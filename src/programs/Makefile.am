@@ -145,8 +145,11 @@ AM_CXXFLAGS = $(FSM_WFLAGS) $(FSM_OFLAGS)
 #${prog_i}_LDADD   = ${non_src_file}.o -lsomelib
 #dwdst_LDFLAGS = -L.
 
-LDFLAGS_COMMON = @FSM_LFLAGS@ -L../libdwdst
-LDADD_COMMON   = -ldwdst -lFSMExt @FSM_LIBS@
+#LDFLAGS_COMMON = @FSM_LFLAGS@ -L../libdwdst
+LDFLAGS_COMMON = -L../libdwdst
+
+#LDADD_COMMON   = -ldwdst -lFSMExt @FSM_LIBS@
+LDADD_COMMON   = -ldwdst -lFSMExt -lFSM -lFSMSymSpec
 
 dwdst_LDFLAGS = $(LDFLAGS_COMMON)
 dwdst_LDADD = $(LDADD_COMMON)

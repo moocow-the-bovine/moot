@@ -1,43 +1,26 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.5)
 
-AC_INIT(dwdst, [0.0.4], [moocow@ling.uni-potsdam.de])
+AC_INIT(dwdst, [0.0.5], [moocow@ling.uni-potsdam.de])
 
-dnl
 dnl source && aux dir
-dnl
 AC_CONFIG_AUX_DIR(config)
 
-dnl
 dnl use automake
-dnl
-AM_INIT_AUTOMAKE(dwdst, [0.0.4])
+AM_INIT_AUTOMAKE(dwdst, [0.0.5])
 
-dnl
 dnl use autoheader
-dnl
 AM_CONFIG_HEADER([src/libdwdst/dwdstConfig.h])
-AH_TOP([
-/*
- * Avoid conflicts with other autotools packages (i.e. FSMlib)
- * Thu Jan 30 02:38:32 CET 2003: hack removed.
- */
-/*#include <cleanConfig.h>*/
-])
-dnl AH_BOTTOM([/*
-dnl /* PACKAGE does not jive well with multiple-program pacakges
-dnl    using 'gengetopt'.  'autoheader' doesn't like to undefine
-dnl    it, so we include an extra little header file to do that
-dnl    --> REVOKED v0.0.3
-dnl   */
-dnl /*#include "nopackage.h"*/
-dnl ])
 
-
-dnl
 dnl default prefix
-dnl
 AC_PREFIX_DEFAULT(/usr/local)
+
+#-------------------------------------------------------------
+# save user's *FLAGS
+#USER_LIBS="$LIBS"
+#USER_LDFLAGS="$LDFLAGS"
+#USER_CPPFLAGS="$CPPFLAGS"
+USER_CXXFLAGS="$CXXFLAGS"
 
 dnl
 dnl check for programs
@@ -45,206 +28,421 @@ dnl
 AC_PROG_CC
 AC_PROG_CXX
 AC_LANG(C++)
+
 dnl v--- needed if Makefile.am uses _LTLIBRARIES targets
 AC_PROG_LIBTOOL
+
+dnl v--- for static-only libraries (non-libtool)
+dnl AC_PROG_RANLIB
 
 dnl v--- needed if Makefile.am uses lex sources
 dnl AM_PROG_LEX
 
-dnl
-dnl for static-only libraries (non-libtool)
-dnl
-dnl AC_PROG_RANLIB
 
-dnl
-dnl substititions
-dnl
-AC_SUBST(FSM_IFLAGS)
-AC_SUBST(FSM_OFLAGS)
-AC_SUBST(FSM_LFLAGS)
-AC_SUBST(FSM_WFLAGS)
-AC_SUBST(FSM_LIBS)
-
-CXXFLAGS_SAVE="$CXXFLAGS"
-CPPFLAGS_SAVE="$CPPFLAGS"
-LDFLAGS_SAVE="$LDFLAGS"
-LIBS_SAVE="$LIBS"
+### --- unmangle user's CXXFLAGS
+if test "$CXXFLAGS" != "$USER_CXXFLAGS" ; then
+  # autoconf likes to set this... who knows why...
+  AC_MSG_NOTICE([Restoring user's original CXXFLAGS value])
+  CXXFLAGS="$USER_CXXFLAGS"
+fi
 
 
-dnl
+#dnl -----------------------
+#dnl substititions
+#AC_SUBST(FSM_IFLAGS)
+#AC_SUBST(FSM_OFLAGS)
+#AC_SUBST(FSM_LFLAGS)
+#AC_SUBST(FSM_WFLAGS)
+#AC_SUBST(FSM_LIBS)
+
+#CXXFLAGS_SAVE="$CXXFLAGS"
+#CPPFLAGS_SAVE="$CPPFLAGS"
+#LDFLAGS_SAVE="$LDFLAGS"
+#LIBS_SAVE="$LIBS"
+
+#---------------------------------------------------------------
+# get real prefix
+AC_CACHE_CHECK([for installation prefix], [ac_cv_install_prefix],
+	[if test "$prefix" = "NONE" ; then
+	   ac_cv_install_prefix="/usr/local"
+	 else
+           ac_cv_install_prefix="$prefix"
+	 fi
+	])
+#  ... and add it to our flags
+CPPFLAGS="$CPPFLAGS -I${ac_cv_install_prefix}/include"
+LDFLAGS="$LDFLAGS -L${ac_cv_install_prefix}/lib"
+
+
 dnl check for strdup
-dnl
 AC_CHECK_FUNC(strdup,[AC_DEFINE(HAVE_STRDUP,1,[Define this if you have the strdup() function])])
 
 
 
-dnl
-dnl check for zlib : headers
+dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+dnl check for zlib  -- THIS CAN GO!
 dnl
 AC_ARG_WITH(zlib-include,
 	AC_HELP_STRING([--with-zlib-include=DIR],
 		       [specify location of zlib headers (default=none)]),
-	[ZLIB_IFLAGS="-I$withval"])
-if test -n "$ZLIB_IFLAGS" ; then
-  FSM_IFLAGS="$IFLAGS $ZLIB_IFLAGS"
-  CPPFLAGS="$CPPFLAGS $ZLIB_IFLAGS"
+	[ac_cv_zlib_incdir="$withval"])
+
+if test -n "$ac_cv_zlib_incdir" -a "$ac_cv_zlib_incdir" != "no" ; then
+  CPPFLAGS="$CPPFLAGS -I$ac_cv_zlib_incdir"
 fi
 
 dnl zlib: headers
 for h in zlib.h ; do
   AC_CHECK_HEADER($h,
-	[fsm_have_header="yes"], [fsm_have_header="no"])
+	[fsm_have_header="yes"], [fsm_have_header="no"], [ ])
   if test "$fsm_have_header" = "no" ; then
-    AC_MSG_ERROR([required zlib header '$h' not detected])
+    AC_MSG_WARN([Required zlib header '$h' not found!])
+    AC_MSG_WARN([Are the zlib headers in your 'CPPFLAGS' environment variable?])
+    AC_MSG_ERROR([Required package not found -- aborting.])
   fi
 done
 
-dnl
-dnl check for pthread
+dnl zlib: library
+AC_ARG_WITH(zlib-libdir,
+	AC_HELP_STRING([--with-zlib-libdir=DIR],
+		       [specify location of zlib library (default=none)]),
+	[ac_cv_zlib_libdir="$withval"])
+
+if test -n "$ac_cv_zlib_libdir" -a "$ac_cv_zlib_libdir" != "no" ; then
+  LDFLAGS="$LDFLAGS -L$ac_cv_zlib_libdir"
+fi
+
+dnl zlib: library: compile
+AC_CHECK_LIB(z,deflate,[ac_cv_have_libz="yes"])
+if test "$ac_cv_have_libz" != "yes" ; then
+  AC_MSG_WARN([zlib library (-lz) not found!])
+  AC_MSG_WARN([Is the directory containing 'libz.a' in your LDFLAGS environment variable?])
+  AC_MSG_ERROR([Required package not found -- aborting.])
+else
+  #ac_cv_zlib_libs="-lz"
+  LIBS="-lz $LIBS"
+fi
+dnl zlib
+dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+dnl check for pthread -- THIS CAN GO!
 dnl
 AC_ARG_WITH(pthread-include,
 	AC_HELP_STRING([--with-pthread-include=DIR],
 		       [specify location of pthread headers (default=none)]),
-	[PTHREAD_IFLAGS="-I$withval"])
-if test -n "$PTHREAD_IFLAGS" ; then
-  FSM_IFLAGS="$IFLAGS $PTHREAD_IFLAGS"
-  CPPFLAGS="$CPPFLAGS $PTHREAD_IFLAGS"
-  #CXXFLAGS="$CXXFLAGS $PTHREAD_IFLAGS"
+	[ac_cv_pthread_incdir="$withval"])
+if test -n "$ac_cv_pthread_incdir" -a "$ac_cv_pthread_incdir" != "no" ; then
+  CPPFLAGS="$CPPFLAGS -I$ac_cv_pthread_incdir"
 fi
 
 dnl pthread: headers
 for h in pthread.h ; do
   AC_CHECK_HEADER($h,
-	[fsm_have_header="yes"], [fsm_have_header="no"])
+	[fsm_have_header="yes"], [fsm_have_header="no"], [ ])
   if test "$fsm_have_header" = "no" ; then
-    AC_MSG_ERROR([required pthread header '$h' not detected])
+    AC_MSG_WARN([Required pthread header '$h' not found!])
+    AC_MSG_WARN([Is the directory containing '$h' in your CPPFLAGS environment variable?])
+    AC_MSG_ERROR([Required package not found -- aborting.])
   fi
 done
 
+dnl pthread: library
+AC_ARG_WITH(pthread-libdir,
+	AC_HELP_STRING([--with-pthread-libdir=DIR],
+		       [specify location of pthread library (default=none)]),
+	[ac_cv_pthread_libdir="$withval"])
+if test -n "$ac_cv_pthread_libdir" -a "$ac_cv_pthread_libdir" != "no" ; then
+  LDFLAGS="$LDFLAGS -L$ac_cv_pthread_libdir"
+fi
 
-dnl
+dnl pthread: library: compile
+AC_CHECK_LIB(pthread,pthread_self,[ac_cv_have_pthread="yes"])
+if test "$ac_cv_have_pthread" != "yes" ; then
+  AC_MSG_WARN([pthread library (-lpthread) not found!])
+  AC_MSG_WARN([Is the directory containing 'libpthread.a' in your LDFLAGS environment variable?])
+  AC_MSG_ERROR([Required package not found -- aborting.])
+else
+  LIBS="-lpthread $LIBS"
+fi
+dnl pthread
+dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+dnl ------------------------------------------------------------
 dnl check for STL
 dnl
 AC_ARG_WITH(stl-include,
 	AC_HELP_STRING([--with-stl-include=DIR],
-		       [specify location of STL headers (default=/usr/local/include/stlport)]),
-	[STL_INCDIR="$withval"],
-	[STL_INCDIR="/usr/local/include/stlport"])
+		       dnl [specify location of STL headers (default=/usr/local/include/stlport)]
+		       [specify location of STL headers (default=none)]),
+	[ac_cv_stl_incdir="$withval"])
+	dnl [STL_INCDIR="/usr/local/include/stlport"]
 
 dnl
 dnl STL: headers: update vars
 dnl
-if test "$STL_INCDIR" != "no" ; then
-  FSM_IFLAGS="$FSM_IFLAGS -I$STL_INCDIR"
-  CPPFLAGS="$CPPFLAGS -I$STL_INCDIR"
+if test -z "$ac_cv_stl_incdir" -a -d "${ac_cv_install_prefix}/include/stlport" ; then
+  ac_cv_stl_incdir="${ac_cv_install_prefix}/include/stlport"
+fi
+if test -n "$ac_cv_stl_incdir" -a "${ac_cv_stl_incdir}/include/stlport" != "no" ; then
+  CPPFLAGS="$CPPFLAGS -I$ac_cv_stl_incdir"
 fi
 
 dnl
-dnl STL: headers
+dnl STL: headers: compile
 dnl
 for h in hash_map ; do
-  AC_CHECK_HEADER($h,[fsm_have_header="yes"],[fsm_have_header="no"])
+  AC_CHECK_HEADER($h,[fsm_have_header="yes"],[fsm_have_header="no"],[ ])
   if test "$fsm_have_header" = "no" ; then
-    AC_MSG_ERROR([could not find required STL header file '$h'])
+    AC_MSG_WARN([Required STL header file '$h' not found!])
+    AC_MSG_WARN([Is the directory with the STL headers in your CPPFLAGS environment variable?])
+    AC_MSG_ERROR([Required package not found -- aborting.])
   fi
 done
 
-
 dnl
+dnl STL: libs
+dnl
+AC_ARG_WITH(stl-libdir,
+	AC_HELP_STRING([--with-stl-libdir=DIR],
+		       [Specify location of STL library (default=none).
+	                You can set this to 'no' to try and use a built-in STL]),
+	[ac_cv_stl_libdir="$withval"])
+
+dnl STL: libs: flags
+if test "$ac_cv_stl_libdir" != "no" ; then
+
+ if test -n "$ac_cv_stl_libdir" ; then
+   LDFLAGS="$LDFLAGS -L$ac_cv_stl_libdir"
+ fi
+
+ dnl STL: libs: compile
+ AC_CACHE_CHECK([for libstlport_gcc], [ac_cv_have_libstlport_gcc],
+	[LIBS_SAVE="$LIBS"
+	 LIBS="-lstlport_gcc $LIBS_SAVE"
+	 AC_TRY_LINK([#include <hash_map>],
+		[],
+		[ac_cv_have_libstlport_gcc="yes"],
+		[av_cv_have_libstlport_gcc="no"; LIBS="$LIBS_SAVE"])
+	])
+ if test "$ac_cv_have_libstlport_gcc" != "yes" ; then
+   AC_CACHE_CHECK([for libstlport], [ac_cv_have_libstlport],
+	[LIBS_SAVE="$LIBS"
+	 LIBS="-lstlport $LIBS_SAVE"
+	 AC_TRY_LINK([#include <hash_map>],
+		[],
+		[ac_cv_have_libstlport="yes"],
+		[av_cv_have_libstlport="no"; LIBS="$LIBS_SAVE"])
+	])
+   if test "$ac_cv_have_libstlport" != "yes" ; then
+     AC_MSG_WARN([--------------------------------------------------------])
+     AC_MSG_WARN([Could not find STLport library])
+     AC_MSG_WARN([ -> Your build is likely to fail!])
+     AC_MSG_WARN([ -> Is the directory containing the STL library in your LDFLAGS variable?])
+     AC_MSG_WARN([--------------------------------------------------------])
+   else
+    ac_cv_stl_libs="-lstlport"
+   fi
+ else
+   ac_cv_stl_libs="-lstlport_gcc"
+ fi
+fi ; ## --- if test "$ac_cv_stl_libdir" != "no"
+## --- $ac_cv_stl_libs should be set correctly for linking to STLport now
+
+## --- STL: libs: substitutions
+STL_LIBS="$ac_cv_stl_libs"
+AC_SUBST(STL_LIBS)
+dnl (STL)
+dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+dnl ------------------------------------------------------------
 dnl Bumble-Bee lex & yacc port
 dnl
-
 dnl bumble: headers
 AC_ARG_WITH(bumble-include,
 	AC_HELP_STRING([--with-bumble-include=DIR],
-		       [specify location of libbumble headers (default=/usr/local/include/bumblelib)]),
-	[BUMBLE_IFLAGS="-I$withval"],
-	[BUMBLE_IFLAGS="-I/usr/local/include/bumblelib"])
+		       [specify location of libbumble headers (default=none)]),
+	[ac_cv_bumble_incdir="$withval"])
 
 dnl bumble: headers: update flags
-FSM_IFLAGS="$FSM_IFLAGS $BUMBLE_IFLAGS"
-CPPFLAGS="$CPPFLAGS $BUMBLE_IFLAGS"
+if test -z "$ac_cv_bumble_incdir" -a -d "${ac_cv_install_prefix}/include/bumblelib" ; then
+  ac_cv_bumble_incdir="${ac_cv_install_prefix}/include/bumblelib"
+fi
+if test -n "$ac_cv_bumble_incdir" -a "${ac_cv_bumble_incdir}/include/bumblelib" != "no" ; then
+  CPPFLAGS="$CPPFLAGS -I$ac_cv_bumble_incdir"
+fi
+
 
 dnl bumble: headers: compile
 for h in clex.h cyacc.h ; do
-  AC_CHECK_HEADER($h,[fsm_have_header="yes"],[fsm_have_header="no"])
+  AC_CHECK_HEADER($h,[fsm_have_header="yes"],[fsm_have_header="no"],[ ])
   if test "$fsm_have_header" = "no" ; then
-    AC_MSG_ERROR([could not find required Bumble-Bee header file '$h'])
+    AC_MSG_WARN([could not find required Bumble-Bee header file '$h'!])
+    AC_MSG_WARN([Is the directory containing '$h' in your CPPFLAGS environment variable?])
+    AC_MSG_ERROR([Required package not found -- aborting.])
   fi
 done
 
-dnl
+dnl bumble: libs
+AC_ARG_WITH(bumble-libdir,
+	AC_HELP_STRING([--with-bumble-libdir=DIR],
+		       [specify location of libbumble++ (default=none)]),
+	[ac_cv_bumble_libdir="$withval"])
+
+dnl bumble: libs: flags
+if test -n "$ac_cv_bumble_libdir" -a "$ac_cv_bumble_libdir" != "no" ; then
+  LDFLAGS="$LDFLAGS -L$ac_cv_bumble_libdir"
+fi
+
+dnl --- bumble: libs: compile
+AC_CACHE_CHECK([for libbumble++], [ac_cv_have_libbumblexx],
+	[LIBS_SAVE="$LIBS"
+	 LIBS="-lbumble++ $LIBS_SAVE"
+	 AC_TRY_LINK([#include <clex.h>],
+		[],
+		[ac_cv_have_libbumblexx="yes"],
+		[av_cv_have_libbumblexx="no"; LIBS="$LIBS_SAVE"])
+	])
+if test "$ac_cv_have_libbumblexx" != "yes" ; then
+  AC_MSG_WARN([Bumble-Bee C++ library (-lbumble++) not found!])
+  AC_MSG_WARN([Is the directory containing 'libbumble.a' in your LDFLAGS environment variable?])
+  AC_MSG_ERROR([Required package not found -- aborting.])
+fi
+dnl (bumble)
+dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+dnl ------------------------------------------------------------
 dnl FSM libraries
 dnl
 AC_ARG_WITH(fsm-include,
 	AC_HELP_STRING([--with-fsm-include=DIR],
-		       [specify location of FSMlib headers (default=/usr/local/include/FSMlib)]),
-	[FSMLIB_IFLAGS="-I$withval"],
-	[FSMLIB_IFLAGS="-I/usr/local/include/FSMlib"])
+		       [specify location of FSMlib headers (default=none)]),
+	[ac_cv_fsmlib_incdir="$withval"])
 
-dnl FSMlib: headers: update flags
-FSM_IFLAGS="$FSM_IFLAGS $FSMLIB_IFLAGS"
-CPPFLAGS="$CPPFLAGS $FSMLIB_IFLAGS"
+dnl FSMlib: headers: update flags (uses default-prefix hack)
+if test -z "$ac_cv_fsmlib_incdir" -a -d "${ac_cv_install_prefix}/include/FSMlib" ; then
+  ac_cv_fsmlib_incdir="${ac_cv_install_prefix}/include/FSMlib"
+fi
+if test -n "$ac_cv_fsmlib_incdir" -a "${ac_cv_fsmlib_incdir}" != "no" ; then
+  CPPFLAGS="$CPPFLAGS -I$ac_cv_fsmlib_incdir"
+fi
 
 dnl FSMlib: headers: compile
-for h in FSM.h ; do
-  AC_CHECK_HEADER($h,[fsm_have_header="yes"],[fsm_have_header="no"])
+for h in FSMSymSpec.h FSM.h FSMRegexCompiler.h ; do
+  AC_CHECK_HEADER($h,[fsm_have_header="yes"],[fsm_have_header="no"],[ ])
   if test "$fsm_have_header" = "no" ; then
-    AC_MSG_ERROR([could not find required FSMlib header file '$h'])
+    AC_MSG_WARN([could not find required FSMlib header file '$h'])
+    AC_MSG_WARN([Is the directory containing '$h' in your CPPFLAGS environment variable?])
+    AC_MSG_ERROR([Required package not found -- aborting.])
   fi
 done
 
-dnl
-dnl FSMlib: libraries
-dnl
+dnl FSMlib: libs
 AC_ARG_WITH(fsm-libdir,
 	AC_HELP_STRING([--with-fsm-libdir=DIR],
-		       [specify location of FSMlib libraries (default=none)]),
-	[FSMLIB_LFLAGS="-L$withval"],
-	[FSMLIB_LFLAGS=""])
+		       [specify location of libFSM (default=none)]),
+	[ac_cv_fsmlib_libdir="$withval"])
 
-dnl AC_CHECK_LIB(FSMSymSpec,[FSMSymSpec::FSMSymSpec],
-dnl	[FSMLIB_LIBS="-lFSMSymSpec"],[FSMLIB_LIBS=""])
-dnl if test -z "$FSMLIB_LIBS" ; then
-dnl  AC_ERROR([required library 'FSMSymSpec' not found.])
-dnl fi
-FSM_LIBS="-lFSM -lFSMSymSpec"
+dnl FSMlib: libs: flags
+if test -n "$ac_cv_fsmlib_libdir" -a "$ac_cv_fsmlib_libdir" != "no" ; then
+  LDFLAGS="$LDFLAGS -L$ac_cv_fsmlib_libdir"
+fi
+
+dnl --- FSMlib: libs: libFSMSymSpec: compile
+AC_CACHE_CHECK([for libFSMSymSpec], [ac_cv_have_libFSMSymSpec],
+	[LIBS_SAVE="$LIBS"
+	 LIBS="-lFSMSymSpec $LIBS_SAVE"
+	 AC_TRY_LINK([#include <FSMSymSpec.h>],
+		[],
+		[ac_cv_have_libFSMSymSpec="yes"],
+		[av_cv_have_libFSMSymSpec="no"; LIBS="$LIBS_SAVE"])
+	])
+if test "$ac_cv_have_libFSMSymSpec" != "yes" ; then
+  AC_MSG_WARN([FSMSymSpec C++ library (-lFSMSymSpec) not found!])
+  AC_MSG_WARN([Is the directory containing 'libFSMSymSpec.a' in your LDFLAGS environment variable?])
+  AC_MSG_ERROR([Required package not found -- aborting.])
+fi
 
 
+dnl --- FSMlib: libs: libFSM: compile
+AC_CACHE_CHECK([for libFSM], [ac_cv_have_libFSM],
+	[LIBS_SAVE="$LIBS"
+	 LIBS="-lFSM $LIBS_SAVE"
+	 AC_TRY_LINK([#include <FSM.h>],
+		[],
+		[ac_cv_have_libFSM="yes"],
+		[ac_cv_have_libFSM="no"; LIBS="$LIBS_SAVE"])
+	])
+if test "$ac_cv_have_libFSM" != "yes" ; then
+  AC_MSG_WARN([FSM C++ library (-lFSM) not found!])
+  AC_MSG_WARN([Is the directory containing 'libFSM.a' in your LDFLAGS environment variable?])
+  AC_MSG_ERROR([Required package not found -- aborting.])
+fi
 
-dnl
+dnl --- FSMlib: libs: libFSMExt: compile
+AC_CACHE_CHECK([for libFSMExt], [ac_cv_have_libFSMExt],
+	[LIBS_SAVE="$LIBS"
+	 LIBS="-lFSMExt $LIBS_SAVE"
+	 AC_TRY_LINK([#include <FSMRegexCompiler.h>],
+		[],
+		[ac_cv_have_libFSMExt="yes"],
+		[av_cv_have_libFSMExt="no"; LIBS="$LIBS_SAVE"])
+	])
+if test "$ac_cv_have_libFSMExt" != "yes" ; then
+  AC_MSG_WARN([FSMExt C++ library (-lFSMExt) not found!])
+  AC_MSG_WARN([Is the directory containing 'libFSMExt.a' in your LDFLAGS environment variable?])
+  AC_MSG_ERROR([Required package not found -- aborting.])
+fi
+
+## -- ok, we've got it: now ignore it
+LIBS="$LIBS_SAVE"
+dnl (FSM)
+dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+dnl ------------------------------------------------------------
 dnl check for flex++
 dnl
+AC_ARG_VAR(FLEXXX, [Path to Alain Coetmeur's flex++ program.])
 AC_ARG_WITH([flexxx],
 	AC_HELP_STRING([--with-flexxx=PATH],
-		       [specify location of Alain Coetmeur's flex++]),
+		       [Specify location of Alain Coetmeur's flex++]),
 	[FLEXXX="$withval"])
 
 if test -z "$FLEXXX" ; then
-  dnl AC_MSG_CHECKING([for Alain Coetmeur's flex++])
   AC_PATH_PROG(FLEXXX,[flex++],[])
   if test -z "$FLEXXX" ; then
-    AC_MSG_RESULT([not found])
-    AC_MSG_WARN([cannot find Alain Coetmeur's flex++ -- CVS build will not work!])
+    AC_MSG_WARN([cannot find Alain Coetmeur's flex++!])
+    AC_MSG_WARN([Is your FLEXXX environment variable set correctly?])
+    AC_MSG_WARN([FSMRegex might not be built!])
   fi
 fi
+
 dnl LEX="$FLEXXX"
 dnl AC_SUBST(LEX)
-AC_SUBST(FLEXXX)
+dnl AC_SUBST(FLEXXX)
 
-dnl
+
+dnl ------------------------------------------------------------
 dnl check for bison++
 dnl
+AC_ARG_VAR(BISONXX, [Path to Alain Coetmeur's bison++ program.])
 AC_ARG_WITH([bisonxx],
 	AC_HELP_STRING([--with-bisonxx=PATH],
 		       [specify location of Alain Coetmeur's bison++]),
 	[BISONXX="$withval"])
+
 if test -z "$BISONXX" ; then
-  dnl AC_MSG_CHECKING([for Alain Coetmeur's bison++])
   AC_PATH_PROG(BISONXX,[bison++],[])
   if test -z "$BISONXX" ; then
-    AC_MSG_RESULT([not found])
-    AC_MSG_WARN([cannot find Alain Coetmeur's bison++ -- CVS build will not work!])
+    AC_MSG_WARN([cannot find Alain Coetmeur's bison++!])
+    AC_MSG_WARN([Is your BISONXX environment variable set correctly?])
+    AC_MSG_WARN([FSMRegex might not be built!])
   fi
 fi
 YACC="$BISONXX"
@@ -252,31 +450,35 @@ AC_SUBST(YACC)
 AC_SUBST(BISONXX)
 
 
+dnl ------------------------------------------------------------
+dnl check for optgen.perl
 dnl
-dnl check for gengetopt
-dnl
-AC_ARG_WITH([gengetopt],
-	AC_HELP_STRING([--with-gengetopt=PATH],
-		       [specify location of gengetopt]),
-	[GENGETOPT="$withval"])
-if test -z "$GENGETOPT" ; then
-  AC_PATH_PROG(GENGETOPT,[gengetopt],[])
-  if test -z "$GENGETOPT" ; then
+AC_ARG_VAR(OPTGEN_PERL, [Path to the 'optgen.perl' script.])
+AC_ARG_WITH([optgen-perl],
+	AC_HELP_STRING([--with-optgen-perl=PATH],
+		       [Specify location of optgen.perl]),
+	[OPTGEN_PERL="$withval"])
+
+if test -z "$OPTGEN_PERL" ; then
+  AC_PATH_PROG(OPTGEN_PERL,[optgen.perl],[])
+  if test -z "$OPTGEN_PERL" ; then
     AC_MSG_RESULT([not found])
-    AC_MSG_WARN([cannot find gengetopt program -- CVS build will not work!])
+    AC_MSG_WARN([])
+    AC_MSG_WARN([cannot find optgen.perl program -- CVS builds will fail!])
+    AC_MSG_WARN([])
   fi
 fi
-AC_SUBST(GENGETOPT)
+AC_SUBST(OPTGEN_PERL)
 
 
 
-dnl
+dnl ------------------------------------------------------------
 dnl documentation
 dnl
 AC_ARG_WITH(docdir,
-	AC_HELP_STRING([--with-docdir=DIR],
-		       [install documentation in DIR/dwdst (default=DATADIR/doc)]),
-	[docdir="$withval"],[docdir="\${datadir}/doc"])
+	AC_HELP_STRING([--with-docdir=DIR], [install documentation in DIR/dwdst (default=DATADIR/doc)]),
+	[docdir="$withval"],
+	[docdir="\${datadir}/doc"])
 
 pkgdocdir="\${docdir}/\${PACKAGE}"
 pkgdocprogdir="\${docdir}/\${PACKAGE}/programs"
@@ -290,7 +492,12 @@ AC_ARG_WITH(doc-formats,
 		       [Build documentation formats in LIST. \
                         Available formats: txt, man, html, dvi, ps, pdf, none.
 	                Default='man html pdf']),
-	[ac_cv_doc_formats="$withval"],[ac_cv_doc_formats="man html pdf"])
+	[ac_cv_doc_formats="$withval"])
+
+## -- set default doc formats if unspecified
+if test -z "$ac_cv_doc_formats" ; then
+  ac_cv_doc_formats="man html pdf"
+fi
 
 ## -- un-comma-tize the doc-formats
 dwdst_doc_formats=`echo "$ac_cv_doc_formats" | sed 's/\,/ /g'`
@@ -459,7 +666,7 @@ if test "$dwdst_doc_formats" != "none" ; then
 fi; # if "$dwdst_doc_formats" != "none" ...
 
 
-dnl
+dnl ------------------------------------------------------------
 dnl debug ?
 dnl
 AC_MSG_CHECKING([whether to build debug version])
@@ -474,8 +681,9 @@ else
   #FSM_OFLAGS="-O2"
   FSM_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
 fi
+AC_SUBST(FSM_OFLAGS)
 
-dnl
+dnl ------------------------------------------------------------
 dnl warnings ?
 dnl
 AC_MSG_CHECKING([whether to display compiler warnings])
@@ -489,17 +697,18 @@ else
   AC_MSG_RESULT(no)
   FSM_WFLAGS=""
 fi
+AC_SUBST(FSM_WFLAGS)
 
-dnl
-dnl Restore user's *FLAGS
-dnl
-CXXFLAGS="$CXXFLAGS_SAVE"
-CPPFLAGS="$CPPFLAGS_SAVE"
-LDFLAGS="$LDFLAGS_SAVE"
-LIBS="$LIBS_SAVE"
-if test "$CXXFLAGS" = "-g -O2" ; then
-  CXXFLAGS=""
-fi
+##
+## Restore user's *FLAGS
+##
+#CXXFLAGS="$CXXFLAGS_SAVE"
+#CPPFLAGS="$CPPFLAGS_SAVE"
+#LDFLAGS="$LDFLAGS_SAVE"
+#LIBS="$LIBS_SAVE"
+#if test "$CXXFLAGS" = "-g -O2" ; then
+#  CXXFLAGS=""
+#fi
 
 
 dnl

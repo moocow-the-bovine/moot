@@ -158,7 +158,7 @@ AM_CXXFLAGS = $(FSM_WFLAGS) $(FSM_OFLAGS)
 LIBCUR = 0
 
 ## --- The implementation number of the CURRENT interface.
-LIBREV = 3
+LIBREV = 5
 
 ## --- The difference between the newest and oldest interfaces that this
 ##     library implements.  In other words, the library implements all the
@@ -175,8 +175,12 @@ LIBAGE = 0
 
 #${lib_i}_la_LDFLAGS = -L. -version-info ${lib_i_current}:${lib_i_rev}:${lib_i_age}
 #${lib_i}_la_LIBADD  = -lotherlib
-libdwdst_la_LDFLAGS = @FSM_LFLAGS@
-libdwdst_la_LIBADD  = -lFSMExt @FSM_LIBS@
+
+#libdwdst_la_LDFLAGS = @FSM_LFLAGS@
+#libdwdst_la_LIBADD  = -lFSMExt @FSM_LIBS@
+
+#libdwdst_la_LDFLAGS =
+libdwdst_la_LIBADD  = -lFSMExt -lFSM -lFSMSymSpec @STL_LIBS@
 
 ##-----------------------------------------------------------------------
 ## Variables: cleanup

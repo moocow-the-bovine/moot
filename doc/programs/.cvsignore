@@ -1,4 +1,8 @@
 other
+dwdspp.pod
+dwdst.pod
+dwdst-pargen.pod
+dwdst-fstgen.pod
 *.gog
 *.html
 *.txt
