@@ -1593,15 +1593,13 @@ void mootHMM::tag_mark_best(mootSentence &sentence)
       }
 #else //-- !MOOT_USE_TRIGRAMS
       //-- get total column probability
-      ViterbiRow *r;
       ViterbiNode *n;
       ProbT pcolsum = 0;
-      ProbT trowpr;
-      for (n = col->rows; n != NULL; n = n->nod_next) {
+      for (n = c->rows; n != NULL; n = n->nod_next) {
 	pcolsum += exp(n->lprob);
       }
       //-- dump analyses to mootToken object
-      for (ViterbiNode *n = c->rows; n != NULL; n = n->nod_next) {
+      for (n = c->rows; n != NULL; n = n->nod_next) {
 	sri->tok_analyses.push_back
 	  (mootToken::Analysis(tagids.id2name(n->tagid),
 			       "",
