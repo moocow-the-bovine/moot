@@ -160,6 +160,9 @@ MAINTAINERCLEANFILES = \
 
 ## --- extra distribution files
 EXTRA_DIST = \
+	dwdst.sym \
+	dwdst_lexer.cc dwdst_lexer.h \
+	dwdspp_lexer.cc dwdspp_lexer.h \
 	dwdst_cmdparser.cc dwdst_cmdparser.h \
 	dwdspp_cmdparser.cc dwdspp_cmdparser.h
 
