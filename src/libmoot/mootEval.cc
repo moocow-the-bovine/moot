@@ -46,12 +46,14 @@ int mootEval::compareTokens(const mootToken &tok1, const mootToken &tok2)
   if (tok1.besttag() != tok2.besttag()) status |= MEF_BestMismatch;
 
   if (tok1.analyses().empty()) {
+    //status |= (MEF_EmptyClass1|MEF_ImpClass1);
     status |= MEF_EmptyClass1;
   } else if (tok1.lower_bound(tok1.besttag()) == tok1.tok_analyses.end()) {
     status |= MEF_ImpClass1;
   }
 
   if (tok2.analyses().empty()) {
+    //status |= (MEF_EmptyClass1|MEF_ImpClass2);
     status |= MEF_EmptyClass2;
   } else if (tok2.lower_bound(tok2.besttag()) == tok2.tok_analyses.end()) {
     status |= MEF_ImpClass2;

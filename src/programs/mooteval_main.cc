@@ -56,6 +56,27 @@ gengetopt_args_info args;
 TokenReader treader1(true,true);
 TokenReader treader2(true,true);
 TokenWriter twriter(false);
+mootSentence s1, s2;
+
+//-- comparison
+mootEval eval;
+int status;
+
+//-- information
+size_t ntokens = 0;     //-- total number of tokens
+size_t nsents = 0;      //-- total number of sentences
+size_t ntokmisses = 0;  //-- number of token-text mismatches
+size_t nbestmisses = 0; //-- number of best-tag mismatches
+size_t nempties1 = 0;   //-- number of empty analyses in file1
+size_t nimps1 = 0;      //-- number of impossible analyses in file1
+size_t nempties2 = 0;   //-- number of empty analyses in file2
+size_t nimps2 = 0;      //-- number of impossible analyses in file2
+
+unsigned long nans1 = 0; //-- total number of analyses in file1
+unsigned long nans2 = 0; //-- total number of analyses in file2
+
+size_t nsaves2 = 0;   //-- saves (empty class & best match) in file 2 vs. 1
+size_t nfumbles2 = 0; //-- fumbles (+class-cover, -best-match) in file 2 vs. 1
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -101,26 +122,65 @@ void GetMyOptions(int argc, char **argv)
 }
 
 /*--------------------------------------------------------------------------
+ * summary (new)
+ *--------------------------------------------------------------------------*/
+void print_summary(FILE *file)
+{
+  if (ntokens==0) ntokens = 1;
+  fprintf(stdout,
+	  "\n%%%%-------------------------------------------------------------------\n");
+  fprintf(stdout, "%%%% %s Summary:\n", PROGNAME);
+  fprintf(stdout, "%%%%  + NTokens             : %9u\n", ntokens);
+  fprintf(stdout, "%%%%  + NSentences          : %9u\n", nsents);
+
+  fprintf(stdout, "%%%%  + File-1              : %s\n", file1.name);
+  /*
+  fprintf(stdout, "%%%%    - Class Empty / Non : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  nempties1, 100.0*(double)nempties1/(double)ntokens,
+	  ntokens-nempties1, 100.0*(double)(ntokens-nempties1)/(double)ntokens);
+  fprintf(stdout, "%%%%    - Class Cover / Non : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  ntokens-nimps1, 100.0*(double)(ntokens-nimps1)/(double)ntokens,
+	  nimps1, 100.0*(double)nimps1/(double)ntokens);
+  fprintf(stdout, "%%%%    - Avg. Class Size   : %12.2f\n",
+         (double)nans1/(double)ntokens);
+  */
+
+  fprintf(stdout, "%%%%  + File-2              : %s\n", file2.name);
+  fprintf(stdout, "%%%%    - Avg. Class Size   : %12.2f\n",
+	  (double)nans2/(double)ntokens);
+  fprintf(stdout, "%%%%    - Class Empty / Non : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  nempties2, 100.0*(double)nempties2/(double)ntokens,
+	  ntokens-nempties2, 100.0*(double)(ntokens-nempties2)/(double)ntokens);
+  fprintf(stdout, "%%%%    - Saves / Non       : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  nsaves2, 100.0*(double)(nsaves2)/(double)nempties2,
+	  nempties2-nsaves2, 100.0*(double)(nempties2-nsaves2)/(double)nempties2);
+  fprintf(stdout, "%%%%    - Class Cover / Non : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  ntokens-nimps2, 100.0*(double)(ntokens-nimps2)/(double)ntokens,
+	  nimps2, 100.0*(double)nimps2/(double)ntokens);
+  fprintf(stdout, "%%%%    - Fumbles / Non     : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  nfumbles2, 100.0*(double)(nfumbles2)/(double)(ntokens-nimps2),
+	  (ntokens-nimps2-nfumbles2),
+	  100.0*(double)(ntokens-nimps2-nfumbles2)/(double)(ntokens-nimps2));
+
+  fprintf(stdout, "%%%%  + Tokens Equal / Non  : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  ntokens-ntokmisses, 100.0*(double)(ntokens-ntokmisses)/(double)ntokens,
+	  ntokmisses, 100.0*(double)(ntokmisses)/(double)ntokens);
+
+  fprintf(stdout, "%%%%  + Tags Equal / Non    : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  ntokens-nbestmisses, 100.0*(double)(ntokens-nbestmisses)/(double)ntokens,
+	  nbestmisses, 100.0*(double)(nbestmisses)/(double)ntokens);
+
+  fprintf(stdout,
+	  "%%%%-------------------------------------------------------------------\n");
+}
+
+
+/*--------------------------------------------------------------------------
  * main
  *--------------------------------------------------------------------------*/
 int main (int argc, char **argv)
 {
   GetMyOptions(argc,argv);
-
-  //-- i/o & comparison
-  mootSentence s1, s2;
-  mootEval eval;
-  int status;
-
-  //-- information
-  size_t ntokens = 0;     //-- total number of tokens
-  size_t nsents = 0;      //-- total number of sentences
-  size_t ntokmisses = 0;  //-- number of token-text mismatches
-  size_t nbestmisses = 0; //-- number of best-tag mismatches
-  size_t nempties1 = 0;   //-- number of empty analyses in file1
-  size_t nimps1 = 0;      //-- number of impossible analyses in file1
-  size_t nempties2 = 0;   //-- number of empty analyses in file2
-  size_t nimps2 = 0;      //-- number of impossible analyses in file2
 
   //-- compare files
   do {
@@ -151,12 +211,21 @@ int main (int argc, char **argv)
 	 s1i++           ,  s2i++)
       {
 	ntokens++;
+	nans1 += s1i->analyses().size();
+	nans2 += s2i->analyses().size();
+
 	status = eval.compareTokens(*s1i,*s2i);
 	if (status & mootEval::MEF_TokMismatch) ntokmisses++;
 	if (status & mootEval::MEF_BestMismatch) nbestmisses++;
 	if (status & mootEval::MEF_EmptyClass1) nempties1++;
 	if (status & mootEval::MEF_ImpClass1) nimps1++;
-	if (status & mootEval::MEF_EmptyClass2) nempties2++;
+	if (status & mootEval::MEF_EmptyClass2) {
+	  nempties2++;
+	  if (!(status & mootEval::MEF_BestMismatch)) nsaves2++;
+	}
+	else if (status & mootEval::MEF_BestMismatch) {
+	  nfumbles2++;
+	}
 	if (status & mootEval::MEF_ImpClass2) nimps2++;
       }
 
@@ -169,45 +238,7 @@ int main (int argc, char **argv)
   } while (1);
 
   //-- summary
-  fprintf(stdout,
-	  "\n------------------------------------------------------------\n");
-  fprintf(stdout, "%s Summary:\n", PROGNAME);
-  fprintf(stdout, "  + File-1         : %s\n", file1.name);
-  fprintf(stdout, "  + File-2         : %s\n", file2.name);
-  fprintf(stdout, "  + General\n");
-  fprintf(stdout, "    - NTokens      : %9u\n", ntokens);
-  fprintf(stdout, "    - NSentences   : %9u\n", nsents);
-  fprintf(stdout, "  + File-1\n");
-  fprintf(stdout, "    - Classes\n");
-  fprintf(stdout, "      * Empty      : %9u (%6.2f%%)\n",
-	  nempties1, 100.0*(double)nempties1/(double)ntokens);
-  fprintf(stdout, "      * Impossible : %9u (%6.2f%%)\n",
-	  nimps1, 100.0*(double)nimps1/(double)ntokens);
-  fprintf(stdout, "  + File-2\n");
-  fprintf(stdout, "    - Classes\n");
-  fprintf(stdout, "      * Empty      : %9u (%6.2f%%)\n",
-	  nempties2, 100.0*(double)nempties2/(double)ntokens);
-  fprintf(stdout, "      * Impossible : %9u (%6.2f%%)\n",
-	  nimps2, 100.0*(double)nimps2/(double)ntokens);
-
-  fprintf(stdout, "  + Token Text\n");
-  fprintf(stdout, "    - Equal        : %9u (%6.2f%%)\n",
-	  ntokens-ntokmisses,
-	  100.0*(double)(ntokens-ntokmisses)/(double)ntokens);
-  fprintf(stdout, "    - Different    : %9u (%6.2f%%)\n",
-	  ntokmisses,
-	  100.0*(double)(ntokmisses)/(double)ntokens);
-
-  fprintf(stdout, "   + Best Tag\n");
-  fprintf(stdout, "     - Equal       : %9u (%6.2f%%)\n",
-	  ntokens-nbestmisses,
-	  100.0*(double)(ntokens-nbestmisses)/(double)ntokens);
-  fprintf(stdout, "     - Different   : %9u (%6.2f%%)\n",
-	  nbestmisses,
-	  100.0*(double)(nbestmisses)/(double)ntokens);
-
-  fprintf(stdout,
-	  "------------------------------------------------------------\n");
+  print_summary(stdout);
 
   //-- cleanup
   file1.close();

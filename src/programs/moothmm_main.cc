@@ -64,6 +64,7 @@ cmdutil_file_churner churner;
 
 // -- files
 cmdutil_file_info out;
+size_t nfiles = 0;
 
 // -- global classes/structs
 mootHMM        hmm;
@@ -302,7 +303,52 @@ void GetMyOptions(int argc, char **argv)
   fprintf(out.file, "%s   Lexical lambdas  : lambdaw1=%g, lambdaw2=%g\n",
 	  cmts, hmm.wlambda1, hmm.wlambda2);
 }
- 
+
+
+/*--------------------------------------------------------------------------
+ * Summary
+ *--------------------------------------------------------------------------*/
+void print_summary(FILE *file)
+{
+  // -- print summary
+  fprintf(file,
+	  "\n%%%%---------------------------------------------------------------------\n");
+  fprintf(file, "%%%%%s Summary:\n", PROGNAME);
+  fprintf(file, "%%%%  + General\n");
+  fprintf(file, "%%%%    - Files Processed     : %9u file(s)\n", nfiles);
+  fprintf(file, "%%%%    - Sentences Processed : %9u sent\n", hmm.nsents);
+  fprintf(file, "%%%%    - Tokens Processed    : %9u tok\n", hmm.ntokens);
+  fprintf(file, "%%%%  + Analysis\n");
+  fprintf(file, "%%%%    - Token Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
+	  hmm.ntokens-hmm.nnewtokens,
+	  100.0*((double)hmm.ntokens-(double)hmm.nnewtokens)/(double)hmm.ntokens,
+	  hmm.nnewtokens,
+	  100.0*(double)hmm.nnewtokens/(double)hmm.ntokens);
+  fprintf(file, "%%%%    - Class Given (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
+	  hmm.ntokens-hmm.nunclassed,
+	  100.0*((double)hmm.ntokens-(double)hmm.nunclassed)/(double)hmm.ntokens,
+	  hmm.nunclassed,
+	  100.0*(double)hmm.nunclassed/(double)hmm.ntokens);
+  fprintf(file, "%%%%    - Class Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
+	  hmm.ntokens-hmm.nnewclasses,
+	  100.0*((double)hmm.ntokens-(double)hmm.nnewclasses)/(double)hmm.ntokens,
+	  hmm.nnewclasses,
+	  100.0*(double)hmm.nnewclasses/(double)hmm.ntokens);
+  fprintf(file, "%%%%    - Total Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
+	  hmm.ntokens-hmm.nunknown,
+	  100.0*((double)hmm.ntokens-(double)hmm.nunknown)/(double)hmm.ntokens,
+	  hmm.nunknown,
+	  100.0*(double)hmm.nunknown/(double)hmm.ntokens);
+  fprintf(file, "%%%%    - Fallbacks           : %9u (%6.2f%%)\n",
+	  hmm.nfallbacks,
+	  100.0*(double)hmm.nfallbacks/(double)hmm.ntokens);
+  fprintf(file, "%%%%  + Performance\n");
+  fprintf(file, "%%%%    - Initialize Time     : %12.2f sec\n", ielapsed);
+  fprintf(file, "%%%%    - Analysis Time       : %12.2f sec\n", aelapsed);
+  fprintf(file, "%%%%    - Throughput Rate     : %12.2f tok/sec\n", (double)hmm.ntokens/aelapsed);
+  fprintf(file,
+	  "%%%%---------------------------------------------------------------------\n");
+}
 
 
 /*--------------------------------------------------------------------------
@@ -310,8 +356,6 @@ void GetMyOptions(int argc, char **argv)
  *--------------------------------------------------------------------------*/
 int main (int argc, char **argv)
 {
-  size_t nfiles = 0;
-
   GetMyOptions(argc,argv);
 
   // -- get init-stop time = analysis-start time
@@ -347,44 +391,7 @@ int main (int argc, char **argv)
       aelapsed = astopped.tv_sec-astarted.tv_sec + (double)(astopped.tv_usec-astarted.tv_usec)/1000000.0;
       ielapsed = astarted.tv_sec-istarted.tv_sec + (double)(astarted.tv_usec-istarted.tv_usec)/1000000.0;
 
-      // -- print summary
-      fprintf(stderr,
-	      "\n---------------------------------------------------------------------\n");
-      fprintf(stderr, "%s Summary:\n", PROGNAME);
-      fprintf(stderr, "  + General\n");
-      fprintf(stderr, "    - Files Processed     : %9u file(s)\n", nfiles);
-      fprintf(stderr, "    - Sentences Processed : %9u sent\n", hmm.nsents);
-      fprintf(stderr, "    - Tokens Processed    : %9u tok\n", hmm.ntokens);
-      fprintf(stderr, "  + Analysis\n");
-      fprintf(stderr, "    - Token Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
-	      hmm.ntokens-hmm.nnewtokens,
-	      100.0*((double)hmm.ntokens-(double)hmm.nnewtokens)/(double)hmm.ntokens,
-	      hmm.nnewtokens,
-	      100.0*(double)hmm.nnewtokens/(double)hmm.ntokens);
-      fprintf(stderr, "    - Class Given (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
-	      hmm.ntokens-hmm.nunclassed,
-	      100.0*((double)hmm.ntokens-(double)hmm.nunclassed)/(double)hmm.ntokens,
-	      hmm.nunclassed,
-	      100.0*(double)hmm.nunclassed/(double)hmm.ntokens);
-      fprintf(stderr, "    - Class Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
-	      hmm.ntokens-hmm.nnewclasses,
-	      100.0*((double)hmm.ntokens-(double)hmm.nnewclasses)/(double)hmm.ntokens,
-	      hmm.nnewclasses,
-	      100.0*(double)hmm.nnewclasses/(double)hmm.ntokens);
-      fprintf(stderr, "    - Total Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
-	      hmm.ntokens-hmm.nunknown,
-	      100.0*((double)hmm.ntokens-(double)hmm.nunknown)/(double)hmm.ntokens,
-	      hmm.nunknown,
-	      100.0*(double)hmm.nunknown/(double)hmm.ntokens);
-      fprintf(stderr, "    - Fallbacks           : %9u (%6.2f%%)\n",
-	      hmm.nfallbacks,
-	      100.0*(double)hmm.nfallbacks/(double)hmm.ntokens);
-      fprintf(stderr, "  + Performance\n");
-      fprintf(stderr, "    - Initialize Time     : %12.2f sec\n", ielapsed);
-      fprintf(stderr, "    - Analysis Time       : %12.2f sec\n", aelapsed);
-      fprintf(stderr, "    - Throughput Rate     : %12.2f tok/sec\n", (double)hmm.ntokens/aelapsed);
-      fprintf(stderr,
-	      "---------------------------------------------------------------------\n");
+      print_summary(stderr);
   }
 
   return 0;
