@@ -1,6 +1,6 @@
 /* -*- Mode: C++ -*- */
 /** 
-\mainpage libmoot: (K)DWDS PoS tagging library
+\mainpage libmoot: moocow's PoS tagging library
 
 \author Bryan Jurish <moocow@ling.uni-potsdam.de>
 
@@ -26,7 +26,7 @@ which tokenizes an input stream, and eliminates most SGML
 markup.
 
 \see mootPPLexer
-\see <A HREF="../../programs/dwdspp.html">dwspp(1)</A>
+\see <A HREF="../../programs/moopp.html">dwspp(1)</A>
 
 
 \section HMM HMM Tagging
@@ -37,7 +37,7 @@ tagging and disambiguation.
 \todo Write a faster HMM trainer -- for now, use moot::mootHMMTrainer.
 
 \see \link moot::mootHMM mootHMM\endlink
-\see <A HREF="../../programs/dwdshmm.html">dwdshmm(1)
+\see <A HREF="../../programs/moohmm.html">moohmm(1)
 
 
 
@@ -52,7 +52,7 @@ you may specify a tag-extraction transducer (yet another FSM) which
 maps morphological output paths to PoS tags.
 
 \see \link moot::mootMorph mootMorph\endlink
-\see <A HREF="../../programs/dwdsm.html">dwdsm(1)</A>
+\see <A HREF="../../programs/moom.html">moom(1)</A>
 
 
 
@@ -75,7 +75,8 @@ improvement (3x) with respect to mootMorph on its own.
 
 \section Ack Acknowledgements
 
-This package was developed as part of the DWDS/Collocations project
+Development of this package began in the context
+of the DWDS/Collocations project
 ('Kollokationen im digitalen W&ouml;rterbuch der deutschen Sprache'
 = 'collocations in the digital dictionary of the German language') at the
 Berlin-Brandenburgische Akademie der Wissenschaften.
@@ -87,13 +88,12 @@ libFSM finite state machine C++ library by Thomas Hanneforth.
 \section SeeAlso More Information
 
 \see FSM
-\see <A HREF="../../programs/dwdspp.html">dwdspp(1)</A>
+\see <A HREF="../../programs/moopp.html">moopp(1)</A>
 \see <A HREF="../../programs/mootrain.html">mootrain(1)</A>
-\see <A HREF="../../programs/dwdshmm.html">dwdshmm(1)</A>
-\see <A HREF="../../programs/dwdsm.html">dwdsm(1)</A>
+\see <A HREF="../../programs/moohmm.html">moohmm(1)</A>
+\see <A HREF="../../programs/moom.html">moom(1)</A>
 \see <A HREF="../../programs/moot.html">moot(1)</A>
 
-\todo Ensure gcc-3.x compatibility.
 \todo Write Perl interface.
 
 */

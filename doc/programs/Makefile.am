@@ -1,7 +1,7 @@
 ## File: doc/programs/Makefile.am
 ## Package: moot
 ## Description:
-##   + program-doc-level automake file for DWDS PoS tagger programs
+##   + program-doc-level automake file for moocow's PoS tagger programs
 ##
 ## Process this file with Automake to create Makefile.in.
 ##-----------------------------------------------------------------------
@@ -66,7 +66,7 @@ OPTGENFLAGS = -l
 ## pod conversion rules
 ##-----------------------------------------------------------------------
 
-POD2MANFLAGS = --center="KDWDS PoS Tagging Tools"
+POD2MANFLAGS = --center="moocow's PoS Tagging Tools"
 POD2HTMLFLAGS = --podpath="$(srcdir):." --htmlroot="."
 
 .pod.1:
