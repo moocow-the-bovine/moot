@@ -10,6 +10,18 @@
 %name dwdspp_lexer
 
 %define CLASS dwdspp_lexer
+%define MEMBERS \
+  public: \
+    /* local data */ \
+    unsigned int numwords; \
+    bool verbose; \
+    \
+    /* local methods */ \
+    bool tokenize_stream(FILE *in=stdin, FILE *out=stdout);
+
+%define CONSTRUCTOR_CODE \
+  numwords = 0;
+
 %header{
 typedef enum {
     PPEOF,
@@ -63,7 +75,7 @@ year			([0-9]|([1-9][0-9][0-9]?[0-9]?))
 
 \<(\/?)(s|p|sp|lg)\>					{ return EOS; }
 \<([\?\!]?){letter}+[^\>]*\>		                { return START_XML_TAG; }
-\<\/{letter}+\>						{ return END_XML_TAG; }
+\<\/{letter}+([0-9\.\_\-]*)\>				{ return END_XML_TAG; }
 
 &#[0-9]+;						{  }
 "&dash;"						{  }
@@ -137,3 +149,43 @@ year			([0-9]|([1-9][0-9][0-9]?[0-9]?))
 
 %%
 
+/*----------------------------------------------------------------------
+ * process_stream(FILE *in=stdin, FILE *out=stdout);
+ *   + run preprocesser from *in to *out
+ */
+bool dwdspp_lexer::tokenize_stream(FILE *in=stdin, FILE *out=stdout)
+{
+  int tok;
+  yyin = in;
+  yyout = out;
+
+  // black magic from the flex manpage
+  if (yy_current_buffer != NULL) { yy_delete_buffer(yy_current_buffer); }
+  yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
+  BEGIN(INITIAL);
+
+  while ((tok = yylex()) != PPEOF) {
+    if (verbose) numwords++;
+    switch (tok) {
+      case EOS:
+          if (yytext[0] != '<') {
+            yy_echo();
+	    fputc(' ',out);
+          }
+          fputc('\n', out);
+
+      case  START_XML_TAG:
+      case END_XML_TAG:
+	  /* ignore XML tags */
+	  break;
+
+      default:
+	  /* write it as its own token */
+          yy_echo();
+          fputc(' ', out);
+      }
+  }
+  fputc('\n', out);
+  yyterminate();
+  return true;
+}

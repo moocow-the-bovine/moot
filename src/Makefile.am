@@ -45,8 +45,6 @@ dwdst_SOURCES = \
 
 dwdspp_SOURCES = \
 	dwdspp_lexer.ll \
-	dwdspp.cc \
-	dwdspp.h \
 	dwdspp_main.cc \
 	dwdspp_cmdparser.ggo
 
@@ -56,7 +54,7 @@ dwdspp_SOURCES = \
 
 ## --- Additional dependencies
 dwdst.o: dwdst_cmdparser.h
-dwdspp.o: dwdspp_cmdparser.h dwdspp_lexer.h
+dwdspp_main.o: dwdspp_cmdparser.h dwdspp_lexer.h
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -126,8 +124,8 @@ AM_CXXFLAGS = $(FSM_WFLAGS) $(FSM_OFLAGS)
 dwdst_LDFLAGS = @FSM_LFLAGS@
 dwdst_LDADD = @FSM_LIBS@
 
-dwdspp_LDFLAGS = @FSM_LFLAGS@
-dwdspp_LDADD = @FSM_LIBS@
+# dwdspp_LDFLAGS = @FSM_LFLAGS@
+# dwdspp_LDADD = @FSM_LIBS@
 
 #${lib_i}_la_LDFLAGS = -L. -version-info ${lib_i_current}:${lib_i_rev}:${lib_i_age}
 #${lib_i}_LIBADD     = -lotherlib

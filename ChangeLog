@@ -1,34 +1,14 @@
-ChangeLog for package testme (automake-template)
+ChangeLog for package dwdst
 
 /*----------------------------------------------------------------------
  * CVS LOG
  *
  * $Log$
+ * Revision 1.1  2002/09/25 17:30:05  moocow
+ * Wed Sep 25 19:29:08 CEST 2002
+ *   + argh.
+ *
  * Revision 1.2  2002/09/12 13:16:57  moocow
  *
  *
- * v0.01 Thu Sep 12 15:11:30 CEST 2002 moocow
- * 	+ dummy-compile and 'distcheck' ok
- * 	+ added '.cvsignore'
- * 	+ added cvs 'Log' keyword to ChangeLog
- *
- * v0.01 Thu Sep 12 14:16:33 CEST 2002 moocow
- * 	+ set package-name to 'testme'
- * 	+ added dummy library 'libtestme', dummy program 'testme'
- * 	+ got 'cvsclean' to work without '.' in SUBDIRS
- *
- *
  *----------------------------------------------------------------------*/
-
-v0.01 Thu Sep 12 15:11:30 CEST 2002 moocow
-	+ dummy-compile and 'distcheck' ok
-	+ added '.cvsignore'
-	+ added cvs 'Log' keyword to ChangeLog
-	
-v0.01 Thu Sep 12 14:16:33 CEST 2002 moocow
-	+ set package-name to 'testme'
-	+ added dummy library 'libtestme', dummy program 'testme'
-	+ got 'cvsclean' to work without '.' in SUBDIRS
-
-v0.0.0 Wed Sep 11 2002 moocow
-	+ original version
