@@ -102,6 +102,8 @@ void GetMyOptions(int argc, char **argv)
   hmm.unknown_lex_threshhold = args.unknown_threshhold_arg;
   hmm.unknown_class_threshhold = args.class_threshhold_arg;
   hmm.suftrie.maxlen() = args.trie_depth_arg;
+  hmm.suftrie.maxcount = args.trie_threshhold_arg;
+  hmm.suftrie.theta = args.trie_theta_arg;
 }
 
 /*--------------------------------------------------------------------------

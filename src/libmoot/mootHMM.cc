@@ -48,11 +48,19 @@ using namespace mootBinIO;
 using namespace mootio;
 
 /*--------------------------------------------------------------------------
+ * Behavioral Flags
+ *--------------------------------------------------------------------------*/
+//-- define this to resort to hapax counts when no suffix matches
+#define NO_SUFFIX_USE_HAPAX
+
+/*--------------------------------------------------------------------------
  * Constructor
  *--------------------------------------------------------------------------*/
 mootHMM::mootHMM(void)
   : verbose(1),
     ndots(0),
+    save_ambiguities(false),
+    save_flavors(false),
     use_lex_classes(true),
     start_tagid(0),
     unknown_lex_threshhold(1.0),
@@ -981,6 +989,7 @@ bool mootHMM::estimate_wlambdas(const mootLexfreqs &lf)
 {
   //-- estimate lexical smoothing constants
   if (lf.n_tokens > 0) {
+    //wlambda0 = 0.5 / (ProbT)(lf.n_tokens);
     wlambda0 = 1.0 / (ProbT)(lf.n_tokens);
     wlambda1 = 1.0 - wlambda0;
   } else {
@@ -997,6 +1006,7 @@ bool mootHMM::estimate_clambdas(const mootClassfreqs &cf)
 {
   //-- estimate lexical-class smoothing constants
   if (cf.totalcount > 0) {
+    //clambda0 = 0.5 / (ProbT)(cf.totalcount);
     clambda0 = 1.0 / (ProbT)(cf.totalcount);
     clambda1 = 1.0 - clambda0;
   } else {
@@ -1227,6 +1237,10 @@ void mootHMM::viterbi_clear(void)
   vtable             = viterbi_get_column();
   vtable->col_prev   = NULL;
 
+  //-- BOS: initialize beam-pruning stuff
+  vtable->bbestpr    = MOOT_PROB_ONE;
+  vtable->bpprmin    = MOOT_PROB_NEG;
+
 
 #ifdef MOOT_USE_TRIGRAMS
   row = vtable->rows = viterbi_get_row();
@@ -1249,10 +1263,6 @@ void mootHMM::viterbi_clear(void)
 
   nod->pth_prev      = NULL;
   nod->nod_next      = NULL;
-
-  //-- reset beam-pruning variables
-  bbestpr = MOOT_PROB_ONE;
-  bpprmin = bbestpr - beamwd;
 }
 
 
@@ -1269,10 +1279,10 @@ void mootHMM::viterbi_step(TokID tokid, const mootTokString &toktext)
 
   //-- info: check for "unknown" token
   if (tokid==0) nnewtokens++;
-    
-  //-- Update beam-pruning variables
-  bpprmin = bbestpr - beamwd;
-  bbestpr = MOOT_PROB_NEG;
+
+  //-- Update beam-pruning variable(s)
+  //bpprmin = vtable->bbestpr - beamwd;
+  //bbestpr = MOOT_PROB_NEG;
 
   //-- get map of possible tags
   const LexProbSubTable *lps;
@@ -1281,7 +1291,9 @@ void mootHMM::viterbi_step(TokID tokid, const mootTokString &toktext)
   } else {
     size_t matchlen;
     lps = &(suftrie.sufprobs(toktext,&matchlen));
+#ifdef NO_SUFFIX_USE_HAPAX
     if (!matchlen) lps = &lexprobs[tokid];
+#endif
   }
 
   //-- for each possible destination tag 'vtagid'
@@ -1344,13 +1356,17 @@ void mootHMM::viterbi_step(TokID tokid,
     } else {
       size_t matchlen;
       lps = &(suftrie.sufprobs(toktext,&matchlen));
+#ifdef NO_SUFFIX_USE_HAPAX
       if (!matchlen) lps = &(lcprobs[classid]);
+#endif
     }
   }
   else {
     size_t matchlen;
     lps = &(suftrie.sufprobs(toktext,&matchlen));
+#ifdef NO_SUFFIX_USE_HAPAX
     if (!matchlen) lps = &(lexprobs[0]);
+#endif
     wclambda0 = wlambda0;
     wclambda1 = wlambda1;
   }
@@ -1359,8 +1375,8 @@ void mootHMM::viterbi_step(TokID tokid,
   ViterbiColumn *col = NULL;
 
   //-- Update beam-pruning variables
-  bpprmin = bbestpr - beamwd;
-  bbestpr = MOOT_PROB_NEG;
+  //bpprmin = vtable->bbestpr - beamwd;
+  //bbestpr = MOOT_PROB_NEG;
 
   //-- for each possible destination tag 'vtagid'
 #ifdef MOOT_RELAX
@@ -1439,10 +1455,10 @@ void mootHMM::viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col)
   vwordpr = MOOT_PROB_ONE;
 
   //-- hack: disable beam-pruning cutoff
-  bpprmin = MOOT_PROB_NEG;
+  //bpprmin = MOOT_PROB_NEG;
 
   //-- populate a new row for this tag
-  col = viterbi_populate_row(vtagid, vwordpr, col);
+  col = viterbi_populate_row(vtagid, vwordpr, col, MOOT_PROB_NEG);
 
   //-- add new column to state table
   vtable        = col;
@@ -1465,7 +1481,7 @@ void mootHMM::_viterbi_step_fallback(TokID tokid, ViterbiColumn *col)
   LexProbSubTable::const_iterator  lpsi;
 
   //-- hack: disable beam-pruning cutoff
-  bpprmin = MOOT_PROB_NEG;
+  //bpprmin = MOOT_PROB_NEG;
 
   //-- for each possible destination tag 'vtagid' (except "UNKNOWN")
   for (vtagid = 1; vtagid < n_tags; vtagid++) {
@@ -1479,7 +1495,7 @@ void mootHMM::_viterbi_step_fallback(TokID tokid, ViterbiColumn *col)
     }
 
     //-- populate a new row for this tag
-    col = viterbi_populate_row(vtagid, vwordpr, col);
+    col = viterbi_populate_row(vtagid, vwordpr, col, MOOT_PROB_NEG);
   }
 
   if (!viterbi_column_ok(col)) {
@@ -1535,6 +1551,35 @@ void mootHMM::tag_mark_best(mootSentence &sentence)
       senti->besttag(tagids.id2name(0)); //-- use 'unknown' tag
     }
   }
+
+  if (save_ambiguities) {
+    mootSentence::reverse_iterator sri;
+    ViterbiColumn *c = vtable && vtable->col_prev ? vtable->col_prev : NULL;
+    if (!c) return;
+
+    for (sri=sentence.rbegin(); c != NULL && sri != sentence.rend(); sri++, c=c->col_prev) {
+      if (sri->toktype() != TokTypeVanilla) continue; //-- ignore non-vanilla tokens
+
+      if (save_flavors) {
+	sri->tok_analyses.push_back
+	  (mootToken::Analysis(mootTokenFlavorNames[tokenFlavor(sri->text())]));
+      }
+
+      if (tokids.name2id(sri->text()) == 0) continue;
+
+      for (
+#ifdef MOOT_USE_TRIGRAMS
+	   ViterbiRow *r = c->rows; r != NULL; r = r->row_next
+#else // !MOOT_USE_TRIGRAMS
+	   ViterbiNode *r = c->rows; r != NULL; r = r->nod_next
+#endif
+	   )
+	{
+	  sri->tok_analyses.push_back(tagids.id2name(r->tagid));
+	}
+    }
+  }
+
 };
 
 
@@ -1726,7 +1771,8 @@ void mootHMM::viterbi_txtdump(FILE *file)
 
   for (coli = 0, col = vtable; col != NULL; col = col->col_prev, coli++) {
     fprintf(file, "%%%%=================================================================\n");
-    fprintf(file, "%%%% COLUMN %u\n", coli);
+    fprintf(file, "%%%% COLUMN %u ; beamwd=%g ; bbestpr=%g ; bpprmin=%g ; cutoff=%g\n",
+	    coli, beamwd, col->bbestpr, col->bpprmin, col->bbestpr-beamwd);
 
     for (rowi = 0, row = col->rows; row != NULL; row = row->row_next, rowi++) {
       fprintf(file, "%%%%-----------------------------------------------------\n");
@@ -1747,7 +1793,7 @@ void mootHMM::viterbi_txtdump(FILE *file)
 	    fprintf(file, "%u(\"%s\")\t [%u(\"%s\")]\t <%u(\"%s\")>\t: %g\n",
 		    node->tagid,             tagids.id2name(node->tagid).c_str(),
 		    node->ptagid,            tagids.id2name(node->ptagid).c_str(),
-		    node->pth_prev->tagid,   tagids.id2name(node->pth_prev->tagid).c_str(),
+		    node->pth_prev->ptagid,  tagids.id2name(node->pth_prev->ptagid).c_str(),
 		    node->lprob
 		    );
 	  }

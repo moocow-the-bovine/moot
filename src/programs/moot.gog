@@ -170,6 +170,22 @@ Use suffixes of up to LEN characters to estimate probabilities
 of unknown words.
 "
 
+int "trie-threshhold" A "Frequency upper bound for trie inclusion." \
+    arg="FREQ" \
+    default="10" \
+    details="
+Use words of at most frequency FREQ to construct the suffix trie.
+"
+
+float "trie-theta" - "Suffix backoff coefficient." \
+    arg="THETA" \
+    default="0" \
+    details="
+Specify suffix-trie backoff coefficient for smoothing.
+Specifying a value of zero (the default) causes the
+smoothing coefficient to be estimated.
+"
+
 int "use-classes" L "Whether to use lexical class-probabilities." \
     arg="BOOL" \
     default="1" \
@@ -307,6 +323,11 @@ During Viterbi search, paths will be ignored if their probabilities
 are less than 1/NUM*p_best , where p_best is the probability of
 the current best path.  Setting this option to zero disables
 beam pruning.
+"
+
+flag "save-ambiguities" S "Annotate tagged tokens with lexical ambiguities" \
+  details="
+Useful for debugging.
 "
 
 #-----------------------------------------------------------------------------

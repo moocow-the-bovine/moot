@@ -99,7 +99,6 @@
 //#define MOOT_VITERBI_DEBUG
 #undef MOOT_VITERBI_DEBUG
 
-
 moot_BEGIN_NAMESPACE
 
 /*--------------------------------------------------------------------------
@@ -365,6 +364,8 @@ public:
   public:
     ViterbiRow    *rows;     ///< Column rows
     ViterbiColumn *col_prev; ///< Previous column
+    ProbT          bbestpr;  ///< Best probability in column for beam search
+    ProbT          bpprmin;  ///< Best previous probability for beam search
   };
 
   /**
@@ -406,6 +407,16 @@ public:
    * Default=0 (no dot printing).
    */
   size_t ndots;
+
+  /**
+   * Add flavor names to @analyses members of mootToken elements on tag_mark_best()
+   */
+  bool save_ambiguities;
+
+  /**
+   * Add token flavors to @analyses members of mootToken elements on tag_mark_best()
+   */
+  bool save_flavors;
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -549,8 +560,8 @@ protected:
 
   ViterbiPathNode  *vbestpath;  /**< For node->path conversion */
 
-  ProbT             bbestpr;   /**< Best current (log-)probability for beam pruning */
-  ProbT             bpprmin;   /**< Minimum previous probability for beam pruning */
+  //ProbT           bbestpr;   /**< Best current (log-)probability for beam pruning */
+  //ProbT           bpprmin;   /**< Minimum previous probability for beam pruning */
   //@}
 
 public:
@@ -1027,12 +1038,13 @@ public:
    * If @col is NULL (the default), a new column will be allocated.
    * Returns a pointer to the trellis column, or NULL on failure.
    *
-   * Updates beam-pruning datum @bbestpr ; and prunes with respect
-   * to @bpprmin.
+   * If specified, @probmin can be used to override beam-pruning
+   * for non-NULL columns.
    */
   inline ViterbiColumn *viterbi_populate_row(TagID curtagid,
 					     ProbT wordpr=MOOT_PROB_ONE,
-					     ViterbiColumn *col=NULL)
+					     ViterbiColumn *col=NULL,
+					     ProbT probmin=MOOT_PROB_NONE)
   {
 #ifdef MOOT_USE_TRIGRAMS
     ViterbiRow  *prow, *row = viterbi_get_row();
@@ -1041,7 +1053,11 @@ public:
     if (!col) {
       col           = viterbi_get_column();
       col->rows     = NULL;
+      col->bbestpr  = MOOT_PROB_NEG;
+      if (vtable) col->bpprmin = vtable->bbestpr - beamwd;
+      else        col->bpprmin = MOOT_PROB_NEG;
     }
+    if (probmin != MOOT_PROB_NONE) col->bpprmin = probmin;
     col->col_prev = vtable;
     row->nodes = NULL;
 
@@ -1051,7 +1067,7 @@ public:
 
       for (pnod = prow->nodes; pnod != NULL; pnod = pnod->nod_next) {
 	//-- beam pruning
-	if (beamwd && pnod->lprob < bpprmin) continue;
+	if (beamwd && pnod->lprob < col->bpprmin) continue;
 
 	//-- probability lookup
 	vtagpr = pnod->lprob + tagp(pnod->ptagid, prow->tagid, curtagid);
@@ -1067,14 +1083,13 @@ public:
 	nod->tagid    = curtagid;
 	nod->ptagid   = prow->tagid;
 	nod->lprob    = vbestpr + wordpr;
-	//nod->row      = row;
 	nod->pth_prev = vbestpn;
 	nod->nod_next = row->nodes;
 
 	row->nodes    = nod;
 
 	//-- save beam information
-	if (nod->lprob > bbestpr) bbestpr = nod->lprob;
+	if (nod->lprob > col->bbestpr) col->bbestpr = nod->lprob;
       }
     }
 
@@ -1090,7 +1105,11 @@ public:
     if (!col) {
       col           = viterbi_get_column();
       col->rows     = NULL;
+      col->bbestpr  = MOOT_PROB_NEG;
+      if (vtable) col->bpprmin = vtable->bbestpr - beamwd;
+      else        col->bpprmin = MOOT_PROB_NEG;
     }
+    if (probmin != MOOT_PROB_NONE) col->bpprmin = probmin;
     col->col_prev = vtable;
 
     vbestpr = MOOT_PROB_NEG;
@@ -1098,7 +1117,7 @@ public:
 
     for (pnod = vtable->rows; pnod != NULL; pnod = pnod->nod_next) {
       //-- beam pruning
-      if (beamwd && pnod->lprob < bpprmin) continue;
+      if (beamwd && pnod->lprob < col->bpprmin) continue;
 
       //-- probability lookup
       vtagpr = pnod->lprob + tagp(pnod->tagid, curtagid);
@@ -1120,7 +1139,7 @@ public:
     col->rows     = nod;
 
     //-- save beam information
-    if (nod->lprob > bbestpr) bbestpr = nod->lprob;
+    if (nod->lprob > col->bbestpr) col->bbestpr = nod->lprob;
 
 #endif // MOOT_USE_TRIGRAMS
 

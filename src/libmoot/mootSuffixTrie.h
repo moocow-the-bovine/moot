@@ -98,44 +98,100 @@ public:
 	     const TagIDTable   &tagids,
 	     TagID eos_tagid,
 	     bool  verbose=false);
+
+  /** Low-level compilation utilitiy:
+   *  enqueue pending suffix arcs */
+  bool _build_insert(const mootLexfreqs &lf);
+
+  /** Low-level compilation utilitiy:
+   *  assign count data to all trie nodes */
+  bool _build_assoc(const mootLexfreqs &lf, const TagIDTable &tagids);
+
+  /** Low-level compilation utilitiy:
+   *  compute smoothing constants */
+  bool _build_compute_theta(const mootLexfreqs &lf,
+			    const mootNgrams   &ng,
+			    const TagIDTable   &tagids,
+			    TagID eos_tagid);
+
+  /** Low-level compilation utilitiy:
+   *  compute MLE probabilities P(tag|suffix) */
+  bool _build_compute_mles(const mootLexfreqs &lf,
+			   const mootNgrams   &ng,
+			   const TagIDTable   &tagids,
+			   TagID eos_tagid);
+
+  /** Low-level compilation utilitiy:
+   *  Bayesian inversion: compute P(suffix|t) = P(t|suffix)*P(suffix)/P(t)
+   */
+  bool _build_invert_mles(const mootNgrams &ng,
+			  const TagIDTable &tagids,
+			  TagID eos_tagid);
   //@}
 
   //--------------------------------------------------
   /// \name Lookup
   //@{
+  /** Get first ancestor (or self) with non-empty data,
+   * or end() on failure (read/write) */
+  inline iterator find_ancestor_nonempty(const node_type &dtr, size_t *nsteps=NULL)
+  {
+    iterator ai;
+    if (nsteps) *nsteps = 0;
+    for (ai=find_mother(dtr); ai != end() && ai->data.empty(); ai=find_mother(*ai)) {
+      if (nsteps) (*nsteps)++;
+    }
+    return ai;
+  };
+
+  /** Get first real ancestor (or self) with non-empty data,
+   * or end() on failure (read-only) */
+  inline const_iterator find_ancestor_nonempty(const node_type &dtr, size_t *nsteps=NULL)
+    const
+  {
+    const_iterator ai;
+    if (nsteps) *nsteps = 0;
+    for (ai=find_mother(dtr); ai != end() && ai->data.empty(); ai=find_mother(*ai)) {
+      if (nsteps) (*nsteps)++;
+    }
+    return ai;
+  };
+
+
+  /** Get reverse-longest match iterator with actual data, read/write */
+  inline iterator rfind_longest_nonempty(const mootTokString &tokstr,
+					 size_t              *matchlen=NULL)
+  {
+    iterator ti = rfind_longest(tokstr, matchlen);
+    return (ti==end() || !ti->data.empty() ? ti : find_ancestor_nonempty(*ti));
+  };
+
+  /** Get reverse-longest match iterator with actual data, read-only */
+  inline const_iterator rfind_longest_nonempty(const mootTokString &tokstr,
+					       size_t              *matchlen=NULL)
+    const
+  {
+    const_iterator ti = rfind_longest(tokstr, matchlen);
+    return (ti==end() || !ti->data.empty() ? ti : find_ancestor_nonempty(*ti));
+  };
+
+
   /** Get (log-) probability table tagid=>log(P(tokstr|tagid))
    *  based on longest matched suffix */
   inline const SuffixTrieDataT& sufprobs(const mootTokString &tokstr, size_t *matchlen=NULL)
     const
   {
-    const_iterator ti = rfind_longest(tokstr, matchlen);
+    const_iterator ti = rfind_longest_nonempty(tokstr,matchlen);
     return (ti==end() ? default_data() : ti->data);
   };
-
-  /** Get (log-) probability table tagid=>log(P(token.text()|tagid))
-   *  based on longest matched suffix */
-  inline const SuffixTrieDataT& sufprobs(const mootToken &token, size_t *matchlen=NULL) const
-  { return sufprobs(token.text(), matchlen); };
-
-
-
-  /** Get (log-) probability log(P(tokstr|tagid))
-   *  based on longest matched suffix */
-  inline ProbT sufprob(const mootTokString &tokstr, const TagID tagid, size_t *matchlen=NULL)
-    const
-  {
-    const_iterator ti = rfind_longest(tokstr,matchlen);
-    if (ti==end()) return MOOT_PROB_ZERO;
-    SuffixTrieDataT::const_iterator tdi = ti->data.find(tagid);
-    return (tdi==ti->data.end() ? MOOT_PROB_ZERO : tdi->value());
-  };
-
-  /** Get (log-) probability log(P(token.text()|tagid))
-   *  based on longest matched suffix */
-  inline ProbT sufprob(const mootToken &token, const TagID tagid, size_t *matchlen=NULL)
-    const
-  { return sufprob(token.text(),tagid,matchlen); };
   //@}
+
+  //--------------------------------------------------
+  /// \name Debug / Dump
+  //@{
+  void txtdump(FILE *out, const TagIDTable &tagids) const;
+  //@}
+
 }; //-- /class SuffixTrie
 
 moot_END_NAMESPACE

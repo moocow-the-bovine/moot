@@ -34,31 +34,108 @@ moot_BEGIN_NAMESPACE
 
 using namespace std;
 
+/*--------------------------------------------------------------------------
+ * Smoothing Methods
+ */
 //-- define to smooth trie probabilities a la Brants(2000)
-//#define SMOOTH_ALA_BRANTS
+#define SMOOTH_ALA_BRANTS
 
 //-- define to smooth trie probabilities using theoretically correct standard deviation
 //#define SMOOTH_ALA_STDDEV
 
+//-- define to smooth trie probabilities a la acopost (NYI)
+//#define SMOOTH_ALA_ACOPOST
+
 //-- define to smooth trie probabilities a la Brants & Samuelsson(1995)
 //   : this seems to work best
-#define SMOOTH_ALA_SAMUELSSON
+//#define SMOOTH_ALA_SAMUELSSON
 
 //-- smoothing logic
 #if defined(SMOOTH_ALA_BRANTS)
 # undef SMOOTH_ALA_STDDEV
+# undef SMOOTH_ALA_ACOPOST
 # undef SMOOTH_ALA_SAMUELSSON
 #elif defined(SMOOTH_ALA_STDDDEV)
 # undef SMOOTH_ALA_BRANTS
+# undef SMOOTH_ALA_ACOPOST
+# undef SMOOTH_ALA_SAMUELSSON
+#elif defined(SMOOTH_ALA_ACOPOST)
+# undef SMOOTH_ALA_BRANTS
+# undef SMOOTH_ALA_STDDEV
 # undef SMOOTH_ALA_SAMUELSSON
 #elif defined(SMOOTH_ALA_SAMUELSSON)
 # undef SMOOTH_ALA_BRANTS
+# undef SMOOTH_ALA_ACOPOST
 # undef SMOOTH_ALA_STDDEV
+#else
+# define SMOOTH_ALA_SAMUELSSON
+#endif
+
+/*--------------------------------------------------------------------------
+ * Smoothing Initialization methods
+ */
+//-- Define this to use global P(t) for empty suffix
+//#define SMOOTH_EMPTY_AS_GLOBAL
+
+//-- Define this to use local P_{low}(t) for empty suffix
+#define SMOOTH_EMPTY_AS_EMPTY
+
+//-- Define this to use lexical entriy @UNKNOWN for empty suffix
+//   (NYI)
+//#define SMOOTH_EMTPY_AS_UNKNOWN
+
+#if defined(SMOOTH_EMPTY_AS_GLOBAL)
+# undef SMOOTH_EMPTY_AS_EMPTY
+# undef SMOOTH_EMTPY_AS_UNKNOWN
+#elif defined(SMOOTH_EMPTY_AS_EMPTY)
+# undef SMOOTH_EMPTY_AS_GLOBAL
+# undef SMOOTH_EMTPY_AS_UNKNOWN
+/*
+#elif defined(SMOOTH_EMPTY_AS_UNKNOWN)
+# undef SMOOTH_EMPTY_AS_GLOBAL
+# undef SMOOTH_EMTPY_AS_EMPTY
+*/
+#else
+# define SMOOTH_EMPTY_AS_GLOBAL
 #endif
 
 
+/*--------------------------------------------------------------------------
+ * Inversion Methods (equivalent)
+ */
+//-- define this to use "Pure" Bayesian inversion: P(suf|t) = P(suf)*P(t|suf)/P(t)
+#define INVERT_PURE
+
+//-- define this to use word-constant inversion: P(suf|t) = P(t|suf)/P(t)
+//#define INVERT_NOSCALE
+
+//-- define this to use acopost-style inversion: P(suf|t) = P(t|suf)/f(t)
+//#define INVERT_ACOPOST
+
+#if defined(INVERT_PURE)
+# undef INVERT_NOSCALE
+# undef INVERT_ACOPOST
+#elif defined(INVERT_NOSCALE)
+# undef INVERT_PURE
+# undef INVERT_ACOPOST
+#elif defined(INVERT_ACOPOST)
+# undef INVERT_PURE
+# undef INVERT_NOSCALE
+#else
+# define INVERT_PURE
+#endif
+
+/*--------------------------------------------------------------------------
+ * Suffix Item Selection
+ */
+//-- define this to ignore non-alphabetic tokens in trie construction
+#define IGNORE_NON_ALPHAS
+
+/*--------------------------------------------------------------------------
+ * Debug
+ */
 //-- define this for verbose debugging
-//#define SUFFIX_TRIE_DEBUG
+#define SUFFIX_TRIE_DEBUG
 #ifdef SUFFIX_TRIE_DEBUG
 # define DEBUG(code) code
 #else
@@ -74,156 +151,258 @@ bool SuffixTrie::build(const mootLexfreqs &lf,
 		       TagID eos_tagid,
 		       bool  verbose)
 {
-  //---- sanity check
+  //-- sanity check
   if (!maxlen()) return true;
 
-  //---- Report
+  //-- Report
   if (verbose) { fprintf(stderr, "("); fflush(stderr); }
 
-  //---- insert: enqueue maximum-length suffixes
+  //-- insert: enqueue maximum-length suffixes
   if (verbose) { fprintf(stderr, "insert"); fflush(stderr); }
-  mootLexfreqs::LexfreqTokTable::const_iterator lfi;
-  for (lfi = lf.lftable.begin(); lfi != lf.lftable.end(); lfi++) {
-    const mootLexfreqs::LexfreqEntry &lfe = lfi->second;
-    if (lfe.count > maxcount
-	|| tokenFlavor(lfi->first) != TokFlavorAlpha
-	|| isTokFlavorName(lfi->first))
-      continue;
-    trie_rinsert(lfi->first);
+  if (!_build_insert(lf)) {
+    fprintf(stderr, "\nSuffixTrie::build(): insertion FAILED.\n");
+    return false;
   }
-  //---- /insert
 
-  //---- compile: populate adjaceny table
+  //-- compile: populate adjaceny table
   if (verbose) { fprintf(stderr, ", compile"); fflush(stderr); }
   compile();
-  //---- /compile
 
-  //---- associate: assign count data to all suffixes
+  //-- associate: assign count data to terminal & branching suffixes
   if (verbose) { fprintf(stderr, ", associate"); fflush(stderr); }
-  TagID tagid;
-  mootLexfreqs::LexfreqSubtable::const_iterator lfsi;
-  iterator ti;
-  for (lfi = lf.lftable.begin(); lfi != lf.lftable.end(); lfi++) {
-    const mootLexfreqs::LexfreqEntry &lfe = lfi->second;
-    if (lfe.count > maxcount
-	|| tokenFlavor(lfi->first) != TokFlavorAlpha
-	|| isTokFlavorName(lfi->first))
-      continue;
-
-    for (ti  = rfind_longest(lfi->first);
-	 ti != end();
-	 ti  = find_mother(*ti))
-      {
-	//-- HACK: store total counts in (node.data[0])
-	if (ti->data.find(0) != ti->data.end()) {
-	  ti->data[0] += lfe.count;
-	} else {
-	  ti->data[0]  = lfe.count;
-	}
-
-	for (lfsi = lfe.freqs.begin(); lfsi != lfe.freqs.end(); lfsi++) {
-	  const string &tagstr = lfsi->first;
-	  tagid = tagids.name2id(tagstr);
-	  if (tagid != 0) {
-	    if (ti->data.find(tagid) != ti->data.end()) {
-	      ti->data[tagid] += lfsi->second;
-	    } else {
-	      ti->data[tagid]  = lfsi->second;
-	    }
-	  }
-	}
-      }
+  if (!_build_assoc(lf,tagids)) {
+    fprintf(stderr, "\nSuffixTrie::build(): frequency association failed.\n");
+    return false;
   }
-  //---- /associate
 
-  //---- sanity check
+  //-- sanity check
   if (empty() || begin()->data.size() <= 2) {
-    fprintf(stderr, " -> empty trie?!)");
+    fprintf(stderr, "\nSuffixTrie::build(): empty trie -- aborting build.\n");
     return false;
   }
 
 
-  //---- smooth: compute smoothing constants and MLE probabilities P(tag|suffix)
+  //-- smooth: theta: compute smoothing constants
   if (verbose) { fprintf(stderr, ", smooth"); fflush(stderr); }
+  if (theta==0) {
+    if (!_build_compute_theta(lf,ng,tagids,eos_tagid)) {
+      fprintf(stderr, "\nSuffixTrie::build(): could not compute theta.\n");
+      return false;
+    }
+  }
 
-  //-- some useful variables
-  SuffixTrieDataT::iterator  tdi;
+  //-- smooth: mle: compute MLE probabilities P(tag|suffix)
+  if (!_build_compute_mles(lf,ng,tagids,eos_tagid)) {
+    fprintf(stderr, "\nSuffixTrie::build(): could not compute MLEs.\n");
+    return false;
+  }
+
+  //-- smooth: invert: compute MLE probabilities P(tag|suffix)
+  if (!_build_invert_mles(ng,tagids,eos_tagid)) {
+    fprintf(stderr, "\nSuffixTrie::build(): could not invert MLEs.\n");
+    return false;
+  }
+
+  //-- report
+  if (verbose) { fprintf(stderr, ")"); fflush(stderr); }
+
+  return true;
+};
+
+
+/*--------------------------------------------------------------
+ * _build_insert()
+ */
+bool SuffixTrie::_build_insert(const mootLexfreqs &lf)
+{
+  mootLexfreqs::LexfreqTokTable::const_iterator lfi;
+  for (lfi = lf.lftable.begin(); lfi != lf.lftable.end(); lfi++) {
+    const mootLexfreqs::LexfreqEntry &lfe = lfi->second;
+      
+    if (lfe.count > maxcount
+#ifdef IGNORE_NON_ALPHAS
+	|| tokenFlavor(lfi->first) != TokFlavorAlpha
+#endif
+	|| isTokFlavorName(lfi->first))
+      continue;
+
+    trie_rinsert(lfi->first);
+  }
+  return true;
+}
+
+/*--------------------------------------------------------------
+ * _build_assoc()
+ */
+bool SuffixTrie::_build_assoc(const mootLexfreqs &lf, const TagIDTable &tagids)
+{
+  TagID tagid;
+  mootLexfreqs::LexfreqTokTable::const_iterator lfi;
+  mootLexfreqs::LexfreqSubtable::const_iterator lfsi;
+  iterator ti, momi;
+
+  for (lfi = lf.lftable.begin(); lfi != lf.lftable.end(); lfi++) {
+    const mootLexfreqs::LexfreqEntry &lfe = lfi->second;
+
+    if (lfe.count > maxcount
+#ifdef IGNORE_NON_ALPHAS
+	|| tokenFlavor(lfi->first) != TokFlavorAlpha
+#endif
+	|| isTokFlavorName(lfi->first))
+      continue;
+
+    ti  = rfind_longest(lfi->first);
+    for (momi = ti; momi != end(); momi = find_mother(*momi)) {
+      if (momi != ti && momi->ndtrs == 1) continue; //-- ignore non-branching nodes
+
+      //-- HACK: reserve full complement of tagid slots for each mom
+      //if (momi->data.empty()) momi->data.reserve(tagids.size());
+   
+      //-- HACK: store total counts in (node.data[0])
+      if (momi->data.find(0) != momi->data.end()) {
+	momi->data[0] += lfe.count;
+      } else {
+	momi->data[0]  = lfe.count;
+      }
+
+      for (lfsi = lfe.freqs.begin(); lfsi != lfe.freqs.end(); lfsi++) {
+	const string &tagstr = lfsi->first;
+	tagid = tagids.name2id(tagstr);
+	if (tagid != 0) {
+	  if (momi->data.find(tagid) != momi->data.end()) {
+	    momi->data[tagid] += lfsi->second;
+	  } else {
+	    momi->data[tagid]  = lfsi->second;
+	  }
+	}
+      }
+    }
+  }
+  return true;
+}
+
+/*--------------------------------------------------------------
+ * _build_compute_theta()
+ */
+bool SuffixTrie::_build_compute_theta(const mootLexfreqs &lf,
+					  const mootNgrams   &ng,
+					  const TagIDTable   &tagids,
+					  TagID eos_tagid)
+{
+  ProbT lextotal = lf.n_tokens;
   ProbT ugtotal  = ng.ugtotal - ng.lookup(tagids.id2name(eos_tagid));
-  ProbT lextotal = lf.n_tokens;              //-- count all lexemes (use real ngrams too!)
-  ProbT tagp;
+  theta          = 0;
 
-
-#if defined(SMOOTH_ALA_BRANTS) || defined(SMOOTH_ALA_STDDEV)
-
-# ifdef SMOOTH_ALA_BRANTS
-  ProbT ntags    = tagids.size()-2;          //-- use HMM tag count (except UNKNOWN,EOS)
-# endif
+#if defined(SMOOTH_ALA_BRANTS)
 
   //---------------------------------------------------------------
-  // theta[Brants|stddev]: compute standard deviation of unigram MLEs (suffix len=0)
-
-  ProbT pavg     = 0;                        //-- E(P(t))
-
-  //-- get average tag probability
-  //for (tdi = begin()->data.begin(); tdi != begin()->data.end(); tdi++)
-  for (tagid = 1; tagid < tagids.size(); tagid++)
+  // theta[Brants]: compute weighted average unigram MLEs
+  ProbT ntags    = tagids.size()-2;        //-- use HMM tag count (except UNKNOWN,EOS)
+  ProbT pavg     = 1/(ProbT)ntags;         //-- use uniform distribution over tag-probs
+  //for (SuffixTrieDataT::const_iterator tdi = begin()->data.begin(); tdi != begin()->data.end(); tdi++)
+  for (TagID tagid = 1; tagid < tagids.size(); tagid++)
     {
       if (tagid == eos_tagid) continue;
-      tagp   = ((ProbT)ng.lookup(tagids.id2name(tagid))) / ugtotal;
+      ProbT tagp = ((ProbT)ng.lookup(tagids.id2name(tagid))) / ugtotal;
+      theta += pow(tagp-pavg, 2);
+    }
+  theta = sqrt(theta/(ntags-1));           //-- Var_{uniform(|Tags|)} (P_t(�)) [Brants,2000]
+  //---- /theta[Brants]
+  //---------------------------------------------------------------
+
+  DEBUG(fprintf(stderr, \
+		"\n-> DEBUG[Brants]: size=%u; lextotal=%g ; ugtotal=%g ; ntags=%g; pavg=%g; theta=%g\n",\
+		size(), lextotal, ugtotal, ntags, pavg, theta));
+
+#elif defined(SMOOTH_ALA_STDDEV)
+
+  //---------------------------------------------------------------
+  // theta[stddev]: compute weighted average unigram MLEs
+
+  //-- get E(P(t))
+  ProbT pavg     = 0;          //-- E(P(t))
+  //for (SuffixTrieDataT::const_iterator tdi = begin()->data.begin(); tdi != begin()->data.end(); tdi++)
+  for (TagID tagid = 1; tagid < tagids.size(); tagid++)
+    {
+      if (tagid == eos_tagid) continue;
+      ProbT tagp = ((ProbT)ng.lookup(tagids.id2name(tagid))) / ugtotal;
       //tagid  = tdi->key();
       //tagp   = tdi->value() / suftotal;
       //ntags += 1.0;
       //--
-# ifdef SMOOTH_ALA_BRANTS
-      pavg  += tagp;           //-- E_{uniform(|Tags|)} (P_t(�)) [Brants,2000]
-# else
-      pavg  += (tagp*tagp);    //-- E_{P_t}             (P_t(�)) [stddev]
-# endif
+      pavg  += (tagp*tagp);    //-- E_{P_t} (P_t(�)) [weighted avg: stddev]
     }
-# ifdef SMOOTH_ALA_BRANTS
-  pavg /= ntags;               //-- E_{uniform(|Tags|)} (P_t(�)) [Brants,2000]
-# endif
-  //--
 
-
-  //-- get standard deviation of tag probability
-  theta = 0;
-  //for (tdi = begin()->data.begin(); tdi != begin()->data.end(); tdi++)
+  //for (SuffixTrieDataT::const_iterator tdi = begin()->data.begin(); tdi != begin()->data.end(); tdi++)
   for (tagid = 1; tagid < tagids.size(); tagid++)
     {
       if (tagid == eos_tagid) continue;
-      tagp   = ((ProbT)ng.lookup(tagids.id2name(tagid))) / ugtotal;
-# ifdef SMOOTH_ALA_BRANTS
-      theta += pow(tagp-pavg, 2);          //-- Var_{uniform(|Tags|)} (P_t(�)) [Brants,2000]
-# else
-      theta += tagp * pow(tagp-pavg, 2);   //-- Var_{P_t}             (P_t(�)) [stddev]
-# endif
+      ProbT tagp = ((ProbT)ng.lookup(tagids.id2name(tagid))) / ugtotal;
+      theta += tagp * pow(tagp-pavg, 2);
     }
-# ifdef SMOOTH_ALA_BRANTS
-  theta /= (ntags-1);                      //-- Var_{uniform(|Tags|)} (P_t(�)) [Brants,2000]
-# endif
-  theta = sqrt(theta);                     //-- Var_{P_t}             (P_t(�)) [stddev]
-  //---- /theta[Brants|stdddev]
+  theta = sqrt(theta);                     //-- Var_{P_t} (P_t(�)) [weighted avg: stddev]
+  //---- /theta[stdddev]
+  //---------------------------------------------------------------
 
   DEBUG(fprintf(stderr, \
-		"\n-> DEBUG: size=%u; lextotal=%g ; ugtotal=%g ; ntags=%g; pavg=%g; theta=%g\n",\
+		"\n-> DEBUG[stddev]: size=%u; lextotal=%g ; ugtotal=%g ; ntags=%g; pavg=%g; theta=%g\n",\
 		size(), lextotal, ugtotal, ntags, pavg, theta));
-#else // defined(SMOOTH_ALA_BRANTS) || defined(SMOOTH_ALA_STDDEV)
+
+#elif defined(SMOOTH_ALA_ACOPOST)
+
+  //---------------------------------------------------------------
+  // theta[acopost]: compute weighted average low-count unigram MLEs
+
+  ProbT ntags    = tagids.size()-2;        //-- use HMM tag count (except UNKNOWN,EOS)
+  ProbT pavg     = 1/ntags;                //-- E(P(t)) [uniform: acopost]
+  ProbT suftotal = begin()->data[0];
+  for (SuffixTrieDataT::const_iterator tdi = begin()->data.begin(); tdi != begin()->data.end(); tdi++) {
+    tagid  = tdi->key();
+    if (tagid == 0 || tagid == eos_tagid) continue;
+
+    ProbT tagp = tdi->value() / suftotal - pavg;
+    theta += tagp * tagp;
+  }
+  theta = sqrt(theta/(ntags-1));           //-- ????
+  //---- /theta[acopost]
+  //---------------------------------------------------------------
 
   DEBUG(fprintf(stderr, \
-		"\n-> DEBUG: size()=%u; lextotal=%g ; ugtotal=%g ; ntags=%g\n", \
-		size(), lextotal, ugtotal, ntags));
+		"\n-> DEBUG[acopost]: size=%u; lextotal=%g ; ugtotal=%g ; ntags=%g; theta=%g\n",\
+		size(), lextotal, ugtotal, ntags, theta));
 
-#endif // defined(SMOOTH_ALA_BRANTS) || defined(SMOOTH_ALA_STDDEV)
+#elif defined(SMOOTH_ALA_SAMUELSSON)
 
   //---- theta[Samuelsson] : ignore
+  theta = sqrt(((ProbT)begin()->data[0])/((ProbT)size()));
+  DEBUG(fprintf(stderr, \
+		"\n-> DEBUG[Samuelsson]: size=%u; lextotal=%g ; ugtotal=%g ; suftotal=%g; avg(theta)=%g\n",\
+		size(), lextotal, ugtotal, begin()->data[0], theta));
 
+#endif // SMOOTH_ALA_BRANTS / SMOOTH_ALA_STDDEV / SMOOTH_ALA_ACOPOST / SMOOTH_ALA_SAMUELSSON
 
+  return true;
+}
 
-  //------ smooth:abstract: smooth increasingly more specific suffix probabilities
-  SuffixTrieDataT::iterator  tdi_zero;
+/*--------------------------------------------------------------
+ * _build_compute_mles()
+ */
+bool SuffixTrie::_build_compute_mles(const mootLexfreqs &lf,
+					 const mootNgrams   &ng,
+					 const TagIDTable   &tagids,
+					 TagID eos_tagid)
+{
+  iterator                         ti;
+  SuffixTrieDataT::iterator        tdi;
+  SuffixTrieDataT::iterator        tdi_zero;
+  ProbT                      lextotal = lf.n_tokens;
+#ifndef SMOOTH_EMPTY_AS_EMPTY
+  ProbT                      ugtotal  = ng.ugtotal - ng.lookup(tagids.id2name(eos_tagid));
+#endif
   list<iterator>             queue;
   queue.push_front(begin());
+
+  //------ smooth:abstract: smooth increasingly more specific suffix probabilities
   while (!queue.empty()) {
     ti = queue.front();
     queue.pop_front();
@@ -231,42 +410,66 @@ bool SuffixTrie::build(const mootLexfreqs &lf,
     //-- get mother Id and iterator
     NodeId           momid = ti->mother;
     const_iterator    momi = find_mother(*ti);
+    size_t         nesteps;
+    const_iterator  nemomi = find_ancestor_nonempty(*momi, &nesteps);
+    SuffixTrieDataT::const_iterator  nemomdi;
 
     //-- process current and all sister nodes
     for ( ; ti->mother == momid; ti++) {
 
       //-- get total, and set pseudo-tag 0 to MLE P(suffix)
-      tdi_zero                  = ti->data.find(0);
-      ProbT             ticount = tdi_zero->value();
-      tdi_zero->value()         = ticount / lextotal;
+      if (!ti->data.empty()) {
+	tdi_zero                  = ti->data.find(0);
+	ProbT             ticount = tdi_zero->value();
+	tdi_zero->value()         = ticount / lextotal;
+
 #ifdef SMOOTH_ALA_SAMUELSSON
-      ProbT             sqrtN   = sqrt(ticount);  //-- Samuelsson
+	ProbT             sqrtN    = sqrt(ticount);  //-- Samuelsson
 #endif
 
-      for (tdi = ti->data.begin(); tdi != ti->data.end(); tdi++) {
-	//-- ignore pseudo-key 0 (zero)
-	if (tdi->key() == 0) continue;
-
-	//-- root node check
 	if (momid == NoNode) {
-	  //-- root-node: use P_{MLE}(t)
-	  tdi->value() = ((ProbT)ng.lookup(tagids.id2name(tdi->key()))) / ugtotal;
+	  //-- root node: iterate over data directly
+	  for (tdi = ti->data.begin(); tdi != ti->data.end(); tdi++) {
+	    if (tdi->key() == 0) continue;
+#ifdef SMOOTH_EMPTY_AS_EMPTY
+	    tdi->value() /= ticount;
+#else
+	    tdi->value() = ((ProbT)ng.lookup(tagids.id2name(tdi->key()))) / ugtotal;
+#endif
+	  }
 	}
 	else {
-	  //-- non-root: smooth MLE probs with mother's
+	  //-- non-root: iterate over mom data, smoothing MLE probs with mom's
+	  ti->data.reserve(nemomi->data.size());
 
-	  //... first compute P_{MLE}(t|suffix) for this pair (t,suffix) only
-	  tdi->value() /= ticount;
+	  for (nemomdi = nemomi->data.begin(); nemomdi != nemomi->data.end(); nemomdi++) {
+	    TagID tagid = nemomdi->key();
+	    ProbT  momp = nemomdi->value();
+	    if (tagid == 0) continue;
 
-	  ProbT                             momp = 0;
-	  SuffixTrieDataT::const_iterator  momdi = momi->data.find(tdi->key());
-	  if (momdi != momi->data.end())    momp = momdi->value();
-
+	    //-- repeatedly smooth momp nesteps times
+	    for (size_t ns = 0; ns < nesteps; ns++) {
 #ifdef SMOOTH_ALA_SAMUELSSON
-	  tdi->value() = (sqrtN*tdi->value() + momp) / (1.0+sqrtN);
+	      ProbT sqrtMomN = sqrt(nemomi->data[0]*lextotal);
+	      momp           = (sqrtMomN*momp + momp) / (1.0+sqrtMomN);
 #else
-	  tdi->value() = (tdi->value() + theta*momp) / (1.0+theta);
+	      momp = (momp + theta*momp) / (1.0+theta);
 #endif
+	    }
+	    
+	    //-- get (possibly new) association for this key
+	    tdi = ti->data.find(tagid);
+	    if (tdi == ti->data.end()) tdi = ti->data.insert(tagid,0);
+	    
+	    //-- compute P_{MLE}(t|suffix) for this pair (t,suffix) only
+	    tdi->value() /= ticount;
+	    
+#ifdef SMOOTH_ALA_SAMUELSSON
+	    tdi->value() = (sqrtN*tdi->value() + momp) / (1.0+sqrtN);
+#else
+	    tdi->value() = (tdi->value() + theta*momp) / (1.0+theta);
+#endif
+	  }
 	}
       }
 
@@ -275,43 +478,77 @@ bool SuffixTrie::build(const mootLexfreqs &lf,
       if (queue.back() == end()) queue.pop_back();
     }
   }
-  //---- /smooth:abstract
 
-  //DEBUG(return true);
+  return true;
+}
 
-  //------ invert: Bayesian inversion: compute P(suffix|t) from P(t|suffix),P(suffix),P(t)
-  if (verbose) { fprintf(stderr, ", invert"); fflush(stderr); }
+
+/*--------------------------------------------------------------
+ * _build_invert_mles
+ */
+bool SuffixTrie::_build_invert_mles(const mootNgrams &ng,
+					const TagIDTable &tagids,
+					TagID eos_tagid)
+{
+  iterator ti;
+  SuffixTrieDataT::iterator tdi;
+  SuffixTrieDataT::iterator tdi_zero;
+#if defined(INVERT_PURE) || defined(INVERT_NOSCALE)
+  ProbT ugtotal = ng.ugtotal - ng.lookup(tagids.id2name(eos_tagid));
+#endif
 
   for (ti = begin(); ti != end(); ti++) {
+    if (ti->data.empty()) continue;
+
     //-- save p(suffix) and erase its pseudo-tag 0 (zero)
     tdi_zero   = ti->data.find(0);
+#if defined(INVERT_PURE)
     ProbT psuf = tdi_zero->value();
+#endif
     ti->data.erase(tdi_zero);
 
     if (ti == begin()) continue;
 
     for (tdi = ti->data.begin(); tdi != ti->data.end(); tdi++) {
-      tagid = tdi->key();
-      tagp  = ((ProbT)ng.lookup(tagids.id2name(tagid))) / ugtotal;
+      TagID tagid = tdi->key();
+#if defined(INVERT_ACOPOST)
+      ProbT tagp  = ((ProbT)ng.lookup(tagids.id2name(tagid)));
+#else
+      ProbT tagp  = ((ProbT)ng.lookup(tagids.id2name(tagid))) / ugtotal;
+#endif
+
       if (tagp != 0) {
-	tdi->value() =
-	  //log(
-	  (tdi->value() * psuf) / tagp;
-	  //)
-	  ;
- 
-      } else {
+#if defined(INVERT_PURE)
+	tdi->value() = (tdi->value() * psuf) / tagp;
+#elif defined(INVERT_NOSCALE) || defined(INVERT_ACOPOST)
+	tdi->value() = (tdi->value() / tagp);
+#endif
+       } else {
 	//tdi->value() = MOOT_PROB_ZERO;
 	tdi->value() = 0;
       }
     }
   }
   //------ /invert
-
-  //-- report
-  if (verbose) { fprintf(stderr, ")"); fflush(stderr); }
-
   return true;
+}
+
+/*--------------------------------------------------------------
+ * txtdump()
+ */
+void SuffixTrie::txtdump(FILE *out, const TagIDTable &tagids) const
+{
+  for (const_iterator i = begin(); i != end(); i++) {
+    string s = node_string(*i);
+    fwrite(s.data(), s.size(), 1, out);
+    fputc('\n', out);
+    for (SuffixTrieDataT::const_iterator di = i->data.begin(); di != i->data.end(); di++) {
+      TagID tagid = di->key();
+      ProbT tagp  = di->value();
+      fwrite(s.data(), s.size(), 1, out);
+      fprintf(out, "\t%s\t%g\n", tagids.id2name(tagid).c_str(), tagp);
+    }
+  }
 };
 
 #undef DEBUG

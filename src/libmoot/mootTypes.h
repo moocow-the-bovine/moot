@@ -129,10 +129,14 @@ typedef ProbT CountT;
  * \def MOOT_PROB_ONE
  * Probability upper-bound
  * The standard value should be appropriate for an IEEE 754-1985 float.
+ *
+ * \def MOOT_PROB_NONE
+ * Impossible probability, used as a default flag.
  */
 #define MOOT_PROB_NEG  -3E+38
 #define MOOT_PROB_ZERO -1E+38
 #define MOOT_PROB_ONE   0.0
+#define MOOT_PROB_NONE  1.0
 /*
 #ifdef FLT_MAX
 #  define MOOT_PROB_NEG  -FLT_MAX

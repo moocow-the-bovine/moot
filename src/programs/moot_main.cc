@@ -145,6 +145,7 @@ void GetMyOptions(int argc, char **argv)
 				       ifmt_default);
 
   //-- i/o format : output
+  if (args.save_ambiguities_given) ofmt_implied |= tiofAnalyzed;
   ofmt = TokenIO::parse_format_request(args.output_format_arg,
 				       args.output_arg,
 				       ofmt_implied,
@@ -175,6 +176,9 @@ void GetMyOptions(int argc, char **argv)
   hmm.unknown_lex_threshhold = args.unknown_threshhold_arg;
   hmm.unknown_class_threshhold = args.class_threshhold_arg;
   hmm.suftrie.maxlen() = args.trie_depth_arg;
+  hmm.suftrie.maxcount = args.trie_threshhold_arg;
+  hmm.suftrie.theta    = args.trie_theta_arg;
+  hmm.save_ambiguities = args.save_ambiguities_given;
 
   // -- assign "verbose" flag
   hmm.ndots = args.dots_arg;

@@ -6,6 +6,7 @@ include config.mak
 TEST = utest
 TRAIN = utrain
 MODEL = $(TRAIN)
+LCMODEL = $(TRAIN).lc
 label = label
 
 EVAL = $(TEST).dmt
@@ -36,11 +37,13 @@ XMLIFY ?= ./xmlify.perl
 OF_XML=xml,pretty
 
 ##-- Globals: programs: moot
-SUFFIX_TRIE_LEN ?= 10
+SUFFIX_TRIE_LEN ?= 4
+SUFFIX_TRIE_THRESH ?= 10
+SUFFIX_THETA  ?= 0.1017023
 MOOT_BINDIR   ?= $(shell cd .. ; pwd -P)
 MOOTRAIN      ?= $(MOOT_BINDIR)/mootrain
 MOOTHMM       ?= $(MOOT_BINDIR)/moot
-MOOTHMM_FLAGS ?= -a$(SUFFIX_TRIE_LEN)
+MOOTHMM_FLAGS ?= -a$(SUFFIX_TRIE_LEN) -A$(SUFFIX_TRIE_THRESH) --trie-theta=$(SUFFIX_THETA)
 #-d1024
 
 MOOTEVAL      ?= $(MOOT_BINDIR)/mooteval
@@ -110,6 +113,19 @@ mt: $(TEST).mt
 #%.mt: %.m1tt
 #	ln $< $@
 
+##-- tagging, lower-case
+lc-tt: $(TEST).lc.tt
+
+lc-dmt: $(TEST).lc.dmt
+
+%.lc.tt: %.lc.t $(LCMODEL).lex $(LCMODEL).123 $(MOOTHMM)
+	$(MOOTHMM) -M$(LCMODEL).lex,$(LCMODEL).123 $(MOOTHMM_FLAGS) $< -o $@
+
+%.lc.dmt: %.lc.mt $(LCMODEL).lex $(LCMODEL).123 $(MOOTHMM)
+	$(MOOTHMM) -M$(LCMODEL).lex,$(LCMODEL).123 $(MOOTHMM_FLAGS) $< -o $@
+
+%.lc.cmt: %.lc.mt $(LCMODEL).lex $(LCMODEL).123 $(LCMODEL).clx $(MOOTHMM)
+	$(MOOTHMM) -M$(LCMODEL).lex,$(LCMODEL).123,$(LCMODEL).clx $(MOOTHMM_FLAGS) $< -o $@
 
 ##-- tagging
 tt: $(TEST).tt
@@ -360,20 +376,27 @@ save/%.xml_stamp: $(TEST).ttt $(TEST).mt.xml $(TRAIN).xml.model
 
 ##-- lower-case
 
-lower: $(TEST)-lower.ttt $(TRAIN)-lower.ttt
+lower: lc
 
-%-lower.ttt: %.ttt
+lc: $(TEST).lc.ttt $(TRAIN).lc.ttt
+
+nolower: nolc
+
+nolc:
+	rm -f *.lc.*
+
+%.lc.ttt: %.ttt
 	tr A-ZÄÖÜ a-zäöü < $< > $@
 
-lower_model: $(TRAIN)-lower.model
+lc_model: $(LCMODEL)
 
-%-lower.model: %-lower.ttt $(MOOTRAIN)
-	$(MOOTRAIN) -Imedium -ln $< -o $*-lower
+%.lc.model: %.lc.ttt $(MOOTRAIN)
+	$(MOOTRAIN) -Imedium -lnC $< -o $*.lc
 	touch $@
 
 ##-- tnt-tagging
 
-TNT_AFLAGS ?= -a10
+TNT_AFLAGS ?= -a$(SUFFIX_TRIE_LEN)
 TNT_DFLAGS ?= -d4
 TNT_UFLAGS ?= -u3
 TNT_NFLAGS ?= -n3
@@ -382,8 +405,8 @@ TNT_FLAGS ?= $(TNT_AFLAGS) $(TNT_DFLAGS) $(TNT_UFLAGS) $(TNT_NFLAGS)
 notnt:
 	rm -f *.tnt-tt *.tnt-tt.*
 
-%-lower.tnt-tt: %-lower.t $(MODEL)-lower.model
-	tnt $(TNT_FLAGS) $(MODEL)-lower $< > $@
+%.lc.tnt-tt: %.lc.t $(LCMODEL).model
+	tnt $(TNT_FLAGS) $(LCMODEL) $< > $@
 
 %.tnt-tt: %.t $(MODEL).model
 	tnt $(TNT_FLAGS) $(MODEL) $< > $@
@@ -395,7 +418,7 @@ notnt:
 clean:
 	rm -f tmp.res *~ \
 	  *.xml-check \
-	  *.tt *.dmt *.cmt \
+	  *.tt *.dmt *.cmt *.lc.* \
 	  *.tt.xml *.dmt.xml *.cmt.xml \
 	  *.tnt-tt \
 	  *.lex *.123 *.clx *.model \
