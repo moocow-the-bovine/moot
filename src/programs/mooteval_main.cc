@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,10 +18,10 @@
 */
 
 /*--------------------------------------------------------------------------
- * File: mootpp_main.cc
+ * File: mooteval_main.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + moocow's tagger: preprocessor : main()
+ *   + moocow's tagger: evaluator: main()
  *--------------------------------------------------------------------------*/
 
 #ifdef HAVE_CONFIG_H
@@ -32,30 +32,26 @@
 #include <errno.h>
 #include <string.h>
 
-#ifdef HAVE_TIME_H
-#include <time.h>
-#endif
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-
-#include <mootPPLexer.h>
-#include "mootpp_cmdparser.h"
+#include <mootTokenIO.h>
+#include "mooteval_cmdparser.h"
 #include "cmdutil.h"
 
 using namespace std;
+using namespace moot;
 
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-char *PROGNAME = "mootpp";
+char *PROGNAME = "mooteval";
 
 // files
 cmdutil_file_info out;
 
 // options & file-churning
 gengetopt_args_info args;
-cmdutil_file_churner churner;
+
+//-- token reader
+TokenReader treader(false,false);
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -70,21 +66,6 @@ void GetMyOptions(int argc, char **argv)
     fprintf(stderr,
 	    "\n%s version %s by Bryan Jurish <jurish@ling.uni-potsdam.de>\n\n",
 	    PROGNAME, VERSION);
-
-  // -- output file
-  out.name = args.output_arg;
-  if (strcmp(out.name,"-") == 0) out.name = "<stdout>";
-  if (!out.open("w")) {
-    fprintf(stderr,"%s: open failed for output-file '%s': %s\n",
-	    PROGNAME, out.name, strerror(errno));
-    exit(1);
-  }
-
-  // -- set up file-churner
-  churner.progname = PROGNAME;
-  churner.inputs = args.inputs;
-  churner.ninputs = args.inputs_num;
-  churner.use_list = args.list_given;
 }
 
 /*--------------------------------------------------------------------------
@@ -92,38 +73,9 @@ void GetMyOptions(int argc, char **argv)
  *--------------------------------------------------------------------------*/
 int main (int argc, char **argv)
 {
-  mootPPLexer lexer;
-  int nfiles = 0;
-  timeval started,stopped;
-  double elapsed;
-
   GetMyOptions(argc,argv);
-  lexer.verbose = args.verbose_arg;
 
-  // -- get start time
-  if (args.verbose_arg > 0) {
-      gettimeofday(&started, NULL);
-  }
-
-  // -- big loop
-  for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
-      if (args.verbose_arg > 0) {
-	nfiles++;
-	if (args.verbose_arg > 1) {
-	  fprintf(stderr,"%s: processing file '%s'... ", PROGNAME, churner.in.name);
-	  fflush(stderr);
-	}
-      }
-      fprintf(out.file, "\n%%%% %s: File: %s\n\n", PROGNAME, churner.in.name);
-
-      lexer.tokenize_stream(churner.in.file, out.file);
-
-      if (args.verbose_arg > 1) {
-	fprintf(stderr," done.\n");
-	fflush(stderr);
-      }
-  }
-  out.close();
+  //-- do something here!
 
   // -- summary
   if (args.verbose_arg > 0) {

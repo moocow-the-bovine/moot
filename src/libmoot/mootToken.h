@@ -128,7 +128,7 @@ public:
     {};
 
     /** Clear this object */
-    void clear(void) {
+    inline void clear(void) {
       tag = "";
       details = "";
       cost = 0.0;
@@ -206,6 +206,28 @@ public:
 	    const mootTagString &besttag)
     : tok_text(text), tok_analyses(analyses), tok_besttag(besttag)
   {};
+
+  /*------------------------------------------------------------
+   * Operators
+   */
+  /** Equality operator */
+  friend bool operator==(const mootToken &x, const mootToken &y)
+  {
+    return
+      x.tok_text == y.tok_text
+      && x.tok_besttag == y.tok_besttag
+      && x.tok_analyses == y.tok_analyses;
+  };
+
+  /** Comparison operaor */
+  friend bool operator <(const mootToken &x, const mootToken &y)
+  {
+    return
+      x.tok_text < y.tok_text
+      || x.tok_besttag < y.tok_besttag
+      || x.tok_analyses < y.tok_analyses;
+  };
+ 
 
   /*------------------------------------------------------------
    * Manipulators: General

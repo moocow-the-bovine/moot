@@ -1,0 +1,49 @@
+# -*- Mode: Shell-Script -*-
+# Getopt::Gen specification for 'mooteval'
+#-----------------------------------------------------------------------------
+program "mooteval"
+#program_version "0.01"
+
+purpose	"Output evaluator for moocow's PoS tagger."
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details "
+mooteval compares a 'medium' file and a 'medium' or 'well done'
+file, and summarizes the differences between them.  See
+L<mootfiles> for details on file formats.
+"
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+argument "FILE1 FILE2" "Files to compare."
+
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+
+int "verbose" v "Verbosity level." \
+    arg="LEVEL" \
+    default="1" \
+    details="Range: 0..1"
+
+#string	"output" o "Write output to FILE." \
+#    arg="FILE" \
+#    default="-" \
+#    details=""
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+acknowledge `cat acknowledge.pod`
+
+seealso "L<mootm>, L<moothmm>, L<moot>, L<mootfiles>."
