@@ -13,6 +13,7 @@
 #include <deque>
 #include <map>
 #include <set>
+//#include <pair>
 #include <FSMSymSpec.h>
 
 using namespace std;
@@ -31,6 +32,16 @@ typedef map<FSMSymbolString,FSMSymbol> dwdstStringToSymbolMap;
 
 /// Used for disambig-fsa generation
 typedef vector<set<FSMSymbolString>::iterator> tagSetIterVector;
+
+/// Used for disambig-fsa generation.
+/// First element is a count, second element is the number of
+/// shortening-adjustments (fallback iterations) required to find
+/// the count.
+class NGramCountFallbacksPair : public pair<float,float> {
+public:
+  inline float &count() { return first; };
+  inline float &fallbacks() { return second; };
+};
 
 
 #endif /* _DWDST_TYPES_H */

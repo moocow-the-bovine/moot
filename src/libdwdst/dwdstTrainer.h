@@ -168,9 +168,15 @@ public:
   /// Low-level possible tagset-ngram iteration initializer.
   tagSetIterVector &tagIters_begin(tagSetIterVector &tagIters,set<FSMSymbolString> &tagSet,int len);
   /// Low-level possible tagset-ngram iteration incrementer.
-  tagSetIterVector &tagIters_next(tagSetIterVector &tagIters);
+  tagSetIterVector &tagIters_next(tagSetIterVector &tagIters,set<FSMSymbolString> &tagSet);
   /// Low-level possible tagset-ngram iteration termination-test predicate.
   bool tagIters_done(tagSetIterVector &tagIters,set<FSMSymbolString> tagSet);
+
+  // -- public methods: low-level: disambig-fsa utilities
+  /// Low-level: get the cost of final transition for nGram.
+  FSMWeight disambigArcCost(NGramVector &nGram, FSMSymbolString &tagTo);
+  /// Low-level: get the count for a single nGram, using fallback strategy.
+  NGramCountFallbacksPair nGramCountFallbacks(NGramVector &nGram);
 };
 
 #endif // _DWDST_TRAINER_H_

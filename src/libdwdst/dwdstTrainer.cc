@@ -37,10 +37,9 @@ dwdstTrainer::~dwdstTrainer() {
  * Public Methods: mid-level: tag-list file-reading
  *--------------------------------------------------------------------------*/
 
-/*
- * set<FSMSymbolString> dwdstTrainer::read_taglist_file(set<FSMSymbolString> &tagset, const char *filename=NULL);
- *  + implicitly clears 'tagset'
- *  + if 'filename' is NULL, 'tagset' is set to all categories according to 'syms' data member
+/**
+ * Implicitly clears 'tagset'.
+ * If 'filename' is NULL, 'tagset' is set to all categories according to 'syms' data member.
  */
 set<FSMSymbolString> dwdstTrainer::read_taglist_file(set<FSMSymbolString> &tagset, const char *filename=NULL)
 {
@@ -93,10 +92,9 @@ set<FSMSymbolString> dwdstTrainer::read_taglist_file(set<FSMSymbolString> &tagse
  * Public Methods: FSA Generation: Unknown-Analysis FSA
  *--------------------------------------------------------------------------*/
 
-/*
- * FSM *dwdstTrainer::generate_unknown_fsa();
- *   + generates analysis-FSA for tokens unknown to KDWDS morphology
- *   + uses 'opentags' : set of open-class PoS tags
+/**
+ * Generates analysis-FSA for tokens unknown to KDWDS morphology.
+ * Uses 'opentags' : set of open-class PoS tags.
  */
 FSM *dwdstTrainer::generate_unknown_fsa()
 {
@@ -131,8 +129,9 @@ FSM *dwdstTrainer::generate_unknown_fsa()
  *  --> BAUSTELLE!
  *--------------------------------------------------------------------------*/
 
-/*
- * FSM *dwdstTrainer::generate_disambig_fsa();
+/**
+ * Generate a statistical PoS-disambiguation FSA based on internal
+ * N-Gram tables. \b Warning: work in progress!
  */
 FSM *dwdstTrainer::generate_disambig_fsa()
 {
@@ -144,19 +143,22 @@ FSM *dwdstTrainer::generate_disambig_fsa()
   */
   if (dfsa) { delete dfsa; }
   dfsa = new FSM();
-  FSMRepresentation rep = dfsa->fsm_representation();
+  FSMRepresentation *rep = dfsa->fsm_representation();
+  FSMWeight freecost = rep->cost_structure()->freecost();
 
   // -- build a symbol-map for all tags we know
   FSMSymbol symMax = 0;
-  dwdstStringToSymbolMap str2sym;
+  dwdstStringToSymbolMap tags2symbols;
   for (set<FSMSymbolString>::iterator si = alltags.begin(); si != alltags.end(); si++) {
-    str2sym[*si] = ++symMax;
+    tags2symbols[*si] = ++symMax;
   }
 
   // -- generate a skeleton-FSA using a single-symbol for each pseudo-tag
+  //    initialization: BOS
   FSMState q0 = rep->new_state();
   rep->add_state(q0);
   rep->set_start_state(q0);
+  rep->mark_state_as_final(q0,freecost);
 
   map<NGramVector,FSMState> nGram2State;
   theNgram.clear();
@@ -167,46 +169,95 @@ FSM *dwdstTrainer::generate_disambig_fsa()
   tagSetIterVector tagIters;
   tagIters.clear();
 
-  int len, j;
+  int len;
+  FSMState prevState;
   NGramVector prevNgram;
-  FSMState theState, prevState;
-  for (len = 1; len <= kmax; len++) {
+  for (len = 1; len < kmax; len++) {
     // -- len: n-gram length for this pass
+    //    we ignore len=0, because that's BOS/EOS,
+    //    and also  len=kmax, because we don't need states for those.
     for (tagIters_begin(tagIters,alltags,len);
 	 !tagIters_done(tagIters,alltags);
-	 tagIters_next(tagIters))
+	 tagIters_next(tagIters,alltags))
       {
-	// -- build current and previous nGrams from tagIters
+	// -- build current nGram from tagIters
 	theNgram.clear();
-	if (len < kmax) theNgram.push_back(eos);
-	for (tagSetIterVector::tsi = tagIters.begin(); tsi != tagIters.end(); tsi++) {
+	if (len < kmax-1) theNgram.push_back(eos);
+	for (tagSetIterVector::iterator tsi = tagIters.begin(); tsi != tagIters.end(); tsi++) {
 	  theNgram.push_back(*(*tsi));
 	}
-	prevNgram = theNgram;
-	prevNgram.pop_back();
 
-	// -- add a state for the current nGram
-	theState = rep->new_state();
-	rep->add_State(theState);
+	// -- add a (final) state for the current nGram
+	FSMState theState = rep->new_state();
+	rep->add_state(theState);
+	rep->mark_state_as_final(theState, freecost);
 	nGram2State[theNgram] = theState;
 
-	// -- add a transition from the preceeding nGram's state, if it exists
+	// -- add a transition from the 'preceeding' nGram's state, if it exists
 	//    (BOS-bootstrap)
-	if ((dwdstStringToSymbolMap::iterator pngi = nGram2State.find(prevNgram)) !=
-	    nGram2State.end())
-	  {
-	    prevState = *pngi;
-	    
-	  }
+	prevNgram = theNgram;
+	prevNgram.pop_back();
+	if (prevNgram[0] != eos) { prevNgram.push_front(eos); }
+	map<NGramVector,FSMState>::const_iterator pngi = nGram2State.find(prevNgram);
+	if (pngi != nGram2State.end()) {
+	  prevState = pngi->second;
+	  FSMSymbolString  theTag     = theNgram[theNgram.size()-1];
+	  FSMSymbol        tagSymbol  = tags2symbols[theTag];
+	  FSMWeight        arcCost    = disambigArcCost(prevNgram, theTag);
+	  rep->add_transition(prevState, theState, tagSymbol, tagSymbol, arcCost);
+	} else {
+	  // -- this should never happen!
+	  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): missing state in BOS bootstrap!\n");
+	  continue;
+	}
       }
   }
 
-  FSMSymbol sym;
-  FSMState q;
-  for (sym = 1; sym < symMax; sym++) {
-    ; // continue!
-  }
+  // -- now, add transitions for the various kmax-Grams,
+  //    between the states for the (kmax-1)-Grams
+  NGramVector nextNgram;
+  for (tagIters_begin(tagIters,alltags,kmax-1);
+       !tagIters_done(tagIters,alltags);
+       tagIters_next(tagIters,alltags))
+    {
+      // -- build (kmax-1)-Gram for source state from tagIters
+      prevNgram.clear();
+      if (len < kmax) {
+	prevNgram.push_back(eos);
+      }
+      for (tagSetIterVector::iterator tsi = tagIters.begin(); tsi != tagIters.end(); tsi++) {
+	prevNgram.push_back(*(*tsi));
+      }
 
+      // -- source-state lookup
+      map<NGramVector,FSMState>::const_iterator pngi = nGram2State.find(prevNgram);
+      if (pngi != nGram2State.end()) {      
+	prevState = pngi->second;
+      } else {
+	// -- this should never happen
+	fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): missing source-state in kmax-linkup!\n");
+	continue;
+      }
+
+      // -- build (kmax-1)-Gram for destination state from prevNgram
+      nextNgram = prevNgram;
+      nextNgram.pop_front();
+      for (set<FSMSymbolString>::iterator tsi = alltags.begin(); tsi != alltags.end(); tsi++) {
+	FSMSymbolString theTag = *tsi;
+	nextNgram.push_back(theTag);
+	map<NGramVector,FSMState>::const_iterator nngi = nGram2State.find(nextNgram);
+	if (nngi != nGram2State.end()) {
+	  FSMState   theState   = nngi->second;
+	  FSMSymbol  tagSymbol  = tags2symbols[theTag];
+	  FSMWeight  arcCost    = disambigArcCost(prevNgram, theTag);
+	  rep->add_transition(prevState, theState, tagSymbol, tagSymbol, arcCost);
+	} else {
+	  // -- this should never happen!
+	  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): missing sink-state in kmax-linkup!\n");
+	}
+	nextNgram.pop_back();
+      }
+    }
   return dfsa;
 }
 
@@ -215,13 +266,57 @@ FSM *dwdstTrainer::generate_disambig_fsa()
  *--------------------------------------------------------------------------*/
 
 /**
- * Returns the expected cost of 
+ * Returns the expected cost of transition from
+ * state nGram to state <nGram,tagTo>.
  */
-FSMWeight dwdstTrainer::transitionCost(NGramVector &nGram)
+FSMWeight dwdstTrainer::disambigArcCost(NGramVector &nGram, FSMSymbolString &tagTo)
 {
-  // continue!
-  return 0;
+  NGramVector nGramFrom = nGram;
+  nGramFrom.pop_back();
+
+  // -- get raw count and number of fallbacks for nGramFrom
+  NGramCountFallbacksPair fromCF = nGramCountFallbacks(nGramFrom);
+
+  // -- now we set up the destination-nGram, because
+  //    nGramFrom might have been shortened.
+  NGramVector nGramTo = nGramFrom;
+  nGramTo.push_back(nGram[nGram.size()-1]);
+  NGramCountFallbacksPair toCF = nGramCountFallbacks(nGramTo);
+
+  // -- now we can just do the math
+  //    ArcCost(fromCF,toCF) := / fromFallbacks + toFallbacks + (toCount / fromCount) : if fromCount != 0
+  //                            \ fromFallbacks + toFallbacks + 1.0                   : otherwise
+  return
+    (fromCF.fallbacks() + toCF.fallbacks() +
+     (fromCF.count() ? (toCF.count() / fromCF.count()) : 1.0));
 }
+
+/**
+ * Get the count for nGram.  If it doesn't exist,
+ * chop its first (oldest) element and get the count for 
+ */
+NGramCountFallbacksPair dwdstTrainer::nGramCountFallbacks(NGramVector &nGram)
+{
+  NGramCountFallbacksPair cfb;
+
+  cfb.fallbacks() = 0;
+  NGramTable::iterator ngfi;
+  while (!nGram.empty() && (ngfi = ngtable.find(nGram)) == ngtable.end()) {
+    // -- didn't find one -- shorten the nGram and adjust the fallback-penalty
+    cfb.fallbacks() += 1.0;
+    nGram.pop_front();
+  }
+  if (nGram.empty()) {
+    // -- we didn't find *anything*
+    cfb.fallbacks() += 1.0;
+    cfb.count() = 0.0;
+  } else {
+    // -- we found something: get the count
+    cfb.count() = ngtable[nGram];
+  }
+  return cfb;
+}
+
 
 /*--------------------------------------------------------------------------
  * Public Methods: low-level tag iteration utilities
@@ -247,14 +342,21 @@ tagSetIterVector &dwdstTrainer::tagIters_begin(tagSetIterVector &tagIters,
 /**
  * Get next possible ${tagIters.size()}-gram iterator-vector for tagSet
  */
-tagSetIterVector &dwdstTrainer::tagIters_next(tagSetIterVector &tagIters) {
+tagSetIterVector &dwdstTrainer::tagIters_next(tagSetIterVector &tagIters,
+					       set<FSMSymbolString> &tagSet)
+{
   for (int j = tagIters.size()-1; j >= 0; j--) {
-    if (++tagIters[j] != alltags.end() || j == 0) {
-      // -- just step this position
+    ++tagIters[j];
+    // -- HACK: ignore EOS
+    if (tagIters[j] != tagSet.end() && *(tagIters[j]) == eos) {
+      ++tagIters[j];
+    }
+    // -- Try to just step this position
+    if (tagIters[j] != tagSet.end() || j == 0) {
       break;
     }
-    // -- reset this position and increment the next highest
-    tagIters[j] = alltags.begin();
+    // -- Reset this position and increment the next highest
+    tagIters[j] = tagSet.begin();
   }
   return tagIters;
 }
