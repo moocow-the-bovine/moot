@@ -163,16 +163,18 @@ bool TokenIO::is_empty_format(int fmt)
  */
 int TokenIO::sanitize_format(int fmt, int fmt_implied, int fmt_default)
 {
+  int san = fmt|fmt_implied;
+
   //-- handle empty formats
-  if (is_empty_format(fmt)) fmt |= fmt_default;
+  if (is_empty_format(san)) san |= fmt_default;
 
   //-- select only one basic format
-  if      (fmt & tiofXML)    fmt &= ~tiofNative;
-  else if (fmt & tiofNative) fmt &= ~tiofXML;
-  else if (!(fmt&tiofUser))  fmt |= tiofNative;
+  if      (fmt & tiofXML)    san &= ~tiofNative;
+  else if (fmt & tiofNative) san &= ~tiofXML;
+  else if (!(fmt&tiofUser))  san |= tiofNative;
 
   //-- and return
-  return (fmt|fmt_implied);
+  return san;
 }
 
 /*------------------------------------------------------------
