@@ -1,9 +1,9 @@
 # -*- Mode: Shell-Script -*-
 
-# File: dwdst.pc
+# File: moot.pc
 # Description:
 #   + pkg-config data for (K)DWDS PoS tagger
-#   + auto-generated from dwdst.pc.in
+#   + auto-generated from moot.pc.in
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
@@ -16,7 +16,7 @@ docdir=@docdir@
 pkgdocdir=@pkgdocdir@
 
 cppflags=-I@spkgincludedir@ @CPPFLAGS@
-ldadd=-ldwdst
+ldadd=-lmoot
 
 
 Name: @PACKAGE@

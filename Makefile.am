@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------
 # File: ./Makefile.am
-# Package: dwdst
+# Package: moot
 # Description:
 #   + top-level automake file for DWDS tagger
 #

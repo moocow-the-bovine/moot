@@ -1,5 +1,8 @@
-ChangeLog for package dwdst
+ChangeLog for package moot
 
+moot-v1.0.4 Tue,  2 Dec 2003 13:26:40 +0100
+  + renamed from 'dwdst' to 'moot'
+	
 v1.0.3 Tue,  2 Dec 2003 02:13:52 +0100
   + changes for compilation with g++-3.2
     - removed many redundant param-default specifications in non-prototype declarations
@@ -14,53 +17,53 @@ v1.0.3 Tue,  2 Dec 2003 02:13:52 +0100
 	flex++ / bison++ distribution(s) seems to have fixed things.
 	
 v1.0.2 Mon, 25 Aug 2003 04:04:44 +0200
-  + added dwdstHMMTrainer class and executable 'dwdstrain'
+  + added mootHMMTrainer class and executable 'mootrain'
 	- names may change to speed things up for fully supervised training
 	  with kmax=3
 	- Even this API still needs some way to handle unknown tokens for
 	  n-gram generation...
-  + added namespace 'dwdst', shoved everything I could into it
+  + added namespace 'moot', shoved everything I could into it
 	- still global: flex++/bison++ lexers/parsers
 	  * couldn't get namespaces to work with these - got
 	    alleged conflicts with stdio.h
   + wrote many docs
   + STILL todo:
-	- missing a decent string API for dwdstCHMM ...
+	- missing a decent string API for mootCHMM ...
 	- get GenGetopt::cmdline_[ch] to stop complaining about
 	  command-lines overriding config-files...
 
 
 v1.0.1 Sun, 24 Aug 2003 00:37:25 +0200
-  + (dwdstCHMM::TagMorphMap)s now handled as pointers, analysis-sets
+  + (mootCHMM::TagMorphMap)s now handled as pointers, analysis-sets
     are stored with corresponding tags in the state-table
-  + Added top-level interface structure (dwdstHMM::ViterbiPathNode*)
+  + Added top-level interface structure (mootHMM::ViterbiPathNode*)
   + Still missing:
-	- string-set interface to dwdstCHMM::viterbi_step()
+	- string-set interface to mootCHMM::viterbi_step()
 	- *HMM::can_flush() , *HMM::viterbi_flush()
 	  ~ ought to be easy to implement
 	
 v1.0.0 Thu, 21 Aug 2003 13:37:21 +0200
-  + new class for morphological analysis: 'dwdstMorph'
-  + new user program for morphology only: 'dwdsm' (replaces old 'dwdst')
-  + new class for morphologically-aware disambiguation: 'dwdstCHMM'
-  + re-wrote 'dwdst': now uses 'dwdstCHMM' as base class
-  + wrote binary load/save routines for 'dwdstHMM', 'dwdstCHMM'
-  + added tag-extraction hook-FST to 'dwdstMorph'
+  + new class for morphological analysis: 'mootMorph'
+  + new user program for morphology only: 'dwdsm' (replaces old 'moot')
+  + new class for morphologically-aware disambiguation: 'mootCHMM'
+  + re-wrote 'moot': now uses 'mootCHMM' as base class
+  + wrote binary load/save routines for 'mootHMM', 'mootCHMM'
+  + added tag-extraction hook-FST to 'mootMorph'
 	- just using an identity-FST slows us down ca. 50%
 	- maybe fixing a libFSM bug preventing FSA->compose(FST)
 	  would help here...
   + tried new morphology, with abominable (accuracy=70%) results
   + TODO:
 	- fix new morphology (argh)
-	- enable pre-computed tagsets in input files in dwdstCHMM
-	  as for dwdstHMM (parse dwdsm "TAG:ANALYSIS" format?!)
+	- enable pre-computed tagsets in input files in mootCHMM
+	  as for mootHMM (parse dwdsm "TAG:ANALYSIS" format?!)
 	  * looks like a job for POSIX regexes...
 	- write perl-XS interface
 	
 v1.0.0_pre4 Thu, 14 Aug 2003 17:55:48 +0200
-  + corrected '-q' syntax for dwdst, optimized 
-    dwdstTagger::symbol_vector_to_string_dq() method.
-  + added class 'dwdstHMM' for HMM-style tagging/disambiguation
+  + corrected '-q' syntax for moot, optimized 
+    mootTagger::symbol_vector_to_string_dq() method.
+  + added class 'mootHMM' for HMM-style tagging/disambiguation
 	
 Wed Nov 13 16:02:33 CET 2002
   + updated for FSMlib v0.1.0

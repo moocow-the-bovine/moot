@@ -1,12 +1,12 @@
 =pod
 
-README for package 'dwdst'
+README for package 'moot'
 
-Last updated for dwdst version 1.0.1
+Last updated for moot version 1.0.1
 
 =head1 DESCRIPTION
 
-dwdst - Part-of-Speech tagger using Thomas Hanneforth's libFSM.
+moot - Part-of-Speech tagger using Thomas Hanneforth's libFSM.
 
 =head1 REQUIREMENTS
 
@@ -128,6 +128,6 @@ For details on the DWDS project, visit: http://www.dwds.de.
 Thomas Hanneforth wrote the underlying FSM library.
 
 Bryan Jurish E<lt>moocow@ling.uni-potsdam.deE<gt>
-wrote and maintains the 'dwdst' package itself.
+wrote and maintains the 'moot' package itself.
 
 =cut

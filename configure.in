@@ -2,8 +2,8 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.5)
 
 dnl Some handy macros
-define([THE_PACKAGE_NAME],    [dwdst])
-define([THE_PACKAGE_VERSION], [1.0.3])
+define([THE_PACKAGE_NAME],    [moot])
+define([THE_PACKAGE_VERSION], [1.0.4])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
@@ -18,7 +18,7 @@ dnl use automake
 AM_INIT_AUTOMAKE(THE_PACKAGE_NAME, THE_PACKAGE_VERSION)
 
 dnl use autoheader
-AM_CONFIG_HEADER([src/libdwdst/dwdstConfig.h])
+AM_CONFIG_HEADER([src/libmoot/mootConfig.h])
 
 dnl default prefix
 AC_PREFIX_DEFAULT(/usr/local)
@@ -249,7 +249,7 @@ if test -z "$ac_cv_doc_formats" ; then
 fi
 
 ## -- un-comma-tize the doc-formats
-dwdst_doc_formats=`echo "$ac_cv_doc_formats" | sed 's/\,/ /g'`
+moot_doc_formats=`echo "$ac_cv_doc_formats" | sed 's/\,/ /g'`
 
 
 AC_ARG_ENABLE(doc,
@@ -260,13 +260,13 @@ AC_ARG_ENABLE(doc,
 AC_MSG_CHECKING([which documentation formats to build])
 if test "$enable_doc" != "yes" ; then
  ### disable all docs
- dwdst_doc_formats="none"
+ moot_doc_formats="none"
 fi
-AC_MSG_RESULT($dwdst_doc_formats)
+AC_MSG_RESULT($moot_doc_formats)
 #echo ">> post RESULT"
 
 
-if test "$dwdst_doc_formats" != "none" ; then
+if test "$moot_doc_formats" != "none" ; then
   ### docs: prog doxygen
   AC_PATH_PROG(DOXYGEN,doxygen,[])
   AC_SUBST(DOXYGEN)
@@ -288,12 +288,12 @@ if test "$dwdst_doc_formats" != "none" ; then
   AC_SUBST(POD2LATEX)
 
   ### -- docs: .gog file linkup
-  #dwdst_program_gogs="dwdst.gog dwdspp.gog dwdst-fstgen.gog dwdst-pargen.gog"
-  dwdst_program_gogs="dwdspp.gog dwdstrain.gog dwdshmm.gog dwdsm.gog dwdst.gog"
-  for g in $dwdst_program_gogs ; do
+  #moot_program_gogs="moot.gog dwdspp.gog moot-fstgen.gog moot-pargen.gog"
+  moot_program_gogs="dwdspp.gog mootrain.gog dwdshmm.gog dwdsm.gog moot.gog"
+  for g in $moot_program_gogs ; do
     AC_CONFIG_LINKS(doc/programs/${g}:src/programs/${g})  
   done
-  AC_SUBST(dwdst_program_gogs)
+  AC_SUBST(moot_program_gogs)
 
 
   ### -- initialize defaults
@@ -303,12 +303,12 @@ if test "$dwdst_doc_formats" != "none" ; then
   DOXY_WANT_MAN="NO"
   DOXY_WANT_LATEX="NO"
 
-  for fmt in $dwdst_doc_formats ; do
+  for fmt in $moot_doc_formats ; do
     case "$fmt" in
 
       txt)
 	if test -n "$POD2TEXT" ; then
-	  DOC_PROG_TXT_TARGETS=`echo "$dwdst_program_gogs" | sed 's/\.gog/\.txt/g'`
+	  DOC_PROG_TXT_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.txt/g'`
 	else
 	  AC_MSG_WARN(pod2text not found -- program text docs will not be built!)
 	fi
@@ -321,7 +321,7 @@ if test "$dwdst_doc_formats" != "none" ; then
           DOC_MAN3_MANS="man/man3/*"
 	fi
 	if test -n "$POD2MAN" ; then
-	  DOC_PROG_MAN_TARGETS=`echo "$dwdst_program_gogs" | sed 's/\.gog/\.1/g'`
+	  DOC_PROG_MAN_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.1/g'`
 	else
 	  AC_MSG_WARN(pod2man not found -- program manpages will not be built!)
 	fi
@@ -333,7 +333,7 @@ if test "$dwdst_doc_formats" != "none" ; then
           DOC_SUBDIRS="$DOC_SUBDIRS html"
 	fi
 	if test -n "$POD2HTML" ; then
-	  DOC_PROG_HTML_TARGETS=`echo "$dwdst_program_gogs" | sed 's/\.gog/\.html/g'`
+	  DOC_PROG_HTML_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.html/g'`
 	else
 	  AC_MSG_WARN(pod2html not found -- program html docs will not be built!)
 	fi
@@ -345,7 +345,7 @@ if test "$dwdst_doc_formats" != "none" ; then
 	  DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.dvi"
 	fi
 	if test -n "$POD2LATEX" ; then
-	  DOC_PROG_DVI_TARGETS=`echo "$dwdst_program_gogs" | sed 's/\.gog/\.dvi/g'`
+	  DOC_PROG_DVI_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.dvi/g'`
 	else
 	  AC_MSG_WARN(pod2latex not found -- program dvi docs will not be built!)
 	fi
@@ -357,7 +357,7 @@ if test "$dwdst_doc_formats" != "none" ; then
 	  DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.ps"
 	fi
 	if test -n "$POD2LATEX" ; then
-	  DOC_PROG_PS_TARGETS=`echo "$dwdst_program_gogs" | sed 's/\.gog/\.ps/g'`
+	  DOC_PROG_PS_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.ps/g'`
 	else
 	  AC_MSG_WARN(pod2latex not found -- program postscript docs will not be built!)
 	fi
@@ -369,7 +369,7 @@ if test "$dwdst_doc_formats" != "none" ; then
     	  DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.pdf"
 	fi
 	if test -n "$POD2LATEX" ; then
-	  DOC_PROG_PDF_TARGETS=`echo "$dwdst_program_gogs" | sed 's/\.gog/\.pdf/g'`
+	  DOC_PROG_PDF_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.pdf/g'`
 	else
 	  AC_MSG_WARN(pod2latex not found -- program pdf docs will not be built!)
 	fi
@@ -379,7 +379,7 @@ if test "$dwdst_doc_formats" != "none" ; then
 	AC_MSG_WARN(ignoring unknown documentation format: $fmt)
 	;;
     esac; # case "$fmt" in ...
-  done; # for fmt in $dwdst_doc_formats ...
+  done; # for fmt in $moot_doc_formats ...
 
   AC_SUBST(DOXY_WANT_HTML)
   AC_SUBST(DOXY_WANT_MAN)
@@ -411,7 +411,7 @@ if test "$dwdst_doc_formats" != "none" ; then
     fi
   done 
   AC_SUBST(DOXY_TAGFILES)   
-fi; # if "$dwdst_doc_formats" != "none" ...
+fi; # if "$moot_doc_formats" != "none" ...
 
 
 #---------------------------------------------------------------
@@ -448,14 +448,14 @@ AC_ARG_ENABLE(debug,
 
 if test "$enable_debug" == "yes" ; then
    AC_MSG_RESULT(yes)
-   DWDST_OFLAGS="-g"
+   moot_OFLAGS="-g"
 else
   AC_MSG_RESULT(no)
-  #DWDST_OFLAGS="-O2"
-  #DWDST_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
-  DWDST_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops"
+  #moot_OFLAGS="-O2"
+  #moot_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
+  moot_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops"
 fi
-AC_SUBST(DWDST_OFLAGS)
+AC_SUBST(moot_OFLAGS)
 
 
 dnl ---------------------------------------------------------------
@@ -476,24 +476,24 @@ AC_ARG_ENABLE(warnings,
 
 if test "$enable_warnings" != "no" ; then
    AC_MSG_RESULT(yes)
-   DWDST_WFLAGS="-Wall"
+   moot_WFLAGS="-Wall"
 else
   AC_MSG_RESULT(no)
-  DWDST_WFLAGS=""
+  moot_WFLAGS=""
 fi
-AC_SUBST(DWDST_WFLAGS)
+AC_SUBST(moot_WFLAGS)
 
 
 dnl
 dnl output
 dnl
-AC_CONFIG_FILES(src/libdwdst/Makefile src/programs/Makefile src/Makefile)
-AC_CONFIG_FILES(doc/libdwdst/mainpage.dox)
-AC_CONFIG_FILES(doc/libdwdst/libdwdst.doxy doc/libdwdst/Makefile)
+AC_CONFIG_FILES(src/libmoot/Makefile src/programs/Makefile src/Makefile)
+AC_CONFIG_FILES(doc/libmoot/mainpage.dox)
+AC_CONFIG_FILES(doc/libmoot/libmoot.doxy doc/libmoot/Makefile)
 AC_CONFIG_FILES(doc/programs/Makefile)
 AC_CONFIG_FILES(doc/Makefile)
 AC_CONFIG_FILES(config/Makefile)
 AC_CONFIG_FILES(Makefile)
-AC_CONFIG_FILES(dwdst.pc)
-AC_CONFIG_FILES(dwdst.spec)
+AC_CONFIG_FILES(moot.pc)
+AC_CONFIG_FILES(moot.spec)
 AC_OUTPUT

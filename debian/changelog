@@ -1,11 +1,29 @@
-moot (1.0.0-pre3) unstable; urgency=low
+moot (1.0.4) unstable; urgency=low
 
- * added class 'mootHMM', program 'dwdshmm'
+ * renaming to 'moot'
+
+ -- Bryan Jurish <moocow@ling.uni-potsdam.de>  Tue,  2 Dec 2003 13:24:39 +0100
+
+dwdst (1.0.3) unstable; urgency=low
+
+ * cleaned up build for compilation with gcc-3.2
+
+ -- Bryan Jurish <moocow@ling.uni-potsdam.de>  Tue,  2 Dec 2003 01:02:03 +0100
+
+dwdst (1.0.2) unstable; urgency=low
+
+ * added trainer, first "official" release
+
+ -- Bryan Jurish <moocow@ling.uni-potsdam.de>  Tue, 13 Aug 2003 00:00:00 +0200
+
+dwdst (1.0.0-pre3) unstable; urgency=low
+
+ * added class 'dwdstHMM', program 'dwdshmm'
  * general cleanup
 
  -- Bryan Jurish <moocow@ling.uni-potsdam.de>  Tue, 12 Aug 2003 00:28:36 +0200
 
-moot (0.0.7) unstable; urgency=low
+dwdst (0.0.7) unstable; urgency=low
 
   * compatibility-fix for ambiguity-class alphabet files.
 
@@ -13,7 +31,7 @@ moot (0.0.7) unstable; urgency=low
 
 
 
-moot (0.0.6) unstable; urgency=low
+dwdst (0.0.6) unstable; urgency=low
 
   * Initial release in .deb format.
 
