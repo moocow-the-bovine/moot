@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2002-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ cmdutil_file_info out;
 // -- global classes/structs
 mootHMM      hmm;
 mootNgrams   ngrams;
-mootLexfreqs lexfreqs;
+mootLexfreqs lexfreqs(32768);
 
 // -- for verbose timing info
 timeval istarted, astarted, astopped;
@@ -170,6 +170,7 @@ void GetMyOptions(int argc, char **argv)
   if (!binfile) {
     if (args.verbose_arg > 1)
       fprintf(stderr, "%s: compiling HMM...", PROGNAME);
+    lexfreqs.compute_specials();
     if (!hmm.compile(lexfreqs, ngrams, args.eos_tag_arg)) {
       fprintf(stderr,"\n%s: HMM compilation FAILED\n", PROGNAME);
       exit(1);

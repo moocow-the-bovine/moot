@@ -1,6 +1,6 @@
 ChangeLog for package moot
 
-v2.0.0 Thu, 27 May 2004 00:48:43 +0200
+v2.0.0 Sat, 29 May 2004 01:59:14 +0200
 	+ added mootToken.h: mootToken, mootSentence interface classes
   	  - old string-based methods now deprecated
 	+ added mootTokenLexer - replaces old 'mootTaggerLexer'
@@ -17,9 +17,25 @@ v2.0.0 Thu, 27 May 2004 00:48:43 +0200
 	  - use nested maps for data: faster
 	+ re-wrote mootHMMTrainer
 	  - (kmax=3) now hard-coded in (use uni-, bi-, and trigrams)
-	  - training from ambiguous data no longer allowed
+	  - training from ambiguous data no longer possible
+	+ fixed token-typification code (now in mootToken.h)
+	  - should now be ca. 99.998% TnT-compatible with moot_TNT_COMPAT
+	    macro defined (can't find the last bugger)
+	  - Today's Most Annoying Undocumented Feature Award goes to
+	    Thorsten Brants for failing to document TnT's (length<=3)
+	    restriction for @CARDSUFFIX types
 	+ reduced old mootCHMM to mootHMM (still untested)
-	  - still todo: integrate training for CHMM into mootHMMTrainer
+	+ added class mootClassfreqs : raw class frequency counter (untested)
+	+ added mootClassfreqs(Lexer|Parser|Compiler) for text
+	  lexical-class parameter text I/O
+	+ Todo:
+	  - add class-counting to mootHMMTrainer
+	    ~ param 'maxClasses' ?
+	  - test mootClassfreqs I/O
+	  - test class-based tagging (CHMM replacement)
+	  - rename 'moothmm' -> 'moot'
+	  - add & test binary I/O for mootClassfreqs
+	  - move compilation / dump to a separate program 'mootcompile' ?
 	
 v1.0.5 Fri, 21 May 2004 14:14:31 +0200
   + extracting FSM dependencies to 'mootm' package

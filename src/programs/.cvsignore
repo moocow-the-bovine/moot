@@ -9,7 +9,10 @@ dwdshmm
 moothmm
 moot-pargen
 moot-fstgen
+typtag
+tokio
 [^a]*.pod
+*.typt*
 *.1
 *.xml
 *.list

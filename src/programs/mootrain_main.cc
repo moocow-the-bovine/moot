@@ -217,15 +217,23 @@ int main (int argc, char **argv)
   //-- save: lexfreqs
   if (hmmt.want_lexfreqs) {
     if (args.verbose_arg >= vlProgress)
+      fprintf(stderr, "%s: computing counts for special lexemes...", PROGNAME);
+
+    hmmt.lexfreqs.compute_specials();
+
+    if (args.verbose_arg >= vlProgress)
+      fprintf(stderr, "done.\n");
+
+    if (args.verbose_arg >= vlProgress)
       fprintf(stderr, "%s: saving lexical frequency file '%s'...", PROGNAME, lfout.name);
 
-    //-- finish summary
+    //-- print summary to file
     fprintf(lfout.file, "%s  Num/Tokens : %g\n", cmts, hmmt.lexfreqs.n_tokens);
-    //fprintf(lfout.file, "%s  Num/Types  : %u\n", cmts, hmmt.lexfreqs.lftotals.size());
+    fprintf(lfout.file, "%s  Num/Types  : %u\n", cmts, hmmt.lexfreqs.lftable.size());
     fprintf(lfout.file, "%s  Num/Tags   : %u\n", cmts, hmmt.lexfreqs.tagtable.size());
-    fprintf(lfout.file, "%s  Table Size : %u tok*tag\n", cmts, hmmt.lexfreqs.lftable.size());
+    fprintf(lfout.file, "%s  Num/Pairs  : %u tok*tag\n", cmts, hmmt.lexfreqs.n_pairs());
 
-    //-- guts
+    //-- lexfreqs: save: guts
     if (!hmmt.lexfreqs.save(lfout.file, lfout.name)) {
       fprintf(stderr, "\n%s: save FAILED for lexical frequency file '%s'\n",
 	      PROGNAME, lfout.name);

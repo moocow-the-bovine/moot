@@ -47,12 +47,14 @@ DOXY_INPUTS = \
 	mootEnum.h \
 	mootLexfreqsLexer.h	mootLexfreqsParser.h	mootLexfreqsCompiler.h	\
 	mootLexfreqs.h \
+	mootClassfreqsLexer.h	mootClassfreqsParser.h	mootClassfreqsCompiler.h	\
+	mootClassfreqs.h \
 	mootNgramsLexer.h	mootNgramsParser.h	mootNgramsCompiler.h	\
 	mootNgrams.h \
 	mootPPLexer.h \
-	mootHMM.h \
-	mootCHMM.h
+	mootHMM.h
 
+#	mootCHMM.h
 #	mootMorph.h
 
 #-----------------------------------------------------------------------
