@@ -52,14 +52,18 @@ the native I/O formats.
 
 =item expat (Optional)
 
-XML parser library by James Clark, required for XML input.
+XML parser toolkit library by James Clark, required for XML input,
+available from
+http://expat.sourceforge.net
 
 Tested version 1.95.6.
 
 
 =item librecode (Optional)
 
-Character-set recoding library by François Pinard, useful for XML output.
+Character-set recoding library by François Pinard, useful for XML output,
+available from
+http://www.gnu.org/directory/recode.html
 
 Tested version 3.6.
 
@@ -67,7 +71,9 @@ Tested version 3.6.
 =item zlib (Optional)
 
 Compression library by Jean-loup Gailly and Mark Adler,
-useful for compressed binary HMM files.
+useful for compressed binary HMM files. 
+Available from:
+http://www.gzip.org/zlib
 
 Tested version 1.2.1.
 
@@ -75,6 +81,8 @@ Tested version 1.2.1.
 =item doxygen (Optional)
 
 Required for building library documentation.
+Available from:
+http://www.doxygen.org
 
 Tested version 1.2.15.
 
