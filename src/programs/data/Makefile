@@ -36,22 +36,25 @@ XMLIFY ?= ./xmlify.perl
 OF_XML=xml,pretty
 
 ##-- Globals: programs: moot
-MOOTRAIN = ../mootrain
-MOOTHMM = ../moot
-#MOOTHMM_FLAGS = -d1024
-MOOTHMM_FLAGS =
-MOOTEVAL = ../mooteval
+MOOT_BINDIR   ?= $(shell cd .. ; pwd -P)
+MOOTRAIN      ?= $(MOOT_BINDIR)/mootrain
+MOOTHMM       ?= $(MOOT_BINDIR)/moot
+#MOOTHMM_FLAGS ?= -d1024
 
-MOOTCOMPILE = ../mootcompile
+MOOTEVAL      ?= $(MOOT_BINDIR)/mooteval
+
+MOOTCOMPILE   ?= $(MOOT_BINDIR)/mootcompile
 #MOOTCOMPILE_FLAGS = -z9
 
-MOOTDUMP = ../mootdump
+MOOTDUMP      ?= $(MOOT_BINDIR)/mootdump
 
-MOOTCHURN = ../mootchurn
+MOOTCHURN     ?= $(MOOT_BINDIR)/mootchurn
 MOOTCHURN_FLAGS ?= -d1024
 
 all:
 	@echo "Usage: make TEST=test TRAIN=train label=label {save|test}"
+	@echo "MOOTM_BINDIR=$(MOOTM_BINDIR)"
+	@echo "MOOT_BINDIR=$(MOOT_BINDIR)"
 
 
 ##-- don't delete these

@@ -212,8 +212,8 @@ void GetMyOptions(int argc, char **argv)
 	      PROGNAME, args.wlambdas_arg);
       exit(1);
     }
-    hmm.wlambda1 = wlambdas[0];
-    hmm.wlambda2 = wlambdas[1];
+    hmm.wlambda0 = wlambdas[0];
+    hmm.wlambda1 = wlambdas[1];
   }
 
   // -- report
@@ -242,13 +242,13 @@ void GetMyOptions(int argc, char **argv)
 #endif
   writer->printf_raw("\n");
   writer->printf_raw("   Lex. Threshhold   : %g\n", hmm.unknown_lex_threshhold);
-  writer->printf_raw("   Lexical lambdas   : lambdaw1=%g, lambdaw2=%g\n",
-	  hmm.wlambda1, hmm.wlambda2);
+  writer->printf_raw("   Lexical lambdas   : lambdaw0=%g, lambdaw1=%g\n",
+	  hmm.wlambda0, hmm.wlambda1);
   writer->printf_raw("   Use classes?      : %s\n",
 	  hmm.use_lex_classes ? "yes" : "no");
   writer->printf_raw("   Class Threshhold  : %g\n", hmm.unknown_class_threshhold);
-  writer->printf_raw("   Class lambdas     : lambdac1=%g, lambdac2=%g\n",
-	  hmm.clambda1, hmm.clambda2);
+  writer->printf_raw("   Class lambdas     : lambdac0=%g, lambdac1=%g\n",
+	  hmm.clambda0, hmm.clambda1);
   writer->printf_raw("\n");
   writer->put_comment_block_end();
 }

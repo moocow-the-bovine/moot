@@ -29,7 +29,10 @@
 #ifndef _moot_HMM_H
 #define _moot_HMM_H
 
-#include <float.h>
+#ifdef __GNUC__
+# include <float.h>
+#endif // __GNUC__
+
 #include <string.h>
 #include <ctype.h>
 
@@ -42,16 +45,6 @@
 #include <mootClassfreqs.h>
 #include <mootNgrams.h>
 #include <mootEnum.h>
-
-/**
- * \def moot_ADD_ONE_HACK
- * Define this to include the 'add one' hack to avoid float underflows.
- *
- * \warning this causes major problems with sparse data, and using
- * 'double' as our probability type seems to work just dandy without
- * this hack.  In other words, you should \b NEVER define this.
- */
-#undef moot_ADD_ONE_HACK
 
 /**
  * \def mootProbEpsilon
@@ -68,6 +61,22 @@
 #else
 # define mootProbEpsilon 1.19209290E-07
 #endif
+
+/** \def MOOT_PROB_ZERO
+ * Probability lower-bound
+ *
+ * \def MOOT_PROB_ONE
+ * Probability upper-bound
+ */
+#ifdef DBL_MAX
+#  define MOOT_PROB_NEG  -DBL_MAX
+#  define MOOT_PROB_ZERO -1E+38
+#  define MOOT_PROB_ONE   0.0
+# else //-- !DBL_MAX
+#  define MOOT_PROB_NEG  -3E+38
+#  define MOOT_PROB_ZERO -1E+38
+#  define MOOT_PROB_ONE   0.0
+#endif //-- /DBL_MAX
 
 /**
  * \def moot_LEX_UNKNOWN_TOKENS
@@ -102,6 +111,9 @@ moot_BEGIN_NAMESPACE
 
 /**
  * \brief 1st-order Hidden Markov Model Tagger/Disambiguator class.
+ *
+ * All probabilities are stored internally as logarithms: this saves
+ * us a bit of runtime, and helps avoid datatype underflows.
  */
 class mootHMM {
 public:
@@ -194,23 +206,23 @@ public:
 		   LexClassEqual>
           ClassIDTable;
 
-  /** Type for lexical probability lookup subtable: \c tagid=>p(tagid) */
+  /** Type for lexical probability lookup subtable: \c tagid=>log(p(·|tagid)) */
   typedef map<TagID,ProbT> LexProbSubTable;
 
   /**
    * Type for lexical-class probability lookup subtable:
-   * \c tagid=>p(...tagid...)
+   * \c tagid=>log(p(·|tagid))
    */
   typedef LexProbSubTable LexClassProbSubTable;
 
   /**
-   * Type for lexical probability lookup table: \c tokid=>(tagid=>p(tokid|tagid))
+   * Type for lexical probability lookup table: \c tokid=>(tagid=>log(p(tokid|tagid)))
    */
   typedef vector<LexProbSubTable> LexProbTable;
 
   /**
    * Type for lexical-class probability lookup table:
-   * \c classid=>(tagid=>p(classid|tagid))
+   * \c classid=>(tagid=>log(p(classid|tagid)))
    * Really just an alias for \c LexProbSubtable: at
    * some point, we should capitalize on this and
    * make things spiffy boffo stomach-lurching fast,
@@ -225,17 +237,10 @@ public:
   typedef LexProbTable LexClassProbTable;
 
   /**
-   * Type for unigram probability table: c-style array:
-   * probabilities indexed by numeric tag-id: \c tagid->p(tagid)
-   */
-  typedef ProbT *TagProbTable;
-  //typedef vector<ProbT> TagProbTable;
-  //typedef hash_map<TagID,ProbT> TagProbTable;
-
-  /**
-   * Type for bigram probability lookup table:
-   * c-style 2d array: probabilites \c p(tagid|ptagid)
-   * indexed by \c ((ntags*ptagid)+tagid).
+   * Type for uni- and bigram probability lookup table:
+   * c-style 2d array: bigram probabilites \c log(p(tagid|ptagid))
+   * indexed by \c ((ntags*ptagid)+tagid) , and
+   * unigram probabilities \c log(p(tagid)) indexed by \c tagid .
    *
    * This winds up being a rather sparse table,
    * but it should fit well in memory even for large
@@ -246,11 +251,11 @@ public:
   //typedef vector<TagProbTable> BigramProbTable;
 
 #ifdef moot_USE_TRIGRAMS
-  /** Key type for a trigram */
+  /// Key type for a trigram
   class Trigram {
   public:
 
-    /** Utility struct for hash_map */
+    /// Utility struct for hash_map
     struct HashFcn {
     public:
       inline size_t operator()(const Trigram &x) const
@@ -260,7 +265,7 @@ public:
       };
     };
 
-    /** Utility struct for hash_map */
+    /// Utility struct for hash_map
     struct EqualFcn {
     public:
       inline size_t operator()(const Trigram &x, const Trigram &y) const
@@ -277,13 +282,17 @@ public:
     TagID tag3;
 
   public:
-    /** Trigram constructor */
-    Trigram(TagID t1=0, TagID t2=0, TagID t3=0) : tag1(t1), tag2(t2), tag3(t3) {};
-    /** Trigram destructor */
+    /// Trigram constructor
+    Trigram(TagID t1=0, TagID t2=0, TagID t3=0)
+      : tag1(t1), tag2(t2), tag3(t3)
+    {};
+
+    /// Trigram destructor
     ~Trigram(void) {};
   };
 
-  /** Type for a trigram probability lookup table : trigram(t1,t2,t3)->p(t3|<t1,t2>)*/
+  /// Type for a trigram probability lookup table
+  /// : trigram(t1,t2,t3)->p(t3|<t1,t2>)
   typedef
     hash_map<Trigram,ProbT,Trigram::HashFcn,Trigram::EqualFcn>
     TrigramProbTable;
@@ -301,10 +310,10 @@ public:
    */
   class ViterbiNode {
   public:
-    TagID tagid;                   /**< Tag-ID for this node */
-    ProbT prob;                    /**< Probability of best path to this node */
-    struct ViterbiNode *pth_prev;  /**< Previous node in best path to this node */
-    struct ViterbiNode *row_next;  /**< Next tag-node in current column */
+    TagID tagid;                   ///< Tag-ID for this node
+    ProbT lprob;                   ///< log-Probability of best path to this node
+    struct ViterbiNode *pth_prev;  ///< Previous node in best path to this node
+    struct ViterbiNode *row_next;  ///< Next tag-node in current column
   };
 
   /**
@@ -315,7 +324,6 @@ public:
    */
   class ViterbiColumn {
   public:
-    //TokID          tokid;    /**< Token-ID for this column */
     ViterbiNode   *nodes;    /**< Column nodes */
     ViterbiColumn *col_prev; /**< Previous column */
   };
@@ -346,7 +354,7 @@ public:
 
 public:
   /*---------------------------------------------------------------------*/
-  /** \name I/O Format Flags */
+  /** \name I/O-related Flags */
   //@{
   /**
    * Verbosity level.  See \c VerbosityLevel typedef.
@@ -359,21 +367,6 @@ public:
    * Default=0 (no dot printing).
    */
   size_t ndots;
-
-  /**
-   * Bitmask of TokenIO::TokenIOFormat flags for input.
-   * Default=TokenIO::tiofMediumRare
-   */
-  //int inputFormat;
-
-  /*---------------------------------------------------------------------
-   * Output format flags : used by moot::TokenWriter
-   */
-  /**
-   * Bitmask of TokenIO::TokenIOFormat flags for output.
-   * Default=TokenIO::tiofWellDone
-   */
-  //int outputFormat;
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -428,20 +421,16 @@ public:
   /*---------------------------------------------------------------------*/
   /** \name Smoothing Constants */
   //@{
-  ProbT             nglambda1;    /**< Smoothing constant for unigrams */
-  ProbT             nglambda2;    /**< Smoothing constant for bigrams */
+  ProbT             nglambda1;    /**< (log) Smoothing constant for unigrams */
+  ProbT             nglambda2;    /**< (log) Smoothing constant for bigrams */
 #ifdef moot_USE_TRIGRAMS
-  ProbT             nglambda3;    /**< Smoothing constant for trigrams */
+  ProbT             nglambda3;    /**< (log) Smoothing constant for trigrams */
 #endif
-  ProbT             wlambda1;     /**< Smoothing constant for lexical probabilities */
-  ProbT             wlambda2;     /**< Smoothing constant for lexical probabilities */
+  ProbT             wlambda0;     /**< (log) Smoothing constant for lexical probabilities */
+  ProbT             wlambda1;     /**< (log) Smoothing constant for lexical probabilities */
 
-  ProbT             clambda1;     /**< Smoothing constant for class probabilities */
-  ProbT             clambda2;     /**< Smoothing constant for class probabilities */
-
-  //ProbT             ngscale;      /* N-gram Scaling factor for exportFreqs() */
-  //ProbT             lscale;       /* Lexical Scaling factor for exportFreqs() */
-  //ProbT             lcscale;      /* Class Scaling factor for exportFreqs() */
+  ProbT             clambda0;     /**< (log) Smoothing constant for class probabilities */
+  ProbT             clambda1;     /**< (log) Smoothing constant for class probabilities */
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -464,10 +453,10 @@ public:
 
   LexProbTable      lexprobs;   /**< Lexical probability lookup table */
   LexClassProbTable lcprobs;    /**< Lexical-class probability lookup table */
-  TagProbTable      ngprobs1;   /**< N-gram probability lookup table: unigrams */
-  BigramProbTable   ngprobs2;   /**< N-gram probability lookup table: bigrams */
 #ifdef moot_USE_TRIGRAMS
-  TrigramProbTable  ngprobs3;   /**< N-gram probability lookup table: trigrams */
+  TrigramProbTable  ngprobs3;   /**< N-gram (log-)probability lookup table: trigrams */
+#else
+  BigramProbTable   ngprobs2;   /**< N-gram (log-)probability lookup table: bigrams */
 #endif
   //@}
 
@@ -502,9 +491,9 @@ protected:
   /** \name Low-level data: temporaries */
   //@{
   TagID             vtagid;     /**< Current tag-id under consideration for viterbi_step() */
-  ProbT             vbestpr;    /**< Best probability for viterbi_step() */
-  ProbT             vtagpr;     /**< Probability for current tag-id for viterbi_step() */
-  ProbT             vwordpr;    /**< Save word-probability */
+  ProbT             vbestpr;    /**< Best (log-)probability for viterbi_step() */
+  ProbT             vtagpr;     /**< (log-)Probability for current tag-id for viterbi_step() */
+  ProbT             vwordpr;    /**< Save (log-)word-probability */
   ViterbiNode      *vbestpn;    /**< Best previous node for viterbi_step() */
 
   ViterbiPathNode  *vbestpath;  /**< For node->path conversion */
@@ -515,55 +504,10 @@ public:
   /** \name Constructor / Destructor */
   //@{
   /** Default constructor */
-  mootHMM(void)
-    : verbose(1),
-      ndots(0),
-      //inputFormat(tiofMediumRare),
-      //outputFormat(tiofWellDone),
-      use_lex_classes(true),
-      start_tagid(0),
-      unknown_lex_threshhold(1.0),
-      unknown_class_threshhold(1.0),
-      nglambda1(mootProbEpsilon),
-      nglambda2(1.0 - mootProbEpsilon),
-      wlambda1(1.0 - mootProbEpsilon),
-      wlambda2(mootProbEpsilon),
-      clambda1(1.0 - mootProbEpsilon),
-      clambda2(mootProbEpsilon),
-      //ngscale(1.0),
-      //lscale(1.0),
-      //lcscale(1.0),
-      n_tags(0),
-      n_toks(0),
-      n_classes(0),
-      ngprobs1(NULL),
-      ngprobs2(NULL),
-      vtable(NULL),
-      nsents(0),
-      ntokens(0),
-      nnewtokens(0),
-      nunclassed(0),
-      nnewclasses(0),
-      nunknown(0),
-      nfallbacks(0),
-      trash_nodes(NULL),
-      trash_columns(NULL), 
-      trash_pathnodes(NULL),
-      vbestpn(NULL),
-      vbestpath(NULL)
-  {
-    //-- create special token entries
-    for (TokID i = 0; i < NTokFlavors; i++) { flavids[i] = 0; }
-    unknown_token_name("@UNKNOWN");
-    unknown_tag_name("UNKNOWN");
-    uclass = LexClass();
-  };
+  mootHMM(void);
 
   /** Destructor */
-  ~mootHMM(void)
-  {
-    clear();
-  };
+  ~mootHMM(void) { clear(); };
   //@}
 
   /*------------------------------------------------------------*/
@@ -637,15 +581,16 @@ public:
    * @param myname name to use for warnings/errors/info
    *
    * If you want to load multiple models, you will need to first
-   * load the raw-freqency objects, then call compile() and
-   * smoothing estimation methods yourself.
+   * load the raw-freqency objects, then call the compile(),
+   * estimate_*(), and compute_logprobs() methods yourself.
    */
   bool load_model(const string &modelname,
 		  const mootTagString &start_tag_str="__$",
 		  const char *myname="mootHMM::load_model()");
 
   /**
-   * Compile probabilites from raw frequency counts in 'lexfreqs' and 'ngrams'.
+   * Compile
+   * probabilites from raw frequency counts in 'lexfreqs' and 'ngrams'.
    * Returns false on failure.
    */
   bool compile(const mootLexfreqs &lexfreqs,
@@ -673,6 +618,9 @@ public:
 
   /** Estimate class smoothing constants: NOT called by compile(). */
   bool estimate_clambdas(const mootClassfreqs &cf);
+
+  /** Pre-compute runtime probability tables: NOT called by compile(). */
+  bool compute_logprobs(void);
   //@}
 
   //------------------------------------------------------------
@@ -906,11 +854,13 @@ public:
   inline ViterbiNode *viterbi_best_node(void)
   {
     ViterbiNode *pnod;
-    vbestpr = -1.0;
+    vbestpr = MOOT_PROB_NEG;
     vbestpn = NULL;
     for (pnod = vtable->nodes; pnod != NULL; pnod = pnod->row_next) {
-      if (pnod->prob > vbestpr) {
-	vbestpr = pnod->prob;
+      //if (pnod->prob > vbestpr) {
+      //vbestpr = pnod->prob;
+      if (pnod->lprob > vbestpr) {
+	vbestpr = pnod->lprob;
 	vbestpn = pnod;
       }
     }
@@ -926,7 +876,7 @@ public:
   inline ViterbiNode *viterbi_best_node(TagID tagid)
   {
     ViterbiNode *pnod;
-    vbestpr = -1.0;
+    vbestpr = MOOT_PROB_NEG;
     for (pnod = vtable->nodes; pnod != NULL; pnod = pnod->row_next) {
       if (pnod->tagid == tagid) return pnod;
     }
@@ -969,25 +919,17 @@ public:
    * \note lexical probabilites are ignored for this computation, since they're
    * constant for the current (token,tag) pair under consideration.
    */
-  inline void viterbi_find_best_prevnode(TagID curtagid, ProbT curtagp=-1.0)
+  inline void viterbi_find_best_prevnode(TagID curtagid, ProbT curtagp=MOOT_PROB_NEG)
   {
     ViterbiNode *pnod;
-    if (curtagp <= 0) curtagp = tagp(curtagid);
+    if (curtagp <= MOOT_PROB_ZERO) curtagp = tagp(curtagid);
 
-    vbestpr = -1.0;
+    vbestpr = MOOT_PROB_NEG;
     vbestpn = NULL;
     for (pnod = vtable->nodes; pnod != NULL; pnod = pnod->row_next) {
       vtagpr = 
-#ifdef moot_ADD_ONE_HACK_BAD
-	1.0 +  //-- add 1 to avoid float underflow (not here!)
-#else
-#endif // moot_ADD_ONE_HACK_BAD
-	pnod->prob
-	*
-	( (nglambda1 * curtagp)
-	  +
-	  (nglambda2 * tagp(pnod->tagid, curtagid)) )
-	;
+	//pnod->lprob + log( (nglambda1 * curtagp) + (nglambda2 * tagp(pnod->tagid, curtagid)) );
+	pnod->lprob + tagp(pnod->tagid, curtagid);
 
       if (vtagpr > vbestpr) {
 	vbestpr = vtagpr;
@@ -998,7 +940,7 @@ public:
 
   //------------------------------------------------------------
   // Viterbi: Low-level: clear best-path
-  /** Clear internal \c vbestpath temporary */
+  /** Clear internal @vbestpath temporary */
   inline void viterbi_clear_bestpath(void)
   {
     //-- move to trash: path-nodes
@@ -1138,14 +1080,16 @@ public:
 	LexClassProbSubTable &lcps = lcprobs[cid];
 	if (!lclass.empty()) {
 	  //-- non-empty class: restrict population to class-members
-	  ProbT lcprob = 1.0/((ProbT)lclass.size());
+	  ProbT lcprob = log(1.0/((ProbT)lclass.size()));
+
 	  for (LexClass::const_iterator lci = lclass.begin(); lci != lclass.end(); lci++) {
 	    lcps[*lci] = lcprob;
 	  }
 	} else {
 	  //-- empty class: use class for "unknown" token instead [HACK!]
 	  const LexProbSubTable &lps = lexprobs[0];
-	  ProbT lpprob = 1.0/((ProbT)lps.size());
+	  ProbT lpprob = log(1.0/((ProbT)lps.size()));
+
 	  for (LexProbSubTable::const_iterator lpsi = lps.begin(); lpsi != lps.end(); lpsi++) {
 	    lcps[lpsi->first] = lpprob;
 	  }
@@ -1170,10 +1114,10 @@ public:
    */
   inline const ProbT wordp(const TokID tokid, const TagID tagid) const
   {
-    if (tokid >= lexprobs.size()) return 0;
+    if (tokid >= lexprobs.size()) return MOOT_PROB_ZERO;
     const LexProbSubTable &lps = lexprobs[tokid];
     LexProbSubTable::const_iterator lpsi = lps.find(tagid);
-    return lpsi != lps.end() ? lpsi->second : 0;
+    return lpsi != lps.end() ? lpsi->second : MOOT_PROB_ZERO;
   };
 
   /**
@@ -1195,10 +1139,10 @@ public:
    */
   inline const ProbT classp(const ClassID classid, const TagID tagid) const
   {
-    if (classid >= lcprobs.size()) return 0;
+    if (classid >= lcprobs.size()) return MOOT_PROB_ZERO;
     const LexClassProbSubTable &lps = lcprobs[classid];
     LexClassProbSubTable::const_iterator lpsi = lps.find(tagid);
-    return lpsi != lps.end() ? lpsi->second : 0;
+    return lpsi != lps.end() ? lpsi->second : MOOT_PROB_ZERO;
   };
 
   /**
@@ -1221,15 +1165,21 @@ public:
   inline const ProbT tagp(const TagID tagid) const
   {
     return
-      ngprobs1 && tagid < n_tags
-      ? ngprobs1[tagid]
-      : 0;
+#ifdef moot_USE_TRIGRAMS
+      ngprobs3 && tagid < n_tags
+      ? ngprobs3[tagid]
+      : MOOT_PROB_ZERO;
+#else
+      ngprobs2 && tagid < n_tags
+      ? ngprobs2[tagid]
+      : MOOT_PROB_ZERO;
+#endif // moot_USE_TRIGRAMS
   };
 
   /**
    * \bold DEPRECATED
    *
-   * Looks up and returns unigram probability: p(tag), string-version.
+   * Looks up and returns unigram (log-)probability: log(p(tag)), string-version.
    */
   inline const ProbT tagp(const mootTagString &tag) const
   {
@@ -1240,21 +1190,27 @@ public:
    * Bigram Probability Lookup
    */
   /**
-   * Looks up and returns bigram probability: p(tagid|prevtagid),
+   * Looks up and returns bigram (log-)probability: log(p(tagid|prevtagid)),
    * given tagid, prevtagid.
    */
   inline const ProbT tagp(const TagID prevtagid, const TagID tagid) const
   {
     return
+#ifdef moot_USE_TRIGRAMS
+      ngprobs3 && prevtagid < n_tags && tagid < n_tags
+      ? ngprobs3[(n_tags*prevtagid)+tagid]
+      : MOOT_PROB_ZERO;
+#else
       ngprobs2 && prevtagid < n_tags && tagid < n_tags
       ? ngprobs2[(n_tags*prevtagid)+tagid]
-      : 0;
+      : MOOT_PROB_ZERO;
+#endif
   };
 
   /**
    * \bold DEPRECATED
    *
-   * Looks up and returns bigram probability: p(tag|prevtag), string-version.
+   * Looks up and returns bigram probability: log(p(tag|prevtag)), string-version.
    */
   inline const ProbT tagp(const mootTagString &prevtag, const mootTagString &tag) const
   {
@@ -1266,7 +1222,7 @@ public:
    */
 #ifdef moot_USE_TRIGRAMS
   /**
-   * Looks up and returns trigram probability: p(tagid|prevtagid2,prevtagid1),
+   * Looks up and returns trigram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
    * given Trigram(prevtagid2,prevtagid1,tagid)
    *
    * \bold NOT REALLY IMPLEMENTED.
@@ -1274,11 +1230,11 @@ public:
   inline const ProbT tagp(const Trigram &trigram) const
   {
     TrigramProbTable::const_iterator tgti = ngprobs3.find(trigram);
-    return tgti == ngprobs3.end() ? 0 : tgti->second;
+    return tgti == ngprobs3.end() ? MOOT_PROB_ZERO : tgti->second;
   };
 
   /**
-   * Looks up and returns trigram probability: p(tagid|prevtagid2,prevtagid1),
+   * Looks up and returns trigram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
    * given prevtagid2, prevtagid1, tagid.
    *
    * \bold NOT REALLY IMPLEMENTED.
@@ -1291,7 +1247,7 @@ public:
   /**
    * \bold DEPRECATED
    *
-   * Looks up and returns trigram probability: p(tag|prevtag1,prevtag2), string-version.
+   * Looks up and returns trigram (log-)probability: log(p(tag|prevtag1,prevtag2)), string-version.
    *
    * \bold NOT REALLY IMPLEMENTED.
    */

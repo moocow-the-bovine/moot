@@ -3,6 +3,14 @@ ChangeLog for package moot
 Todo:
 	+ write perl-XS interface & utilities
 
+v2.0.2 Sun, 18 Jul 2004 13:59:28 +0200
+	+ pre-compute log-probabilities
+	  - avoid underflow, and a snippet faster at runtime
+	+ reduce storage requirements by storing unigrams as [0][tagid]
+	  - i.e. the 'unknown' tag is never valid
+	+ renamed '(w|c)lambda(1|2)' to '(w|c)lambda(0|1)'
+	  - a bit more intuitive
+	
 v2.0.1 Fri, 16 Jul 2004 14:02:07 +0200
 	+ fixed XML parsing bug which somehow snuck into version 2.0.0
 

@@ -243,8 +243,8 @@ int main (int argc, char **argv)
 	      PROGNAME, args.wlambdas_arg);
       exit(1);
     }
-    hmm.wlambda1 = wlambdas[0];
-    hmm.wlambda2 = wlambdas[1];
+    hmm.wlambda0 = wlambdas[0];
+    hmm.wlambda1 = wlambdas[1];
   } else {
     if (args.verbose_arg > 1)
       fprintf(stderr, "%s: estimating lexical lambdas...", PROGNAME);
@@ -266,6 +266,16 @@ int main (int argc, char **argv)
     } else if (args.verbose_arg > 1) {
       fprintf(stderr," done.\n");
     }
+  }
+
+  //-- compute logprobs
+  if (args.verbose_arg > 1)
+    fprintf(stderr, "%s: computing log-probabilities...", PROGNAME);
+  if (!hmm.compute_logprobs()) {
+    fprintf(stderr,"\n%s: log-probability computation FAILED.\n", PROGNAME);
+    exit(1);
+  } else if (args.verbose_arg > 1) {
+    fprintf(stderr," done.\n");
   }
 
   //-- dump binary model
@@ -293,13 +303,13 @@ int main (int argc, char **argv)
 #endif
     fprintf(stderr, "\n");
     fprintf(stderr, "%s   Lex. Threshhold   : %g\n", cmts, hmm.unknown_lex_threshhold);
-    fprintf(stderr, "%s   Lexical lambdas   : lambdaw1=%g, lambdaw2=%g\n",
-	    cmts, hmm.wlambda1, hmm.wlambda2);
+    fprintf(stderr, "%s   Lexical lambdas   : lambdaw0=%g, lambdaw1=%g\n",
+	    cmts, hmm.wlambda0, hmm.wlambda0);
     fprintf(stderr, "%s   Use classes?      : %s\n",
 	    cmts, hmm.use_lex_classes ? "yes" : "no");
     fprintf(stderr, "%s   Class Threshhold  : %g\n", cmts, hmm.unknown_class_threshhold);
-    fprintf(stderr, "%s   Class lambdas     : lambdac1=%g, lambdac2=%g\n",
-	    cmts, hmm.clambda1, hmm.clambda2);
+    fprintf(stderr, "%s   Class lambdas     : lambdac0=%g, lambdac1=%g\n",
+	    cmts, hmm.clambda0, hmm.clambda1);
   }
 
   return 0;

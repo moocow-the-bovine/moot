@@ -86,14 +86,14 @@ LAMBDA_1 + LAMBDA_2 == 1.0.
 string "wlambdas" W "Lexical smoothing constants (default=estimate)" \
   arg="LAMBDAS" \
   details="
-LAMBDAS should be a string of the form \"LAMBDA_W,EPSILON_W\"
+LAMBDAS should be a string of the form \"LAMBDA_W0,LAMBDA_W1\"
 (without the quotes).
 
-LAMBDA_W is the constant smoothing coefficient for lexical probabilities.
-EPSILON_W is the constant minimum lexical probability.
+LAMBDA_W0 is the constant minimum lexical probability.
+LAMBDA_W1 is the constant smoothing coefficient for lexical probabilities.
 
 If you override the default values, you should choose values such that
-LAMBDA_W + EPSILON_W == 1.0.
+LAMBDA_W0 + LAMBDA_W == 1.0.
 "
 
 double "unknown-threshhold" T "Freq. threshhold for 'unknown' lexical probabilities" \
