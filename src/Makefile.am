@@ -81,9 +81,9 @@ dwdst_pargen_SOURCES = \
 
 ## --- Additional dependencies
 dwdspp_main.o: dwdspp_cmdparser.h dwdspp_lexer.h
-dwdst.o: dwdst_cmdparser.h dwdst_lexer.h
-dwdst_fstgen.o: dwdst_fstgen_cmdparser.h dwdst_lexer.h postag_lexer.h
-dwdst_pargen.o: dwdst_pargen_cmdparser.h dwdst_lexer.h postag_lexer.h
+dwdst_main.o: dwdst_cmdparser.h dwdst_lexer.h
+dwdst_fstgen_main.o: dwdst_fstgen_cmdparser.h dwdst_lexer.h postag_lexer.h
+dwdst_pargen_main.o: dwdst_pargen_cmdparser.h dwdst_lexer.h postag_lexer.h
 
 ##-----------------------------------------------------------------------
 ## headers

@@ -332,21 +332,36 @@ inline void dwds_tagger_trainer::train_next_token(void)
     curtags->clear();
     if (!is_eos) {
       if (want_features) {
+	// -- all features
 	results.clear();
 	tmp->fsm_strings(syms, &results, false, want_avm);
+
 	// -- set curtags to full string results
 	for (ri = results.begin(); ri != results.end(); ri++) {
 	  curtags->insert(ri->istr);
 	}
       } else {
-	// -- all features
-	  get_fsm_tag_strings(tmp,curtags);
+	// -- tags only
+	get_fsm_tag_strings(tmp,curtags);
       }
-      // -- unknown token?
-      if (curtags->empty()) get_fsm_tag_strings(ufsa,curtags);
     } else {
       // -- terminal EOS
       curtags->insert(eos);
+    }
+    
+    // -- unknown token?
+    if (curtags->empty()) {
+      get_fsm_tag_strings(ufsa,curtags);
+      if (want_features) {
+	// HACK
+	for (g_old = curtags->begin(); g_old != curtags->end(); g_old++) {
+	  FSMSymbolString hacked_tag = *g_old;
+	  hacked_tag.insert(0,"[");
+	  hacked_tag.append("]");
+	  curtags->erase(g_old);
+	  curtags->insert(hacked_tag);
+	}
+      }
     }
     
     // -- push 'current' tags onto the queue (front of queue == newest)
@@ -396,14 +411,18 @@ inline void dwds_tagger_trainer::train_next_token(void)
 bool dwds_tagger_trainer::write_param_file(FILE *out=stdout)
 {
   // -- sorted string-list
-  set<FSMSymbolString> allstrings;
-  for (sci = strings2counts.begin(); sci != strings2counts.end(); sci++) {
-    allstrings.insert(sci->first);
-  }
-
+  //set<FSMSymbolString> allstrings;
+  //for (sci = strings2counts.begin(); sci != strings2counts.end(); sci++) {
+  //  allstrings.insert(sci->first);
+  //}
   fputs("%% Parameter File\n", out);
-  for (set<FSMSymbolString>::iterator asi = allstrings.begin(); asi != allstrings.end(); asi++) {
-    fprintf(out, "%s\t%f\n", asi->c_str(), strings2counts[*asi]);
+  //for (set<FSMSymbolString>::iterator asi = allstrings.begin(); asi != allstrings.end(); asi++) {
+  //  fprintf(out, "%s\t%f\n", asi->c_str(), strings2counts[*asi]);
+  //}
+
+  // -- unsorted
+  for (sci = strings2counts.begin(); sci != strings2counts.end(); sci++) {
+    fprintf(out, "%s\t%f\n", sci->first.c_str(), sci->second);
   }
   return true;
 }
