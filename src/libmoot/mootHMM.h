@@ -493,6 +493,13 @@ public:
 
   ProbT             clambda0;     /**< (log) Smoothing constant for class probabilities */
   ProbT             clambda1;     /**< (log) Smoothing constant for class probabilities */
+
+  /**
+   * (log) Beam-search width: during Viterbi search,
+   * heuristically prune paths whose probability is <= 1/beamwd*p_best
+   * A value of zero indicates no beam pruning.
+   */
+  ProbT             beamwd;
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -562,6 +569,9 @@ protected:
   ViterbiNode      *vbestpn;    /**< Best previous node for viterbi_step() */
 
   ViterbiPathNode  *vbestpath;  /**< For node->path conversion */
+
+  ProbT             bbestpr;   /**< Best current (log-)probability for beam pruning */
+  ProbT             bpprmin;   /**< Minimum previous probability for beam pruning */
   //@}
 
 public:
@@ -572,7 +582,7 @@ public:
   mootHMM(void);
 
   /** Destructor */
-  ~mootHMM(void) { clear(); };
+  ~mootHMM(void) { clear(true,false); };
   //@}
 
   /*------------------------------------------------------------*/
@@ -583,7 +593,7 @@ public:
    * If 'wipe_everything' is false, ID-tables and constants will
    * spared.
    */
-  void clear(bool wipe_everything=true);
+  void clear(bool wipe_everything=true, bool unlogify=false);
   //@}
 
   /*------------------------------------------------------------*/
@@ -651,7 +661,11 @@ public:
    */
   bool load_model(const string &modelname,
 		  const mootTagString &start_tag_str="__$",
-		  const char *myname="mootHMM::load_model()");
+		  const char *myname="mootHMM::load_model()",
+		  bool  do_estimate_nglambdas=true,
+		  bool  do_estimate_wlambdas=true,
+		  bool  do_estimate_clambdas=true,
+		  bool  do_compute_logprobs=true);
 
   /**
    * Compile
@@ -1016,6 +1030,9 @@ public:
    * @curtagid with lexical (log-)probability @wordpr.
    * If @col is NULL (the default), a new column will be allocated.
    * Returns a pointer to the trellis column, or NULL on failure.
+   *
+   * Updates beam-pruning datum @bbestpr ; and prunes with respect
+   * to @bpprmin.
    */
   inline ViterbiColumn *viterbi_populate_row(TagID curtagid,
 					     ProbT wordpr=MOOT_PROB_ONE,
@@ -1037,6 +1054,10 @@ public:
       vbestpn = NULL;
 
       for (pnod = prow->nodes; pnod != NULL; pnod = pnod->nod_next) {
+	//-- beam pruning
+	if (beamwd && pnod->lprob < bpprmin) continue;
+
+	//-- probability lookup
 	vtagpr = pnod->lprob + tagp(pnod->ptagid, prow->tagid, curtagid);
 	if (vtagpr > vbestpr) {
 	  vbestpr = vtagpr;
@@ -1045,15 +1066,20 @@ public:
       }
 
       //-- set node information
-      nod = viterbi_get_node();
-      nod->tagid    = curtagid;
-      nod->ptagid   = prow->tagid;
-      nod->lprob    = vbestpr + wordpr;
-      //nod->row      = row;
-      nod->pth_prev = vbestpn;
-      nod->nod_next = row->nodes;
+      if (vbestpn != NULL) {
+	nod = viterbi_get_node();
+	nod->tagid    = curtagid;
+	nod->ptagid   = prow->tagid;
+	nod->lprob    = vbestpr + wordpr;
+	//nod->row      = row;
+	nod->pth_prev = vbestpn;
+	nod->nod_next = row->nodes;
 
-      row->nodes    = nod;
+	row->nodes    = nod;
+
+	//-- save beam information
+	if (nod->lprob > bbestpr) bbestpr = nod->lprob;
+      }
     }
 
     //-- set row information
@@ -1075,6 +1101,10 @@ public:
     vbestpn = NULL;
 
     for (pnod = vtable->rows; pnod != NULL; pnod = pnod->nod_next) {
+      //-- beam pruning
+      if (beamwd && pnod->lprob < bpprmin) continue;
+
+      //-- probability lookup
       vtagpr = pnod->lprob + tagp(pnod->tagid, curtagid);
       if (vtagpr > vbestpr) {
 	vbestpr = vtagpr;
@@ -1092,6 +1122,9 @@ public:
     //-- set row/col information
     nod->nod_next = col->rows;
     col->rows     = nod;
+
+    //-- save beam information
+    if (nod->lprob > bbestpr) bbestpr = nod->lprob;
 
 #endif // MOOT_USE_TRIGRAMS
 

@@ -12,7 +12,7 @@ v2.0.2 Mon, 19 Jul 2004 15:51:53 +0200
 	    * rare                   :  7165.76 vs. 120071.95 tok/sec (ca. 17x slower) [-relax]
 	    * -classfreq medium-rare : 25648.62 vs.  48529.92 tok/sec (ca.  2x slower) [-relax]
 	    * +classfreq medium-rare : 14237.84 vs.  40900.69 tok/sec (ca.  3x slower) [-relax]
-	  --> maybe beam-search would help here?
+	  --> beam-search helps a bit (see below)
 	+ added build option '--enable-relax'
 	  - 'relaxed' interpretation of pre-analyses:
 	     * raises accuracy and speed at the cost of internal coverage
@@ -23,6 +23,10 @@ v2.0.2 Mon, 19 Jul 2004 15:51:53 +0200
 	+ added build option '--enable-trigram-hash'
 	  - use slow but memory-friendly hash for sparse trigram table
 	  - only meaningful if '--enable-trigrams=yes'
+	+ added beam-pruning a la TnT to mootHMM
+	  - speeds things up a bit, with no accuracy loss for default beam-width=1000
+	  - now all cookedness flavors uniformly ca. 2x slower with trigrams
+	    * this at least sounds theoretically realistic
 	+ added pkg-config variable 'build_options'
 	  - for easy access to compile-time options for an installed distribution
 	+ pre-compute log-probabilities

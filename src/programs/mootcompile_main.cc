@@ -223,7 +223,15 @@ int main (int argc, char **argv)
     hmm.nglambda2 = nlambdas[1];
 #ifdef moot_USE_TRIGRAMS
     hmm.nglambda3 = nlambdas[2];
+#else
+    if (nlambdas[2] != 0) {
+      fprintf(stderr, "%s: Warning: use of trigrams disabled.\n", PROGNAME);
+    }
 #endif
+    if (nlambdas[0]+nlambdas[1]+nlambdas[2] != 1) {
+      fprintf(stderr, "%s: Warning: N-gram smoothing constants do not sum to one: %s\n",
+	      PROGNAME, args.nlambdas_arg);
+    }
   } else {
     if (args.verbose_arg > 1)
       fprintf(stderr, "%s: estimating n-gram lambdas...", PROGNAME);
@@ -245,6 +253,10 @@ int main (int argc, char **argv)
     }
     hmm.wlambda0 = wlambdas[0];
     hmm.wlambda1 = wlambdas[1];
+    if (hmm.wlambda0 + hmm.wlambda1 != 1) {
+      fprintf(stderr, "%s: Warning: Lexical smoothing constants do not sum to one: %s\n",
+	      PROGNAME, args.wlambdas_arg);
+    }
   } else {
     if (args.verbose_arg > 1)
       fprintf(stderr, "%s: estimating lexical lambdas...", PROGNAME);
@@ -256,17 +268,35 @@ int main (int argc, char **argv)
     }
   }
 
-  //-- estimate class lambdas
+  //-- parse/estimate lexical-class smoothing constants (clambdas)
   if (hmm.use_lex_classes) {
-    if (args.verbose_arg > 1)
-      fprintf(stderr, "%s: estimating class lambdas...", PROGNAME);
-    if (!hmm.estimate_clambdas(classfreqs)) {
-      fprintf(stderr,"\n%s: class lambda estimation FAILED.\n", PROGNAME);
-      exit(1);
-    } else if (args.verbose_arg > 1) {
-      fprintf(stderr," done.\n");
+    if (args.clambdas_arg) {
+      double clambdas[2] = {1,0};
+      if (!moot_parse_doubles(args.clambdas_arg, clambdas, 2)) {
+	fprintf(stderr, "%s: could not parse lexical-class smoothing constants '%s'\n",
+		PROGNAME, args.clambdas_arg);
+	exit(1);
+      }
+      hmm.clambda0 = clambdas[0];
+      hmm.clambda1 = clambdas[1];
+      if (hmm.clambda0 + hmm.clambda1 != 1) {
+	fprintf(stderr, "%s: Warning: Lexical-class smoothing constants do not sum to one: %s\n",
+		PROGNAME, args.clambdas_arg);
+      }
+    } else {
+      if (args.verbose_arg > 1)
+	fprintf(stderr, "%s: estimating class lambdas...", PROGNAME);
+      if (!hmm.estimate_clambdas(classfreqs)) {
+	fprintf(stderr,"\n%s: class lambda estimation FAILED.\n", PROGNAME);
+	exit(1);
+      } else if (args.verbose_arg > 1) {
+	fprintf(stderr," done.\n");
+      }
     }
   }
+
+  //-- assign beam-width
+  hmm.beamwd = args.beam_width_arg;
 
   //-- compute logprobs
   if (args.verbose_arg > 1)
@@ -310,8 +340,9 @@ int main (int argc, char **argv)
     fprintf(stderr, "%s   Class Threshhold  : %g\n", cmts, hmm.unknown_class_threshhold);
     fprintf(stderr, "%s   Class lambdas     : lambdac0=%g, lambdac1=%g\n",
 	    cmts, hmm.clambda0, hmm.clambda1);
+    fprintf(stderr, "%s   Beam Width        : %g\n",
+	    cmts, hmm.beamwd);
   }
 
   return 0;
 }
-

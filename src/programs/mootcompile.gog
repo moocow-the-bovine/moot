@@ -71,32 +71,85 @@ a non-empty class-frequency file.
 "
 
 string "nlambdas" N "N-Gram smoothing constants (default=estimate)" \
-  arg="LAMBDAS" \
+  arg="FLOATS" \
   details="
-LAMBDAS should be a string of the form \"LAMBDA1,LAMBDA2\"
-(without the quotes).
+FLOATS should be a string of the form \"LAMBDA1,LAMBDA2,LAMBDA3\"
+(without the quotes), where each LAMBDA$i is a floating-point constant.
 
-LAMBDA_1 is the constant smoothing coefficient for unigram probabilities,
-LAMBDA_2 is the constant smoothing coefficient for bigram probabilities.
+=over 4
+
+=item LAMBDA_1
+
+is the constant smoothing coefficient for unigram probabilities,
+
+=item LAMBDA_2
+
+is the constant smoothing coefficient for bigram probabilities,
+
+=item LAMBDA_3
+
+is the constant smoothing coefficient for trigram probabilities
+(only meaningful if libmoot was built with '--enable-trigrams=yes'.
+See the output of
+
+ pkg-config --variable=build_options moot
+
+for details.
+
+=back
 
 If you override the default values, you should choose values such that
-LAMBDA_1 + LAMBDA_2 == 1.0.
+LAMBDA_1 + LAMBDA_2 + LAMBDA_3 == 1.0.
 "
 
 string "wlambdas" W "Lexical smoothing constants (default=estimate)" \
-  arg="LAMBDAS" \
+  arg="FLOATS" \
   details="
-LAMBDAS should be a string of the form \"LAMBDA_W0,LAMBDA_W1\"
-(without the quotes).
+FLOATS should be a string of the form \"LAMBDA_W0,LAMBDA_W1\"
+(without the quotes), where each LAMBDA_W$i is a floating-point
+constant.
 
-LAMBDA_W0 is the constant minimum lexical probability.
-LAMBDA_W1 is the constant smoothing coefficient for lexical probabilities.
+=over 4
+
+=item LAMBDA_W0
+
+is the constant minimum lexical probability,
+
+=item LAMBDA_W1
+
+is the constant smoothing coefficient for lexical probabilities.
+
+=back
 
 If you override the default values, you should choose values such that
-LAMBDA_W0 + LAMBDA_W == 1.0.
+LAMBDA_W0 + LAMBDA_W1 == 1.0.
 "
 
-double "unknown-threshhold" T "Freq. threshhold for 'unknown' lexical probabilities" \
+
+string "clambdas" C "Lexical-class smoothing constants (default=estimate)" \
+  arg="FLOATS" \
+  details="
+LAMBDAS should be a string of the form \"LAMBDA_C0,LAMBDA_C1\"
+(without the quotes), where each LAMBDA_C$i is a floating-point constant.
+
+=over 4
+
+=item LAMBDA_C0
+
+is the constant minimum lexical-class probability,
+
+=item LAMBDA_C1
+
+is the constant smoothing coefficient for lexical-class probabilities.
+
+=back
+
+If you override the default values, you should choose values such that
+LAMBDA_C0 + LAMBDA_C1 == 1.0.
+"
+
+
+double "unknown-threshhold" t "Freq. threshhold for 'unknown' lexical probabilities" \
   arg="FLOAT" \
   default="1.0" \
   details="
@@ -104,7 +157,7 @@ Lexical probabilities for unknown tokens in the input are estimated
 from tokens which occur at most FLOAT times in the model.
 "
 
-double "class-threshhold" X "Freq. threshhold for 'unknown' class probabilities" \
+double "class-threshhold" T "Freq. threshhold for 'unknown' class probabilities" \
   arg="FLOAT" \
   default="1.0" \
   details="
@@ -135,6 +188,17 @@ sentence boundaries, both beginning- and end-of-sentence.  It should
 not be an element of the actual tag-set -- that is, it should not
 be a valid analysis for any token.
 "
+
+double "beam-width" Z "Specify cutoff factor for beam pruning" \
+  arg="NUM" \
+  default="1000" \
+  details="
+During Viterbi search, paths will be ignored if their probabilities
+are less than 1/NUM*p_best , where p_best is the probability of
+the current best path.  Setting this option to zero disables
+beam pruning.
+"
+
 
 #-----------------------------------------------------------------------------
 # Addenda

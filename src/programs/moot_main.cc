@@ -184,11 +184,6 @@ void GetMyOptions(int argc, char **argv)
   else if (args.verbose_arg <= vlProgress) hmm.verbose = mootHMM::vlProgress;
   else hmm.verbose = mootHMM::vlEverything;
 
-  //-- load model spec
-  if (!hmm.load_model(args.model_arg, args.eos_tag_arg, PROGNAME)) {
-    fprintf(stderr, "%s: could not load model `%s'\n", PROGNAME, args.model_arg);
-  }
-
   // -- parse and assign n-gram smoothing constants (nlambdas)
   if (args.nlambdas_arg) {
     double nlambdas[3] = {0,1,0};
@@ -201,7 +196,15 @@ void GetMyOptions(int argc, char **argv)
     hmm.nglambda2 = nlambdas[1];
 #ifdef moot_USE_TRIGRAMS
     hmm.nglambda3 = nlambdas[2];
+#else
+    if (nlambdas[2] != 0) {
+      fprintf(stderr, "%s: Warning: use of trigrams disabled.\n", PROGNAME);
+    }
 #endif
+    if (nlambdas[0]+nlambdas[1]+nlambdas[2] != 1) {
+      fprintf(stderr, "%s: Warning: N-gram smoothing constants do not sum to one: %s\n",
+	      PROGNAME, args.nlambdas_arg);
+    }
   }
 
   // -- parse and assign lexical smoothing constants (wlambdas)
@@ -214,7 +217,41 @@ void GetMyOptions(int argc, char **argv)
     }
     hmm.wlambda0 = wlambdas[0];
     hmm.wlambda1 = wlambdas[1];
+    if (hmm.wlambda0 + hmm.wlambda1 != 1) {
+      fprintf(stderr, "%s: Warning: Lexical smoothing constants do not sum to one: %s\n",
+	      PROGNAME, args.wlambdas_arg);
+    }
   }
+
+  // -- parse and assign lexical smoothing constants (clambdas)
+  if (args.clambdas_arg) {
+    double clambdas[2] = {1,0};
+    if (!moot_parse_doubles(args.clambdas_arg, clambdas, 2)) {
+      fprintf(stderr, "%s: could not parse lexical-class smoothing constants '%s'\n",
+	      PROGNAME, args.clambdas_arg);
+      exit(1);
+    }
+    hmm.clambda0 = clambdas[0];
+    hmm.clambda1 = clambdas[1];
+    if (hmm.clambda0 + hmm.clambda1 != 1) {
+      fprintf(stderr, "%s: Warning: Lexical-class smoothing constants do not sum to one: %s\n",
+	      PROGNAME, args.clambdas_arg);
+    }
+  }
+
+  //-- assign beam-width
+  hmm.beamwd = args.beam_width_arg;
+
+  //-- load model spec
+  if (!hmm.load_model(args.model_arg,
+		      args.eos_tag_arg,
+		      PROGNAME,
+		      !args.nlambdas_given,
+		      !args.wlambdas_given,
+		      !args.clambdas_given))
+    {
+      fprintf(stderr, "%s: could not load model `%s'\n", PROGNAME, args.model_arg);
+    }
 
   // -- report
   if (args.verbose_arg >= vlProgress) {
@@ -249,6 +286,7 @@ void GetMyOptions(int argc, char **argv)
   writer->printf_raw("   Class Threshhold  : %g\n", hmm.unknown_class_threshhold);
   writer->printf_raw("   Class lambdas     : lambdac0=%g, lambdac1=%g\n",
 	  hmm.clambda0, hmm.clambda1);
+  writer->printf_raw("   Beam Width        : %g\n", hmm.beamwd);
   writer->printf_raw("\n");
   writer->put_comment_block_end();
 }

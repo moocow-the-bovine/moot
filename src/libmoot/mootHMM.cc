@@ -63,6 +63,7 @@ mootHMM::mootHMM(void)
     wlambda1(1.0 - mootProbEpsilon),
     clambda0(mootProbEpsilon),
     clambda1(1.0 - mootProbEpsilon),
+    beamwd(1000),
     n_tags(0),
     n_toks(0),
     n_classes(0),
@@ -100,7 +101,7 @@ mootHMM::mootHMM(void)
  * clear, freeing dynamic data
  *--------------------------------------------------------------------------*/
 
-void mootHMM::clear(bool wipe_everything)
+void mootHMM::clear(bool wipe_everything, bool unlogify)
 {
   //-- iterator variables
   ViterbiColumn *col, *col_next;
@@ -202,6 +203,20 @@ void mootHMM::clear(bool wipe_everything)
   nnewclasses = 0;
   nunknown = 0;
 
+  //-- un-logify constants
+  if (unlogify) {
+    nglambda1 = exp(nglambda1);
+    nglambda2 = exp(nglambda2);
+#ifdef MOOT_USE_TRIGRAMS
+    nglambda3 = exp(nglambda3);
+#endif
+    wlambda0 = exp(wlambda0);
+    wlambda1 = exp(wlambda1);
+    clambda0 = exp(clambda0);
+    clambda1 = exp(clambda1);
+    if (beamwd) beamwd = exp(beamwd);
+  }
+
   if (wipe_everything) {
     //-- free id-tables
     tokids.clear();
@@ -229,7 +244,12 @@ void mootHMM::clear(bool wipe_everything)
  */
 bool mootHMM::load_model(const string &modelname,
 			 const mootTagString &start_tag_str,
-			 const char *myname)
+			 const char *myname,
+			 bool  do_estimate_nglambdas,
+			 bool  do_estimate_wlambdas,
+			 bool  do_estimate_clambdas,
+			 bool  do_compute_logprobs)
+
 {
   string binfile, lexfile, ngfile, lcfile;
   hmm_parse_model_name(modelname, binfile,lexfile,ngfile,lcfile);
@@ -307,25 +327,29 @@ bool mootHMM::load_model(const string &modelname,
     if (lcprobs.size() <= 2) use_lex_classes = false;
 
     //-- estimate smoothing constants: lexical probabiltiies (wlambdas)
-    if (verbose >= vlProgress)
-      carp("%s: estimating lexical lambdas...", myname);
-    if (!estimate_wlambdas(lexfreqs)) {
-      carp("\n%s: lexical lambda estimation FAILED.\n", myname);
-      return false;
+    if (do_estimate_wlambdas) {
+      if (verbose >= vlProgress)
+	carp("%s: estimating lexical lambdas...", myname);
+      if (!estimate_wlambdas(lexfreqs)) {
+	carp("\n%s: lexical lambda estimation FAILED.\n", myname);
+	return false;
+      }
+      else if (verbose >= vlProgress) carp(" done.\n");
     }
-    else if (verbose >= vlProgress) carp(" done.\n");
 
     //-- estimate smoothing constants: n-gram probabiltiies (nglambdas)
-    if (verbose >= vlProgress)
-      carp("%s: estimating n-gram lambdas...", myname);
-    if (!estimate_lambdas(ngfreqs)) {
-      carp("\n%s: n-gram lambda estimation FAILED.\n", myname);
-      return false;
+    if (do_estimate_nglambdas) {
+      if (verbose >= vlProgress)
+	carp("%s: estimating n-gram lambdas...", myname);
+      if (!estimate_lambdas(ngfreqs)) {
+	carp("\n%s: n-gram lambda estimation FAILED.\n", myname);
+	return false;
+      }
+      else if (verbose >= vlProgress) carp(" done.\n");
     }
-    else if (verbose >= vlProgress) carp(" done.\n");
 
     //-- estimate smoothing constants: class probabiltiies (clambdas)
-    if (use_lex_classes) {
+    if (use_lex_classes && do_estimate_clambdas) {
       if (verbose >= vlProgress)
 	carp("%s: estimating class lambdas...", myname);
       if (!estimate_clambdas(classfreqs)) {
@@ -336,13 +360,15 @@ bool mootHMM::load_model(const string &modelname,
     }
 
     //-- compute log-probabilities
-    if (verbose >= vlProgress)
-      carp("%s: computing log-probabilities...", myname);
-    if (!compute_logprobs()) {
-      carp("\n%s: log-probability computation FAILED.\n", myname);
-      return false;
+    if (do_compute_logprobs) {
+      if (verbose >= vlProgress)
+	carp("%s: computing log-probabilities...", myname);
+      if (!compute_logprobs()) {
+	carp("\n%s: log-probability computation FAILED.\n", myname);
+	return false;
+      }
+      else if (verbose >= vlProgress) carp(" done.\n");
     }
-    else if (verbose >= vlProgress) carp(" done.\n");
   }
 
   return true;
@@ -387,7 +413,7 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
   //estimate_lambdas(ngrams);
 
   //-- allocate lookup tables : lex
-  clear(false);
+  clear(false,false);
   lexprobs.resize(tokids.size());
 
   //-- allocate lookup tables : classes
@@ -1089,6 +1115,8 @@ bool mootHMM::compute_logprobs(void)
   clambda0  = log(clambda0);
   clambda1  = log(clambda1);
 
+  if (beamwd) beamwd = log(beamwd);
+
   return true;
 }
 
@@ -1155,6 +1183,10 @@ void mootHMM::viterbi_clear(void)
 
   nod->pth_prev      = NULL;
   nod->nod_next      = NULL;
+
+  //-- reset beam-pruning variables
+  bbestpr = MOOT_PROB_ONE;
+  bpprmin = bbestpr - beamwd;
 }
 
 
@@ -1174,6 +1206,10 @@ void mootHMM::viterbi_step(TokID tokid)
 
   //-- Get map of possible destination tags
   const LexProbSubTable &lps = lexprobs[tokid];
+
+  //-- Update beam-pruning variables
+  bpprmin = bbestpr - beamwd;
+  bbestpr = MOOT_PROB_NEG;
 
   //-- for each possible destination tag 'vtagid'
   for (LexProbSubTable::const_iterator lpsi = lps.begin(); lpsi != lps.end(); lpsi++)
@@ -1232,6 +1268,10 @@ void mootHMM::viterbi_step(TokID tokid, ClassID classid, const LexClass &lclass)
 
   //-- Get next column
   ViterbiColumn *col = NULL;
+
+  //-- Update beam-pruning variables
+  bpprmin = bbestpr - beamwd;
+  bbestpr = MOOT_PROB_NEG;
 
   //-- for each possible destination tag 'vtagid'
 #ifdef MOOT_RELAX
@@ -1308,6 +1348,9 @@ void mootHMM::viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col)
   //-- get lexical probability: p(tok|tag) 
   vwordpr = wordp(tokid,tagid);
 
+  //-- hack: disable beam-pruning cutoff
+  bpprmin = MOOT_PROB_NEG;
+
   //-- populate a new row for this tag
   col = viterbi_populate_row(vtagid, vwordpr, col);
 
@@ -1330,6 +1373,9 @@ void mootHMM::_viterbi_step_fallback(TokID tokid, ViterbiColumn *col)
   //-- variables
   const LexProbSubTable           &lps = lexprobs[tokid];
   LexProbSubTable::const_iterator  lpsi;
+
+  //-- hack: disable beam-pruning cutoff
+  bpprmin = MOOT_PROB_NEG;
 
   //-- for each possible destination tag 'vtagid' (except "UNKNOWN")
   for (vtagid = 1; vtagid < n_tags; vtagid++) {
@@ -1424,8 +1470,10 @@ void mootHMM::txtdump(FILE *file)
 
   fprintf(file, "clambda0\t%g\n", clambda0);
   fprintf(file, "clambda1\t%g\n", clambda1);
-
   fprintf(file, "use_lex_classes\t%d\n", use_lex_classes ? 1 : 0);
+
+  fprintf(file, "beamwd\t%g\n", beamwd);
+
   fputs("uclass\t", file);
   for (LexClass::const_iterator lci = uclass.begin();  lci != uclass.end(); lci++) {
     if (lci!=uclass.begin()) fputc(' ', file);
@@ -1748,6 +1796,8 @@ bool mootHMM::_bindump(mootio::mostream *obs, const char *filename)
 	 && probt_item.save(obs, clambda0)
 	 && probt_item.save(obs, clambda1)
 
+	 && probt_item.save(obs, beamwd)
+
 	 && tokids_item.save(obs, tokids)
 	 && tagids_item.save(obs, tagids)
 	 && classids_item.save(obs, classids)
@@ -1812,7 +1862,7 @@ bool mootHMM::load(const char *filename)
 
 bool mootHMM::load(mootio::mistream *ibs, const char *filename)
 {
-  clear(true); //-- make sure the object is totally empty
+  clear(true,false); //-- make sure the object is totally empty
 
   HeaderInfo hi, hi_magic(string("mootHMM"));
   size_t     crc;
@@ -1931,6 +1981,8 @@ bool mootHMM::_binload(mootio::mistream *ibs, const char *filename)
 	 && lclass_item.load(ibs, uclass)
 	 && probt_item.load(ibs, clambda0)
 	 && probt_item.load(ibs, clambda1)
+
+	 && probt_item.load(ibs, beamwd)
 	 ))
     {
       carp("mootHMM::load(): could not load smoothing constants%s%s\n",
