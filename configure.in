@@ -528,8 +528,14 @@ if test "$moot_doc_formats" != "none" ; then
   AC_SUBST(moot_program_gogs)
   AC_CONFIG_LINKS(doc/programs/acknowledge.pod:src/programs/acknowledge.pod)
 
+  ##-- index-skeleton
+  DOC_PROG_INDEX_SKEL="mootutils.skel"
+  DOC_PROG_INDEX_POD="mootutils.pod"
+  DOC_PROG_INDEX_MAN="mootutils.1"
+  AC_SUBST(DOC_PROG_INDEX_SKEL)
+
   ##-- hack, must add section-5 stuff below in 'mans' section too!
-  moot_pods="mootfiles.pod `echo \"$moot_program_gogs\" | sed 's/\.gog/\.pod/g'`"
+  moot_pods="mootfiles.pod mootutils.pod `echo \"$moot_program_gogs\" | sed 's/\.gog/\.pod/g'`"
   AC_SUBST(moot_pods)
 
   ### -- initialize defaults
@@ -557,7 +563,9 @@ if test "$moot_doc_formats" != "none" ; then
           DOC_MAN3_MANS="man/man3/*"
 	fi
 	if test -n "$POD2MAN" ; then
-	  DOC_PROG_MAN1_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.1/g'`
+	  DOC_PROG_MAN1_TARGETS="$DOC_PROG_INDEX_MAN \
+	                        `echo \"$moot_program_gogs\" \
+	                         | sed 's/\.gog/\.1/g'`"
 	  DOC_PROG_MAN5_TARGETS="mootfiles.5"
 	else
 	  AC_MSG_WARN(pod2man not found -- program manpages will not be built!)

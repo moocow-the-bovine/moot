@@ -15,6 +15,8 @@
 ## primary targets
 ##-----------------------------------------------------------------------
 
+INDEX_SKEL = @DOC_PROG_INDEX_SKEL@
+
 ## --- manpages (section 1)
 man1_MANS = @DOC_PROG_MAN1_TARGETS@
 
@@ -30,8 +32,6 @@ pkgdocprog_DATA = \
 ##-----------------------------------------------------------------------
 ## sources
 ##-----------------------------------------------------------------------
-
-INDEX_SKEL = mootutils.skel
 
 SUFFIXES = .skel .gog .pod .txt .1 .5 .html .tex .dvi .ps .pdf
 
