@@ -348,15 +348,26 @@ int main (int argc, char **argv)
       ielapsed = astarted.tv_sec-istarted.tv_sec + (double)(astarted.tv_usec-istarted.tv_usec)/1000000.0;
 
       // -- print summary
-      fprintf(stderr, "\n-----------------------------------------------------\n");
+      fprintf(stderr, "\n-------------------------------------------------\n");
       fprintf(stderr, "%s Summary:\n", PROGNAME);
       fprintf(stderr, "  + General\n");
-      fprintf(stderr, "    - Files Processed     : %u files\n", nfiles);
-      fprintf(stderr, "    - Tokens Processed    : %u tok\n", hmm.ntokens);
-      fprintf(stderr, "    - Initialize Time     : %.3f sec\n", ielapsed);
-      fprintf(stderr, "    - Analysis Time       : %.3f sec\n", aelapsed);
-      fprintf(stderr, "    - Throughput Rate     : %.2f tok/sec\n", (double)hmm.ntokens/aelapsed);
-      fprintf(stderr, "-----------------------------------------------------\n");
+      fprintf(stderr, "    - Files Processed     : %9u file(s)\n", nfiles);
+      fprintf(stderr, "    - Sentences Processed : %9u sent\n", hmm.nsents);
+      fprintf(stderr, "    - Tokens Processed    : %9u tok\n", hmm.ntokens);
+      fprintf(stderr, "  + Analysis\n");
+      fprintf(stderr, "    - Unclassed Tokens    : %9u (%7.2f%%)\n",
+	      hmm.nunclassed, (double)hmm.nunclassed/(double)hmm.ntokens);
+      fprintf(stderr, "    - Unknown Classes     : %9u (%7.2f%%)\n",
+	      hmm.nnewclasses, (double)hmm.nnewclasses/(double)hmm.ntokens);
+      fprintf(stderr, "    - Unknown Tokens      : %9u (%7.2f%%)\n",
+	      hmm.nunknown, (double)hmm.nunknown/(double)hmm.ntokens);
+      fprintf(stderr, "    - Fallbacks           : %9u (%7.2f%%)\n",
+	      hmm.nfallbacks, (double)hmm.nfallbacks/(double)hmm.ntokens);
+      fprintf(stderr, "  + Performance\n");
+      fprintf(stderr, "    - Initialize Time     : %12.2f sec\n", ielapsed);
+      fprintf(stderr, "    - Analysis Time       : %12.2f sec\n", aelapsed);
+      fprintf(stderr, "    - Throughput Rate     : %12.2f tok/sec\n", (double)hmm.ntokens/aelapsed);
+      fprintf(stderr, "-------------------------------------------------\n");
   }
 
   return 0;

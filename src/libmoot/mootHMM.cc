@@ -113,6 +113,9 @@ void mootHMM::clear(bool wipe_everything)
   vbestpn = NULL;
   nsents = 0;
   ntokens = 0;
+  nunclassed = 0;
+  nnewclasses = 0;
+  nunknown = 0;
 
   if (wipe_everything) {
     //-- free id-tables
@@ -721,6 +724,9 @@ void mootHMM::viterbi_step(TokID tokid)
   //-- sanity check
   if (tokid >= n_toks) tokid = 0;
 
+  //-- info: check for "unknown" token
+  if (tokid==0) nunknown++;
+
   //-- Get map of possible destination tags
   const LexProbSubTable &lps = lexprobs[tokid];
 
@@ -776,6 +782,9 @@ void mootHMM::viterbi_step(TokID tokid, ClassID classid, const LexClass &lclass)
 
   //-- unknown class check(s)
   if (!classid) classid = uclassid;
+
+  //-- info: check for "unknown" token + class
+  if (tokid==0 && classid==uclassid) nunknown++;
 
   //-- Get map of possible destination tags
   const LexProbSubTable      &lps  = lexprobs[tokid];
@@ -883,6 +892,9 @@ void mootHMM::viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col)
  */
 void mootHMM::_viterbi_step_fallback(TokID tokid, ViterbiColumn *col)
 {
+  //-- info
+  nfallbacks++;
+
   //-- sanity
   if (tokid >= n_toks) tokid = 0;
   if (col==NULL) {

@@ -85,6 +85,12 @@
  */
 #undef moot_USE_TRIGRAMS
 
+/**
+ * \def moot_VITERBI_VERBOSE
+ * Define this to store verbose information during viterbi_step().
+ */
+#define moot_VITERBI_VERBOSE
+
 moot_BEGIN_NAMESPACE
 
 /*--------------------------------------------------------------------------
@@ -305,6 +311,15 @@ public:
   //typedef deque<ViterbiNode*> ViterbiPath;
   //@}
 
+
+#ifdef moot_VITERBI_VERBOSE
+  /*---------------------------------------------------------------------*/
+  /** \name Viterbi Debug Types  */
+  //@{
+  typedef map<string,size_t> viterbiStepInfo;
+  //@}
+#endif // moot_VITERBI_VERBOSE
+
 public:
   /*---------------------------------------------------------------------*/
   /** \name I/O Format Flags */
@@ -406,9 +421,17 @@ public:
   /*---------------------------------------------------------------------*/
   /** \name Statistics / Performance Tracking */
   //@{
-  size_t             nsents;    /**< Number of sentenced processed */
-  size_t             ntokens;   /**< Number of tokens processed */
+  size_t             nsents;      /**< Total number of sentenced processed */
+  size_t             ntokens;     /**< Total number of tokens processed */
+  size_t             nunclassed;  /**< Number of classless tokens processed */
+  size_t             nnewclasses; /**< Number of unknown-class tokens processed */
+  size_t             nunknown;    /**< Number of totally unknown tokens procesed */
+  size_t             nfallbacks;  /**< Number of fallbacks in viterbi_step() */
   //@}
+
+#ifdef moot_VITERBI_VERBOSE
+  viterbiStepInfo    viterbiInfo;  /**< viterbi_step() information */
+#endif // moot_VITERBI_VERBOSE
 
 protected:
   /*---------------------------------------------------------------------*/
@@ -456,6 +479,10 @@ public:
       vtable(NULL),
       nsents(0),
       ntokens(0),
+      nunclassed(0),
+      nnewclasses(0),
+      nunknown(0),
+      nfallbacks(0),
       trash_nodes(NULL),
       trash_columns(NULL), 
       trash_pathnodes(NULL),
@@ -583,7 +610,6 @@ public:
     viterbi_clear();
     for (mootSentence::const_iterator si = sentence.begin(); si != sentence.end(); si++) {
       viterbi_step(*si);
-      ntokens++;
     }
     viterbi_finish();
     tag_mark_best(sentence);
@@ -609,7 +635,9 @@ public:
    * Really just a wrapper for \c viterbi_step(TokID,set<TagID>).
    */
   inline void viterbi_step(const mootToken &token) {
+    ntokens++;
     if (token.analyses().empty()) {
+      nunclassed++;
       viterbi_step(token2id(token.text()));
     }
     else {
@@ -633,10 +661,15 @@ public:
    */
   inline void viterbi_step(TokID tokid, const LexClass &lexclass)
   {
-    if (lexclass.empty()) viterbi_step(tokid);
-    else {
+    if (lexclass.empty()) {
+      nunclassed++;
+      viterbi_step(tokid);
+    } else {
       ClassID classid = class2id(lexclass);  //-- instantiates new class if unknown
-      if (classid==0) viterbi_step(tokid);   //-- this should never happen!
+      if (classid==0) {
+	nnewclasses++;
+	viterbi_step(tokid);   //-- this should never happen! (?)
+      }
       viterbi_step(tokid,classid,lexclass);
     }
   };
