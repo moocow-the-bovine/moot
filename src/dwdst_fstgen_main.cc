@@ -15,7 +15,7 @@
 #endif
 
 #include "dwdst_fstgen_cmdparser.h"
-#include "dwdst_fstgen.h"
+#include "dwdst_trainer.h"
 
 using namespace std;
 
@@ -31,7 +31,7 @@ gengetopt_args_info args;
 char *symfile = "dwdst.sym";
 
 // -- global classes/structs
-dwds_fst_generator fstgen;
+dwds_tagger_trainer dwdstt;
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -60,13 +60,13 @@ void GetMyOptions(int argc, char **argv)
 	    PROGNAME, VERSION);
 
   // -- generator object setup : flags
-  fstgen.want_avm = false;
-  fstgen.want_features = !args.tags_only_given;
-  fstgen.verbose  = (args.verbose_arg > 0);
+  dwdstt.want_avm = false;
+  dwdstt.want_features = !args.tags_only_given;
+  dwdstt.verbose  = (args.verbose_arg > 0);
 
   // -- generator object setup : symbols
   if (args.verbose_arg > 0) fprintf(stderr, "%s: loading symbols-file '%s'...", PROGNAME, args.symbols_arg);
-  if (!fstgen.load_symbols(args.symbols_arg)) {
+  if (!dwdstt.load_symbols(args.symbols_arg)) {
     fprintf(stderr,"\n%s: load FAILED for symbols-file '%s'\n", PROGNAME, args.symbols_arg);
   } else if (args.verbose_arg > 0) {
     fprintf(stderr," loaded.\n");
@@ -76,7 +76,7 @@ void GetMyOptions(int argc, char **argv)
   if (args.verbose_arg > 0)
     fprintf(stderr, "%s: generating universal PoS-tag list from file '%s'...",
 	    PROGNAME, args.pos_tag_list_given ? args.pos_tag_list_arg : "(none)");
-  if (fstgen.get_all_pos_tags(args.pos_tag_list_given ? args.pos_tag_list_arg : NULL).empty()) {
+  if (dwdstt.get_all_pos_tags(args.pos_tag_list_given ? args.pos_tag_list_arg : NULL).empty()) {
     fprintf(stderr,"\n%s: generation FAILED for universal PoS-tag list from file '%s'\n",
 	    PROGNAME, args.pos_tag_list_given ? args.pos_tag_list_arg : "(none)");
   } else if (args.verbose_arg > 0) {
@@ -86,7 +86,7 @@ void GetMyOptions(int argc, char **argv)
   if (args.verbose_arg > 0)
     fprintf(stderr, "%s: generating open-class PoS-tag list from file '%s'...",
 	    PROGNAME, args.open_class_list_given ? args.open_class_list_arg : "(none)");
-  if (fstgen.get_open_class_tags(args.open_class_list_given ? args.open_class_list_arg : NULL).empty()) {
+  if (dwdstt.get_open_class_tags(args.open_class_list_given ? args.open_class_list_arg : NULL).empty()) {
     fprintf(stderr,"\n%s: generation FAILED for open-class PoS-tag list from file '%s'\n",
 	    PROGNAME, args.open_class_list_given ? args.open_class_list_arg : "(none)");
   } else if (args.verbose_arg > 0) {
@@ -127,7 +127,7 @@ int main (int argc, char **argv)
     //-------------------------------------------
     if (args.verbose_arg > 0)
       fprintf(stderr, "%s: generating analysis FSA for unknown tokens...", PROGNAME);
-    if (!fstgen.generate_unknown_fsa()) {
+    if (!dwdstt.generate_unknown_fsa()) {
       fprintf(stderr,"\n%s: generation FAILED for unknown-token analysis FSA!\n", PROGNAME);
     } else if (args.verbose_arg > 0) {
       fprintf(stderr," generated.\n");
@@ -138,7 +138,7 @@ int main (int argc, char **argv)
       fprintf(stderr, "%s: saving analysis FSA for unknown tokens to file '%s'...",
 	      PROGNAME, args.output_file_arg);
     }
-    FSM *ufsa_t = fstgen.ufsa->fsm_convert(FSM::FSMCTTable);
+    FSM *ufsa_t = dwdstt.ufsa->fsm_convert(FSM::FSMCTTable);
     if (!ufsa_t->fsm_save_to_binary_file(args.output_file_arg)) {
       fprintf(stderr, "\n%s Error: could not save analysis FSA for unknown tokens to file '%s'.\n",
 	      PROGNAME, args.output_file_arg);

@@ -57,8 +57,8 @@ dwdst_fstgen_SOURCES = \
 	dwdst_lexer.ll \
 	dwdst.cc \
 	dwdst.h \
-	dwdst_fstgen.cc \
-	dwdst_fstgen.h \
+	dwdst_trainer.cc \
+	dwdst_trainer.h \
 	dwdst_fstgen_main.cc \
 	dwdst_fstgen_cmdparser.ggo \
 	postag_lexer.ll
@@ -69,10 +69,8 @@ dwdst_pargen_SOURCES = \
 	dwdst_lexer.ll \
 	dwdst.cc \
 	dwdst.h \
-	dwdst_fstgen.cc \
+	dwdst_trainer.cc \
 	dwdst_fstgen.h \
-	dwdst_pargen.cc \
-	dwdst_pargen.h \
 	dwdst_pargen_main.cc \
 	dwdst_pargen_cmdparser.ggo \
 	postag_lexer.ll

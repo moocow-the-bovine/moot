@@ -16,7 +16,7 @@
 
 #include "dwdst_pargen_cmdparser.h"
 #include "cmdutil.h"
-#include "dwdst_pargen.h"
+#include "dwdst_trainer.h"
 
 using namespace std;
 
@@ -37,7 +37,7 @@ char *fstfile = "dwdst.fst";
 cmdutil_file_info out;
 
 // -- global classes/structs
-dwds_param_generator pargen;
+dwds_tagger_trainer dwdstt;
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -70,14 +70,14 @@ void GetMyOptions(int argc, char **argv)
 
   // -- trainer object setup : flags
   //dwdst.want_avm = args.avm_given;
-  pargen.want_avm = false;
-  pargen.want_features = !args.tags_only_given;
-  pargen.verbose  = (args.verbose_arg > 0);
-  pargen.wdsep = args.word_separator_arg;
+  dwdstt.want_avm = false;
+  dwdstt.want_features = !args.tags_only_given;
+  dwdstt.verbose  = (args.verbose_arg > 0);
+  dwdstt.wdsep = args.word_separator_arg;
 
   // -- trainer object setup : symbols
   if (args.verbose_arg > 0) fprintf(stderr, "%s: loading symbols-file '%s'...", PROGNAME, args.symbols_arg);
-  if (!pargen.load_symbols(args.symbols_arg)) {
+  if (!dwdstt.load_symbols(args.symbols_arg)) {
     fprintf(stderr,"\n%s: load FAILED for symbols-file '%s'\n", PROGNAME, args.symbols_arg);
   } else if (args.verbose_arg > 0) {
     fprintf(stderr," loaded.\n");
@@ -87,7 +87,7 @@ void GetMyOptions(int argc, char **argv)
   if (args.verbose_arg > 0)
       fprintf(stderr, "%s: loading unknown-token analysis FSA file '%s'...",
 	      PROGNAME, args.unknown_fsa_arg);
-  if (!pargen.load_unknown_fsa(args.unknown_fsa_arg)) {
+  if (!dwdstt.load_unknown_fsa(args.unknown_fsa_arg)) {
       fprintf(stderr,"\n%s: load FAILED for unknown-token analysis FSA file '%s'.\n",
 	      PROGNAME, args.unknown_fsa_arg);
   } else if (args.verbose_arg > 0) {
@@ -97,19 +97,19 @@ void GetMyOptions(int argc, char **argv)
 
   // -- trainer object setup : morphology FST
   if (args.verbose_arg > 0) fprintf(stderr, "%s: loading morphology FST '%s'...", PROGNAME, args.morph_arg);
-  if (!pargen.load_morph(args.morph_arg)) {
+  if (!dwdstt.load_morph(args.morph_arg)) {
     fprintf(stderr,"\n%s: load FAILED for morphology FST '%s'\n", PROGNAME, args.morph_arg);
   } else if (args.verbose_arg > 0) {
     fprintf(stderr," loaded.\n");
   }
 
   // -- trainer object setup : kmax , eos
-  pargen.kmax = args.kgram_max_arg;
-  pargen.eos = args.eos_string_arg;
+  dwdstt.kmax = args.kgram_max_arg;
+  dwdstt.eos = args.eos_string_arg;
 
   // -- trainer object setup : link morph-FST to symbols file
-  if (!pargen.morph->fsm_use_symbol_spec(pargen.syms) ||
-      !pargen.ufsa->fsm_use_symbol_spec(pargen.syms))
+  if (!dwdstt.morph->fsm_use_symbol_spec(dwdstt.syms) ||
+      !dwdstt.ufsa->fsm_use_symbol_spec(dwdstt.syms))
       {
 	  fprintf(stderr,"%s ERROR: could not use symbols from '%s' in FST from '%s'\n",
 		  PROGNAME, args.symbols_arg, args.morph_arg);
@@ -138,7 +138,7 @@ int main (int argc, char **argv)
     if (args.verbose_arg > 0) {
       fprintf(stderr, "%s: Training from command-line tokens\n\n", PROGNAME);
     }
-    pargen.train_from_strings(args.inputs_num, args.inputs, out.file);
+    dwdstt.train_from_strings(args.inputs_num, args.inputs, out.file);
   } else {
     if (args.verbose_arg > 0) {
       fprintf(stderr, "%s: Training from input files... %s",
@@ -157,7 +157,7 @@ int main (int argc, char **argv)
       fprintf(out.file, "\n# %s (DEBUG): File: %s\n\n", PROGNAME, churner.in.name);
 #    endif
       
-      pargen.train_from_stream(churner.in.file, out.file);
+      dwdstt.train_from_stream(churner.in.file, out.file);
 
       if (args.verbose_arg > 1) {
 	fprintf(stderr," done.\n");
@@ -179,7 +179,7 @@ int main (int argc, char **argv)
     fprintf(stderr, "%s: Generating parameter file '%s'... ",
 	    PROGNAME, out.name);
   }
-  pargen.write_param_file(out.file);
+  dwdstt.write_param_file(out.file);
   if (args.verbose_arg > 0 && out.file != stdout) {
     out.close();
     fprintf(stderr, "done.\n");
@@ -192,12 +192,12 @@ int main (int argc, char **argv)
       // -- print summary
       fprintf(stderr, "\n-----------------------------------------------------\n");
       fprintf(stderr, "%s Summary:\n", PROGNAME);
-      fprintf(stderr, "  + kmax                       : %d\n", pargen.kmax);
-      fprintf(stderr, "  + tags-only                  : %s\n", pargen.want_features ? "no" : "yes");
+      fprintf(stderr, "  + kmax                       : %d\n", dwdstt.kmax);
+      fprintf(stderr, "  + tags-only                  : %s\n", dwdstt.want_features ? "no" : "yes");
       fprintf(stderr, "  + Files processed            : %d\n", nfiles);
-      fprintf(stderr, "  + Tokens processed           : %d\n", pargen.ntokens);
-      fprintf(stderr, "  + Total number of tags       : %d\n", pargen.alltags.size());
-      fprintf(stderr, "  + Total number of j<=%d-grams : %d\n", pargen.kmax, pargen.strings2counts.size());
+      fprintf(stderr, "  + Tokens processed           : %d\n", dwdstt.ntokens);
+      fprintf(stderr, "  + Total number of tags       : %d\n", dwdstt.alltags.size());
+      fprintf(stderr, "  + Total number of j<=%d-grams : %d\n", dwdstt.kmax, dwdstt.strings2counts.size());
       fprintf(stderr, "-----------------------------------------------------\n");
   }
 
