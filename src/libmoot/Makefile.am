@@ -152,6 +152,8 @@ mootEventLexer.o: mootEventLexer.h mootEvent.h
 #pkginclude_HEADERS = ${hfile_1} ... ${hfile_N}
 pkginclude_HEADERS = \
 	\
+	mootConfig.h \
+	\
 	mootIO.h \
 	mootCIO.h \
 	mootZIO.h \
