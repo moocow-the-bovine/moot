@@ -37,14 +37,23 @@ all-local: $(STAMPFILE)
 vpath %.h @top_srcdir@/src/libdwdst @top_builddir@/src/libdwdst
 
 DOXY_INPUTS = \
-	dwdstLexfreqs.h		dwdstPPLexer.h \
-	dwdstLexfreqsCompiler.h	dwdstParamLexer.h \
-	dwdstLexfreqsLexer.h	dwdstParamParser.h \
-	dwdstLexfreqsParser.h	dwdstTagger.h \
-	dwdstConfig.h	        dwdstNgrams.h		dwdstTaggerLexer.h \
-	dwdstNgramsCompiler.h	dwdstTaglistLexer.h \
-	dwdstEnum.h	        dwdstNgramsLexer.h	dwdstTypes.h \
-	dwdstHMM.h	        dwdstNgramsParser.h
+	dwdstConfig.h \
+	dwdstTypes.h \
+	dwdstEnum.h \
+	dwdstLexfreqsLexer.h	dwdstLexfreqsParser.h	dwdstLexfreqsCompiler.h	\
+	dwdstLexfreqs.h \
+	dwdstNgramsLexer.h	dwdstNgramsParser.h	dwdstNgramsCompiler.h	\
+	dwdstNgrams.h \
+	dwdstPPLexer.h \
+	dwdstTaggerLexer.h \
+	dwdstHMM.h \
+	dwdstTagger.h
+
+DOXY_INPUTS_old = \
+	dwdstTaglistLexer.h \
+	dwdstParamLexer.h \
+	dwdstParamParser.h \
+	dwdstTaglistLexer.h
 
 #-----------------------------------------------------------------------
 # Additional dependencies
