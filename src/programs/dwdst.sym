@@ -1,0 +1,860 @@
+UppercaseLetter		A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Ä Ö Ü
+LowercaseLetter		a b c d e f g h i j k l m n o p q r s t u v w x y z ä ö ü ß
+
+ForeignUppercaseLetter	Ú Á Å Ý Ó Æ Í É Ç Ø Ñ
+ForeignLowercaseLetter	é ó á í ï ë ñ å â è ú à î æ ð þ ò ì ã ê õ ù ô ø ý ç
+
+Letter			A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Ä Ö Ü
+Letter			a b c d e f g h i j k l m n o p q r s t u v w x y z ä ö ü ß
+Letter			é ó á í ï ë ñ å â è ú à î æ ð þ ò ì ã ê õ ù ô ø ý
+Letter			Ú Á Å Ý Ó ç Æ Í É Ç Ø Ñ
+
+
+InWordPunct		-
+
+MorphBoundary		| # ~
+
+
+Cat		noun verb adj
+Number		sg pl none
+Case		nom gen acc dat none
+Tense		pres pret none
+Mood		ind subjI subjII imp none
+Gender		masc fem neut Npl none
+Person		first second third none
+VForm		fin inf zuinf partI partII
+MSubcat		ms_verb ms_adj ms_noun
+StForm		st_default st_prefsep st_zuinf st_partII
+LinkMor		lm_0 lm_n lm_s lm_e lm_en lm_nen lm_er lm_es lm_ien lm_ens lm_dl lm_el lm_l lm_dash
+StemType	default deko flex
+ConfType	pre post in
+
+
+NICSg		ic_sg_none ic_sg1 ic_sg2 ic_sg3 ic_sg4 ic_sg5 ic_sg6 ic_sg7 ic_sg8
+NICPl		ic_pl_none ic_pl1 ic_pl2 ic_pl3 ic_pl4 ic_pl5 ic_pl6 ic_pl7 ic_pl8 ic_pl9
+ADecl		strong weak mixed
+Degree		pos comp sup
+Umlaut		yes no
+PartIIReg	yes no
+AuxVerb		haben sein none
+Latinate	yes no
+PrefVerb	yes no
+VType		main aux modal
+StDef 		yes no
+St23SgInd 	yes no
+StPret 		yes no
+StSubjI 	yes no
+StSubjII	yes no
+StPartII	yes no
+StImpSg		yes no
+StPred 		yes no
+StPos 		yes no
+StComp 		yes no
+StSup		yes no
+
+DType		poss demo indef def
+PronType	poss indef rel pers refl interro demo
+ConjType	kon kous koui kokom
+AdPosType	appr appo apprart apzr
+Nametype	firstname lastname geoname
+CardType	num ord frac roman
+
+Wh		plus minus
+
+
+Category:	VERB VType VPart VForm Person Number Tense Mood
+Category:	ADJ Degree Number Case Gender ADecl
+Category:	NOUN Gender Number Case
+Category:	ARTDEF Number Case Gender
+Category:	ARTINDEF Number Case Gender
+Category:	ADVERB
+Category:	CONJ ConjType
+Category:	ADPOS AdPosType
+Category:	NAME Nametype
+Category:	GEONAME GeoSemClass
+Category:	CARD CardType
+Category:	ACR
+Category:	PAV
+Category:	PDS Case Number Gender
+Category:       PDAT Case Number Gender
+Category:       PIS Case Number Gender
+Category:       PISNEG Case Number Gender
+Category:       PIAT Case Number Gender
+Category:       PIDAT Case Number Gender
+Category:       PIDATNEG Case Number Gender
+Category:       PPER Person Case Number Gender
+Category:       PRF Person Case Number Gender
+Category:       PPOS Case Number Gender
+Category:       PPOSAT Case Number Gender
+Category:       PRELS Case Number Gender
+Category:       PRELAT Case Number Gender
+Category:       PWS Case Number Gender
+Category:       PWAT Case Number Gender
+Category:       PWAV
+Category:       PTKA
+Category:       PTKABT
+Category:       PTKANT
+Category:       PTKFOC
+Category:       PTKNEG
+Category:       PTKVZ
+Category:       PTKZU
+
+
+Category:	ASTEM_REG Cat
+Category:	ASTEM_IRREG Cat StPred StPos StComp StSup
+Category:	VSTEM_REG Cat VType PrefVerb Latinate VPart StForm PartIIReg
+Category:	VSTEM_IRREG Cat VType PrefVerb Latinate VPart StDef St23SgInd StPret StSubjI StSubjII StPartII StImpSg StForm
+Category:	VSTEM_SEMIREG Cat VType PrefVerb Latinate VPart StDef St23SgInd StPret StSubjI StSubjII StPartII StImpSg StForm
+Category:	NSTEM Cat Gender NICSg NICPl StemType LinkMor
+Category:	NINFL Number Case NICSg NICPl
+Category:	VINFL_REG VForm Person Number Tense Mood
+Category:	VINFL_IRREG VForm Person Number Tense Mood
+Category:	VINFIN VForm
+Category:	VPARTI VForm
+Category:	VPARTII VForm
+Category:	VIMP VForm Number Mood
+Category:	AINFL Number Case Gender ADecl
+Category:	ACOMPAFFIX Degree
+Category:	LINKMORPH
+Category:	NSUFFIX Cat MSubcat Gender NICSg NICPl
+Category:	ASUFFIX Cat MSubcat
+Category:	VGEPREF
+Category:	VZUINFIX
+Category:	VPART
+Category:	APREFIX
+Category:	CONFIX ConfType
+ 
+
+MorphNonTerminals	VERBFORM INFLECTEDVERB PARTICIPLE INFINITEVERB IMPERATITEVERB ZUINFINITEVERB
+MorphNonTerminals	PARTICIPLE_I PARTICIPLE_II VSTEMCOMP
+MorphNonTerminals	WORD ADJECTIVESTEM ADJFORM NOUNFORM STEM VSTEM ASTEM LETTERS
+
+NumberNonTerminals	ORDNUM ORDNUM_100 ORDNUM_1000 ORDNUM_100000 
+NumberNonTerminals	BASENUM1_9  BASENUM10_19  BASENUM20_90
+NumberNonTerminals	ORDINAL ORDADJ ORDADJ1 ORDADJ2 ORDFRAC ORDFRAC2 AINFLAFFIX
+
+
+VPart no_vpart
+VPart ab
+VPart abwärts
+VPart acht
+VPart allein
+VPart an
+VPart aneinander
+VPart anheim
+VPart ansich
+VPart auf
+VPart aufeinander
+VPart aufrecht
+VPart aufwärts
+VPart aus
+VPart auseinander
+VPart auswärts
+VPart back
+VPart ball
+VPart bauch
+VPart bei
+VPart beieinander
+VPart beisammen
+VPart beiseite
+VPart bekannt
+VPart bereit
+VPart besser
+VPart bestehen
+VPart bevor
+VPart blank
+VPart blasen
+VPart blau
+VPart bleiben
+VPart blind
+VPart bloß
+VPart brach
+VPart braun
+VPart breit
+VPart bruch
+VPart da
+VPart dabei
+VPart dafür
+VPart dagegen
+VPart daher
+VPart dahin
+VPart dahinter
+VPart daneben
+VPart danieder
+VPart dank
+VPart dar
+VPart daran
+VPart darauf
+VPart darein
+VPart darnieder
+VPart darüber
+VPart darum
+VPart darunter
+VPart davon
+VPart davor
+VPart dawider
+VPart dazu
+VPart dazwischen
+VPart dicht
+VPart dick
+VPart dicke
+VPart dort
+VPart dran
+VPart drauf
+VPart drauflos
+VPart drei
+VPart drein
+VPart drin
+VPart drüber
+VPart drum
+VPart drumrum
+VPart drunter
+VPart dünn
+VPart durch
+VPart durcheinander
+VPart ehe
+VPart ein
+VPart einher
+VPart einig
+VPart einwärts
+VPart empor
+VPart entgegen
+VPart entlang
+VPart entzwei
+VPart ernst
+VPart fahren
+VPart fallen
+VPart falsch
+VPart fehl
+VPart feil
+VPart fein
+VPart fern
+VPart fertig
+VPart fest
+VPart flach
+VPart flöten
+VPart flott
+VPart flüssig
+VPart form
+VPart fort
+VPart frei
+VPart fremd
+VPart frisch
+VPart für
+VPart fürlieb
+VPart fuß
+VPart gar
+VPart gefangen
+VPart gegen
+VPart gegenüber
+VPart geheim
+VPart gehen
+VPart genug
+VPart gerade
+VPart gering
+VPart gerinnen
+VPart gesund
+VPart glatt
+VPart gleich
+VPart grade
+VPart groß
+VPart groß an
+VPart großreine
+VPart gut
+VPart haften
+VPart halt
+VPart hängen
+VPart hart
+VPart heilig
+VPart heim
+VPart heimlich
+VPart heiß
+VPart hell
+VPart her
+VPart herab
+VPart heran
+VPart herauf
+VPart heraus
+VPart herbei
+VPart herein
+VPart hernieder
+VPart herüber
+VPart herum
+VPart herunter
+VPart hervor
+VPart hier
+VPart hierher
+VPart hin
+VPart hinab
+VPart hinan
+VPart hinauf
+VPart hinaus
+VPart hindurch
+VPart hinein
+VPart hintan
+VPart hinten
+VPart hinten über
+VPart hintenan
+VPart hintenüber
+VPart hinter
+VPart hinterdrein
+VPart hintereinander
+VPart hinterher
+VPart hinüber
+VPart hinunter
+VPart hinweg
+VPart hinzu
+VPart hoch
+VPart hof
+VPart hohn
+VPart hopp
+VPart hops
+VPart ineinander
+VPart ingang
+VPart inne
+VPart instand
+VPart irre
+VPart kahl
+VPart kalt
+VPart kaputt
+VPart kegel
+VPart kehrt
+VPart kennen
+VPart ketten
+VPart kiel
+VPart klar
+VPart kleben
+VPart klein
+VPart klug
+VPart knapp
+VPart kopf
+VPart krank
+VPart krumm
+VPart kund
+VPart kurz
+VPart lahm
+VPart lang
+VPart leck
+VPart leer
+VPart leicht
+VPart lieb
+VPart lieben
+VPart liegen
+VPart lob
+VPart locker
+VPart los
+VPart lungen
+VPart mal
+VPart maschine
+VPart maß
+VPart matt
+VPart mies
+VPart miß
+VPart miss
+VPart mit
+VPart mitan
+VPart mitfort
+VPart mobil
+VPart mündig
+VPart nach
+VPart nahe
+VPart näher
+VPart nas
+VPart neben
+VPart nebeneinander
+VPart nebenher
+VPart nein
+VPart neu
+VPart nieder
+VPart not
+VPart offen
+VPart parallel
+VPart paß
+VPart plan
+VPart platt
+VPart preis
+VPart probe
+VPart quer
+VPart rad
+VPart ran
+VPart rauf
+VPart raus
+VPart rein
+VPart richtig
+VPart rüber
+VPart rück
+VPart rückwärts
+VPart ruhig
+VPart rum
+VPart rund
+VPart runter
+VPart sack
+VPart sand
+VPart satt
+VPart sauber
+VPart scharf
+VPart schätzen
+VPart schau
+VPart schi
+VPart schief
+VPart schlank
+VPart schlapp
+VPart schlecht
+VPart schlitten
+VPart schön
+VPart schritt
+VPart schwarz
+VPart schwer
+VPart seil
+VPart segel
+VPart selig
+VPart sicher
+VPart sitzen
+VPart spazieren
+VPart spitz
+VPart stand
+VPart statt
+VPart staub
+VPart stecken
+VPart stehen
+VPart steif
+VPart stich
+VPart stiften
+VPart still
+VPart stramm
+VPart streng
+VPart teil
+VPart tief
+VPart tot
+VPart trocken
+VPart übel
+VPart über
+VPart überein
+VPart übereinander
+VPart überhand
+VPart übrig
+VPart um
+VPart umher
+VPart umhin
+VPart unten
+VPart unter
+VPart urauf
+VPart urbar
+VPart verloren
+VPart verschütt
+VPart verto
+VPart vier
+VPart voll
+VPart voneinander
+VPart vor
+VPart voran
+VPart vorauf
+VPart voraus
+VPart vorbei
+VPart vorher
+VPart vorlieb
+VPart vorüber
+VPart vorwärts
+VPart vorweg
+VPart wach
+VPart wahr
+VPart warm
+VPart weg
+VPart weh
+VPart weis
+VPart weiß
+VPart weiter
+VPart wert
+VPart wett
+VPart wider
+VPart wieder
+VPart wiederab
+VPart wiederan
+VPart wiederauf
+VPart wiederein
+VPart wiederher
+VPart wirklich
+VPart wohl
+VPart wohnen
+VPart wort
+VPart wund
+VPart wunder
+VPart zähne
+VPart zu
+VPart zufrieden
+VPart zugrunde
+VPart zurecht
+VPart zurück
+VPart zusammen
+VPart zustande
+VPart zuvor
+VPart zuwege
+VPart zuwider
+VPart zwangsum
+VPart zwei
+VPart zwischen
+VPart zwischendrein
+VPart zwischendrin
+VPart zwischendurch
+
+
+
+
+SemClass1	a
+SemClass1	h_gr
+SemClass1	h_m
+SemClass1	h_m_eig
+SemClass1	h_m_eig_aktm
+SemClass1	h_m_eig_aktm_aktm_sozhdlgkon
+SemClass1	h_m_eig_aktm_betr
+SemClass1	h_m_eig_aktm_betr_empf
+SemClass1	h_m_eig_aktm_betr_erf
+SemClass1	h_m_eig_aktm_betr_erf_gesch
+SemClass1	h_m_eig_aktm_betr_erf_nutz
+SemClass1	h_m_eig_aktm_betr_erf_verurtbestr
+SemClass1	h_m_eig_aktm_ohnetät_ohneerw
+SemClass1	h_m_eig_aktm_ohnetät_pass
+SemClass1	h_m_eig_aktm_ohnetät_ruhest
+SemClass1	h_m_eig_aktm_sozhdlg
+SemClass1	h_m_eig_aktm_sozhdlgkon
+SemClass1	h_m_eig_aktm_sozhdlgkon_team
+SemClass1	h_m_eig_aktm_tät
+SemClass1	h_m_eig_aktm_tät_akt
+SemClass1	h_m_eig_aktm_tät_akt_fortb
+SemClass1	h_m_eig_aktm_tät_akt_kogn
+SemClass1	h_m_eig_aktm_tät_akt_laut
+SemClass1	h_m_eig_aktm_tät_akt_spra
+SemClass1	h_m_eig_aktm_tät_amtberufg
+SemClass1	h_m_eig_aktm_tät_amtberufg_for
+SemClass1	h_m_eig_aktm_tät_amtberufg_kir
+SemClass1	h_m_eig_aktm_tät_amtberufg_kün
+SemClass1	h_m_eig_aktm_tät_amtberufg_pol
+SemClass1	h_m_eig_aktm_tät_ausb
+SemClass1	h_m_eig_aktm_tät_bedakt
+SemClass1	h_m_eig_aktm_tät_berst
+SemClass1	h_m_eig_aktm_tät_berst_arbverh
+SemClass1	h_m_eig_aktm_tät_berst_ausf
+SemClass1	h_m_eig_aktm_tät_berst_drang
+SemClass1	h_m_eig_aktm_tät_berst_leit
+SemClass1	h_m_eig_aktm_tät_bldakt
+SemClass1	h_m_eig_aktm_tät_bürgakt
+SemClass1	h_m_eig_aktm_tät_erw
+SemClass1	h_m_eig_aktm_tät_erw_ber
+SemClass1	h_m_eig_aktm_tät_erw_ber_agr
+SemClass1	h_m_eig_aktm_tät_erw_ber_agrforstgart
+SemClass1	h_m_eig_aktm_tät_erw_ber_agrforstgart_forstjagfish
+SemClass1	h_m_eig_aktm_tät_erw_ber_agrforstgart_gartflor
+SemClass1	h_m_eig_aktm_tät_erw_ber_agrforstgart_landwald
+SemClass1	h_m_eig_aktm_tät_erw_ber_agrforstgart_lw
+SemClass1	h_m_eig_aktm_tät_erw_ber_bergroh
+SemClass1	h_m_eig_aktm_tät_erw_ber_bldg
+SemClass1	h_m_eig_aktm_tät_erw_ber_die
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_artsport
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_arztheil
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_bavers
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_bestatt
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_biblarmu
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_dienst
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_edv
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_gast
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_geistl
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_ges
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_hslehr
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_ing
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_kaufm
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_koerpfle
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_kunst
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_lehr
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_logist
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_medien
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_medien_funkfernseh
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_medien_netmultim
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_medien_pubueb
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_medien_werbfoto
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_polmiljust
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_posttele
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_recht
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_reinents
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_sicher
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_sozial
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_transverk
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_transverk_fahrfuehr
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_transverk_fahrpers
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_transverk_fahrpers_wasser
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_transverk_fahrperswasser
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_wirbüver
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_wirbüver_kalkbuchkass
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_wirbüver_schreib
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_wirbüver_untgeschfunkt
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_wirbüver_verwbetr
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_wirbüver_wirprüfber
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_wirbüver_öffverw
+SemClass1	h_m_eig_aktm_tät_erw_ber_die_wiss
+SemClass1	h_m_eig_aktm_tät_erw_ber_forleh
+SemClass1	h_m_eig_aktm_tät_erw_ber_ges
+SemClass1	h_m_eig_aktm_tät_erw_ber_hdwk
+SemClass1	h_m_eig_aktm_tät_erw_ber_hilf
+SemClass1	h_m_eig_aktm_tät_erw_ber_hist
+SemClass1	h_m_eig_aktm_tät_erw_ber_ind
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_bauraum
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_buchb
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_dekgest
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_druck
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_grstind
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_grstind_chpap
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_grstind_hoko
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_grstind_metall
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_grstind_mikegl
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_hoko
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_maschheiz
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_mechmonelektr
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_mechmonger
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_nahrgenuss
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_techlab
+SemClass1	h_m_eig_aktm_tät_erw_ber_indhandw_textil
+SemClass1	h_m_eig_aktm_tät_erw_ber_it
+SemClass1	h_m_eig_aktm_tät_erw_ber_kunst
+SemClass1	h_m_eig_aktm_tät_erw_ber_medien
+SemClass1	h_m_eig_aktm_tät_erw_ber_polmil
+SemClass1	h_m_eig_aktm_tät_erw_ber_recht
+SemClass1	h_m_eig_aktm_tät_erw_zweif
+SemClass1	h_m_eig_aktm_tät_freiz
+SemClass1	h_m_eig_aktm_tät_habit
+SemClass1	h_m_eig_aktm_tät_sportl
+SemClass1	h_m_eig_aktm_tät_verurs
+SemClass1	h_m_eig_aktm_tät_verurs_neg
+SemClass1	h_m_eig_aktm_tät_verurs_normverl
+SemClass1	h_m_eig_aktm_tät_verurs_pos
+SemClass1	h_m_eig_phys
+SemClass1	h_m_eig_phys_alt
+SemClass1	h_m_eig_phys_alt_alt
+SemClass1	h_m_eig_phys_alt_erw
+SemClass1	h_m_eig_phys_alt_jung
+SemClass1	h_m_eig_phys_geschl_f
+SemClass1	h_m_eig_phys_geschl_m
+SemClass1	h_m_eig_phys_geschl_uneind
+SemClass1	h_m_eig_phys_konst
+SemClass1	h_m_eig_phys_konst_kbau
+SemClass1	h_m_eig_phys_konst_phverm
+SemClass1	h_m_eig_phys_konst_tot
+SemClass1	h_m_eig_phys_konst_vit
+SemClass1	h_m_eig_phys_konst_wohlg
+SemClass1	h_m_eig_phys_rasse
+SemClass1	h_m_eig_psy
+SemClass1	h_m_eig_psy_geistverm
+SemClass1	h_m_eig_psy_psyverf
+SemClass1	h_m_eig_psy_verh
+SemClass1	h_m_eig_psy_verh_sex
+SemClass1	h_m_eig_sozk
+SemClass1	h_m_eig_sozk_bev
+SemClass1	h_m_eig_sozk_bev_hist
+SemClass1	h_m_eig_sozk_bev_kont
+SemClass1	h_m_eig_sozk_bev_natethn
+SemClass1	h_m_eig_sozk_bev_natethn_ethn
+SemClass1	h_m_eig_sozk_bev_natethn_nat
+SemClass1	h_m_eig_sozk_bev_reg
+SemClass1	h_m_eig_sozk_bev_regort
+SemClass1	h_m_eig_sozk_bev_regort_geb
+SemClass1	h_m_eig_sozk_bev_regort_ins
+SemClass1	h_m_eig_sozk_bev_regort_ort
+SemClass1	h_m_eig_sozk_bev_regort_reg
+SemClass1	h_m_eig_sozk_bev_regort_reggeo
+SemClass1	h_m_eig_sozk_epoche
+SemClass1	h_m_eig_sozk_gr
+SemClass1	h_m_eig_sozk_gr_priv
+SemClass1	h_m_eig_sozk_gr_öff
+SemClass1	h_m_eig_sozk_gr_öff_freiz
+SemClass1	h_m_eig_sozk_gr_öff_pol
+SemClass1	h_m_eig_sozk_gr_öff_rel
+SemClass1	h_m_eig_sozk_gr_öff_wirtsch
+SemClass1	h_m_eig_sozk_sozpos
+SemClass1	h_m_eig_sozk_stat
+SemClass1	h_m_eig_sozk_stat_ansbek_ans_ger
+SemClass1	h_m_eig_sozk_stat_ansbek_ans_hoh
+SemClass1	h_m_eig_sozk_stat_ansbek_bek_bek
+SemClass1	h_m_eig_sozk_stat_ansbek_bek_unb
+SemClass1	h_m_eig_sozk_stat_bildkult
+SemClass1	h_m_eig_sozk_stat_bildkult_ber
+SemClass1	h_m_eig_sozk_stat_bildkult_ber_aka
+SemClass1	h_m_eig_sozk_stat_bildkult_kultbldg
+SemClass1	h_m_eig_sozk_stat_bildkult_schul
+SemClass1	h_m_eig_sozk_stat_einkbes
+SemClass1	h_m_eig_sozk_stat_einkbes_arm
+SemClass1	h_m_eig_sozk_stat_einkbes_reich
+SemClass1	h_m_eig_sozk_stat_fähigk
+SemClass1	h_m_eig_sozk_stat_herk
+SemClass1	h_m_eig_sozk_stat_machteinfl
+SemClass1	h_m_eig_sozk_stat_machteinfl_machtl
+SemClass1	h_m_eig_sozk_stat_machteinfl_mächt
+SemClass1	h_m_eig_sozk_stat_repfli
+SemClass1	h_m_eig_sozk_stat_repfli_pflichten
+SemClass1	h_m_eig_sozk_stat_repfli_rechte
+SemClass1	h_m_eig_sozk_stat_repfli_rechtlos
+SemClass1	h_m_eig_sozk_stat_schicht
+SemClass1	h_m_eig_sozk_stat_schicht_adel
+SemClass1	h_m_eig_sozk_verw
+SemClass1	h_m_eig_sozk_verw_dir
+SemClass1	h_m_eig_sozk_verw_ind
+SemClass1	h_m_eig_sozk_verw_sonst
+SemClass1	h_m_eig_sozk_wertor
+SemClass1	h_m_eig_sozk_wertor_eth
+SemClass1	h_m_eig_sozk_wertor_pol
+SemClass1	h_m_eig_sozk_wertor_rel
+SemClass1	h_m_eig_sozk_wertor_sonst
+SemClass1	h_m_eig_sozk_wertor_spir
+SemClass1	h_m_eig_sozk_wertor_theoprak
+SemClass1	h_m_eig_sozk_wertor_ästh
+SemClass1	h_m_eig_sozk_wertor_ökon
+SemClass1	h_m_eig_sozpos
+SemClass1	h_m_namti
+SemClass1	h_m_namti_adel
+SemClass1	h_m_namti_akgr
+SemClass1	h_m_namti_anrti
+SemClass1	h_m_namti_fam
+SemClass1	h_m_namti_kosspitz
+SemClass1	h_m_namti_scherz
+SemClass1	h_m_namti_schimpf
+SemClass1	h_m_namti_vorn_m
+SemClass1	h_m_namti_vorn_w
+SemClass1	h_meng
+SemClass1	h_myth
+SemClass1	h_sozeinh_zweck
+SemClass1	h_sozeinh_zweck_klgr_kunst
+SemClass1	h_sozeinh_zweck_unterninst
+SemClass1	h_sozeinh_zweck_unterninst_poladmin_polmil
+SemClass1	h_sozeinh_zweck_unterninst_polizmilit
+SemClass1	h_sozeinh_zweck_unterninst_wirtsch
+SemClass1	h_sozeinh_zweck_verein
+SemClass1	h_spez
+SemClass1	h_überm_göttl_nam
+SemClass1	none
+
+
+
+SemClass2	h_m_eig_aktm_betr
+SemClass2	h_m_eig_aktm_betr_erf
+SemClass2	h_m_eig_aktm_betr_erf_gesch
+SemClass2	h_m_eig_aktm_betr_erf_nutz
+SemClass2	h_m_eig_aktm_betr_erf_verurtbestr
+SemClass2	h_m_eig_aktm_ohnetät_ohneerw
+SemClass2	h_m_eig_aktm_ohnetät_pass
+SemClass2	h_m_eig_aktm_ohnetät_ruhest
+SemClass2	h_m_eig_aktm_sozhdlgkon
+SemClass2	h_m_eig_aktm_tät
+SemClass2	h_m_eig_aktm_tät_akt
+SemClass2	h_m_eig_aktm_tät_akt_fortb
+SemClass2	h_m_eig_aktm_tät_akt_spra
+SemClass2	h_m_eig_aktm_tät_amtberufg
+SemClass2	h_m_eig_aktm_tät_amtberufg_kir
+SemClass2	h_m_eig_aktm_tät_amtberufg_kün
+SemClass2	h_m_eig_aktm_tät_amtberufg_pol
+SemClass2	h_m_eig_aktm_tät_ausb
+SemClass2	h_m_eig_aktm_tät_bedakt
+SemClass2	h_m_eig_aktm_tät_berst
+SemClass2	h_m_eig_aktm_tät_berst_arbverh
+SemClass2	h_m_eig_aktm_tät_berst_ausf
+SemClass2	h_m_eig_aktm_tät_berst_drang
+SemClass2	h_m_eig_aktm_tät_berst_leit
+SemClass2	h_m_eig_aktm_tät_bldakt
+SemClass2	h_m_eig_aktm_tät_bürgakt
+SemClass2	h_m_eig_aktm_tät_erw_ber
+SemClass2	h_m_eig_aktm_tät_erw_ber_agrforstgart
+SemClass2	h_m_eig_aktm_tät_erw_ber_agrforstgart_lw
+SemClass2	h_m_eig_aktm_tät_erw_ber_die_geistl
+SemClass2	h_m_eig_aktm_tät_erw_ber_die_kaufm
+SemClass2	h_m_eig_aktm_tät_erw_ber_die_kunst
+SemClass2	h_m_eig_aktm_tät_erw_ber_die_medien_funkfernseh
+SemClass2	h_m_eig_aktm_tät_erw_ber_die_polmiljust
+SemClass2	h_m_eig_aktm_tät_erw_ber_die_wirbüver_untgeschfunkt
+SemClass2	h_m_eig_aktm_tät_erw_ber_ges
+SemClass2	h_m_eig_aktm_tät_erw_ber_hist
+SemClass2	h_m_eig_aktm_tät_erw_ber_polmil
+SemClass2	h_m_eig_aktm_tät_erw_zweif
+SemClass2	h_m_eig_aktm_tät_freiz
+SemClass2	h_m_eig_aktm_tät_sportl
+SemClass2	h_m_eig_aktm_tät_verurs
+SemClass2	h_m_eig_aktm_tät_verurs_normverl
+SemClass2	h_m_eig_aktm_tät_verurs_pos
+SemClass2	h_m_eig_phys_alt_alt
+SemClass2	h_m_eig_phys_alt_jung
+SemClass2	h_m_eig_phys_konst
+SemClass2	h_m_eig_phys_konst_kbau
+SemClass2	h_m_eig_phys_konst_vit
+SemClass2	h_m_eig_psy
+SemClass2	h_m_eig_psy_geistverm
+SemClass2	h_m_eig_psy_verh
+SemClass2	h_m_eig_psy_verh_sex
+SemClass2	h_m_eig_sozk
+SemClass2	h_m_eig_sozk_bev_hist
+SemClass2	h_m_eig_sozk_bev_natethn_nat
+SemClass2	h_m_eig_sozk_gr
+SemClass2	h_m_eig_sozk_gr_priv
+SemClass2	h_m_eig_sozk_gr_öff
+SemClass2	h_m_eig_sozk_stat_ansbek_ans_ger
+SemClass2	h_m_eig_sozk_stat_ansbek_ans_hoh
+SemClass2	h_m_eig_sozk_stat_ansbek_bek_bek
+SemClass2	h_m_eig_sozk_stat_bildkult_kultbldg
+SemClass2	h_m_eig_sozk_stat_bildkult_schul
+SemClass2	h_m_eig_sozk_stat_einkbes
+SemClass2	h_m_eig_sozk_stat_fähigk
+SemClass2	h_m_eig_sozk_stat_machteinfl
+SemClass2	h_m_eig_sozk_stat_machteinfl_machtl
+SemClass2	h_m_eig_sozk_stat_machteinfl_mächt
+SemClass2	h_m_eig_sozk_stat_repfli
+SemClass2	h_m_eig_sozk_stat_repfli_pflichten
+SemClass2	h_m_eig_sozk_stat_repfli_rechte
+SemClass2	h_m_eig_sozk_stat_repfli_rechtlos
+SemClass2	h_m_eig_sozk_stat_schicht
+SemClass2	h_m_eig_sozk_stat_schicht_adel
+SemClass2	h_m_eig_sozk_verw_dir
+SemClass2	h_m_eig_sozk_verw_ind
+SemClass2	h_m_eig_sozk_verw_sonst
+SemClass2	h_m_eig_sozk_wertor
+SemClass2	h_m_eig_sozk_wertor_pol
+SemClass2	h_m_eig_sozk_wertor_rel
+SemClass2	h_m_eig_sozk_wertor_sonst
+SemClass2	h_m_eig_sozk_wertor_theoprak
+SemClass2	h_m_eig_sozk_wertor_ökon
+SemClass2	h_sozeinh_sozkat_sozkult_sozbev_sozpos
+SemClass2	none
+
+
+GeoSemClass	none
+GeoSemClass	hist
+GeoSemClass	k_raumort_art_boden_festland_kontinent
+GeoSemClass	k_raumort_art_boden_festland_land
+GeoSemClass	k_raumort_art_boden_festland_land_hist
+GeoSemClass	k_raumort_art_boden_festland_ortsteil
+GeoSemClass	k_raumort_art_boden_festland_region
+GeoSemClass	k_raumort_art_boden_festland_region_pol
+GeoSemClass	k_raumort_art_boden_festland_stadtort
+GeoSemClass	k_raumort_art_boden_festland_subkontinent
+GeoSemClass	k_raumort_art_boden_gelaend_gelaendform
+GeoSemClass	k_raumort_art_boden_gelaend_gelaendform_inselnam
+GeoSemClass	k_raumort_art_boden_gelaend_gelaendform_nam
+GeoSemClass	k_raumort_art_boden_gelaend_gelaendteil
+GeoSemClass	k_raumort_art_boden_gelaend_gelaendteil_nam
+GeoSemClass	k_raumort_art_boden_gelaend_gelaendveget_nam
+GeoSemClass	k_raumort_art_gewaess
+GeoSemClass	k_raumort_art_gewaess_binnen_fliess_nam
+GeoSemClass	k_raumort_art_gewaess_binnen_steh_nam
+GeoSemClass	k_raumort_art_gewaess_meer
+GeoSemClass	k_raumort_boden_festland_land
+
+
+WordStart	++(
+WordEnd		++)
+
+QuoteChar	" ` ' ´ » «
+PunctChar	, . ? ! : ;
+PunctChar	@ _ / \ = § $ % & ( ) { } [ ] < > + * ^
+PunctChar	° ½ ¼ ¾ ² £
+Digit		0 1 2 3 4 5 6 7 8 9
+
+Category:	QUOTE
+Category:	PUNCT
+Category:	NUMBER
+Category:	ABBREV
+
+Category:	BOTTOM

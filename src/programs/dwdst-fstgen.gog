@@ -1,0 +1,193 @@
+# -*- Mode: Shell-Script -*-
+#
+# Getopt::Gen specification for dwdst-fstgen
+# + You must specify one of the options '--unknown' or '--disambig'
+# + Default output filename is mode-dependent"
+#-----------------------------------------------------------------------------
+
+program "dwdst-fstgen"
+#program_version "0.01"
+
+purpose	"Generate FSTs for use with dwdst."
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+unnamed 0
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details "
+
+'dwdst-fstgen' is intended to be used to generate
+the auxialliary finite-state machines used by the
+'dwdst' Part-of-Speech tagger.  Currently,
+'dwdst-fstgen' can generate either an
+unknown-token-analysis-fsa from a list of PoS-tag alternatives,
+or a nondeterministic weighted disambiguation automaton
+from a TnT-style parameter file.  Of these two modes,
+only unknown-fsa generation is considered stable,
+but the generated analysis FSA is currently unused
+except by 'dwdst-pargen'.
+
+B<Warning>:
+The author considers this program to be quirky alpha-state software.
+"
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+# (none)
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+#group "Basic Options"
+int "verbose" v "Verbosity level." \
+    arg="LEVEL" \
+    default="1" \
+    details="Be more or less verbose.  Recognized values are in the range 0..2."
+
+string "symbols" s "Specify morphological symbols file." \
+    arg="FILE" \
+    default="dwdst.sym" \
+    envdefault="DWDST_SYMBOLS" \
+    details="
+This symbols file will be used to analyze input-tokens and
+to label any arcs in the generated automata.
+"
+
+string	"output-file"  F  "Specify output FST file." \
+    arg="FILE" \
+    details="Default filename is mode-dependent."
+
+
+
+#---------------------------------------------------
+# Operational Mode 
+#---------------------------------------------------
+group "Operational Mode Options"
+
+flag "unknown" u "Generate a binary unknown-FSA." \
+    details="
+Reads a list of PoS-tags (--open-class-list) and compiles
+an automaton ambiguous between these tags.  Rests on an
+unsound method in libdwdst: for unknown-fst generation, it
+is still safer to use external tools (i.e. lexcomplex).
+"
+
+flag "disambig"  d "Generate a binary n-gram based disambiguation-FSA (BROKEN)" \
+    details="
+Reads an n-gram parameter file and generates a
+nondeterministic weighted finite-state recognizer based
+on probabilities derived from the n-gram counts in the input file.
+Preliminary tests suggest that the generation step works as expected,
+but that the resulting FSTs are too large and unwieldy to be of much
+use in a production environment.
+"
+
+flag "skeleton"  S  "Generate skeleton of n-gram disambiguation-FSA." \
+    details="Useful for debugging."
+
+string "labels" L "Specify skeleton label-file (skeleton-mode only). " \
+    arg="FILE" \
+    default="dskeleton.lab" \
+    details="Useful for debugging."
+
+#---------------------------------------------------
+# Input Options
+#---------------------------------------------------
+group "Input Options"
+
+string	"open-class-list"   P	"PoS-tag listfile for open classes." \
+    arg="FILE" \
+    details="For --unknown mode."
+
+string  "pos-tag-list"	    p	"PoS-tag listfile for all classes." \
+    arg="FILE" \
+    details="
+Used in --disambig mode, just in case some tags don't occur in the
+parameter file
+"
+
+string  "ngram-parameters"  n	"N-Gram parameter file." \
+    arg="FILE" \
+    default="dwdst.par" \
+    details="Input parameters for --disambig mode."
+
+
+
+#-----------------------------------------------------------------------------
+# Output Format Options
+#-----------------------------------------------------------------------------
+group "Output Format Options"
+
+flag "avm"       a "Produce AVM ('vector') output." \
+    details="
+Influences the translation from tags to analysis-sets.
+Generally, analysis-sets are larger if '--avm' is specified.
+The big idea: disambig-FSAs compiled with '--avm' should
+be able to disambiguate in both tags-only and all-features
+modes.  Problems: the critters is just too dagnabbled big.
+"
+
+flag "tags-only" t "Do not output morphological features." \
+    details="This results in much smaller output files."
+
+string "eos-string"  e   "Specify end-of-sentence marker." \
+    arg="STRING" \
+    default="EOS" \
+    details="
+For --disambig mode.
+More properly a 'begging-of-sentence' marker, this pseudo-tag
+occurs in parameter file as a placeholder for
+unfilled positions in the k-gram window, which is cleared
+on each end-of-sentence recognized in the input file.
+This option may disappear in future releases.
+"
+#option	"word-boundary" b "Use STRING as word-boundary symbol" string default="WordBoundary" no
+
+
+string	"bow"	    B	"Use STRING as BOW symbol"  \
+    arg="SYMBOL" \
+    default="WordStart"	\
+    details="
+For --disambig mode.
+This option may disappear in future releases.
+"
+
+string	"eow"	    E	"Use STRING as EOW symbol" \
+    arg="SYMBOL" \
+    default="WordEnd" \
+    detailts="
+For --disambig mode.
+This option may disappear in future releases.
+"
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+#addenda
+
+#-----------------------------------------------------------------------------
+# Bugs
+#-----------------------------------------------------------------------------
+bugs "
+
+Way too numerous to mention.
+
+"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+acknowledge {
+
+This package was developed as part of the DWDS/Collocations project
+('Kollokationen im digitalen W"orterbuch der deutschen Sprache'
+= 'collocations in the digital dictionary of the German language') at the
+Berlin-Brandenburgische Akademie der Wissenschaften.
+For details on the DWDS project, visit: http://www.dwds.de.
+
+}
+
+seealso "L<dwdspp>, L<dwdst>, L<dwdst-pargen>."
