@@ -11,49 +11,52 @@
 %name dwdst_param_lexer
 
 %header{
+
+#include <string.h>
+#include <string>
+#include <FSMSymSpec.h>
+#include "dwdst_param_parser.h"
+
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
 /*!
  * \class dwdst_param_lexer
- * \brief Flex++ lexer for TnT parameter files.  Supports comments introduced with '#'.
+ * \brief Flex++ lexer for dwdst-pargen (TnT-style) parameter files.  Supports comments introduced with '%%'.
  */
-
-/*#define DWDST_PARLEX_BUFSIZE 1024*/
-
 %}
+
+%define LEX_PARAM \
+  YY_dwdst_param_parser_STYPE *yylval, YY_dwdst_param_parser_LTYPE *yylloc
+
 
 %define CLASS dwdst_param_lexer
 %define MEMBERS \
   public: \
     /* -- public typedefs */\
-    /** \brief Return type for dwdst_param_lexer::yylex() */\
-    typedef enum { \
-      PF_EOF, \
-      PF_REGEX, \
-      PF_COUNT, \
-      PF_TAB, \
-      PF_NEWLINE, \
-      PF_UNKNOWN \
-    } TokenType; \
   public: \
    /* -- positional parameters */\
     /** \brief current line*/\
     int theLine;\
     /** \brief current column*/\
     int theColumn;\
+    /** \brief token-buffering */\
+    /*FSMSymbolString tokbuf;*/\
+    /** \brief whether to clear the token-buffer on 'tokbuf_append()' */\
+    /*bool tokbuf_clear;*/\
   private: \
     /* private local data */ \
     bool use_string; \
     char *stringbuf; \
-    /* argh: regex-buffereing */ \
-    /*char rebuf[DWDST_PARLEX_BUFSIZE];*/ \
-    /*int  rebufleng;*/ \
   public: \
+    /** \brief virtual destructor to shut up gcc */\
+    virtual ~dwdst_param_lexer(void) {};\
     /** \brief use stream input */\
     void select_streams(FILE *in=stdin, FILE *out=stdout); \
     /** \brief use string input */\
-    void select_string(const char *in, FILE *out=stdout);
+    void select_string(const char *in, FILE *out=stdout); \
+    /** \brief for token-buffering: append yyleng characters of yytext to 'tokbuf' */\
+    /*inline void tokbuf_append(char *text, int leng);*/
 
 %define CONSTRUCTOR_INIT :\
   theLine(1), \
@@ -94,38 +97,38 @@ textorsp   [^\n\r\t]
 }
 
 "%%"({nonnewline}*) {
-   // -- comments : throw away
+   // -- ignore comments
    theColumn += yyleng;
 }
 
 ({whitespace}*)"\t"({whitespace}*) {
-  // -- tab: return the current text-segment
+  // -- tab: return the current token-buffer
   theColumn += yyleng;
-  return PF_TAB;
+  return '\t';
 }
 
 {textchar}({textorsp}*{textchar})? {
-  // -- append all other text to the current text-segment
+  // -- any other text: append to the token-buffer
   theColumn += yyleng;
-  return PF_REGEX;
+  yylval->symstr = new FSMSymbolString((const char *)yytext);
+  return dwdst_param_parser::REGEX;
 }
 
-([\-\+]?)([0-9]*)(\.?)([0-9]+)([ \t]*)("%%".*)?/{newline} {
-  // -- counts : return it
+([\-\+]?)([0-9]*)(\.?)([0-9]+) {
+  // -- count : return it
   theLine++; theColumn = 0;
-  return PF_COUNT;
+  yylval->cost = atof((const char *)yytext);
+  return dwdst_param_parser::COUNT;
 }
 
 {newline} {
-  // -- newlines : ignore (and chuck any current text!)
+  // -- newlines : ignore
   theLine++; theColumn = 0;
-  //return PF_NEWLINE;
+  return '\n';
 }
 
 <<EOF>> {
-  // -- end-of-file
-  if (*yytext) return PF_REGEX;
-  return PF_EOF;
+  return 0;
 }
 
 . {
@@ -135,6 +138,12 @@ textorsp   [^\n\r\t]
 }
 
 %%
+
+// -- co-exist with BumbleBee 'clex.h'
+#ifdef REJECT
+# undef REJECT
+#endif
+
 
 
 /*----------------------------------------------------------------------
@@ -164,4 +173,17 @@ void dwdst_param_lexer::select_string(const char *in, FILE *out=stdout) {
   // -- string-buffer stuff
   use_string = true;
   stringbuf = (char *)in;
+}
+
+
+/*
+ * tokbuf_append(text,leng)
+ */
+inline void dwdst_param_lexer::tokbuf_append(char *text, int leng) {
+  if (tokbuf_clear) {
+    tokbuf = (char *)text;
+    tokbuf_clear = false;
+  } else {
+    tokbuf.append((char *)text,leng);
+  }
 }

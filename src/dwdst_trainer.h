@@ -33,23 +33,17 @@ using namespace std;
  * dwds_tagger_trainer : tagger-trainer class
  *--------------------------------------------------------------------------*/
 class dwds_tagger_trainer : public dwds_tagger {
-  // -- typedefs
 public:
-  //typedef hash_map<string,float> StringToCountTable;
-  //typedef vector<FSMSymbolString>       NGramVector;
-  typedef deque<FSMSymbolString>        NGramVector;
-  typedef map<NGramVector,float>        NGramTable;
-  typedef deque<set<FSMSymbolString> *> FSMSymbolStringQueue;
+  // -- typedefs (see dwdst.h)
 private:
-
-  // -- data members
+  // -- private data
 public:
+  // -- public data
   // -- tagsets
   set<FSMSymbolString>  opentags;  // set of PoS tags for open-classes (used for unknown-FST generation)
   set<FSMSymbolString>  alltags;   // set of all PoS tags (to be used for disambig-FST generation)
   // -- count parameters
   int kmax;
-  //StringToCountTable    strings2counts;
   NGramTable            ngtable;
   FSMSymbolStringQueue  stringq;
 

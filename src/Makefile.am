@@ -62,7 +62,8 @@ dwdst_fstgen_SOURCES = \
 	dwdst_fstgen_main.cc \
 	dwdst_fstgen_cmdparser.ggo \
 	postag_lexer.ll \
-	dwdst_param_lexer.ll
+	dwdst_param_lexer.ll \
+	dwdst_param_parser.yy
 
 dwdst_pargen_SOURCES = \
 	cmdutil.cc \
@@ -75,7 +76,8 @@ dwdst_pargen_SOURCES = \
 	dwdst_pargen_main.cc \
 	dwdst_pargen_cmdparser.ggo \
 	postag_lexer.ll \
-	dwdst_param_lexer.ll
+	dwdst_param_lexer.ll \
+	dwdst_param_parser.yy
 
 ## --- Extra (possible) sources
 #EXTRA_${prog_i}_SOURCES = 
@@ -86,7 +88,7 @@ dwdspp_main.o: dwdspp_cmdparser.h dwdspp_lexer.h
 dwdst_main.o: dwdst_cmdparser.h dwdst_lexer.h
 dwdst_fstgen_main.o: dwdst_fstgen_cmdparser.h dwdst_lexer.h postag_lexer.h
 dwdst_pargen_main.o: dwdst_pargen_cmdparser.h dwdst_lexer.h postag_lexer.h
-dwdst_trainer.o: dwdst_param_lexer.h dwdst_param_lexer.cc
+dwdst_trainer.o: dwdst_param_lexer.h dwdst_param_parser.h
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -102,6 +104,18 @@ noinst_HEADERS = nopackage.h
 ## pre-compile rules: gengetopt ; flex++
 ##-----------------------------------------------------------------------
 
+## --- flex++/bison++ flags
+#FLEXXX_SKEL = $(SRCDIR)/flexskel.cc
+#FLEXXX_HSKEL = $(SRCDIR)/flexskel.h
+#FLEXXX_FLAGS = -8 -S$(FLEXXX_SKEL) -H$(FLEXXX_HSKEL)
+FLEXXX_FLAGS = -8
+
+#BISONXX_SKEL = $(SRCDIR)/bison.cc
+#BISONXX_HSKEL = $(SRCDIR)/bison.h
+#BISONXX_FLAGS = $(BISONXX_DFLAGS) -d -v -S$(BISONXX_SKEL) -H$(BISONXX_HSKEL)
+#BISONXX_FLAGS = --debug -d -v
+BISONXX_FLAGS = -d -v
+
 .ggo.h:
 	gengetopt -u -F$* < $^
 	mv $*.c $*.cc
@@ -111,10 +125,16 @@ noinst_HEADERS = nopackage.h
 	mv $*.c $*.cc
 
 .ll.h:
-	flex++ -8 -h$*.h -o$*.cc $<
+	$(FLEXXX) $(FLEXXX_FLAGS) -h$*.h -o$*.cc $<
 
 .ll.cc:
-	flex++ -8 -h$*.h -o$*.cc $<
+	$(FLEXXX) $(FLEXXX_FLAGS) -h$*.h -o$*.cc $<
+
+.yy.cc:
+	$(BISONXX) $(BISONXX_FLAGS) -o $*.cc -h $*.h  $<
+
+.yy.h:
+	$(BISONXX) $(BISONXX_FLAGS) -o $*.cc -h $*.h  $<
 
 ##-----------------------------------------------------------------------
 ## compile flags

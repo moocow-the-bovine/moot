@@ -33,6 +33,11 @@
  *--------------------------------------------------------------------------*/
 class dwds_tagger {
 public:
+  // -- public typedefs
+  typedef deque<FSMSymbolString>        NGramVector;
+  typedef map<NGramVector,float>        NGramTable;
+  typedef deque<set<FSMSymbolString> *> FSMSymbolStringQueue;
+public:
   // -- public data
   FSMSymSpec *syms;
   FSM *morph;

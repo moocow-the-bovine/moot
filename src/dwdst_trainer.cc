@@ -482,7 +482,7 @@ bool dwds_tagger_trainer::load_param_file(FILE *in=stdin,const char *filename=NU
   int tok;
   dwdst_param_lexer plexer;
   NGramVector     ng;
-  FSMSymbolString symstr;
+  //FSMSymbolString symstr;
   float           count;
 
   plexer.select_streams(in,stdout);
@@ -490,10 +490,9 @@ bool dwds_tagger_trainer::load_param_file(FILE *in=stdin,const char *filename=NU
   while ((tok = plexer.yylex()) != dwdst_param_lexer::PF_EOF) {
     switch (tok) {
     case dwdst_param_lexer::PF_REGEX:
-      symstr = (char *)plexer.yytext;
-      ng.push_back(symstr);
+      ng.push_back(plexer.tokbuf);
       // -- add to alltags
-      alltags.insert(symstr);
+      alltags.insert(plexer.tokbuf);
       break; 
     case dwdst_param_lexer::PF_COUNT:
       count = atof((char *)plexer.yytext);
