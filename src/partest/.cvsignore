@@ -1,5 +1,6 @@
 *~
 .*~
+beforeepsclosure.fsm
 words
 dwdspp
 dwdst
@@ -20,3 +21,8 @@ dwdst.sym
 *.atag
 *.ttag
 *.attag
+*.afsa
+*.afst
+*.lab
+*.scl
+

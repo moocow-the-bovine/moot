@@ -64,7 +64,7 @@ public:
   /// output in AVM ("vector") mode?
   bool want_avm;
 
-  //bool want_numeric;
+  bool want_numeric;
   //bool want_binary;
 
   /// output morphosyntactic features as well as PoS tags?
@@ -119,6 +119,13 @@ protected:
 
 
   // -- all features, numeric
+  /// pre-allocated temporary: numeric, all features
+  set<FSM::FSMWeightedSymbolVector> nresults;
+  /// pre-allocated temporary: numeric, all features
+  set<FSM::FSMWeightedSymbolVector>::iterator nri;
+  /// pre-allocated temporary: numeric
+  FSM::FSMSymbolVector::const_iterator svi;
+
   // -- tags only, numeric
   /// pre-allocated temporary: tags-only
   set<FSMSymbol> ntagresults;

@@ -1,5 +1,8 @@
 Letter		a b c
-Category:	ACAT
+FValue		val1 val2
+Foo		FValue
+Bar		FValue
+Category:	ACAT Foo Bar
 Category:	BCAT
 Category:	CCAT
 

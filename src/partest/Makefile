@@ -120,6 +120,15 @@ $(dfsa): $(FSTGEN) $(sym) $(utags) $(atags) $(par)
 	  --ngram-parameters=$(par) \
 	  -F $@
 
+#-----------------------------------------------------------------------
+# epsilon removal
+#-----------------------------------------------------------------------
+
+%-e.fsa: %.fsa
+	FSMprint $< | \
+	fsmcompile | fsmrmepsilon - | fsmprint - | \
+	FSMcompile - -F $@
+
 
 #-----------------------------------------------------------------------
 # regex compiling
