@@ -9,9 +9,11 @@
 
 #include "FSMTypes.h"
 
+#include <string>
 #include <set>
 #include <list>
-//#include <string>
+
+using namespace std;
 
 bool dwdst_tag_stream(FILE *in,
 		      FILE *out,
@@ -41,13 +43,8 @@ bool dwdst_tag_token(char *tok,
   result->fsm_strings(syms, &results, false, want_attrs);
   
   fprintf(out,"%s: %d Analyse(n)\n", tok, results.size());
-  string *str;
   for (set<FSMStringWeight>::iterator r = results.begin(); r != results.end(); r++) {
-    //fprintf(out, "\t%s\n", AnsiString(r->c_str()));
-    //fprintf(out, "\t%s\n", r);
-    //fprintf(out, "\t%s\n", r->ostr);
-    str = new string(r->ostr);
-    fprintf(out, "\t%s\n", str);
+    fprintf(out, "\t((%s)<%f>)\n", r->istr.c_str(), r->weight);
   }
   fprintf(out,"\n");
 

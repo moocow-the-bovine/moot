@@ -121,26 +121,29 @@ void GetMyOptions(int argc, char **argv)
  *--------------------------------------------------------------------------*/
 int main (int argc, char **argv)
 {
-  int i;
+  unsigned int i;
 
   GetMyOptions(argc,argv);
 
   if (args.words_given) {
+    fprintf(out, "# %s: File: command-line\n\n", PROGNAME);
     for (i = 0; i < args.inputs_num; i++) {
       dwdst_tag_token(args.inputs[i], out, morph, syms, args.avm_given);
     }
   }
   else if (args.inputs_num == 0) {
+    fprintf(out, "# %s: File: stdin\n\n", PROGNAME);
     dwdst_tag_stream(stdin, out, morph, syms, args.avm_given);
   }
   else {
     for (i = 0; i < args.inputs_num; i++) {
+      fprintf(out, "# %s: File: %s\n\n", PROGNAME, args.inputs[i]);
       if (!(in = fopen(args.inputs[i], "r"))) {
 	fprintf(stderr, "%s: open failed for input-file '%s': %s", PROGNAME, args.inputs[i], strerror(errno));
 	exit(1);
       }
       if (args.verbose_given) {
-	fprintf(stderr,"%s: parsing file '%s'... ", args.inputs[i]);
+	fprintf(stderr,"%s: parsing file '%s'... ", PROGNAME, args.inputs[i]);
       }
       dwdst_tag_stream(in, out, morph, syms, args.avm_given);
       fclose(in);
