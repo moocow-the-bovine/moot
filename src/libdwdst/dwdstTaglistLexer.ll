@@ -1,32 +1,44 @@
 /*-*- Mode: Flex++ -*-*/
 /*----------------------------------------------------------------------
- * Name: dwdst_lexer.ll
+ * Name: dwdstTaglistLexer.ll
  * Author: Bryan Jurish
  * Description:
- *   + lexer for KDWDS tagger
- *   + assumes pre-tokenized input
- *     - space-separated tokens
- *     - one sentence per line
- *     - raw text (no markup!)
- *   + process with Coetmeur's flex++ to produce 'dwdst_lexer.cc'
+ *   + lexer for KDWDS tagger PoS-tag lists
+ *   + input format:
+ *     - PoS tags are space- and/or newline-separated
+ *     - comment-lines introduced with '#'
  *----------------------------------------------------------------------*/
 
 /* --- Lexer name --- */
-%name dwdst_lexer
+%name dwdstTaglistLexer
 
-%define CLASS dwdst_lexer
+%define CLASS dwdstTaglistLexer
 %define MEMBERS \
   public: \
-    /* local methods */ \
+    /* -- public typedefs */\
+    /** \brief typedef for token-types */\
+    typedef enum { \
+     PTEOF, \
+     PTUNKNOWN, \
+     POSTAG \
+    } TokenType; \
+  \
+  public: \
+    /* -- local methods */ \
+    /** \brief hack for non-global yywrap() */\
     void step_streams(FILE *in, FILE *out);
 
 %header{
-typedef enum {
-    DTEOF,
-    UNKNOWN,
-    EOS,
-    TOKEN
-  } dwdst_token_type;
+/*============================================================================
+ * Doxygen docs
+ *============================================================================*/
+/*!
+ * \class dwdstTaglistLexer
+ * \brief
+ * Flex++ lexer for KDWDS tagger PoS-tag lists.
+ * Input format: PoS tags are space- and/or newline-separated.
+ * Comment-lines introduced with '#'.
+ */
 %}
 
 
@@ -42,24 +54,21 @@ wchar      [^ \t\n\r]
  *----------------------------------------------------------------------*/
 %%
 
-{newline}+                     { return EOS; }
-{space}+                       { /* ignore spaces */ }
-
+({space}|{newline})+           { /* ignore and newlines */ }
 ^{space}*\#([^\r\n]*){newline} { /* ignore comments */ }
 
-{wchar}+                       { return TOKEN; }
-.                              { return UNKNOWN; }
-
-<<EOF>>                        { return DTEOF; }
+{wchar}+                       { return POSTAG; }
+<<EOF>>                        { return PTEOF; }
+.			       { return PTUNKNOWN; }
 
 %%
 
 
 /*----------------------------------------------------------------------
- * dwdst_lexer::step_streams(FILE *in, FILE *out)
+ * dwdstTaglistLexer::step_streams(FILE *in, FILE *out)
  *   + hack for non-global yywrap()
  *----------------------------------------------------------------------*/
-void dwdst_lexer::step_streams(FILE *in, FILE *out)
+void dwdstTaglistLexer::step_streams(FILE *in, FILE *out)
 {
   yyin = in;
   yyout = out;

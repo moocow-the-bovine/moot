@@ -1,6 +1,6 @@
 /*-*- Mode: Flex++ -*-*/
 /*----------------------------------------------------------------------
- * Name: dwdspp_lexer.ll
+ * Name: dwdstPPLexer.ll
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
  *   + preprocessor for the KDWDS tagger
@@ -9,37 +9,55 @@
  *----------------------------------------------------------------------*/
 
 /* --- Lexer name --- */
-%name dwdspp_lexer
+%name dwdstPPLexer
 
-%define CLASS dwdspp_lexer
+%define CLASS dwdstPPLexer
 %define MEMBERS \
   public: \
-    /* local data */ \
-    unsigned int ntokens; \
+  /* -- public typedefs */\
+  /** \brief typedef for token-types */ \
+  typedef enum { \
+    PPEOF, \
+    UNKNOWN, \
+    EOS, \
+    START_XML_TAG, \
+    END_XML_TAG, \
+    WORD, \
+    ABBREV, \
+    HYPHWORD, \
+    INTEGER, \
+    FLOAT, \
+    PUNCT, \
+    DATE \
+  } TokenType; \
+  \
+  public: \
+    /* -- public local data */ \
+    /** \brief enable verbose reporting (track ntokens)?  */\
     bool verbose; \
+    /** \brief number of tokens processed (for verbose mode) */\
+    unsigned int ntokens; \
     \
-    /* local methods */ \
+    /* -- local methods */ \
+    /** \brief preprocess a C-stream */\
     bool tokenize_stream(FILE *in=stdin, FILE *out=stdout); \
+    /** \brief hack for non-global yywrap() */\
     void step_streams(FILE *in, FILE *out);
 
 %define CONSTRUCTOR_CODE \
   ntokens = 0;
 
 %header{
-typedef enum {
-    PPEOF,
-    UNKNOWN,
-    EOS,
-    START_XML_TAG,
-    END_XML_TAG,
-    WORD,
-    ABBREV,
-    HYPHWORD,
-    INTEGER,
-    FLOAT,
-    PUNCT,
-    DATE
-  } dwdspp_tag;
+/*============================================================================
+ * Doxygen docs
+ *============================================================================*/
+/*!
+ * \class dwdstPPLexer
+ * \brief Flex++ lexer for 'dwdspp' raw-text preprocessor:
+ * Does rudimentary end-of-sentence and abbreviation recognition,
+ * and filters out XML markup.
+ */
+
 %}
 
 /*----------------------------------------------------------------------
@@ -153,10 +171,8 @@ year			([0-9]|([1-9][0-9][0-9]?[0-9]?))
 %%
 
 /*----------------------------------------------------------------------
- * dwdspp_lexer::step_streams(FILE *in, FILE *out)
- *   + hack for non-global yywrap()
- *----------------------------------------------------------------------*/
-void dwdspp_lexer::step_streams(FILE *in, FILE *out)
+ */
+void dwdstPPLexer::step_streams(FILE *in, FILE *out)
 {
   yyin = in;
   yyout = out;
@@ -167,10 +183,8 @@ void dwdspp_lexer::step_streams(FILE *in, FILE *out)
 }
 
 /*----------------------------------------------------------------------
- * tokenize_stream(FILE *in=stdin, FILE *out=stdout);
- *   + run preprocesser from *in to *out
  */
-bool dwdspp_lexer::tokenize_stream(FILE *in=stdin, FILE *out=stdout)
+bool dwdstPPLexer::tokenize_stream(FILE *in=stdin, FILE *out=stdout)
 {
   int tok;
   step_streams(in,out);

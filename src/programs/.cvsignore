@@ -1,4 +1,8 @@
-mabbaw
+dwdspp
+dwdst
+dwdstt
+dwdst-pargen
+dwdst-fstgen
 *.par
 *.tt
 *.pp
@@ -16,6 +20,8 @@ mabbaw
 *.fst
 *.tfst
 *.lab
+*_cmdparser.cc
+*_cmdparser.h
 stamp-h*
 config.h
 config.h.in

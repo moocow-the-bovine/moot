@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------
- * File: dwdst.cc
+ * File: dwdstTagger.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
  *   + PoS tagger for DWDS project : the guts
@@ -13,8 +13,8 @@
 
 #include <FSMTypes.h>
 
-#include "dwdst_lexer.h"
-#include "dwdst.h"
+#include "dwdstTaggerLexer.h"
+#include "dwdstTagger.h"
 
 using namespace std;
 
@@ -23,9 +23,9 @@ using namespace std;
  *--------------------------------------------------------------------------*/
 
 /*
- * dwds_tagger::dwds_tagger(FSMSymSpec *mysmys=NULL, FSM *mymorph=NULL)
+ * dwdstTagger::dwdstTagger(FSMSymSpec *mysmys=NULL, FSM *mymorph=NULL)
  */
-dwds_tagger::dwds_tagger(FSMSymSpec *mysyms, FSM *mymorph)
+dwdstTagger::dwdstTagger(FSMSymSpec *mysyms, FSM *mymorph)
 {
   // -- public data
   morph = mymorph;
@@ -56,9 +56,9 @@ dwds_tagger::dwds_tagger(FSMSymSpec *mysyms, FSM *mymorph)
 
 
 /*
- * FSMSymSpec *dwds_tagger::load_symbols(const char *filename)
+ * FSMSymSpec *dwdstTagger::load_symbols(const char *filename)
  */
-FSMSymSpec *dwds_tagger::load_symbols(char *filename)
+FSMSymSpec *dwdstTagger::load_symbols(char *filename)
 {
   list<string> msglist;
 
@@ -67,7 +67,7 @@ FSMSymSpec *dwds_tagger::load_symbols(char *filename)
 
   syms = new FSMSymSpec(filename, &msglist, DWDST_SYM_ATT_COMPAT);
   if (!msglist.empty()) {
-    fprintf(stderr,"\ndwdst_tagger::load_symbols() Error: could not load symbols from file '%s'\n", filename);
+    fprintf(stderr,"\ndwdstTagger::load_symbols() Error: could not load symbols from file '%s'\n", filename);
     for (list<string>::iterator e = msglist.begin(); e != msglist.end(); e++) {
       fprintf(stderr,"%s\n",e->c_str());
     }
@@ -79,16 +79,16 @@ FSMSymSpec *dwds_tagger::load_symbols(char *filename)
 }
 
 /*
- * FSM *dwds_tagger::load_fsm_file(const char *filename, FSM **fsm, bool *i_made_fsm=NULL);
+ * FSM *dwdstTagger::load_fsm_file(const char *filename, FSM **fsm, bool *i_made_fsm=NULL);
  */
-FSM *dwds_tagger::load_fsm_file(char *filename, FSM **fsm, bool *i_made_fsm=NULL)
+FSM *dwdstTagger::load_fsm_file(char *filename, FSM **fsm, bool *i_made_fsm=NULL)
 {
   // -- cleanup old FSM first
   if (*fsm && i_made_fsm && *i_made_fsm) { delete *fsm; }
 
   *fsm = new FSM(filename);
   if (!**fsm) {
-    fprintf(stderr,"\ndwds_tagger::load_fsm_file() Error: load failed for FST file '%s'.\n", filename);
+    fprintf(stderr,"\ndwdstTagger::load_fsm_file() Error: load failed for FST file '%s'.\n", filename);
     *fsm = NULL; // -- invalidate the object
   }
   if (i_made_fsm) { *i_made_fsm = true; }
@@ -97,9 +97,9 @@ FSM *dwds_tagger::load_fsm_file(char *filename, FSM **fsm, bool *i_made_fsm=NULL
 
 
 /*
- * dwds_tagger::~dwds_tagger()
+ * dwdstTagger::~dwdstTagger()
  */
-dwds_tagger::~dwds_tagger() {
+dwdstTagger::~dwdstTagger() {
   if (tmp) delete tmp;
   if (syms && i_made_syms) delete syms;
   if (morph && i_made_morph) delete morph;
@@ -119,12 +119,12 @@ dwds_tagger::~dwds_tagger() {
  *--------------------------------------------------------------------------*/
 
 /*
- * inline void dwds_tagger::tag_token(void)
+ * inline void dwdstTagger::tag_token(void)
  *  + tags the input-token in this->token
  *  + ouputs to this->outfile
  *  + formats according to this->want_* data members
  */
-inline void dwds_tagger::tag_token(void)
+inline void dwdstTagger::tag_token(void)
 {
   tmp->fsm_clear();
   s = (char *)token;
@@ -199,15 +199,15 @@ inline void dwds_tagger::tag_token(void)
  *--------------------------------------------------------------------------*/
 
 /*
- * bool dwds_tagger::tag_stream(FILE *in, FILE *out)
+ * bool dwdstTagger::tag_stream(FILE *in, FILE *out)
  */
-bool dwds_tagger::tag_stream(FILE *in, FILE *out)
+bool dwdstTagger::tag_stream(FILE *in, FILE *out)
 {
   int tok;
 
   // -- sanity check
   if (!can_tag()) {
-    fprintf(stderr, "dwds_tagger::tag_stream(): cannot run uninitialized tagger!\n");
+    fprintf(stderr, "dwdstTagger::tag_stream(): cannot run uninitialized tagger!\n");
     return false;
   }
 
@@ -216,9 +216,9 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
   outfile = out;
 
   lexer.step_streams(in,out);
-  while ((tok = lexer.yylex()) != DTEOF) {
+  while ((tok = lexer.yylex()) != dwdstTaggerLexer::DTEOF) {
     switch (tok) {
-    case EOS:
+    case dwdstTaggerLexer::EOS:
       /* do something spiffy */
       if (want_tnt_format) {
 	fputc('\n', out);
@@ -228,7 +228,7 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
       }
       break;
 
-    case TOKEN:
+    case dwdstTaggerLexer::TOKEN:
     default:
       if (verbose) ntokens++;
 
@@ -246,13 +246,13 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
 }
 
 /*
- * bool dwds_tagger::tag_strings(int argc, char **argv, FILE *out=stdout)
+ * bool dwdstTagger::tag_strings(int argc, char **argv, FILE *out=stdout)
  */
-bool dwds_tagger::tag_strings(int argc, char **argv, FILE *out=stdout)
+bool dwdstTagger::tag_strings(int argc, char **argv, FILE *out=stdout)
 {
   // -- sanity check
   if (!can_tag()) {
-    fprintf(stderr, "dwds_tagger::tag_strings(): cannot run uninitialized tagger!\n");
+    fprintf(stderr, "dwdstTagger::tag_strings(): cannot run uninitialized tagger!\n");
     return false;
   }
 
@@ -282,9 +282,9 @@ bool dwds_tagger::tag_strings(int argc, char **argv, FILE *out=stdout)
  *--------------------------------------------------------------------------*/
 
 /*
- * set<FSMSymbol> *dwdst_tagger::get_fsm_tags(FSM *fsa, set<FSMSymbol> *tags=NULL);
+ * set<FSMSymbol> *dwdstTagger::get_fsm_tags(FSM *fsa, set<FSMSymbol> *tags=NULL);
  */
-set<FSMSymbol> *dwds_tagger::get_fsm_tags(FSM *fsa, set<FSMSymbol> *tags=NULL)
+set<FSMSymbol> *dwdstTagger::get_fsm_tags(FSM *fsa, set<FSMSymbol> *tags=NULL)
 {
   FSMState q0;
   FSMTransitions *arcs;
@@ -312,9 +312,9 @@ set<FSMSymbol> *dwds_tagger::get_fsm_tags(FSM *fsa, set<FSMSymbol> *tags=NULL)
 
 
 /*
- * set<FSMSymbolString> *dwdst_tagger::get_fsm_tag_strings(FSM *fsa, set<FSMSymbolString> *tag_strings=NULL);
+ * set<FSMSymbolString> *dwdstTagger::get_fsm_tag_strings(FSM *fsa, set<FSMSymbolString> *tag_strings=NULL);
  */
-set<FSMSymbolString> *dwds_tagger::get_fsm_tag_strings(FSM *fsa, set<FSMSymbolString> *tag_strings=NULL)
+set<FSMSymbolString> *dwdstTagger::get_fsm_tag_strings(FSM *fsa, set<FSMSymbolString> *tag_strings=NULL)
 {
   get_fsm_tags(fsa,&fsm_tags_tmp);
 

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.5)
 
-AC_INIT(dwdst, [0.0.2], [moocow@ling.uni-potsdam.de])
+AC_INIT(dwdst, [0.0.3], [moocow@ling.uni-potsdam.de])
 
 dnl
 dnl source && aux dir
@@ -11,20 +11,20 @@ AC_CONFIG_AUX_DIR(config)
 dnl
 dnl use automake
 dnl
-AM_INIT_AUTOMAKE(dwdst, [0.0.2])
+AM_INIT_AUTOMAKE(dwdst, [0.0.3])
 
 dnl
 dnl use autoheader
 dnl
-AM_CONFIG_HEADER([src/config.h])
-AH_BOTTOM([
-
-/* PACKAGE does not jive well with multiple-program pacakges
-   using 'gengetopt'.  'autoheader' doesn't like to undefine
-   it, so we include an extra little header file to do that */
-#include "nopackage.h"
-
-])
+AM_CONFIG_HEADER([src/libdwdst/dwdstConfig.h])
+dnl AH_BOTTOM([
+dnl /* PACKAGE does not jive well with multiple-program pacakges
+dnl    using 'gengetopt'.  'autoheader' doesn't like to undefine
+dnl    it, so we include an extra little header file to do that
+dnl    --> REVOKED v0.0.3
+dnl   */
+dnl /*#include "nopackage.h"*/
+dnl ])
 
 
 dnl
@@ -39,10 +39,10 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_LANG(C++)
 dnl v--- needed if Makefile.am uses _LTLIBRARIES targets
-dnl AC_PROG_LIBTOOL
+AC_PROG_LIBTOOL
 
 dnl v--- needed if Makefile.am uses lex sources
-AM_PROG_LEX
+dnl AM_PROG_LEX
 
 dnl
 dnl for static-only libraries (non-libtool)
@@ -203,6 +203,198 @@ dnl  AC_ERROR([required library 'FSMSymSpec' not found.])
 dnl fi
 FSM_LIBS="-lFSM -lFSMSymSpec"
 
+
+
+dnl
+dnl check for flex++
+dnl
+AC_ARG_WITH([flexxx],
+	AC_HELP_STRING([--with-flexxx=PATH],
+		       [specify location of Alain Coetmeur's flex++]),
+	[FLEXXX="$withval"])
+
+if test -z "$FLEXXX" ; then
+  dnl AC_MSG_CHECKING([for Alain Coetmeur's flex++])
+  AC_PATH_PROG(FLEXXX,[flex++],[])
+  if test -z "$FLEXXX" ; then
+    AC_MSG_RESULT([not found])
+    AC_MSG_WARN([cannot find Alain Coetmeur's flex++ -- CVS build will not work!])
+  fi
+fi
+dnl LEX="$FLEXXX"
+dnl AC_SUBST(LEX)
+AC_SUBST(FLEXXX)
+
+dnl
+dnl check for bison++
+dnl
+AC_ARG_WITH([bisonxx],
+	AC_HELP_STRING([--with-bisonxx=PATH],
+		       [specify location of Alain Coetmeur's bison++]),
+	[BISONXX="$withval"])
+if test -z "$BISONXX" ; then
+  dnl AC_MSG_CHECKING([for Alain Coetmeur's bison++])
+  AC_PATH_PROG(BISONXX,[bison++],[])
+  if test -z "$BISONXX" ; then
+    AC_MSG_RESULT([not found])
+    AC_MSG_WARN([cannot find Alain Coetmeur's bison++ -- CVS build will not work!])
+  fi
+fi
+YACC="$BISONXX"
+AC_SUBST(YACC)
+AC_SUBST(BISONXX)
+
+
+dnl
+dnl check for gengetopt
+dnl
+AC_ARG_WITH([gengetopt],
+	AC_HELP_STRING([--with-gengetopt=PATH],
+		       [specify location of gengetopt]),
+	[GENGETOPT="$withval"])
+if test -z "$GENGETOPT" ; then
+  AC_PATH_PROG(GENGETOPT,[gengetopt],[])
+  if test -z "$GENGETOPT" ; then
+    AC_MSG_RESULT([not found])
+    AC_MSG_WARN([cannot find gengetopt program -- CVS build will not work!])
+  fi
+fi
+AC_SUBST(GENGETOPT)
+
+
+
+dnl
+dnl documentation
+dnl
+AC_ARG_WITH(docdir,
+	AC_HELP_STRING([--with-docdir=DIR],
+		       [install documentation in DIR/dwdst (default=DATADIR/doc)]),
+	[docdir="$withval"],[docdir="\${datadir}/doc"])
+pkgdocdir="\${docdir}/\${PACKAGE}"
+AC_SUBST(docdir)
+AC_SUBST(pkgdocdir)
+
+AC_MSG_CHECKING([whether to build documentation])
+AC_ARG_ENABLE(doc,
+	AC_HELP_STRING([--enable-doc],[build documentation (default=yes)]),
+	[enable_doc="$enableval"],[enable_doc="yes"])
+
+if test "$enable_doc" = "yes" ; then
+ AC_MSG_RESULT(yes)
+
+ dnl
+ dnl docs: prog doxygen
+ dnl
+ AC_PATH_PROG(DOXYGEN,doxygen,[])
+ AC_SUBST(DOXYGEN_SOURCES)
+
+ if test -n "$DOXYGEN" ; then
+  dnl
+  dnl docs: html
+  dnl
+  AC_MSG_CHECKING([whether to build html documentation])
+  AC_ARG_ENABLE(html,
+	AC_HELP_STRING([--enable-html],[build HTML documentation (default=yes)]),
+	[enable_html="$enableval"],[enable_html="yes"])
+  if test "$enable_html" = "yes" ; then
+    AC_MSG_RESULT(yes) ; DOXY_WANT_HTML="YES" ;
+    DOC_SUBDIRS="html"
+  else
+    AC_MSG_RESULT(no) ; DOXY_WANT_HTML="NO" 
+  fi
+  AC_SUBST(DOXY_WANT_HTML)
+  AC_SUBST(DOC_SUBDIRS)
+
+  dnl
+  dnl docs: manpages
+  dnl
+  AC_MSG_CHECKING([whether to build manpages])
+  AC_ARG_ENABLE(man,
+	AC_HELP_STRING([--enable-man],[build manpages (default=yes)]),
+	[enable_man="$enableval"],[enable_man="yes"])
+  if test "$enable_man" = "yes" ; then
+    AC_MSG_RESULT(yes) ; DOXY_WANT_MAN="YES" ;
+    DOC_MANDIRS="man/man3"
+    DOC_MAN3_MANS="man/man3/*"
+  else
+    AC_MSG_RESULT(no) ; DOXY_WANT_MAN="NO" 
+  fi
+  AC_SUBST(DOXY_WANT_MAN)
+  AC_SUBST(DOC_MANDIRS)
+  AC_SUBST(DOC_MAN3_MANS)
+
+  dnl
+  dnl doxy: dvi
+  dnl
+  AC_MSG_CHECKING([whether to build dvi documentation])
+  AC_ARG_ENABLE(dvi,
+	AC_HELP_STRING([--enable-dvi],[build dvi documentation (default=no)]),
+	[enable_dvi="$enableval"],[enable_dvi="no"])
+  if test "$enable_dvi" = "yes" ; then
+    AC_MSG_RESULT(yes) ; DOXY_WANT_LATEX="YES" ;
+    DOC_LATEX_TARGETS="refman.dvi"
+  else
+    AC_MSG_RESULT(no) ;
+  fi
+  dnl
+  dnl doxy: postscript
+  dnl
+  AC_MSG_CHECKING([whether to build postscript documentation])
+  AC_ARG_ENABLE(postscript,
+	AC_HELP_STRING([--enable-postscript],[build postscript documentation (default=yes)]),
+	[enable_ps="$enableval"],[enable_ps="yes"])
+  if test "$enable_ps" = "yes" ; then
+    AC_MSG_RESULT(yes) ; DOXY_WANT_LATEX="YES" ;
+    DOC_LATEX_TARGETS="$DOC_LATEX_TARGETS refman.ps"
+  else
+    AC_MSG_RESULT(no) ;
+  fi
+  dnl
+  dnl doxy: pdf
+  dnl
+  AC_MSG_CHECKING([whether to build pdf documentation])
+  AC_ARG_ENABLE(pdf,
+	AC_HELP_STRING([--enable-pdf],[build pdf documentation (default=yes)]),
+	[enable_pdf="$enableval"],[enable_pdf="yes"])
+  if test "$enable_pdf" = "yes" ; then
+    AC_MSG_RESULT(yes) ; DOXY_WANT_LATEX="YES"
+    DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.pdf"
+  else
+    AC_MSG_RESULT(no)
+  fi
+
+  test -z "$DOXY_WANT_LATEX" && DOXY_WANT_LATEX="NO"
+  AC_SUBST(DOXY_WANT_LATEX)
+  AC_SUBST(DOC_LATEX_TARGETS)
+
+  # -- check for tag-files
+  AC_ARG_WITH(fsm-docdir,
+	AC_HELP_STRING([--with-fsm-docdir=DIR],
+		       [specify location of FSMlib docs (default=DOCDIR/FSMlib)]),
+	[fsmdocdir="$withval"],[fsmdocdir="/usr/local/share/doc/FSMlib"])
+  if test -n "$fsmdocdir" -a "$fsmdocdir" != "no" ; then
+    ext=FSM
+    if test -d "$fsmdocdir/$ext" -a -e "$fsmdocdir/$ext/$ext.tag" -a -d "$fsmdocdir/$ext/html"
+    then DOXY_TAGFILES="$DOXY_TAGFILES $fsmdocdir/$ext/$ext.tag=$fsmdocdir/$ext/html"
+    fi
+    ext=FSMExt
+    if test -d "$fsmdocdir/$ext" -a -e "$fsmdocdir/$ext/$ext.tag" -a -d "$fsmdocdir/$ext/html"
+    then DOXY_TAGFILES="$DOXY_TAGFILES $fsmdocdir/$ext/$ext.tag=$fsmdocdir/$ext/html"
+    fi
+  fi
+  AC_SUBST(DOXY_TAGFILES)   
+	
+ else # prog doxygen
+  dnl no doxygen: just notify
+  AC_MSG_NOTICE([doxygen not found -- documentation will not be built])
+ fi # prog doxygen
+
+else # enable doc
+  AC_MSG_RESULT(no)
+fi # enable doc
+
+
+
 dnl
 dnl debug ?
 dnl
@@ -249,5 +441,8 @@ fi
 dnl
 dnl output
 dnl
-AC_CONFIG_FILES(config/Makefile src/Makefile Makefile)
+AC_CONFIG_FILES(src/libdwdst/Makefile src/programs/Makefile src/Makefile)
+AC_CONFIG_FILES(doc/libdwdst/libdwdst.doxy doc/libdwdst/Makefile doc/Makefile)
+AC_CONFIG_FILES(config/Makefile)
+AC_CONFIG_FILES(Makefile)
 AC_OUTPUT

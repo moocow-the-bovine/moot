@@ -10,13 +10,14 @@
 #include <string.h>
 #include <sys/time.h>
 
+#include <dwdstTrainer.h>
+
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
 #include "dwdst_pargen_cmdparser.h"
 #include "cmdutil.h"
-#include "dwdst_trainer.h"
 
 using namespace std;
 
@@ -37,7 +38,7 @@ char *fstfile = "dwdst.fst";
 cmdutil_file_info out;
 
 // -- global classes/structs
-dwds_tagger_trainer dwdstt;
+dwdstTrainer dwdstt;
 
 /*--------------------------------------------------------------------------
  * Option Processing

@@ -10,13 +10,14 @@
 #include <string.h>
 #include <sys/time.h>
 
+#include <dwdstTagger.h>
+
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
-#include "dwdst_cmdparser.h"
 #include "cmdutil.h"
-#include "dwdst.h"
+#include "dwdst_cmdparser.h"
 
 using namespace std;
 
@@ -37,7 +38,7 @@ char *fstfile = "dwdst.fst";
 cmdutil_file_info out;
 
 // -- global classes/structs
-dwds_tagger dwdst;
+dwdstTagger dwdst;
 
 // -- for verbose timing info
 timeval istarted, astarted, astopped;

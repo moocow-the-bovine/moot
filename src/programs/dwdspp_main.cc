@@ -14,7 +14,7 @@
 # include <config.h>
 #endif
 
-#include "dwdspp_lexer.h"
+#include <dwdstPPLexer.h>
 #include "dwdspp_cmdparser.h"
 #include "cmdutil.h"
 
@@ -67,7 +67,7 @@ void GetMyOptions(int argc, char **argv)
  *--------------------------------------------------------------------------*/
 int main (int argc, char **argv)
 {
-  dwdspp_lexer lexer;
+  dwdstPPLexer lexer;
   int nfiles = 0;
   timeval started,stopped;
   double elapsed;

@@ -15,7 +15,7 @@
 AUTOMAKE_OPTIONS = foreign dist-bzip2
 
 ## --- recursion subdirectories
-SUBDIRS = config src
+SUBDIRS = config src doc
 
 ## --- pseudo-deps for '.SUFFIXES'
 SUFFIXES = .pod .txt

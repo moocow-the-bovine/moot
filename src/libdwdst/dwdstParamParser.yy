@@ -1,13 +1,13 @@
 /*-*- Mode: Bison++ -*-*/
 /*----------------------------------------------------------------------
- * Name: dwdst_param_parser.yy
+ * Name: dwdstParamParser.yy
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
  *   + specification for parameter-file parser for (K)DWDS PoS-tagger
  *   + process with Alain Coetmeur's 'bison++' to produce a C++ parser
  *----------------------------------------------------------------------*/
 
-%name dwdst_param_parser
+%name dwdstParamParser
 
 /* -- bison++ flags --- */
 // -- force use of location stack
@@ -21,7 +21,7 @@
 //%define ERROR_BODY =0
 
 // -- use inline error-reporting
-%define ERROR_BODY { fprintf(stderr,"dwdst_param_parser error: %s\n", msg); }
+%define ERROR_BODY { fprintf(stderr,"dwdstParamParser error: %s\n", msg); }
 
 // -- use pure-function lexer body
 //%define LEX_BODY =0
@@ -29,7 +29,7 @@
 
 %header{
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+# include <dwdstConfig.h>
 #endif
 
 # include <stdio.h>
@@ -39,7 +39,8 @@
 
 # include <string>
 # include <FSMSymSpec.h>
-# include <dwdst.h>
+
+# include "dwdstTagger.h"
 
 // -- get rid of bumble's macros
 #undef YYACCEPT
@@ -48,42 +49,42 @@
 #undef YYRECOVERING
 
 /**
- * \class dwdst_param_parser
+ * \class dwdstParamParser
  * \brief Bison++ parser for dwdst-pargen parameter files
  */
 %}
 
-%define CLASS dwdst_param_parser
+%define CLASS dwdstParamParser
 %define MEMBERS \
-  public:\
-   /* public instance members go here */\
-   /** \brief a pointer to the parameter-map we're constructing */\
-   NGramTable *ngtable;\
-  private:\
-   /* private instance members go here */\
-  public:\
-   /* public methods */\
-   /** \brief report warnings */\
-   virtual void yywarn(const char *msg) {\
-      fprintf(stderr,"dwdst_param_parser warning: %s\n", msg);\
+  public: \
+   /* public instance members go here */ \
+   /** \brief a pointer to the parameter-map we're constructing */ \
+   dwdstTagger::NGramTable *ngtable; \
+  private: \
+   /* private instance members go here */ \
+  public: \
+   /* public methods */ \
+   /** \brief report warnings */ \
+   virtual void yywarn(const char *msg) { \
+      fprintf(stderr,"dwdstParamParser warning: %s\n", msg); \
    };
 
-%define CONSTRUCTOR_INIT :\
+%define CONSTRUCTOR_INIT : \
    ngtable(NULL)
-
 
 /*------------------------------------------------------------
  * Parser Properties
  *------------------------------------------------------------*/
 %union {
-  NGramVector      *ngram;   // -- for tag-lists
-  FSMSymbolString *symstr;   // -- for single-tag regex-strings
-  float             count;   // -- for tag-list counts
+  dwdstTagger::NGramVector *ngram;    // -- for tag-lists
+  FSMSymbolString *symstr;            // -- for single-tag regex-strings
+  float             count;            // -- for tag-list counts
 }
+
 %header{
 /**
- * \typedef yy_dwdst_param_parser_stype
- * \brief Bison++ semantic value typedef for dwdst-pargen parameter-file parser
+ * \typedef yy_dwdstParamParser_stype
+ * \brief Bison++ semantic value typedef for dwdst-pargen parameter-file parser.
  */
 %}
 
@@ -95,7 +96,7 @@
 %type  <ngram>   ngram
 
 // -- Operator precedence and associativity
-%left TAB       // -- ngram-construction operator
+//%left TAB       // -- ngram-construction operator
 
 %start params
 
@@ -110,9 +111,9 @@ param:		ngram tab count newline
 		{
 		    // -- single-parameter: add the parsed parameter to our table
 		    if (ngtable->find(*$1) != ngtable->end()) {
-			ngtable[*$1] = $3;
+			(*ngtable)[*$1] = $3;
 		    } else {
-			ngtable[*$1] += $3;
+			(*ngtable)[*$1] += $3;
 		    }
                     // -- and delete any components
                     $1->clear();
@@ -124,7 +125,7 @@ param:		ngram tab count newline
 ngram:		regex
 		{
 		    // -- single regex: make a new vector
-		    $$ = new NGramVector;
+		    $$ = new dwdstTagger::NGramVector;
                     $$->clear();
                     $$->push_back(*$1);
                     delete $1;
@@ -139,11 +140,12 @@ ngram:		regex
 	;
 
 regex:		REGEX { $$ = $1; }
-	|	/* empty */
+/*	|	// empty
 		{
 		    yyerror("expected a regex");
                     YYABORT;
 		}
+*/
 	;
 
 count:		COUNT { $$ = $1; }
@@ -154,7 +156,7 @@ count:		COUNT { $$ = $1; }
 		}
 	;
 
-tab:		'\t'
+tab:		'\t' { $$=0; }
 	|	/* empty */
 		{
 		    yyerror("expected a TAB");
@@ -162,8 +164,8 @@ tab:		'\t'
                 }
 	;
 
-newline:	'\n'
-	|	'\0'
+newline:	'\n' { $$=0; }
+	|	'\0' { $$=0; }
 	|	newline '\n'
 	|	/* empty */
 		{

@@ -1,238 +1,65 @@
-## File: src/Makefile.am
-## Package: dwdst
-## Description:
-##   + source-level automake file for DWDS tagger
-##
-## Process this file with Automake to create Makefile.in.
-##-----------------------------------------------------------------------
+# File: ./src/Makefile.am
+# Package: dwdst
+# Description:
+#   + source-level automake file for DWDS tagger
+#
+# Process this file with Automake to create Makefile.in.
+#-----------------------------------------------------------------------
 
-##-----------------------------------------------------------------------
-## subdirectories
-##-----------------------------------------------------------------------
-#SUBDIRS =
+#-----------------------------------------------------------------------
+# Options & Subdirectories
+#-----------------------------------------------------------------------
 
-##-----------------------------------------------------------------------
-## primary targets
-##-----------------------------------------------------------------------
+## --- recursion subdirectories
+SUBDIRS = libdwdst programs
 
-## --- executable programs
-#bin_PROGRAMS = ${prog_1} ... ${prog_N}
-bin_PROGRAMS = dwdspp dwdst dwdst-fstgen dwdst-pargen
-
-## --- libtool libraries
-#lib_LTLIBRARIES = ${lib_1}.la ... ${lib_N}.la
-
-## --- shared data in @pkgdatadir@
-#pkgdata_DATA = ${data_1} ... ${data_N}
-
-## --- manpages -- section is auto-detected
-#man_MANS = ${man_1} ... ${man_N}
-
-##-----------------------------------------------------------------------
-## sources
-##-----------------------------------------------------------------------
-
-SUFFIXES = .ggo
-
-## --- Required sources
-#${prog_i}_SOURCES =
-#${lib_i}_la_SOURCES =
-dwdspp_SOURCES = \
-	cmdutil.cc \
-	cmdutil.h \
-	dwdspp_lexer.ll \
-	dwdspp_main.cc \
-	dwdspp_cmdparser.ggo
-
-dwdst_SOURCES = \
-	cmdutil.cc \
-	cmdutil.h \
-	dwdst_lexer.ll \
-	dwdst.cc \
-	dwdst.h \
-	dwdst_main.cc \
-	dwdst_cmdparser.ggo
-
-dwdst_fstgen_SOURCES = \
-	dwdst_lexer.ll \
-	dwdst.cc \
-	dwdst.h \
-	dwdst_trainer.cc \
-	dwdst_trainer.h \
-	dwdst_fstgen_main.cc \
-	dwdst_fstgen_cmdparser.ggo \
-	postag_lexer.ll \
-	dwdst_param_lexer.ll \
-	dwdst_param_parser.yy
-
-dwdst_pargen_SOURCES = \
-	cmdutil.cc \
-	cmdutil.h \
-	dwdst_lexer.ll \
-	dwdst.cc \
-	dwdst.h \
-	dwdst_trainer.cc \
-	dwdst_trainer.h \
-	dwdst_pargen_main.cc \
-	dwdst_pargen_cmdparser.ggo \
-	postag_lexer.ll \
-	dwdst_param_lexer.ll \
-	dwdst_param_parser.yy
-
-## --- Extra (possible) sources
-#EXTRA_${prog_i}_SOURCES = 
-#EXTRA_${lib_i}_la_SOURCES = 
-
-## --- Additional dependencies
-dwdspp_main.o: dwdspp_cmdparser.h dwdspp_lexer.h
-dwdst_main.o: dwdst_cmdparser.h dwdst_lexer.h
-dwdst_fstgen_main.o: dwdst_fstgen_cmdparser.h dwdst_lexer.h postag_lexer.h
-dwdst_pargen_main.o: dwdst_pargen_cmdparser.h dwdst_lexer.h postag_lexer.h
-dwdst_trainer.o: dwdst_param_lexer.h dwdst_param_parser.h
-
-##-----------------------------------------------------------------------
-## headers
-##-----------------------------------------------------------------------
-
-## --- installable headers: @includedir@/@pkgname@
-#pkginclude_HEADERS = ${hfile_1} ... ${hfile_N}
-
-## --- no-install headers
-noinst_HEADERS = nopackage.h
-
-##-----------------------------------------------------------------------
-## pre-compile rules: gengetopt ; flex++
-##-----------------------------------------------------------------------
-
-## --- flex++/bison++ flags
-#FLEXXX_SKEL = $(SRCDIR)/flexskel.cc
-#FLEXXX_HSKEL = $(SRCDIR)/flexskel.h
-#FLEXXX_FLAGS = -8 -S$(FLEXXX_SKEL) -H$(FLEXXX_HSKEL)
-FLEXXX_FLAGS = -8
-
-#BISONXX_SKEL = $(SRCDIR)/bison.cc
-#BISONXX_HSKEL = $(SRCDIR)/bison.h
-#BISONXX_FLAGS = $(BISONXX_DFLAGS) -d -v -S$(BISONXX_SKEL) -H$(BISONXX_HSKEL)
-#BISONXX_FLAGS = --debug -d -v
-BISONXX_FLAGS = -d -v
-
-.ggo.h:
-	gengetopt -u -F$* < $^
-	mv $*.c $*.cc
-
-.ggo.cc:
-	gengetopt -u -F$* < $^
-	mv $*.c $*.cc
-
-.ll.h:
-	$(FLEXXX) $(FLEXXX_FLAGS) -h$*.h -o$*.cc $<
-
-.ll.cc:
-	$(FLEXXX) $(FLEXXX_FLAGS) -h$*.h -o$*.cc $<
-
-.yy.cc:
-	$(BISONXX) $(BISONXX_FLAGS) -o $*.cc -h $*.h  $<
-
-.yy.h:
-	$(BISONXX) $(BISONXX_FLAGS) -o $*.cc -h $*.h  $<
-
-##-----------------------------------------------------------------------
-## compile flags
-##-----------------------------------------------------------------------
-#SRCDIR = @srcdir@
-#SRCINCLUDE = $(SRCDIR)/../include
-
-## --- preprocessor flags
-AM_CPPFLAGS = $(FSM_IFLAGS)
-
-## --- compiler flags (c++)
-AM_CXXFLAGS = $(FSM_WFLAGS) $(FSM_OFLAGS)
-
-##-----------------------------------------------------------------------
-## Additional variable: library versioning
-##  + for -version-info $(CUR):$(REV):$(AGE) :
-##  + base lib is created as libMYLIB.so.$(CUR).$(AGE).$(REV)
-##-----------------------------------------------------------------------
-
-## --- The most recent interface number that this library implements.
-#LIBCUR = 0
-
-## --- The implementation number of the CURRENT interface.
-#LIBREV = 0
-
-## --- The difference between the newest and oldest interfaces that this
-##     library implements.  In other words, the library implements all the
-##     interface numbers in the range from number `CURRENT - AGE' to
-##     `CURRENT'.
-#LIBAGE = 0
-
-##-----------------------------------------------------------------------
-## linker flags
-##   + library special handling of configure.in vars:
-##-----------------------------------------------------------------------
-#${prog_i}_LDFLAGS = -L. -static
-#${prog_i}_LDADD   = ${non_src_file}.o -lsomelib
-#dwdst_LDFLAGS = -L.
-dwdst_LDFLAGS = @FSM_LFLAGS@
-dwdst_LDADD = @FSM_LIBS@
-
-dwdst_fstgen_LDFLAGS = @FSM_LFLAGS@
-dwdst_fstgen_LDADD = -lFSMExt @FSM_LIBS@
-
-dwdst_pargen_LDFLAGS = @FSM_LFLAGS@
-dwdst_pargen_LDADD = -lFSMExt @FSM_LIBS@
-
-# dwdspp_LDFLAGS = @FSM_LFLAGS@
-# dwdspp_LDADD = @FSM_LIBS@
-
-#${lib_i}_la_LDFLAGS = -L. -version-info ${lib_i_current}:${lib_i_rev}:${lib_i_age}
-#${lib_i}_LIBADD     = -lotherlib
-
-##-----------------------------------------------------------------------
-## Variables: cleanup
-##-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
+# Variables: cleanup
+#-----------------------------------------------------------------------
 
 ## --- mostlyclean: built by 'make' & commonly rebuilt
 #MOSTLYCLEANFILES =
 
-## --- clean:  built by 'make'
+## --- clean: built by 'make'
 #CLEANFILES =
 
 ## --- distclean: built by 'configure'
-#DISTCLEANFILES =
+DISTCLEANFILES = \
+	autom4te.cache \
+	config.log \
+	config.status \
+	config.cache
 
 ## -- maintainerclean: built by maintainer / by hand
-MAINTAINERCLEANFILES = \
-	*~ .*~ Makefile Makefile.in \
-	dwdst_lexer.cc dwdst_lexer.h \
-	dwdspp_lexer.cc dwdspp_lexer.h \
-	postag_lexer.cc postag_lexer.h \
-	dwdst_cmdparser.cc dwdst_cmdparser.h \
-	dwdst_fstgen_cmdparser.cc dwdst_fstgen_cmdparser.h \
-	dwdst_pargen_cmdparser.cc dwdst_pargen_cmdparser.h \
-	dwdspp_cmdparser.cc dwdspp_cmdparser.h
+MAINTAINERCLEANFILES = *~ \
+	$(PODS:.pod=.txt) \
+	Makefile Makefile.in \
+	aclocal.m4 \
+	configure
 
-##-----------------------------------------------------------------------
-## Variables: distribution
-##-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
+# Additional Variables & Rules: PODS
+#-----------------------------------------------------------------------
+PODS = README.pod
+
+.pod.txt:
+	pod2text $< $@
+
+
+#-----------------------------------------------------------------------
+# Variables: distribution
+#-----------------------------------------------------------------------
 
 ## --- extra distribution files
-EXTRA_DIST = \
-	dwdst.sym \
-	dwdst_lexer.cc dwdst_lexer.h \
-	dwdspp_lexer.cc dwdspp_lexer.h \
-	postag_lexer.cc postag_lexer.h \
-	dwdst_cmdparser.cc dwdst_cmdparser.h \
-	dwdst_fstgen_cmdparser.cc dwdst_fstgen_cmdparser.h \
-	dwdst_pargen_cmdparser.cc dwdst_pargen_cmdparser.h \
-	dwdspp_cmdparser.cc dwdspp_cmdparser.h
+#EXTRA_DIST =
 
 ## --- recursion subdirectories for 'make dist'
-#DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = $(SUBDIRS)
 
 ## --- dist-hook: when another 'Makefile.am' is overkill
-#DISTHOOK_DIRS = foo
-#DISTHOOK_FILES = foo/bar.txt foo/baz.txt
+#DISTHOOK_DIRS = subdir
+#DISTHOOK_FILES = subdir/file1 subdir/file2
+#
 #dist-hook:
 #	for d in $(DISTHOOK_DIRS); do\
 #	  mkdir -p $(distdir)/$$d ;\
@@ -241,9 +68,9 @@ EXTRA_DIST = \
 #	  cp -p $(srcdir)/$$f $(distdir)/$$f ;\
 #	done
 
-##-----------------------------------------------------------------------
-## Rules: cleanup
-##-----------------------------------------------------------------------
-.PHONY: cvsclean
+#-----------------------------------------------------------------------
+# Rules: cleanup
+#-----------------------------------------------------------------------
+.PHONY: cvsclean cvsclean-hook
 
 cvsclean: maintainer-clean ;

@@ -10,12 +10,13 @@
 #include <string.h>
 #include <sys/time.h>
 
+#include <dwdstTrainer.h>
+
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
 #include "dwdst_fstgen_cmdparser.h"
-#include "dwdst_trainer.h"
 
 using namespace std;
 
@@ -31,7 +32,7 @@ gengetopt_args_info args;
 char *symfile = "dwdst.sym";
 
 // -- global classes/structs
-dwds_tagger_trainer dwdstt;
+dwdstTrainer dwdstt;
 
 /*--------------------------------------------------------------------------
  * Option Processing

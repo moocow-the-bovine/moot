@@ -8,9 +8,9 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include "dwdst_trainer.h"
-#include "postag_lexer.h"
-#include "dwdst_param_lexer.h"
+#include "dwdstTrainer.h"
+#include "dwdstTaglistLexer.h"
+#include "dwdstParamLexer.h"
 
 using namespace std;
 
@@ -19,9 +19,9 @@ using namespace std;
  *--------------------------------------------------------------------------*/
 
 /*
- * dwds_tagger_trainer::~dwds_tagger_trainer()
+ * dwdstTrainer::~dwdstTrainer()
  */
-dwds_tagger_trainer::~dwds_tagger_trainer()
+dwdstTrainer::~dwdstTrainer()
 {
   // -- do nothing
   ;
@@ -32,11 +32,11 @@ dwds_tagger_trainer::~dwds_tagger_trainer()
  *--------------------------------------------------------------------------*/
 
 /*
- * set<FSMSymbolString> dwds_tagger_trainer::read_taglist_file(set<FSMSymbolString> &tagset, const char *filename=NULL);
+ * set<FSMSymbolString> dwdstTrainer::read_taglist_file(set<FSMSymbolString> &tagset, const char *filename=NULL);
  *  + implicitly clears 'tagset'
  *  + if 'filename' is NULL, 'tagset' is set to all categories according to 'syms' data member
  */
-set<FSMSymbolString> dwds_tagger_trainer::read_taglist_file(set<FSMSymbolString> &tagset, const char *filename=NULL)
+set<FSMSymbolString> dwdstTrainer::read_taglist_file(set<FSMSymbolString> &tagset, const char *filename=NULL)
 {
   // -- sanity check
   tagset.clear();
@@ -44,7 +44,7 @@ set<FSMSymbolString> dwds_tagger_trainer::read_taglist_file(set<FSMSymbolString>
   if (!filename) {
     // -- default: all categories
     if (!syms) {
-      fprintf(stderr, "dwds_tagger_trainer::read_taglist_file(): no symbols loaded!\n");
+      fprintf(stderr, "dwdstTrainer::read_taglist_file(): no symbols loaded!\n");
       return tagset;
     }
     const set<FSMSymbolString> *symbols = syms->symbols();
@@ -55,26 +55,26 @@ set<FSMSymbolString> dwds_tagger_trainer::read_taglist_file(set<FSMSymbolString>
   } else {
     // -- load from file
     FILE *pos_file;
-    postag_lexer lexer;
+    dwdstTaglistLexer lexer;
     FSMSymbolString s;
     int  tok;
     
     if (!(pos_file = fopen(filename,"r"))) {
-      fprintf(stderr,"dwds_tagger_trainer::read_taglist_file(): could not open file '%s' for read.\n",
+      fprintf(stderr,"dwdstTrainer::read_taglist_file(): could not open file '%s' for read.\n",
 	      filename);
       return tagset;
     }
     // -- parse the pos-tag file
     lexer.step_streams(pos_file,stdout);
-    while ((tok = lexer.yylex()) != PTEOF) {
+    while ((tok = lexer.yylex()) != dwdstTaglistLexer::PTEOF) {
       switch (tok) {
-      case POSTAG:
+      case dwdstTaglistLexer::POSTAG:
 	s = (char *)lexer.yytext;
 	tagset.insert(s);
-      case PTEOF:
+      case dwdstTaglistLexer::PTEOF:
 	break;
       default:
-	fprintf(stderr,"dwds_tagger_trainer::get_pos_tags(): Error in input file '%s'.\n",
+	fprintf(stderr,"dwdstTrainer::get_pos_tags(): Error in input file '%s'.\n",
 		filename);
       }
     }
@@ -88,11 +88,11 @@ set<FSMSymbolString> dwds_tagger_trainer::read_taglist_file(set<FSMSymbolString>
  *--------------------------------------------------------------------------*/
 
 /*
- * FSM *dwds_tagger_trainer::generate_unknown_fsa();
+ * FSM *dwdstTrainer::generate_unknown_fsa();
  *   + generates analysis-FSA for tokens unknown to KDWDS morphology
  *   + uses 'opentags' : set of open-class PoS tags
  */
-FSM *dwds_tagger_trainer::generate_unknown_fsa()
+FSM *dwdstTrainer::generate_unknown_fsa()
 {
   FSMRepresentation *base;
   FSMState q0;
@@ -126,11 +126,11 @@ FSM *dwds_tagger_trainer::generate_unknown_fsa()
  *--------------------------------------------------------------------------*/
 
 /*
- * FSM *dwds_tagger_trainer::generate_disambig_fsa();
+ * FSM *dwdstTrainer::generate_disambig_fsa();
  */
-FSM *dwds_tagger_trainer::generate_disambig_fsa()
+FSM *dwdstTrainer::generate_disambig_fsa()
 {
-  fprintf(stderr,"dwds_tagger_trainer::generate_disambig_fsa(): not yet implemented!");
+  fprintf(stderr,"dwdstTrainer::generate_disambig_fsa(): not yet implemented!");
   abort();
   return NULL;
 }
@@ -142,13 +142,13 @@ FSM *dwds_tagger_trainer::generate_disambig_fsa()
 
 /*
  * set<FSMState>
- * dwds_tagger_trainer::fsm_add_pos_arc(FSM *fsm, FSMState qfrom, FSMSymbolString &pos,
+ * dwdstTrainer::fsm_add_pos_arc(FSM *fsm, FSMState qfrom, FSMSymbolString &pos,
  *                                      FSMWeight cost = FSM_default_cost_structure.freecost())
  *   + returns set of "final" states for the arc
  *   + honors the 'want_features' data-member
  */
 set<FSMState>
-dwds_tagger_trainer::fsm_add_pos_arc(FSM *fsm, const FSMState qfrom, const FSMSymbolString &pos,
+dwdstTrainer::fsm_add_pos_arc(FSM *fsm, const FSMState qfrom, const FSMSymbolString &pos,
 				     const FSMWeight cost = FSM_default_cost_structure.freecost())
 {
   FSMRepresentation *base = fsm->fsm_representation();
@@ -189,24 +189,24 @@ dwds_tagger_trainer::fsm_add_pos_arc(FSM *fsm, const FSMState qfrom, const FSMSy
  *--------------------------------------------------------------------------*/
 
 /*
- * bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
+ * bool dwdstTrainer::train_from_stream(FILE *in, FILE *out)
  */
-bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
+bool dwdstTrainer::train_from_stream(FILE *in, FILE *out)
 {
   int tok;
 
   // -- sanity check
   if (!can_tag() || !init_training_temps(in,out)) {
-    fprintf(stderr, "dwds_tagger_trainer::train_from_stream(): cannot run uninitialized trainer!\n");
+    fprintf(stderr, "dwdstTrainer::train_from_stream(): cannot run uninitialized trainer!\n");
     return false;
   }
 
   // -- ye olde guttes
   lexer.step_streams(in,out);
-  while ((tok = lexer.yylex()) != DTEOF) {
+  while ((tok = lexer.yylex()) != dwdstTaggerLexer::DTEOF) {
     switch (tok) {
-    case EOS:
-    case DTEOF:
+    case dwdstTaggerLexer::EOS:
+    case dwdstTaggerLexer::DTEOF:
       // -- don't do much on eos
       train_eos();
       break;
@@ -220,13 +220,13 @@ bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
 }
 
 /*
- * bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=stdout)
+ * bool dwdstTrainer::train_from_strings(int argc, char **argv, FILE *out=stdout)
  */
-bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=stdout)
+bool dwdstTrainer::train_from_strings(int argc, char **argv, FILE *out=stdout)
 {
   // -- sanity check
   if (!can_tag() || !init_training_temps(NULL,out)) {
-    fprintf(stderr, "dwds_tagger_trainer::train_from_strings(): cannot run uninitialized trainer!\n");
+    fprintf(stderr, "dwdstTrainer::train_from_strings(): cannot run uninitialized trainer!\n");
     return false;
   }
 
@@ -242,9 +242,9 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
 
 
 /*
- * bool dwds_tagger_trainer::init_training_temps()
+ * bool dwdstTrainer::init_training_temps()
  */
-inline bool dwds_tagger_trainer::init_training_temps(FILE *in=NULL, FILE *out=NULL)
+inline bool dwdstTrainer::init_training_temps(FILE *in=NULL, FILE *out=NULL)
 {
   int i;
 
@@ -266,9 +266,9 @@ inline bool dwds_tagger_trainer::init_training_temps(FILE *in=NULL, FILE *out=NU
 
 
 /*
- * bool dwds_tagger_trainer::cleanup_training_temps()
+ * bool dwdstTrainer::cleanup_training_temps()
  */
-inline bool dwds_tagger_trainer::cleanup_training_temps()
+inline bool dwdstTrainer::cleanup_training_temps()
 {
   int i;
 
@@ -300,10 +300,10 @@ inline bool dwds_tagger_trainer::cleanup_training_temps()
 }
 
 /*
- * void dwds_tagger_trainer::train_eos()
+ * void dwdstTrainer::train_eos()
  *   + update internal ngram tables for EOS pseudo-tokens
  */
-inline void dwds_tagger_trainer::train_eos(void)
+inline void dwdstTrainer::train_eos(void)
 {
   // -- count it!
   theNgram.clear();
@@ -325,10 +325,10 @@ inline void dwds_tagger_trainer::train_eos(void)
 
 
 /*
- * inline void dwds_tagger_trainer::train_next_token(void);
+ * inline void dwdstTrainer::train_next_token(void);
  *   + update internal ngram tables for real text tokens
  */
-inline void dwds_tagger_trainer::train_next_token(void)
+inline void dwdstTrainer::train_next_token(void)
 {
   // -- tag it first
   s = (char *)token;
@@ -451,9 +451,9 @@ inline void dwds_tagger_trainer::train_next_token(void)
  *--------------------------------------------------------------------------*/
 
 /*
- * bool dwds_tagger_trainer::save_param_file(FILE *out=stdout);
+ * bool dwdstTrainer::save_param_file(FILE *out=stdout);
  */
-bool dwds_tagger_trainer::save_param_file(FILE *out=stdout)
+bool dwdstTrainer::save_param_file(FILE *out=stdout)
 {
   for (ngti = ngtable.begin(); ngti != ngtable.end(); ngti++) {
     //for (NGramVector::const_reverse_iterator ngvi = ngti->first.rbegin(); ngvi != ngti->first.rend(); ngvi++)
@@ -471,30 +471,30 @@ bool dwds_tagger_trainer::save_param_file(FILE *out=stdout)
  * load_param_file(file,filename)
  *  + adds counts from given param file to internal table 'strings2counts'
  */
-bool dwds_tagger_trainer::load_param_file(FILE *in=stdin,const char *filename=NULL)
+bool dwdstTrainer::load_param_file(FILE *in=stdin,const char *filename=NULL)
 {
-  /*//--  MECKER
+  //--  MECKER
   fprintf(stderr,"dwdst_tagger_trainer::load_param_file(): not yet implemented!\n");
   abort();
   return false;
-  */
 
+  /*
   int tok;
-  dwdst_param_lexer plexer;
+  dwdstParamLexer plexer;
   NGramVector     ng;
   //FSMSymbolString symstr;
   float           count;
 
   plexer.select_streams(in,stdout);
 
-  while ((tok = plexer.yylex()) != dwdst_param_lexer::PF_EOF) {
+  while ((tok = plexer.yylex()) != dwdstParamLexer::PF_EOF) {
     switch (tok) {
-    case dwdst_param_lexer::PF_REGEX:
+    case dwdstParamLexer::PF_REGEX:
       ng.push_back(plexer.tokbuf);
       // -- add to alltags
       alltags.insert(plexer.tokbuf);
       break; 
-    case dwdst_param_lexer::PF_COUNT:
+    case dwdstParamLexer::PF_COUNT:
       count = atof((char *)plexer.yytext);
       // -- add loaded count
       if (ngtable.find(ng) != ngtable.end()) {
@@ -508,11 +508,12 @@ bool dwds_tagger_trainer::load_param_file(FILE *in=stdin,const char *filename=NU
       count = 0;
       break;
     default:
-      fprintf(stderr, "dwds_tagger_trainer::load_param_file: unknown token '%s' -- ignored.\n", plexer.yytext);
+      fprintf(stderr, "dwdstTrainer::load_param_file: unknown token '%s' -- ignored.\n", plexer.yytext);
       break;
     }
   }
   return true;
+  */
 }
 
 /*--------------------------------------------------------------------------
