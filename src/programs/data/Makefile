@@ -14,7 +14,7 @@ MOOTM = $(shell \
 	test -x /usr/local/bin/mootm && @echo "/usr/local/bin/mootm" \
 	|| echo "/home/moocow/public/bin/mootm")
 MORPHHACK = ./morphhack.perl
-MOOTM_FLAGS = -m /usr/local/share/moot/dwdst-stts-nofeatures.fst -d1024
+MOOTM_FLAGS = -m share-moot/dwdst-stts-nofeatures.fst -d1024
 MOOTRAIN = ../mootrain
 MOOTHMM = ../moot
 MOOTHMM_FLAGS =
@@ -180,4 +180,7 @@ clean:
 	rm -f *~ *.t *.tt *.dmtt
 
 realclean: clean
-	rm -f *.lex *.123 *.clx *.mtt *.mttt *.amtt
+	rm -f \
+	  *.lex *.123 *.clx \
+	  *.mtt *.m0tt *.mttt *.amtt \
+	  *.model *.hmm *.chmm *.dump *.cdump
