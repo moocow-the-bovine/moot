@@ -27,6 +27,7 @@ void dwdstLexfreqs::clear(void)
     }
   }
   lftable.clear();
+  lftotals.clear();
 }
 
 /*----------------------------------------------------------------------
@@ -87,20 +88,17 @@ bool dwdstLexfreqs::save(FILE *file, char *filename)
   //-- iterate through sorted tokens
   set<dwdstTagString> tags;
   LexfreqSubtable    *subt;
-  LexfreqCount       total;
   for (set<dwdstTokString>::const_iterator toki = tokens.begin(); toki != tokens.end(); toki++) {
     //-- prepare sorted tag-list
     tags.clear();
-    total = 0;
     subt = lftable[*toki];
     if (subt==NULL || subt->empty()) continue;
     for (LexfreqSubtable::const_iterator sti = subt->begin(); sti != subt->end(); sti++) {
       tags.insert(sti->first);
-      total += sti->second;
     }
 
     //-- finally, output
-    fprintf(file, "%s\t%g", toki->c_str(), total);
+    fprintf(file, "%s\t%g", toki->c_str(), lookup(*toki));
     for (set<dwdstTagString>::const_iterator tagi = tags.begin(); tagi != tags.end(); tagi++) {
       fprintf(file, "\t%s\t%g", tagi->c_str(), (*subt)[*tagi]);
     }

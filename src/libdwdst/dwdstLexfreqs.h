@@ -23,11 +23,17 @@ public:
   typedef float LexfreqCount;
 
   /**
+   * Type for the lexical total-frequency lookup table.
+   */
+  typedef hash_map<dwdstTokString,LexfreqCount> LexTotalTable;
+
+
+  /**
    * Type for a single lexical frequency entry (subtable), string form.
    * Keys are tag-strings, values are counts.
    */
   typedef hash_map<dwdstTagString,LexfreqCount> LexfreqSubtable;
- 
+
   /** Actual Lexeme->(Tag->Count) lookup table typedef */
   typedef
     hash_map<dwdstTokString,LexfreqSubtable *>
@@ -37,6 +43,7 @@ public:
   //------ public data
   /** lexeme->(tag->count) lookup table */
   LexfreqStringTable lftable;
+  LexTotalTable      lftotals;
 
 public:
   //------ public methods
@@ -66,13 +73,20 @@ public:
     } else {
       sti = ti->second->insert(pair<dwdstTagString, LexfreqCount>(tag, count)).first;
     }
+    //-- adjust total
+    LexTotalTable::iterator toti = lftotals.find(token);
+    if (toti == lftotals.end()) {
+      lftotals[token] = count;
+    } else {
+      toti->second += count;
+    }
     return sti->second;
   }; //-- add_count()
 
 
   //------ public methods: lookup
 
-  /** Returns current count for lexfreq, returns 0 if unknown */
+  /** Returns current count for (token,tag), returns 0 if unknown */
   inline const LexfreqCount lookup(const dwdstTokString &token, const dwdstTagString &tag)
   {
     LexfreqStringTable::const_iterator ti = lftable.find(token);
@@ -80,6 +94,13 @@ public:
     LexfreqSubtable::const_iterator sti = ti->second->find(tag);
     if (sti == ti->second->end()) return 0;
     return sti->second;
+  }; //-- lookup
+
+  /** Returns current total count for token, returns 0 if unknown */
+  inline const LexfreqCount lookup(const dwdstTokString &token)
+  {
+    LexTotalTable::const_iterator toti = lftotals.find(token);
+    return toti == lftotals.end() ? 0 : toti->second;
   }; //-- lookup
 
 

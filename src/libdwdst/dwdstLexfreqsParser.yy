@@ -142,7 +142,7 @@ entry:		entryBody newline
 	;
 
 entryBody:	token { $$ = $1; }
-	|	entryBody   tab   total { $$ = $1; /* total is, like, totally optional, bro! */ }
+	|	token   tab   total { $$ = $1; /* total is optional (not really) */ }
 	|	entryBody   tab   tag   tab   count
 		{
 		  lexfreqs->add_count(*$1, *$3, $5);

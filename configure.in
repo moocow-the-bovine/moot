@@ -455,7 +455,7 @@ AC_SUBST(DWDST_OFLAGS)
 dnl ---------------------------------------------------------------
 dnl cxxflags: template depth
 dnl
-CXXFLAGS="$DWDST_OFLAGS -ftemplate-depth-24"
+CXXFLAGS="$CXXFLAGS -ftemplate-depth-24"
 dnl
 dnl cxxflags: template depth
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

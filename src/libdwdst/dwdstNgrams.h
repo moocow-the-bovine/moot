@@ -33,7 +33,6 @@ public:
     public:
       inline size_t operator()(const NgramString &x) const {
 	size_t hv = 0;
-	;
 	for (NgramString::const_iterator xi = x.begin();
 	     xi != x.end();
 	     xi++)
@@ -68,8 +67,8 @@ public:
 
 public:
   //------ public data
-  /** N-Gram to count lookup table */
-  NgramStringTable ngtable;
+  NgramStringTable ngtable;  /**< N-Gram to count lookup table */
+  NgramCount       ugtotal;  /**< total number of unigrams */
 
 public:
   //------ public methods
@@ -86,6 +85,7 @@ public:
     } else {
       ngtable[ngram] += count;
     }
+    if (ngram.size() == 1) ugtotal += count;
     return ngtable[ngram];
   };
 

@@ -47,9 +47,7 @@ libdwdst_la_SOURCES = \
 	dwdstLexfreqsLexer.cc \
 	dwdstLexfreqsParser.cc \
 	dwdstLexfreqsCompiler.cc \
-	dwdstTagger.cc
-
-libdwdst_later = \
+	dwdstTagger.cc \
 	dwdstHMM.cc
 
 libdwdst_old = \
@@ -121,7 +119,8 @@ pkginclude_HEADERS = \
 	dwdstLexfreqsLexer.h \
 	dwdstLexfreqsParser.h \
 	dwdstLexfreqsCompiler.h \
-	dwdstLexfreqs.h
+	dwdstLexfreqs.h \
+	dwdstHMM.h
 
 pkgheaders_old = \
 	dwdstTrainer.h \
