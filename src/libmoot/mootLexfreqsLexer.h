@@ -55,9 +55,6 @@
 /* % here is the declaration from section1 %header{  */ 
 #line 33 "mootLexfreqsLexer.ll"
 
-#include "mootTypes.h"
-#include "mootLexfreqsParser.h"
-
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
@@ -67,56 +64,44 @@
 
 \details Supports comments introduced with '%%'.
 */
-#line 48 "mootLexfreqsLexer.ll"
+
+#include <mootTypes.h>
+#include <mootLexfreqsParser.h>
+#include <mootGenericLexer.h>
+
+using namespace moot;
+#line 51 "mootLexfreqsLexer.ll"
 #define YY_mootLexfreqsLexer_LEX_PARAM  \
   YY_mootLexfreqsParser_STYPE *yylval, YY_mootLexfreqsParser_LTYPE *yylloc
-#line 52 "mootLexfreqsLexer.ll"
+#line 54 "mootLexfreqsLexer.ll"
 #define YY_mootLexfreqsLexer_CLASS  mootLexfreqsLexer
-#line 53 "mootLexfreqsLexer.ll"
+#line 56 "mootLexfreqsLexer.ll"
+#define YY_mootLexfreqsLexer_INHERIT  \
+  : public GenericLexer
+#line 59 "mootLexfreqsLexer.ll"
+#define YY_mootLexfreqsLexer_INPUT_CODE  \
+  return moot::GenericLexer::yyinput(buffer,result,max_size);
+#line 62 "mootLexfreqsLexer.ll"
 #define YY_mootLexfreqsLexer_MEMBERS  \
-  public: \
-    /* -- public typedefs */\
-  public: \
-   /* -- positional parameters */\
-    /** current line*/\
-    int theLine;\
-    /** current column*/\
-    int theColumn;\
-    /** token-buffering */\
-    moot::mootTagString tokbuf;\
-    /** whether to clear the token-buffer on 'tokbuf_append()' */\
-    bool tokbuf_clear;\
-  private: \
-    /* private local data */ \
-    bool use_string; \
-    char *stringbuf; \
   public: \
     /** virtual destructor to shut up gcc */\
     virtual ~mootLexfreqsLexer(void) {};\
-    /** use stream input */\
-    void select_streams(FILE *in=stdin, FILE *out=stdout); \
-    /** use string input */\
-    void select_string(const char *in, FILE *out=stdout); \
-    /** for token-buffering: append yyleng characters of yytext to 'tokbuf' */\
-    inline void tokbuf_append(char *text, int leng);
+  /* moot::GenericLexer helpers */ \
+  virtual void **mgl_yy_current_buffer_p(void) \
+                 {return (void**)(&yy_current_buffer);};\
+  virtual void  *mgl_yy_create_buffer(int size, FILE *unused=stdin) \
+                 {return (void*)(yy_create_buffer(unused,size));};\
+  virtual void   mgl_yy_init_buffer(void *buf, FILE *unused=stdin) \
+                 {yy_init_buffer((YY_BUFFER_STATE)buf,unused);};\
+  virtual void   mgl_yy_delete_buffer(void *buf) \
+                 {yy_delete_buffer((YY_BUFFER_STATE)buf);};\
+  virtual void   mgl_yy_switch_to_buffer(void *buf) \
+                 {yy_switch_to_buffer((YY_BUFFER_STATE)buf);};\
+  virtual void   mgl_begin(int stateno);
 #line 80 "mootLexfreqsLexer.ll"
 #define YY_mootLexfreqsLexer_CONSTRUCTOR_INIT  :\
-  theLine(1), \
-  theColumn(1), \
-  use_string(false), \
-  stringbuf(NULL)
-#line 86 "mootLexfreqsLexer.ll"
-#define YY_mootLexfreqsLexer_INPUT_CODE  \
-  /* yy_input(char *buf, int &result, int max_size) */\
-  if (use_string) {\
-    size_t len = strlen(stringbuf) > (size_t)max_size ? max_size : strlen(stringbuf);\
-    strncpy(buffer,stringbuf,len);\
-    stringbuf += len;\
-    return result = len;\
-  }\
-  /* black magic */\
-  return result= fread(buffer, 1, max_size, YY_mootLexfreqsLexer_IN);
-#line 111 "mootLexfreqsLexer.ll"
+  GenericLexer("mootLexfreqsLexer")
+#line 96 "mootLexfreqsLexer.ll"
 #line 52 "/usr/local/share/flex++bison++/flexskel.h"
 
 
@@ -368,7 +353,7 @@ class YY_mootLexfreqsLexer_CLASS YY_mootLexfreqsLexer_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 162 "mootLexfreqsLexer.ll"
+#line 147 "mootLexfreqsLexer.ll"
 #endif
 #line 302 "/usr/local/share/flex++bison++/flexskel.h"
 

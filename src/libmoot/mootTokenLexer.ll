@@ -44,17 +44,12 @@
 %name mootTokenLexer
 
 %header{
-
-#include <stdarg.h>
-#include "mootToken.h"
-
-
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
 /**
  * \class mootTokenLexer
- * \brief Flex++ lexer for KDWDS tagger.
+ * \brief Flex++ lexer for moot PoS tagger native text input.
  *
  * Assumes pre-tokenized input:
  * one token per line,  blank lines = EOS, raw text only (no markup!).
@@ -75,32 +70,47 @@
  *
  */
 
+#include <mootToken.h>
+#include <mootGenericLexer.h>
+
+using namespace moot;
 %}
 
-/*%define LEX_PARAM \
-  YY_mootTokenParser_STYPE *yylval, YY_mootTokenParser_LTYPE *yylloc
-*/
+/*%define FLEX_DEBUG*/
 
 %define CLASS mootTokenLexer
+
+%define INHERIT \
+  : public moot::GenericLexer
+
+%define INPUT_CODE \
+  return moot::GenericLexer::yyinput(buffer,result,max_size);
+
 %define MEMBERS \
   public: \
   /* -- public typedefs */\
-  typedef moot::mootTokFlavor TokenType; \
+  typedef moot::mootTokenType TokenType; \
+  /* extra token types */ \
+  static const int LexTypeText = moot::NTokTypes+1;    /* literal token text */ \
+  static const int LexTypeTag = moot::NTokTypes+2;     /* analysis tag */ \
+  static const int LexTypeDetails = moot::NTokTypes+3; /* analysis details */ \
+  static const int LexTypeEOA = moot::NTokTypes+4;     /* end-of-analysis (separator) */ \
+  static const int LexTypeEOT = moot::NTokTypes+5;     /* end-of-token */ \
+  static const int LexTypeIgnore = moot::NTokTypes+6;  /* ignored data (unused) */ \
   \
   public: \
-   /* -- positional parameters */ \
-   /** current line*/\
-   int theLine;\
-   /** current column*/\
-   int theColumn;\
+   /** last token type */ \
+   int lasttyp; \
    \
    /* -- pre-allocated construction buffers */ \
-   /** current token */\
-   moot::mootToken mtoken; \
-   /** current analysis */ \
-   moot::mootToken::Analysis manalysis;\
-   /** last token type */ \
-   TokenType lasttyp; \
+   /* current token (default) */ \
+   moot::mootToken mtoken_default; \
+   /* current token (real) */ \
+   moot::mootToken *mtoken; \
+   \
+   /** current analysis (real) */ \
+   moot::mootToken::Analysis *manalysis;\
+   \
    /** whether to ignore comments (default=false) */ \
    bool ignore_comments; \
    /** whether first analysis parsed should be considered 'best' (default=true) */ \
@@ -111,62 +121,62 @@
    bool ignore_first_analysis; \
    /** whether to ignore current analysis */\
    bool ignore_current_analysis; \
-  \
-   /* -- token-buffering */\
-   /** token-buffer */\
-   std::string itokbuf;\
-   /** whether to clear the token-buffer on 'itokbuf_append()' */\
-   bool itokbuf_clear;\
    \
-   /* -- diagnositcs */\
-   /** Name of our input source: used for diagnostics & error messages */\
-   std::string srcname;\
-  /* private: */\
-    /** low-level pseudo-private local data */ \
-    bool use_string; \
-    /** low-level pseudo-private local data */ \
-    char *stringbuf; \
   public: \
     /* -- local methods */ \
     /** virtual destructor to shut up gcc */\
-    virtual ~mootTokenLexer(void) {}; \
+    virtual ~mootTokenLexer(void) {};\
     /** reset to initial state */ \
-    void reset(void); \
-    /** hack for non-global yywrap() */\
-    void select_streams(FILE *in=stdin, FILE *out=stdout); \
-    /** use string input */\
-    void select_string(const char *in, FILE *out=stdout); \
-    /** for token-buffering: append yyleng characters of yytext to 'itokbuf' */\
-    inline void itokbuf_append(char *text, int leng); \
-    /** for error reporting */ \
-    virtual void yycarp(char *fmt, ...);
+    virtual void reset(void); \
+    /** actions to perform on end-of-analysis */ \
+    inline void on_EOA(void) \
+    { \
+      /*-- EOA: add & clear current analysis, if any */ \
+      /*-- add & clear current analysis, if any */ \
+      if (lasttyp != LexTypeEOA) { \
+        /*-- set default tag */\
+        if (manalysis->tag.empty()) { \
+          manalysis->tag.swap(manalysis->details); \
+        }  \
+        /* set best tag if applicable */\
+        if (current_analysis_is_best) { \
+          mtoken->besttag(manalysis->tag); \
+          current_analysis_is_best = false; \
+        } \
+        if (ignore_current_analysis) { \
+          ignore_current_analysis=false; \
+          mtoken->tok_analyses.pop_back(); \
+        } \
+      } \
+    }; \
+  /*-- moot::GenericLexer helpers */ \
+  virtual void **mgl_yy_current_buffer_p(void) \
+                 {return (void**)(&yy_current_buffer);};\
+  virtual void  *mgl_yy_create_buffer(int size, FILE *unused=stdin) \
+                 {return (void*)(yy_create_buffer(unused,size));};\
+  virtual void   mgl_yy_init_buffer(void *buf, FILE *unused=stdin) \
+                 {yy_init_buffer((YY_BUFFER_STATE)buf,unused);};\
+  virtual void   mgl_yy_delete_buffer(void *buf) \
+                 {yy_delete_buffer((YY_BUFFER_STATE)buf);};\
+  virtual void   mgl_yy_switch_to_buffer(void *buf) \
+                 {yy_switch_to_buffer((YY_BUFFER_STATE)buf);};\
+  virtual void   mgl_begin(int stateno);
+
 
 %define CONSTRUCTOR_INIT :\
-  theLine(1), \
-  theColumn(0), \
-  lasttyp(moot::TF_EOS), \
+  GenericLexer("mootTokenLexer"), \
+  yyin(NULL), \
+  lasttyp(moot::TokTypeEOS), \
+  manalysis(NULL), \
   ignore_comments(false), \
   first_analysis_is_best(true), \
   current_analysis_is_best(false), \
   ignore_first_analysis(false), \
-  ignore_current_analysis(false), \
-  itokbuf_clear(true), \
-  srcname("(unknown)"),\
-  use_string(false), \
-  stringbuf(NULL)
+  ignore_current_analysis(false)
 
-%define INPUT_CODE \
-  /* yy_input(char *buf, int &result, int max_size) */\
-  if (use_string) {\
-    size_t len = strlen(stringbuf) > (size_t)max_size \
-      ? max_size \
-      : strlen(stringbuf);\
-    strncpy(buffer,stringbuf,len);\
-    stringbuf += len;\
-    return result = len;\
-  }\
-  /* black magic */\
-  return result= fread(buffer, 1, max_size, YY_mootTokenLexer_IN);
+%define CONSTRUCTOR_CODE \
+  mtoken = &mtoken_default;
+
 
 /*----------------------------------------------------------------------
  * Start States
@@ -182,11 +192,14 @@
 space      [ ]
 wordchar   [^ \t\n\r]
 tab        [\t]
-eotchar    [\t\n\r]
+eoachar    [\t\n\r]
+eotchar    [\n\r]
 newline    [\n\r]
 tokchar    [^\t\n\r]
-detchar    [^ \t\n\r\<\>\[]
+/*detchar    [^ \t\n\r\<\>\[]*/
+detchar    [^ \t\n\r\[]
 tagchar    [^ \t\n\r\]]
+anlchar    [^ \t\n\r]
 /*bestchar   [\/]*/
 
 /*----------------------------------------------------------------------
@@ -199,196 +212,183 @@ tagchar    [^ \t\n\r\]]
   using namespace moot;
 %}
 
-^([ \t]*){newline} {
-  /** blank line: maybe return eos (ignore empty sentences) */
+%{
+/*--------------------------------------------------------------------
+ * TOKEN
+ */
+%}
+
+<TOKEN>^([ \t]*){newline} {
+  //-- EOS: blank line: maybe return eos (ignore empty sentences)
   theLine++; theColumn=0;
-  if (lasttyp != TF_EOS) {
-    lasttyp=TF_EOS;
-    return TF_EOS;
+  if (mtoken->tok_type != TokTypeEOS) {
+    mtoken->tok_type=TokTypeEOS;
+    return TokTypeEOS;
   }
 }
 
-^([ \t]*)"%%"([^\r\n]*){newline} {
-  //-- return comments as special tokens
+<TOKEN>^"%%"([^\r\n]*){newline} {
+  //-- COMMENT: return comments as special tokens
   theLine++;
   theColumn = 0;
-  lasttyp = TF_COMMENT;
+  lasttyp = TokTypeComment;
   if (!ignore_comments) {
-    mtoken.clear();
-    mtoken.flavor(TF_COMMENT);
-    mtoken.tok_text = mootTokString((const char *)yytext, yyleng-1);
-    return TF_COMMENT;
+    mtoken->clear();
+    mtoken->toktype(TokTypeComment);
+    mtoken->textAppend((const char *)yytext+2, yyleng-3);
+    return TokTypeComment;
   }
 }
 
-
 <TOKEN>^({tokchar}*){wordchar} {
-  //-- TOKEN: keep only internal whitespace
+  //-- TOKEN-TEXT: keep only internal whitespace
   theColumn += yyleng;
-  mtoken.clear();
-  mtoken.flavor(TF_TOKEN);
-  mtoken.text((const char *)yytext);
-  lasttyp = TF_TEXT;
+  mtoken->clear();
+  mtoken->toktype(TokTypeVanilla);
+  mtoken->text((const char *)yytext, yyleng);
+  lasttyp = LexTypeText;
 }
 
-<TOKEN>{space}*/{eotchar} {
+<TOKEN>{newline} {
+  //-- TOKEN: end-of-token
+  theLine++;
+  theColumn = 0;
+  mtoken->toktype(TokTypeVanilla);
+  lasttyp = TokTypeVanilla;
+  return TokTypeVanilla;
+}
+
+<<EOF>> {
+  //-- EOF: should only happen in TOKEN mode
+  switch (lasttyp) {
+   case LexTypeText:
+   case LexTypeTag:
+   case LexTypeDetails:
+   case LexTypeEOA:
+     on_EOA();
+     lasttyp = TokTypeVanilla;
+     break;
+
+   case TokTypeUnknown:
+   case TokTypeVanilla:
+   case TokTypeComment:
+   case TokTypeUser:
+     lasttyp = TokTypeEOS;
+     break;
+
+   case TokTypeEOS:
+     lasttyp = TokTypeEOF;
+     break;
+
+   case TokTypeEOF:
+     break;
+
+   default:
+     lasttyp = TokTypeEOS;
+     break;
+  }
+  mtoken->toktype((mootTokenType)lasttyp);
+  return lasttyp;;
+}
+
+<TOKEN>{space}*/{eoachar} {
   //-- TOKEN: end-of-token
   theColumn += yyleng;
 
   if (first_analysis_is_best) current_analysis_is_best = true;
   if (ignore_first_analysis)  ignore_current_analysis = true;
 
-  lasttyp = TF_TEXT;
+  lasttyp = LexTypeText;
   BEGIN(SEPARATORS);
 }
 
-<TOKEN><<EOF>> { BEGIN(SEPARATORS); }
+
+%{
+/*--------------------------------------------------------------------
+ * SEPARATORS
+ */
+%}
 
 <SEPARATORS>{tab}({space}*) {
   //-- SEPARATORS: Separator character(s): increment column nicely
   theColumn = (((int)theColumn/8)+1)*8 + (yyleng ? yyleng-1 : 0);
-  lasttyp = TF_TAB;
+  lasttyp = LexTypeEOA;
 }
 <SEPARATORS>""/{wordchar} {
   //-- SEPARATORS: end of separators
   theColumn += yyleng;
   BEGIN(DETAILS);
+  //-- allocate new analysis
+  mtoken->insert(mootToken::Analysis());
+  manalysis = &(mtoken->tok_analyses.back());
 }
-<SEPARATORS>{newline} {
-  //-- SEPARATORS/EOT: reset to initial state : see also <SEPARATORS><<EOF>>
+<SEPARATORS>""/{eotchar} {
+  //-- SEPARATORS/EOT: reset to initial state
   theLine++;
   theColumn = 0;
   BEGIN(TOKEN);
-  //-- return token flag (actual data is in 'mtoken' member)
-  lasttyp = TF_TOKEN;
-  return TF_TOKEN;
 }
 
-<SEPARATORS><<EOF>> {
-  //fprintf(stderr, "<SEPARATORS>EOF: lasttyp=%s\n", mootTokenLexerTypeNames[lasttyp]);
-  switch (lasttyp) {
-   case TF_TEXT:
-     lasttyp = TF_TOKEN;
-     break;
-   case TF_TOKEN:
-   case TF_COMMENT:
-   case TF_NEWLINE:
-     lasttyp = TF_EOS;
-     break;
-   case TF_EOS:
-   case TF_EOF:
-     lasttyp = TF_EOF;
-     break;
-   default:
-     lasttyp = TF_EOS;
-  }
-  //fprintf(stderr, "<SEPARATORS>EOF: returning=%s\n", mootTokenLexerTypeNames[lasttyp]);
-  return lasttyp;
-}
 
+%{
+/*--------------------------------------------------------------------
+ * DETAILS
+ */
+%}
 
 <DETAILS>"["/{tagchar} {
   //-- DETAILS: looks like a tag
   theColumn += yyleng;
-  manalysis.details.append((const char *)yytext);
-  lasttyp = TF_DETAILS;
+  manalysis->details.push_back('[');
+  lasttyp = LexTypeDetails;
   BEGIN(TAG);
 }
 
 <DETAILS>{detchar}+ {
   //-- DETAILS: detail text
   theColumn += yyleng;
-  manalysis.details.append((const char *)yytext);
-  lasttyp = TF_DETAILS;
+  manalysis->details.append((const char *)yytext, yyleng);
+  lasttyp = LexTypeDetails;
 }
 
 <DETAILS>{space}+/{wordchar} {
   //-- DETAILS: internal whitespace: keep it
   theColumn += yyleng;
-  manalysis.details.append((const char *)yytext);
-  lasttyp = TF_DETAILS;
+  manalysis->details.append((const char *)yytext, yyleng);
+  lasttyp = LexTypeDetails;
 }
 
-<DETAILS>"<"([+-]?)[0-9]*(\.?)([0-9]+)">" {
-  //-- DETAILS/COST: add cost to current analysis
-  theColumn += yyleng;
-  moot::mootToken::Cost cost;
-  sscanf((const char *)yytext+1, "%f", &cost);
-  manalysis.cost += cost;
-  lasttyp = TF_COST;
-}
-
-<DETAILS>""/{eotchar} {
-  //-- DETAILS/EOD: add & clear current analysis, if any : see also <DETAILS><<EOF>>
-  //-- add & clear current analysis, if any
-  if (lasttyp != TF_TAB) {
-    //-- set default tag
-    if (manalysis.tag.empty()) {
-      manalysis.tag.swap(manalysis.details);
-      //manalysis.details.clear();
-    } 
-
-    if (ignore_current_analysis) {
-      ignore_current_analysis=false;
-    } else {
-      mtoken.insert(manalysis);
-    }
-
-    //-- set best tag if applicable
-    if (current_analysis_is_best) {
-      mtoken.besttag(manalysis.tag);
-      current_analysis_is_best = false;
-    }
-
-    //-- clear
-    manalysis.clear();
-  }
+<DETAILS>{space}*/{eoachar} {
+  //-- DETAILS/EOA: add & clear current analysis, if any
+  on_EOA();
   BEGIN(SEPARATORS);
 }
-<DETAILS><<EOF>> {
-  //fprintf(stderr, "<DETAILS>EOF : lasttyp=%s\n", mootTokenLexerTypeNames[lasttyp]);
-  //-- add & clear current analysis, if any : see also <DETAILS>""/{eotchar}
-  if (lasttyp != TF_TAB) {
-    //-- set default tag
-    if (manalysis.tag.empty()) {
-      manalysis.tag.swap(manalysis.details);
-      //manalysis.details.clear();
-    } 
 
-    if (ignore_current_analysis) ignore_current_analysis=false;
-    else mtoken.insert(manalysis);
-
-    //-- set best tag if applicable
-    if (current_analysis_is_best) {
-      mtoken.besttag(manalysis.tag);
-      current_analysis_is_best = false;
-    }
-
-    //-- clear
-    manalysis.clear();
-  }
-  //-- return the token NOW
-  BEGIN(TOKEN);
-  lasttyp = TF_TOKEN;
-  return TF_TOKEN;
-}
+%{
+/*--------------------------------------------------------------------
+ * TAG
+ */
+%}
 
 <TAG>{tagchar}+ {
   //-- TAG: tag text
   theColumn += yyleng;
-  manalysis.details.append((const char *)yytext);
-  if (manalysis.tag.empty()) manalysis.tag = (const char *)yytext;
-  lasttyp = TF_TAG;
+  manalysis->details.append((const char *)yytext, yyleng);
+  if (manalysis->tag.empty()) manalysis->tag.assign((const char *)yytext, yyleng);
+  lasttyp = LexTypeTag;
   BEGIN(DETAILS);
 }
 
-<TAG><<EOF>> { BEGIN(DETAILS); }
-
+%{
+/*--------------------------------------------------------------------
+ * UNKNOWN
+ */
+%}
 
 {space}+ {
   /* mostly ignore spaces */
   theColumn += yyleng;
-  lasttyp = TF_IGNORE;
+  //lasttyp = LexTypeIgnore;
 }
 
 . {
@@ -406,87 +406,21 @@ tagchar    [^ \t\n\r\]]
   yycarp("Unrecognized TAG character '%c'", *yytext);
 }
 
-
-<<EOF>> {
-  //fprintf(stderr, "<>EOF: lasttyp=%d\n", lasttyp);
-  switch (lasttyp) {
-   case TF_EOS:
-   case TF_EOF:
-     lasttyp = TF_EOF;
-     break;
-   case TF_NEWLINE:
-     lasttyp = TF_EOS;
-     break;
-   default:
-     lasttyp = TF_EOS;
-  }
-  return lasttyp;
-}
-
 %%
 
+/*----------------------------------------------------------------------
+ * mootTokenLexer helpers
+ */
+void mootTokenLexer::mgl_begin(int stateno) {BEGIN(stateno);}
 
 /*----------------------------------------------------------------------
  * Local Methods for mootTokenLexer
  *----------------------------------------------------------------------*/
-
 void mootTokenLexer::reset(void)
 {
   current_analysis_is_best = false;
+  manalysis = NULL;
+  mtoken_default.clear();
+  lasttyp = moot::TokTypeEOS;
   BEGIN(TOKEN);
-}
-
-
-/*-----------------------------------------------------------------------
- * mootTokenLexer::select_streams(FILE *in, FILE *out)
- *   + hack for non-global yywrap()
- */
-void mootTokenLexer::select_streams(FILE *in, FILE *out)
-{
-  yyin = in;
-  yyout = out;
-  use_string = false;
-
-  //-- black magic from flex(1) manpage
-  if (yy_current_buffer != NULL) { yy_delete_buffer(yy_current_buffer); }
-  yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
-  reset();
-}
-
-/*
- * void mootTokenLexer::select_string(const char *in, FILE *out=stdout)
- */
-void mootTokenLexer::select_string(const char *in, FILE *out) {
-  select_streams(stdin,out);  // flex __really__ wants a real input stream
-
-  // -- string-buffer stuff
-  use_string = true;
-  stringbuf = (char *)in;
-
-  reset();
-}
-
-/*
- * itokbuf_append(text,leng)
- */
-inline void mootTokenLexer::itokbuf_append(char *text, int leng) {
-  if (itokbuf_clear) {
-    itokbuf = (char *)text;
-    itokbuf_clear = false;
-  } else {
-    itokbuf.append((char *)text,leng);
-  }
-}
-
-void mootTokenLexer::yycarp(char *fmt, ...)
-{
-    fprintf(stderr, "mootTokenLexer: ");
-    va_list ap;
-    va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
-    va_end(ap);
-    fprintf(stderr, " in %s %s at line %d, column %d, near `%s'\n",
-            (use_string ? "string" : "file"),
-            (srcname.empty() ? "(null)" : srcname.c_str()),
-            theLine, theColumn, yytext);
 }

@@ -69,6 +69,7 @@ negra*
 *.tt
 *.ttt
 *.out
+*.xml
 
 DWDS
 DWDS-POS

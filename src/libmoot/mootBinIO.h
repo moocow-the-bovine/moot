@@ -23,11 +23,11 @@
  * File: mootBinIO.h
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + PoS tagger for DWDS project : abstract librarian templates
+ *   + moot PoS tagger : abstract templates for binary librarians
  *--------------------------------------------------------------------------*/
 
-#ifndef _moot_BINIO_H
-#define _moot_BINIO_H
+#ifndef _MOOT_BINIO_H
+#define _MOOT_BINIO_H
 
 #include <stdlib.h>
 
@@ -36,37 +36,33 @@
 #include <map>
 #include <set>
 
-/* included in mootTypes.h */
-//#include <hash_map>
-//#include <hash_set>
 #include <mootTypes.h>
-
 #include <mootEnum.h>
-//#include <mootCHMM.h>
+#include <mootIO.h>
 
-#include <mootBinStream.h>
 
-/** Namespace for structured binary stream I/O */
+/** \brief Namespace for structured binary stream I/O */
 namespace mootBinIO {
   using namespace std;
   using namespace moot;
-  using namespace mootBinStream;
+  using namespace mootio;
 
   /*------------------------------------------------------------
    * Generic items
    */
+  /** \brief Binary item I/O template class, used for binary HMM model files */
   template<class T> class Item {
   public:
     /** Load a single item */
-    inline bool load(iBinStream &is, T &x) const
+    inline bool load(mootio::mistream *is, T &x) const
     {
-      return is.getbytes((char *)&x, sizeof(T));
+      return is->read((char *)&x, sizeof(T)) == sizeof(T);
     };
 
     /** Save a single item */
-    inline bool save(oBinStream &os, const T &x) const
+    inline bool save(mootio::mostream *os, const T &x) const
     {
-      return os.putbytes((char *)&x, sizeof(T));
+      return os->write((char *)&x, sizeof(T));
     };
 
     /**
@@ -75,7 +71,7 @@ namespace mootBinIO {
      *  If the saved length is > n, 'x' will be re-allocated.
      *  The new size of the array will be stored in 'n' at completion.
      */
-    inline bool load_n(iBinStream &is, T *&x, size_t &n) const {
+    inline bool load_n(mootio::mistream *is, T *&x, size_t &n) const {
       //-- get saved size
       Item<size_t> size_item;
       size_t saved_size;
@@ -92,40 +88,46 @@ namespace mootBinIO {
       }
 
       //-- read in items
-      if (!is.getbytes((char *)x, sizeof(T)*saved_size)) return false;
+      ByteCount wanted = sizeof(T)*saved_size;
+      if (is->read((char *)x, wanted) != wanted) return false;
       n=saved_size;
       return true;
     };
 
     /**
      * Save a C-array of items.
-     * 'n' should hold the number of items in 'x', it will be stored too.
+     * 'n' should hold the number of items in 'x', it will be
+     * written first.
      */
-    inline bool save_n(oBinStream &os, const T *x, size_t n) const {
+    inline bool save_n(mootio::mostream *os, const T *x, size_t n) const {
       //-- get saved size
       Item<size_t> size_item;
       if (!size_item.save(os, n)) return false;
 
       //-- save items
-      return os.putbytes((char *)x, n*sizeof(T));
+      return os->write((char *)x, n*sizeof(T));
     };
   };
 
   /*------------------------------------------------------------
    * C-strings
    */
+  /** \brief Binary I/O template instantiation for C strings
+   *
+   *  Terminating NULs are loaded/saved too.
+   */
   template<> class Item<char *> {
   public:
     Item<char> charItem;
 
   public:
-    inline bool load(iBinStream &is, char *&x) const
+    inline bool load(mootio::mistream *is, char *&x) const
     {
       size_t len=0;
       return charItem.load_n(is,x,len);
     };
  
-    inline bool save(oBinStream &os, const char *x) const
+    inline bool save(mootio::mostream *os, const char *x) const
     {
       if (x) {
 	size_t len = strlen(x)+1;
@@ -139,33 +141,39 @@ namespace mootBinIO {
   /*------------------------------------------------------------
    * C++ strings
    */
+  /** \brief Binary I/O template instantiation for STL strings
+   *
+   * Terminating NULs are not loaded or saved.
+   */
   template<> class Item<string> {
   public:
-    Item<char *> cstr_item;
+    Item<char> charItem;
   public:
-    inline bool load(iBinStream &is, string &x) const
+    inline bool load(mootio::mistream *is, string &x) const
     {
       char *buf=NULL;
-      bool rc = cstr_item.load(is, buf);
-      if (rc) x = buf;
+      size_t len=0;
+      bool rc = charItem.load_n(is,buf,len);
+      if (rc && len) x.assign(buf,len);
       if (buf) free(buf);
       return rc;
     };
 
-    inline bool save(oBinStream &os, const string &x) const
+    inline bool save(mootio::mostream *os, const string &x) const
     {
-      return cstr_item.save(os, x.c_str());
+      return charItem.save_n(os,x.data(),x.size());
     };
   };
 
   /*------------------------------------------------------------
    * STL: vectors
    */
+  /** \brief Binary I/O template instantiation for STL vector<> */
   template<class ValT> class Item<vector<ValT> > {
   public:
     Item<ValT> val_item;
   public:
-    inline bool load(iBinStream &is, vector<ValT> &x) const
+    inline bool load(mootio::mistream *is, vector<ValT> &x) const
     {
       //-- get saved size
       Item<size_t> size_item;
@@ -184,7 +192,7 @@ namespace mootBinIO {
       return len==0;
     };
 
-    inline bool save(oBinStream &os, const vector<ValT> &x) const
+    inline bool save(mootio::mostream *os, const vector<ValT> &x) const
     {
       //-- save size
       Item<size_t> size_item;
@@ -202,11 +210,12 @@ namespace mootBinIO {
   /*------------------------------------------------------------
    * STL: set<>
    */
+  /** \brief Binary I/O template instantiation for STL set<> */
   template<class ValT> class Item<set<ValT> > {
   public:
     Item<ValT> val_item;
   public:
-    inline bool load(iBinStream &is, set<ValT> &x) const
+    inline bool load(mootio::mistream *is, set<ValT> &x) const
     {
       //-- load size
       Item<size_t> size_item;
@@ -226,7 +235,7 @@ namespace mootBinIO {
       return len==0;
     };
 
-    inline bool save(oBinStream &os, const set<ValT> &x) const
+    inline bool save(mootio::mostream *os, const set<ValT> &x) const
     {
       //-- save size
       Item<size_t> size_item;
@@ -243,11 +252,12 @@ namespace mootBinIO {
   /*------------------------------------------------------------
    * STL: hash_set<>
    */
+  /** \brief Binary I/O template instantiation for STL hash_set<> */
   template<class ValT> class Item<hash_set<ValT> > {
   public:
     Item<ValT> val_item;
   public:
-    inline bool load(iBinStream &is, hash_set<ValT> &x) const
+    inline bool load(mootio::mistream *is, hash_set<ValT> &x) const
     {
       //-- load size
       Item<size_t> size_item;
@@ -267,7 +277,7 @@ namespace mootBinIO {
       return len==0;
     };
 
-    inline bool save(oBinStream &os, const hash_set<ValT> &x) const
+    inline bool save(mootio::mostream *os, const hash_set<ValT> &x) const
     {
       //-- save size
       Item<size_t> size_item;
@@ -285,12 +295,13 @@ namespace mootBinIO {
   /*------------------------------------------------------------
    * STL: map<>
    */
+  /** \brief Binary I/O template instantiation for STL map<> */
   template<class KeyT, class ValT> class Item<map<KeyT,ValT> > {
   public:
     Item<KeyT> key_item;
     Item<ValT> val_item;
   public:
-    inline bool load(iBinStream &is, map<KeyT,ValT> &x) const
+    inline bool load(mootio::mistream *is, map<KeyT,ValT> &x) const
     {
       //-- load size
       Item<size_t> size_item;
@@ -311,7 +322,7 @@ namespace mootBinIO {
       return len==0;
     };
 
-    inline bool save(oBinStream &os, const map<KeyT,ValT> &x) const
+    inline bool save(mootio::mostream *os, const map<KeyT,ValT> &x) const
     {
       //-- save size
       Item<size_t> size_item;
@@ -330,12 +341,13 @@ namespace mootBinIO {
   /*------------------------------------------------------------
    * STL: hash_map<>
    */
+  /** \brief Binary I/O template instantiation for STL hash_map<> */
   template<class KeyT, class ValT> class Item<hash_map<KeyT,ValT> > {
   public:
     Item<KeyT> key_item;
     Item<ValT> val_item;
   public:
-    inline bool load(iBinStream &is, hash_map<KeyT,ValT> &x) const
+    inline bool load(mootio::mistream *is, hash_map<KeyT,ValT> &x) const
     {
       //-- load size
       Item<size_t> size_item;
@@ -357,7 +369,7 @@ namespace mootBinIO {
       return len==0;
     };
 
-    inline bool save(oBinStream &os, const hash_map<KeyT,ValT> &x) const
+    inline bool save(mootio::mostream *os, const hash_map<KeyT,ValT> &x) const
     {
       //-- save size
       Item<size_t> size_item;
@@ -375,12 +387,13 @@ namespace mootBinIO {
   /*------------------------------------------------------------
    * moot types: mootEnum
    */
+  /** \brief Binary I/O template instantiation for mootEnum<> */
   template<class NameT, class HashFunc, class NameEqlFunc>
   class Item<mootEnum<NameT,HashFunc,NameEqlFunc> > {
   public:
     Item<typename mootEnum<NameT,HashFunc,NameEqlFunc>::Id2NameMap> i2n_item;
   public:
-    inline bool load(iBinStream &is, mootEnum<NameT,HashFunc,NameEqlFunc> &x) const
+    inline bool load(mootio::mistream *is, mootEnum<NameT,HashFunc,NameEqlFunc> &x) const
     {
       if (i2n_item.load(is, x.ids2names)) {
 	x.names2ids.resize(x.ids2names.size());
@@ -395,7 +408,7 @@ namespace mootBinIO {
       return false;
     };
 
-    inline bool save(oBinStream &os, const mootEnum<NameT,HashFunc,NameEqlFunc> &x) const
+    inline bool save(mootio::mostream *os, const mootEnum<NameT,HashFunc,NameEqlFunc> &x) const
     {
       return i2n_item.save(os, x.ids2names);
     };
@@ -405,7 +418,7 @@ namespace mootBinIO {
   /*------------------------------------------------------------
    * public typedefs: Generic header information
    */
-  /** Header information struct */
+  /** \brief Header information structure, used for binary HMM model files */
   class HeaderInfo {
   public:
     /** Typedef for a version component */
@@ -458,4 +471,4 @@ namespace mootBinIO {
 }; //-- mootBinIO
 
 
-#endif /* _moot_BINIO_H */
+#endif /* _MOOT_BINIO_H */

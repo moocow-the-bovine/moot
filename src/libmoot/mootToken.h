@@ -29,33 +29,12 @@
 #ifndef _moot_TOKEN_H
 #define _moot_TOKEN_H
 
-#define MOOT_TOKEN_VERSION 1
-#define MOOT_TOKEN_REVISION 0
-
 #include <ctype.h>
 
 #include <list>
+#include <vector>
 #include <set>
 #include <string>
-
-#if defined(__GNUC__)
-# include <float.h>
-
-/** Cost value to use when finding lower bounds in mootToken methods */
-# define MOOT_COST_LB -FLT_MAX
-
-/** Cost value to use when finding upper bounds in mootToken methods */
-# define MOOT_COST_UB +FLT_MAX
-
-#else /* defined(__GNUC__) */
-
-/** Cost value to use when finding lower bounds in mootToken methods */
-# define MOOT_COST_LB -1E+37F
-
-/** Cost value to use when finding upper bounds in mootToken methods */
-# define MOOT_COST_UB +1E+37F
-
-#endif /* defined(__GNUC__) */
 
 /**
  * \def MOOT_TNT_COMPAT
@@ -63,13 +42,6 @@
  */
 #define MOOT_TNT_COMPAT 1
 //#undef MOOT_TNT_COMPAT
-
-/**
- * \def MOOT_TOKEN_INLINE
- * define this to inline mootToken methods
- */
-#define MOOT_TOKEN_INLINE inline
-//#define MOOT_TOKEN_INLINE 
 
 namespace moot {
   using namespace std;
@@ -89,30 +61,24 @@ typedef set<mootTagString> mootTagSet;
 
 
 /*----------------------------------------------------------------------
- * Token Flavors
+ * Basic Token Types
  *----------------------------------------------------------------------*/
-typedef enum {
+enum mootTokenTypeE {
   /* Output token-types */
-  TF_UNKNOWN,   /**< we dunno what it is -- could be anything  */
-  TF_TOKEN,     /**< plain token (+/-besttag,+/-analyses) */
-  TF_COMMENT,   /**< a comment, should be ignored by processing routines */
-  TF_EOS,       /**< end-of-sentence */
-  TF_EOF,       /**< end-of-file */
-  TF_XML,       /**< literal XML text for lossless XML I/O */
-  TF_USER,      /**< user-defined token type: use in conjunction with 'user_data' */
-  /*-- internal native-lexer use only */ 
-  TF_TEXT,      /**< token text (internal use only) */ 
-  TF_TAB,       /**< tabs (internal use only) */ 
-  TF_TAG,       /**< analysis tags (internal use only) */ 
-  TF_DETAILS,   /**< analysis details (internal use only) */ 
-  TF_COST,      /**< analysis costs (internal use only) */ 
-  TF_NEWLINE,   /**< newlines (internal use only) */ 
-  TF_IGNORE,    /**< ignored (internal use only) */ 
-  TF_NFLAVORS   /**< number of flavors (not a flavor itself) */
-} mootTokFlavor;
+  TokTypeUnknown,   /**< we dunno what it is -- could be anything  */
+  TokTypeVanilla,   /**< plain "vanilla" token (+/-besttag,+/-analyses) */
+  TokTypeLibXML,    /**< plain XML token; much like 'Vanilla' */
+  TokTypeXMLRaw,    /**< Raw XML text (for lossless XML I/O) */
+  TokTypeComment,   /**< a comment, should be ignored by processing routines */
+  TokTypeEOS,       /**< end-of-sentence */
+  TokTypeEOF,       /**< end-of-file */
+  TokTypeUser,      /**< user-defined token type: use in conjunction with 'user_data' */
+  NTokTypes         /**< number of token-types (not a type itself) */
+};
+typedef mootTokenTypeE mootTokenType;
 
-/** Useful for debugging token flavors */
-extern const char* mootTokFlavorNames[TF_NFLAVORS];
+/** Useful for debugging token types */
+extern const char* mootTokenTypeNames[NTokTypes];
 
 /*--------------------------------------------------------------------------
  * mootToken
@@ -129,67 +95,78 @@ public:
   /** Type for analysis weights */
   typedef float Cost;
 
-  /** Type for a single morphological analysis */
+  /** \brief Type for a single morphological analysis */
   class Analysis {
   public:
+    /** Type flag */
+    //mootTokenType type;
+
     /** PoS Tag */
     mootTagString tag;
 
     /** Full analysis string (possibly with features) */
     mootTagString details;
 
-    /** "Cost" of this analysis (lower=better) */
-    Cost          cost;
-
     /*--------------------------------------------------
      * Constructor / Destructor
      */
     /** Default constructor */
-    Analysis(const mootToken::Cost my_cost=0.0)
-      : tag(""), details(""), cost(my_cost)
+    Analysis(void)
     {};
 
     /** Constructor given only tag: full analysis defaults to empty */
-    Analysis(const mootTagString &my_tag, const mootToken::Cost my_cost=0.0)
-      : tag(my_tag), details(""), cost(my_cost)
+    Analysis(const mootTagString &my_tag
+	     //, mootTokenType typ=TokTypeVanilla
+	     )
+      : tag(my_tag)
+      //, type(typ)
     {};
 
     /** Constructor given tag and full analysis */
     Analysis(const mootTagString &my_tag,
-	     const mootTagString &my_details,
-	     const Cost my_cost=0.0)
-      : tag(my_tag), details(my_details), cost(my_cost)
+	     const mootTagString &my_details
+	     //, mootTokenType typ=TokTypeVanilla
+	     )
+      : tag(my_tag)
+      , details(my_details)
+      //, type(typ)
     {};
 
     /** Clear this object */
-    MOOT_TOKEN_INLINE void clear(void) {
+    inline void clear(void) {
       tag.clear();
       details.clear();
-      cost = 0.0;
     };
 
+    /** Check for empty analysis*/
+    inline bool empty(void) const {
+      return tag.empty() && details.empty();
+    }
+
     /** Comparsion operator */
-    friend bool operator <(const Analysis &x, const Analysis &y)
+    friend bool operator<(const Analysis &x, const Analysis &y)
     {
       int tcomp = x.tag.compare(y.tag);
-      if (tcomp < 0) return true;
-      else if (tcomp > 0) return false;
-      return (x.cost == y.cost
-	      ? x.details < y.details
-	      : x.cost < y.cost);
+      return (tcomp < 0
+	      ? true
+	      : (tcomp > 0
+		 ? false
+		 : x.details < y.details));
     };
 
     /** Equality operator */
-    friend bool operator ==(const Analysis &x, const Analysis &y)
+    friend bool operator==(const Analysis &x, const Analysis &y)
     {
-      return x.tag == y.tag && x.cost == y.cost && x.details == y.details;
+      return x.tag == y.tag && x.details == y.details;
     }
     
   }; //-- /mootToken::Analysis
 
 
   /** Type for multiple concurrent analyses : tag => set<Analysis> */
-  typedef set<Analysis> AnalysisSet;
+  //typedef set<Analysis> AnalysisSet;
+  //typedef vector<Analysis> Analyses;
+  typedef list<Analysis> Analyses;
 
 public:
   /*---------------------------------------------------------------------*
@@ -198,76 +175,67 @@ public:
 
   /**
    * Token content type.
-   * This should usually be \c TF_TOKEN , but it might
-   * also be \c TF_COMMENT .
    */
-  mootTokFlavor   tok_flavor;
+  mootTokenType   tok_type;
 
   /**
    * Literal token text.
-   * \warning Use the text() method(s) instead of accessing this directly!
    */
   mootTokString   tok_text;
   
   /**
    * Best tag for this token.
-   * \warning Use the besttag() method(s) instead of accessing this directly!
    */
   mootTagString   tok_besttag;
 
   /**
    * Set of possible analyses as a mootToken::AnalysisSet
-   * \warning Use the analyses() method(s) instead of accessing this directly!
    */
-  AnalysisSet     tok_analyses;
-
-  /** Aribtrary user data associated with this token */
-  void           *user_data;
+  Analyses       tok_analyses;
 
 public:
   /*------------------------------------------------------------
    * Constructors / Destructors
    */
   /** Default constructor: empty text, no analyses */
-  mootToken(void)
-    : tok_flavor(TF_TOKEN),
-      //tok_text(""),
-      //tok_besttag(""),
-      user_data(NULL)
-  {
-    //fprintf(stderr, "mootToken::mootToken() called\n");
-  };
+  mootToken(mootTokenType type=TokTypeVanilla)
+    : tok_type(type)
+  {};
 
   /** Constructor given only token text: no analyses */
-  mootToken(const mootTokString &text)
-    : tok_flavor(TF_TOKEN),
-      //tok_text(text),
-      //tok_besttag(""),
-      user_data(NULL)
-  {
-    //fprintf(stderr, "mootToken::mootToken(text=`%s') called\n", text.c_str());
-  };
+  mootToken(const mootTokString &text, mootTokenType type=TokTypeVanilla)
+    : tok_type(type),
+      tok_text(text)
+  {};
 
   /** Constructor given text & analyses */
   mootToken(const mootTokString &text,
-	    const AnalysisSet &analyses)
-    : tok_flavor(TF_TOKEN),
-      tok_text(text), 
-      //tok_besttag(""),
-      tok_analyses(analyses),
-      user_data(NULL)
+	    const Analyses &analyses)
+    : tok_type(TokTypeVanilla),
+      tok_text(text),
+      tok_analyses(analyses)
   {};
 
   /** Constructor given text & analyses & best tag */
   mootToken(const mootTokString &text,
-	    const AnalysisSet &analyses,
+	    const Analyses &analyses,
 	    const mootTagString &besttag)
-    : tok_flavor(TF_TOKEN),
+    : tok_type(TokTypeVanilla),
       tok_text(text),
       tok_besttag(besttag),
-      tok_analyses(analyses),
-      user_data(NULL)
+      tok_analyses(analyses)
   {};
+
+  /** Constructor for text-only tokens from C buffer of known length */
+  /*
+  mootToken(mootTokenType type=TokTypeVanilla, const char *text, size_t len)
+    : tok_type(type),
+      tok_text(text,len)
+  {};
+  */
+
+  /* Destructor */
+  ~mootToken(void) {};
 
   /*------------------------------------------------------------
    * Operators
@@ -276,7 +244,7 @@ public:
   friend bool operator==(const mootToken &x, const mootToken &y)
   {
     return
-      x.tok_flavor == y.tok_flavor
+      x.tok_type == y.tok_type
       && x.tok_text == y.tok_text
       && x.tok_besttag == y.tok_besttag
       && x.tok_analyses == y.tok_analyses;
@@ -296,88 +264,131 @@ public:
    * Manipulators: General
    */
   /** Clear this object (except for user_data) */
-  MOOT_TOKEN_INLINE void clear(void) {
-    tok_flavor = TF_TOKEN;
+  inline void clear(void) {
+    tok_type = TokTypeVanilla;
     tok_text.clear();
-    tok_analyses.clear();
     tok_besttag.clear();
-    //user_data = NULL;
+    tok_analyses.clear();
   };
 
   /*------------------------------------------------------------
    * Manipulators: specific
    */
   /** Get token text */
-  MOOT_TOKEN_INLINE const mootTokString &text(void) const {
+  inline const mootTokString &text(void) const {
     return tok_text;
   };
   /** Set token text */
-  MOOT_TOKEN_INLINE mootTokString &text(const mootTokString &text) {
+  inline mootTokString &text(const mootTokString &text) {
     tok_text = text;
+    return tok_text;
+  }; 
+  /** Set token text */
+  inline mootTokString &text(const char *s, size_t len) {
+    tok_text.assign(s,len);
+    return tok_text;
+  }; 
+  /** Append to token text, returns new token-text */
+  inline mootTokString &textAppend(const mootTokString &text) {
+    tok_text.append(text);
+    return tok_text;
+  };
+  /** Append to token text, returns new token-text */
+  inline mootTokString &textAppend(const char *s, size_t len) {
+    tok_text.append(s, len);
     return tok_text;
   };
 
   /** Get best tag */
-  MOOT_TOKEN_INLINE const mootTagString &besttag(void) const {
+  inline const mootTagString &besttag(void) const {
     return tok_besttag;
   };
   /** Set best tag */
-  MOOT_TOKEN_INLINE mootTagString &besttag(const mootTagString &besttag) {
+  inline mootTagString &besttag(const mootTagString &besttag) {
     tok_besttag = besttag;
     return tok_besttag;
   };
+  /** Append to 'besttag' text, returns new text */
+  inline mootTagString &besttagAppend(const mootTagString &text) {
+    tok_besttag.append(text);
+    return tok_besttag;
+  };
+  /** Append to 'besttag' text, returns new text */
+  inline mootTagString &besttagAppend(const char *s, size_t len) {
+    tok_besttag.append(s, len);
+    return tok_besttag;
+  };
 
-  /** Get token flavor */
-  MOOT_TOKEN_INLINE mootTokFlavor flavor(void) const { return tok_flavor; }
-  /** Set token flavor */
-  MOOT_TOKEN_INLINE mootTokFlavor flavor(const mootTokFlavor flavr) {
-    tok_flavor = flavr;
-    return tok_flavor;
+  /** Get token type */
+  inline mootTokenType toktype(void) const { return tok_type; }
+  /** Set token type */
+  inline mootTokenType toktype(const mootTokenType type) {
+    tok_type = type;
+    return tok_type;
   };
 
   /** Get token analyses */
-  MOOT_TOKEN_INLINE const AnalysisSet &analyses(void) const {
-    return tok_analyses;
-  };
+  inline const Analyses &analyses(void) const { return tok_analyses; };
   /** Set token analyses */
-  MOOT_TOKEN_INLINE const AnalysisSet &analyses(const AnalysisSet &analyses)
-  {
+  inline const Analyses &analyses(const Analyses &analyses) {
     tok_analyses = analyses;
     return tok_analyses;
   };
   /** Insert an analysis */
-  MOOT_TOKEN_INLINE void insert(const Analysis &analysis)
+  inline void insert(const Analysis &analysis)
   {
-    tok_analyses.insert(analysis);
+    //tok_analyses.insert(analysis);
+    tok_analyses.push_back(analysis);
+  };
+  /** Insert a new analysis */
+  inline void insert(const mootTagString &tag, const mootTagString &details)
+  {
+    //insert(Analysis(tag,details));
+    tok_analyses.push_back(Analysis());
+    tok_analyses.back().tag = tag;
+    tok_analyses.back().details = details;
+  };
+  /** Insert a new analysis, C-style */
+  inline void insert(const char *tag, const char *details)
+  {
+    //insert(Analysis(tag,details));
+    tok_analyses.push_back(Analysis());
+    tok_analyses.back().tag = tag;
+    tok_analyses.back().details = details;
+  };
+  /** Test presence of an analysis for 'tag' */
+  inline bool has_analysis_for_tag(const mootTagString &tag) const
+  {
+    for (Analyses::const_iterator asi = tok_analyses.begin();
+	 asi != tok_analyses.end();
+	 asi++)
+      {
+	if (asi->tag == tag) return true;
+      }
+    return false;
   };
   /** Remove an analysis */
-  MOOT_TOKEN_INLINE void erase(const Analysis &analysis)
+  inline void erase(const Analysis &analysis)
   {
-    tok_analyses.erase(analysis);
+    for (Analyses::iterator asi = tok_analyses.begin();
+	 asi != tok_analyses.end();
+	 )
+      {
+	if (*asi == analysis) tok_analyses.erase(asi);
+	else asi++;
+      }
   };
   /** Prune analyses, retaining only those for 'besttag' */
-  MOOT_TOKEN_INLINE void prune(void)
+  inline void prune(void)
   {
-    Analysis bound(tok_besttag,MOOT_COST_LB);
-    tok_analyses.erase(tok_analyses.begin(),
-		       tok_analyses.lower_bound(bound));
-    bound.cost = MOOT_COST_UB;
-    tok_analyses.erase(tok_analyses.upper_bound(bound),
-		       tok_analyses.end());
+    for (Analyses::iterator asi = tok_analyses.begin();
+	 asi != tok_analyses.end();
+	 )
+      {
+	if (asi->tag != tok_besttag) tok_analyses.erase(asi);
+	else asi++;
+      }
   };
-
-  /** Find first analysis (if any) whose tag is <= tag */
-  MOOT_TOKEN_INLINE AnalysisSet::const_iterator lower_bound(const mootTagString &tag) const
-  {
-    return tok_analyses.lower_bound(Analysis(tag,MOOT_COST_LB));
-  };
-  /** Find first analysis (if any) whose tag is > tag */
-  MOOT_TOKEN_INLINE AnalysisSet::const_iterator upper_bound(const mootTagString &tag) const
-  {
-    return tok_analyses.upper_bound(Analysis(tag,MOOT_COST_UB));
-  };
-
- 
 
   /*------------------------------------------------------------
    * Compatibility
@@ -388,7 +399,7 @@ public:
    *
    * \warning current analysis-set is NOT cleared by this method.
    */
-  MOOT_TOKEN_INLINE void tokImport(const mootTokString *src_toktext=NULL,
+  inline void tokImport(const mootTokString *src_toktext=NULL,
 			const mootTagSet    *src_tagset=NULL)
   {
     if (src_toktext) tok_text = *src_toktext;
@@ -397,7 +408,7 @@ public:
 	   tsi != src_tagset->end();
 	   tsi++)
 	{
-	  tok_analyses.insert(Analysis(*tsi));
+	  insert(Analysis(*tsi));
 	}
     }
   };
@@ -412,16 +423,16 @@ public:
 
    * \warning argument tagset is NOT cleared by this method.
    */
-  MOOT_TOKEN_INLINE void tokExport(mootTokString *dst_toktext=NULL,
+  inline void tokExport(mootTokString *dst_toktext=NULL,
 			mootTagSet *dst_tagset=NULL,
 			bool want_besttag_in_tagset = true) const
   {
     if (dst_toktext) *dst_toktext = tok_text;
     if (dst_tagset) {
-      for (AnalysisSet::const_iterator asi = tok_analyses.begin();
+      for (Analyses::const_iterator asi = tok_analyses.begin();
 	   asi != tok_analyses.end();
-	   //asi++
-	   asi = upper_bound(asi->tag)
+	   asi++
+	     //asi = upper_bound(asi->tag)
 	   )
 	{
 	  dst_tagset->insert(asi->tag);
@@ -438,10 +449,11 @@ public:
  * mootSentence
  *--------------------------------------------------------------------------*/
 
-/**
- * Sentences are just lists of mootToken objects
- */
+/** Sentences are just lists of mootToken objects */
 typedef list<mootToken> mootSentence;
+
+/** Sentences are just vectors of mootToken objects */
+//typedef vector<mootToken> mootSentence;
 
 /*----------------------------------------------------------------------
  * Pattern-based Typification
@@ -449,22 +461,22 @@ typedef list<mootToken> mootSentence;
 
 /** Enum for TnT-style token typification */
 typedef enum {
-  TokTypeAlpha,      /**< (Mostly) alphabetic token: "foo", "bar", "foo2bar" */
-  TokTypeCard,       /**< @CARD: Digits-only: "42" */
-  TokTypeCardPunct,  /**< @CARDPUNCT: Digits single-char punctuation suffix: "42." */
-  TokTypeCardSuffix, /**< @CARDSUFFIX: Digits with (almost any) suffix: "42nd" */
-  TokTypeCardSeps,   /**< @CARDEPS: Digits with interpunctuation: "420.24/7" */
-  TokTypeUnknown,    /**< @UNKNOWN: Special "Unknown" token-type */
-  //TokTypeSpecial,    /* A literal '@CARD', '@CARDPUNCT', etc. */
-  NTokTypes          /**< Not really a token-type */
-} TokenType;
+  TokFlavorAlpha,      /**< (Mostly) alphabetic token: "foo", "bar", "foo2bar" */
+  TokFlavorCard,       /**< @CARD: Digits-only: "42" */
+  TokFlavorCardPunct,  /**< @CARDPUNCT: Digits single-char punctuation suffix: "42." */
+  TokFlavorCardSuffix, /**< @CARDSUFFIX: Digits with (almost any) suffix: "42nd" */
+  TokFlavorCardSeps,   /**< @CARDEPS: Digits with interpunctuation: "420.24/7" */
+  TokFlavorUnknown,    /**< @UNKNOWN: Special "Unknown" token-type */
+  //TokFlavorSpecial,    /* A literal '@CARD', '@CARDPUNCT', etc. */
+  NTokFlavors          /**< Not really a token-type */
+} mootTokenFlavor;
 
 
 /** Convert token-types to symbolic names */
-extern const char *TokenTypeNames[NTokTypes];
+extern const char *mootTokenFlavorNames[NTokFlavors];
 
 /** TnT compatibility hack */
-inline bool tok2type_isCardPunctChar(const char c) {
+inline bool tokenFlavor_isCardPunctChar(const char c) {
   return
 #if !defined(MOOT_TNT_COMPAT)
     (ispunct(c));             //-- This is the "right" way to do it
@@ -474,28 +486,28 @@ inline bool tok2type_isCardPunctChar(const char c) {
 };
 
 /** TnT compatibility hack */
-inline bool tok2type_isCardSuffixChar(const char c) {
-  //bool answer = !tok2type_isCardPunctChar(c);
+inline bool tokenFlavor_isCardSuffixChar(const char c) {
+  //bool answer = !tokenFlavor_isCardPunctChar(c);
   //bool answer = !ispunct(c);
-  //fprintf(stderr, "tok2type_isCardSuffixChar(%c)=%d\n", c, answer);
+  //fprintf(stderr, "tokenFlavor_isCardSuffixChar(%c)=%d\n", c, answer);
   //return answer;
   return true;
 };
 
 /** Get the TokenType for a given token */
-inline TokenType token2type(const mootTokString &token)
+inline mootTokenFlavor tokenFlavor(const mootTokString &token)
 {
   mootTokString::const_iterator ti = token.begin();
   bool leading_punct = false;
 
-  if (ti==token.end()) return TokTypeAlpha;
-  else if (tok2type_isCardPunctChar(*ti)) {
+  if (ti==token.end()) return TokFlavorAlpha;
+  else if (tokenFlavor_isCardPunctChar(*ti)) {
     leading_punct = true;
     ti++;
   }
   
   if (!isdigit(*ti))
-    return TokTypeAlpha;
+    return TokFlavorAlpha;
     
   //-- ^[:digit:]
   for (ti++; ti != token.end() && isdigit(*ti); ti++) {;}  //-- find first non-digit
@@ -503,24 +515,24 @@ inline TokenType token2type(const mootTokString &token)
   
   if (ti == token.end()) {
     //-- ^([:digit:]+)$
-    if (!leading_punct) return TokTypeCard;
-    else return TokTypeCardSeps;
+    if (!leading_punct) return TokFlavorCard;
+    else return TokFlavorCardSeps;
   }
 
-  else if (tok2type_isCardPunctChar(*ti)) {
+  else if (tokenFlavor_isCardPunctChar(*ti)) {
     //-- ^([:digit:]+)([:CardPunct:])
 
     if (++ti == token.end())
       //-- ^([:digit:]+)([:CardPunct:])$
-      return TokTypeCardPunct;
+      return TokFlavorCardPunct;
 
-    else if (isdigit(*ti)  || tok2type_isCardPunctChar(*ti)) {
+    else if (isdigit(*ti)  || tokenFlavor_isCardPunctChar(*ti)) {
       //-- ^([:digit:]+)([:CardPunct:])([:digit:])
-      for (ti++; ti != token.end() && (isdigit(*ti) || tok2type_isCardPunctChar(*ti)); ti++) {;}
+      for (ti++; ti != token.end() && (isdigit(*ti) || tokenFlavor_isCardPunctChar(*ti)); ti++) {;}
       //-- ^([:digit:]+)([:CardPunct:])([[:digit:][:CardPunct:]]+)
       if (ti == token.end())
 	//-- ^([:digit:]+)([:CardPunct:])([[:digit:]|[:CardPunct:]]+)$
-	return TokTypeCardSeps;
+	return TokFlavorCardSeps;
     }
   }
 
@@ -531,17 +543,17 @@ inline TokenType token2type(const mootTokString &token)
 
   if (ti == token.end())
     //-- ^([:digit:]+)([[:digit:][:CardPunct]]*)([^[:digit:][:CardPunct:]])(.{0,3})$
-    return TokTypeCardSuffix;
+    return TokFlavorCardSuffix;
 
 #else // !defined(MOOT_TNT_COMPAT)
   //-- allow suffixes of arbitrary length
-  //for ( ; ti != token.end() && tok2type_isCardSuffixChar(*ti); ti++) {;}
+  //for ( ; ti != token.end() && tokenFlavor_isCardSuffixChar(*ti); ti++) {;}
   //-- ^([:digit:]+)([[:digit:][:CardPunct]]*)(([^[:digit:][:CardPunct:]]+)?)([:CardSuffixChar:]*)
-  return TokTypeCardSuffix;
+  return TokFlavorCardSuffix;
 
 #endif // MOOT_TNT_COMPAT
   
-  return TokTypeAlpha;
+  return TokFlavorAlpha;
 };
 
 

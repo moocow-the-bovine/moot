@@ -232,7 +232,7 @@ int read();
  * Rules
  *----------------------------------------------------------------------*/
 #include "mootLexfreqsLexer.h"
-#line 111 "mootLexfreqsLexer.ll"
+#line 96 "mootLexfreqsLexer.ll"
 #line 196 "/usr/local/share/flex++bison++/flexskel.cc"
 
 #define yy___text YY_mootLexfreqsLexer_TEXT
@@ -496,7 +496,7 @@ static YY_CHAR *yy_last_accepting_cpos;
 #if YY_mootLexfreqsLexer_DEBUG != 0
 static const short int yy_rule_linenum[9] =
     {   0,
-      113,  118,  123,  130,  138,  145,  145,  155
+       98,  103,  108,  115,  123,  130,  130,  140
     } ;
 
 #endif
@@ -641,21 +641,21 @@ do_action:      /* this label is used only to access EOF actions */
 	    goto yy_find_action;
 
 case 1:
-#line 113 "mootLexfreqsLexer.ll"
+#line 98 "mootLexfreqsLexer.ll"
 {
   // -- ignore leading whitespace
   theColumn += yyleng;
 }
 	YY_BREAK
 case 2:
-#line 118 "mootLexfreqsLexer.ll"
+#line 103 "mootLexfreqsLexer.ll"
 {
    // -- ignore comments
    theColumn += yyleng;
 }
 	YY_BREAK
 case 3:
-#line 123 "mootLexfreqsLexer.ll"
+#line 108 "mootLexfreqsLexer.ll"
 {
   // -- tab: return the current token-buffer
   //theColumn += yyleng+7; // -- interpret tab as 8 spaces
@@ -664,7 +664,7 @@ case 3:
 }
 	YY_BREAK
 case 4:
-#line 130 "mootLexfreqsLexer.ll"
+#line 115 "mootLexfreqsLexer.ll"
 {
   // -- count : return it
   //theLine++; theColumn = 0;
@@ -674,7 +674,7 @@ case 4:
 }
 	YY_BREAK
 case 5:
-#line 138 "mootLexfreqsLexer.ll"
+#line 123 "mootLexfreqsLexer.ll"
 {
   // -- any other text: append to the token-buffer
   theColumn += yyleng;
@@ -683,7 +683,7 @@ case 5:
 }
 	YY_BREAK
 case 6:
-#line 145 "mootLexfreqsLexer.ll"
+#line 130 "mootLexfreqsLexer.ll"
 {
   // -- newlines : ignore
   theLine++; theColumn = 0;
@@ -691,13 +691,13 @@ case 6:
 }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 151 "mootLexfreqsLexer.ll"
+#line 136 "mootLexfreqsLexer.ll"
 {
   return 0;
 }
 	YY_BREAK
 case 8:
-#line 155 "mootLexfreqsLexer.ll"
+#line 140 "mootLexfreqsLexer.ll"
 {
   // -- huh? -- just ignore it!
   theColumn += yyleng;
@@ -706,7 +706,7 @@ case 8:
 }
 	YY_BREAK
 case 9:
-#line 162 "mootLexfreqsLexer.ll"
+#line 147 "mootLexfreqsLexer.ll"
 ECHO;
 	YY_BREAK
 #line 463 "/usr/local/share/flex++bison++/flexskel.cc"
@@ -1301,7 +1301,7 @@ void YY_mootLexfreqsLexer_CLASS::YY_mootLexfreqsLexer_INIT_BUFFER( YY_BUFFER_STA
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 162 "mootLexfreqsLexer.ll"
+#line 147 "mootLexfreqsLexer.ll"
 
 
 // -- co-exist with BumbleBee 'clex.h'
@@ -1314,41 +1314,4 @@ void YY_mootLexfreqsLexer_CLASS::YY_mootLexfreqsLexer_INIT_BUFFER( YY_BUFFER_STA
 /*----------------------------------------------------------------------
  * Local Methods for mootLexfreqsLexer
  *----------------------------------------------------------------------*/
-
-/*
- * void mootLexfreqsLexer::select_streams(FILE *in, FILE *out)
- */
-void mootLexfreqsLexer::select_streams(FILE *in, FILE *out) {
-  yyin = in;
-  yyout = out;
-  use_string = false;
-
-  // -- black magic from flex(1) manpage
-  if (yy_current_buffer != NULL) { yy_delete_buffer(yy_current_buffer); }
-  yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
-  BEGIN(INITIAL);
-}
-
-/*
- * void mootLexfreqsLexer::select_string(const char *in, FILE *out=stdout)
- */
-void mootLexfreqsLexer::select_string(const char *in, FILE *out) {
-  select_streams(stdin,out);  // flex __really__ wants a real input stream
-
-  // -- string-buffer stuff
-  use_string = true;
-  stringbuf = (char *)in;
-}
-
-
-/*
- * tokbuf_append(text,leng)
- */
-inline void mootLexfreqsLexer::tokbuf_append(char *text, int leng) {
-  if (tokbuf_clear) {
-    tokbuf = (char *)text;
-    tokbuf_clear = false;
-  } else {
-    tokbuf.append((char *)text,leng);
-  }
-}
+void mootLexfreqsLexer::mgl_begin(int stateno) {BEGIN(stateno);}

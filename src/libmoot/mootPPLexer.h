@@ -53,22 +53,29 @@
 
 
 /* % here is the declaration from section1 %header{  */ 
-#line 34 "mootPPLexer.ll"
+#line 33 "mootPPLexer.ll"
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
 /*!
  * \class mootPPLexer
- * \brief Flex++ lexer for 'dwdspp' raw-text preprocessor:
+ * \brief Flex++ lexer for 'mootpp' raw-text preprocessor:
  * Does rudimentary end-of-sentence and abbreviation recognition,
- * and filters out XML markup.
+ * and filters out (most) XML markup.
  */
 
-//#include <string>
-#include <mootTypes.h>
-#line 53 "mootPPLexer.ll"
+#include <string>
+#include <mootGenericLexer.h>
+using namespace moot;
+#line 48 "mootPPLexer.ll"
 #define YY_mootPPLexer_CLASS  mootPPLexer
-#line 54 "mootPPLexer.ll"
+#line 50 "mootPPLexer.ll"
+#define YY_mootPPLexer_INHERIT  \
+  : public GenericLexer
+#line 53 "mootPPLexer.ll"
+#define YY_mootPPLexer_INPUT_CODE  \
+  return moot::GenericLexer::yyinput(buffer,result,max_size);
+#line 56 "mootPPLexer.ll"
 #define YY_mootPPLexer_MEMBERS  \
   public: \
   /* -- public typedefs */\
@@ -77,15 +84,13 @@
     PPEOF, \
     UNKNOWN, \
     EOS, \
-    START_XML_TAG, \
-    END_XML_TAG, \
+    XML_START_TAG, \
+    XML_END_TAG, \
+    XML_ENTITY, \
     WORD, \
-    ABBREV, \
-    HYPHWORD, \
     INTEGER, \
     FLOAT, \
     PUNCT, \
-    DATE \
   } TokenType; \
   \
   public: \
@@ -95,23 +100,32 @@
     /** number of tokens processed (for verbose mode) */\
     unsigned int ntokens; \
     /** output sentence separator */ \
-    moot::mootTagString output_sentence_separator; \
+    std::string output_sentence_separator; \
     /** output token separator */ \
-    moot::mootTagString output_token_separator; \
+    std::string output_token_separator; \
     \
-    /* -- local methods */ \
-    /** preprocess a C-stream */\
-    bool tokenize_stream(FILE *in=stdin, FILE *out=stdout); \
-    /** hack for non-global yywrap() */\
-    void step_streams(FILE *in, FILE *out);\
     /** make g++ happy */\
-    virtual ~mootPPLexer(void) {};
-#line 92 "mootPPLexer.ll"
-#define YY_mootPPLexer_CONSTRUCTOR_CODE  \
-  ntokens = 0; \
-  output_sentence_separator = "\n\n"; \
-  output_token_separator = "\n";
-#line 130 "mootPPLexer.ll"
+    virtual ~mootPPLexer(void) {}; \
+    \
+  /** mootGenericLexer requirements */ \
+  virtual void **mgl_yy_current_buffer_p(void) \
+                 {return (void**)(&yy_current_buffer);};\
+  virtual void  *mgl_yy_create_buffer(int size, FILE *unused=stdin) \
+                 {return (void*)(yy_create_buffer(unused,size));};\
+  virtual void   mgl_yy_init_buffer(void *buf, FILE *unused=stdin) \
+                 {yy_init_buffer((YY_BUFFER_STATE)buf,unused);};\
+  virtual void   mgl_yy_delete_buffer(void *buf) \
+                 {yy_delete_buffer((YY_BUFFER_STATE)buf);};\
+  virtual void   mgl_yy_switch_to_buffer(void *buf) \
+                 {yy_switch_to_buffer((YY_BUFFER_STATE)buf);};\
+  virtual void   mgl_begin(int stateno);
+#line 100 "mootPPLexer.ll"
+#define YY_mootPPLexer_CONSTRUCTOR_INIT  : \
+  GenericLexer("mootPPLexer"), \
+  ntokens(0), \
+  output_sentence_separator("\n\n"), \
+  output_token_separator("\n")
+#line 125 "mootPPLexer.ll"
 #line 52 "/usr/local/share/flex++bison++/flexskel.h"
 
 
@@ -363,7 +377,7 @@ class YY_mootPPLexer_CLASS YY_mootPPLexer_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 206 "mootPPLexer.ll"
+#line 180 "mootPPLexer.ll"
 #endif
 #line 302 "/usr/local/share/flex++bison++/flexskel.h"
 

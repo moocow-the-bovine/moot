@@ -26,44 +26,26 @@
  *   + moocow's PoS tagger : useful utilities
  *--------------------------------------------------------------------------*/
 
-#include "mootUtils.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <errno.h>
 
-
-#define CMDUTIL_CHURN_DEFAULT_BUFSIZE 2048
-
-extern "C" int getline(char **, size_t *, FILE *);
-
+#include <mootUtils.h>
+#include <mootIO.h>
+#include <mootCIO.h>
 
 namespace moot {
-
-/*--------------------------------------------------------------------
- * Global utility functions
- *---------------------------------------------------------------------*/
-bool file_exists(const char *filename)
-{
-  FILE *f = fopen(filename, "r");
-  if (f) {
-    fclose(f);
-    return true;
-  }
-  return false;
-}
-
-string unextend(const char *filename)
-{
-  string fn = filename;
-  fn.erase(fn.rfind('.'));
-  return fn;
-}
+  using namespace std;
 
 /*----------------------------------------------------------------------
- * parse_doubles
- *----------------------------------------------------------------------*/
+ * String Utilities
+ *---------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------
+ * String Utilities: parse_doubles()
+ */
 bool moot_parse_doubles(char *str, double *dbls, size_t ndbls)
 {
   size_t i;
@@ -78,8 +60,122 @@ bool moot_parse_doubles(char *str, double *dbls, size_t ndbls)
 }
 
 
+/*----------------------------------------------------------------------
+ * String Utilities: normalize_ws()
+ */
+void moot_normalize_ws(const char *buf,
+		       size_t len,
+		       std::string &out,
+		       bool trim_left,
+		       bool trim_right)
+{
+  size_t i, j;     //-- begin-, end-markers for relevant substrings: buf[i..j(
+  char sp = ' ';
+  out.reserve(out.size()+len);
+  for (i = 0; i < len; i = j) {
+    if (isspace(buf[i])) {
+      //-- whitespace substring: (maybe) append single space
+      for (j = i+1; j < len && isspace(buf[j]); j++) ;
+      if ((i != 0 || !trim_left) && (j != len || !trim_right)) {
+	out.push_back(sp); //-- what the?
+      }
+    } else {
+      //-- Non-whitespace substring: append substring in one swell foop
+      for (j = i+1; j < len && !isspace(buf[j]); j++) ;
+      out.append(buf+i, j-i);
+    }
+  }
+}
+
+/*----------------------------------------------------------------------
+ * String Utilities: normalize_ws()
+ */
+void moot_normalize_ws(const std::string &in,
+		       std::string &out,
+		       bool trim_left,
+		       bool trim_right)
+{
+  //-- begin-, end-markers for relevant substrings: in[i..j(
+  string::const_iterator i,j;
+  for (i = in.begin(); i < in.end(); i++) {
+    if (isspace(*i)) {
+      //-- whitespace substring: (maybe) append single space
+      for (j = i+1; j != in.end() && isspace(*j); j++) ;
+      if ((i != in.begin()    || !trim_left)
+	  && (j != in.end()-1 || !trim_right)) {
+	out.push_back(' ');
+      }
+    } else {
+      //-- Non-whitespace substring: append substring in one swell foop
+      for (j = i+1; j != in.end() && !isspace(*j); j++) ;
+      out.append(i,j);
+    }
+  }
+}
+
+/*----------------------------------------------------------------------
+ * String Utilities: remove_newlines(): C
+ */
+//(inlined)
+
+/*----------------------------------------------------------------------
+ * String Utilities: remove_newlines(): STL
+ */
+//(inlined)  
+
+/*----------------------------------------------------------------------
+ * String Utilities: moot_strtok()
+ */
+void moot_strtok(const std::string &s,
+		 const std::string &delim,
+		 std::list<std::string> &out)
+{
+  out.clear();
+  size_t beg, end;
+  for (beg = s.find_first_not_of(delim,0)   , end = s.find_first_of(delim,beg);
+       beg < s.size();
+       beg = s.find_first_not_of(delim,end) , end = s.find_first_of(delim,beg))
+    {
+      out.push_back(string());
+      out.back().assign(s,beg,end-beg);
+    }
+}
+
+
+/*--------------------------------------------------------------------
+ * Named File Utilities
+ *---------------------------------------------------------------------*/
+
+/*------------------------------------------------------
+ * Named File Utilities : moot_file_exists
+ */
+bool moot_file_exists(const char *filename)
+{
+  FILE *f = fopen(filename, "r");
+  if (f) {
+    fclose(f);
+    return true;
+  }
+  return false;
+}
+
+/*------------------------------------------------------
+ * Named File Utilities : moot_unextend
+ */
+std::string moot_unextend(const char *filename)
+{
+  string fn = filename;
+  fn.erase(fn.rfind('.'));
+  return fn;
+}
+
+/*------------------------------------------------------
+ * Named File Utilities : extension
+ */
+//(inlined)
+
 /*--------------------------------------------------------------------------
- * utilities: parse_model_name()
+ * Named File utilities: parse_model_name()
  */
 bool hmm_parse_model_name(const string &modelname,
 			  string &binfile,
@@ -87,7 +183,7 @@ bool hmm_parse_model_name(const string &modelname,
 			  string &ngfile,
 			  string &lcfile)
 {
-  if (file_exists(modelname.c_str())) {
+  if (moot_file_exists(modelname.c_str())) {
     binfile = modelname;
     lexfile.clear();
     ngfile.clear();
@@ -102,7 +198,7 @@ bool hmm_parse_model_name(const string &modelname,
 }
 
 /*--------------------------------------------------------------------------
- * utilities: parse_model_name_text()
+ * Named File utilities: parse_model_name_text()
  */
 bool hmm_parse_model_name_text(const string &modelname,
 			       string &lexfile,
@@ -132,212 +228,125 @@ bool hmm_parse_model_name_text(const string &modelname,
     //-- no commas: expand modelname as basename
     lexfile = modelname;
     lexfile.append(".lex");
-    //if (!file_exists(lexfile.c_str())) lexfile.clear();  //-- not here: (used for training!)
+    //if (!moot_file_exists(lexfile.c_str())) lexfile.clear();  //-- not here: (used for training!)
 
     ngfile = modelname;
     ngfile.append(".123");
-    //if (!file_exists(ngfile.c_str())) ngfile.clear(); //-- not here: (used for training!)
+    //if (!moot_file_exists(ngfile.c_str())) ngfile.clear(); //-- not here: (used for training!)
 
     lcfile = modelname;
     lcfile.append(".clx");
-    //if (!file_exists(lcfile.c_str())) lcfile.clear(); //-- not here: (used for training!)
+    //if (!moot_file_exists(lcfile.c_str())) lcfile.clear(); //-- not here: (used for training!)
   }
 
   return !(lexfile.empty() && ngfile.empty() && lcfile.empty());
 }
 
-
-
-/*----------------------------------------------------------------------
- * cmdutil_file_info
- *----------------------------------------------------------------------*/
-// cmdutil_file_info::cmdutil_file_info(name,file);
-cmdutil_file_info::cmdutil_file_info(char *myname, FILE *myfile)
-{
-  name = myname;
-  file = myfile;
-}
-
-// cmdutil_file_info::~cmdutil_file_info();
-cmdutil_file_info::~cmdutil_file_info()
-{
-  //if (name) free(name);
-  name = NULL;
-  file = NULL;
-}
-
-
-// FILE *cmdutil_file_info::open(mode="r")
-FILE *cmdutil_file_info::open(const char *mode)
-{
-  if (file) close();
-  if (!name) {
-    errno = ENOSTR;
-    return NULL;
-  }
-  if (strcmp(name,"<stdin>") == 0) {
-    file = stdin;
-  } else if (strcmp(name,"<stdout>") == 0) {
-    file = stdout;
-  } else if (strcmp(name,"<stderr>") == 0) {
-    file = stderr;
-  } else {
-    // normal filename
-    file = fopen(name, mode);
-  }
-  return file;
-}
-
-// int cmdutil_file_info::close()
-int cmdutil_file_info::close() {
-  int i;
-  if (!file) {
-    // allow multiple close()s on one file
-    return 0;
-  }
-  else if (file == stdin || file == stdout || file == stderr) {
-    // dont' close the standard streams
-    file = NULL;
-    return 0;
-  }
-  i = fclose(file);
-  file = NULL;
-  return i;
-}
-
-
 /*----------------------------------------------------------------------
  * cmdutil_file_churner
  *----------------------------------------------------------------------*/
 
-// cmdutil_file_churner::cmdutil_file_churner(progname, inputs, ninputs, use_list);
-cmdutil_file_churner::cmdutil_file_churner(char *my_progname,
-					   char **my_inputs,
-					   int  my_ninputs,
-					   bool my_use_list)
-{
-  // -- public data
-  progname = my_progname;
-  inputs = my_inputs;
-  ninputs = my_ninputs;
-  use_list = my_use_list;
-
-  // -- private data
-  linebuf = (char *)malloc(CMDUTIL_CHURN_DEFAULT_BUFSIZE);
-  lbsize = CMDUTIL_CHURN_DEFAULT_BUFSIZE-1;
-}
-
-
-// cmdutil_file_churner::~cmdutil_file_churner();
-cmdutil_file_churner::~cmdutil_file_churner()
-{
-  // -- public data
-
-  // -- private data
-  if (linebuf) free(linebuf);
-  linebuf = NULL;
-}
 
 /*
  * file = cmdutil_file_churner::first_input_file();
  *   + get first input file
  */
 FILE *cmdutil_file_churner::first_input_file() {
-  if (use_list) {
-    // -- args/inputs are file-LISTS
-    if (ninputs <= 0) {
-      // -- file-list on stdin
-      list.name = "<stdin>";
-    } else {
-      // -- file-list(s) given in inputs[]
-      list.name = inputs[0];
-    }
-    // -- sanity check
-    if (!list.open("r")) {
-      fprintf(stderr,"%s: open failed for input list-file '%s': %s\n",
-	      progname, list.name, strerror(errno));
-      exit(1);
-    }
-
-    // -- read next input filename from list-file
-    while (getline(&linebuf, &lbsize, list.file) == -1) {
-      if (feof(list.file)) {
-	if (!next_list_file()) return NULL;
-      } else {
-	fprintf(stderr, "%s: Error reading input-list-file '%s': %s\n",
-		progname, list.name, strerror(errno));
-	exit(1);
-      }
-    }
-
-    in.name = linebuf;
-    in.name[strlen(in.name)-1] = '\0';  // eliminate trailing newline
-    // -- check for stdin
-    if (strcmp(in.name, "-") == 0) in.name = "<stdin>";
-
-    if (!in.open("r")) {
-      fprintf(stderr, "%s: open failed for input-file '%s': %s\n",
-	      progname, in.name, strerror(errno));
-      exit(1);
-    }
-    return in.file;
-  }
-
-  // -- args/inputs are file-NAMES
-  if (ninputs <= 0) {
-    // -- read from stdin
-    in.name = "<stdin>";
-  } else {
-    // -- read from user-specified filenames
-    in.name = *inputs;
-    if (strcmp(in.name,"-") == 0) in.name = "<stdin>";
-  }
-  if (!in.open("r")) {
+  if (first_input_name().empty()) return NULL;
+  if (!in.reopen()) {
     fprintf(stderr, "%s: open failed for input-file '%s': %s\n",
-	    progname, in.name, strerror(errno));
-    exit(1);
+	    progname, in.name.c_str(), strerror(errno));
+    abort();
   }
   return in.file;
 }
-
 
 /*
  * in = cmdutil_file_churner::next_input_file();
  */
 FILE *cmdutil_file_churner::next_input_file() {
-  in.close();
+  if (next_input_name().empty()) return NULL;
+  if (!in.reopen()) {
+    fprintf(stderr, "%s: open failed for input-file '%s': %s\n",
+	    progname, in.name.c_str(), strerror(errno));
+    abort();
+  }
+  return in.file;
+}
+
+/*
+ * name = cmdutil_file_churner::first_input_name();
+ *   + get first input name
+ */
+std::string &cmdutil_file_churner::first_input_name() {
   if (use_list) {
-    // -- read next file
-    while (getline(&linebuf, &lbsize, list.file) == -1) {
-      if (feof(list.file)) {
-	if (!next_list_file()) return NULL;
-      } else {
-	fprintf(stderr, "%s: Error reading input-list-file '%s': %s\n",
-		progname, list.name, strerror(errno));
-	exit(1);
-      }
+    // -- args/inputs are file-LISTS
+    if (ninputs <= 0) {
+      // -- file-list on stdin
+      list.name = "-";
+    } else {
+      // -- file-list(s) given in inputs[]
+      list.name = inputs[0];
+    }
+    // -- sanity check
+    if (!list.reopen()) {
+      fprintf(stderr,"%s: open failed for input list-file '%s': %s\n",
+	      progname, list.name.c_str(), strerror(errno));
+      abort();
     }
 
-    in.name = linebuf;
-    in.name[strlen(in.name)-1] = '\0';  // eliminate trailing newline
-    if (!in.open("r")) {
-      fprintf(stderr, "%s: open failed for input-file '%s': %s\n",
-	      progname, in.name, strerror(errno));
-      exit(1);
+    // -- read next input filename from list-file
+    while (list.getline(line) == EOF) { //-- no more data left
+      if (list.eof()) {
+	if (!next_list_file()) return in.name = "";
+      } else {
+	fprintf(stderr, "%s: Error reading input-list-file '%s': %s\n",
+		progname, list.name.c_str(), strerror(errno));
+	abort();
+      }
     }
-    return in.file;
+    in.name = line;
+    in.name.erase(in.name.size()-1);  // eliminate trailing newline
+    return in.name;
   }
 
   // -- args/inputs are file-NAMES
-  if (--ninputs <= 0) { return NULL; }
-  in.name = *(++inputs);
-  if (strcmp(in.name,"-") == 0) in.name = "<stdin>";
-  if (!in.open("r")) {
-    fprintf(stderr, "%s: open failed for input-file '%s': %s\n",
-	    progname, in.name, strerror(errno));
-    exit(1);
+  if (ninputs <= 0) {
+    // -- read from stdin
+    in.name = "-";
+  } else {
+    // -- read from user-specified filenames
+    in.name = *inputs;
   }
-  return in.file;
+  return in.name;
+}
+
+
+/*
+ * in = cmdutil_file_churner::next_input_name();
+ */
+std::string &cmdutil_file_churner::next_input_name() {
+  in.close();
+  if (use_list) {
+    // -- read next file
+    while (list.getline(line) == EOF) { //-- no more data left
+      if (list.eof()) {
+	if (!next_list_file()) return in.name = "";
+      } else {
+	fprintf(stderr, "%s: Error reading input-list-file '%s': %s\n",
+		progname, list.name.c_str(), strerror(errno));
+	abort();
+      }
+    }
+    in.name = line;
+    in.name.erase(in.name.size()-1);  // eliminate trailing newline
+    return in.name;
+  }
+
+  //-- args/inputs are file-NAMES
+  if (--ninputs <= 0) { return in.name = ""; }
+  in.name = *(++inputs);
+  return in.name;
 }
 
 
@@ -351,14 +360,13 @@ FILE *cmdutil_file_churner::next_list_file() {
   
   list.name = *(++inputs);
   
-  if (!list.open("r")) {
+  if (!list.reopen()) {
     fprintf(stderr,"%s: open failed for input list-file '%s': %s\n",
-	    progname, list.name, strerror(errno));
-    exit(1);
+	    progname, list.name.c_str(), strerror(errno));
+    abort();
   }
   return list.file;
 }
 
 }; //-- namespace moot
 
-#undef CMDUTIL_CHURN_DEFAULT_BUFSIZE

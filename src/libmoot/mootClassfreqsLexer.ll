@@ -31,9 +31,6 @@
 
 %header{
 
-#include "mootTypes.h"
-#include "mootClassfreqsParser.h"
-
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
@@ -43,57 +40,44 @@
 
 \details Supports comments introduced with '%%'.
 */
+
+#include <mootTypes.h>
+#include <mootClassfreqsParser.h>
+#include <mootGenericLexer.h>
+
+using namespace moot;
 %}
 
 %define LEX_PARAM \
   YY_mootClassfreqsParser_STYPE *yylval, YY_mootClassfreqsParser_LTYPE *yylloc
 
-
 %define CLASS mootClassfreqsLexer
+
+%define INHERIT \
+  : public GenericLexer
+
+%define INPUT_CODE \
+  return moot::GenericLexer::yyinput(buffer,result,max_size);
+
 %define MEMBERS \
-  public: \
-    /* -- public typedefs */\
-  public: \
-   /* -- positional parameters */\
-    /** current line*/\
-    int theLine;\
-    /** current column*/\
-    int theColumn;\
-    /** token-buffering */\
-    moot::mootTagString tokbuf;\
-    /** whether to clear the token-buffer on 'tokbuf_append()' */\
-    bool tokbuf_clear;\
-  private: \
-    /* private local data */ \
-    bool use_string; \
-    char *stringbuf; \
   public: \
     /** virtual destructor to shut up gcc */\
     virtual ~mootClassfreqsLexer(void) {};\
-    /** use stream input */\
-    void select_streams(FILE *in=stdin, FILE *out=stdout); \
-    /** use string input */\
-    void select_string(const char *in, FILE *out=stdout); \
-    /** for token-buffering: append yyleng characters of yytext to 'tokbuf' */\
-    inline void tokbuf_append(char *text, int leng);
+  /* moot::GenericLexer helpers */ \
+  virtual void **mgl_yy_current_buffer_p(void) \
+                 {return (void**)(&yy_current_buffer);};\
+  virtual void  *mgl_yy_create_buffer(int size, FILE *unused=stdin) \
+                 {return (void*)(yy_create_buffer(unused,size));};\
+  virtual void   mgl_yy_init_buffer(void *buf, FILE *unused=stdin) \
+                 {yy_init_buffer((YY_BUFFER_STATE)buf,unused);};\
+  virtual void   mgl_yy_delete_buffer(void *buf) \
+                 {yy_delete_buffer((YY_BUFFER_STATE)buf);};\
+  virtual void   mgl_yy_switch_to_buffer(void *buf) \
+                 {yy_switch_to_buffer((YY_BUFFER_STATE)buf);};\
+  virtual void   mgl_begin(int stateno);
 
 %define CONSTRUCTOR_INIT :\
-  theLine(1), \
-  theColumn(1), \
-  use_string(false), \
-  stringbuf(NULL)
-
-%define INPUT_CODE \
-  /* yy_input(char *buf, int &result, int max_size) */\
-  if (use_string) {\
-    size_t len = strlen(stringbuf) > (size_t)max_size ? max_size : strlen(stringbuf);\
-    strncpy(buffer,stringbuf,len);\
-    stringbuf += len;\
-    return result = len;\
-  }\
-  /* black magic */\
-  return result= fread(buffer, 1, max_size, YY_mootClassfreqsLexer_IN);
-
+  GenericLexer("mootClassfreqsLexer")
 
 
 /*----------------------------------------------------------------------
@@ -172,45 +156,7 @@ textorsp   [^\n\r\t]
 #endif
 
 
-
 /*----------------------------------------------------------------------
  * Local Methods for mootClassfreqsLexer
  *----------------------------------------------------------------------*/
-
-/*
- * void mootClassfreqsLexer::select_streams(FILE *in, FILE *out)
- */
-void mootClassfreqsLexer::select_streams(FILE *in, FILE *out) {
-  yyin = in;
-  yyout = out;
-  use_string = false;
-
-  // -- black magic from flex(1) manpage
-  if (yy_current_buffer != NULL) { yy_delete_buffer(yy_current_buffer); }
-  yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
-  BEGIN(INITIAL);
-}
-
-/*
- * void mootClassfreqsLexer::select_string(const char *in, FILE *out=stdout)
- */
-void mootClassfreqsLexer::select_string(const char *in, FILE *out) {
-  select_streams(stdin,out);  // flex __really__ wants a real input stream
-
-  // -- string-buffer stuff
-  use_string = true;
-  stringbuf = (char *)in;
-}
-
-
-/*
- * tokbuf_append(text,leng)
- */
-inline void mootClassfreqsLexer::tokbuf_append(char *text, int leng) {
-  if (tokbuf_clear) {
-    tokbuf = (char *)text;
-    tokbuf_clear = false;
-  } else {
-    tokbuf.append((char *)text,leng);
-  }
-}
+void mootClassfreqsLexer::mgl_begin(int stateno) {BEGIN(stateno);}

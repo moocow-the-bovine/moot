@@ -26,22 +26,24 @@
  *   + moocow's PoS tagger : expat wrapper
  *--------------------------------------------------------------------------*/
 
-#ifndef _MOOT_XML_PARSER_H
-#define _MOOT_XML_PARSER_H
+#ifndef _MOOT_EXPAT_PARSER_H
+#define _MOOT_EXPAT_PARSER_H
 
 #include <mootConfig.h>
 
-#ifdef MOOT_XML_ENABLED
+#ifdef MOOT_EXPAT_ENABLED
 
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
 #include <stdarg.h>
 
+#include <string>
+
 #include <expat.h>
 
 /** Default input buffer length for XML parsers */
-#define MOOT_DEFAULT_XML_BUFLEN 8192
+#define MOOT_DEFAULT_EXPAT_BUFLEN 8192
 
 namespace moot {
 
@@ -83,7 +85,7 @@ namespace moot {
      * \bufsize: length of parse buffer for expat
      * \encoding: override document input encoding (broken?)
      */
-    mootXmlParser(size_t bufsize=MOOT_DEFAULT_XML_BUFLEN, const char *encoding=NULL);
+    mootXmlParser(size_t bufsize=MOOT_DEFAULT_EXPAT_BUFLEN, const char *encoding=NULL);
 
     /** Reset parser state */
     virtual void reset(const char *encoding=NULL);
@@ -132,18 +134,31 @@ namespace moot {
 		     const char *in_name=NULL);
 
     /**
+     * Read in and parse the next chunk from current C input stream \c in ,
+     * using an internal buffer.  Returns true on success,
+     * false on failure.
+     *
+     * \nbytes: number of bytes read from file will be stored here
+     * \is_final: will be 1 if the file ended, 0 otherwise
+     *
+     * \warning you should have called reset() at least once before
+     *          calling this method -- no sanity checks are performed!
+     */
+    bool parseChunk(int &nbytes, int &is_final);
+
+    /**
      * Parse from your very own string buffer.
-     * \warning This method should not be called incrementally,
-     * since the stack is cleared before parsing the buffer.
-     * If you need to do incremental buffer parsing, use
-     * \c XMLParseBuffer(this->parser, buf, buflen, int is_last_chunk);
+     * \warning This method is made to be called incrementally,
+     * so the stack is \b NOT cleared before parsing the buffer.
+     * If you want to parse a whole buffered document, you
+     * should call reset() before calling this method.
      *
      * \buf: buffer to parse
      * \buflen: number of bytes to parse from the buffer
      * \in_name: input-name to use for errors/warnings
+     * \is_last_chunk: whether this is the final bit of the document
      */
-    bool parseBuffer(const char *buf, size_t buflen,
-		     const char *in_name=NULL);
+    bool parseBuffer(const char *buf, size_t buflen, bool is_last_chunk);
     //@}
 
     /** \name Utilities */
@@ -154,6 +169,9 @@ namespace moot {
      */
     /** Print current parser context (in real input encoding) */
     virtual void printContext(FILE *tofile=NULL);
+
+    /** Get current parser context as a std::string */
+    virtual std::string contextString(void);
 
     /*----------------------------------------------------
      * mootXmlParser: Error Reporting
@@ -276,6 +294,6 @@ namespace moot {
 
 }; // moot_END_NAMESPACE
 
-#endif // moot_XML_ENABLED
+#endif // moot_EXPAT_ENABLED
 
-#endif // MOOT_XML_PARSER_H
+#endif // MOOT_EXPAT_PARSER_H

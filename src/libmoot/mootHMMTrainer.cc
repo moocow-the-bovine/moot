@@ -24,7 +24,7 @@
  * File: mootHMMTrainer.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + HMM-Trainer for KDWDS PoS-tagger: the guts
+ *   + HMM-Trainer for moot PoS-tagger: the guts
  *--------------------------------------------------------------------------*/
 
 #ifdef HAVE_CONFIG_H
@@ -78,30 +78,35 @@ bool mootHMMTrainer::train_from_file(const string &filename)
 
 bool mootHMMTrainer::train_from_reader(TokenReader *reader)
 {
-  mootTokFlavor typ;
+  mootTokenType typ;
+  mootToken *tokptr;
 
   //-- do training
   train_init();
-  while (reader && (typ = reader->get_token()) != TF_EOF) {
+  while (reader && (typ = reader->get_token()) != TokTypeEOF) {
     DEBUG( carp("DEBUG: Got token type %d\n", typ) );
     switch (typ) {
 
-    case TF_COMMENT:
+    case TokTypeComment:
       break;
 
-    case TF_TOKEN:
-      train_token(reader->token());
+    case TokTypeVanilla:
+      tokptr = reader->token();
+      if (tokptr) train_token(*tokptr);
       break;
 
-    case TF_EOS:
+    case TokTypeEOS:
       train_eos();
       train_bos();
       break;
 
     default:
       reader->carp("%s: Error: unknown token '%s'",
-		   "in mootHMMTrainer::train_stream()",
-		   reader->token().text().c_str());
+		   "during mootHMMTrainer::train_stream()",
+		   (reader->token()
+		    ? reader->token()->text().c_str()
+		    : "(null)"));
+		   
       break;
     }
   }
@@ -143,7 +148,7 @@ void mootHMMTrainer::train_bos(void)
 /*-- new (hack) */
 void mootHMMTrainer::train_token(const mootToken &curtok)
 {
-  if (curtok.flavor() != TF_TOKEN) return; //-- ignore comments, etc.
+  if (curtok.toktype() != TokTypeVanilla) return; //-- ignore comments, etc.
 
   if (curtok.besttag().empty()) {
     carp("mootHMMTrainer::train_token(): no best tag for token `%s'",

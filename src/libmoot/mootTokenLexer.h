@@ -54,17 +54,12 @@
 
 /* % here is the declaration from section1 %header{  */ 
 #line 47 "mootTokenLexer.ll"
-
-#include <stdarg.h>
-#include "mootToken.h"
-
-
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
 /**
  * \class mootTokenLexer
- * \brief Flex++ lexer for KDWDS tagger.
+ * \brief Flex++ lexer for moot PoS tagger native text input.
  *
  * Assumes pre-tokenized input:
  * one token per line,  blank lines = EOS, raw text only (no markup!).
@@ -85,28 +80,44 @@
  *
  */
 
-#line 84 "mootTokenLexer.ll"
+#include <mootToken.h>
+#include <mootGenericLexer.h>
+
+using namespace moot;
+#line 81 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CLASS  mootTokenLexer
-#line 85 "mootTokenLexer.ll"
+#line 83 "mootTokenLexer.ll"
+#define YY_mootTokenLexer_INHERIT  \
+  : public moot::GenericLexer
+#line 86 "mootTokenLexer.ll"
+#define YY_mootTokenLexer_INPUT_CODE  \
+  return moot::GenericLexer::yyinput(buffer,result,max_size);
+#line 89 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_MEMBERS  \
   public: \
   /* -- public typedefs */\
-  typedef moot::mootTokFlavor TokenType; \
+  typedef moot::mootTokenType TokenType; \
+  /* extra token types */ \
+  static const int LexTypeText = moot::NTokTypes+1;    /* literal token text */ \
+  static const int LexTypeTag = moot::NTokTypes+2;     /* analysis tag */ \
+  static const int LexTypeDetails = moot::NTokTypes+3; /* analysis details */ \
+  static const int LexTypeEOA = moot::NTokTypes+4;     /* end-of-analysis (separator) */ \
+  static const int LexTypeEOT = moot::NTokTypes+5;     /* end-of-token */ \
+  static const int LexTypeIgnore = moot::NTokTypes+6;  /* ignored data (unused) */ \
   \
   public: \
-   /* -- positional parameters */ \
-   /** current line*/\
-   int theLine;\
-   /** current column*/\
-   int theColumn;\
+   /** last token type */ \
+   int lasttyp; \
    \
    /* -- pre-allocated construction buffers */ \
-   /** current token */\
-   moot::mootToken mtoken; \
-   /** current analysis */ \
-   moot::mootToken::Analysis manalysis;\
-   /** last token type */ \
-   TokenType lasttyp; \
+   /* current token (default) */ \
+   moot::mootToken mtoken_default; \
+   /* current token (real) */ \
+   moot::mootToken *mtoken; \
+   \
+   /** current analysis (real) */ \
+   moot::mootToken::Analysis *manalysis;\
+   \
    /** whether to ignore comments (default=false) */ \
    bool ignore_comments; \
    /** whether first analysis parsed should be considered 'best' (default=true) */ \
@@ -117,63 +128,61 @@
    bool ignore_first_analysis; \
    /** whether to ignore current analysis */\
    bool ignore_current_analysis; \
-  \
-   /* -- token-buffering */\
-   /** token-buffer */\
-   std::string itokbuf;\
-   /** whether to clear the token-buffer on 'itokbuf_append()' */\
-   bool itokbuf_clear;\
    \
-   /* -- diagnositcs */\
-   /** Name of our input source: used for diagnostics & error messages */\
-   std::string srcname;\
-  /* private: */\
-    /** low-level pseudo-private local data */ \
-    bool use_string; \
-    /** low-level pseudo-private local data */ \
-    char *stringbuf; \
   public: \
     /* -- local methods */ \
     /** virtual destructor to shut up gcc */\
-    virtual ~mootTokenLexer(void) {}; \
+    virtual ~mootTokenLexer(void) {};\
     /** reset to initial state */ \
-    void reset(void); \
-    /** hack for non-global yywrap() */\
-    void select_streams(FILE *in=stdin, FILE *out=stdout); \
-    /** use string input */\
-    void select_string(const char *in, FILE *out=stdout); \
-    /** for token-buffering: append yyleng characters of yytext to 'itokbuf' */\
-    inline void itokbuf_append(char *text, int leng); \
-    /** for error reporting */ \
-    virtual void yycarp(char *fmt, ...);
-#line 144 "mootTokenLexer.ll"
+    virtual void reset(void); \
+    /** actions to perform on end-of-analysis */ \
+    inline void on_EOA(void) \
+    { \
+      /*-- EOA: add & clear current analysis, if any */ \
+      /*-- add & clear current analysis, if any */ \
+      if (lasttyp != LexTypeEOA) { \
+        /*-- set default tag */\
+        if (manalysis->tag.empty()) { \
+          manalysis->tag.swap(manalysis->details); \
+        }  \
+        /* set best tag if applicable */\
+        if (current_analysis_is_best) { \
+          mtoken->besttag(manalysis->tag); \
+          current_analysis_is_best = false; \
+        } \
+        if (ignore_current_analysis) { \
+          ignore_current_analysis=false; \
+          mtoken->tok_analyses.pop_back(); \
+        } \
+      } \
+    }; \
+  /*-- moot::GenericLexer helpers */ \
+  virtual void **mgl_yy_current_buffer_p(void) \
+                 {return (void**)(&yy_current_buffer);};\
+  virtual void  *mgl_yy_create_buffer(int size, FILE *unused=stdin) \
+                 {return (void*)(yy_create_buffer(unused,size));};\
+  virtual void   mgl_yy_init_buffer(void *buf, FILE *unused=stdin) \
+                 {yy_init_buffer((YY_BUFFER_STATE)buf,unused);};\
+  virtual void   mgl_yy_delete_buffer(void *buf) \
+                 {yy_delete_buffer((YY_BUFFER_STATE)buf);};\
+  virtual void   mgl_yy_switch_to_buffer(void *buf) \
+                 {yy_switch_to_buffer((YY_BUFFER_STATE)buf);};\
+  virtual void   mgl_begin(int stateno);
+#line 166 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CONSTRUCTOR_INIT  :\
-  theLine(1), \
-  theColumn(0), \
-  lasttyp(moot::TF_EOS), \
+  GenericLexer("mootTokenLexer"), \
+  yyin(NULL), \
+  lasttyp(moot::TokTypeEOS), \
+  manalysis(NULL), \
   ignore_comments(false), \
   first_analysis_is_best(true), \
   current_analysis_is_best(false), \
   ignore_first_analysis(false), \
-  ignore_current_analysis(false), \
-  itokbuf_clear(true), \
-  srcname("(unknown)"),\
-  use_string(false), \
-  stringbuf(NULL)
-#line 158 "mootTokenLexer.ll"
-#define YY_mootTokenLexer_INPUT_CODE  \
-  /* yy_input(char *buf, int &result, int max_size) */\
-  if (use_string) {\
-    size_t len = strlen(stringbuf) > (size_t)max_size \
-      ? max_size \
-      : strlen(stringbuf);\
-    strncpy(buffer,stringbuf,len);\
-    stringbuf += len;\
-    return result = len;\
-  }\
-  /* black magic */\
-  return result= fread(buffer, 1, max_size, YY_mootTokenLexer_IN);
-#line 195 "mootTokenLexer.ll"
+  ignore_current_analysis(false)
+#line 177 "mootTokenLexer.ll"
+#define YY_mootTokenLexer_CONSTRUCTOR_CODE  \
+  mtoken = &mtoken_default;
+#line 208 "mootTokenLexer.ll"
 #line 52 "/usr/local/share/flex++bison++/flexskel.h"
 
 
@@ -425,7 +434,7 @@ class YY_mootTokenLexer_CLASS YY_mootTokenLexer_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 426 "mootTokenLexer.ll"
+#line 409 "mootTokenLexer.ll"
 #endif
 #line 302 "/usr/local/share/flex++bison++/flexskel.h"
 

@@ -139,15 +139,20 @@ public:
   /*------------------------------------------------------------*/
   /// \name Top-level training methods
   //@{
-  /** Gather training data using mootTokenIO layer */
+  /** Gather training data using TokenIO layer */
   bool train_from_reader(TokenReader *reader);
 
-  /** Gather training data from a C-stream using mootTaggerLexer */
+  /** Gather training data from a native text-format C-stream */
   bool train_from_stream(FILE *in=stdin, const string &srcname="(unknown)")
   {
-    TokenReaderCookedFile reader(true,in,srcname);
-    reader.lexer.ignore_first_analysis = true;
-    return train_from_reader(&reader);
+    TokenReader *tr = TokenIO::new_reader(tiofNative|tiofWellDone);
+    tr->reader_name(srcname);
+    tr->from_file(in);
+    //TokenReaderCookedFile reader(true,in,srcname);
+    //reader.lexer.ignore_first_analysis = true;
+    bool rc = train_from_reader(tr);
+    delete tr;
+    return rc;
   };
 
   /** Gather training data from a file using mootTaggerLexer */
@@ -163,7 +168,7 @@ public:
   /** Initialize data for training a new sentence  */
   void train_bos(void);
 
-  /** Gather training information for a single token, using mootToken */
+  /** Gather training information for a single token, using mootToken interface */
   void train_token(const mootToken &curtok);
 
   /** Gather training information for a sentence boundary. */

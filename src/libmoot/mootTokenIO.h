@@ -29,143 +29,515 @@
 #ifndef _moot_TOKEN_IO_H
 #define _moot_TOKEN_IO_H
 
-#include "mootToken.h"
-#include "mootTokenLexer.h"
+#include <mootToken.h>
+#include <mootTokenLexer.h>
+
+#include <mootIO.h>
+#include <mootCIO.h>
+#include <mootCxxIO.h>
+#include <mootBufferIO.h>
+
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdexcept>
 
 /*moot_BEGIN_NAMESPACE*/
 namespace moot {
 
 /*==========================================================================
+ * TokenIO
+ *==========================================================================*/
+/** Enum for I/O format flags */
+enum TokenIOFormatE {
+  tiofNone      = 0x00000000,  ///< no format
+  tiofUnknown   = 0x00000001,  ///< unknown format
+  tiofNull      = 0x00000002,  ///< null i/o, useful for testing
+  tiofUser      = 0x00000004,  ///< some user-defined format
+  tiofNative    = 0x00000008,  ///< native text format
+  tiofXML       = 0x00000010,  ///< XML format
+  tiofConserve  = 0x00000020,  ///< Conserve raw XML
+  tiofPretty    = 0x00000040,  ///< Pretty-print (XML only)
+  tiofText      = 0x00000080,  ///< Pretty-print (XML only)
+  tiofAnalyzed  = 0x00000100,  ///< input is pre-analyzed (>= "medium rare")
+  tiofTagged    = 0x00000200,  ///< input is tagged ("medium" or "well done")
+  tiofPruned    = 0x00000400,  ///< pruned output
+};
+typedef TokenIOFormatE TokenIOFormat;
+
+/** Format alias for 'Cooked Rare' files. */
+static const int tiofRare = tiofText;
+
+/** Format alias for 'Cooked Medium Rare' files. */
+static const int tiofMediumRare = tiofText|tiofAnalyzed;
+
+/** Format alias for 'Cooked Medium' files. */
+static const int tiofMedium = tiofText|tiofTagged;
+
+/** Format alias for 'Cooked Well Done' files. */
+static const int tiofWellDone = tiofText|tiofAnalyzed|tiofTagged;
+
+/** Enum for I/O mode flags */
+/*
+enum TokenIOModeE {
+  tiomNone,     ///< no I/O
+  tiomUnknown,  ///< unknown mode (dangerous)
+  tiomFilename, ///< named file I/O
+  tiomFile,     ///< FILE* I/O
+  tiomFd,       ///< file descriptor I/O
+  tiomCBuffer,  ///< C memory-buffer I/O
+  tiomCString,  ///< NUL-terminated string I/O
+  tiomString,   ///< STL string I/O
+  tiomUser,     ///< some other user-defined I/O mode
+  tiomNModes    ///< number of modes; not really an I/O mode itself
+};
+typedef TokenIOModeE TokenIOMode;
+*/
+
+
+/** \brief Abstract class for token I/O */
+class TokenIO {
+public:
+  /*--------------------------------------------------------------------*/
+  ///\name Format String <-> Bitmask Utilities
+  //@{
+  /**
+   * Parse a format string, which should be a comma-separated
+   * list of TokenIOFormat flag-names (without the 'tiof' prefix,
+   * matching is case-insensitive).
+   * A prefix of '!' indicates negation of the given flag.
+   * Returns the corresponding bitmask.
+   * \see parse_format_request
+   */
+  static int parse_format_string(const std::string &fmtString);
+
+  /**
+   * Guess basic format flags from a filename based on
+   * dot-separated extension substrings.
+   * Returns a bitmask suitable for passing to sanitize_format().
+   * Recognizes filename extensions as documented in mootfiles(5).
+   * \see parse_format_request
+   */
+  static int guess_filename_format(const char *filename);
+
+  /**
+   * Returns true iff no information content is requested by fmt.
+   * \see parse_format_request
+   */
+  static bool is_empty_format(int fmt);
+
+  /** Sanity check for format bitmasks.
+   * \see parse_format_request
+   */
+  static int sanitize_format(int fmt,
+			     int fmt_implied=tiofNone,
+			     int fmt_default=tiofNone);
+
+  /**
+   * Top-level format-instantiation utility.
+   *
+   * @param request user-requested format string, has highest priority
+   * @param filename filename used to guess basic format flags
+   * @param fmt_implied implied format bitmask (required information content)
+   * @param fmt_default default format bitmask (for empty formats)
+   */
+  static int parse_format_request(const char *request,
+				  const char *filename=NULL,
+				  int fmt_implied=tiofNone,
+				  int fmt_default=tiofNone);
+
+  /** Convert a format bitmask to a canonical string form. */
+  static std::string format_canonical_string(int fmt);
+  //@}
+
+  /*--------------------------------------------------------------------*/
+  ///\name Format-Based Reader/Writer Creation
+  //@{
+  /**
+   * Create a new TokenReader object suitable for reading
+   * the format @fmt.
+   * \fmt should be a bitmask composed of TokenIOFormat flags.
+   * Caller is responsible for deleting the object returned.
+   */
+  static class TokenReader *new_reader(int fmt);
+
+  /**
+   * Create a new TokenReader object suitable for reading
+   * the format @fmt.
+   * @fmt should be a bitmask composed of TokenIOFormat flags.
+   * Caller is responsible for delting the object returned.
+   */
+  static class TokenWriter *new_writer(int fmt);
+  //@}
+};
+
+/*==========================================================================
  * TokenReader
  *==========================================================================*/
 
-/** Abstract class for token I/O */
-class TokenReader {
+/** \brief Abstract class for token input */
+class TokenReader : public TokenIO {
 public:
-  /** Default constructor */
-  TokenReader(void) {};
+  /** Default size of input buffer. */
+  static const size_t TR_DEFAULT_BUFSIZE = 256;
 
-  /** Default destructor */
-  virtual ~TokenReader(void) { clear(); };
+public:
+  /** Format flags: bitmask of TokenIO::TokenIOFormat flags */
+  int tr_format;
 
-  /**
-   * Get current internal token buffer.
-   * The contents of this buffer may be overwritten on the next
-   * call to any other TokenReader method -- copy it
-   * if you need persistence.
-   */
-  virtual mootToken &token(void) =0;
+  /** Name of TokenReader subtype. */
+  std::string tr_name;
 
-  /**
-   * Get current internal sentence buffer.
-   * The contents of this buffer may be overwritten on the next
-   * call to any other TokenReader method -- copy it
-   * if you need persistence.
-   */
-  virtual mootSentence &sentence(void) =0;
+  /** Currently selected input stream (may be NULL) */
+  mootio::mistream *tr_istream;
 
-
-  /** Clear any/all underlying buffers */
-  virtual void clear(void) {};
+  /** Whether we created tr_istream locally */
+  bool tr_istream_created;
 
   /**
-   * Read in next token, storing information in internal token buffer.
+   * Pointer to a real internal 'current token' buffer,
+   * used as return value for token() method.
+   *
+   * Descendant implementations are responsible for
+   * allocation, population, manipulation, and destruction
+   * of the data it points to.
    */
-  //inline
-  virtual mootTokFlavor get_token(void) =0;
+  mootToken *tr_token;
 
   /**
-   * Read in next sentence, storing tokens in an
-   * internal buffer.  Returns TF_EOF on EOF,
-   * otherwise should always return TF_EOS.
+   * Pointer to a real internal 'current sentence' buffer,
+   * used as return value for sentence() method.
+   *
+   * Descendant implementations are responsible for
+   * allocation, population, maniuplation, and destruction
+   * of the data it points to.
    */
-  virtual mootTokFlavor get_sentence(void) =0;
+  mootSentence *tr_sentence;
 
-  /** Complain. */
+public:
+  /*------------------------------------------------------------
+   * TokenReader: Constructors
+   */
+  /** \name Constructors etc. */
+  //@{
+  /**
+   * Default constructor
+   * \fmt: bitmask of TokenIO::TokenIOFormat flags
+   * \mode: default input mode
+   * \name: name of current input source
+   */
+  TokenReader(int                fmt  =tiofUnknown,
+	      const std::string &name ="TokenReader")
+    : tr_format(fmt),
+      tr_name(name),
+      tr_istream(NULL),
+      tr_istream_created(false),
+      tr_token(NULL),
+      tr_sentence(NULL)
+  {};
+
+  /** Default destructor : override in descendant classes */
+  virtual ~TokenReader(void)
+  {
+    TokenReader::close();
+  };
+
+  /**
+   * Clear TokenReader-relevant construction buffers, if they exist.
+   */
+  inline void tr_clear(void)
+  {
+    if (tr_token) tr_token->clear();
+    if (tr_sentence) tr_sentence->clear();
+  };
+  //@}
+
+
+  /*------------------------------------------------------------
+   * TokenReader: Input Selection
+   */
+  /** \name Input Selection */
+  //@{
+
+  /**
+   * Select input from a mootio::mistream pointer.
+   * This is the basic case.
+   * Descendendant classes may want to override this method.
+   */
+  virtual void from_mstream(mootio::mistream *mistreamp) {
+    close();
+    tr_istream = mistreamp;
+    byte_number(1);
+    line_number(1);
+    column_number(0);
+    tr_istream_created = false;
+  };
+
+  /**
+   * Select input from a mootio::mistream object, reference version.
+   * Default implementation just calls from_mstream(&mis).
+   */
+  virtual void from_mstream(mootio::mistream &mis) {
+    from_mstream(&mis);
+  };
+
+  /**
+   * Select input from a named file.
+   * Descendants using named file input may override this method.
+   * The filename "-" may be used to specify stdin.
+   * Default implementation calls from_mstream().
+   */
+  virtual void from_filename(const char *filename)
+  {
+    from_mstream(new mootio::mifstream(filename,"rb"));
+    tr_istream_created = true;
+    if (!tr_istream->valid()) {
+      carp("open failed for \"%s\": %s", filename, strerror(errno));
+      close();
+    }
+  };
+
+  /**
+   * Select input from a C stream.
+   * Caller is responsible for opening and closing the stream.
+   * Descendants using C stream input may override this method.
+   * Default implementation calls from_mstream().
+   */
+  virtual void from_file(FILE *file)
+  {
+    from_mstream(new mootio::micstream(file));
+    tr_istream_created = true;
+  };
+
+  /**
+   * Select input from a file descriptor.
+   * Caller is responsible for opening and closing the stream.
+   * Descendants using file descriptor input may override this method.
+   * No default implementation.
+   */
+  virtual void from_fd(int fd)
+  {
+    close();
+    throw domain_error("from_fd(): not implemented");
+  };
+
+  /**
+   * Select input from a C memory-buffer.
+   * Caller is responsible for allocation and de-allocation.
+   * Descendants using C memory-buffer input may override this method.
+   * Default implementation calls from_mstream().
+   */
+  virtual void from_buffer(const void *buf, size_t len)
+  {
+    from_mstream(new mootio::micbuffer(buf,len));
+    tr_istream_created = true;
+  };
+
+  /**
+   * Select input from a NUL-terminated C string.
+   * Caller is responsible for allocation and de-allocation.
+   * Descendants using C string input may override this method.
+   * Default implementation calls from_cbuffer(s,len).
+   */
+  virtual void from_string(const char *s) {
+    from_buffer(s,strlen(s));
+  };
+
+  /**
+   * Select input from a C++ stream.
+   * Caller is responsible for allocation and de-allocation.
+   * Descendants using C++ stream input may override this method.
+   * Default implementation calls from_mstream().
+   */
+  virtual void from_cxxstream(std::istream &is)
+  {
+    from_mstream(new mootio::micxxstream(is));
+    tr_istream_created = true;
+  };
+
+  /**
+   * Finish input from currently selected source & perform any required
+   * cleanup operations.
+   * This method should always be called before selecting a new input source.
+   * The current input stream is only closed if it was created locally.
+   *
+   * Descendants may override this method.
+   */
+  virtual void close(void) {
+    if (tr_istream_created) {
+      tr_istream->close();
+      if (tr_istream) delete tr_istream;
+    }
+    tr_istream_created = false;
+    tr_istream = NULL;
+  };
+  //@}
+
+  /*------------------------------------------------------------
+   * TokenReader: Token-Level Access
+   */
+  /** \name Token-Level Access */
+  //@{
+
+  /**
+   * Get pointer to the current input token.
+   * Returns NULL if no token is available.
+   *
+   * \warning The contents of the token returned may be overwritten
+   *          on the next call to any other TokenReader method.
+   */
+  inline mootToken *token(void) { return tr_token; };
+
+  /**
+   * Get a pointer to the current input sentence.
+   * Returns NULL if no sentence is available.
+   *
+   * \warning The contents of the sentence returned may be overwritten
+   *          on the next call to any other TokenReader method.
+   */
+  inline mootSentence *sentence(void) { return tr_sentence; };
+
+  /**
+   * Get the next token from the buffer.
+   * On completion, current token (if any) is in *tr_token.
+   * Descendants \b must override this method.
+   */
+  virtual mootTokenType get_token(void) {
+    throw domain_error("TokenReader: get_token() not implemented");
+  };
+
+  /**
+   * Read in next sentence.
+   * On completion, current sentence (if any) is in *tr_sentence.
+   * Descendants may override this method for sentence-wise input.
+   */
+  virtual mootTokenType get_sentence(void);
+  //@}
+
+  /*------------------------------------------------------------
+   * TokenReader: Diagnostics
+   */
+  /** \name Diagnostics */
+  //@{
+  /** Set reader subtype name to use for diagnostics.
+   * Descendants may override this method. */
+  virtual void reader_name(const std::string &myname) { tr_name = myname; };
+
+  /** Get current line number. Descendants may override this method. */
+  virtual size_t line_number(void) { return 0; };
+
+  /** Set current line number. Descendants may override this method. */
+  virtual size_t line_number(size_t n) { return n; };
+
+  /** Get current column number. Descendants may override this method. */
+  virtual size_t column_number(void) { return 0; };
+
+  /** Set current column number. Descendants may override this method. */
+  virtual size_t column_number(size_t n) { return n; };
+
+  /** Get current byte number. Descendants may override this method. */
+  virtual size_t byte_number(void) { return 0; };
+
+  /** Get current byte number. Descendants may override this method. */
+  virtual size_t byte_number(size_t n) { return n; };
+
+  /** Complain, giving verbose information */
   virtual void carp(const char *fmt, ...);
+  //@}
 };
 
 
 /*------------------------------------------------------------
- * TokenReaderCooked
+ * TokenReaderNative
  */
-/** Abstract class for native "cooked" text-format token input */
-class TokenReaderCooked : public TokenReader {
+/**
+ * \brief Class for native "cooked" text-format token input.
+ */
+class TokenReaderNative : public TokenReader {
 public:
   /*----------------------------------------
-   * Reader: Cooked: Types
-   */
-  /*
-  typedef enum {
-    CFT_Unknown,     //< unknown input format, treated as CFT_Rare
-    CFT_Rare,        //< -tagged, -analyzed
-    CFT_MediumRare,  //< -taggged, +analyzed
-    CFT_Medium,      //< +tagged, -analyzed
-    CFT_WellDone,    //< +tagged, +analyzed
-    CFT_NTypes       //< Not really a format type
-  } CookedFormatType;
-  */
-
-public:
-  /*----------------------------------------
-   * Reader: Cooked: Data
+   * Reader: Native: Data
    */
   /** The underlying lexer (does the dirty work). */
   mootTokenLexer lexer;
 
-  /** Internal sentence buffer used by get_sentence() */
-  mootSentence msentence;
+  /** Default construction buffer for get_sentence() */
+  mootSentence   trn_sentence;
 
 public:
   /*----------------------------------------
-   * Reading: Cooked: Methods: Overrides
+   * Reading: Native: Methods: Constructors
    */
-
+  /** \name Constructors etc. */
+  //@{
   /** Default constructor
-   *
-   * \input_is_tagged:
-   * Whether input is tagged with intitial 'best' tags.
+   * \fmt: bitmask of TokenIOFormat flags.
+   * \name: name of input source, for diagnostics.
    */
-  TokenReaderCooked(bool is_tagged=false)
+  TokenReaderNative(int                fmt  =tiofWellDone,
+		    const std::string &name ="TokenReaderNative")
+    : TokenReader(fmt,name)
   {
-    input_is_tagged(is_tagged);
+    tr_format |= tiofNative;
+    input_is_tagged(tr_format&tiofTagged);
+
+    tr_sentence = &trn_sentence;
+    tr_token    = &lexer.mtoken_default;
+
+    lexer.to_file(stderr);
   };
 
   /** Default destructor */
-  virtual ~TokenReaderCooked(void) {};
-
-  /** Get underlying token buffer */
-  virtual mootToken &token(void) { return lexer.mtoken; }
-
-  /** Get underlying sentence buffer. */
-  virtual mootSentence &sentence(void) { return msentence; }
-
-  /** Clear any/all underlying buffers */
-  virtual void clear(void)
+  virtual ~TokenReaderNative(void)
   {
-    lexer.mtoken.clear();
-    msentence.clear();
-    lexer.reset();
-  }
+    close();
+  };
+  //@}
 
-  /** Read in next token, storing information in internal token buffer. */
-  virtual mootTokenLexer::TokenType get_token(void)
-  {
-    return (mootTokenLexer::TokenType)lexer.yylex();
-  }
-
-  /** Read in next sentence, buffering tokens.  Returns TF_EOF on EOF. */
-  virtual mootTokFlavor get_sentence(void);
-
-  /** Complain, giving position information for current input source. */
-  virtual void carp(const char *fmt, ...);
+  /*----------------------------------------
+   * Reader: Native: Methods: Input Selection
+   */
+  ///\name Input Selection
+  //@{
+  /** Select input from a mootio::mstream object. */
+  virtual void from_mstream(mootio::mistream *mis);
+  //@}
 
 
   /*----------------------------------------
-   * Reader: Cooked: Methods: New methods
+   * Reader: Native: Methods: Input
    */
+  /** \name Overrides */
+  //@{
+  virtual mootTokenType get_token(void);
+  virtual mootTokenType get_sentence(void);
+  //@}
+
+
+  /*----------------------------------------
+   * Reader: Native: Methods: Diagnostics
+   */
+  /** \name Diagnostics */
+  //@{
+
+  /** Get current line number. */
+  virtual size_t line_number(void) { return lexer.theLine; };
+
+  /** Set current line number. */
+  virtual size_t line_number(size_t n) { return lexer.theLine = n; };
+
+  /** Get current column number. */
+  virtual size_t column_number(void) { return lexer.theColumn; };
+
+  /** Set current column number. */
+  virtual size_t column_number(size_t n) { return lexer.theColumn = n; };
+  //@}
+
+
+  /*----------------------------------------
+   * Reader: Native: Methods: New methods
+   */
+  /** \name New Methods */
+  //@{
   /**
    * Get value of the 'tagged' flag : whether we
    * think the input has been tagged with initial
@@ -184,111 +556,18 @@ public:
   inline bool input_is_tagged(bool is_tagged)
   {
     if (is_tagged) {
+      tr_format |= tiofTagged;
       lexer.first_analysis_is_best = true;
       lexer.ignore_first_analysis = true;
+    } else {
+      tr_format &= ~tiofTagged;
+      lexer.first_analysis_is_best = false;
+      lexer.ignore_first_analysis = false;
     }
     return is_tagged;
   };
+  //@}
 };
-
-
-/*------------------------------------------------------------
- * TokenReaderCookedFile
- */
-/** Class for native "cooked" text-format token input from a C stream */
-class TokenReaderCookedFile : public TokenReaderCooked {
-public:
-  /*----------------------------------------
-   * Reading: Cooked: File: Methods: Overrides
-   */
-  /**
-   * Default constructor
-   *
-   * \input_is_tagged: Whether input is tagged with intitial 'best' tags.
-   * \infile: C stream from which to read (default=stdin)
-   * \filename: name for input stream to use for diagnostics
-   */
-  TokenReaderCookedFile(bool is_tagged=false,
-			FILE *infile=stdin,
-			const string &filename="")
-  {
-    input_is_tagged(is_tagged);
-    select_stream(infile, filename);
-  };
-
-  /** Default destructor */
-  virtual ~TokenReaderCookedFile(void) {};
-
-  /*----------------------------------------
-   * Reader: Cooked: File: Methods: New
-   */
-  /** Select a (new) input stream.
-   * \infile: C stream from which to read (default=stdin)
-   * \filename: name for input stream to use for diagnostics
-   */
-  virtual void select_stream(FILE *infile, const std::string &filename="")
-  {
-    lexer.select_streams(infile,stderr);
-    lexer.srcname   = filename;
-    lexer.theLine   = 1;
-    lexer.theColumn = 0;
-  };
-};
-
-
-/*------------------------------------------------------------
- * TokenReaderCookedString
- */
-/** Class for native "cooked" text-format token input from a C string */
-class TokenReaderCookedString : public TokenReaderCooked {
-public:
-  /*----------------------------------------
-   * Reader: Cooked: String: Methods: Overrides
-   */
-
-  /**
-   * Default constructor
-   * \input_is_tagged: Whether input is tagged with intitial 'best' tags.
-   * \s: C string from which to read (default=empty)
-   * \srcname: name for input string to use for diagnostics
-   *
-   * \warning: the underlying lexer will try and read \b directly
-   * from the string \c s (no copying is performed) so keep
-   * it around as long as you need to read tokens from it.
-   */
-  TokenReaderCookedString(bool is_tagged=false,
-			  const char *s="",
-			  const string &srcname="(string)")
-  {
-    input_is_tagged(is_tagged);
-    select_string(s, srcname);
-  };
-
-  /** Default destructor */
-  virtual ~TokenReaderCookedString(void) {};
-
-  /*----------------------------------------
-   * Reader: Cooked: String: Methods: New
-   */
-  /**
-   * Select a new input string.
-   * \s: C string from which to read (default=empty)
-   * \srcname: name for input string to use for diagnostics
-   *
-   * \warning: the underlying lexer will try and read \b directly
-   * from the string \c s (no copying is performed) so keep
-   * it around as long as you need to read tokens from it.
-   */
-  virtual void select_string(const char *s="",
-			     const string &srcname="")
-  {
-    if (!srcname.empty()) lexer.srcname = srcname;
-    lexer.select_string(s,stderr);
-    lexer.theLine   = 1;
-    lexer.theColumn = 0;
-  };
-};
-
 
 
 /*==========================================================================
@@ -298,196 +577,373 @@ public:
 /*------------------------------------------------------------
  * TokenWriter
  */
-/** Abstract class for token output */
-class TokenWriter {
+/** \brief Abstract class for token output */
+class TokenWriter : public TokenIO {
 public:
-  /*----------------------------------------
-   * Writing: Methods
-   */
-  /** Default constructor */
-  TokenWriter(void) {};
+  /** Format flags: bitmask of TokenIO::TokenIOFormat flags */
+  int tw_format;
 
-  /** Default destructor */
-  virtual ~TokenWriter(void) {};
-	
-  /** Write a single token */
-  virtual void put_token(const mootToken &token) =0;
+  /** Name of TokenWriter subtype for diagnostics */
+  std::string tw_name;
 
-  /** Write a whole sentence */
-  virtual void put_sentence(const mootSentence &sentence) =0;
-};
+  /** Pointer to underlying mootio::mostream used for output */
+  mootio::mostream *tw_ostream;
 
-/*------------------------------------------------------------
- * TokenWriterCooked
- */
-/** Abstract class for native "cooked" text-format token output */
-class TokenWriterCooked : public TokenWriter {
-public:
-  /*----------------------------------------
-   * Writer: Data
-   */
-  /** Whether to output all analyses or just those for the 'best' tag (the default). */
-  bool want_best_only;
+  /** Whether we created @tw_ostream ourselves */
+  bool tw_ostream_created;
+
+  /** Whether we're in a comment-block */
+  bool tw_is_comment_block;
 
 public:
   /*----------------------------------------
-   * Writer: Cooked: Methods: Overrides
+   * Writer: Methods
    */
-  /** Default constructor */
-  TokenWriterCooked(bool i_want_best_only=false)
-    : want_best_only(i_want_best_only)
+  /** \name Constructors etc. */
+  //@{
+  /**
+   * Default constructor
+   * @param fmt output format: should be a bitmask of TokenIO::TokenIOFormat flags 
+   * @param name name of TokenWriter subtype for diagnostics
+   */
+  TokenWriter(int fmt=tiofWellDone,
+	      const std::string &name="TokenWriter")
+    : tw_format(fmt),
+      tw_name(name),
+      tw_ostream(NULL),
+      tw_ostream_created(false)
   {};
 
   /** Default destructor */
-  virtual ~TokenWriterCooked(void) {};
-
-  /*----------------------------------------
-   * Writer: Cooked: Methods: New
-   */
-  //(none)
-};
-
-
-/*------------------------------------------------------------
- * TokenWriterCookedString
- */
-/** Class for native "cooked" text-format token output to strings */
-class TokenWriterCookedString : public TokenWriterCooked {
-public:
-  /*----------------------------------------
-   * Writer: Cooked: String: Data
-   */
-  /** Pointer to current output buffer (use buffer() instead) */
-  std::string *dst;
-
-  /** Default buffer for output string (use buffer() instead) */
-  std::string dst_default;
-
-  /** Temporary buffer for stringification of costs */
-  char costbuf[32];
-public:
-  /*----------------------------------------
-   * Writer: Cooked: String: Methods: Overrides
-   */
-  /**
-   * Default constructor
-   * \i_want_best_only: whether to output only 'best' tags
-   */
-  TokenWriterCookedString(bool i_want_best_only=false)
+  virtual ~TokenWriter(void)
   {
-    want_best_only = i_want_best_only;
+    //close();
+  };
+  //@}
+
+  /*------------------------------------------------------------
+   * Writer: Methods: Output Selection
+   */
+  /** \name Output Selection */
+  //@{
+
+  /**
+   * Select output to a mootio::mostream object, pointer version.
+   * This is the basic case.
+   * Descendendant classes may override this method.
+   */
+  virtual void to_mstream(mootio::mostream *mostreamp) {
+    close();
+    tw_ostream = mostreamp;
+    if (!(tw_format&tiofNull) && (!tw_ostream || !tw_ostream->valid())) {
+      carp("Warning: selecting output to invalid stream");
+    }
+    tw_ostream_created = false;
   };
 
-  /** Default destructor */
-  virtual ~TokenWriterCookedString(void) {};
-	
-  /** Write string for a token to current string buffer (buffer is cleared) */
-  virtual void put_token(const mootToken &token)
-  {
-    if (!dst) dst = &dst_default;
-    dst->clear();
-    token2string(token, *dst);
-  }
+  /**
+   * Select output to a mootio::mistream object, reference version.
+   * Default implementation just calls to_mstream(&mos).
+   */
+  virtual void to_mstream(mootio::mostream &mos) {
+    to_mstream(&mos);
+  };
 
-  /** Write a whole sentence to current string buffer (buffer is cleared) */
+  /**
+   * Select output to a named file.
+   *  Descendants using named file output may override this method.
+   * The filename "-" may be used to specify stdout.
+   */
+  virtual void to_filename(const char *filename)
+  {
+    to_mstream(new mootio::mofstream(filename,"wb"));
+    tw_ostream_created = true;
+    if (!tw_ostream->valid()) {
+      carp("open failed for \"%s\": %s", filename, strerror(errno));
+      close();
+    }
+  };
+
+  /**
+   * Select output to a C stream.
+   * Caller is responsible for opening and closing the stream.
+   * Descendants using C stream output may override this method.
+   * Default implementation calls to_fd().
+   */
+  virtual void to_file(FILE *file)
+  {
+    to_mstream(new mootio::mocstream(file));
+    tw_ostream_created = true;
+  };
+
+  /**
+   * Select output to a file descriptor.
+   * Caller is responsible for opening and closing the stream.
+   * Descendants using file descriptor may override this method.
+   * No default implementation.
+   */
+  virtual void to_fd(int fd)
+  {
+    close();
+    throw domain_error("to_fd(): not implemented.");
+  };
+
+  /**
+   * Select output to a C++ stream.
+   * Caller is responsible for allocation and de-allocation.
+   * Descendants using C++ stream input may override this method.
+   * Default implementation calls from_mstream().
+   */
+  virtual void to_cxxstream(std::ostream &os)
+  {
+    to_mstream(new mootio::mocxxstream(os));
+    tw_ostream_created = true;
+  };
+
+  /**
+   * Finish output to currently selected sink & perform any required
+   * cleanup operations.
+   * This method should always be called before selecting a new output sink.
+   * The current output stream is only closed if it was created locally.
+   *
+   * Descendants may override this method.
+   */
+  virtual void close(void) {
+    if (tw_is_comment_block) put_comment_block_end();
+    if (tw_ostream && tw_ostream_created) {
+      tw_ostream->close();
+      delete tw_ostream;
+    }
+    tw_ostream_created = false;	
+    tw_ostream = NULL;
+  };
+  //@}
+
+
+  /*----------------------------------------*/
+  /** \name Output Methods: Token-level */
+  //@{
+  /**
+   * Write a single token to the currently selected output sink.
+   * Descendants \b must override this method.
+   */
+  virtual void put_token(const mootToken &token) {
+    throw domain_error("TokenWriter: put_token() not implemented");
+  };
+
+  /**
+   * Write a single sentence to the currently selected output sink.
+   * Descendants may override this method.
+   * Default implementation just calls putToken() for every element of sentence.
+   */
   virtual void put_sentence(const mootSentence &sentence)
   {
-    if (!dst) dst = &dst_default;
-    dst->clear();
-    sentence2string(sentence, *dst);
-  }
+    for (mootSentence::const_iterator si = sentence.begin(); si != sentence.end(); si++)
+      put_token(*si);
+  };
+  //@}
 
-  /*----------------------------------------
-   * Writer: Cooked: String: Methods: New
-   */
+  /*----------------------------------------*/
+  /** \name Output Methods: Comments */
+  //@{
   /**
-   * Append canonical string-form of a mootToken (without trailing newline)
-   * to string \c s .  Returns a reference to \c s .
+   * Begin a comment block.
+   * This may effect behavior of subsequent put_raw_*() calls.
+   * Descendants using comments should override this method.
    */
-  std::string &token2string(const mootToken &token, std::string &s);
-
-  /** Clear internal buffer and stringify token into it */
-  inline std::string &token2string(const mootToken &token)
-  {
-    buffer().clear();
-    return token2string(token,buffer());
+  virtual void put_comment_block_begin(void) {
+    tw_is_comment_block = true;
   };
 
   /**
-   * Append canonical string-form of a mootSentence (without trailing empty line)
-   * to string \c s .  Returns reference to \c s .
+   * End a comment block.
+   * This may effect behavior of subsequent put_raw() calls.
+   * Descendants using comments should override this method.
    */
-  std::string &sentence2string(const mootSentence &sentence, std::string &s);
-
-  /** Clear internal buffer and stringify sentence into it */
-  inline std::string &sentence2string(const mootSentence &sentence)
-  {
-    buffer().clear();
-    return sentence2string(sentence,buffer());
+  virtual void put_comment_block_end(void) {
+    tw_is_comment_block = false;
   };
 
-  /** Select a new output string buffer for \c put_* methods */
-  inline std::string &buffer(std::string &buf)
-  { 
-    dst = &buf;
-    return *dst;
+  /**
+   * Write a single comment to the currently selected output sink
+   * Descendants may override this method.
+   */
+  virtual void put_comment_buffer(const char *buf, size_t len) {
+    put_comment_block_begin();
+    put_raw_buffer(buf,len);
+    put_comment_block_end();
   };
 
-  /** Get currently selected output string buffer */
-  inline std::string &buffer(void)
-  {
-    if (!dst) dst = &dst_default;
-    return *dst;
+  /**
+   * Write a single comment to the currently selected output sink
+   * Descendants may override this method.
+   */
+  virtual void put_comment(const char *s) {
+    put_comment_buffer(s,strlen(s));
   };
+
+  /**
+   * Write a single comment to the currently selected output sink
+   * Descendants may override this method.
+   */
+  virtual void put_comment_buffer(const std::string &s) {
+    put_comment_buffer(s.data(),s.size());
+  };
+
+  /**
+   * Write a comment to the currently selected output sink, printf() style.
+   * Descendants may override this method.
+   */
+  virtual void printf_comment(const char *fmt, ...);
+  //@}
+
+  /*----------------------------------------*/
+  /** \name Output Methods: Raw */
+  //@{
+  /**
+   * Write some data to the currently selected output sink
+   * Descendants may override this method.
+   */
+  virtual void put_raw_buffer(const char *buf, size_t len)
+  {};
+  /**
+   * Write some data to the currently selected output sink
+   * Descendants may override this method.
+   */
+  virtual void put_raw(const char *s) {
+    put_raw_buffer(s,strlen(s));
+  };
+  /**
+   * Write some data to the currently selected output sink
+   * Descendants may override this method.
+   */
+  virtual void put_raw(const std::string &s) {
+    put_raw_buffer(s.data(),s.size());
+  };
+
+  /**
+   * Write some data to the currently selected output sink, printf() style.
+   * Descendants may override this method.
+   */
+  virtual void printf_raw(const char *fmt, ...);
+  //@}
+
+  /*----------------------------------------*/
+  /** \name Diagnostics */
+  //@{
+  /** Set writer subtype name to use for diagnostics.
+   * Descendants may override this method. */
+  virtual void writer_name(const std::string &myname) { tw_name = myname; };
+
+  /** Complain */
+  virtual void carp(const char *fmt, ...);
+  //@}
 };
 
-
 /*------------------------------------------------------------
- * TokenWriterCookedFile
+ * TokenWriterNative
  */
-/** Class for native "cooked" text-format output to a C stream */
-class TokenWriterCookedFile : public TokenWriterCooked {
+/**
+ * \brief Class for native "cooked" text-format token output.
+ */
+class TokenWriterNative : public TokenWriter {
 public:
   /*----------------------------------------
-   * Writer: Cooked: File: Data
+   * Writer: Native: Data
    */
-  /** Current output file */
-  FILE *out;
+  /** Temporary buffer for *2string methods */
+  mootio::mocbuffer twn_tmpbuf;
 
 public:
   /*----------------------------------------
-   * Writer: Cooked: File: Methods: Overrides
+   * Writer: Native: Methods: construction
    */
-  /**
-   * Default constructor
-   * \i_want_best_only: whether to output only 'best' tags
-   * \outfile: C stream to which to write data.
-   */
-  TokenWriterCookedFile(bool i_want_best_only=false, FILE *outfile=stdout)
-    : out(outfile)
+  /** \name Constructors etc. */
+  //@{
+  /** Default constructor */
+  TokenWriterNative(int fmt=tiofWellDone,
+		    const std::string name="TokenWriterNative")
+    : TokenWriter(fmt,name)
   {
-    want_best_only = i_want_best_only;
+    if (! tw_format&tiofNative ) tw_format |= tiofNative;
   };
 
   /** Default destructor */
-  virtual ~TokenWriterCookedFile(void) {};
-	
-  /** Write string for a token to current string buffer (buffer is cleared) */
-  virtual void put_token(const mootToken &token);
-
-  /** Write a whole sentence to current string buffer (buffer is cleared) */
-  virtual void put_sentence(const mootSentence &sentence);
+  virtual ~TokenWriterNative(void)
+  {
+    //TokenWriterNative::close();
+  };
+  //@}
 
   /*----------------------------------------
-   * Writing: Cooked: File: Methods: New
+   * Writer: Native: Methods: Output Selection
    */
-  /** Get current output file */
-  inline FILE *output_file(void) { return out; };
+  /** \name Output Selection */
+  // @ {
 
-  /** Set current output file */
-  inline FILE *output_file(FILE *outfile) { out=outfile; return out; };
+  /*
+   * Finish output to currently selected sink & perform any required
+   * cleanup operations.
+   * Used by named-file interface.
+   */
+  //virtual void close(void);
+  // @ }
+
+  /*----------------------------------------
+   * Writer: Native: Methods: Output
+   */
+  /** \name Overrides */
+  //@{
+  virtual void put_token(const mootToken &token) {
+    _put_token(token,tw_ostream);
+  };
+  virtual void put_sentence(const mootSentence &sentence) {
+    _put_sentence(sentence,tw_ostream);
+  };
+
+  virtual void put_raw_buffer(const char *buf, size_t len) {
+    _put_raw_buffer(buf,len,tw_ostream);
+  };
+  //@}
+
+  /*----------------------------------------
+   * Writer: Native: Methods: Utilities
+   */
+  /** \name Output Utilities */
+  //@{
+  /** Write a single token to a mootio::mostream (with eot marker) */
+  void _put_token(const mootToken &token, mootio::mostream *os);
+
+  /** Write a whole sentence to a mootio::mostream (with eos marker) */
+  void _put_sentence(const mootSentence &sentence, mootio::mostream *os);
+
+  /** Write a raw comment to a mootio::mostream */
+  void _put_comment(const char *buf, size_t len, mootio::mostream *os);
+
+  /** Write some raw data to a mootio::mostream, respecinting @tw_is_comment_block */
+  void _put_raw_buffer(const char *buf, size_t len, mootio::mostream *os);
+
+  /** Clear internal buffer and stringify sentence into it,
+   * returning result as a new std::string
+   */
+  inline std::string token2string(const mootToken &token)
+  {
+    twn_tmpbuf.clear();
+    _put_token(token,&twn_tmpbuf);
+    return std::string(twn_tmpbuf.data(), twn_tmpbuf.size());
+  };
+
+  /** Clear internal buffer and stringify sentence into it,
+   * returning result as a new std::string
+   */
+  inline std::string sentence2string(const mootSentence &sentence)
+  {
+    twn_tmpbuf.clear();
+    _put_sentence(sentence,&twn_tmpbuf);
+    return std::string(twn_tmpbuf.data(), twn_tmpbuf.size());
+  };
+  //@}
 };
-
 
 }; /*moot_END_NAMESPACE*/
 

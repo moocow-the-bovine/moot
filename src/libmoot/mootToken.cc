@@ -31,26 +31,19 @@
 namespace moot {
   using namespace std;
 
-  const char *mootTokFlavorNames[TF_NFLAVORS] =
+  const char *mootTokenTypeNames[NTokTypes] =
     {
-      "TF_UNKNOWN",
-      "TF_TOKEN",
-      "TF_COMMENT",
-      "TF_EOS",
-      "TF_EOF",
-      "TF_XML",
-      "TF_USER",
-      /*-- internal lexer use only */
-      "TF_TEXT",
-      "TF_TAB",
-      "TF_TAG",
-      "TF_DETAILS",
-      "TF_COST",
-      "TF_NEWLINE",
-      "TF_IGNORE"
+      "TokTypeUnknown",
+      "TokTypeVanilla",
+      "TokTypeLibXML",
+      "TokTypeXMLRaw",
+      "TokTypeComment",
+      "TokTypeEOS",
+      "TokTypeEOF",
+      "TokTypeUser"
     };
 
-  const char *TokenTypeNames[NTokTypes] =
+  const char *mootTokenFlavorNames[NTokFlavors] =
     {
       "@ALPHA",
       "@CARD",

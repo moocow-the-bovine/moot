@@ -40,7 +40,6 @@ moot_BEGIN_NAMESPACE
 int mootEval::compareTokens(const mootToken &tok1, const mootToken &tok2)
 {
   status = MEF_None;
-  mootToken::AnalysisSet::const_iterator bound;
 
   if (tok1.text() != tok2.text()) status |= MEF_TokMismatch;
 
@@ -50,12 +49,10 @@ int mootEval::compareTokens(const mootToken &tok1, const mootToken &tok2)
     //status |= (MEF_EmptyClass1|MEF_ImpClass1|MEF_XImpClass1);
     status |= MEF_EmptyClass1;
   } else {
-    bound = tok1.lower_bound(tok1.besttag());
-    if (bound == tok1.analyses().end() || bound->tag != tok1.besttag())
+    if (!tok1.has_analysis_for_tag(tok1.besttag()))
 	status |= MEF_ImpClass1;
 
-    bound = tok1.lower_bound(tok2.besttag());
-    if (bound == tok1.analyses().end() || bound->tag != tok2.besttag())
+    if (!tok1.has_analysis_for_tag(tok2.besttag()))
 	status |= MEF_XImpClass1;
   }
 
@@ -63,12 +60,10 @@ int mootEval::compareTokens(const mootToken &tok1, const mootToken &tok2)
     //status |= (MEF_EmptyClass1|MEF_ImpClass2|MEF_XImpClass2);
     status |= MEF_EmptyClass2;
   } else {
-    bound = tok2.lower_bound(tok2.besttag());
-    if (bound == tok2.analyses().end() || bound->tag != tok2.besttag())
+    if (!tok2.has_analysis_for_tag(tok2.besttag()))
 	status |= MEF_ImpClass2;
 
-    bound = tok2.lower_bound(tok1.besttag());
-    if (bound == tok2.analyses().end() || bound->tag != tok1.besttag())
+    if (!tok2.has_analysis_for_tag(tok1.besttag()))
 	status |= MEF_XImpClass2;
   }
 

@@ -26,215 +26,509 @@
  *   + moocow's PoS tagger : token I/O
  *--------------------------------------------------------------------------*/
 
-/*#include "mootTypes.h"*/
-#include "mootTokenIO.h"
+#include <mootConfig.h>
+
+#include <mootTokenIO.h>
+#include <mootUtils.h>
+#include <assert.h>
+
+#ifdef MOOT_LIBXML_ENABLED
+# include <mootTokenXmlDoc.h>
+#endif /* MOOT_LIBXML_ENABLED */
+
+#ifdef MOOT_EXPAT_ENABLED
+# include <mootTokenExpatIO.h>
+#endif /* MOOT_EXPAT_ENABLED */
 
 /*moot_BEGIN_NAMESPACE*/
 namespace moot {
+  using namespace std;
+
+/*==========================================================================
+ * TokenIO
+ *==========================================================================*/
+
+/*------------------------------------------------------------
+ * TokenIO: parse_format_string()
+ */
+int TokenIO::parse_format_string(const std::string &fmtString)
+{
+  int flags = 0;
+  int flag = 0;
+  bool neg = false;
+  list<string> sflags = moot_strtok(fmtString,", ");
+
+  for (list<string>::iterator sfi = sflags.begin();
+       sfi != sflags.end();
+       sfi++)
+    {
+      string &s = *sfi;
+      if (s[0] == '!') {
+	neg = true;
+	s.erase(0,1);
+      }
+      else neg = false;
+
+      //-- canonicalize to lower case
+      for (string::iterator si = s.begin(); si != s.end(); si++) {
+	*si = tolower(*si);
+      }
+
+      //-- get flag bitmask
+      if (s=="none") flag = tiofNone;
+      else if (s=="null") flag = tiofNull;
+      else if (s=="unknown") flag = tiofUnknown;
+      else if (s=="native") flag = tiofNative;
+      else if (s=="xml") flag = tiofXML;
+      //else if (s=="expat") flag = tiofExpat;
+      else if (s=="conserve") flag = tiofConserve;
+      else if (s=="pretty") flag = tiofPretty;
+      else if (s=="text") flag = tiofText;
+      else if (s=="analyzed") flag = tiofAnalyzed;
+      else if (s=="tagged") flag = tiofTagged;
+      else if (s=="user") flag = tiofUser;
+      //-- aliases
+      else if (s=="rare" || s=="r") flag = tiofRare;
+      else if (s=="mediumrare" || s=="mr") flag = tiofMediumRare;
+      else if (s=="medium" || s=="m") flag = tiofMedium;
+      else if (s=="welldone" || s=="wd") flag = tiofWellDone;
+      else {
+	flag = 0;
+	fprintf(stderr,
+		"TokenIO::parse_format_string(): unknown format flag \"%s\"\n",
+		s.c_str());
+	continue;
+      }
+
+      if (neg) flags &= ~flag;
+      else flags |= flag;
+    }
+  return flags;
+}
+
+/*------------------------------------------------------------
+ * TokenIO: guess_filename_format()
+ */
+int TokenIO::guess_filename_format(const char *filename)
+{
+  if (!filename) return tiofNone;
+
+  int flags = 0;
+  list<string> exts = moot_strtok(filename,".");
+
+  for (list<string>::reverse_iterator exti = exts.rbegin();
+       exti != exts.rend();
+       exti++)
+    {
+      if      (*exti == "t"   ) flags |= tiofRare;
+      else if (*exti == "tt"  ) flags |= tiofMedium;
+      else if (*exti == "ttt" ) flags |= tiofMedium;
+      else if (*exti == "mr"  ) flags |= tiofMediumRare;
+      else if (*exti == "wd"  ) flags |= tiofWellDone;
+      else if (*exti == "wdt" ) flags |= tiofWellDone;
+      else if (*exti == "xml" ) flags |= tiofXML;
+      else if (*exti == "moot") flags |= tiofNative;
+      else {
+	//-- unknown extension - break off search
+	break;
+      }
+    }
+  return flags;
+}
+
+/*------------------------------------------------------------
+ * TokenIO: is_empty_format()
+ */
+bool TokenIO::is_empty_format(int fmt)
+{
+  return
+    //( (fmt&~(tiofNative|tiofXML|tiofExpat|tiofPretty)) == 0 )
+    ( (fmt&(tiofText|tiofAnalyzed|tiofTagged)) == 0 )
+    ;
+}
+
+/*------------------------------------------------------------
+ * TokenIO: sanitize_format()
+ */
+int TokenIO::sanitize_format(int fmt, int fmt_implied, int fmt_default)
+{
+  //-- handle empty formats
+  if (is_empty_format(fmt)) fmt |= fmt_default;
+
+  //-- select only one basic format
+  if      (fmt & tiofXML)    fmt &= ~tiofNative;
+  else if (fmt & tiofNative) fmt &= ~tiofXML;
+  else if (!(fmt&tiofUser))  fmt |= tiofNative;
+
+  //-- and return
+  return (fmt|fmt_implied);
+}
+
+/*------------------------------------------------------------
+ * TokenIO: parse_format_request()
+ */
+int TokenIO::parse_format_request(const char *request,
+				  const char *filename,
+				  int fmt_implied,
+				  int fmt_default)
+{
+  int fmt = 0;
+
+  if (request && *request)
+    fmt |= parse_format_string(request ? request : "");
+  else
+    fmt |= guess_filename_format(filename);
+
+  return sanitize_format(fmt,fmt_implied,fmt_default);
+}
+
+/*------------------------------------------------------------
+ * TokenIO: format_canonical_string()
+ */
+std::string TokenIO::format_canonical_string(int fmt)
+{
+  string s;
+  if (fmt & tiofUnknown) s.append("Unknown,");
+  if (fmt & tiofNull) s.append("Null,");
+  if (fmt & tiofNative) s.append("Native,");
+  if (fmt & tiofXML) s.append("XML,");
+  //if (fmt & tiofExpat) s.append("Expat,");
+  if (fmt & tiofConserve) s.append("Conserve,");
+  if (fmt & tiofPretty) s.append("Pretty,");
+  if (fmt & tiofText) s.append("Text,");
+  if (fmt & tiofAnalyzed) s.append("Analyzed,");
+  if (fmt & tiofTagged) s.append("Tagged,");
+  if (fmt & tiofPruned) s.append("Pruned,");
+  if (fmt & tiofUser) s.append("User,");
+
+  if (s.empty()) s = "None";
+  else s.erase(s.size()-1);
+
+  return s;
+}
+
+
+/*------------------------------------------------------------
+ * TokenIO: new_reader()
+ */
+class TokenReader *TokenIO::new_reader(int fmt)
+{
+  //-- format dispatch
+  if      (fmt & tiofNative) { return new TokenReaderNative(fmt); }
+
+  //else if (fmt & (tiofExpat|tiofXML)) {
+else if (fmt & tiofXML) {
+#ifdef MOOT_EXPAT_ENABLED
+    return new TokenReaderExpat(fmt);
+#elif MOOT_LIBXML_ENABLED
+    return new TokenXmlDoc(fmt);
+#else
+    throw domain_error("XML support disabled");
+#endif
+  }
+
+  //-- ... more here ...
+
+  //-- default to native format
+  return new TokenReaderNative(fmt);
+}
+
+/*------------------------------------------------------------
+ * TokenIO: new_writer()
+ */
+class TokenWriter *TokenIO::new_writer(int fmt)
+{
+  //-- format dispatch
+
+  //-- native output
+  if (fmt&tiofNative)
+    {
+      return new TokenWriterNative(fmt);
+    }
+  
+  //-- XML output
+  //else if (fmt & (tiofXML|tiofExpat)) {
+  else if (fmt & tiofXML) {
+#ifdef MOOT_EXPAT_ENABLED
+    return new TokenWriterExpat(fmt);
+#elif MOOT_LIBXML_ENABLED
+    return new TokenXmlDoc(fmt);
+#else
+    throw domain_error("XML support disabled");
+#endif
+  }
+
+  //-- ... more here ...
+
+  //-- default to native format
+  return new TokenWriterNative(fmt);
+}
 
 /*==========================================================================
  * TokenReader
  *==========================================================================*/
 
+
 /*------------------------------------------------------------
- * TokenReader
+ * Reader : Methods : Input : get_sentence
+ */
+mootTokenType TokenReader::get_sentence(void)
+{
+  if (!tr_sentence) return TokTypeEOF;
+
+  int lxtyp = TokTypeUnknown;
+  mootToken *tr_token_old = tr_token;
+  tr_sentence->clear();
+
+  while (lxtyp != TokTypeEOS && lxtyp != TokTypeEOF) {
+    //-- allocate new destination token
+    tr_sentence->push_back(mootToken());
+    tr_token = &(tr_sentence->back());
+    lxtyp = get_token();
+  }
+
+  tr_token = tr_token_old;
+  return (mootTokenType)lxtyp;  
+}
+
+/*------------------------------------------------------------
+ * TokenReader : Diagnostics : carp
  */
 void TokenReader::carp(const char *fmt, ...)
 {
-  fprintf(stderr, "moot::TokenReader: ");
+  fprintf(stderr, "%s: ", tr_name.c_str());
   va_list ap;
   va_start(ap, fmt);
   vfprintf(stderr, fmt, ap);
   va_end(ap);
+  fprintf(stderr, " in \"%s\" at byte %u: line %u, column %u\n",
+	  ((tr_istream
+	    && tr_istream->valid()
+	    && !tr_istream->name.empty()) ? tr_istream->name.c_str() : "(unknown)"),
+	  byte_number(),
+	  line_number(),
+	  column_number());
 }
 
+
+/*==========================================================================
+ * TokenReaderNative
+ *==========================================================================*/
+
 /*------------------------------------------------------------
- * TokenReaderCooked
+ * Reader : Native : Input Selection
  */
-/* mootSentence &get_sentence(void); */
-mootTokFlavor TokenReaderCooked::get_sentence(void)
+//(in header)
+
+/*----------------------------------------------
+ * Reader : Native : Input Selection : from_mstream()
+ */
+void TokenReaderNative::from_mstream(mootio::mistream *mis)
 {
-  int lxtok;
+  TokenReader::from_mstream(mis);
+  lexer.from_mstream(mis);
+}
 
-  msentence.clear();
-  while ((lxtok = lexer.yylex()) != TF_EOF) {
-    switch (lxtok) {
 
-    case TF_COMMENT:
-    case TF_TOKEN:
-      msentence.push_back(lexer.mtoken);
-      break;
+/*------------------------------------------------------------
+ * Reader : Native : Methods : get_token()
+ */
+mootTokenType TokenReaderNative::get_token(void)
+{
+  tr_token = lexer.mtoken = &(lexer.mtoken_default); //-- grab to lexer-internal token
+  return (mootTokenType)(lexer.yylex());
+};
 
-    case TF_EOS:
-      if (!msentence.empty()) return TF_EOS;
-      break;
-
-    default:
-      //-- whoa
-      fprintf(stderr,
-	      "mootTokenIO::get_sentence(): unknown token type '%d' ignored!\n",
-	      lxtok);
-      break;
-    }
+/*------------------------------------------------------------
+ * Reader : Native : Methods : get_sentence()
+ */
+mootTokenType TokenReaderNative::get_sentence(void)
+{
+  if (!tr_sentence) tr_sentence = &trn_sentence;
+  int lxtyp = TokTypeUnknown;
+  tr_sentence->clear();
+  while (lxtyp != TokTypeEOS && lxtyp != TokTypeEOF) {
+    //-- allocate new destination token
+    tr_sentence->push_back(mootToken());
+    lexer.mtoken = &(tr_sentence->back());
+    lxtyp = lexer.yylex();
   }
-  return TF_EOF;
-}
-
-void TokenReaderCooked::carp(const char *fmt, ...)
-{
-  fprintf(stderr, "moot::TokenReaderCooked: ");
-  va_list ap;
-  va_start(ap, fmt);
-  vfprintf(stderr, fmt, ap);
-  va_end(ap);
-  fprintf(stderr, " in %s %s at line %d, column %d, near `%s'\n",
-	  (lexer.use_string ? "string" : "file"),
-	  (lexer.srcname.empty() ? "(null)" : lexer.srcname.c_str()),
-	  lexer.theLine,
-	  lexer.theColumn,
-	  lexer.yytext);
-}
-
-/*------------------------------------------------------------
- * TokenReaderCookedFile
- */
-//(empty)
-
-/*------------------------------------------------------------
- * TokenReaderCookedString
- */
-//(empty)
-
+  tr_sentence->pop_back();
+  return (mootTokenType)lxtyp;
+};
 
 
 /*==========================================================================
  * TokenWriter
  *==========================================================================*/
 
-/*------------------------------------------------------------
- * TokenWriterCooked
+/*==========================================================================
+ * TokenWriter
  */
-//(empty)
 
 /*------------------------------------------------------------
- * TokenWriterCookedString
+ * TokenWriter : Output : put_sentence()
  */
-/* std::string &token2string(const mootToken &token, std::string &s); */
-string &TokenWriterCookedString::token2string(const mootToken &token, string &s)
+//(in class def)
+
+/*------------------------------------------------------------
+ * TokenWriter : Comments : printf_comment()
+ */
+void TokenWriter::printf_comment(const char *fmt, ...)
 {
-  s = token.text();
-  if (token.flavor() == TF_COMMENT) return s;
+  char *buf =NULL;
+  int len =0;
+  va_list ap;
+  va_start(ap, fmt);
+  len = vasprintf(&buf, fmt, ap);
+  va_end(ap);
+  if (len>=0 && buf) {
+    put_comment_buffer(buf,(size_t)len);
+    free(buf);
+  }
+}
 
-  //-- best tag is always standalone first 'analysis'
-  s.push_back('\t');
-  s.append(token.besttag());
-
-  if (want_best_only) {
-    //-- best-only, full analyses
-    for (mootToken::AnalysisSet::const_iterator ai = token.lower_bound(token.besttag());
-	 ai != token.analyses().end() && ai->tag == token.besttag();
-	 ai++ )
-      {
-	s.push_back('\t');
-	s.append(ai->details.empty() ? ai->tag : ai->details);
-	if (ai->cost != 0.0) {
-	  s.push_back('<');
-	  sprintf(costbuf, "%g", ai->cost);
-	  s.append(costbuf);
-	  s.push_back('>');
-	}
-      }
-  } //-- /-tags,+best
-  else {
-    //-- all possibilities, full analyses
-    for (mootToken::AnalysisSet::const_iterator ai = token.analyses().begin();
-	 ai != token.analyses().end();
-	 ai++ )
-      {
-	s.push_back('\t');
-	s.append(ai->details.empty() ? ai->tag : ai->details);
-	if (ai->cost != 0.0) {
-	  s.push_back('<');
-	  sprintf(costbuf, "%g", ai->cost);
-	  s.append(costbuf);
-	  s.push_back('>');
-	}
-      }
-  } //-- -tags,-best
-  return s;
-};
-
-/*void sentence2string(const mootSentence &sentence, std::string &s);*/
-string &TokenWriterCookedString::sentence2string(const mootSentence &sentence, string &s)
+/*------------------------------------------------------------
+ * TokenWriter : Raw Data : printf_raw()
+ */
+void TokenWriter::printf_raw(const char *fmt, ...)
 {
+  char *buf =NULL;
+  int len=0;
+  va_list ap;
+  va_start(ap, fmt);
+  len = vasprintf(&buf, fmt, ap);
+  va_end(ap);
+  if (len>=0 && buf) {
+    put_raw_buffer(buf,len);
+    free(buf);
+  }
+}
+
+/*------------------------------------------------------------
+ * TokenWriter : Diagnostics : carp()
+ */
+void TokenWriter::carp(const char *fmt, ...)
+{
+  fprintf(stderr, "%s: ", tw_name.c_str());
+  va_list ap;
+  va_start(ap, fmt);
+  vfprintf(stderr, fmt, ap);
+  va_end(ap);
+}
+
+
+
+/*==========================================================================
+ * TokenWriterNative
+ */
+
+/*------------------------------------------------------------
+ * TokenWriterNative : Output : Utilities : _put_token()
+ */
+void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
+{
+  if (!os || !os->valid() || tw_format & tiofNull) return;
+
+  switch (token.toktype()) {
+
+  case TokTypeComment:
+    put_comment_buffer(token.text().data(), token.text().size());
+    return;
+
+  case TokTypeVanilla:
+  case TokTypeLibXML:
+    if (tw_is_comment_block) os->puts("%%");
+    if (tw_format & tiofText) {
+      os->puts(token.text());
+    }
+
+    if (tw_format & tiofTagged) {
+      //-- best tag is always standalone first 'analysis'
+      os->putc('\t');
+      os->puts(token.besttag());
+    }
+
+    if (tw_format & tiofAnalyzed) {
+      for (mootToken::Analyses::const_iterator ai = token.analyses().begin();
+	   ai != token.analyses().end();
+	   ai++)
+	{
+	  if ((tw_format & tiofPruned) && ai->tag != token.besttag()) continue;
+	  os->putc('\t');
+	  if (tw_format & tiofPretty) {
+	    os->puts(moot_normalize_ws((ai->details.empty() ? ai->tag : ai->details),
+				       true, true));
+	  } else {
+	    os->puts(ai->details.empty() ? ai->tag : ai->details);
+	  }
+	}
+    }
+    os->putc('\n');
+    break;
+
+  case TokTypeEOS:
+    if (tw_is_comment_block) os->puts("%%\n");
+    else os->putc('\n');
+    break;
+
+  default:
+    //-- ignore
+    break;
+  }
+}
+
+/*------------------------------------------------------------
+ * TokenWriterNative : Output : Utilities : put_sentence()
+ */
+void TokenWriterNative::_put_sentence(const mootSentence &sentence, mootio::mostream *os)
+{
+  if (!os || !os->valid() || tw_format & tiofNull) return;
   for (mootSentence::const_iterator si = sentence.begin();
        si != sentence.end();
        si++)
     {
-      token2string(*si, s);
-      s.push_back('\n');
+      _put_token(*si, os);
     }
-  return s;
-};
+  if (!sentence.empty() || sentence.back().toktype() != TokTypeEOS) {
+    os->putc('\n');
+  }
+}
+
 
 /*------------------------------------------------------------
- * TokenWriterCookedFile
+ * TokenWriterNative : Output : Utilities : Comment
  */
-void TokenWriterCookedFile::put_token(const mootToken &token)
+void TokenWriterNative::_put_comment(const char *buf, size_t len, mootio::mostream *os)
 {
-  /*
-  string s;
-  fputs(token2string(token,s).c_str(), out);
-  fputc('\n', out);
-  */
-  fputs(token.text().c_str(), out);
-  if (token.flavor() == TF_COMMENT) {
-    fputc('\n', out);
+  if (!os || !os->valid() || tw_format & tiofNull) return;
+
+  if (len == 0) {
+    os->putc('\n');
     return;
   }
 
-  //-- best tag is always standalone first 'analysis'
-  fputc('\t',out);
-  fputs(token.besttag().c_str(),out);
-
-  if (want_best_only) {
-    //-- best-only, full analyses
-    for (mootToken::AnalysisSet::const_iterator ai = token.lower_bound(token.besttag());
-	 ai != token.analyses().end() && ai->tag == token.besttag();
-	 ai++ )
-      {
-	fputc('\t',out);
-	fputs((ai->details.empty() ? ai->tag.c_str() : ai->details.c_str()), out);
-	if (ai->cost != 0.0) {
-	  fprintf(out,"<%g>",ai->cost);
-	}
-      }
-  } //-- /-tags,+best
-  else {
-    //-- all possibilities, full analyses
-    for (mootToken::AnalysisSet::const_iterator ai = token.analyses().begin();
-	 ai != token.analyses().end();
-	 ai++ )
-      {
-	fputc('\t',out);
-	fputs((ai->details.empty() ? ai->tag.c_str() : ai->details.c_str()), out);
-	if (ai->cost != 0.0) {
-	  fprintf(out,"<%g>",ai->cost);
-	}
-      }
-    } //-- -tags,-best
-  fputc('\n',out);
+  size_t i, j;
+  for (i=0; i < len; i=j+1) {
+    for (j=i; j < len && buf[j] != '\n'; j++)
+      ;
+    os->puts("%%");
+    os->write(buf+i, j-i);
+    os->putc('\n');
+  }
 }
 
-void TokenWriterCookedFile::put_sentence(const mootSentence &sentence)
+/*------------------------------------------------------------
+ * Writer : Native : Output : Utilities : Raw
+ */
+void TokenWriterNative::_put_raw_buffer(const char *buf, size_t len, mootio::mostream *os)
 {
-  for (mootSentence::const_iterator si = sentence.begin();
-       si != sentence.end();
-       si++)
-    {
-      put_token(*si);
-    }
-  fputc('\n', out);
+  if (!os || !os->valid() || tw_format & tiofNull)
+    return;
+  else if (tw_is_comment_block)
+    _put_comment(buf, len, os);
+  else
+    os->write(buf,len);
 }
 
 

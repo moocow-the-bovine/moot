@@ -20,8 +20,9 @@
 */
 
 #include "mootXmlParser.h"
+#include <string>
 
-#ifdef MOOT_XML_ENABLED
+#ifdef MOOT_EXPAT_ENABLED
 
 using namespace moot;
 using namespace std;
@@ -147,20 +148,7 @@ bool mootXmlParser::parseStream(FILE *infile, FILE *outfile, const char *in_name
   reset();
   int done, len;
   do {
-    //-- fill 'er up
-    len = fread(xml_buf, 1, xml_buflen, infile);
-    if (ferror(in)) {
-      xpcarp("parseStream(): Read error");
-      return false;
-    }
-
-    //-- check for eof
-    done = feof(in);
-
-    if (!XML_Parse(parser, xml_buf, len, done)) {
-      xpcarp("parseStream(): Parse error");
-      return false;
-    }
+    if (!parseChunk(len,done)) return false;
   } while (!done);
 
   //-- maybe add final newline
@@ -170,12 +158,35 @@ bool mootXmlParser::parseStream(FILE *infile, FILE *outfile, const char *in_name
 }
 
 /*----------------------------------------------------
+ * mootXmlParser: Parsing: Chunks
+ */
+bool mootXmlParser::parseChunk(int &nbytes, int &is_final)
+{
+  //-- fill 'er up
+  nbytes = fread(xml_buf, 1, xml_buflen, in);
+  if (ferror(in)) {
+    xpcarp("parseChunk(): Read error");
+    return false;
+  }
+
+  //-- check for eof
+  is_final = feof(in);
+
+  //-- ye olde expatte guttes
+  if (!XML_Parse(parser, xml_buf, nbytes, is_final)) {
+    xpcarp("parseStream(): Parse error");
+    return false;
+  }
+
+  return true;
+}
+
+
+/*----------------------------------------------------
  * mootXmlParser: Parsing: String buffers
  */
-bool mootXmlParser::parseBuffer(const char *buf, size_t buflen, const char *in_name)
+bool mootXmlParser::parseBuffer(const char *buf, size_t buflen, bool is_last_chunk)
 {
-  setSrcName(in_name);
-    
   //-- sanity check(s)
   if (!buf) {
     carp("Error: cannot parse NULL buffer!\n");
@@ -186,8 +197,8 @@ bool mootXmlParser::parseBuffer(const char *buf, size_t buflen, const char *in_n
     return false;
   }
 
-  reset();
-  if (!XML_Parse(parser, buf, buflen, 1)) {
+  //reset();
+  if (!XML_Parse(parser, buf, buflen, is_last_chunk)) {
     xpcarp("parseBuffer(): Parse error");
     return false;
   }
@@ -196,7 +207,7 @@ bool mootXmlParser::parseBuffer(const char *buf, size_t buflen, const char *in_n
 }
 
 /*----------------------------------------------------
- * mootXmlParser: Printing
+ * mootXmlParser: Context
  */
 void mootXmlParser::printContext(FILE *tofile)
 {
@@ -220,6 +231,28 @@ void mootXmlParser::printContext(FILE *tofile)
 
   //-- remember last character printed
   if (bytecount != 0) lastc = ctx[offset+bytecount-1];
+}
+
+std::string mootXmlParser::contextString(void)
+{
+  if (!parser) {
+    carp("Error: cannot get context from NULL parser!\n");
+    return std::string("");
+  }
+
+  int offset, size, bytecount;
+  const char *ctx = XML_GetInputContext(parser, &offset, &size);
+  bytecount       = XML_GetCurrentByteCount(parser);
+
+  //-- print (literal buffer content)
+  if (!ctx || offset < 0) {
+    xpcarp("printContext(): Error: buffer overrun!\n");
+    return std::string("");
+  }
+  //-- remember last character printed
+  //if (bytecount != 0) lastc = ctx[offset+bytecount-1];
+
+  return std::string(ctx+offset, bytecount);
 }
 
 /*----------------------------------------------------
@@ -250,4 +283,4 @@ void mootXmlParser::xpcarp(char *fmt, ...)
   fputs("\"\n", stderr);
 }
 
-#endif // moot_XML_ENABLED
+#endif // MOOT_EXPAT_ENABLED

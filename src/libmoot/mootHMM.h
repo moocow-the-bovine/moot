@@ -33,16 +33,15 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "mootTypes.h"
-#include "mootToken.h"
-#include "mootTokenIO.h"
-#include "mootLexfreqs.h"
-#include "mootClassfreqs.h"
-#include "mootNgrams.h"
-#include "mootEnum.h"
-#include "mootBinStream.h"
-
-#include <zlib.h>
+#include <mootTypes.h>
+#include <mootIO.h>
+#include <mootZIO.h>
+#include <mootToken.h>
+#include <mootTokenIO.h>
+#include <mootLexfreqs.h>
+#include <mootClassfreqs.h>
+#include <mootNgrams.h>
+#include <mootEnum.h>
 
 /**
  * \def moot_ADD_ONE_HACK
@@ -295,7 +294,11 @@ public:
   /** \name Viterbi State-Table Types  */
   //@{
 
-  /** Type for a Viterbi state-table entry (linked-list columns of linked-list rows) */
+  /** \brief Type for a Viterbi state-table entry
+   *
+   * Viterbi state-table is a reverse-linked-list of columns
+   * of linked-list rows.
+   */
   class ViterbiNode {
   public:
     TagID tagid;                   /**< Tag-ID for this node */
@@ -305,9 +308,10 @@ public:
   };
 
   /**
-   * Type for a Viterbi state-table column.
+   * \brief Type for a Viterbi state-table column.
+   *
    * A Viterbi state-table is completely represented by its (current)
-   * final column.
+   * final column (top of the stack).
    */
   class ViterbiColumn {
   public:
@@ -357,20 +361,19 @@ public:
   size_t ndots;
 
   /**
-   * Whether to ignore first analysis of each input token (re-analysis).
-   * Default=false.
+   * Bitmask of TokenIO::TokenIOFormat flags for input.
+   * Default=TokenIO::tiofMediumRare
    */
-  bool input_ignore_first_analysis;
+  //int inputFormat;
 
   /*---------------------------------------------------------------------
    * Output format flags : used by moot::TokenWriter
    */
   /**
-   * Whether to output only analyses 
-   * corresponding to the 'best' PoS tag (true),
-   * or for all given PoS tags (false=default)
+   * Bitmask of TokenIO::TokenIOFormat flags for output.
+   * Default=TokenIO::tiofWellDone
    */
-  bool output_best_only;
+  //int outputFormat;
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -448,7 +451,8 @@ public:
   TagIDTable        tagids;     /**< Tag-ID lookup table */
   ClassIDTable      classids;   /**< Class-ID lookup table */
 
-  TokID             typids[NTokTypes]; /**< TokenType to TokenID lookup table for non-alphabetics */
+  /* TokenFlavor to TokenID lookup table for non-alphabetics */
+  TokID             flavids[NTokFlavors];
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -514,8 +518,8 @@ public:
   mootHMM(void)
     : verbose(1),
       ndots(0),
-      input_ignore_first_analysis(false),
-      output_best_only(false),
+      //inputFormat(tiofMediumRare),
+      //outputFormat(tiofWellDone),
       use_lex_classes(true),
       start_tagid(0),
       unknown_lex_threshhold(1.0),
@@ -549,7 +553,7 @@ public:
       vbestpath(NULL)
   {
     //-- create special token entries
-    for (TokID i = 0; i < NTokTypes; i++) { typids[i] = 0; }
+    for (TokID i = 0; i < NTokFlavors; i++) { flavids[i] = 0; }
     unknown_token_name("@UNKNOWN");
     unknown_tag_name("UNKNOWN");
     uclass = LexClass();
@@ -577,22 +581,22 @@ public:
   /**\name Binary load / save */
   //@{
   /** Save to a binary file */
-  bool save(const char *filename, int compression_level=Z_DEFAULT_COMPRESSION);
+  bool save(const char *filename, int compression_level=MOOT_DEFAULT_COMPRESSION);
 
   /** Save to a binary stream */
-  bool save(mootBinStream::oBinStream &obs, const char *filename=NULL);
+  bool save(mootio::mostream *obs, const char *filename=NULL);
 
   /** Low-level: save guts to a binary stream */
-  bool _bindump(mootBinStream::oBinStream &obs, const char *filename=NULL);
+  bool _bindump(mootio::mostream *obs, const char *filename=NULL);
 
   /** Load from a binary file */
   bool load(const char *filename=NULL);
 
   /** Load from a binary stream */
-  bool load(mootBinStream::iBinStream &ibs, const char *filename=NULL);
+  bool load(mootio::mistream *ibs, const char *filename=NULL);
 
   /** Low-level: load guts from a binary stream */
-  bool _binload(mootBinStream::iBinStream &ibs, const char *filename=NULL);
+  bool _binload(mootio::mistream *ibs, const char *filename=NULL);
   //@}
 
   /*------------------------------------------------------------*/
@@ -676,28 +680,21 @@ public:
   /** \name Top-level Tagging Interface */
   //@{
 
-  /** Top-level tagging interface: mootTokenIO layer */
-  void tag_churn(TokenReader *reader, TokenWriter *writer)
+  /** Top-level tagging interface: TokenIO layer */
+  void tag_io(TokenReader *reader, TokenWriter *writer)
   {
     int rtok;
-    while (reader && (rtok = reader->get_sentence()) != TF_EOF) {
-      mootSentence &sent = reader->sentence();
-      tag_sentence(sent);
-      if (writer) writer->put_sentence(sent);
+    mootSentence *sent;
+    while (reader && (rtok = reader->get_sentence()) != TokTypeEOF) {
+      sent = reader->sentence();
+      if (!sent) continue;
+      tag_sentence(*sent);
+      if (writer) writer->put_sentence(*sent);
     }
   };
 
-  /** Top-level tagging interface: C-stream I/O */
-  void tag_stream(FILE *in=stdin, FILE *out=stdout, const string &srcname="")
-  {
-    TokenReaderCookedFile tr(false,in,srcname);
-    TokenWriterCookedFile tw(output_best_only,out);
-    tr.lexer.ignore_first_analysis = input_ignore_first_analysis;
-    tag_churn(&tr,&tw);
-  };
-
   /** Top-level tagging interface: string input, file output */
-  void tag_strings(int argc, char **argv, FILE *out=stdout);
+  //void tag_strings(int argc, char **argv, FILE *out=stdout);
 
   /**
    * Top-level tagging interface: mootSentence input & output (destructive).
@@ -706,10 +703,13 @@ public:
    */
   inline void tag_sentence(mootSentence &sentence) {
     viterbi_clear();
-    for (mootSentence::const_iterator si = sentence.begin(); si != sentence.end(); si++) {
-      viterbi_step(*si);
-      if (ndots && (ntokens % ndots)==0) fputc('.', stderr);
-    }
+    for (mootSentence::const_iterator si = sentence.begin();
+	 si != sentence.end();
+	 si++)
+      {
+	viterbi_step(*si);
+	if (ndots && (ntokens % ndots)==0) fputc('.', stderr);
+      }
     viterbi_finish();
     tag_mark_best(sentence);
     nsents++;
@@ -734,12 +734,15 @@ public:
    * Really just a wrapper for \c viterbi_step(TokID,set<TagID>).
    */
   inline void viterbi_step(const mootToken &token) {
-    if (token.flavor() == TF_COMMENT) return; //-- ignore comments
+    if (token.toktype() != TokTypeVanilla) return; //-- ignore non-vanilla tokens
     ntokens++;
     LexClass tok_class;
-    for (mootToken::AnalysisSet::const_iterator ani = token.analyses().begin();
+    /*for (mootToken::AnalysisSet::const_iterator ani = token.analyses().begin();
 	 ani != token.analyses().end();
-	 ani = token.upper_bound(ani->tag))
+	 ani = token.upper_bound(ani->tag))*/
+    for (mootToken::Analyses::const_iterator ani = token.analyses().begin();
+	 ani != token.analyses().end();
+	 ani++)
       {
 	tok_class.insert(tagids.name2id(ani->tag));
       }
@@ -1073,8 +1076,8 @@ public:
   /** Get the TokID for a given token, using type-based lookup */
   inline TokID token2id(const mootTokString &token) const
   {
-    TokenType typ = token2type(token);
-    return typids[typ]==0 ? tokids.name2id(token) : typids[typ];
+    mootTokenFlavor flav = tokenFlavor(token);
+    return flavids[flav]==0 ? tokids.name2id(token) : flavids[flav];
   };
 
   /**

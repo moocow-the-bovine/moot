@@ -57,16 +57,16 @@ void mootLexfreqs::clear(void)
  *----------------------------------------------------------------------*/
 void mootLexfreqs::compute_specials(void)
 {
-  LexfreqEntry *entries[NTokTypes];
-  int typ;
+  LexfreqEntry *entries[NTokFlavors];
+  int flav;
   
   //-- initialize entry pointers
-  for (typ = 0; typ < NTokTypes; typ++) {
-    if (typ == TokTypeAlpha) { //  || typ == TokTypeUnknown
-      entries[typ] = NULL;
+  for (flav = 0; flav < NTokFlavors; flav++) {
+    if (flav == TokFlavorAlpha) { //  || typ == TokFlavorUnknown
+      entries[flav] = NULL;
     } else {
-      entries[typ] = &(lftable[TokenTypeNames[typ]]);
-      entries[typ]->clear();
+      entries[flav] = &(lftable[mootTokenFlavorNames[flav]]);
+      entries[flav]->clear();
     }
   }
 
@@ -75,17 +75,17 @@ void mootLexfreqs::compute_specials(void)
        lfti != lftable.end();
        lfti++)
     {
-      typ = token2type(lfti->first);
-      if (lfti->first[0] == '@' || typ == TokTypeAlpha) // || typ == TokTypeUnknown
+      flav = tokenFlavor(lfti->first);
+      if (lfti->first[0] == '@' || flav == TokFlavorAlpha) // || typ == TokTypeUnknown
 	continue;
       
       //-- found a special: add its counts to proper subtable
-      entries[typ]->count += lfti->second.count;
+      entries[flav]->count += lfti->second.count;
       for (LexfreqSubtable::const_iterator lsi = lfti->second.freqs.begin();
 	   lsi != lfti->second.freqs.end();
 	   lsi++)
 	{
-	  entries[typ]->freqs[lsi->first] += lsi->second;
+	  entries[flav]->freqs[lsi->first] += lsi->second;
 	}
     }
 };

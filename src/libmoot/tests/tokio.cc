@@ -6,12 +6,7 @@
 using namespace moot;
 
 void churntest(int argc, char **argv) {
-  TokenReader tr;
   FILE *infile = stdin;
-
-  tr.lexer.first_analysis_is_best = false;
-  tr.lexer.ignore_first_analysis = false;
-
   if (argc > 1) {
     infile = fopen(argv[1], "r");
   }
@@ -20,29 +15,34 @@ void churntest(int argc, char **argv) {
     exit(1);
   }
 
-  tr.select_stream(infile);
+  int fmt = (tiofNative
+	     | tiofWellDone
+	     );
+  TokenReaderNative tr(fmt);
+  tr.fromFile(infile);
 
   mootSentence sent;
-  do {
-    sent = tr.get_sentence();
+  int lxtyp;
+  while ((lxtyp = tr.get_sentence()) != TokTypeEOF) {
+    sent = tr.sentence();
 
     printf("SENTENCE:\n");
     for (mootSentence::const_iterator si = sent.begin();
 	 si != sent.end();
 	 si++)
       {
-	printf("\t+ TOKEN: flavor=`%s' ; toktext=`%s'\t ; besttag=`%s'\n",
-	       mootTokFlavorNames[si->flavor()],
+	printf("\t+ TOKEN: type=`%s' ; toktext=`%s'\t ; besttag=`%s'\n",
+	       mootTokenTypeNames[si->toktype()],
 	       si->text().c_str(), si->besttag().c_str());
-	for (mootToken::AnalysisSet::const_iterator ai = si->analyses().begin();
+	for (mootToken::Analyses::const_iterator ai = si->analyses().begin();
 	     ai != si->analyses().end();
 	     ai++)
 	  {
-	    printf("\t  - ANALYSIS: cost=%g\t ; tag=`%s'\t ; details=`%s'\t\n",
-		   ai->cost, ai->tag.c_str(), ai->details.c_str());
+	    printf("\t  - ANALYSIS: tag=`%s'\t ; details=`%s'\t\n",
+		   ai->tag.c_str(), ai->details.c_str());
 	  }
       }
-  } while (tr.lexer.lasttyp != TF_EOF);
+  }
   printf("EOF\n");
 }
 

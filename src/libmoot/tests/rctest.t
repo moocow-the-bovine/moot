@@ -1,0 +1,3 @@
+<	LT
+&	AMP
+ä	AUML_UTF8

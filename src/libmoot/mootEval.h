@@ -40,7 +40,7 @@ moot_BEGIN_NAMESPACE
  * mootEval : evaluation class
  *--------------------------------------------------------------------------*/
 
-/** Evaluator class */
+/** \brief Tagger-evaluation utility class */
 class mootEval {
 public:
 

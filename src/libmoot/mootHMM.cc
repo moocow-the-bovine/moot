@@ -36,17 +36,16 @@
 #include <errno.h>
 #include <string.h>
 
-#include "mootHMM.h"
-#include "mootTokenIO.h"
-
-#include <zlib.h>
-#include "mootBinIO.h"
-#include "mootBinStream.h"
-
-#include "mootUtils.h"
+#include <mootHMM.h>
+#include <mootTokenIO.h>
+#include <mootCIO.h>
+#include <mootZIO.h>
+#include <mootBinIO.h>
+#include <mootUtils.h>
 
 using namespace std;
 using namespace mootBinIO;
+using namespace mootio;
 
 /*--------------------------------------------------------------------------
  * clear, freeing dynamic data
@@ -125,8 +124,8 @@ void mootHMM::clear(bool wipe_everything)
     tokids.clear();
     tagids.clear();
 
-    for (int i = 0; i < NTokTypes; i++) {
-      typids[i] = 0;
+    for (int i = 0; i < NTokFlavors; i++) {
+      flavids[i] = 0;
     }
 
     start_tagid = 0;
@@ -175,7 +174,7 @@ bool mootHMM::load_model(const string &modelname,
     mootNgrams     ngfreqs;
 
     //-- load model: lexical frequencies
-    if (!lexfile.empty() && file_exists(lexfile.c_str())) {
+    if (!lexfile.empty() && moot_file_exists(lexfile.c_str())) {
       if (verbose >= vlProgress)
 	carp("%s: loading lexical frequency file '%s'...", myname, lexfile.c_str());
 
@@ -187,7 +186,7 @@ bool mootHMM::load_model(const string &modelname,
     }
 
     // -- load model: n-gram frequencies
-    if (!ngfile.empty() && file_exists(ngfile.c_str())) {
+    if (!ngfile.empty() && moot_file_exists(ngfile.c_str())) {
       if (verbose >= vlProgress)
 	carp("%s: loading n-gram frequency file '%s'...", myname, ngfile.c_str());
 
@@ -199,7 +198,7 @@ bool mootHMM::load_model(const string &modelname,
     }
 
     // -- load model: class frequencies
-    if (use_lex_classes && !lcfile.empty() && file_exists(lcfile.c_str())) {
+    if (use_lex_classes && !lcfile.empty() && moot_file_exists(lcfile.c_str())) {
       if (verbose >= vlProgress)
 	carp("%s: loading class frequency file '%s'...", myname, lcfile.c_str());
 
@@ -327,7 +326,7 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 
   //-- compilation variables
   TokID                       tokid;          //-- current token-ID
-  TokenType                   toktyp;         //-- current token-type
+  mootTokenFlavor             tokflav;        //-- current token-flavor
   LexClass                    lclass;         //-- current lexical class
   ClassID                     classid;        //-- current lexical class-ID
   TagID                       tagid;          //-- current tag-ID
@@ -357,9 +356,9 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
       //-- sanity check
       if (toktotal == 0) continue;
 
-      //-- get token type, id
-      toktyp = token2type(tokstr);
-      tokid  = toktyp != TokTypeUnknown ? tokids.name2id(tokstr) : typids[toktyp];
+      //-- get token flavor, id
+      tokflav = tokenFlavor(tokstr);
+      tokid   = tokflav != TokFlavorUnknown ? tokids.name2id(tokstr) : flavids[tokflav];
 
       //-- ... for all tags occurring with this token(lftagi)
       for (mootLexfreqs::LexfreqSubtable::const_iterator lftagi = entry.freqs.begin();
@@ -377,7 +376,7 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	  tagid  = tagids.name2id(tagstr);
 	  
 	  //-- "unknown" token check
-	  if (toktyp == TokTypeAlpha && toktotal <= unknown_lex_threshhold) {
+	  if (tokflav == TokFlavorAlpha && toktotal <= unknown_lex_threshhold) {
 	    //-- "unknown" token: just store the raw counts for now
 	    
 	    //-- ... and add to "unknown" counts
@@ -566,16 +565,16 @@ void mootHMM::compile_unknown_lexclass(const mootClassfreqs &classfreqs)
  *--------------------------------------------------------------------------*/
 void mootHMM::assign_ids_lf(const mootLexfreqs &lexfreqs)
 {
-  //-- add special type-tokens
-  for (TokID i = 0; i < NTokTypes; i++) {
-    if (i == TokTypeAlpha || i == TokTypeUnknown) { continue; }
-    typids[i] =
-      tokids.nameExists(TokenTypeNames[i])
-      ? tokids.name2id(TokenTypeNames[i])
-      : tokids.insert(TokenTypeNames[i]);
+  //-- add special flavor-tokens
+  for (TokID i = 0; i < NTokFlavors; i++) {
+    if (i == TokFlavorAlpha || i == TokFlavorUnknown) { continue; }
+    flavids[i] =
+      tokids.nameExists(mootTokenFlavorNames[i])
+      ? tokids.name2id(mootTokenFlavorNames[i])
+      : tokids.insert(mootTokenFlavorNames[i]);
   }
-  typids[TokTypeAlpha] = 0;
-  typids[TokTypeUnknown] = 0;
+  flavids[TokFlavorAlpha] = 0;
+  flavids[TokFlavorUnknown] = 0;
 
   //-- compile lexical IDs
   for (mootLexfreqs::LexfreqTokTable::const_iterator lfti = lexfreqs.lftable.begin();
@@ -585,7 +584,7 @@ void mootHMM::assign_ids_lf(const mootLexfreqs &lexfreqs)
       const mootTokString &tokstr = lfti->first;
       const mootLexfreqs::LexfreqEntry &entry = lfti->second;
 
-      TokenType typ = token2type(tokstr);
+      mootTokenFlavor flav = tokenFlavor(tokstr);
 
       //-- ... for all tags occurring with this token(lftagi)
       for (mootLexfreqs::LexfreqSubtable::const_iterator lftagi = entry.freqs.begin();
@@ -598,7 +597,7 @@ void mootHMM::assign_ids_lf(const mootLexfreqs &lexfreqs)
 	  //-- always assign a tag-id
 	  if (!tagids.nameExists(tagstr)) tagids.insert(tagstr);
 
-	  if (typ != TokTypeAlpha)
+	  if (flav != TokFlavorAlpha)
 	    //-- ignore non-alphabetics
 	    continue; 
 
@@ -1115,6 +1114,7 @@ void mootHMM::_viterbi_step_fallback(TokID tokid, ViterbiColumn *col)
 /*--------------------------------------------------------------------------
  * Top-level: tag_strings
  *--------------------------------------------------------------------------*/
+/*
 void mootHMM::tag_strings(int argc, char **argv, FILE *out)
 {
   //-- prepare variables
@@ -1127,6 +1127,7 @@ void mootHMM::tag_strings(int argc, char **argv, FILE *out)
 
   //if (ndots) fputc('\n', stderr);
 }
+*/
 
 /*--------------------------------------------------------------------------
  * Mid-level: output
@@ -1140,7 +1141,7 @@ void mootHMM::tag_mark_best(mootSentence &sentence)
   if (pnod) pnod = pnod->path_next;  //-- skip boundary tag
 
   for (senti = sentence.begin(); senti != sentence.end(); senti++) {
-    if (senti->flavor() == TF_COMMENT) continue; //-- ignore comments
+    if (senti->toktype() != TokTypeVanilla) continue; //-- ignore non-vanilla tokens
     if (pnod && pnod->node) {
       senti->besttag(tagids.id2name(pnod->node->tagid));
       pnod = pnod->path_next;
@@ -1361,36 +1362,31 @@ const HeaderInfo::VersionT BINCOMPAT_REV = 0;
 
 bool mootHMM::save(const char *filename, int compression_level)
 {
-  //-- sanity checks
-  if (compression_level != Z_DEFAULT_COMPRESSION
-      && (compression_level > Z_BEST_COMPRESSION || compression_level < Z_NO_COMPRESSION))
-    {
-      carp("mootHMM::save(): bad compression level %d defaults to %d\n",
-	   compression_level, Z_DEFAULT_COMPRESSION);
-      compression_level = Z_DEFAULT_COMPRESSION;
-    }
-
   //-- open file
-  gzFile gzf = gzopen(filename, "wb");
-  if (!gzf) {
-    carp("mootHMM::save(): open failed for file '%s': %s\n",
-	 filename, gzerror(gzf, &errno));
+#ifdef MOOT_ZLIB_ENABLED
+  mootio::mozfstream 
+#else 
+  mootio::mofstream
+#endif
+    ofs(filename,"wb");
+
+  if (!ofs.valid()) {
+    carp("mootHMM::save(): open failed for \"%s\": %s\n",
+	 filename, ofs.errmsg().c_str());
     return false;
   }
-  gzsetparams(gzf, compression_level, Z_DEFAULT_STRATEGY);
+  ofs.setparams(compression_level);
 
-
-  //-- setup stream-hack
-  mootBinStream::ozBinStream ozs(gzf);
-
-  //-- and save
-  bool rc = save(ozs, filename);
-  ozs.close();
+  //-- ... and save
+  bool rc = save(&ofs, filename);
+  ofs.close();
   return rc;
 }
 
-bool mootHMM::save(mootBinStream::oBinStream &obs, const char *filename)
+bool mootHMM::save(mootio::mostream *obs, const char *filename)
 {
+  if (!obs || !obs->valid()) return false;
+
   HeaderInfo hi(string("mootHMM"),
 		BINCOMPAT_VER,     BINCOMPAT_REV,
 		BINCOMPAT_MIN_VER, BINCOMPAT_MIN_REV,
@@ -1416,7 +1412,7 @@ bool mootHMM::save(mootBinStream::oBinStream &obs, const char *filename)
   return _bindump(obs, filename);
 }
 
-bool mootHMM::_bindump(mootBinStream::oBinStream &obs, const char *filename)
+bool mootHMM::_bindump(mootio::mostream *obs, const char *filename)
 {
   //-- variables
   Item<size_t> size_item;
@@ -1466,9 +1462,9 @@ bool mootHMM::_bindump(mootBinStream::oBinStream &obs, const char *filename)
     }
 
   int i;
-  for (i = 0; i < NTokTypes; i++) {
-    if (!tokid_item.save(obs, typids[i])) {
-      carp("mootHMM::save(): could not save type data%s%s\n",
+  for (i = 0; i < NTokFlavors; i++) {
+    if (!tokid_item.save(obs, flavids[i])) {
+      carp("mootHMM::save(): could not save flavor data%s%s\n",
 	   (filename ? " to file " : ""), (filename ? filename : ""));
       return false;
     }
@@ -1483,23 +1479,27 @@ bool mootHMM::_bindump(mootBinStream::oBinStream &obs, const char *filename)
 
 bool mootHMM::load(const char *filename)
 {
-  //-- setup gzFile
-  gzFile gzs = gzopen(filename, "rb");
-  if (!gzs) {
-    carp("mootHMM::load(): could not open file '%s' for read: %s\n",
-	 filename, strerror(errno));
+  //-- open file
+#ifdef MOOT_ZLIB_ENABLED
+  mootio::mizfstream
+#else //-- !MOOT_ZLIB_ENABLED
+  mootio::mifstream
+#endif
+    ifs(filename,"rb");
+
+  if (!ifs.valid()) {
+    carp("mootHMM::load(): open failed for \"%s\": %s\n",
+	 filename, ifs.errmsg().c_str());
     return false;
   }
 
-  //-- setup stream-hack
-  mootBinStream::izBinStream izs(gzs);
-
-  bool rc = load(izs, filename);
-  izs.close();
+  //... and load
+  bool rc = load(&ifs, filename);
+  ifs.close();
   return rc;
 }
 
-bool mootHMM::load(mootBinStream::iBinStream &ibs, const char *filename)
+bool mootHMM::load(mootio::mistream *ibs, const char *filename)
 {
   clear(true); //-- make sure the object is totally empty
 
@@ -1551,7 +1551,7 @@ bool mootHMM::load(mootBinStream::iBinStream &ibs, const char *filename)
 }
 
 
-bool mootHMM::_binload(mootBinStream::iBinStream &ibs, const char *filename)
+bool mootHMM::_binload(mootio::mistream *ibs, const char *filename)
 {
   //-- variables
   Item<size_t> size_item;
@@ -1626,14 +1626,14 @@ bool mootHMM::_binload(mootBinStream::iBinStream &ibs, const char *filename)
     }
 
   int i;
-  for (i = 0; i < NTokTypes; i++) {
-    if (!tokid_item.load(ibs, typids[i])) {
-      carp("mootHMM::save(): could not load type data%s%s\n",
+  for (i = 0; i < NTokFlavors; i++) {
+    if (!tokid_item.load(ibs, flavids[i])) {
+      carp("mootHMM::save(): could not load flavor data%s%s\n",
 	   (filename ? " to file " : ""), (filename ? filename : ""));
       return false;
     }
   }
-  
+
   return true;
 }
 

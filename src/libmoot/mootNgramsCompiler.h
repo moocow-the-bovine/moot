@@ -23,7 +23,7 @@
  * File: mootNgramsCompiler.h
  * Author:  Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *    Compiler for TnT parameter files for DWDS PoS tagger
+ *    Compiler for TnT parameter files for moot PoS tagger
  *============================================================================*/
 
 #ifndef _moot_NGRAMS_COMPILER_H
