@@ -1,7 +1,7 @@
 ## File: src/programs/Makefile.am
 ## Package: moot
 ## Description:
-##   + src-level automake file for DWDS PoS tagger programs
+##   + src-level automake file for moot PoS tagger programs
 ##
 ## Process this file with Automake to create Makefile.in.
 ##-----------------------------------------------------------------------
@@ -17,7 +17,7 @@
 
 ## --- executable programs
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
-bin_PROGRAMS = dwdspp dwdsm dwdshmm moot mootrain
+bin_PROGRAMS = moopp moom moohmm moot mootrain
 
 old_programs = moot-fstgen moot-pargen
 
@@ -41,21 +41,21 @@ SUFFIXES = \
 ## --- Required sources
 #${prog_i}_SOURCES =
 #${lib_i}_la_SOURCES =
-dwdspp_SOURCES = \
+moopp_SOURCES = \
 	cmdutil.cc cmdutil.h \
-	dwdspp_main.cc \
-	dwdspp_cmdparser.cc dwdspp_cmdparser.h
+	moopp_main.cc \
+	moopp_cmdparser.cc moopp_cmdparser.h
 
-dwdsm_SOURCES = \
+moom_SOURCES = \
 	cmdutil.cc cmdutil.h \
-	dwdsm_main.cc \
-	dwdsm_cmdparser.cc dwdsm_cmdparser.h
+	moom_main.cc \
+	moom_cmdparser.cc moom_cmdparser.h
 
-dwdshmm_SOURCES = \
+moohmm_SOURCES = \
 	cmdutil.cc cmdutil.h \
 	hmmutil.cc hmmutil.h \
-	dwdshmm_main.cc \
-	dwdshmm_cmdparser.cc dwdshmm_cmdparser.h
+	moohmm_main.cc \
+	moohmm_cmdparser.cc moohmm_cmdparser.h
 
 moot_SOURCES = \
 	cmdutil.cc cmdutil.h \
@@ -75,9 +75,9 @@ mootrain_SOURCES = \
 #EXTRA_${lib_i}_la_SOURCES = 
 
 ## --- Additional dependencies
-dwdspp_main.o: dwdspp_cmdparser.h
-dwdsm_main.o: dwdsm_cmdparser.h
-dwdshmm_main.o: dwdshmm_cmdparser.h hmmutil.h
+moopp_main.o: moopp_cmdparser.h
+moom_main.o: moom_cmdparser.h
+moohmm_main.o: moohmm_cmdparser.h hmmutil.h
 moot_main.o: moot_cmdparser.h hmmutil.h
 mootrain_main.o: mootrain_cmdparser.h hmmutil.h
 
@@ -126,7 +126,7 @@ OPTGENFLAGS = -u -l
 ## pod conversion
 ##-----------------------------------------------------------------------
 
-POD2MANFLAGS = --center="KDWDS PoS Tagging Tools"
+POD2MANFLAGS = --center="KMOO PoS Tagging Tools"
 
 .pod.1:
 	pod2man $(POD2MANFLAGS) --section=1 $< $@
@@ -166,14 +166,14 @@ LDFLAGS_COMMON = -L../libmoot
 
 LDADD_COMMON   = ../libmoot/libmoot.la
 
-dwdspp_LDFLAGS = $(LDFLAGS_COMMON)
-dwdspp_LDADD = $(LDADD_COMMON)
+moopp_LDFLAGS = $(LDFLAGS_COMMON)
+moopp_LDADD = $(LDADD_COMMON)
 
-dwdsm_LDFLAGS = $(LDFLAGS_COMMON)
-dwdsm_LDADD = $(LDADD_COMMON)
+moom_LDFLAGS = $(LDFLAGS_COMMON)
+moom_LDADD = $(LDADD_COMMON)
 
-dwdshmm_LDFLAGS = $(LDFLAGS_COMMON)
-dwdshmm_LDADD = $(LDADD_COMMON)
+moohmm_LDFLAGS = $(LDFLAGS_COMMON)
+moohmm_LDADD = $(LDADD_COMMON)
 
 moot_LDFLAGS = $(LDFLAGS_COMMON)
 moot_LDADD = $(LDADD_COMMON)
@@ -210,9 +210,9 @@ MAINTAINERCLEANFILES = \
 ## --- extra distribution files
 EXTRA_DIST = \
 	moot.gog \
-	dwdsm.gog \
-	dwdspp.gog \
-	dwdshmm.gog \
+	moom.gog \
+	moopp.gog \
+	moohmm.gog \
 	mootrain.gog
 
 #	moot.sym
