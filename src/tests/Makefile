@@ -111,44 +111,63 @@ pardiff_check:
 par ?= test.par
 parbase = $(basename $(par))
 dis = $(addsuffix .fsa,$(parbase))
+dskel = dskeleton.fsa
 .SUFFIXES: .par .apar .tpar .atpar .dps
 
-.PHONY: dis dskel
+#.PHONY: dskel dis
 
-dis: dskel
+### generation: disambig-skeleton
+dskel: $(dskel)
+	@echo ">> N-Gram Parameter File    = $(par)"
+	@echo ">> Disambiguation-Skeleton  = $(dis)"
 
-dskel: $(dis)
+$(dskel): $(par)
+	( cd ../programs ;\
+	  $(MAKE) dwdst-fstgen ;\
+	  ./dwdst-fstgen -d -n ../tests/$(par) -F ../tests/$(dis) )
+	mv ../programs/dskeleton.fsa $(dskel)
+	mv ../programs/dskeleton.lab $(dskel:.fsa=.lab)
+
+### generation: disambig-fsa
+dis: $(dis)
 	@echo ">> N-Gram Parameter File = $(par)"
 	@echo ">> Disambiguation-FSA    = $(dis)"
 
 .par.fsa:
 	( cd ../programs ;\
 	  $(MAKE) dwdst-fstgen ;\
-	  ./dwdst-fstgen -d -n ../tests/$(par) -F $(dis) )
-	mv ../programs/$(dis) .
-	mv ../programs/dskeleton.lab $(parbase).lab
+	  ./dwdst-fstgen -d -n ../tests/$(par) -F ../tests/$(dis) )
+	mv ../programs/dskeleton.fsa $(dskel)
+	mv ../programs/dskeleton.lab $(dskel:.fsa=.lab)
 
 .par.lab:
 	( cd ../programs ;\
 	  $(MAKE) dwdst-fstgen ;\
-	  ./dwdst-fstgen -d -n ../tests/$(par) -F $(dis) )
-	mv ../programs/$(dis) .
-	mv ../programs/dskeleton.lab $(parbase).lab
+	  ./dwdst-fstgen -d -n ../tests/$(par) -F ../tests/$(dis) )
+	mv ../programs/dskeleton.fsa $(dskel)
+	mv ../programs/dskeleton.lab $(dskel:.fsa=.lab)
 
-### viewing
+### viewing: disambig-fsa
 .PHONY: disgv
 
 disps = $(parbase).dps
 
 disps: $(disps)
-
-$(disps): $(dis)
+$(disps): $(dis) $(LABFILE)
 	FSMprint $(dis) | fsmcompile -F $(parbase).afsa
-	fsmdraw -i $(parbase).lab $(parbase).afsa > $(parbase).dot
+	fsmdraw -i $(LABFILE) $(parbase).afsa > $(parbase).dot
 	dot -Tps $(parbase).dot > $@
-
 disgv: $(disps)
 	gv $(disps)
+
+### viewing: disambig-skeleton
+dskelps = $(dskel:.fsa=.ps)
+$(dskelps): $(dskel)
+	FSMprint $< | fsmcompile -F $(dskel:.fsa=.afsa)
+	fsmdraw -i  $(dskel:.fsa=.lab) $(dskel:.fsa=.afsa) > dskeleton.dot
+	dot -Tps dskeleton.dot > $@
+dskelgv: $(dskelps)
+	gv $(dskelps)
 
 #----------------------------------------------------------------
 # FSM stuff
@@ -176,12 +195,13 @@ endif
 re      ?= [<epsilon>]
 #reflags ?= --debug --compress
 #reflags ?= --debug
+reflags ?= --incomplete-categories
 refile  ?= re.fst
 arefile ?= are.afst
 
 gvre: $(refile:.fst=.ps); gv $(refile:.fst=.ps)
 re: $(refile)
-$(refile): FSMcompre $(SYMFILE)
+$(refile): $(SYMFILE)
 	FSMcompre $(COMPAT_FLAGS) -s $(SYMFILE) $(reflags) -F $@ "$(re)"
 
 areflags =

@@ -192,6 +192,7 @@ FSM *dwdstTrainer::generate_disambig_fsa()
   // debug: save skeleton tag-labels
   FILE *labfile = fopen("dskeleton.lab","w");
   if (labfile) {
+    fprintf(labfile,"<eps>\t0\n");
     for (dwdstStringToSymbolMap::iterator t2si =  tags2symbols.begin();
 	 t2si != tags2symbols.end();
 	 t2si++)
@@ -256,8 +257,11 @@ FSM *dwdstTrainer::expand_disambig_skeleton()
   }
 
   // -- perform the substitution on dfsa
-  dfsa->fsm_substitute(syms2fsms,FSM::FSMModeDestructive);
-  if (!dfsa || !*dfsa) {
+  FSM *dfsa2 = new FSM;
+  *dfsa2 = dfsa->fsm_substitute(syms2fsms,FSM::FSMModeConstructive);
+  delete dfsa;
+  dfsa = dfsa2;
+  if (!dfsa2 || !*dfsa2) {
     fprintf(stderr, "%s: could not expand disambiguator skeleton!\n", methodName);
     if (dfsa) {
       delete dfsa;
@@ -283,6 +287,9 @@ FSM *dwdstTrainer::expand_disambig_skeleton()
  * N-Gram tables.  The skeleton FSA uses a single symbol for each possible
  * tag.  Later, these symbols should be replaced by the sub-FSAs resulting
  * from compiling the 'tag' as a regex.
+ * HACK: Pseudo-tag transitions in the skeleton are prefixed with
+ * an epsilon-transition, which is assigned the generated weight -- otherwise,
+ * we lose the weights when we call 'fsm_substitute()' [*grumble*].
  */
 FSM *dwdstTrainer::generate_disambig_skeleton()
 {
@@ -303,11 +310,11 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
   rep->set_start_state(q0);
   rep->mark_state_as_final(q0,freecost);
 
-  map<NGramVector,FSMState> nGram2State;
+  NGramToStateMap nGram2State;
   theNgram.clear();
   theNgram.push_back(eos);
   nGram2State.clear();
-  nGram2State[theNgram] = q0;
+  nGram2State[theNgram] = pair<FSMState,FSMState>(q0,q0);
 
   tagSetIterVector tagIters;
   tagIters.clear();
@@ -344,24 +351,37 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
 	fprintf(stderr, ">\n");
 # endif
 
-	// -- add a (final) state for the current nGram
-	FSMState theState = rep->new_state();
-	rep->add_state(theState);
-	rep->mark_state_as_final(theState, freecost);
-	nGram2State[theNgram] = theState;
+	// -- add a non-final state for the current nGram's cost: [context="<cost>.nGram"]
+	FSMState costState = rep->new_state();
+	rep->add_state(costState);
 
-	// -- add a transition from the 'preceeding' nGram's state, if it exists
+	// -- add a final state for the current nGram itself: [context="<cost>nGram."]
+	FSMState ngramState = rep->new_state();
+	rep->add_state(ngramState);
+	rep->mark_state_as_final(ngramState, freecost);
+
+	// -- remember what we've done: we may be needing it later
+	nGram2State[theNgram] = pair<FSMState,FSMState>(costState,ngramState);
+
+	// -- add transitions from the 'preceeding' nGram's state, if it exists
 	//    (BOS-bootstrap)
+	//    States:
+	//     prevState  : [context=".<cost>nGram."]
+	//     costState  : [context="<cost>.nGram."]
+	//     ngramState : [context="<cost>nGram."]
+	//    Transits:
+	//      prevState --(eps/0)--> costState --($tag/$cost)--> ngramState
 	prevNgram = theNgram;
 	prevNgram.pop_back();
 	if (prevNgram[0] != eos) { prevNgram.push_front(eos); }
-	map<NGramVector,FSMState>::const_iterator pngi = nGram2State.find(prevNgram);
+	NGramToStateMap::const_iterator pngi = nGram2State.find(prevNgram);
 	if (pngi != nGram2State.end()) {
-	  prevState = pngi->second;
-	  FSMSymbolString  theTag     = theNgram[theNgram.size()-1];
-	  FSMSymbol        tagSymbol  = tags2symbols[theTag];
-	  FSMWeight        arcCost    = disambigArcCost(prevNgram, theTag, uniGramCount);
-	  rep->add_transition(prevState, theState, tagSymbol, tagSymbol, arcCost);
+	  prevState                  = pngi->second.second;
+	  FSMSymbolString  theTag    = theNgram[theNgram.size()-1];
+	  FSMSymbol        tagSymbol = tags2symbols[theTag];
+	  FSMWeight        arcCost   = disambigArcCost(prevNgram, theTag, uniGramCount);
+	  rep->add_transition(prevState,  costState,   EPSILON,   EPSILON,  arcCost);
+	  rep->add_transition(costState, ngramState, tagSymbol, tagSymbol, freecost);
 	} else {
 	  // -- this should never happen!
 	  fprintf(stderr, "%s: missing state in BOS bootstrap!\n", methodName);
@@ -400,9 +420,9 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
 # endif
 
       // -- source-state lookup
-      map<NGramVector,FSMState>::const_iterator pngi = nGram2State.find(prevNgram);
+      NGramToStateMap::const_iterator pngi = nGram2State.find(prevNgram);
       if (pngi != nGram2State.end()) {      
-	prevState = pngi->second;
+	prevState = pngi->second.second;
       } else {
 	// -- this should never happen
 	fprintf(stderr, "%s: missing source-state in kmax-linkup!\n", methodName);
@@ -420,12 +440,11 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
 
 	FSMSymbolString theTag = *tsi;
 	nextNgram.push_back(theTag);
-	map<NGramVector,FSMState>::const_iterator nngi = nGram2State.find(nextNgram);
+	NGramToStateMap::const_iterator nngi = nGram2State.find(nextNgram);
 	if (nngi != nGram2State.end()) {
-	  FSMState   theState   = nngi->second;
-	  FSMSymbol  tagSymbol  = tags2symbols[theTag];
+	  FSMState   costState  = nngi->second.first;
 	  FSMWeight  arcCost    = disambigArcCost(prevNgram, theTag, uniGramCount);
-	  rep->add_transition(prevState, theState, tagSymbol, tagSymbol, arcCost);
+	  rep->add_transition(prevState, costState,   EPSILON,  EPSILON,   arcCost);
 # ifdef DWDST_DFSA_DEBUG_VERBOSE
 	  fprintf(stderr, "%s:     > cost='%f'\n", methodName, arcCost);
 # endif
@@ -436,6 +455,7 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
 	nextNgram.pop_back();
       }
     }
+
   return dfsa;
 }
 

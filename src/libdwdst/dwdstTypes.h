@@ -34,6 +34,11 @@ typedef map<FSMSymbolString,FSMSymbol> dwdstStringToSymbolMap;
 typedef vector<set<FSMSymbolString>::iterator> tagSetIterVector;
 
 /// Used for disambig-fsa generation.
+/// First element of value-pair is the nGram-start state, second
+/// element is the nGram-final state.
+typedef map<NGramVector,pair<FSMState,FSMState> > NGramToStateMap;
+
+/// Used for disambig-fsa generation.
 /// First element is a count, second element is the number of
 /// shortening-adjustments (fallback iterations) required to find
 /// the count.
