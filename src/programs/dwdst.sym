@@ -843,7 +843,8 @@ GeoSemClass	k_raumort_art_gewaess_meer
 GeoSemClass	k_raumort_boden_festland_land
 
 
-WordBoundary	+++
+WordStart	++(
+WordEnd		++)
 
 QuoteChar	" ` ' ´ » «
 PunctChar	, . ? ! : ;
