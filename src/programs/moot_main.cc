@@ -21,7 +21,7 @@
  * File: moot_main.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + HMM PoS tagger/disambiguator for DWDS project : main()
+ *   + moot HMM PoS tagger/disambiguator : main()
  *--------------------------------------------------------------------------*/
 
 #ifdef HAVE_CONFIG_H

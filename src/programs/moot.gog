@@ -193,7 +193,7 @@ is the constant smoothing coefficient for trigram probabilities
 (only meaningful if libmoot was built with '--enable-trigrams=yes'.
 See the output of
 
- pkg-config --variable=build_options moot
+ mootconfig --options
 
 for details.
 

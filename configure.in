@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.2])
+define([THE_PACKAGE_VERSION], [2.0.3])
 define([THE_PACKAGE_MAINTAINER],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -42,7 +42,7 @@ AC_LANG(C++)
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## debug ?
 ##
-build_options=""
+CONFIG_OPTIONS=""
 AC_MSG_CHECKING([whether to build debug version])
 AC_ARG_ENABLE(debug,
 	AC_HELP_STRING([--enable-debug], [build debug version (default=no)]))
@@ -51,16 +51,18 @@ if test "$enable_debug" == "yes" ; then
    AC_MSG_RESULT(yes)
    AC_DISABLE_SHARED
    moot_OFLAGS="-g"
-   build_options="$build_options DEBUG"
+   #CONFIG_OPTIONS="$CONFIG_OPTIONS DEBUG=1"
+   CONFIG_OPTIONS="DEBUG=1"
 else
   AC_MSG_RESULT(no)
   #moot_OFLAGS="-O2"
   #moot_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
   moot_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops"
+  #CONFIG_OPTIONS="$CONFIG_OPTIONS DEBUG=0"
+  CONFIG_OPTIONS="DEBUG=0"
 fi
 
 AC_SUBST(moot_OFLAGS)
-AC_SUBST(build_options)
 ##
 ## /debug ?
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -185,19 +187,20 @@ if test "$ac_cv_enable_zlib" != "no" ; then
     AC_MSG_WARN([])
     ac_cv_enable_zlib="no"
  else
-   build_options="$build_options ZLIB"
-   LIBS="$LIBS -lz"
+   moot_LIBS="$moot_LIBS -lz"
  fi
 fi
 
 ##-- zlib: config.h flag
 if test "$ac_cv_enable_zlib" = "no" ; then
   AC_MSG_NOTICE([zlib compression support disabled.])
+  CONFIG_OPTIONS="$CONFIG_OPTIONS ZLIB=0"
 else
  ##-- ac_cv_enable_zlib != no
  AC_DEFINE(MOOT_ZLIB_ENABLED,1,
 	   [Define this to enable zlib compression support])
  DOXY_DEFINES="$DOXY_DEFINES MOOT_ZLIB_ENABLED=1"
+ CONFIG_OPTIONS="$CONFIG_OPTIONS ZLIB=1"
 fi
 dnl
 dnl zlib
@@ -320,19 +323,20 @@ if test "$ac_cv_enable_recode" != "no" ; then
    AC_MSG_WARN([])
    ac_cv_enable_recode="no"
  else
-   build_options="$build_options RECODE"
-  LIBS="$LIBS -lrecode"
+  moot_LIBS="$moot_LIBS -lrecode"
  fi
 fi ;##-- /ac_cv_enable_recode != no
 
 dnl recode: config.h flag
 if test "$ac_cv_enable_recode" = "no" ; then
   AC_MSG_NOTICE([librecode support disabled.])
+  CONFIG_OPTIONS="$CONFIG_OPTIONS RECODE=0"
 else
  ##-- ac_cv_enable_recode != no
  AC_DEFINE(MOOT_RECODE_ENABLED,1,
 	   [Define this to enable librecode support (useful for XML)])
  DOXY_DEFINES="$DOXY_DEFINES MOOT_RECODE_ENABLED=1"
+ CONFIG_OPTIONS="$CONFIG_OPTIONS RECODE=1"
 fi
 dnl recode
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -382,19 +386,20 @@ if test "$ac_cv_enable_expat" != "no" ; then
     AC_MSG_WARN([])
     ac_cv_enable_expat="no"
  else
-    build_options="$build_options EXPAT"
-    LIBS="$LIBS -lexpat"
+    moot_LIBS="$moot_LIBS -lexpat"
  fi
 fi ;##-- /ac_cv_enable_xml != no
 
 dnl expat: config.h flag
 if test "$ac_cv_enable_expat" = "no" ; then
   AC_MSG_NOTICE([Expat XML support disabled.])
+  CONFIG_OPTIONS="$CONFIG_OPTIONS EXPAT=0"
 else
  ##-- ac_cv_enable_xml != no
  AC_DEFINE(MOOT_EXPAT_ENABLED,1,
 	   [Define this to enable experimental expat XML support])
  DOXY_DEFINES="$DOXY_DEFINES MOOT_EXPAT_ENABLED=1"
+ CONFIG_OPTIONS="$CONFIG_OPTIONS EXPAT=1"
 fi
 dnl expat
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -419,17 +424,17 @@ fi
 dnl libxml: config.h flag
 if test "$ac_cv_enable_libxml" = "no" ; then
   AC_MSG_NOTICE([libxml2 XML support disabled.])
+ CONFIG_OPTIONS="$CONFIG_OPTIONS LIBXML2=0"
 else
  ##-- ac_cv_enable_xml != no
  AC_DEFINE(MOOT_LIBXML_ENABLED,1,
 	   [Define this to enable experimental libxml2 XML support])
  CXXFLAGS="$CXXFLAGS $LIBXML2_CFLAGS"
  LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L libxml-2.0`"
- LIBS="$LIBS `$PKG_CONFIG --libs-only-l libxml-2.0`"
+ moot_LIBS="$moot_LIBS `$PKG_CONFIG --libs-only-l libxml-2.0`"
 
  DOXY_DEFINES="$DOXY_DEFINES MOOT_LIBXML_ENABLED=1"
-
- build_options="$build_options LIBXML2"
+ CONFIG_OPTIONS="$CONFIG_OPTIONS LIBXML2=1"
 fi
 ## /libxml2
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -528,6 +533,7 @@ if test "$moot_doc_formats" != "none" ; then
   #moot_program_gogs="mootpp.gog mootrain.gog moothmm.gog mootm.gog moot.gog"
   #moot_program_gogs="mootpp.gog mootrain.gog moothmm.gog moot.gog"
   moot_program_gogs="\
+	mootconfig.gog \
 	mootpp.gog \
 	mootrain.gog \
 	mootcompile.gog \
@@ -728,9 +734,10 @@ if test "$ac_cv_enable_trigrams" != "no" ; then
   AC_MSG_RESULT(yes)
   AC_DEFINE(MOOT_USE_TRIGRAMS,1,
 	    [Define this to enable use of trigrams])
-  build_options="$build_options TRIGRAMS"
+  CONFIG_OPTIONS="$CONFIG_OPTIONS USE_TRIGRAMS=1"
 else
   AC_MSG_RESULT(no)
+  CONFIG_OPTIONS="$CONFIG_OPTIONS USE_TRIGRAMS=0"
 fi
 ##
 ## /trigrams ?
@@ -749,9 +756,10 @@ if test "$ac_cv_enable_trigrams" != "no" -a "$ac_cv_enable_trigram_hash" != "no"
    AC_MSG_RESULT(yes)
    AC_DEFINE(MOOT_HASH_TRIGRAMS,1,
  	    [Define this to enable slow but memory-friendly trigram hash])
-   build_options="$build_options TRIGRAM_HASH"
+   CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_TRIGRAMS=1"
 else
    AC_MSG_RESULT(no)
+   CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_TRIGRAMS=0"
 fi
 ##
 ## /trigram-hash ?
@@ -768,9 +776,10 @@ AC_ARG_ENABLE(relax,
 if test "$ac_cv_enable_relax" != "no" ; then
   AC_MSG_RESULT(yes)
   AC_DEFINE(MOOT_RELAX,1, [Define this to enable relaxed interpretation of pre-analyses])
-  build_options="$build_options RELAX"
+  CONFIG_OPTIONS="$CONFIG_OPTIONS RELAX=1"
 else
   AC_MSG_RESULT(no)
+  CONFIG_OPTIONS="$CONFIG_OPTIONS RELAX=0"
 fi
 ##
 ## /relax ?
@@ -797,10 +806,24 @@ AC_SUBST(moot_WFLAGS)
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## configuration options
+##
+AC_SUBST(CONFIG_OPTIONS)
+AC_SUBST(moot_LIBS)
+##
+## /config options
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
 dnl
 dnl output
 dnl
-AC_CONFIG_FILES(src/libmoot/Makefile src/programs/Makefile src/Makefile)
+AC_CONFIG_FILES(src/libmoot/Makefile)
+AC_CONFIG_FILES(src/programs/Makefile)
+AC_CONFIG_FILES(src/programs/mootconfig, [chmod 0755 src/programs/mootconfig])
+AC_CONFIG_FILES(src/Makefile)
 dnl AC_CONFIG_FILES(doc/libmoot/mainpage.dox)
 dnl AC_CONFIG_FILES(doc/libmoot/doxy-filter.cfg)
 AC_CONFIG_FILES(doc/libmoot/libmoot.doxy doc/libmoot/Makefile)

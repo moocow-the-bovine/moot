@@ -20,6 +20,10 @@
 #bin_PROGRAMS = mootpp mootm moothmm moot mootrain
 #bin_PROGRAMS = mootpp moothmm moot mootrain
 bin_PROGRAMS = mootpp mootrain mootcompile mootdump moot mooteval mootchurn
+#mootconfig
+
+#bin_SCRIPTS = ${script1} ... ${scriptN}
+bin_SCRIPTS = mootconfig
 
 ## --- libtool libraries
 #lib_LTLIBRARIES = ${lib_1}.la ... ${lib_N}.la
@@ -41,6 +45,8 @@ SUFFIXES = \
 ## --- Required sources
 #${prog_i}_SOURCES =
 #${lib_i}_la_SOURCES =
+#mootconfig_SOURCES = mootconfig.cc
+
 mootpp_SOURCES = \
 	mootpp_main.cc \
 	mootpp_cmdparser.cc mootpp_cmdparser.h
@@ -165,7 +171,10 @@ LDFLAGS_COMMON = -L../libmoot
 #LDADD_COMMON   = -lmoot -lFSMExt @FSM_LIBS@
 #LDADD_COMMON   = -lmoot -lFSMExt -lFSM -lFSMSymSpec -lbumble++ @STL_LIBS@ -lz
 
-LDADD_COMMON   = ../libmoot/libmoot.la
+LDADD_COMMON   = ../libmoot/libmoot.la @moot_LIBS@
+
+#mootconfig_LDFLAGS = $(LDFLAGS_COMMON)
+#mootconfig_LDADD =
 
 mootpp_LDFLAGS = $(LDFLAGS_COMMON)
 mootpp_LDADD = $(LDADD_COMMON)
@@ -202,7 +211,8 @@ mootchurn_LDADD = $(LDADD_COMMON)
 #CLEANFILES =
 
 ## --- distclean: built by 'configure'
-#DISTCLEANFILES =
+DISTCLEANFILES = \
+	mootconfig
 
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = \
@@ -217,6 +227,7 @@ MAINTAINERCLEANFILES = \
 
 ## --- extra distribution files
 EXTRA_DIST = \
+	mootconfig.gog \
 	mootpp.gog \
 	mootrain.gog \
 	mootcompile.gog \

@@ -43,6 +43,8 @@ share-dwdst
 *.chmm
 *.hmm-dump
 *.chmm-dump
+*.tnt-tt
+*_vs_*
 *1
 *2
 *3

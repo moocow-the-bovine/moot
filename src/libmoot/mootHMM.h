@@ -115,6 +115,14 @@
 #define MOOT_LEX_UNKNOWN_CLASSES
 //#undef MOOT_LEX_UNKNOWN_CLASSES
 
+/**
+ * \def MOOT_VITERBI_DEBUG
+ * If defined, Viterbi trellis will be dumped to stderr on
+ * mootHMM::tag_sentence()
+ */
+//#define MOOT_VITERBI_DEBUG
+#undef MOOT_VITERBI_DEBUG
+
 
 moot_BEGIN_NAMESPACE
 
@@ -716,6 +724,10 @@ public:
       sent = reader->sentence();
       if (!sent) continue;
       tag_sentence(*sent);
+#ifdef MOOT_VITERBI_DEBUG
+      viterbi_txtdump(stderr);
+#endif
+
       if (writer) writer->put_sentence(*sent);
     }
   };

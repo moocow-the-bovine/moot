@@ -44,7 +44,8 @@ MOOTHMM       ?= $(MOOT_BINDIR)/moot
 MOOTEVAL      ?= $(MOOT_BINDIR)/mooteval
 
 MOOTCOMPILE   ?= $(MOOT_BINDIR)/mootcompile
-#MOOTCOMPILE_FLAGS = -z9
+ZFLAGS        ?= -z3
+MOOTCOMPILE_FLAGS ?= $(ZFLAGS)
 
 MOOTDUMP      ?= $(MOOT_BINDIR)/mootdump
 
@@ -122,7 +123,7 @@ dmt: $(TEST).dmt
 	$(MOOTHMM) -M$(MODEL).lex,$(MODEL).123,$(MODEL).clx $(MOOTHMM_FLAGS) $< -o $@
 
 ##-- eval
-eval: $(EVAL).eval
+eval: $(TEST).tt.eval $(TEST).dmt.eval $(TEST).cmt.eval
 
 %.tt.eval: %.tt $(TRUTH) $(MOOTEVAL)
 	$(MOOTEVAL) -v4 -2 -o $@ $*.ttt $<
@@ -287,7 +288,7 @@ cmt_xml: $(TEST).cmt.xml
 	$(MOOTHMM) -Ixml -O$(OF_XML),welldone -M$(MODEL).xml.lex,$(MODEL).xml.123,$(MODEL).xml.clx $(MOOTHMM_FLAGS) -o $@ $<
 
 ##-- XML: eval (by conversion)
-xml_eval1: $(EVAL).xml.eval1
+xml_eval1: $(TEST).tt.xml.eval1 $(TEST).dmt.xml.eval1 $(TEST).cmt.xml.eval1
 
 %.tt.xml.eval1: %.tt.post-xml $(XML_TRUTH_PRE) $(MOOTEVAL)
 	$(MOOTEVAL) -v4 -2 -o $@ $*.ttt.pre-xml $<
@@ -302,7 +303,7 @@ xml_eval1: $(EVAL).xml.eval1
 	$(MOOTEVAL) -v4 -2 -o $@ $*.ttt.pre-xml $<
 
 ##-- XML: eval (direct)
-xml_eval: $(EVAL).xml.eval
+xml_eval: $(TEST).tt.xml.eval $(TEST).dmt.xml.eval $(TEST).cmt.xml.eval
 
 %.tt.xml.eval: %.tt.xml $(XML_TRUTH) $(MOOTEVAL)
 	$(MOOTEVAL) -v4 -2 -Ixml,medium -o $@ $*.ttt.xml $<
@@ -316,6 +317,18 @@ xml_eval: $(EVAL).xml.eval
 %.mttt.xml.eval: %.mttt.xml $(XML_TRUTH) $(MOOTEVAL)
 	$(MOOTEVAL) -v4 -2 -Ixml,welldone -o $@ $*.ttt.xml $<
 
+##-- XML: check
+xml_check: $(TEST).tt.xml-check $(TEST).dmt.xml-check $(TEST).cmt.xml-check
+
+%.tt.xml-check: %.tt.post-xml %.tt $(MOOTEVAL)
+	$(MOOTEVAL) -v2 -2 -Imedium -o $@ $*.tt $<
+
+%.dmt.xml-check: %.dmt.post-xml %.dmt $(MOOTEVAL)
+	$(MOOTEVAL) -v2 -2 -Iwelldone -o $@ $*.dmt $<
+
+%.cmt.xml-check: %.cmt.post-xml %.cmt $(MOOTEVAL)
+	$(MOOTEVAL) -v2 -2 -Iwelldone  -o $@ $*.cmt $<
+
 
 ##-- XML: save
 xml_save: save/$(label).xml_stamp
@@ -327,7 +340,7 @@ xml_test: xml_save xml_unsave
 
 save/%.xml_stamp: $(TEST).ttt $(TEST).mt.xml $(TRAIN).xml.model
 	for ext in tt dmt cmt ; do \
-	  $(MAKE) $(TEST).$$ext.xml $(TEST).$$ext.xml.eval ;\
+	  $(MAKE) $(TEST).$$ext.xml $(TEST).$$ext.xml-check ;\
 	done
 	mkdir -p save/$*
 	mv \
@@ -335,24 +348,62 @@ save/%.xml_stamp: $(TEST).ttt $(TEST).mt.xml $(TRAIN).xml.model
 	   $(TEST).dmt.xml \
 	   $(TEST).cmt.xml \
 	   \
-	   $(TEST).tt.xml.eval \
-	   $(TEST).dmt.xml.eval \
-	   $(TEST).cmt.xml.eval \
+	   $(TEST).tt.xml-check \
+	   $(TEST).dmt.xml-check \
+	   $(TEST).cmt.xml-check \
 	  save/$*
-	rm -f $(TRAIN).xml_model
+	rm -f $(TRAIN).xml.model
 	touch $@
 
+##-- lower-case
+
+lower: $(TEST)-lower.ttt $(TRAIN)-lower.ttt
+
+%-lower.ttt: %.ttt
+	tr A-ZAÄÖÜ a-zäöü < $< > $@
+
+lower_model: $(TRAIN)-lower.model
+
+%-lower.model: %-lower.ttt $(MOOTRAIN)
+	$(MOOTRAIN) -Imedium -ln $< -o $*
+	touch $@
+
+##-- tnt-tagging
+
+TNT_AFLAGS ?= -a10
+TNT_DFLAGS ?= -d4
+TNT_UFLAGS ?= -u3
+TNT_NFLAGS ?= -n3
+TNT_FLAGS ?= $(TNT_AFLAGS) $(TNT_DFLAGS) $(TNT_UFLAGS) $(TNT_NFLAGS)
+
+notnt:
+	rm -f *.tnt-tt *.tnt-tt.*
+
+%-lower.tnt-tt: %-lower.t $(MODEL)-lower.model
+	tnt $(TNT_FLAGS) $(MODEL)-lower $< > $@
+
+%.tnt-tt: %.t $(MODEL).model
+	tnt $(TNT_FLAGS) $(MODEL) $< > $@
+
+%.tnt-tt.eval: %.tnt-tt %.ttt
+	$(MOOTEVAL) -v3 -2 -Imedium $*.ttt $< -o $@
 
 ##-- cleanup
 clean:
-	rm -f *~ *.t *.tt *.dmt tmp.res
+	rm -f tmp.res *~ \
+	  *.xml-check \
+	  *.tt *.dmt *.cmt \
+	  *.tt.xml *.dmt.xml *.cmt.xml \
+	  *.tnt-tt \
+	  *.lex *.123 *.clx *.model \
+	  *.hmm *.chmm *.dump *.cdump \
+	  *.errors *.cerrors *.icerrors *.eval \
+	  *.post-xml
 
 realclean: clean
 	rm -f \
-	  *.lex *.123 *.clx \
+	  *.t  *.t.xml \
 	  *.mt *.m0t *.m1t *.amt \
 	  *.mtt *.m0tt *.m1tt \
 	  *.mttt *.m0ttt *.m1ttt \
-	  *.model *.hmm *.chmm *.dump *.cdump \
-	  *.errors *.cerrors *.icerrors *.eval \
-	  *.pre-xml *.xml *.post-xml
+	  *.pre-xml

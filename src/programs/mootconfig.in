@@ -1,0 +1,56 @@
+#!/bin/sh
+
+##-- variables
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+includedir=@includedir@
+libdir=@libdir@
+
+PACKAGE=@PACKAGE@
+datadir=@datadir@
+docdir=@docdir@
+pkgdocdir=@pkgdocdir@
+
+cppflags="-I@spkgincludedir@ @CPPFLAGS@"
+
+
+##-- main
+case "$1" in
+  --cflags)
+    echo @CXXFLAGS@
+    ;;
+
+  --cppflags)
+    echo ${cppflags}
+    ;;
+
+  --cxxflags)
+    echo @moot_OFLAGS@ @CXXFLAGS@
+    ;;
+
+  --ldflags)
+    echo @LDFLAGS@ -L${libdir}
+    ;;
+
+  --libs)
+    echo -lmoot @moot_LIBS@ @LIBS@
+    ;;
+
+  --version)
+    echo @VERSION@
+    ;;
+
+  -V)
+    ##-- argh: optgen weirdness
+    echo @VERSION@
+    ;;
+
+  --options)
+    echo @CONFIG_OPTIONS@
+    ;;
+
+  *)
+    echo "Usage: $0 --{cflags|cppflags|cxxflags|ldflags|libs|version|options}"
+    exit 1
+    ;;
+esac

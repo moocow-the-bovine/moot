@@ -15,7 +15,7 @@ datadir=@datadir@
 docdir=@docdir@
 pkgdocdir=@pkgdocdir@
 
-build_options=@build_options@
+build_options=@CONFIG_OPTIONS@
 
 cppflags=-I@spkgincludedir@ @CPPFLAGS@
 ldadd=-lmoot @LIBS@

@@ -1,0 +1,42 @@
+# -*- Mode: Shell-Script -*-
+#
+# Getopt::Gen specification for mootconfig
+#-----------------------------------------------------------------------------
+program "mootconfig"
+
+purpose	"moocow's part-of-speech tagger: report configuration"
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details "
+'mootconfig' allows easy access to the options with which
+the 'libmoot' library was built (on systems with a /bin/sh).
+"
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+flag "version" V "Display package version"
+
+flag "cflags" - "Display C compiler flags"
+
+flag "cppflags" - "Display C/C++ preprocessor flags"
+
+flag "cxxflags" - "Display C++ compiler flags"
+
+flag "ldflags" - "Display linker flags"
+
+flag "libs" - "Display required linker libraries"
+
+flag "options" - "Display compile-time options"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+acknowledge `cat acknowledge.pod`
+
+seealso "
+mootutils(1)
+"

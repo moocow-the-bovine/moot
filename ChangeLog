@@ -3,6 +3,24 @@ ChangeLog for package moot
 Todo:
 	+ write perl-XS interface & utilities
 
+v2.0.3 Tue, 20 Jul 2004 19:49:58 +0200
+	+ added shell-script 'mootconfig' to report compile-time
+	  options for installed systems (pkg-config variable
+	  still workds too, but pkg-config might not be present
+	  for static builds...)
+	+ fixed a nasty icky stinky ugly bug in mootHMM causing
+	  zero-probabilities on transitions to EOS
+	  - problem was forcing tokid=0 (with TagID=start_tagid)
+            in call to viterbi_step(TokID,TagID) from viterbi_finish()
+	  - of course this winds up goofy, since EOS is never associated
+	    with any real token
+	  - hack: force all calls of viterbi_step(TokID,TagID) to
+	    use MOOT_PROB_ONE as lexical-probability: this is probably
+	    OK, since the method only gets called on last-resort
+            ("UNKNOWN" tag) fallbacks and on EOS -- also, if you're
+	    only adding a single tag per column, you can safely use
+	    a probability of 1.0 without disturbing any maxima.
+	
 v2.0.2 Mon, 19 Jul 2004 15:51:53 +0200
 	+ fixed a bug in mootBufferIO.h causing bad read/write buffers
 	  (force cb_rdata==cb_wdata)

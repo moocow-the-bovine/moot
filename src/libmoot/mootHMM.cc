@@ -1391,8 +1391,9 @@ void mootHMM::viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col)
   //-- for the destination tag 'vtagid'
   vtagid = tagid >= n_tags ? 0 : tagid;
 
-  //-- get lexical probability: p(tok|tag) 
-  vwordpr = wordp(tokid,tagid);
+  //-- get lexical probability: p(tok|tag) : BAD at EOS!
+  //vwordpr = wordp(tokid,tagid);
+  vwordpr = MOOT_PROB_ONE;
 
   //-- hack: disable beam-pruning cutoff
   bpprmin = MOOT_PROB_NEG;

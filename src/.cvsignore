@@ -2,6 +2,7 @@ alphatest
 hashtest
 opttest
 mabbaw
+mootconfig
 *.par
 *.tt
 *.pp

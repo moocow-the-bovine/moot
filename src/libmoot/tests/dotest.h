@@ -37,4 +37,9 @@ void dotest_report(const char *label,
   gettimeofday(&tv_stopped,NULL); \
   dotest_report(#CODE,NITERS);
 
+void memprompt(const char *label="none") {
+  fprintf(stderr, "Check memory (label=\"%s\") ? ", label);
+  fgetc(stdin);
+}
+
 #endif // DOTEST_H

@@ -63,13 +63,26 @@ pdf: $(moot_pods:.pod=.pdf) $(INDEX_SKEL:.skel=.pdf)
 
 OPTGENFLAGS = -l
 
+mootconfig.pod: mootconfig.gog
+	optgen.perl $(OPTGENFLAGS) --nocfile --nohfile \
+	--no-handle-help \
+	--no-handle-version \
+	--no-handle-rcfile \
+	--no-handle-error \
+	-F $* $<
+
 .gog.pod:
 	optgen.perl $(OPTGENFLAGS) --nocfile --nohfile -F $* $<
 
 ##-----------------------------------------------------------------------
 ## pod compilation rules: Getopt::Gen (from skel)
 ##-----------------------------------------------------------------------
-OPTGEN_SKELFLAGS = --nocfile --nohfile --nopod
+OPTGEN_SKELFLAGS = \
+	--nocfile --nohfile --nopod \
+	--no-handle-help \
+	--no-handle-version \
+	--no-handle-rcfile \
+	--no-handle-error
 
 .skel.pod:
 	echo | optgen.perl $(OPTGEN_SKELFLAGS) --template=$< - > $@ 2>/dev/null
