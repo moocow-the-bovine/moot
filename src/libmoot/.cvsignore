@@ -86,3 +86,9 @@ test.*
 
 tokio
 tokbounds
+
+dotest.h
+pre-gpl
+
+utrain.*
+utest.*
