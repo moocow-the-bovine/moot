@@ -67,7 +67,7 @@ OPTGENFLAGS = -l
 ##-----------------------------------------------------------------------
 
 POD2MANFLAGS = --center="KDWDS PoS Tagging Tools"
-POD2HTMLFLAGS = --podpath="$(srcdir):."
+POD2HTMLFLAGS = --podpath="$(srcdir):." --htmlroot="."
 
 .pod.1:
 	$(POD2MAN) $(POD2MANFLAGS) --section=1 $< $@
