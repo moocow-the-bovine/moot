@@ -30,6 +30,7 @@
 #    include <ext/hash_map>
 #    include <ext/hash_set>
 #  else  /* __GNUC__ >= 3 */
+#    define DWDST_STL_NAMESPACE std
 #    include <hash_map>
 #    include <hash_set>
 #  endif /* __GNUC__ >= 3 */
@@ -56,6 +57,7 @@
 DWDST_BEGIN_NAMESPACE
 
 using namespace std;
+using namespace DWDST_STL_NAMESPACE;
 
 /*----------------------------------------------------------------------
  * Basic Types

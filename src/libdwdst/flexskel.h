@@ -50,8 +50,6 @@
 
 %% here is the declaration from section1 %header{ 
 
-
-
 #ifndef YY_@_TEXT
 #define YY_@_TEXT yytext
 #endif
@@ -233,6 +231,7 @@ YY_@_LEX_PARAM_DEF
 #endif
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 
+/** Flex++ generated lexer class */
 class YY_@_CLASS YY_@_INHERIT
 {
  private:/* data */
@@ -281,12 +280,20 @@ class YY_@_CLASS YY_@_INHERIT
 #endif
   ;
  public:
+ /** text of current token */
  YY_@_CHAR  *YY_@_TEXT;
+ /** length of current token */
  int YY_@_LENG;
- FILE *YY_@_IN, *YY_@_OUT;
+ /** current input stream (must not be NULL!) */
+ FILE *YY_@_IN;
+ /** current output stream */
+ FILE *YY_@_OUT;
+ /** get the next token from the input stream */
  YY_@_LEX_RETURN YY_@_LEX ( YY_@_LEX_PARAM);
+ /** constructor */
  YY_@_CLASS(YY_@_CONSTRUCTOR_PARAM) ;
 #if YY_@_DEBUG != 0
+ /** debug flags */
  int YY_@_DEBUG_FLAG;
 #endif
  public: /* added members */

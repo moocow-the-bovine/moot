@@ -79,7 +79,6 @@ int read();
 #endif
 #endif
 
-
 /*********************/
 /* parameters        */
 
@@ -189,7 +188,6 @@ int read();
 
 /* action number for EOF rule of a given start state */
 #define YY_STATE_EOF(state) (YY_END_OF_BUFFER + state + 1)
-
 
 
 %% section 1 definitions go here
@@ -363,6 +361,11 @@ YY_@_CLASS::YY_@_CLASS(YY_@_CONSTRUCTOR_PARAM) YY_@_CONSTRUCTOR_INIT
 
 #ifndef YY_USER_INIT
 #define YY_USER_INIT
+#endif
+
+// -- peacefully co-exist with BumbleBee 'clex.h'
+#ifdef REJECT
+# undef REJECT
 #endif
 
 %% data tables for the DFA go here
