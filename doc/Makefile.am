@@ -11,7 +11,7 @@
 ##-----------------------------------------------------------------------
 
 ## --- recursion subdirectories
-SUBDIRS = libdwdst
+SUBDIRS = libdwdst programs
 
 #-----------------------------------------------------------------------
 # Variables: cleanup
@@ -30,9 +30,9 @@ SUBDIRS = libdwdst
 MAINTAINERCLEANFILES = *~ .*~ Makefile Makefile.in
 
 #-----------------------------------------------------------------------
-# Variables: install
+# Variables: (un)install
 #-----------------------------------------------------------------------
-pkgdoc_UNINSTALL_FILES = libdwdst README.txt
+pkgdoc_UNINSTALL_FILES = libdwdst programs README.txt
 uninstall-local:
 	for f in $(pkgdoc_UNINSTALL_FILES) ; do \
 	   rm -rf $(DESTDIR)$(pkgdocdir)/$$f ;\

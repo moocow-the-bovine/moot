@@ -48,8 +48,9 @@ EXTRA_DIST = \
 	depcomp \
 	install-sh \
 	mkinstalldirs \
-	missing \
-	ylwrap
+	missing
+
+#	ylwrap
 
 #	ltmain.sh
 #	config.guess 

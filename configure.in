@@ -17,10 +17,12 @@ dnl
 dnl use autoheader
 dnl
 AM_CONFIG_HEADER([src/libdwdst/dwdstConfig.h])
-AH_TOP([/*
+AH_TOP([
+/*
  * Avoid conflicts with other autotools packages (i.e. FSMlib)
+ * Thu Jan 30 02:38:32 CET 2003: hack removed.
  */
-#include <cleanConfig.h>
+/*#include <cleanConfig.h>*/
 ])
 dnl AH_BOTTOM([/*
 dnl /* PACKAGE does not jive well with multiple-program pacakges
@@ -275,104 +277,170 @@ AC_ARG_WITH(docdir,
 	AC_HELP_STRING([--with-docdir=DIR],
 		       [install documentation in DIR/dwdst (default=DATADIR/doc)]),
 	[docdir="$withval"],[docdir="\${datadir}/doc"])
+
 pkgdocdir="\${docdir}/\${PACKAGE}"
+pkgdocprogdir="\${docdir}/\${PACKAGE}/programs"
+
 AC_SUBST(docdir)
 AC_SUBST(pkgdocdir)
+AC_SUBST(pkgdocprogdir)
 
-AC_MSG_CHECKING([whether to build documentation])
+AC_ARG_WITH(doc-formats,
+	AC_HELP_STRING([--with-doc-formats=LIST],
+		       [Build documentation formats in LIST. \
+                        Available formats: txt, man, html, dvi, ps, pdf, none.
+	                Default='man html pdf']),
+	[ac_cv_doc_formats="$withval"],[ac_cv_doc_formats="man html pdf"])
+
+## -- un-comma-tize the doc-formats
+dwdst_doc_formats=`echo "$ac_cv_doc_formats" | sed 's/\,/ /g'`
+
+
 AC_ARG_ENABLE(doc,
-	AC_HELP_STRING([--enable-doc],[build documentation (default=yes)]),
+	AC_HELP_STRING([--enable-doc],[Synonym for --with-doc-formats=none]),
 	[enable_doc="$enableval"],[enable_doc="yes"])
 
-if test "$enable_doc" = "yes" ; then
- AC_MSG_RESULT(yes)
 
- dnl
- dnl docs: prog doxygen
- dnl
- AC_PATH_PROG(DOXYGEN,doxygen,[])
- AC_SUBST(DOXYGEN_SOURCES)
+AC_MSG_CHECKING([which documentation formats to build])
+if test "$enable_doc" != "yes" ; then
+ ### disable all docs
+ dwdst_doc_formats="none"
+fi
+AC_MSG_RESULT($dwdst_doc_formats)
+#echo ">> post RESULT"
 
- if test -n "$DOXYGEN" ; then
-  dnl
-  dnl docs: html
-  dnl
-  AC_MSG_CHECKING([whether to build html documentation])
-  AC_ARG_ENABLE(html,
-	AC_HELP_STRING([--enable-html],[build HTML documentation (default=yes)]),
-	[enable_html="$enableval"],[enable_html="yes"])
-  if test "$enable_html" = "yes" ; then
-    AC_MSG_RESULT(yes) ; DOXY_WANT_HTML="YES" ;
-    DOC_SUBDIRS="html"
-  else
-    AC_MSG_RESULT(no) ; DOXY_WANT_HTML="NO" 
+
+if test "$dwdst_doc_formats" != "none" ; then
+  ### docs: prog doxygen
+  AC_PATH_PROG(DOXYGEN,doxygen,[])
+  AC_SUBST(DOXYGEN)
+  AC_SUBST(DOXYGEN_SOURCES)
+
+  ### -- report doxygen-check results
+  if test -z "$DOXYGEN" ; then
+    AC_MSG_WARN([doxygen not found: library documentation will not be built!]) 
   fi
+
+  ### docs: pod converters
+  AC_PATH_PROG(POD2TEXT,pod2text,[])
+  AC_PATH_PROG(POD2MAN,pod2man,[])
+  AC_PATH_PROG(POD2HTML,pod2html,[])
+  AC_PATH_PROG(POD2LATEX,pod2latex,[])
+  AC_SUBST(POD2TEXT)
+  AC_SUBST(POD2MAN)
+  AC_SUBST(POD2HTML)
+  AC_SUBST(POD2LATEX)
+
+  ### -- docs: .gog file linkup
+  dwdst_program_gogs="dwdst.gog dwdspp.gog dwdst-fstgen.gog dwdst-pargen.gog"
+  for g in $dwdst_program_gogs ; do
+    AC_CONFIG_LINKS(doc/programs/${g}:src/programs/${g})  
+  done
+  AC_SUBST(dwdst_program_gogs)
+
+
+  ### -- initialize defaults
+  DOC_SUBDIRS=""
+  DOC_LATEX_TARGETS=""
+  DOXY_WANT_HTML="NO"
+  DOXY_WANT_MAN="NO"
+  DOXY_WANT_LATEX="NO"
+
+  for fmt in $dwdst_doc_formats ; do
+    case "$fmt" in
+
+      txt)
+	if test -n "$POD2TEXT" ; then
+	  DOC_PROG_TXT_TARGETS=`echo "$dwdst_program_gogs" | sed 's/\.gog/\.txt/g'`
+	else
+	  AC_MSG_WARN(pod2text not found -- program text docs will not be built!)
+	fi
+	;;
+
+      man)
+	if test -n "$DOXYGEN" ; then
+	  DOXY_WANT_MAN="YES"
+          DOC_MANDIRS="man/man3"
+          DOC_MAN3_MANS="man/man3/*"
+	fi
+	if test -n "$POD2MAN" ; then
+	  DOC_PROG_MAN_TARGETS=`echo "$dwdst_program_gogs" | sed 's/\.gog/\.1/g'`
+	else
+	  AC_MSG_WARN(pod2man not found -- program manpages will not be built!)
+	fi
+	;;
+
+      html)
+	if test -n "$DOXYGEN" ; then
+          DOXY_WANT_HTML="YES"
+          DOC_SUBDIRS="$DOC_SUBDIRS html"
+	fi
+	if test -n "$POD2HTML" ; then
+	  DOC_PROG_HTML_TARGETS=`echo "$dwdst_program_gogs" | sed 's/\.gog/\.html/g'`
+	else
+	  AC_MSG_WARN(pod2html not found -- program html docs will not be built!)
+	fi
+	;;
+
+      dvi)
+	if test -n "$DOXYGEN" ; then
+	  DOXY_WANT_LATEX="YES"
+	  DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.dvi"
+	fi
+	if test -n "$POD2LATEX" ; then
+	  DOC_PROG_DVI_TARGETS=`echo "$dwdst_program_gogs" | sed 's/\.gog/\.dvi/g'`
+	else
+	  AC_MSG_WARN(pod2latex not found -- program dvi docs will not be built!)
+	fi
+	;;
+
+      ps)
+	if test -n "$DOXYGEN" ; then
+	  DOXY_WANT_LATEX="YES"
+	  DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.ps"
+	fi
+	if test -n "$POD2LATEX" ; then
+	  DOC_PROG_PS_TARGETS=`echo "$dwdst_program_gogs" | sed 's/\.gog/\.ps/g'`
+	else
+	  AC_MSG_WARN(pod2latex not found -- program postscript docs will not be built!)
+	fi
+	;;
+
+      pdf)
+	if test -n "$DOXYGEN" ; then
+	  DOXY_WANT_LATEX="YES"
+    	  DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.pdf"
+	fi
+	if test -n "$POD2LATEX" ; then
+	  DOC_PROG_PDF_TARGETS=`echo "$dwdst_program_gogs" | sed 's/\.gog/\.pdf/g'`
+	else
+	  AC_MSG_WARN(pod2latex not found -- program pdf docs will not be built!)
+	fi
+	;;
+
+      *)
+	AC_MSG_WARN(ignoring unknown documentation format: $fmt)
+	;;
+    esac; # case "$fmt" in ...
+  done; # for fmt in $dwdst_doc_formats ...
+
   AC_SUBST(DOXY_WANT_HTML)
-  AC_SUBST(DOC_SUBDIRS)
-
-  dnl
-  dnl docs: manpages
-  dnl
-  AC_MSG_CHECKING([whether to build manpages])
-  AC_ARG_ENABLE(man,
-	AC_HELP_STRING([--enable-man],[build manpages (default=yes)]),
-	[enable_man="$enableval"],[enable_man="yes"])
-  if test "$enable_man" = "yes" ; then
-    AC_MSG_RESULT(yes) ; DOXY_WANT_MAN="YES" ;
-    DOC_MANDIRS="man/man3"
-    DOC_MAN3_MANS="man/man3/*"
-  else
-    AC_MSG_RESULT(no) ; DOXY_WANT_MAN="NO" 
-  fi
   AC_SUBST(DOXY_WANT_MAN)
+  AC_SUBST(DOXY_WANT_LATEX)
+  AC_SUBST(DOC_SUBDIRS)
   AC_SUBST(DOC_MANDIRS)
   AC_SUBST(DOC_MAN3_MANS)
-
-  dnl
-  dnl doxy: dvi
-  dnl
-  AC_MSG_CHECKING([whether to build dvi documentation])
-  AC_ARG_ENABLE(dvi,
-	AC_HELP_STRING([--enable-dvi],[build dvi documentation (default=no)]),
-	[enable_dvi="$enableval"],[enable_dvi="no"])
-  if test "$enable_dvi" = "yes" ; then
-    AC_MSG_RESULT(yes) ; DOXY_WANT_LATEX="YES" ;
-    DOC_LATEX_TARGETS="refman.dvi"
-  else
-    AC_MSG_RESULT(no) ;
-  fi
-  dnl
-  dnl doxy: postscript
-  dnl
-  AC_MSG_CHECKING([whether to build postscript documentation])
-  AC_ARG_ENABLE(postscript,
-	AC_HELP_STRING([--enable-postscript],[build postscript documentation (default=yes)]),
-	[enable_ps="$enableval"],[enable_ps="yes"])
-  if test "$enable_ps" = "yes" ; then
-    AC_MSG_RESULT(yes) ; DOXY_WANT_LATEX="YES" ;
-    DOC_LATEX_TARGETS="$DOC_LATEX_TARGETS refman.ps"
-  else
-    AC_MSG_RESULT(no) ;
-  fi
-  dnl
-  dnl doxy: pdf
-  dnl
-  AC_MSG_CHECKING([whether to build pdf documentation])
-  AC_ARG_ENABLE(pdf,
-	AC_HELP_STRING([--enable-pdf],[build pdf documentation (default=yes)]),
-	[enable_pdf="$enableval"],[enable_pdf="yes"])
-  if test "$enable_pdf" = "yes" ; then
-    AC_MSG_RESULT(yes) ; DOXY_WANT_LATEX="YES"
-    DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.pdf"
-  else
-    AC_MSG_RESULT(no)
-  fi
-
-  test -z "$DOXY_WANT_LATEX" && DOXY_WANT_LATEX="NO"
-  AC_SUBST(DOXY_WANT_LATEX)
   AC_SUBST(DOC_LATEX_TARGETS)
+  AC_SUBST(POD_DOC_SUFFIXES)
 
-  # -- check for tag-files
+  AC_SUBST(DOC_PROG_TXT_TARGETS)
+  AC_SUBST(DOC_PROG_MAN_TARGETS)
+  AC_SUBST(DOC_PROG_HTML_TARGETS)
+  AC_SUBST(DOC_PROG_DVI_TARGETS)
+  AC_SUBST(DOC_PROG_PS_TARGETS)
+  AC_SUBST(DOC_PROG_PDF_TARGETS)
+
+  # -- check for tag-files (this needs an overhaul!)
   AC_ARG_WITH(fsm-docdir,
 	AC_HELP_STRING([--with-fsm-docdir=DIR],
 		       [specify location of FSMlib docs (default=DOCDIR/FSMlib)]),
@@ -388,16 +456,7 @@ if test "$enable_doc" = "yes" ; then
     fi
   fi
   AC_SUBST(DOXY_TAGFILES)   
-	
- else # prog doxygen
-  dnl no doxygen: just notify
-  AC_MSG_NOTICE([doxygen not found -- documentation will not be built])
- fi # prog doxygen
-
-else # enable doc
-  AC_MSG_RESULT(no)
-fi # enable doc
-
+fi; # if "$dwdst_doc_formats" != "none" ...
 
 
 dnl
@@ -447,7 +506,9 @@ dnl
 dnl output
 dnl
 AC_CONFIG_FILES(src/libdwdst/Makefile src/programs/Makefile src/Makefile)
-AC_CONFIG_FILES(doc/libdwdst/libdwdst.doxy doc/libdwdst/Makefile doc/Makefile)
+AC_CONFIG_FILES(doc/libdwdst/libdwdst.doxy doc/libdwdst/Makefile)
+AC_CONFIG_FILES(doc/programs/Makefile)
+AC_CONFIG_FILES(doc/Makefile)
 AC_CONFIG_FILES(config/Makefile)
 AC_CONFIG_FILES(Makefile)
 AC_OUTPUT
