@@ -3,7 +3,7 @@ Name: @PACKAGE@
 Version: @VERSION@
 Release: @BINDIST_RELEASE@
 Copyright: Copyright (c) 2002-2003 by Bryan Jurish.  All Rights Reserved.
-Summary: Part-of-Speech tagger using libFSM.
+Summary: moocow's part-of-speech tagger.
 Group: dev
 Source: @PACKAGE@-@VERSION@.tar.gz
 #Patch: 
@@ -11,7 +11,7 @@ BuildRoot: /var/tmp/%{name}-buildroot
 #BuildRoot: buildroot
 
 %description
-Part-of-Speech tagger using libFSM.
+moocow's part-of-speech tagger.
 
 
 %package doc
@@ -51,11 +51,11 @@ ldconfig
 
 %files
 %defattr(-,root,root)
-/usr/bin/dwds*
+/usr/bin/moot*
 /usr/lib/libmoot.*
 /usr/lib/pkgconfig/moot.*
 /usr/include/moot/*
-/usr/man/man1/dwds*
+/usr/man/man1/moot*
 %doc /usr/share/doc/moot/AUTHORS
 %doc /usr/share/doc/moot/ChangeLog
 %doc /usr/share/doc/moot/COPYING

@@ -20,7 +20,7 @@ ldadd=-lmoot
 
 
 Name: @PACKAGE@
-Description: (K)DWDS Part-of-Speech tagging library.
+Description: moocow's part-of-speech tagging library.
 Version: @VERSION@
 #Requires: libbumble >= 1.13.5, flex++bison++ >= 0.0.5
 Requires: libFSM >= 0.1.0.3, libFSMext >= 0.0.0
