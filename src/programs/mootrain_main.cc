@@ -188,7 +188,7 @@ void GetMyOptions(int argc, char **argv)
   //-- io: new_reader
   reader = TokenIO::new_reader(ifmt);
   if (!reader) {
-    fprintf(stderr, "%s: Error: could not set up TokenReader!\n");
+    fprintf(stderr, "%s: Error: could not set up TokenReader!\n", PROGNAME);
     exit(1);
   }
 
