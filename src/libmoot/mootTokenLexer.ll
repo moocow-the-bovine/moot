@@ -120,10 +120,11 @@
    \
    /* -- diagnositcs */\
    /** Name of our input source: used for diagnostics & error messages */\
-   char *srcname;\
-  private: \
-    /* private local data */ \
+   std::string srcname;\
+  /* private: */\
+    /** low-level pseudo-private local data */ \
     bool use_string; \
+    /** low-level pseudo-private local data */ \
     char *stringbuf; \
   public: \
     /* -- local methods */ \
@@ -486,6 +487,6 @@ void mootTokenLexer::yycarp(char *fmt, ...)
     va_end(ap);
     fprintf(stderr, " in %s %s at line %d, column %d, near `%s'\n",
             (use_string ? "string" : "file"),
-            (srcname ? srcname : "(null)"),
+            (srcname.empty() ? "(null)" : srcname.c_str()),
             theLine, theColumn, yytext);
 }

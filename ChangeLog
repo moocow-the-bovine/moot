@@ -2,12 +2,22 @@ ChangeLog for package moot
 
 Todo:
 	+ add XML I/O (subclass of moot::Token(Reader|Writer) ?)
-	  - test performance impact of virtuals here
 	+ write perl-XS interface & utilities
 	+ find out where all the process time is going in
 	  class-based disambig (it ain't in the find(), as I had
 	  thought: classification maybe?)
 
+v2.0.0pre7 Thu, 17 Jun 2004 16:58:37 +0200
+	+ added mootXmlParser.(h|cc) : abstract expat wrapper class
+	+ re-worked mootTokenIO
+	  - now with 10% MORE Object Orientation than Ever Before!
+	  - i.e. many virtual methods and a biggish hierarchy,
+	    hopefully abstract enough to incorporate XML I/O
+	  - adding virtuals doesn't seem to have noticeably
+	    degraded performance at all (whew)
+	+ fixed a bug in mootTokenLexer which was preventing us
+	  from actually reading tokens containing spaces
+	
 v2.0.0pre6 Thu, 10 Jun 2004 01:37:09 +0200
 	+ got comment pass-through working: added type
 	  'mootTokFlavor' in 'mootToken.h' and instance datum

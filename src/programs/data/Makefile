@@ -39,7 +39,7 @@ MOOTCOMPILE = ../mootcompile
 MOOTDUMP = ../mootdump
 
 all:
-	@echo "Usage: make TEST=test TRAIN=train label=label save"
+	@echo "Usage: make TEST=test TRAIN=train label=label {save|test}"
 
 
 ##-- don't delete these
@@ -149,7 +149,9 @@ cerrors: $(EVAL).cerrors
 save: save/$(label).stamp
 
 unsave:
-	rm -rf save/$(label).stamp
+	rm -rf save/$(label).stamp save/$(label)
+
+test: save unsave
 
 save/%.stamp: \
 	$(TEST).ttt $(TEST).mtt $(TRAIN).model
@@ -165,7 +167,6 @@ save/%.stamp: \
 	  save/$*
 	rm -f $(TRAIN).model
 	touch $@
-
 
 ##-- models
 model: $(MODEL).model

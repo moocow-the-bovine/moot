@@ -36,6 +36,7 @@
 
 #include "mootTypes.h"
 #include "mootToken.h"
+#include "mootTokenIO.h"
 #include "mootNgrams.h"
 #include "mootLexfreqs.h"
 #include "mootClassfreqs.h"
@@ -138,11 +139,19 @@ public:
   /*------------------------------------------------------------*/
   /// \name Top-level training methods
   //@{
+  /** Gather training data using mootTokenIO layer */
+  bool train_from_reader(TokenReader *reader);
+
   /** Gather training data from a C-stream using mootTaggerLexer */
-  bool train_from_stream(FILE *in=stdin, const char *filename="(unknown)");
+  bool train_from_stream(FILE *in=stdin, const string &srcname="(unknown)")
+  {
+    TokenReaderCookedFile reader(true,in,srcname);
+    reader.lexer.ignore_first_analysis = true;
+    return train_from_reader(&reader);
+  };
 
   /** Gather training data from a file using mootTaggerLexer */
-  bool train_from_file(const char *filename);
+  bool train_from_file(const string &filename);
   //@}
 
   /*------------------------------------------------------------*/

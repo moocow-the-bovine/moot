@@ -256,7 +256,7 @@ int read();
  * Rules
  *----------------------------------------------------------------------*/
 #include "mootTokenLexer.h"
-#line 194 "mootTokenLexer.ll"
+#line 195 "mootTokenLexer.ll"
 #line 196 "/usr/local/share/flex++bison++/flexskel.cc"
 
 #define yy___text YY_mootTokenLexer_TEXT
@@ -560,9 +560,9 @@ static YY_CHAR *yy_last_accepting_cpos;
 #if YY_mootTokenLexer_DEBUG != 0
 static const short int yy_rule_linenum[23] =
     {   0,
-      201,  210,  224,  233,  233,  246,  251,  256,  256,  289,
-      297,  304,  311,  320,  320,  375,  375,  387,  393,  398,
-      403,  403
+      202,  211,  225,  234,  234,  247,  252,  257,  257,  290,
+      298,  305,  312,  321,  321,  376,  376,  388,  394,  399,
+      404,  404
     } ;
 
 #endif
@@ -711,7 +711,7 @@ do_action:      /* this label is used only to access EOF actions */
   using namespace moot;
 
 case 1:
-#line 201 "mootTokenLexer.ll"
+#line 202 "mootTokenLexer.ll"
 {
   /** blank line: maybe return eos (ignore empty sentences) */
   theLine++; theColumn=0;
@@ -722,7 +722,7 @@ case 1:
 }
 	YY_BREAK
 case 2:
-#line 210 "mootTokenLexer.ll"
+#line 211 "mootTokenLexer.ll"
 {
   //-- return comments as special tokens
   theLine++;
@@ -737,7 +737,7 @@ case 2:
 }
 	YY_BREAK
 case 3:
-#line 224 "mootTokenLexer.ll"
+#line 225 "mootTokenLexer.ll"
 {
   //-- TOKEN: keep only internal whitespace
   theColumn += yyleng;
@@ -751,7 +751,7 @@ case 4:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 233 "mootTokenLexer.ll"
+#line 234 "mootTokenLexer.ll"
 {
   //-- TOKEN: end-of-token
   theColumn += yyleng;
@@ -764,11 +764,11 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
 }
 	YY_BREAK
 case YY_STATE_EOF(TOKEN):
-#line 244 "mootTokenLexer.ll"
+#line 245 "mootTokenLexer.ll"
 { BEGIN(SEPARATORS); }
 	YY_BREAK
 case 6:
-#line 246 "mootTokenLexer.ll"
+#line 247 "mootTokenLexer.ll"
 {
   //-- SEPARATORS: Separator character(s): increment column nicely
   theColumn = (((int)theColumn/8)+1)*8 + (yyleng ? yyleng-1 : 0);
@@ -779,7 +779,7 @@ case 7:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 251 "mootTokenLexer.ll"
+#line 252 "mootTokenLexer.ll"
 {
   //-- SEPARATORS: end of separators
   theColumn += yyleng;
@@ -787,7 +787,7 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
 }
 	YY_BREAK
 case 8:
-#line 256 "mootTokenLexer.ll"
+#line 257 "mootTokenLexer.ll"
 {
   //-- SEPARATORS/EOT: reset to initial state : see also <SEPARATORS><<EOF>>
   theLine++;
@@ -799,7 +799,7 @@ case 8:
 }
 	YY_BREAK
 case YY_STATE_EOF(SEPARATORS):
-#line 266 "mootTokenLexer.ll"
+#line 267 "mootTokenLexer.ll"
 {
   //fprintf(stderr, "<SEPARATORS>EOF: lasttyp=%s\n", mootTokenLexerTypeNames[lasttyp]);
   switch (lasttyp) {
@@ -826,7 +826,7 @@ case 10:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 289 "mootTokenLexer.ll"
+#line 290 "mootTokenLexer.ll"
 {
   //-- DETAILS: looks like a tag
   theColumn += yyleng;
@@ -836,7 +836,7 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
 }
 	YY_BREAK
 case 11:
-#line 297 "mootTokenLexer.ll"
+#line 298 "mootTokenLexer.ll"
 {
   //-- DETAILS: detail text
   theColumn += yyleng;
@@ -848,7 +848,7 @@ case 12:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 304 "mootTokenLexer.ll"
+#line 305 "mootTokenLexer.ll"
 {
   //-- DETAILS: internal whitespace: keep it
   theColumn += yyleng;
@@ -857,7 +857,7 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
 }
 	YY_BREAK
 case 13:
-#line 311 "mootTokenLexer.ll"
+#line 312 "mootTokenLexer.ll"
 {
   //-- DETAILS/COST: add cost to current analysis
   theColumn += yyleng;
@@ -871,7 +871,7 @@ case 14:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 320 "mootTokenLexer.ll"
+#line 321 "mootTokenLexer.ll"
 {
   //-- DETAILS/EOD: add & clear current analysis, if any : see also <DETAILS><<EOF>>
   //-- add & clear current analysis, if any
@@ -901,7 +901,7 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
 }
 	YY_BREAK
 case YY_STATE_EOF(DETAILS):
-#line 347 "mootTokenLexer.ll"
+#line 348 "mootTokenLexer.ll"
 {
   //fprintf(stderr, "<DETAILS>EOF : lasttyp=%s\n", mootTokenLexerTypeNames[lasttyp]);
   //-- add & clear current analysis, if any : see also <DETAILS>""/{eotchar}
@@ -931,7 +931,7 @@ case YY_STATE_EOF(DETAILS):
 }
 	YY_BREAK
 case 16:
-#line 375 "mootTokenLexer.ll"
+#line 376 "mootTokenLexer.ll"
 {
   //-- TAG: tag text
   theColumn += yyleng;
@@ -942,11 +942,11 @@ case 16:
 }
 	YY_BREAK
 case YY_STATE_EOF(TAG):
-#line 384 "mootTokenLexer.ll"
+#line 385 "mootTokenLexer.ll"
 { BEGIN(DETAILS); }
 	YY_BREAK
 case 18:
-#line 387 "mootTokenLexer.ll"
+#line 388 "mootTokenLexer.ll"
 {
   /* mostly ignore spaces */
   theColumn += yyleng;
@@ -954,28 +954,28 @@ case 18:
 }
 	YY_BREAK
 case 19:
-#line 393 "mootTokenLexer.ll"
+#line 394 "mootTokenLexer.ll"
 {
   theColumn += yyleng;
   yycarp("Unrecognized TOKEN character '%c'", *yytext);
 }
 	YY_BREAK
 case 20:
-#line 398 "mootTokenLexer.ll"
+#line 399 "mootTokenLexer.ll"
 {
   theColumn += yyleng;
   yycarp("Unrecognized DETAIL character '%c'", *yytext);
 }
 	YY_BREAK
 case 21:
-#line 403 "mootTokenLexer.ll"
+#line 404 "mootTokenLexer.ll"
 {
   theColumn += yyleng;
   yycarp("Unrecognized TAG character '%c'", *yytext);
 }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 409 "mootTokenLexer.ll"
+#line 410 "mootTokenLexer.ll"
 {
   //fprintf(stderr, "<>EOF: lasttyp=%d\n", lasttyp);
   switch (lasttyp) {
@@ -993,7 +993,7 @@ case YY_STATE_EOF(INITIAL):
 }
 	YY_BREAK
 case 23:
-#line 425 "mootTokenLexer.ll"
+#line 426 "mootTokenLexer.ll"
 ECHO;
 	YY_BREAK
 #line 463 "/usr/local/share/flex++bison++/flexskel.cc"
@@ -1588,7 +1588,7 @@ void YY_mootTokenLexer_CLASS::YY_mootTokenLexer_INIT_BUFFER( YY_BUFFER_STATE b, 
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 425 "mootTokenLexer.ll"
+#line 426 "mootTokenLexer.ll"
 
 
 
@@ -1653,6 +1653,6 @@ void mootTokenLexer::yycarp(char *fmt, ...)
     va_end(ap);
     fprintf(stderr, " in %s %s at line %d, column %d, near `%s'\n",
             (use_string ? "string" : "file"),
-            (srcname ? srcname : "(null)"),
+            (srcname.empty() ? "(null)" : srcname.c_str()),
             theLine, theColumn, yytext);
 }

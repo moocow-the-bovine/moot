@@ -63,12 +63,12 @@ moot_BEGIN_NAMESPACE
 /*------------------------------------------------------------
  * Top-level Training
  */
-bool mootHMMTrainer::train_from_file(const char *filename)
+bool mootHMMTrainer::train_from_file(const string &filename)
 {
-  FILE *file = fopen(filename,"r");
+  FILE *file = fopen(filename.c_str(),"r");
   if (!file) {
     carp("mootHMMTrainer::train_from_file(): open failed for file '%s': %s\n",
-	 filename, strerror(errno));
+	 filename.c_str(), strerror(errno));
     return false;
   }
   bool rc = train_from_stream(file, filename);
@@ -76,21 +76,13 @@ bool mootHMMTrainer::train_from_file(const char *filename)
   return rc;
 }
 
-bool mootHMMTrainer::train_from_stream(FILE *in, const char *filename)
+bool mootHMMTrainer::train_from_reader(TokenReader *reader)
 {
-  //-- prepare filename
-  char *myfile = strdup(filename);
-
-  //-- prepare lexer
-  TokenReader treader(true,true);
-  treader.select_stream(in,myfile);
-
-  //-- prepare variables
   mootTokFlavor typ;
 
   //-- do training
   train_init();
-  while ((typ = treader.get_token()) != TF_EOF) {
+  while (reader && (typ = reader->get_token()) != TF_EOF) {
     DEBUG( carp("DEBUG: Got token type %d\n", typ) );
     switch (typ) {
 
@@ -98,7 +90,7 @@ bool mootHMMTrainer::train_from_stream(FILE *in, const char *filename)
       break;
 
     case TF_TOKEN:
-      train_token(treader.token());
+      train_token(reader->token());
       break;
 
     case TF_EOS:
@@ -107,18 +99,12 @@ bool mootHMMTrainer::train_from_stream(FILE *in, const char *filename)
       break;
 
     default:
-      carp("%s: Error: unknown token '%s' in file '%s' at line %d, column %d\n",
-	   "mootHMMTrainer::train_stream()",
-	   filename,
-	   treader.lexer.yytext,
-	   treader.lexer.theLine,
-	   treader.lexer.theColumn);
+      reader->carp("%s: Error: unknown token '%s'",
+		   "in mootHMMTrainer::train_stream()",
+		   reader->token().text().c_str());
       break;
     }
   }
-
-  free(myfile);
-  treader.select_stream(stdin,"-");
   return true;
 }
 

@@ -55,9 +55,10 @@ cmdutil_file_info out;
 gengetopt_args_info args;
 
 //-- token i/o
-TokenReader treader1(true,true);
-TokenReader treader2(true,true);
-TokenWriter twriter(false);
+TokenReaderCookedFile treader1(true);
+TokenReaderCookedFile treader2(true);
+TokenWriterCookedString twriter1(false);
+TokenWriterCookedFile twriter2(false);
 //mootSentence s1, s2;
 mootTokFlavor tf1, tf2, tf1prev, tf2prev;
 
@@ -142,8 +143,9 @@ void GetMyOptions(int argc, char **argv)
 	    PROGNAME, out.name, strerror(errno));
     exit(1);
   }
+  twriter2.output_file(out.file);
 
-  //-- process arguments: files
+  //-- process arguments: input files
   if (args.inputs_num < 2) {
     fprintf(stderr, "%s: you must specify two files to compare!\n", PROGNAME);
     cmdline_parser_print_help();
@@ -481,8 +483,8 @@ void put_tok_results(FILE *file, const mootToken &tok1, const mootToken &tok2)
     {
       fputs(eval.status_string().c_str(), file);
       fputc('\t', file);
-      fputs(twriter.token_string(tok1).c_str(), file);
+      fputs(twriter1.token2string(tok1).c_str(), file);
       fputs("\t/\t", file);
-      twriter.token_put(file, tok2);
+      twriter2.put_token(tok2);
     }
 }

@@ -126,10 +126,11 @@
    \
    /* -- diagnositcs */\
    /** Name of our input source: used for diagnostics & error messages */\
-   char *srcname;\
-  private: \
-    /* private local data */ \
+   std::string srcname;\
+  /* private: */\
+    /** low-level pseudo-private local data */ \
     bool use_string; \
+    /** low-level pseudo-private local data */ \
     char *stringbuf; \
   public: \
     /* -- local methods */ \
@@ -145,7 +146,7 @@
     inline void itokbuf_append(char *text, int leng); \
     /** for error reporting */ \
     virtual void yycarp(char *fmt, ...);
-#line 143 "mootTokenLexer.ll"
+#line 144 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CONSTRUCTOR_INIT  :\
   theLine(1), \
   theColumn(0), \
@@ -159,7 +160,7 @@
   srcname("(unknown)"),\
   use_string(false), \
   stringbuf(NULL)
-#line 157 "mootTokenLexer.ll"
+#line 158 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_INPUT_CODE  \
   /* yy_input(char *buf, int &result, int max_size) */\
   if (use_string) {\
@@ -172,7 +173,7 @@
   }\
   /* black magic */\
   return result= fread(buffer, 1, max_size, YY_mootTokenLexer_IN);
-#line 194 "mootTokenLexer.ll"
+#line 195 "mootTokenLexer.ll"
 #line 52 "/usr/local/share/flex++bison++/flexskel.h"
 
 
@@ -424,7 +425,7 @@ class YY_mootTokenLexer_CLASS YY_mootTokenLexer_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 425 "mootTokenLexer.ll"
+#line 426 "mootTokenLexer.ll"
 #endif
 #line 302 "/usr/local/share/flex++bison++/flexskel.h"
 

@@ -95,10 +95,12 @@ typedef enum {
   /* Output token-types */
   TF_UNKNOWN,   /**< we dunno what it is -- could be anything  */
   TF_TOKEN,     /**< plain token (+/-besttag,+/-analyses) */
-  TF_COMMENT,   /**< a line-comment */
+  TF_COMMENT,   /**< a comment, should be ignored by processing routines */
   TF_EOS,       /**< end-of-sentence */
   TF_EOF,       /**< end-of-file */
-  /*-- internal lexer use only */ 
+  TF_XML,       /**< literal XML text for lossless XML I/O */
+  TF_USER,      /**< user-defined token type: use in conjunction with 'user_data' */
+  /*-- internal native-lexer use only */ 
   TF_TEXT,      /**< token text (internal use only) */ 
   TF_TAB,       /**< tabs (internal use only) */ 
   TF_TAG,       /**< analysis tags (internal use only) */ 

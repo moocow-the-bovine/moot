@@ -32,7 +32,7 @@ markup.
 
 The \link moot::mootHMM mootHMM\endlink class provides
 an implementation of a traditional HMM tagging and disambiguation,
-optionally extended by lexical-class probabilities -- these can be
+optionally extended by lexical-class probabilities, which can be
 helpful if you have some prior information on what sorts of
 tags your input tokens might in fact happen to carry.
 
@@ -43,14 +43,35 @@ tags your input tokens might in fact happen to carry.
 
 \section Eval Tagger Evaluation
 
-The \link moot::mootEval mootEval\endlink class provides
+The \link mootEval mootEval\endlink class provides
 an API for (cross-)evaluation of parallel tagged files,
 optionally extended by prior analyses. 
 
-\see \link moot::mootEval mootEval\endlink
+\see \link mootEval mootEval\endlink
 \see <A HREF="../../programs/mooteval.html">mooteval(1)</A>
 
 
+\section IO Virtual I/O
+
+The abstract
+\link mootTokenIO.h mootTokenIO\endlink
+layer
+comprises the \link TokenReader TokenReader\endlink 
+and \link TokenWriter TokenWriter\endlink
+classes, which provide an abstract API specification for
+definition of user-defined I/O protocols using
+the C++ virtual method convention.
+Builtin I/O layer specializations include classes
+for native text-format I/O to and from strings
+and C-style streams.
+
+\see \link moot::TokenReader TokenReader\endlink
+\see \link moot::TokenReaderCookedString TokenReaderCookedString\endlink
+\see \link moot::TokenReaderCookedFile TokenReaderCookedFile\endlink
+
+\see \link moot::TokenWriter TokenWriter\endlink
+\see \link moot::TokenWriterCookedString TokenWriterCookedString\endlink
+\see \link moot::TokenWriterCookedFile TokenWriterCookedFile\endlink
 
 \section Ack Acknowledgements
 
@@ -84,7 +105,7 @@ class-based HMM tagger / disambiguator.
 
 \section SeeAlso More Information
 
-\see FSM
+\see libmootm extension library \link moot::mootMorph mootMorph\endlink
 \see <A HREF="../../programs/mootpp.html">mootpp(1)</A>
 \see <A HREF="../../../mootm/programs/mootm.html">mootm(1)</A>
 \see <A HREF="../../programs/mootrain.html">mootrain(1)</A>
@@ -93,6 +114,6 @@ class-based HMM tagger / disambiguator.
 \see <A HREF="../../programs/moot.html">moot(1)</A>
 \see <A HREF="../../programs/mooteval.html">mooteval(1)</A>
 
-\todo Write Perl interface.
+\todo Write Perl XS interface.
 
 */

@@ -32,64 +32,97 @@
 /*moot_BEGIN_NAMESPACE*/
 namespace moot {
 
+/*==========================================================================
+ * TokenReader
+ *==========================================================================*/
+
 /*------------------------------------------------------------
  * TokenReader
- *------------------------------------------------------------*/
-
-/* void select_stream(FILE *in=stdin, char *srcname=NULL); */
-void TokenReader::select_stream(FILE *in, char *source_name)
+ */
+void TokenReader::carp(const char *fmt, ...)
 {
-  //-- prepare lexer
-  lexer.select_streams(in,stderr);
-  lexer.srcname   = source_name;
-  lexer.theLine   = 1;
-  lexer.theColumn = 0;
+  fprintf(stderr, "moot::TokenReader: ");
+  va_list ap;
+  va_start(ap, fmt);
+  vfprintf(stderr, fmt, ap);
+  va_end(ap);
 }
 
-/* void select_string(const char *instr, char *srcname=NULL); */
-void TokenReader::select_string(const char *instr, char *source_name)
-{
-    lexer.select_string(instr,stderr);
-    lexer.srcname = source_name;
-    lexer.theLine = 1;
-    lexer.theColumn = 0;
-}
-
-
+/*------------------------------------------------------------
+ * TokenReaderCooked
+ */
 /* mootSentence &get_sentence(void); */
-mootSentence &TokenReader::get_sentence(void)
+mootTokFlavor TokenReaderCooked::get_sentence(void)
 {
   int lxtok;
 
-  sentence.clear();
+  msentence.clear();
   while ((lxtok = lexer.yylex()) != TF_EOF) {
     switch (lxtok) {
 
     case TF_COMMENT:
     case TF_TOKEN:
-      sentence.push_back(lexer.mtoken);
+      msentence.push_back(lexer.mtoken);
       break;
 
     case TF_EOS:
-      if (!sentence.empty()) return sentence;
+      if (!msentence.empty()) return TF_EOS;
       break;
 
     default:
       //-- whoa
-      fprintf(stderr, "mootTokenIO::get_sentence(): unknown token type '%d' ignored!\n", lxtok);
+      fprintf(stderr,
+	      "mootTokenIO::get_sentence(): unknown token type '%d' ignored!\n",
+	      lxtok);
       break;
     }
   }
-  return sentence;
+  return TF_EOF;
 }
 
+void TokenReaderCooked::carp(const char *fmt, ...)
+{
+  fprintf(stderr, "moot::TokenReaderCooked: ");
+  va_list ap;
+  va_start(ap, fmt);
+  vfprintf(stderr, fmt, ap);
+  va_end(ap);
+  fprintf(stderr, " in %s %s at line %d, column %d, near `%s'\n",
+	  (lexer.use_string ? "string" : "file"),
+	  (lexer.srcname.empty() ? "(null)" : lexer.srcname.c_str()),
+	  lexer.theLine,
+	  lexer.theColumn,
+	  lexer.yytext);
+}
 
 /*------------------------------------------------------------
+ * TokenReaderCookedFile
+ */
+//(empty)
+
+/*------------------------------------------------------------
+ * TokenReaderCookedString
+ */
+//(empty)
+
+
+
+/*==========================================================================
  * TokenWriter
- *------------------------------------------------------------*/
-string TokenWriter::token_string(const mootToken &token)
+ *==========================================================================*/
+
+/*------------------------------------------------------------
+ * TokenWriterCooked
+ */
+//(empty)
+
+/*------------------------------------------------------------
+ * TokenWriterCookedString
+ */
+/* std::string &token2string(const mootToken &token, std::string &s); */
+string &TokenWriterCookedString::token2string(const mootToken &token, string &s)
 {
-  string s = token.text();
+  s = token.text();
   if (token.flavor() == TF_COMMENT) return s;
 
   //-- best tag is always standalone first 'analysis'
@@ -129,12 +162,29 @@ string TokenWriter::token_string(const mootToken &token)
       }
   } //-- -tags,-best
   return s;
-}
+};
 
-void TokenWriter::token_put(FILE *out, const mootToken &token)
+/*void sentence2string(const mootSentence &sentence, std::string &s);*/
+string &TokenWriterCookedString::sentence2string(const mootSentence &sentence, string &s)
+{
+  for (mootSentence::const_iterator si = sentence.begin();
+       si != sentence.end();
+       si++)
+    {
+      token2string(*si, s);
+      s.push_back('\n');
+    }
+  return s;
+};
+
+/*------------------------------------------------------------
+ * TokenWriterCookedFile
+ */
+void TokenWriterCookedFile::put_token(const mootToken &token)
 {
   /*
-  fputs(token_string(token).c_str(), out);
+  string s;
+  fputs(token2string(token,s).c_str(), out);
   fputc('\n', out);
   */
   fputs(token.text().c_str(), out);
@@ -176,15 +226,13 @@ void TokenWriter::token_put(FILE *out, const mootToken &token)
   fputc('\n',out);
 }
 
-
-
-void TokenWriter::sentence_put(FILE *out, const mootSentence &sentence)
+void TokenWriterCookedFile::put_sentence(const mootSentence &sentence)
 {
   for (mootSentence::const_iterator si = sentence.begin();
        si != sentence.end();
        si++)
     {
-      token_put(out, *si);
+      put_token(*si);
     }
   fputc('\n', out);
 }

@@ -492,14 +492,15 @@ if test "$moot_doc_formats" != "none" ; then
 
   # -- check for tag-files (this needs an overhaul!)
   for ext in mootm ; do
-    extdocdir="`$PKG_CONFIG --variable=pkgdocdir lib${ext}`"
+    extdocdir="`$PKG_CONFIG --variable=pkgdocdir ${ext}`"
     if test -n "$extdocdir" -a "$extdocdir" != "no" ; then
-      if test \
-	-d "$extdocdir/$ext" \
-	-a \
-	-e "$extdocdir/$ext/$ext.tag" -a -d "$extdocdir/$ext/html"
-      then DOXY_TAGFILES="$DOXY_TAGFILES $extdocdir/$ext/$ext.tag=$extdocdir/$ext/html"
-      fi
+      exttagfiles="`find $extdocdir -name '*.tag'`"
+      for exttag in $exttagfiles ; do
+        exttagdir="`dirname $exttag`/html"
+        if test -d "$exttagdir" ; then
+          DOXY_TAGFILES="$DOXY_TAGFILES $exttag=$exttagdir"
+        fi
+      done
     fi
   done 
   AC_SUBST(DOXY_TAGFILES)   

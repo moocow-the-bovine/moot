@@ -1111,34 +1111,11 @@ void mootHMM::_viterbi_step_fallback(TokID tokid, ViterbiColumn *col)
 }
 
 
-/*--------------------------------------------------------------------------
- * Top-level: stream
- *--------------------------------------------------------------------------*/
-void mootHMM::tag_stream(FILE *in, FILE *out, char *srcname)
-{
-  TokenReader treader(false,input_ignore_first_analysis);
-  TokenWriter twriter(output_best_only);
-
-  treader.select_stream(in,srcname);
-  do {
-    mootSentence &sent = treader.get_sentence();
-
-    //if (sent.empty()) break;
-    if (treader.lexer.lasttyp == TF_EOF) break;
-
-    tag_sentence(sent);
-
-    twriter.sentence_put(out,sent);
-  } while (1);
-
-  //if (ndots) fputc('\n', stderr);
-}
-
 
 /*--------------------------------------------------------------------------
- * Top-level: strings
+ * Top-level: tag_strings
  *--------------------------------------------------------------------------*/
-void mootHMM::tag_strings(int argc, char **argv, FILE *out, char *infilename)
+void mootHMM::tag_strings(int argc, char **argv, FILE *out)
 {
   //-- prepare variables
   mootSentence sent;

@@ -28,16 +28,6 @@
 
 #include "mootToken.h"
 
-#include <ctype.h>
-#include <list>
-#include <set>
-#include <string>
-
-
-#if defined(__GNUC__)
-# include <float.h>
-#endif // __GNUC__
-
 namespace moot {
   using namespace std;
 
@@ -48,6 +38,8 @@ namespace moot {
       "TF_COMMENT",
       "TF_EOS",
       "TF_EOF",
+      "TF_XML",
+      "TF_USER",
       /*-- internal lexer use only */
       "TF_TEXT",
       "TF_TAB",

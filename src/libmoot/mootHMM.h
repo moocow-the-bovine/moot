@@ -35,6 +35,7 @@
 
 #include "mootTypes.h"
 #include "mootToken.h"
+#include "mootTokenIO.h"
 #include "mootLexfreqs.h"
 #include "mootClassfreqs.h"
 #include "mootNgrams.h"
@@ -675,11 +676,28 @@ public:
   /** \name Top-level Tagging Interface */
   //@{
 
-  /** Top-level tagging interface: file input & output */
-  void tag_stream(FILE *in=stdin, FILE *out=stdout, char *srcname=NULL);
+  /** Top-level tagging interface: mootTokenIO layer */
+  void tag_churn(TokenReader *reader, TokenWriter *writer)
+  {
+    int rtok;
+    while (reader && (rtok = reader->get_sentence()) != TF_EOF) {
+      mootSentence &sent = reader->sentence();
+      tag_sentence(sent);
+      if (writer) writer->put_sentence(sent);
+    }
+  };
+
+  /** Top-level tagging interface: C-stream I/O */
+  void tag_stream(FILE *in=stdin, FILE *out=stdout, const string &srcname="")
+  {
+    TokenReaderCookedFile tr(false,in,srcname);
+    TokenWriterCookedFile tw(output_best_only,out);
+    tr.lexer.ignore_first_analysis = input_ignore_first_analysis;
+    tag_churn(&tr,&tw);
+  };
 
   /** Top-level tagging interface: string input, file output */
-  void tag_strings(int argc, char **argv, FILE *out=stdout, char *infilename=NULL);
+  void tag_strings(int argc, char **argv, FILE *out=stdout);
 
   /**
    * Top-level tagging interface: mootSentence input & output (destructive).
