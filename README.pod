@@ -1,0 +1,48 @@
+=pod
+
+README for package 'PACKAGENAME'
+
+=head1 DESCRIPTION
+
+PACKAGENAME - flobbing wiffle munger
+
+=head1 INSTALLATION
+
+Issue the following commands to the shell:
+
+ sh ./configure
+ make
+ make install
+
+See the file INSTALL in the top-level distribution
+directory for details.
+
+=head1 BUILD FROM CVS
+
+To build from CVS, you need the GNU utilities
+aclocal, automake, autoconf, and libtool.  If
+you have these, you can just run the top-level
+script:
+
+ sh ./autogen.sh
+
+This will create the 'configure' script and other
+necessary build files.
+
+=head1 KNOWN BUGS
+
+Probably many.
+
+=head1 ACKNOWLEDGEMENTS
+
+This package was developed as part of the DWDS project
+("Digitales Wörterbuch deutscher Sprache"
+= "digital dictionary of the German language") at the
+Berlin-Brandenburgische Akademie der Wissenschaften.
+For details on the DWDS project, visit: http://www.dwds.de.
+
+=head1 AUTHOR / MAINTAINER
+
+Bryan Jurish E<lt>moocow@ling.uni-potsdam.deE<gt>
+
+=cut

@@ -1,0 +1,251 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_PREREQ(2.5)
+
+AC_INIT(dwdst, [0.0.1], [moocow@ling.uni-potsdam.de])
+
+dnl
+dnl source && aux dir
+dnl
+AC_CONFIG_AUX_DIR(config)
+
+dnl
+dnl use automake
+dnl
+AM_INIT_AUTOMAKE(dwdst, [0.0.1])
+
+dnl
+dnl use autoheader
+dnl
+AM_CONFIG_HEADER([src/config.h])
+AH_BOTTOM([
+
+/* PACKAGE does not jive well with multiple-program pacakges
+   using 'gengetopt'.  'autoheader' doesn't like to undefine
+   it, so we include an extra little header file to do that */
+#include "nopackage.h"
+
+])
+
+
+dnl
+dnl default prefix
+dnl
+AC_PREFIX_DEFAULT(/usr/local)
+
+dnl
+dnl check for programs
+dnl
+AC_PROG_CC
+AC_PROG_CXX
+AC_LANG(C++)
+dnl v--- needid if Makefile.am uses _LTLIBRARIES targets
+dnl AC_PROG_LIBTOOL
+
+dnl
+dnl for static-only libraries (non-libtool)
+dnl
+dnl AC_PROG_RANLIB
+
+dnl
+dnl substititions
+dnl
+AC_SUBST(FSM_IFLAGS)
+AC_SUBST(FSM_OFLAGS)
+AC_SUBST(FSM_LFLAGS)
+AC_SUBST(FSM_WFLAGS)
+AC_SUBST(FSM_LIBS)
+
+CXXFLAGS_SAVE="$CXXFLAGS"
+CPPFLAGS_SAVE="$CPPFLAGS"
+LDFLAGS_SAVE="$LDFLAGS"
+LIBS_SAVE="$LIBS"
+
+
+dnl
+dnl check for strdup
+dnl
+AC_CHECK_FUNC(strdup,[AC_DEFINE(HAVE_STRDUP,1,[Define this if you have the strdup() function])])
+
+
+
+dnl
+dnl check for zlib : headers
+dnl
+AC_ARG_WITH(zlib-include,
+	AC_HELP_STRING([--with-zlib-include=DIR],
+		       [specify location of zlib headers (default=none)]),
+	[ZLIB_IFLAGS="-I$withval"])
+if test -n "$ZLIB_IFLAGS" ; then
+  FSM_IFLAGS="$IFLAGS $ZLIB_IFLAGS"
+  CPPFLAGS="$CPPFLAGS $ZLIB_IFLAGS"
+fi
+
+dnl zlib: headers
+for h in zlib.h ; do
+  AC_CHECK_HEADER($h,
+	[fsm_have_header="yes"], [fsm_have_header="no"])
+  if test "$fsm_have_header" = "no" ; then
+    AC_MSG_ERROR([required zlib header '$h' not detected])
+  fi
+done
+
+dnl
+dnl check for pthread
+dnl
+AC_ARG_WITH(pthread-include,
+	AC_HELP_STRING([--with-pthread-include=DIR],
+		       [specify location of pthread headers (default=none)]),
+	[PTHREAD_IFLAGS="-I$withval"])
+if test -n "$PTHREAD_IFLAGS" ; then
+  FSM_IFLAGS="$IFLAGS $PTHREAD_IFLAGS"
+  CPPFLAGS="$CPPFLAGS $PTHREAD_IFLAGS"
+  #CXXFLAGS="$CXXFLAGS $PTHREAD_IFLAGS"
+fi
+
+dnl pthread: headers
+for h in pthread.h ; do
+  AC_CHECK_HEADER($h,
+	[fsm_have_header="yes"], [fsm_have_header="no"])
+  if test "$fsm_have_header" = "no" ; then
+    AC_MSG_ERROR([required pthread header '$h' not detected])
+  fi
+done
+
+
+dnl
+dnl check for STL
+dnl
+AC_ARG_WITH(stl-include,
+	AC_HELP_STRING([--with-stl-include=DIR],
+		       [specify location of STL headers (default=/usr/local/include/stlport)]),
+	[STL_INCDIR="$withval"],
+	[STL_INCDIR="/usr/local/include/stlport"])
+
+dnl
+dnl STL: headers: update vars
+dnl
+if test "$STL_INCDIR" != "no" ; then
+  FSM_IFLAGS="$FSM_IFLAGS -I$STL_INCDIR"
+  CPPFLAGS="$CPPFLAGS -I$STL_INCDIR"
+fi
+
+dnl
+dnl STL: headers
+dnl
+for h in hash_map ; do
+  AC_CHECK_HEADER($h,[fsm_have_header="yes"],[fsm_have_header="no"])
+  if test "$fsm_have_header" = "no" ; then
+    AC_MSG_ERROR([could not find required STL header file '$h'])
+  fi
+done
+
+
+dnl
+dnl Bumble-Bee lex & yacc port
+dnl
+
+dnl bumble: headers
+AC_ARG_WITH(bumble-include,
+	AC_HELP_STRING([--with-bumble-include=DIR],
+		       [specify location of libbumble headers (default=/usr/local/include/bumblelib)]),
+	[BUMBLE_IFLAGS="-I$withval"],
+	[BUMBLE_IFLAGS="-I/usr/local/include/bumblelib"])
+
+dnl bumble: headers: update flags
+FSM_IFLAGS="$FSM_IFLAGS $BUMBLE_IFLAGS"
+CPPFLAGS="$CPPFLAGS $BUMBLE_IFLAGS"
+
+dnl bumble: headers: compile
+for h in clex.h cyacc.h ; do
+  AC_CHECK_HEADER($h,[fsm_have_header="yes"],[fsm_have_header="no"])
+  if test "$fsm_have_header" = "no" ; then
+    AC_MSG_ERROR([could not find required Bumble-Bee header file '$h'])
+  fi
+done
+
+dnl
+dnl FSM libraries
+dnl
+AC_ARG_WITH(fsm-include,
+	AC_HELP_STRING([--with-fsm-include=DIR],
+		       [specify location of FSMlib headers (default=/usr/local/include/FSMlib)]),
+	[FSMLIB_IFLAGS="-I$withval"],
+	[FSMLIB_IFLAGS="-I/usr/local/include/FSMlib"])
+
+dnl FSMlib: headers: update flags
+FSM_IFLAGS="$FSM_IFLAGS $FSMLIB_IFLAGS"
+CPPFLAGS="$CPPFLAGS $FSMLIB_IFLAGS"
+
+dnl FSMlib: headers: compile
+for h in FSM.h ; do
+  AC_CHECK_HEADER($h,[fsm_have_header="yes"],[fsm_have_header="no"])
+  if test "$fsm_have_header" = "no" ; then
+    AC_MSG_ERROR([could not find required FSMlib header file '$h'])
+  fi
+done
+
+dnl
+dnl FSMlib: libraries
+dnl
+AC_ARG_WITH(fsm-libdir,
+	AC_HELP_STRING([--with-fsm-libdir=DIR],
+		       [specify location of FSMlib libraries (default=none)]),
+	[FSMLIB_LFLAGS="-L$withval"],
+	[FSMLIB_LFLAGS=""])
+
+dnl AC_CHECK_LIB(FSMSymSpec,[FSMSymSpec::FSMSymSpec],
+dnl	[FSMLIB_LIBS="-lFSMSymSpec"],[FSMLIB_LIBS=""])
+dnl if test -z "$FSMLIB_LIBS" ; then
+dnl  AC_ERROR([required library 'FSMSymSpec' not found.])
+dnl fi
+FSM_LIBS="-lFSM -lFSMSymSpec"
+
+dnl
+dnl debug ?
+dnl
+AC_MSG_CHECKING([whether to build debug version])
+AC_ARG_ENABLE(debug,
+	AC_HELP_STRING([--enable-debug],[build debug version (default=no)]))
+
+if test "$enable_debug" == "yes" ; then
+   AC_MSG_RESULT(yes)
+   FSM_OFLAGS="-g"
+else
+  AC_MSG_RESULT(no)
+  #FSM_OFLAGS="-O2"
+  FSM_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops"
+fi
+
+dnl
+dnl warnings ?
+dnl
+AC_MSG_CHECKING([whether to display compiler warnings])
+AC_ARG_ENABLE(warnings,
+	AC_HELP_STRING([--enable-warnings],[display compiler warnings (default=no)]))
+
+if test "$enable_warnings" = "yes" ; then
+   AC_MSG_RESULT(yes)
+   WFLAGS="-Wall"
+else
+  AC_MSG_RESULT(no)
+  WFLAGS=""
+fi
+
+
+dnl
+dnl Restore user's *FLAGS
+dnl
+CXXFLAGS="$CXXFLAGS_SAVE"
+CPPFLAGS="$CPPFLAGS_SAVE"
+LDFLAGS="$LDFLAGS_SAVE"
+LIBS="$LIBS_SAVE"
+if test "$CXXFLAGS" = "-g -O2" ; then
+  CXXFLAGS=""
+fi
+
+
+dnl
+dnl output
+dnl
+AC_CONFIG_FILES(config/Makefile src/Makefile Makefile)
+AC_OUTPUT
