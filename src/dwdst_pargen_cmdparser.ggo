@@ -13,7 +13,7 @@ option	"words"		w	"Args are input tokens, not filenames"	    no
 option	"tags-only"	 t	"Analyze only PoS tags, not morpho-syntactic features"			no
 option	"kgram-max"	 k	"Size of k-gram window"                     int default="2"		no
 option	"eos-string"	 e	"Use STRING as the EOS marker"		    string default="EOS"	no
-option  "word-separator" W      "Use STRING as the word-separator"          string default=" "          no
+option  "word-separator" W      "Use STRING as the word-separator"          string default="\t"         no
 
 # ---- Output
 option	"output"	 o	"Specify output file"			    string default="-"		no

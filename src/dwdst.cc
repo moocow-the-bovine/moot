@@ -31,7 +31,7 @@ dwds_tagger::dwds_tagger(FSMSymSpec *mysyms, FSM *mymorph)
   morph = mymorph;
   syms = mysyms;
   eos = "--EOS--";
-  wdsep = " ";
+  wdsep = "\t";
   ufsa = NULL;
   dfsa = NULL;
 
