@@ -62,7 +62,10 @@ mootSentence &TokenReader::get_sentence(void)
   int lxtok;
   sentence.clear();
   while ((lxtok = lexer.yylex()) != mootTokenLexer::TLEOF) {
-    if (lxtok == mootTokenLexer::TLEOS && !sentence.empty()) return sentence;
+    if (lxtok == mootTokenLexer::TLEOS) {
+      if (!sentence.empty()) return sentence;
+      continue;
+    }
     sentence.push_back(lexer.mtoken);
   }
   return sentence;
