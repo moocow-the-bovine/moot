@@ -5,7 +5,7 @@
 program "mootrain"
 #program_version "0.01"
 
-purpose	"Trainer for HMM Part-of-Speech taggers/disambiguators for the KDWDS project."
+purpose	"moocow's trainer for HMM part-of-speech taggers/disambiguators."
 author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
 on_reparse "warn"
 
@@ -14,7 +14,7 @@ on_reparse "warn"
 #-----------------------------------------------------------------------------
 details "
 'mootrain' gathers training data for HMM disambiguators used
-by 'dwdshmm' and 'moot'.
+by 'moothmm' and 'moot'.
 "
 
 #-----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ addenda "
 =head2 Model Files
 
 The mootrain program produces text-format model files for use with
-dwdshmm(1) and/or moot(1).
+moothmm(1) and/or moot(1).
 
 A \"Text Model\" TMODEL is completely defined by a pair of files
 'TMODEL.lex' and 'TMODEL.123' (see below for details on these files).
@@ -149,7 +149,8 @@ Not 100% compatible with tnt-para(1), and *much* slower.
 #-----------------------------------------------------------------------------
 acknowledge "
 
-This package was developed as part of the DWDS/Collocations project
+Development of this package began in the context
+of the DWDS/Collocations project
 ('Kollokationen im digitalen W\"orterbuch deutscher Sprache'
 = 'collocations in the digital dictionary of the German language') at the
 Berlin-Brandenburgische Akademie der Wissenschaften.
@@ -157,4 +158,4 @@ For details on the DWDS project, visit: http://www.dwds.de.
 
 "
 
-seealso "L<dwdspp>, L<dwdshmm>, L<dwdsm>, L<moot>"
+seealso "L<mootpp>, L<moothmm>, L<mootm>, L<moot>"

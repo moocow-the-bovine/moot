@@ -2,10 +2,10 @@
 #
 # Getopt::Gen specification for moot
 #-----------------------------------------------------------------------------
-program "dwdshmm"
+program "moothmm"
 #program_version "0.01"
 
-purpose	"HMM Part-of-Speech tagger/disambiguator for the KDWDS project."
+purpose	"moocow's HMM part-of-speech tagger/disambiguator."
 author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
 on_reparse "warn"
 
@@ -20,8 +20,8 @@ tagger / disambiguator program based on the 'libmoot' library.
 #-----------------------------------------------------------------------------
 # Files
 #-----------------------------------------------------------------------------
-rcfile "/etc/dwdshmmrc"
-rcfile "~/.dwdshmmrc"
+rcfile "/etc/moothmmrc"
+rcfile "~/.moothmmrc"
 
 
 #-----------------------------------------------------------------------------
@@ -89,7 +89,7 @@ group "HMM Options"
 
 string "model" M "Use HMM model file(s) MODEL." \
   arg="MODEL" \
-  default="dwdshmm" \
+  default="moothmm" \
   details="See L<Model Files> for details."
 
 string "nlambdas" N "N-Gram smoothing constants (default=estimate)" \
@@ -237,7 +237,8 @@ None known.
 #-----------------------------------------------------------------------------
 acknowledge "
 
-This package was developed as part of the DWDS/Collocations project
+Development of this package began in the context
+of the DWDS/Collocations project
 ('Kollokationen im digitalen W\"orterbuch deutscher Sprache'
 = 'collocations in the digital dictionary of the German language') at the
 Berlin-Brandenburgische Akademie der Wissenschaften.
@@ -245,4 +246,4 @@ For details on the DWDS project, visit: http://www.dwds.de.
 
 "
 
-seealso "L<dwdspp>, L<mootrain>, L<dwdsm>, L<moot>"
+seealso "L<mootpp>, L<mootrain>, L<mootm>, L<moot>"

@@ -5,7 +5,7 @@
 program "moot"
 #program_version "1.0.0"
 
-purpose	"Class-based HMM Part-of-Speech tagger for the KDWDS project."
+purpose	"moocow's classifying HMM part-of-speech tagger."
 author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
 on_reparse "warn"
 
@@ -21,9 +21,9 @@ compatible with Thomas
 Hanneforth's FSM library for representation and manipulation
 of the underlying finite-state machines.
 
-Unlike the 'dwdsm', 'moot' disambiguates the ambiguity classes
+Unlike the 'mootm', 'moot' disambiguates the ambiguity classes
 output by the morphological transducer, and caches morphological
-analyses at compile-time based on token frequency. Unlike 'dwdshmm',
+analyses at compile-time based on token frequency. Unlike 'moothmm',
 'moot' makes use of an additional probability table for
 lexical classes, which somewhat improves its accuracy for
 unknown tokens.
@@ -375,7 +375,8 @@ Must specify absolute pathnames for compilation.
 #-----------------------------------------------------------------------------
 acknowledge "
 
-This package was developed as part of the DWDS/Collocations project
+Development of this package began in the context
+of the DWDS/Collocations project
 ('Kollokationen im digitalen W\"orterbuch deutscher Sprache'
 = 'collocations in the digital dictionary of the German language') at the
 Berlin-Brandenburgische Akademie der Wissenschaften.
@@ -383,4 +384,4 @@ For details on the DWDS project, visit: http://www.dwds.de.
 
 "
 
-seealso "L<dwdspp>, L<mootrain>, L<dwdsm>, L<dwdshmm>"
+seealso "L<mootpp>, L<mootrain>, L<mootm>, L<moothmm>"

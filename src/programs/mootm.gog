@@ -2,10 +2,10 @@
 #
 # Getopt::Gen specification for moot
 #-----------------------------------------------------------------------------
-program "dwdsm"
+program "mootm"
 #program_version "0.01"
 
-purpose	"Morphological analyzer for the KDWDS project."
+purpose	"Morphological analyzer for moocow's part-of-speech tagger."
 author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
 on_reparse "warn"
 
@@ -22,8 +22,8 @@ of the underlying finite-state machines.
 #-----------------------------------------------------------------------------
 # Files
 #-----------------------------------------------------------------------------
-rcfile "/etc/dwdsmrc"
-rcfile "~/.dwdsmrc"
+rcfile "/etc/mootmrc"
+rcfile "~/.mootmrc"
 
 
 #-----------------------------------------------------------------------------
@@ -153,7 +153,8 @@ Quite slow.
 #-----------------------------------------------------------------------------
 acknowledge "
 
-This package was developed as part of the DWDS/Collocations project
+Development of this package began in the context
+of the DWDS/Collocations project
 ('Kollokationen im digitalen W\"orterbuch der deutschen Sprache'
 = 'collocations in the digital dictionary of the German language') at the
 Berlin-Brandenburgische Akademie der Wissenschaften.
@@ -161,4 +162,4 @@ For details on the DWDS project, visit: http://www.dwds.de.
 
 "
 
-seealso "L<dwdspp>, L<dwdshmm>, L<moot>"
+seealso "L<mootpp>, L<moothmm>, L<moot>"

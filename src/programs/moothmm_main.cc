@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------
- * File: dwdshmm_main.cc
+ * File: moothmm_main.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
  *   + HMM PoS tagger/disambiguator for DWDS project : main()
@@ -28,7 +28,7 @@
 
 #include "cmdutil.h"
 #include "hmmutil.h"
-#include "dwdshmm_cmdparser.h"
+#include "moothmm_cmdparser.h"
 
 using namespace std;
 using namespace moot;
@@ -36,7 +36,7 @@ using namespace moot;
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-char *PROGNAME = "dwdshmm";
+char *PROGNAME = "moothmm";
 
 // options & file-churning
 gengetopt_args_info  args;

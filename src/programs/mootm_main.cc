@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------
- * File: dwdsm_main.cc
+ * File: mootm_main.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
  *   + Morphological analyzer for DWDS project : main()
@@ -23,7 +23,7 @@
 #include <mootMorph.h>
 
 #include "cmdutil.h"
-#include "dwdsm_cmdparser.h"
+#include "mootm_cmdparser.h"
 
 using namespace std;
 using namespace moot;
@@ -31,7 +31,7 @@ using namespace moot;
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-char *PROGNAME = "dwdsm";
+char *PROGNAME = "mootm";
 
 // options & file-churning
 gengetopt_args_info args;

@@ -17,7 +17,7 @@
 
 ## --- executable programs
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
-bin_PROGRAMS = moopp moom moohmm moot mootrain
+bin_PROGRAMS = mootpp mootm moothmm moot mootrain
 
 old_programs = moot-fstgen moot-pargen
 
@@ -41,21 +41,21 @@ SUFFIXES = \
 ## --- Required sources
 #${prog_i}_SOURCES =
 #${lib_i}_la_SOURCES =
-moopp_SOURCES = \
+mootpp_SOURCES = \
 	cmdutil.cc cmdutil.h \
-	moopp_main.cc \
-	moopp_cmdparser.cc moopp_cmdparser.h
+	mootpp_main.cc \
+	mootpp_cmdparser.cc mootpp_cmdparser.h
 
-moom_SOURCES = \
+mootm_SOURCES = \
 	cmdutil.cc cmdutil.h \
-	moom_main.cc \
-	moom_cmdparser.cc moom_cmdparser.h
+	mootm_main.cc \
+	mootm_cmdparser.cc mootm_cmdparser.h
 
-moohmm_SOURCES = \
+moothmm_SOURCES = \
 	cmdutil.cc cmdutil.h \
 	hmmutil.cc hmmutil.h \
-	moohmm_main.cc \
-	moohmm_cmdparser.cc moohmm_cmdparser.h
+	moothmm_main.cc \
+	moothmm_cmdparser.cc moothmm_cmdparser.h
 
 moot_SOURCES = \
 	cmdutil.cc cmdutil.h \
@@ -75,9 +75,9 @@ mootrain_SOURCES = \
 #EXTRA_${lib_i}_la_SOURCES = 
 
 ## --- Additional dependencies
-moopp_main.o: moopp_cmdparser.h
-moom_main.o: moom_cmdparser.h
-moohmm_main.o: moohmm_cmdparser.h hmmutil.h
+mootpp_main.o: mootpp_cmdparser.h
+mootm_main.o: mootm_cmdparser.h
+moothmm_main.o: moothmm_cmdparser.h hmmutil.h
 moot_main.o: moot_cmdparser.h hmmutil.h
 mootrain_main.o: mootrain_cmdparser.h hmmutil.h
 
@@ -126,7 +126,7 @@ OPTGENFLAGS = -u -l
 ## pod conversion
 ##-----------------------------------------------------------------------
 
-POD2MANFLAGS = --center="KMOO PoS Tagging Tools"
+POD2MANFLAGS = --center="moocow's tagging tools"
 
 .pod.1:
 	pod2man $(POD2MANFLAGS) --section=1 $< $@
@@ -166,14 +166,14 @@ LDFLAGS_COMMON = -L../libmoot
 
 LDADD_COMMON   = ../libmoot/libmoot.la
 
-moopp_LDFLAGS = $(LDFLAGS_COMMON)
-moopp_LDADD = $(LDADD_COMMON)
+mootpp_LDFLAGS = $(LDFLAGS_COMMON)
+mootpp_LDADD = $(LDADD_COMMON)
 
-moom_LDFLAGS = $(LDFLAGS_COMMON)
-moom_LDADD = $(LDADD_COMMON)
+mootm_LDFLAGS = $(LDFLAGS_COMMON)
+mootm_LDADD = $(LDADD_COMMON)
 
-moohmm_LDFLAGS = $(LDFLAGS_COMMON)
-moohmm_LDADD = $(LDADD_COMMON)
+moothmm_LDFLAGS = $(LDFLAGS_COMMON)
+moothmm_LDADD = $(LDADD_COMMON)
 
 moot_LDFLAGS = $(LDFLAGS_COMMON)
 moot_LDADD = $(LDADD_COMMON)
@@ -210,9 +210,9 @@ MAINTAINERCLEANFILES = \
 ## --- extra distribution files
 EXTRA_DIST = \
 	moot.gog \
-	moom.gog \
-	moopp.gog \
-	moohmm.gog \
+	mootm.gog \
+	mootpp.gog \
+	moothmm.gog \
 	mootrain.gog
 
 #	moot.sym

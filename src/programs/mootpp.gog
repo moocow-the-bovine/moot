@@ -1,10 +1,10 @@
 # -*- Mode: Shell-Script -*-
-# Getopt::Gen specification for 'dwdspp'
+# Getopt::Gen specification for 'mootpp'
 #-----------------------------------------------------------------------------
-program "dwdspp"
+program "mootpp"
 #program_version "0.01"
 
-purpose	"Tokenizer for the KDWDS project."
+purpose	"Tokenizer for moocow's part-of-speech tagger."
 author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
 on_reparse "warn"
 
@@ -12,9 +12,9 @@ on_reparse "warn"
 # Details
 #-----------------------------------------------------------------------------
 details "
-dwdspp is a pre-processor for raw text intended to be
-used to prepare documents for PoS tagging by 'dwdsm' (see L<dwdsm>)
-or 'dwdshmm' (see L<dwdshmm>).
+mootpp is a pre-processor for raw text intended to be
+used to prepare documents for PoS tagging by 'mootm' (see L<mootm>),
+'moothmm' (see L<moothmm>), or 'moot' (see L<moot>).
 "
 
 #-----------------------------------------------------------------------------
@@ -59,7 +59,8 @@ as filenames of the input files themselves.
 #-----------------------------------------------------------------------------
 acknowledge "
 
-This package was developed as part of the DWDS/Collocations project
+Development of this package begin in the context of
+of the DWDS/Collocations project
 ('Kollokationen im digitalen W\"orterbuch der deutschen Sprache'
 = 'collocations in the digital dictionary of the German language') at the
 Berlin-Brandenburgische Akademie der Wissenschaften.
@@ -67,4 +68,4 @@ For details on the DWDS project, visit: http://www.dwds.de.
 
 "
 
-seealso "L<dwdsm>, L<dwdshmm>."
+seealso "L<mootm>, L<moothmm>."

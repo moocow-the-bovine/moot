@@ -21,7 +21,7 @@
 #endif
 
 #include <mootPPLexer.h>
-#include "dwdspp_cmdparser.h"
+#include "mootpp_cmdparser.h"
 #include "cmdutil.h"
 
 using namespace std;
@@ -29,7 +29,7 @@ using namespace std;
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-char *PROGNAME = "dwdspp";
+char *PROGNAME = "mootpp";
 
 // files
 cmdutil_file_info out;
