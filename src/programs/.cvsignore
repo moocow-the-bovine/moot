@@ -3,6 +3,7 @@ dwdst
 dwdstt
 dwdst-pargen
 dwdst-fstgen
+*.list
 *.par
 *.apar
 *.tpar
