@@ -7,6 +7,9 @@ Todo:
 	+ add XML I/O (subclass of mootToken(Reader|Writer) ?)
 	  - test effect of virtuals here
 	+ find gaspode bug
+	+ optimize class-based tagging: pre-prune classfreqs
+	  and merge viterbi_step()s into one iterator-based
+	  method
 
 v2.0.0pre3 Sat, 05 Jun 2004 18:33:07 +0200
 	+ added perl script 'morphhack.perl' to make
