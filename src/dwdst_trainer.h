@@ -52,6 +52,16 @@ public:
 
 private:
   StringToCountTable::iterator sci;
+  bool is_eos;
+
+  // -- training variables
+  set<FSMSymbolString> *curtags;
+  set<FSMSymbolString>::iterator t;
+  set<FSMSymbolString> *curngrams;
+  set<FSMSymbolString> *nextngrams;
+  set<FSMSymbolString>::iterator g_old;
+  set<FSMSymbolString>::iterator g_new;
+  FSMSymbolStringQueue::iterator qi;
 
 
   // -- methods
@@ -69,6 +79,8 @@ public:
   // -- public methods: param-generation: (output-file = DEBUG)
   bool train_from_strings(int argc, char **argv, FILE *out=stdout);
   bool train_from_stream(FILE *in=stdin, FILE *out=stdout);
+  // -- mid-level
+  inline void train_next_token(void);
 
   // -- public methods: param-generation: parameter-file output
   bool write_param_file(FILE *out=stdout);
