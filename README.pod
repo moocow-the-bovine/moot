@@ -83,6 +83,10 @@ script:
 This will create the 'configure' script and other
 necessary build files.
 
+You will also need the Getopt::Gen perl module,
+which should be available from wherever you acquired
+these sources.
+
 =head1 KNOWN BUGS
 
 No config-file parsing.
