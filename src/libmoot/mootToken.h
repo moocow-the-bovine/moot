@@ -577,7 +577,7 @@ inline bool isTokFlavorName(const mootTokString &tokstr)
   for (i = 0; i < NTokFlavors; i++) {
     if (tokstr == mootTokenFlavorNames[i]) return true;
   }
-  return (tokstr == "@USE_CASE");
+  return (tokstr == "@USECASE");
 };
 
 }; /* namespace moot */

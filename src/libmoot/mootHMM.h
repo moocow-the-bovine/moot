@@ -92,6 +92,16 @@
 //#undef MOOT_LEX_UNKNOWN_CLASSES
 
 /**
+ * \def MOOT_LEX_NONALPHA
+ * Define this to include real lexical entries for "special"
+ * (pattern-matched) tokens.
+ * TnT for example seems to do this.
+ */
+#define MOOT_LEX_NONALPHA
+//#undef MOOT_LEX_NONALPHA
+
+
+/**
  * \def MOOT_VITERBI_DEBUG
  * If defined, Viterbi trellis will be dumped to stderr on
  * mootHMM::tag_sentence()
@@ -422,6 +432,11 @@ public:
    * Mark unknown tokens with a single analysis '*' on tag_mark_best()
    */
   bool save_mark_unknown;
+
+  /**
+   * Save Viterbi trellis on tag_sentence()
+   */
+  bool save_dump_trellis;
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -719,8 +734,9 @@ public:
       sent = reader->sentence();
       if (!sent) continue;
       tag_sentence(*sent);
+
 #ifdef MOOT_VITERBI_DEBUG
-      viterbi_txtdump(stderr);
+      if (save_dump_trellis) viterbi_txtdump(writer);
 #endif
 
       if (writer) writer->put_sentence(*sent);
@@ -1250,8 +1266,13 @@ public:
   /** Get the TokID for a given token, using type-based lookup */
   inline TokID token2id(const mootTokString &token) const
   {
+#ifdef MOOT_LEX_NONALPHA
+    TokID tokid = tokids.name2id(token);
+    return tokid ? tokid : flavids[tokenFlavor(token)];
+#else
     mootTokenFlavor flav = tokenFlavor(token);
     return flavids[flav]==0 ? tokids.name2id(token) : flavids[flav];
+#endif
   };
 
   /**
@@ -1556,8 +1577,11 @@ public:
   /** Debugging method: dump basic HMM contents to a text file. */
   void txtdump(FILE *file);
 
-  /** Debugging method: dump current Viterbi state-table column to a text file */
-  void viterbi_txtdump(FILE *file);
+  /** Debugging method: dump entire Viterbi trellis to a text file */
+  void viterbi_txtdump(TokenWriter *w);
+
+  /** Debugging method: dump single Viterbi column to a text file */
+  void viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, size_t colnum=0);
   //@}
 };
 

@@ -62,6 +62,7 @@ mootHMM::mootHMM(void)
     save_ambiguities(false),
     save_flavors(false),
     save_mark_unknown(false),
+    save_dump_trellis(false),
     use_lex_classes(true),
     start_tagid(0),
     unknown_lex_threshhold(1.0),
@@ -492,7 +493,8 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 
       //-- get token flavor, id
       tokflav = tokenFlavor(tokstr);
-      tokid   = tokflav != TokFlavorUnknown ? tokids.name2id(tokstr) : flavids[tokflav];
+      tokid   = token2id(tokstr);
+      //tokid   = tokflav != TokFlavorUnknown ? tokids.name2id(tokstr) : flavids[tokflav];
 
       //-- ... for all tags occurring with this token(lftagi)
       for (mootLexfreqs::LexfreqSubtable::const_iterator lftagi = entry.freqs.begin();
@@ -510,18 +512,19 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	  tagid  = tagids.name2id(tagstr);
 	  
 	  //-- "unknown" token check
-	  if (tokflav == TokFlavorAlpha && toktotal <= unknown_lex_threshhold) {
-	    //-- "unknown" token: just store the raw counts for now
+	  if (tokflav == TokFlavorAlpha && toktotal <= unknown_lex_threshhold) //-- dubious
+	    {
+	      //-- "unknown" token: just store the raw counts for now
 	    
-	    //-- ... and add to "unknown" counts
-	    unTotal += tagcount;
-	    LexProbSubTable::iterator lpsi = untagcts.find(tagid);
-	    if (lpsi == untagcts.end()) {
-	      untagcts[tagid] = tagcount;
-	    } else {
-	      lpsi->second += tagcount;
+	      //-- ... and add to "unknown" counts
+	      unTotal += tagcount;
+	      LexProbSubTable::iterator lpsi = untagcts.find(tagid);
+	      if (lpsi == untagcts.end()) {
+		untagcts[tagid] = tagcount;
+	      } else {
+		lpsi->second += tagcount;
+	      }
 	    }
-	  }
 	  if (tokid != 0) {
 	    //-- it's a kosher token (too?): compute lexical probability: p(tok|tag)
 	    lexprobs[tokid][tagid] = tagcount / tagtotal;
@@ -610,7 +613,9 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
   }
 
   //-- Compute ngram probabilites
+  //ProbT ugtotal = ngrams.ugtotal;
   ProbT ugtotal = ngrams.ugtotal - ngrams.lookup(start_tag_str);
+
   for (mootNgrams::NgramTable::const_iterator ngi1 = ngrams.ngtable.begin();
        ngi1 != ngrams.ngtable.end();
        ngi1++)
@@ -746,7 +751,9 @@ void mootHMM::assign_ids_lf(const mootLexfreqs &lexfreqs)
       const mootTokString &tokstr = lfti->first;
       const mootLexfreqs::LexfreqEntry &entry = lfti->second;
 
+#   ifndef MOOT_LEX_NONALPHA
       mootTokenFlavor flav = tokenFlavor(tokstr);
+#   endif
 
       //-- ... for all tags occurring with this token(lftagi)
       for (mootLexfreqs::LexfreqSubtable::const_iterator lftagi = entry.freqs.begin();
@@ -759,15 +766,17 @@ void mootHMM::assign_ids_lf(const mootLexfreqs &lexfreqs)
 	  //-- always assign a tag-id
 	  if (!tagids.nameExists(tagstr)) tagids.insert(tagstr);
 
+#       ifndef MOOT_LEX_NONALPHA
 	  if (flav != TokFlavorAlpha)
 	    //-- ignore non-alphabetics
-	    continue; 
+	    continue;
+#       endif
 
 	  if (
-#          ifndef MOOT_LEX_UNKNOWN_TOKENS
+#       ifndef MOOT_LEX_UNKNOWN_TOKENS
 	      //-- unknown threshhold check
 	      entry.count > unknown_lex_threshhold &&
-#          endif // MOOT_LEX_UNKNOWN_TOKENS
+#       endif
 	      !tokids.nameExists(tokstr))
 	    {
 	      //-- it's a kosher token : assign a token-ID
@@ -871,7 +880,9 @@ bool mootHMM::estimate_lambdas(const mootNgrams &ngrams)
   ProbT ngp3;    //-- adjusted unigram probability : (f(t3)       - 1) / (corpus_size - 1)
 
   //-- initialize
+  //f_N       = ngrams.ugtotal;
   f_N       = ngrams.ugtotal - ngrams.lookup(tagids.id2name(start_tagid));
+
   nglambda1 = 0.0;
   nglambda2 = 0.0;
   nglambda3 = 0.0;
@@ -937,6 +948,7 @@ bool mootHMM::estimate_lambdas(const mootNgrams &ngrams)
   ProbT ngp2;    //-- adjusted unigram probability : (f(t2)       - 1) / (corpus_size - 1)
 
   //-- initialize
+  //f_N       = ngrams.ugtotal
   f_N       = ngrams.ugtotal - ngrams.lookup(tagids.id2name(start_tagid));
   nglambda1 = 0.0;
   nglambda2 = 0.0;
@@ -1619,7 +1631,7 @@ void mootHMM::tag_mark_best(mootSentence &sentence)
 
 
 /*--------------------------------------------------------------------------
- * Debug / Dump
+ * Debug / HMM Dump
  *--------------------------------------------------------------------------*/
 void mootHMM::txtdump(FILE *file)
 {
@@ -1630,19 +1642,19 @@ void mootHMM::txtdump(FILE *file)
   fprintf(file, "%%%% Constants\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   fprintf(file, "start_tagid\t%u(\"%s\")\n", start_tagid, tagids.id2name(start_tagid).c_str());
-  fprintf(file, "nglambda1\t%g\n", nglambda1);
-  fprintf(file, "nglambda2\t%g\n", nglambda2);
+  fprintf(file, "nglambda1\t%g (=%g)\n", nglambda1, exp(nglambda1));
+  fprintf(file, "nglambda2\t%g (=%g)\n", nglambda2, exp(nglambda2));
 #ifdef MOOT_USE_TRIGRAMS
-  fprintf(file, "nglambda3\t%g\n", nglambda3);
+  fprintf(file, "nglambda3\t%g (=%g)\n", nglambda3, exp(nglambda3));
 #endif
-  fprintf(file, "wlambda0\t%g\n", wlambda0);
-  fprintf(file, "wlambda1\t%g\n", wlambda1);
+  fprintf(file, "wlambda0\t%g (=%g)\n", wlambda0, exp(wlambda0));
+  fprintf(file, "wlambda1\t%g (=%g)\n", wlambda1, exp(wlambda1));
 
-  fprintf(file, "clambda0\t%g\n", clambda0);
-  fprintf(file, "clambda1\t%g\n", clambda1);
+  fprintf(file, "clambda0\t%g (=%g)\n", clambda0, exp(clambda0));
+  fprintf(file, "clambda1\t%g (=%g)\n", clambda1, exp(clambda1));
   fprintf(file, "use_lex_classes\t%d\n", use_lex_classes ? 1 : 0);
 
-  fprintf(file, "beamwd\t%g\n", beamwd);
+  fprintf(file, "beamwd\t%g (=%g)\n", beamwd, exp(beamwd));
 
   fputs("uclass\t", file);
   for (LexClass::const_iterator lci = uclass.begin();  lci != uclass.end(); lci++) {
@@ -1660,7 +1672,7 @@ void mootHMM::txtdump(FILE *file)
   fprintf(file, "\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   fprintf(file, "%%%% Lexical Probabilities\n");
-  fprintf(file, "%%%% TokID(\"TokStr\")\tTagID(\"TagStr\")\tlog(p(TokID|TagID))\n");
+  fprintf(file, "%%%% TokID(\"TokStr\")\tTagID(\"TagStr\")\tlog(p(TokID|TagID))\tp\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   LexProbTable::const_iterator lpi;
   for (lpi = lexprobs.begin() , tokid = 0;
@@ -1671,17 +1683,18 @@ void mootHMM::txtdump(FILE *file)
 	{
 	  TagID tagid = lpsi->first;
 	  ProbT prob  = lpsi->second;
-	  fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%g\n",
+	  fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%g\t%g\n",
 		  tokid, tokids.id2name(tokid).c_str(),
 		  tagid, tagids.id2name(tagid).c_str(),
-		  prob);
+		  prob,
+		  exp(prob));
 	}
     }
 
   fprintf(file, "\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   fprintf(file, "%%%% Class Probabilities\n");
-  fprintf(file, "%%%% ClassID(\"ClassStr\")\tTagID(\"TagStr\")\tlog(p(ClassID|TagID))\n");
+  fprintf(file, "%%%% ClassID(\"ClassStr\")\tTagID(\"TagStr\")\tlog(p(ClassID|TagID))\tp\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   LexClassProbTable::const_iterator cpi;
   ClassID cid;
@@ -1707,9 +1720,9 @@ void mootHMM::txtdump(FILE *file)
 	  TagID ctagid = cpsi->first;
 	  ProbT cprob  = cpsi->second;
 
-	  fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%g\n",
+	  fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%g\t%g\n",
 		  cid, classname.c_str(),
-                  ctagid, tagids.id2name(ctagid).c_str(), cprob);
+                  ctagid, tagids.id2name(ctagid).c_str(), cprob, exp(cprob));
 	}
     }
 
@@ -1718,7 +1731,7 @@ void mootHMM::txtdump(FILE *file)
   fprintf(file, "\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   fprintf(file, "%%%% Uni-, Bi-, and Trigram Probabilities\n");
-  fprintf(file, "%%%% PrevPrevPrevTagID(\"PrevPrevTagStr\")\tPrevTagID(\"PrevTagStr\")\tTagID(\"TagStr\")\tlog(p(TagID|PrevPrevTagID,PrevTagID))\n");
+  fprintf(file, "%%%% PrevPrevPrevTagID(\"PrevPrevTagStr\")\tPrevTagID(\"PrevTagStr\")\tTagID(\"TagStr\")\tlog(p(TagID|PrevPrevTagID,PrevTagID))\tp\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   TagID pptagid;
 # ifdef MOOT_HASH_TRIGRAMS
@@ -1732,11 +1745,12 @@ void mootHMM::txtdump(FILE *file)
 	  for (tagid = 0; tagid < n_tags; tagid++) {
 	    prob = tagp(pptagid, ptagid, tagid);
 	    if (prob != MOOT_PROB_ZERO) {
-	      fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%u(\"%s\")\t%g\n",
+	      fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%u(\"%s\")\t%g\t%g\n",
 		      pptagid,  tagids.id2name(pptagid).c_str(),
 		      ptagid,  tagids.id2name(ptagid).c_str(),
 		      tagid, tagids.id2name(tagid).c_str(),
-		      prob);
+		      prob,
+		      exp(prob));
 	    }
 	  }
 	}
@@ -1759,10 +1773,11 @@ void mootHMM::txtdump(FILE *file)
       for (tagid = 0; tagid < n_tags; tagid++) {
 	prob = ngprobs2[(n_tags*ptagid)+tagid];
 	//if (prob == 0) continue;
-	fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%g\n",
+	fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%g\t%g\n",
 		ptagid,  tagids.id2name(ptagid).c_str(),
 		tagid, tagids.id2name(tagid).c_str(),
-		prob);
+		prob,
+		exp(prob));
       }
     }
   } else {
@@ -1774,99 +1789,116 @@ void mootHMM::txtdump(FILE *file)
   fprintf(file, "%%%%-----------------------------------------------------\n");
   fprintf(file, "%%%% Suffix Trie\n");
   fprintf(file, "%%%% maxlen=%u ; theta=%g\n", suftrie.maxlen(), suftrie.theta);
-  fprintf(file, "%%%% \"Suffix\"\tTagID(\"TagStr\")\tlog(p(Suffix|TagID))\n");
+  fprintf(file, "%%%% \"Suffix\"\tTagID(\"TagStr\")\tlog(p(Suffix|TagID))\tp\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   for (SuffixTrie::const_iterator sti = suftrie.begin(); sti != suftrie.end(); sti++) {
     string suf = suftrie.node_string(*sti);
     for (SuffixTrieDataT::const_iterator stdi=sti->data.begin(); stdi != sti->data.end(); stdi++)
       {
-	fprintf(file, "\"%s\"\t%u(\"%s\")\t%g\n",
+	fprintf(file, "\"%s\"\t%u(\"%s\")\t%g\t%g\n",
 		suf.c_str(),
 		stdi->first,
 		tagids.id2name(stdi->first).c_str(),
-		stdi->second);
+		stdi->second,
+		exp(stdi->second));
       }
   }
 
   fprintf(file, "\n");
 }
 
-void mootHMM::viterbi_txtdump(FILE *file)
+/*--------------------------------------------------------------------------
+ * Debug: Viterbi Trellis Dump
+ *--------------------------------------------------------------------------*/
+void mootHMM::viterbi_txtdump(TokenWriter *w)
 {
-  fprintf(file, "%%%%*********************************************************************\n");
-  fprintf(file, "%%%% mootHMM Viterbi Trellis text dump\n");
-  fprintf(file, "%%%%*********************************************************************\n");
-
-#ifdef MOOT_USE_TRIGRAMS
+  w->put_comment_block_begin();
+  w->printf_raw("%%%%*********************************************************************\n");
+  w->printf_raw("%%%% BEGIN mootHMM Viterbi Trellis text dump\n");
+  w->printf_raw("%%%%*********************************************************************\n");
 
   ViterbiColumn  *col;
-  ViterbiRow     *row;
-  ViterbiNode    *node;
-  size_t         coli, rowi;
+  size_t         coli;
 
   for (coli = 0, col = vtable; col != NULL; col = col->col_prev, coli++) {
-    fprintf(file, "%%%%=================================================================\n");
-    fprintf(file, "%%%% COLUMN %u ; beamwd=%g ; bbestpr=%g ; bpprmin=%g ; cutoff=%g\n",
-	    coli, beamwd, col->bbestpr, col->bpprmin, col->bbestpr-beamwd);
+    viterbi_txtdump_col(w,col,coli);
+  }
 
-    for (rowi = 0, row = col->rows; row != NULL; row = row->row_next, rowi++) {
-      fprintf(file, "%%%%-----------------------------------------------------\n");
-      fprintf(file, "%%%% ROW %u.%u [tag=%u(\"%s\")]\n",
-	      coli, rowi, row->tagid, tagids.id2name(row->tagid).c_str());
-      fprintf(file,
-	      "%%%% TagID(\"Str\")\t [PrevTagID(\"PStr\")]\t <PPrevTagID(\"PPStr\")>:\t Prob\n");
+  w->printf_raw("%%%%*********************************************************************\n");
+  w->printf_raw("%%%% END mootHMM Viterbi Trellis text dump\n");
+  w->printf_raw("%%%%*********************************************************************\n");
+  w->put_comment_block_end();
+}
 
-	for (node = row->nodes; node != NULL; node = node->nod_next) {
-	  if (node->pth_prev == NULL) {
-	    //-- BOS
-	    fprintf(file, "%u(\"%s\")\t [%u(\"%s\")]\t <(NULL)>\t: %g\n",
-		    node->tagid,   tagids.id2name(node->tagid).c_str(),
-		    node->ptagid,  tagids.id2name(node->ptagid).c_str(),
-		    node->lprob
-		    );
-	  } else {
-	    fprintf(file, "%u(\"%s\")\t [%u(\"%s\")]\t <%u(\"%s\")>\t: %g\n",
-		    node->tagid,             tagids.id2name(node->tagid).c_str(),
-		    node->ptagid,            tagids.id2name(node->ptagid).c_str(),
-		    node->pth_prev->ptagid,  tagids.id2name(node->pth_prev->ptagid).c_str(),
-		    node->lprob
-		    );
-	  }
-	}
+/*--------------------------------------------------------------------------
+ * Debug: Viterbi Column Dump
+ *--------------------------------------------------------------------------*/
+void mootHMM::viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, size_t colnum)
+{
+  w->put_comment_block_begin();
+
+#ifdef MOOT_USE_TRIGRAMS
+  ViterbiRow     *row;
+  ViterbiNode    *node;
+  size_t          rowi;
+
+  w->printf_raw("%%%%=================================================================\n");
+  w->printf_raw("%%%% COLUMN %u ; beamwd=%g ; bbestpr=%g ; bpprmin=%g ; cutoff=%g\n",
+		colnum, beamwd, col->bbestpr, col->bpprmin, col->bbestpr-beamwd);
+
+  for (rowi = 0, row = col->rows; row != NULL; row = row->row_next, rowi++) {
+    w->printf_raw("%%%%-----------------------------------------------------\n");
+    w->printf_raw("%%%% ROW %u.%u [tag=%u(\"%s\")]\n",
+		  colnum, rowi, row->tagid, tagids.id2name(row->tagid).c_str());
+    w->printf_raw
+      ("%%%% TagID(\"Str\")\t [PrevTagID(\"PStr\")]\t <PPrevTagID(\"PPStr\")>:\t Prob\n");
+
+    for (node = row->nodes; node != NULL; node = node->nod_next) {
+      if (node->pth_prev == NULL) {
+	//-- BOS
+	w->printf_raw("%u(\"%s\")\t [%u(\"%s\")]\t <(NULL)>\t: %g\n",
+		      node->tagid,   tagids.id2name(node->tagid).c_str(),
+		      node->ptagid,  tagids.id2name(node->ptagid).c_str(),
+		      node->lprob
+		      );
+      } else {
+	w->printf_raw("%u(\"%s\")\t [%u(\"%s\")]\t <%u(\"%s\")>\t: %g\n",
+		      node->tagid,             tagids.id2name(node->tagid).c_str(),
+		      node->ptagid,            tagids.id2name(node->ptagid).c_str(),
+		      node->pth_prev->ptagid,  tagids.id2name(node->pth_prev->ptagid).c_str(),
+		      node->lprob
+		      );
+      }
     }
   }
 
 #else // !MOOT_USE_TRIGRAMS
 
-  ViterbiColumn  *col;
   ViterbiNode    *node;
-  size_t         coli;
 
-  for (coli = 0, col = vtable; col != NULL; col = col->col_prev, coli++) {
-    fprintf(file, "%%%%=================================================================\n");
-    fprintf(file, "%%%% COLUMN %u\n", coli);
-    fprintf(file, "%%%% TagID(\"Str\")\t <PrevTagID(\"PStr\")>:\t Prob\n");
+  w->printf_raw("%%%%=================================================================\n");
+  w->printf_raw("%%%% COLUMN %u\n", colnum);
+  w->printf_raw("%%%% TagID(\"Str\")\t <PrevTagID(\"PStr\")>:\t Prob\n");
 
-    for (node = col->rows; node != NULL; node = node->nod_next) {
-      if (node->pth_prev == NULL) {
-	//-- BOS
-	fprintf(file, "%u(\"%s\")\t <(NULL)>\t: %g\n",
-		node->tagid,   tagids.id2name(node->tagid).c_str(),
-		node->lprob
-		);
-      } else {
-	fprintf(file, "%u(\"%s\")\t <%u(\"%s\")>\t: %g\n",
-		node->tagid,             tagids.id2name(node->tagid).c_str(),
-		node->pth_prev->tagid,   tagids.id2name(node->pth_prev->tagid).c_str(),
-		node->lprob
-		);
-      }
+  for (node = col->rows; node != NULL; node = node->nod_next) {
+    if (node->pth_prev == NULL) {
+      //-- BOS
+      w->printf_raw("%u(\"%s\")\t <(NULL)>\t: %g\n",
+		    node->tagid,   tagids.id2name(node->tagid).c_str(),
+		    node->lprob
+		    );
+    } else {
+      w->printf_raw("%u(\"%s\")\t <%u(\"%s\")>\t: %g\n",
+		    node->tagid,             tagids.id2name(node->tagid).c_str(),
+		    node->pth_prev->tagid,   tagids.id2name(node->pth_prev->tagid).c_str(),
+		    node->lprob
+		    );
     }
   }
 
 #endif // MOOT_USE_TRIGRAMS
 
-  fprintf(file, "%%%% (END-OF-TRELLIS)\n");
+  w->put_comment_block_end();
 }
 
 /*--------------------------------------------------------------------------

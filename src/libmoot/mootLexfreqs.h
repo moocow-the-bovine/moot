@@ -130,16 +130,18 @@ public:
       }
     }
 
-    //-- adjust total tag-count
-    LexfreqTagTable::iterator lftagi = tagtable.find(tag);
-    if (lftagi != tagtable.end()) {
-      lftagi->second += count;
-    } else {
-      tagtable[tag] = count;
-    }
+    if (!isTokFlavorName(text)) {
+      //-- adjust total tag-count
+      LexfreqTagTable::iterator lftagi = tagtable.find(tag);
+      if (lftagi != tagtable.end()) {
+	lftagi->second += count;
+      } else {
+	tagtable[tag] = count;
+      }
 
-    //-- adjust total token-count
-    if (!isTokFlavorName(text)) n_tokens += count;
+      //-- adjust total token-count
+      n_tokens += count;
+    }
   };
 
   //------ public methods: lookup

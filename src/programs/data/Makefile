@@ -126,6 +126,9 @@ lc-dmt: $(TEST).lc.dmt
 %.lc.tt: %.lc.t $(LCMODEL).lex $(LCMODEL).123 $(MOOTHMM)
 	$(MOOTHMM) -M$(LCMODEL).lex,$(LCMODEL).123 $(MOOTHMM_FLAGS) $< -o $@
 
+%.lc.vtt: %.lc.t $(LCMODEL).lex $(LCMODEL).123 $(MOOTHMM)
+	$(MOOTHMM) -M$(LCMODEL).lex,$(LCMODEL).123 $(MOOTHMM_FLAGS) -S $< -o $@
+
 %.lc.dmt: %.lc.mt $(LCMODEL).lex $(LCMODEL).123 $(MOOTHMM)
 	$(MOOTHMM) -M$(LCMODEL).lex,$(LCMODEL).123 $(MOOTHMM_FLAGS) $< -o $@
 
@@ -138,7 +141,7 @@ tt: $(TEST).tt
 dmt: $(TEST).dmt
 
 nott:
-	rm -f *.tt *.dmt *.cmt *.tnt-tt *.tnt-vtt
+	rm -f *.tt *.vtt *.dmt *.cmt *.tnt-tt *.tnt-vtt
 
 %.tt: %.t $(MODEL).lex $(MODEL).123 $(MOOTHMM)
 	$(MOOTHMM) -M$(MODEL).lex,$(MODEL).123 $(MOOTHMM_FLAGS) $< -o $@
@@ -148,6 +151,9 @@ nott:
 
 %.cmt: %.mt $(MODEL).lex $(MODEL).123 $(MODEL).clx $(MOOTHMM)
 	$(MOOTHMM) -M$(MODEL).lex,$(MODEL).123,$(MODEL).clx $(MOOTHMM_FLAGS) $< -o $@
+
+%.vtt: %.t $(MODEL).lex $(MODEL).123 $(MOOTHMM)
+	$(MOOTHMM) -M$(MODEL).lex,$(MODEL).123 $(MOOTHMM_FLAGS) -S $< -o $@
 
 ##-- eval
 eval: $(TEST).tt.eval $(TEST).dmt.eval $(TEST).cmt.eval
