@@ -232,7 +232,7 @@ int read();
  * Rules
  *----------------------------------------------------------------------*/
 #include "mootClassfreqsLexer.h"
-#line 111 "mootClassfreqsLexer.ll"
+#line 112 "mootClassfreqsLexer.ll"
 #line 196 "/usr/local/share/flex++bison++/flexskel.cc"
 
 #define yy___text YY_mootClassfreqsLexer_TEXT
@@ -408,11 +408,11 @@ YY_mootClassfreqsLexer_CLASS::YY_mootClassfreqsLexer_CLASS(YY_mootClassfreqsLexe
 #endif
 
 /* % data tables for the DFA go here */ 
-#define YY_END_OF_BUFFER 10
+#define YY_END_OF_BUFFER 11
 typedef int yy_state_type;
 static const short int yy_accept[27] =
     {   0,
-        0,    0,   10,    5,    3,    6,    6,    8,    5,    5,
+        0,    0,   11,    5,    3,    6,    6,    7,    5,    5,
         5,    4,    1,    5,    3,    3,    3,    0,    2,    5,
         4,    4,    1,    2,    2,    0
     } ;
@@ -490,9 +490,9 @@ static yy_state_type yy_last_accepting_state;
 static YY_CHAR *yy_last_accepting_cpos;
 
 #if YY_mootClassfreqsLexer_DEBUG != 0
-static const short int yy_rule_linenum[9] =
+static const short int yy_rule_linenum[10] =
     {   0,
-      113,  118,  123,  129,  137,  144,  144,  154
+      114,  119,  124,  130,  138,  145,  151,  151,  160
     } ;
 
 #endif
@@ -637,21 +637,21 @@ do_action:      /* this label is used only to access EOF actions */
 	    goto yy_find_action;
 
 case 1:
-#line 113 "mootClassfreqsLexer.ll"
+#line 114 "mootClassfreqsLexer.ll"
 {
   // -- ignore leading whitespace
   theColumn += yyleng;
 }
 	YY_BREAK
 case 2:
-#line 118 "mootClassfreqsLexer.ll"
+#line 119 "mootClassfreqsLexer.ll"
 {
    // -- ignore comments
    theColumn += yyleng;
 }
 	YY_BREAK
 case 3:
-#line 123 "mootClassfreqsLexer.ll"
+#line 124 "mootClassfreqsLexer.ll"
 {
   // -- tab: return the current token-buffer
   theColumn += (((int)theColumn/8)+1)*8 + (yyleng ? yyleng-1 : 0);
@@ -659,7 +659,7 @@ case 3:
 }
 	YY_BREAK
 case 4:
-#line 129 "mootClassfreqsLexer.ll"
+#line 130 "mootClassfreqsLexer.ll"
 {
   // -- count : return it
   //theLine++; theColumn = 0;
@@ -669,7 +669,7 @@ case 4:
 }
 	YY_BREAK
 case 5:
-#line 137 "mootClassfreqsLexer.ll"
+#line 138 "mootClassfreqsLexer.ll"
 {
   // -- text characters: just return
   theColumn += yyleng;
@@ -678,21 +678,28 @@ case 5:
 }
 	YY_BREAK
 case 6:
-#line 144 "mootClassfreqsLexer.ll"
+#line 145 "mootClassfreqsLexer.ll"
 {
-  // -- newlines : ignore
+  // -- newlines : return 'em
   theLine++; theColumn = 0;
   return '\n';
 }
 	YY_BREAK
+case 7:
+#line 151 "mootClassfreqsLexer.ll"
+{
+  //-- ignore spaces
+  theColumn += yyleng;
+}
+	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 150 "mootClassfreqsLexer.ll"
+#line 156 "mootClassfreqsLexer.ll"
 {
   return 0;
 }
 	YY_BREAK
-case 8:
-#line 154 "mootClassfreqsLexer.ll"
+case 9:
+#line 160 "mootClassfreqsLexer.ll"
 {
   // -- huh? -- just ignore it!
   theColumn += yyleng;
@@ -700,8 +707,8 @@ case 8:
           yytext[YY_MORE_ADJ], theLine, theColumn, yytext);
 }
 	YY_BREAK
-case 9:
-#line 161 "mootClassfreqsLexer.ll"
+case 10:
+#line 167 "mootClassfreqsLexer.ll"
 ECHO;
 	YY_BREAK
 #line 463 "/usr/local/share/flex++bison++/flexskel.cc"
@@ -1296,7 +1303,7 @@ void YY_mootClassfreqsLexer_CLASS::YY_mootClassfreqsLexer_INIT_BUFFER( YY_BUFFER
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 161 "mootClassfreqsLexer.ll"
+#line 167 "mootClassfreqsLexer.ll"
 
 
 // -- co-exist with BumbleBee 'clex.h'

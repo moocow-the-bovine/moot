@@ -28,14 +28,19 @@ v2.0.0pre1 Sat, 29 May 2004 01:59:14 +0200
 	+ added class mootClassfreqs : raw class frequency counter (untested)
 	+ added mootClassfreqs(Lexer|Parser|Compiler) for text
 	  lexical-class parameter text I/O
+	+ added section 5 manpage 'mootfiles' documenting various
+	  file formats
+	+ added class-counting to mootHMMTrainer (tests ok)
+	+ added class compilation to mootHMM (tests ok)
+	  - old mootHMM behavior can be emulated by achieved
+	    by removing .clx (class-frequency) file
+	+ CHMM behavior reduced to HMM tests OK (good ol' 95.67% correct)
 	+ Todo:
-	  - add class-counting to mootHMMTrainer
-	    ~ param 'maxClasses' ?
-	  - test mootClassfreqs I/O
-	  - test class-based tagging (CHMM replacement)
+	  - (added, untested) add & test binary I/O for mootClassfreqs
 	  - rename 'moothmm' -> 'moot'
-	  - add & test binary I/O for mootClassfreqs
 	  - move compilation / dump to a separate program 'mootcompile' ?
+	  - add XML I/O (subclass of mootToken(Reader|Writer) ?)
+	    ~ test effect of virtuals here
 	
 v1.0.5 Fri, 21 May 2004 14:14:31 +0200
   + extracting FSM dependencies to 'mootm' package

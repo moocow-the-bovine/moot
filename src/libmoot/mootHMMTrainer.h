@@ -36,8 +36,9 @@
 
 #include "mootTypes.h"
 #include "mootToken.h"
-#include "mootLexfreqs.h"
 #include "mootNgrams.h"
+#include "mootLexfreqs.h"
+#include "mootClassfreqs.h"
 
 moot_BEGIN_NAMESPACE
 
@@ -68,28 +69,29 @@ public:
   /// \name Training data
   //@{
 
-  /** Lexical frequency data */
+  /** Raw n-gram frequency data */
+  mootNgrams   ngrams;
+
+  /** Raw lexical frequency data */
   mootLexfreqs lexfreqs;
 
-  /** N-gram data */
-  mootNgrams   ngrams;
+  /** Raw lexical-class frequency data */
+  mootClassfreqs lcfreqs;
   //@}
 
   /*-------------------------------------------------------------*/
   /// \name Flags
   //@{
-  bool want_lexfreqs;  /**< Whether to gather lexical frequency data */
-  bool want_ngrams;    /**< Whether to gather n-gram frequency data */
+  bool want_ngrams;     /**< Whether to gather n-gram frequency data */
+  bool want_lexfreqs;   /**< Whether to gather lexical frequency data */
+  bool want_classfreqs; /**< Whether to gather lexical-class frequency data */
   //@}
 
   /*-------------------------------------------------------------*/
   /// \name Pragmatic constants
   //@{
-  /** String indicating end-of-sentence */
+  /** String indicating end-of-sentence: this is usually \c __$ */
   mootTagString eos_tag;
-
-  /* Maximum length of n-grams for which to gather data (n<=kmax) */
-  //unsigned short int kmax;
   //@}
 
 protected:
@@ -109,8 +111,9 @@ public:
   //@{
   /** Default constructor */
   mootHMMTrainer(void)
-    : want_lexfreqs(true),
-      want_ngrams(true),
+    : want_ngrams(true),
+      want_lexfreqs(true),
+      want_classfreqs(true),
       eos_tag("__$"),
       last_was_eos(false)
   {};
@@ -128,6 +131,7 @@ public:
   {
     lexfreqs.clear();
     ngrams.clear();
+    lcfreqs.clear();
   };
   //@}
 

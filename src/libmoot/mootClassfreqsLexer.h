@@ -116,7 +116,7 @@
   }\
   /* black magic */\
   return result= fread(buffer, 1, max_size, YY_mootClassfreqsLexer_IN);
-#line 111 "mootClassfreqsLexer.ll"
+#line 112 "mootClassfreqsLexer.ll"
 #line 52 "/usr/local/share/flex++bison++/flexskel.h"
 
 
@@ -368,7 +368,7 @@ class YY_mootClassfreqsLexer_CLASS YY_mootClassfreqsLexer_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 161 "mootClassfreqsLexer.ll"
+#line 167 "mootClassfreqsLexer.ll"
 #endif
 #line 302 "/usr/local/share/flex++bison++/flexskel.h"
 

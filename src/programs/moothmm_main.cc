@@ -43,6 +43,7 @@
 
 #include <mootHMM.h>
 #include <mootLexfreqs.h>
+#include <mootClassfreqs.h>
 #include <mootNgrams.h>
 
 #include "cmdutil.h"
@@ -65,9 +66,10 @@ cmdutil_file_churner churner;
 cmdutil_file_info out;
 
 // -- global classes/structs
-mootHMM      hmm;
-mootNgrams   ngrams;
-mootLexfreqs lexfreqs(32768);
+mootHMM        hmm;
+mootNgrams     ngrams;
+mootLexfreqs   lexfreqs(32768);
+mootClassfreqs classfreqs(512);
 
 // -- for verbose timing info
 timeval istarted, astarted, astopped;
@@ -120,8 +122,9 @@ void GetMyOptions(int argc, char **argv)
   // -- parse model spec
   char *binfile=NULL;
   char *lexfile=NULL;
+  char *classfile=NULL;
   char *ngfile=NULL;
-  if (!hmm_parse_model(args.model_arg, &binfile, &lexfile, &ngfile)) {
+  if (!hmm_parse_model(args.model_arg, &binfile, &lexfile, &ngfile, &classfile)) {
     fprintf(stderr, "%s: could not parse model specification '%s'\n",
 	    PROGNAME, args.model_arg);
     exit(1);
@@ -166,12 +169,33 @@ void GetMyOptions(int argc, char **argv)
     }
   }
 
+  // -- load model: class frequencies
+  if (classfile && *classfile) {
+    if (file_exists(classfile)) {
+      if (args.verbose_arg > 1)
+	fprintf(stderr, "%s: loading class frequency file '%s'...", PROGNAME, classfile);
+
+      if (!classfreqs.load(classfile)) {
+	fprintf(stderr,"\n%s: load FAILED for class frequency file '%s'\n",
+		PROGNAME, classfile);
+	exit(1);
+      } else if (args.verbose_arg > 1) {
+	fprintf(stderr," loaded.\n");
+      }
+    }
+    else {
+      if (args.verbose_arg > 1)
+	fprintf(stderr, "%s: no class frequency file '%s' -- skipping.\n",
+		PROGNAME, classfile);
+    }
+  }
+
   // -- compile HMM
   if (!binfile) {
     if (args.verbose_arg > 1)
       fprintf(stderr, "%s: compiling HMM...", PROGNAME);
     lexfreqs.compute_specials();
-    if (!hmm.compile(lexfreqs, ngrams, args.eos_tag_arg)) {
+    if (!hmm.compile(lexfreqs, ngrams, classfreqs, args.eos_tag_arg)) {
       fprintf(stderr,"\n%s: HMM compilation FAILED\n", PROGNAME);
       exit(1);
     } else if (args.verbose_arg > 1) {

@@ -318,7 +318,9 @@ public:
     if (dst_tagset) {
       for (AnalysisSet::const_iterator asi = tok_analyses.begin();
 	   asi != tok_analyses.end();
-	   asi++)
+	   //asi++
+	   asi = upper_bound(asi->tag)
+	   )
 	{
 	  dst_tagset->insert(asi->tag);
 	}

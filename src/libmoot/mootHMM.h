@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  * File: mootHMM.h
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + PoS tagger for DWDS project : Hidden Markov Model (Disambiguator): headers
+ *   + moot PoS tagger : Hidden Markov Model (Disambiguator): headers
  *--------------------------------------------------------------------------*/
 
 #ifndef _moot_HMM_H
@@ -36,6 +36,7 @@
 #include "mootTypes.h"
 #include "mootToken.h"
 #include "mootLexfreqs.h"
+#include "mootClassfreqs.h"
 #include "mootNgrams.h"
 #include "mootEnum.h"
 #include "mootBinStream.h"
@@ -112,8 +113,7 @@ public:
   /**
    * Typedef for a lexical ClassID. Zero indicates a previously
    * unknown class.  If you want the ClassID associated with
-   * unknown tokens, use tokids2classids[0], which ought to
-   * give you a "real" (read "non-empty") ClassID.
+   * empty lexical classes, use \c class2id(LexClass()).
    */
   typedef mootEnumID ClassID;
   //@}
@@ -344,7 +344,16 @@ public:
   ProbT     unknown_lex_threshhold;
 
   /**
-   * Class-ID to use for tokens for which no analyses were specified.
+   * Lexical class for unknown tokens. 
+   * An empty class (the default) means to treat them as 
+   * "plain" (possibly @UNKNOWN) tokens.
+   * Used by compile() to set \c uclassid datum.
+   */
+  mootTagSet unknown_tagset;
+
+  /**
+   * Class-ID to use for unknown tokens with no analyses (the "empty class").
+   * Zero (the default) corresponds to an empty 'uclass_tags'.
    */
   ClassID   uclassid;
   //@}
@@ -514,6 +523,15 @@ public:
   {
     tagids.unknown_name(name);
   };
+
+  /**
+   * Set lexical class to use for tokens without user-specified analyses.
+   * \see uclassid
+   */
+  inline void unknown_class_name(const mootTagSet &tagset)
+  {
+    unknown_tagset = tagset;
+  };
   //@}
 
 
@@ -526,12 +544,16 @@ public:
    */
   bool compile(const mootLexfreqs &lexfreqs,
 	       const mootNgrams &ngrams,
+	       const mootClassfreqs &classfreqs,
 	       const mootTagString &start_tag_str=mootTagString());
 
   /** Assign IDs for tokens and tags from lexfreqs: called by compile() */
   void assign_ids_lf(const mootLexfreqs &lexfreqs);
 
-  /** Assign IDs for tags (and tokens?) from ngrams: called by compile() */
+  /** Assign IDs for classes and tags from classfreqs: called by compile() */
+  void assign_ids_cf(const mootClassfreqs &classfreqs);
+
+  /** Assign IDs for tags from ngrams: called by compile() */
   void assign_ids_ng(const mootNgrams   &ngrams);
 
   /** Estimate ngram-smoothing constants: NOT called by compile(). */
@@ -925,6 +947,37 @@ public:
     TokenType typ = token2type(token);
     return typids[typ]==0 ? tokids.name2id(token) : typids[typ];
   };
+
+  /**
+   * Convert string-form tagsets to lexical classes.
+   * If \c add_tagids is true, then tag-IDs will
+   * be assigned as needed for the element tags.
+   * If you specify \c NULL as the lexical class, a
+   * new one will be allocated and returned (you must
+   * then delete it yourself!)
+   *
+   * \note \c lclass is NOT cleared by this method.
+   */
+  inline LexClass *tagset2lexclass(const mootTagSet &tagset,
+				   LexClass *lclass=NULL,
+				   bool add_tagids=false)
+  {
+    if (!lclass) lclass = new LexClass();
+    //-- ... for all tags in the class (utsi)
+    for (mootTagSet::const_iterator tsi = unknown_tagset.begin();
+	 tsi != unknown_tagset.end();
+	 tsi++)
+      {
+	//-- lookup or assign a tag id
+	TagID tagid = tagids.name2id(*tsi);
+	if (add_tagids && tagid==0) tagid = tagids.insert(*tsi);
+
+	//-- insert tagid into lexical class
+	lclass->insert(tagid);
+      }
+    return lclass;
+  };
+
 
   /**
    * Lookup the ClassID for the lexical-class \c lclass.

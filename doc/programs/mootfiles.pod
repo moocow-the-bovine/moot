@@ -1,0 +1,643 @@
+####==============================================================
+## Header
+=pod
+
+=head1 moot FILE FORMATS
+
+This manpage describes various file formats used by the
+moot PoS tagging utilities.
+
+=cut
+
+##==============================================================
+## Program Configuration Files
+=pod
+
+=head1 PROGRAM CONFIGURATION FILES
+
+Most moot utility programs support global and user-specific
+configuration files which can be used to set system defaults
+and/or user preferences for values of program options.
+
+Configuration files are expected to contain lines of the form:
+
+ LONG_OPTION_NAME    OPTION_VALUE
+
+where LONG_OPTION_NAME is the long name of one of the
+program's options, without the leading '--', and
+OPTION_VALUE is the value for that option, if any.
+Fields are whitespace-separated.
+Blank lines and comments (lines beginning with a '#' character)
+are ignored.
+
+The following configuration files are read by default,
+where ${PROGNAME} is the name of a moot utility program,
+and ${HOME} is the home directory of the current user:
+
+=over 4
+
+=item /etc/${PROGNAME}rc
+
+System defaults file; read first.
+
+=item ${HOME}/.${PROGNAME}rc
+
+User preferences file, can be used to override system defaults.
+
+=back
+
+Any options specified on the command-line override
+defaults from a program configuration file.
+
+=cut
+
+## /Program Configuration Files
+##==============================================================
+
+
+##==============================================================
+## Text File Formats
+=pod
+
+=head1 TEXT FILE FORMATS
+
+=cut
+
+##--------------------------------------------------------------
+## Input: Raw Text files
+=pod
+
+=head2 Raw Text Files
+
+A "raw" text file is just that: any file consiting of (8-bit)
+characters.  Such files may be processed by the L<mootpp>
+preprocessor to produce "rare cooked" (-tagged, -analyzed)
+text files.  An example "raw" text file is:
+
+ This is a test.  This too.
+
+=cut
+
+
+##--------------------------------------------------------------
+## Input: Cooked Text Files
+=pod
+
+=head2 Cooked Text Files
+
+A "cooked" text file is a text file which encodes information
+such as token boundaries, sentence boundaries, part-of-speech tag,
+and/or potential analyses.  The moot utilities distinguish between
+four different types of cooked text file: in order of ascending
+informational content, these are:
+"rare" (-tagged, -analyzed),
+"medium rare" (-tagged, +analyzed),
+"medium" (+tagged, -analyzed),
+and
+"well done" (+tagged, +analyzed).
+Differnent moot utilities require their input files to be
+more or less "cooked" -- see the documentation of the individual
+utilities for details.
+
+=over 4
+
+=cut
+
+##--------------------------------------------------------------
+## Input: Cooked: Rare (-tagged,-analyzed)
+=pod
+
+=item Rare
+
+=item (-tagged, -analyzed)
+
+The most basic level of "cookedness", a "rare" text file encodes
+only token- and sentence-boundaries.
+By convention, "rare"
+filenames carry the extension ".t".  The syntax is:
+
+ RARE_FILE  ::= {RARE_LINE}*
+ RARE_LINE  ::= {COMMENT} | {EOS} | {RARE_TOKEN}
+ COMMENT    ::= {SPACE}* "%%" ([^{NEWLINE}])*  {NEWLINE}
+ EOS        ::= ( {SPACE}* {NEWLINE} )+
+ RARE_TOKEN ::= {TOKEN_TEXT} {NEWLINE}
+ TOKEN_TEXT ::= ( {WORDCHAR} | {SPACE} )+
+ SPACE      ::= " "
+ NEWLINE    ::= "\n" | "\r"
+ WORDCHAR   ::= [^{SPACE}{NEWLINE}]
+
+Leading and trailing spaces are stripped from token text; it is
+thus impossible to declare an "empty" token.  An example
+"rare cooked" file is:
+
+ %% Example rare cooked file for moot
+ %% Sentence 1
+ This
+ is
+ a
+ test
+ .
+
+ %% Sentence 2
+ This
+ too
+ .
+
+=cut
+
+##--------------------------------------------------------------
+## Input: Cooked: Medium Rare (-tagged,+analyzed)
+=pod
+
+=item Medium Rare
+
+=item (-tagged, +analyzed)
+
+A "medium rare" file is at least as informative as a "rare"
+file -- that is, it encodes everything that a "rare" file
+encodes, and in exactly the same fashion.  Additionally,
+a "medium rare" file may contain for each token a set
+of (TAB-separated) possible I<analyses> for that token, where
+an "analysis" contains at least a part-of-speech tag, and possibly
+also a numeric cost and arbitrary analysis details.
+Somewhat counter-intuitively,
+every "rare" file is also a "medium rare" file for which
+every token is associated with an empty set of possible analyses.
+By convention, "medium rare" filenames carry the extension ".mt"
+
+ MED_RARE_FILE  ::= {MED_RARE_LINE}*
+ MED_RARE_LINE  ::= {COMMENT} | {EOS} | {MED_RARE_TOKEN}
+ MED_RARE_TOKEN ::= {TOKEN_TEXT} ( {TAB} {ANALYSIS} )*
+ ANALYSIS       ::= {DETAIL_PREFIX}? {TAG} {DETAIL_SUFFIX}?
+ DETAIL_PREFIX  ::= ( {WORDCHAR} | {SPACE} | {COST} )* ("[" ("_"?))?
+ COST           ::= "<" ("-"|"+")? ([0-9]* ".")? [0-9]+ ">"
+ TAG            ::= {TAGCHAR}+
+ DETAIL_SUFFIX  ::= ( {WORDCHAR} | {SPACE} | {COST} )*
+ TAGCHAR        ::= [^{SPACE}{TAB}{NEWLINE}"]"]
+ TAB            ::= "\t"
+
+Leading and trailing spaces are stripped from token text,
+as well as from analysis-detail and -tag text.  It should
+be noted that the I<TAG> component of each I<ANALYSIS>
+is "greedy" -- if an
+analysis contains no left-bracket to mark the beginning
+of a tag, then the whole analysis (up to the first right-bracket
+or space) is considered the tag.  Also, if the analysis
+contains multiple left-brackets, only the I<first> is
+considered to introduce the I<TAG> component.
+An example "medium rare" file is:
+
+ %% Example medium-rare cooked file for moot
+ %% Sentence 1 : possible analyses are tags only
+ This   NE      PDAT    PDIS
+ is     VAFIN   VVFIN
+ a      ART     CARD
+ test   NN      VVIN
+ .      $.
+
+ %% Sentence 2 : detailed analyses, with unknown word "foo".
+ This   This [NE type="name"] <420>      <24.7> this [_PDAT][_sg]
+ foo
+ .      . [$.] <-42>
+
+Tokens in "medium rare" files with empty analysis sets
+(i.e. I<RARE_TOKEN>s)
+are called "unrecognized" tokens.
+
+=cut
+
+##--------------------------------------------------------------
+## Input: Cooked: Medium (+tagged,-analyzed)
+=pod
+
+=item Medium
+
+=item (+tagged, -analyzed)
+
+A "medium" file can be understood as a "medium rare" file which
+associates exactly one analysis with each token.  The tag for this
+analysis is considered the "best" tag for the associated token.
+By convention, "medium" filenames carry the extension ".tt"
+(tagger output) or ".ttt" (gold standard).
+
+ MEDIUM_FILE    ::= {MEDIUM_LINE}*
+ MEDIUM_LINE    ::= {COMMENT} | {EOS} | {MEDIUM_TOKEN}
+ MEDIUM_TOKEN   ::= {TOKEN_TEXT} {TAB} {BEST_ANALYSIS}
+ BEST_ANALYSIS  ::= {ANALYSIS}
+
+As before, leading and trailing spaces are stripped from
+token text and analyses, and the I<TAG> component of each
+I<ANALYSIS> is "greedy".
+An example "medium" file is:
+
+ %% Example medium cooked file for moot
+ %% Sentence 1 : best analyses are tags only
+ This   PDAT
+ is     VVFIN
+ a      ART
+ test   NN
+ .      $.
+
+ %% Sentence 2 : tags embedded in detailed analyses
+ This   <24.7> this [PDAT num="sg"]
+ too    <0.0> too [ADV]
+ .      <-42> . [$.]
+
+=cut
+
+##--------------------------------------------------------------
+## Input: Cooked: Well Done (+tagged,+analyzed)
+=pod
+
+=item Well Done
+
+=item (+tagged, +analyzed)
+
+A "well done" file can be understood as the synthesis of
+a "medium rare" and a "medium" file: it contains a "best"
+analysis for each token (the first one), as well as a set of
+I<a priori> potential analyses analyses for that token.
+By convention, "well done" filenames carry the extension ".dtt"
+(tagger output) or ".dttt" (gold standard).
+
+ WELL_DONE_FILE  ::= {WELL_DONE_LINE}*
+ WELL_DONE_LINE  ::= {COMMENT} | {EOS} | {WELL_DONE_TOKEN}
+ WELL_DONE_TOKEN ::= {TOKEN_TEXT} {TAB} {BEST_ANALYSIS} ( {TAB} {ANALYSIS} )*
+
+As before, leading and trailing spaces are stripped from
+token text and analyses, and the I<TAG> component of each
+I<ANALYSIS> is "greedy".
+An example "well done" file is:
+
+ %% Example well-done cooked file for moot
+ %% Sentence 1 : analysis-set tags bracketed for clarity
+ This   PDAT    [NE]    [PDAT]    [PDIS]
+ is     VVFIN   [VAFIN] [VVFIN]
+ a      ART     [ART]   [CARD]
+ test   NN      [NN]    [VVFIN]
+ .      $.      [$.]
+
+ %% Sentence 2 : analysis-tags embedded in complete analyses
+ This   PDAT    [NE type="last"] This <420>  [PDAT num="sg"] this <24.7>
+ too    ADV     [ADV] too <0.0>
+ .      $.      [$.] . <-42>
+
+=back
+
+=cut
+
+## /Input File Formats
+##==============================================================
+
+
+##==============================================================
+## HMM Model File Formats
+=pod
+
+=head1 HMM MODEL FILE FORMATS
+
+The moothmm(1) program can use either text- or native
+binary-format model files, which encode raw frequency counts
+(text model files), or probability tables and compile-time
+flags for the Hidden Markov Model (binary model files),
+respectively.
+
+=cut
+
+##--------------------------------------------------------------
+## HMM Models: Text
+=pod
+
+=head2 Text Models
+
+A "Text Model" is completely specified by
+three files: a lexical freqency file (*.lex), an n-gram frequency
+file (*.123), and an optional lexical-class frequency file (*.clx).
+
+When specifiying a text model name to a moot utility program,
+you may specify the model name as I<TMODEL> in order to use the
+files I<TMODEL>.lex , I<TMODEL>.123 , and I<TMODEL>.clx (if present).
+Otherwise, you may specifiy a composite model name as
+a comma-separated list of the individual component filenames:
+F<mylex.lex,myngrams.123,myclasses.clx>.
+
+=over 4
+
+=cut
+
+##--------------------------------------------------------------
+## HMM Models: Text: Lexical Frequencies
+=pod
+
+=item B<Lexical Frequency Files>
+
+Lexical frequency files store raw frequencies for known tokens
+and (token,tag) pairs.  The format use is ca. 99.998% compatible
+with that generated by the tnt-para(1) program:
+
+ LEX_FILE    ::= ({COMMENT} | {BLANK_LINE} | {LEX_ENTRY})*
+ COMMENT     ::= {SPACE}* "%%" ([^{NEWLINE}])*  {NEWLINE}
+ BLANK_LINE  ::= {SPACE}* {NEWLINE}
+ LEX_ENTRY   ::= {TOKEN_TEXT} {TAB} {TOKEN_TOTAL} ( {TAB} {TAG_COUNT} )*
+ TAG_COUNT   ::= {TAG_TEXT} {TAB} {TOK_TAG_CT}
+ TOKEN_TOTAL ::= {COUNT}
+ TOK_TAG_CT  ::= {COUNT}
+ TOKEN_TEXT  ::= {STRING} | {SPECIAL_TOK}
+ TAG_TEXT    ::= {STRING}
+ STRING      ::= ( [^{TAB}{NEWLINE}] )+
+ COUNT       ::=  ("-"|"+")? ([0-9]* ".")? [0-9]+
+ NEWLINE     ::= "\n" | "\r"
+ TAB         ::= "\t"
+ SPECIAL_TOK ::= "@UNKNOWN"
+                 | "@CARD"
+                 | "@CARDSEPS"
+                 | "@CARDPUNCT"
+                 | "@CARDSUFFIX"
+
+Leading and trailing spaces are stripped from token
+and tag text.
+
+The special tokens whose text begins with an '@' character
+declare counts for special token types:
+
+=over 4
+
+=item * @UNKNOWN
+
+Declares frequency counts to be used when no other training
+data is available (i.e. for alphabetic tokens which did not occur in the
+training corpus).
+
+=item * @CARD
+
+Declares frequency counts to be used for tokens consisting
+only of digits -- tokens which match the regex:
+
+ [0-9]+
+
+=item * @CARDSEPS
+
+Declares frequency counts to be used for tokens which
+contain digits and separators.  The regex matching
+such tokens is (?):
+
+ ([:digit:}+)([\.\,\-]|{:digit:})*
+
+=item * @CARDPUNCT
+
+Declares frequency counts to be used for tokens which
+contain digits followed by punctuation.
+The regex matching such tokens is (?):
+
+ ([:digit:}+)({:punct:})
+
+=item * @CARDSUFFIX
+
+Declares frequency counts to be used for tokens which
+contain digits followed by some suffix.
+The regex matching
+these tokens depends on whether the C<moot_TNT_COMPAT> macro
+macro was defined when you compiled libmoot:
+
+If C<moot_TNT_COMPAT> was defined, then the suffix
+of "@CARDSUFFIX" tokens is required to be of maximum
+length 3, thus matching the regex:
+
+ ([:digit:}+)(.{1,3})
+
+Otherwise, the suffix for "@CARDSUFFIX" tokens may
+be of arbitrary length:
+
+ ([:digit:}+)(.*)
+
+=back
+
+An example lexical frequency file is:
+
+ %% Example lexical frequency file
+ This   4       PDAT    4
+ is     1.0     VVFIN   0.7     VAFIN   0.3
+ a      365     ART     350     CARD    5
+ test   1       NN      0.5     VVFIN   0.5
+ too    1       ADV     1
+ .      42      $.      42
+
+=cut
+
+##--------------------------------------------------------------
+## HMM Text-Models: Ngram Frequency Files
+=pod
+
+=item B<Ngram Frequency Files>
+
+An n-gram frequency file stores raw frequency counts for
+uni-, bi-, and tri-grams.  An n-gram file may be in either
+"long" or "short" format, both of which are compatible
+with the respective formats produced by the tnt-para(1)
+program:
+
+ NGRAM_FILE  ::= ({COMMENT} | {BLANK_LINE} | {NGRAM_ENTRY})*
+ COMMENT     ::= {SPACE}* "%%" ([^{NEWLINE}])*  {NEWLINE}
+ BLANK_LINE  ::= {SPACE}* {NEWLINE}
+ NGRAM_ENTRY ::= {UNIGRAM} | {BIGRAM} | {TRIGRAM}
+ UNIGRAM     ::= {TAG} {TAB} {COUNT}
+ BIGRAM      ::= {TAG} {TAB} {TAG} {TAB} {COUNT}
+ TRIGRAM     ::= {TAG} {TAB} {TAG} {TAB} {TAG} {TAB} {COUNT}
+ TAG         ::= EOS_TAG | ( [^{TAB}{NEWLINE}] )*
+ EOS_TAG     ::= "__$"
+ COUNT       ::=  ("-"|"+")? ([0-9]* ".")? [0-9]+
+ NEWLINE     ::= "\n" | "\r"
+ TAB         ::= "\t"
+
+Leading and trailing spaces are stripped from tags.
+An empty I<TAG> component is populated with the tag
+in the corresponding position from the last n-gram
+parsed -- exhaustive use of this feature produces
+"short" format n-gram files.  Non-use of this feature
+produces "long" format n-gram files.
+
+An example "long" format n-gram file is:
+
+ %% Example n-gram frequency file in "long" format
+ __$    2
+ __$    PDAT    2
+ __$    PDAT    VVFIN   1
+ __$    PDAT    ADV     1
+ ADV    1
+ ADV    $.      1
+ ADV    $.      __$     1
+ ART    1
+ ART    NN      1
+ ART    NN      $.      1
+ PDAT   2
+ PDAT   VVFIN   1
+ PDAT   VVFIN   ART     1
+ PDAT   ADV     1
+ PDAT   ADV     $.      1
+ VVFIN  1
+ VVFIN  ART     1
+ VVFIN  ART     NN      1
+ NN     1
+ NN     $.      1
+ NN     $.      __$     1
+
+The same data in "short" format:
+
+ %% Example n-gram frequency file in "short" format
+ __$    2
+        PDAT    2
+                VVFIN   1
+                ADV     1
+ ADV    1
+        $.      1
+                __$     1
+ ART    1
+                1
+                $.      1
+ PDAT   2
+        VVFIN   1
+                ART     1
+        ADV     1
+                $.      1
+ VVFIN  1
+        ART     1
+                NN      1
+ NN     1
+        $.      1
+                __$     1
+
+=cut
+
+##--------------------------------------------------------------
+## HMM Text-Models: Lexical-Class Frequency Files
+=pod
+
+=item B<Lexical-Class Frequency Files>
+
+Lexical-class frequency files store raw frequencies for known
+lexical classes (read "sets of possible part-of-speech tags")
+and (class,tag) pairs.  The format is a direct extension
+of the format for lexical frequency files
+(see "Lexical Frequency Files", above):
+
+ CLASS_FILE  ::= ({COMMENT} | {BLANK_LINE} | {CLASS_ENTRY})*
+ CLASS_ENTRY ::= {CLASS_ELTS} {TAB} {CLASS_TOTAL} ( {TAB} {TAG_COUNT} )*
+ CLASS_ELTS  ::= ( {CLASS_TAG} {SPACE} )*
+ CLASS_TAG   ::= ( [^{SPACE}{TAB}{NEWLINE}] )+
+
+As for lexical frequency files, leading and trailing whitespaces
+are stripped from class and tag text.
+
+The I<CLASS_ELTS> component specifies a (space-separated) list
+of tags belonging to the lexical class.  All other (tab-separated)
+fields are as for a lexical frequency file.
+
+A pair (CLASS,TAG) such that TAG is not an element of CLASS
+is called an "contradictory pair" or an "impossible pair".
+It is not required that the the tags in the I<TAG_COUNT>
+components of a I<CLASS_ENTRY> are "possible" in this sense,
+although it certainly helps if this is the case.
+
+An example lexical class frequency file is:
+
+ %% Example lexical frequency file
+ PDAT NE        4       PDAT    4
+ VVFIN VAFIN    1.0     VVFIN   0.7     VAFIN   0.3
+ ART CARD       365     ART     350     CARD    5
+ NN VVFIN       1       NN      0.5     VVFIN   0.5
+ ADV            1       ADV     1
+ $.             42      $.      42
+
+
+=back
+
+=cut
+
+#"
+## /HMM Models: Text
+##--------------------------------------------------------------
+
+##--------------------------------------------------------------
+## HMM Binary Model Files
+=pod
+
+=head2 HMM Binary Model Files
+
+A "Binary Model" I<BINMODEL> is a (compressed) binary format
+file storing a compiled Hidden Markov Model (probabilities
+and constants).  It is completely
+specified by its filename F<BINMODEL>.
+By convention, HMM binary model files carry the suffix
+".hmm".
+
+When specifying an HMM model file,
+note that the existence of a file F<BINMODEL> overrides
+any text models which might exists in files
+I<BINMODEL>.lex , I<BINMODEL>.123 , I<BINMODEL>.clx.
+
+=cut
+
+##--------------------------------------------------------------
+## HMM Dumps
+=pod
+
+=head2 HMM Dumps
+
+An HMM dump is a plain text file containing all the
+information stored in a compiled HMM.  The format exists
+solely for purposes of debugging.
+
+=cut
+
+## /HMM Model File Formats
+##==============================================================
+
+
+##--------------------------------------------------------------
+## Acknowledgements
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+
+Development of this package was supported by the project
+'Kollokationen im Wörterbuch'
+( "collocations in the dictionary", http://www.bbaw.de/forschung/kollokationen )
+in association with the project
+'Digitales Wörterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
+( "digital dictionary of the German language of the 20th century", http://www.dwds.de )
+at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de )
+with funding from
+the Alexander von Humboldt Stiftung ( http://www.avh.de )
+and from the Zukunftsinvestitionsprogramm of the
+German federal government.
+
+I am grateful to Christiane Fellbaum, Alexander Geyken,
+Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
+for offering useful insights in the course of development
+of this package.
+
+Thomas Hanneforth wrote and maintains the libFSM C++ library
+for finite-state device operations used in the
+development of the class-based HMM tagger / disambiguator.
+Alexander Geyken and Thomas Hanneforth developed the
+rule-based morphological analysis system for German
+which was used in the development of the
+class-based HMM tagger / disambiguator.
+
+=cut
+
+##--------------------------------------------------------------
+## Footer
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@ling.uni-potsdam.deE<gt>
+
+=head1 SEE ALSO
+
+L<mootpp>, L<mootrain>, L<mootm>, L<moothmm>, L<moot>
+
+=cut
+

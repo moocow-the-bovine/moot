@@ -322,6 +322,10 @@ if test "$moot_doc_formats" != "none" ; then
   AC_SUBST(moot_program_gogs)
   AC_CONFIG_LINKS(doc/programs/acknowledge.pod:src/programs/acknowledge.pod)
 
+  ##-- hack, must add section-5 stuff below in 'mans' section too!
+  moot_pods="mootfiles.pod `echo \"$moot_program_gogs\" | sed 's/\.gog/\.pod/g'`"
+  AC_SUBST(moot_pods)
+
   ### -- initialize defaults
   DOC_SUBDIRS=""
   DOC_LATEX_TARGETS=""
@@ -334,7 +338,7 @@ if test "$moot_doc_formats" != "none" ; then
 
       txt)
 	if test -n "$POD2TEXT" ; then
-	  DOC_PROG_TXT_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.txt/g'`
+	  DOC_PROG_TXT_TARGETS=`echo "$moot_pods" | sed 's/\.pod/\.txt/g'`
 	else
 	  AC_MSG_WARN(pod2text not found -- program text docs will not be built!)
 	fi
@@ -347,7 +351,8 @@ if test "$moot_doc_formats" != "none" ; then
           DOC_MAN3_MANS="man/man3/*"
 	fi
 	if test -n "$POD2MAN" ; then
-	  DOC_PROG_MAN_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.1/g'`
+	  DOC_PROG_MAN1_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.1/g'`
+	  DOC_PROG_MAN5_TARGETS="mootfiles.5"
 	else
 	  AC_MSG_WARN(pod2man not found -- program manpages will not be built!)
 	fi
@@ -359,7 +364,7 @@ if test "$moot_doc_formats" != "none" ; then
           DOC_SUBDIRS="$DOC_SUBDIRS html"
 	fi
 	if test -n "$POD2HTML" ; then
-	  DOC_PROG_HTML_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.html/g'`
+	  DOC_PROG_HTML_TARGETS=`echo "$moot_pods" | sed 's/\.pod/\.html/g'`
 	else
 	  AC_MSG_WARN(pod2html not found -- program html docs will not be built!)
 	fi
@@ -371,7 +376,7 @@ if test "$moot_doc_formats" != "none" ; then
 	  DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.dvi"
 	fi
 	if test -n "$POD2LATEX" ; then
-	  DOC_PROG_DVI_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.dvi/g'`
+	  DOC_PROG_DVI_TARGETS=`echo "$moot_pods" | sed 's/\.pod/\.dvi/g'`
 	else
 	  AC_MSG_WARN(pod2latex not found -- program dvi docs will not be built!)
 	fi
@@ -383,7 +388,7 @@ if test "$moot_doc_formats" != "none" ; then
 	  DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.ps"
 	fi
 	if test -n "$POD2LATEX" ; then
-	  DOC_PROG_PS_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.ps/g'`
+	  DOC_PROG_PS_TARGETS=`echo "$moot_pods" | sed 's/\.pod/\.ps/g'`
 	else
 	  AC_MSG_WARN(pod2latex not found -- program postscript docs will not be built!)
 	fi
@@ -395,7 +400,7 @@ if test "$moot_doc_formats" != "none" ; then
     	  DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.pdf"
 	fi
 	if test -n "$POD2LATEX" ; then
-	  DOC_PROG_PDF_TARGETS=`echo "$moot_program_gogs" | sed 's/\.gog/\.pdf/g'`
+	  DOC_PROG_PDF_TARGETS=`echo "$moot_pods" | sed 's/\.pod/\.pdf/g'`
 	else
 	  AC_MSG_WARN(pod2latex not found -- program pdf docs will not be built!)
 	fi
@@ -417,7 +422,8 @@ if test "$moot_doc_formats" != "none" ; then
   AC_SUBST(POD_DOC_SUFFIXES)
 
   AC_SUBST(DOC_PROG_TXT_TARGETS)
-  AC_SUBST(DOC_PROG_MAN_TARGETS)
+  AC_SUBST(DOC_PROG_MAN1_TARGETS)
+  AC_SUBST(DOC_PROG_MAN5_TARGETS)
   AC_SUBST(DOC_PROG_HTML_TARGETS)
   AC_SUBST(DOC_PROG_DVI_TARGETS)
   AC_SUBST(DOC_PROG_PS_TARGETS)

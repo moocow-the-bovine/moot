@@ -15,6 +15,7 @@ moothmm.pod
 *.txt
 *.tex
 *.1
+*.5
 *.man
 *.ps
 *.pdf

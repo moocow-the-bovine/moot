@@ -36,7 +36,6 @@
 #include <stdarg.h>
 
 #include "mootHMMTrainer.h"
-#include "mootToken.h"
 #include "mootTokenIO.h"
 
 //#define mootHMMTrainerDEBUG 1
@@ -82,7 +81,7 @@ bool mootHMMTrainer::train_from_stream(FILE *in, const char *filename)
   char *myfile = strdup(filename);
 
   //-- prepare lexer
-  TokenReader treader(true,false);
+  TokenReader treader(true,true);
   treader.select_stream(in,myfile);
 
   //-- prepare variables
@@ -163,6 +162,13 @@ void mootHMMTrainer::train_token(const mootToken &curtok)
   if (want_lexfreqs) {
     DEBUG( carp("DEBUG: train_token(`%s') : training lexfreqs\n", curtok.text().c_str()) );
     lexfreqs.add_count(curtok.text(), curtok.besttag(), 1.0);
+  }
+
+  //-- count class frequencies
+  if (want_classfreqs) {
+    mootTagSet lclass;
+    curtok.tokExport(NULL,&lclass);
+    lcfreqs.add_count(lclass, curtok.besttag(), 1.0);
   }
 
   //-- count n-gram frequencies

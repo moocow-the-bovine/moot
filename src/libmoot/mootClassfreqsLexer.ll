@@ -101,6 +101,7 @@
  *----------------------------------------------------------------------*/
 newline    [\n\r]
 nonnewline [^\n\r]
+space      [ ]
 whitespace [ \t]
 textchar   [^ \n\r\t]
 textorsp   [^\n\r\t]
@@ -142,9 +143,14 @@ textorsp   [^\n\r\t]
 }
 
 {newline} {
-  // -- newlines : ignore
+  // -- newlines : return 'em
   theLine++; theColumn = 0;
   return '\n';
+}
+
+{space} {
+  //-- ignore spaces
+  theColumn += yyleng;
 }
 
 <<EOF>> {

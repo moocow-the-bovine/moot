@@ -42,6 +42,7 @@ void mootClassfreqs::clear(void)
 {
   lctable.clear();
   tagtable.clear();
+  totalcount = 0;
 }
 
 /*----------------------------------------------------------------------

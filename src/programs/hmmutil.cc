@@ -39,7 +39,7 @@
  *---------------------------------------------------------------------*/
 
 
-bool hmm_parse_textmodel(char *model, char **lexfile, char **ngfile)
+bool hmm_parse_textmodel(char *model, char **lexfile, char **ngfile, char **lcfile)
 {
   char *comma = strchr(model, ',');
   if (comma) {
@@ -52,19 +52,33 @@ bool hmm_parse_textmodel(char *model, char **lexfile, char **ngfile)
     if (!*ngfile) *ngfile = (char *)malloc(strlen(comma)+1);
     strcpy(*ngfile, comma);
 
+    if (lcfile) {
+      comma++;
+      if (!*lcfile) *lcfile = (char *)malloc(strlen(comma)+1);
+      strcpy(*lcfile, comma);
+    }
+
     return true;
   }
   
   if (!*lexfile) *lexfile = (char *)malloc(strlen(model)+4);
-  if (!*ngfile)  *ngfile = (char *)malloc(strlen(model)+4);
   strcpy(*lexfile, model);
-  strcpy(*ngfile, model);
   strcat(*lexfile, ".lex");
+
+  if (!*ngfile)  *ngfile = (char *)malloc(strlen(model)+4);
+  strcpy(*ngfile, model);
   strcat(*ngfile, ".123");
+
+  if (lcfile) {
+    if (!*lcfile)  *lcfile = (char *)malloc(strlen(model)+4);
+    strcpy(*lcfile, model);
+    strcat(*lcfile, ".clx");
+  }
+
   return true;
 }
 
-bool hmm_parse_corpusmodel(char *corpus, char **lexfile, char **ngfile)
+bool hmm_parse_corpusmodel(char *corpus, char **lexfile, char **ngfile, char **lcfile)
 {
   char olddot = '.';
   char *dot   = strrchr(corpus, '.');
@@ -73,17 +87,27 @@ bool hmm_parse_corpusmodel(char *corpus, char **lexfile, char **ngfile)
     olddot = '\0';
   }
   *dot = '\0';
+
   if (!*lexfile) *lexfile = (char *)malloc(strlen(corpus)+4);
-  if (!*ngfile)  *ngfile = (char *)malloc(strlen(corpus)+4);
   strcpy(*lexfile, corpus);
-  strcpy(*ngfile, corpus);
   strcat(*lexfile, ".lex");
+
+  if (!*ngfile)  *ngfile = (char *)malloc(strlen(corpus)+4);
+  strcpy(*ngfile, corpus);
   strcat(*ngfile, ".123");
+
+  if (lcfile) {
+    if (!*lcfile)  *lcfile = (char *)malloc(strlen(corpus)+4);
+    strcpy(*lcfile, corpus);
+    strcat(*lcfile, ".clx");
+  }
+
   *dot = olddot;
   return true;
 }
 
-bool hmm_parse_model(char *model, char **binfile, char **lexfile, char **ngfile)
+bool hmm_parse_model(char *model, char **binfile, char **lexfile, char **ngfile,
+		     char **lcfile)
 {
   //-- binary file: easy
   if (file_exists(model)) {
@@ -91,7 +115,7 @@ bool hmm_parse_model(char *model, char **binfile, char **lexfile, char **ngfile)
     strcpy(*binfile, model);
     return true;
   }
-  return hmm_parse_textmodel(model, lexfile, ngfile);
+  return hmm_parse_textmodel(model, lexfile, ngfile, lcfile);
 }
 
 

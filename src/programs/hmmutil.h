@@ -1,7 +1,7 @@
 /* -*- Mode: C++ -*- */
 /*
-   moot-utils version 1.0.4 : moocow's part-of-speech tagger
-   Copyright (C) 2002-2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   moot-utils : moocow's part-of-speech tagger
+   Copyright (C) 2002-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -45,13 +45,14 @@
  * 
  * The assigned (*file) strings will be allocated if they are NULL.
  */
-bool hmm_parse_model(char *model, char **binfile, char **lexfile, char **ngfile);
+bool hmm_parse_model(char *model, char **binfile, char **lexfile, char **ngfile,
+		     char **lcfile=NULL);
 
 /** As above, text only */
-bool hmm_parse_textmodel(char *model, char **lexfile, char **ngfile);
+bool hmm_parse_textmodel(char *model, char **lexfile, char **ngfile, char **lcfile=NULL);
 
 /** Similar, uses corpus basename  */
-bool hmm_parse_corpusmodel(char *corpus, char **lexfile, char **ngfile);
+bool hmm_parse_corpusmodel(char *corpus, char **lexfile, char **ngfile, char **lcfile=NULL);
 
 /**
  * Parse a comma-separated list of doubles (at most 'ndbls') from str into dbls.

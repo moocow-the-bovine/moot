@@ -89,11 +89,12 @@ public:
   //------ public data
   ClassfreqTable    lctable;    /**< lexeme->(tag->count) lookup table */
   TagfreqTable      tagtable;   /**< tag->count lookup table */
+  CountT            totalcount; /**< Sum of all counts */
 
 public:
   //------ public methods
   /** Default constructor */
-  mootClassfreqs(size_t initial_bucket_count=0)
+  mootClassfreqs(size_t initial_bucket_count=0) : totalcount(0)
   {
     if (initial_bucket_count != 0) {
       lctable.resize(initial_bucket_count);
@@ -142,6 +143,9 @@ public:
     } else {
       tagtable[tag] = count;
     }
+
+    //-- adjust total token-count
+    totalcount += count;
   };
 
   //------ public methods: lookup

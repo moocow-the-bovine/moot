@@ -16,7 +16,9 @@
 ##-----------------------------------------------------------------------
 
 ## --- manpages (section 1)
-man1_MANS = @DOC_PROG_MAN_TARGETS@
+man1_MANS = @DOC_PROG_MAN1_TARGETS@
+
+man5_MANS = @DOC_PROG_MAN5_TARGETS@
 
 pkgdocprog_DATA = \
 	@DOC_PROG_TXT_TARGETS@ \
@@ -29,26 +31,26 @@ pkgdocprog_DATA = \
 ## sources
 ##-----------------------------------------------------------------------
 
-SUFFIXES = .gog .pod .txt .1 .html .tex .dvi .ps .pdf
+SUFFIXES = .gog .pod .txt .1 .5 .html .tex .dvi .ps .pdf
 
 ##-----------------------------------------------------------------------
 ## local hooks
 ##-----------------------------------------------------------------------
 all-local: $(man_MANS)
 
-txt: $(moot_program_gogs:.gog=.txt)
+txt: $(moot_pods:.pod=.txt)
 
-man: $(moot_program_gogs:.gog=.1)
+man: $(man1_MANS) $(MAN5_MANS)
 
-html: $(moot_program_gogs:.gog=.html)
+html: $(moot_pods:.pod=.html)
 
-latex: $(moot_program_gogs:.gog=.tex)
+latex: $(moot_pods:.pod=.tex)
 
-dvi: $(moot_program_gogs:.gog=.dvi)
+dvi: $(moot_pods:.pod=.dvi)
 
-ps: $(moot_program_gogs:.gog=.ps)
+ps: $(moot_pods:.pod=.ps)
 
-pdf: $(moot_program_gogs:.gog=.pdf)
+pdf: $(moot_pods:.pod=.pdf)
 
 
 ##-----------------------------------------------------------------------
@@ -66,11 +68,16 @@ OPTGENFLAGS = -l
 ## pod conversion rules
 ##-----------------------------------------------------------------------
 
-POD2MANFLAGS = --center="moocow's PoS Tagging Tools"
+POD2MANFLAGS = \
+	--center="moot PoS Tagger" \
+	--release="moot v$(VERSION)"
 POD2HTMLFLAGS = --podpath="$(srcdir):." --htmlroot="."
 
 .pod.1:
 	$(POD2MAN) $(POD2MANFLAGS) --section=1 $< $@
+
+.pod.5:
+	$(POD2MAN) $(POD2MANFLAGS) --section=5 $< $@
 
 .pod.txt:
 	$(POD2TEXT) $< $@
@@ -104,8 +111,8 @@ POD2HTMLFLAGS = --podpath="$(srcdir):." --htmlroot="."
 
 ## --- clean:  built by 'make'
 CLEANFILES = \
-	$(filter-out acknowledge.pod,$(wildcard *.pod)) \
-	*.man *.1 *.html *.txt *.tex *.dvi *.ps *.pdf \
+	$(moot_program_gogs:.gog=.pod) \
+	*.man *.1 *.5 *.html *.txt *.tex *.dvi *.ps *.pdf \
 	*.log *.aux *.toc *.idx *~~ *.tmp
 
 ## --- distclean: built by 'configure'
@@ -125,7 +132,8 @@ MAINTAINERCLEANFILES = \
 EXTRA_DIST = \
 	@DOC_PROG_TXT_TARGETS@ \
 	@DOC_PROG_MAN_TARGETS@ \
-	@DOC_PROG_HTML_TARGETS@
+	@DOC_PROG_HTML_TARGETS@ \
+	mootfiles.pod
 
 ## --- recursion subdirectories for 'make dist'
 #DIST_SUBDIRS = $(SUBDIRS)
