@@ -44,9 +44,17 @@ share-dwdst
 *.hmm-dump
 *.chmm-dump
 *.tnt-tt
+*.vtt
+*-vtt
 *_vs_*
 *1
 *2
 *3
 *4
 *.txt
+hack
+tmp
+*.dat
+get*.perl
+argh.out
+savemore

@@ -1,0 +1,106 @@
+
+from lexprobs.perl:
+p_lex( lachen | vvinf ) = 6.4599e-04 	; p_uni( vvinf ) = 1.4522e-02 	; product = 9.3813e-06
+p_lex( lachen | vvfin ) = 1.5448e-04 	; p_uni( vvfin ) = 4.0487e-02 	; product = 6.2542e-06
+p_lex( lachen | nn )    = 4.5145e-05 	; p_uni( nn )    = 2.0780e-01 	; product = 9.3813e-06
+
+
+LEXTOTAL = 319785 ; UGTOTAL =, 319785
+
+----
+from utrain.lc.dump [default args]
+(global)
+nglambda1	-2.15139 (=0.116322)
+nglambda2	-1.16952 (=0.310515)
+nglambda3	-0.556585 (=0.573163)
+wlambda0	-12.6754 (=3.1271e-06)
+wlambda1	-3.09945e-06 (=0.999997)
+
+(lex)
+19693("lachen")	2("nn")		-9.93875	4.82676e-05
+19693("lachen")	9("vvfin")	-8.75543	0.000157603
+19693("lachen")	4("vvinf")	-7.33989	0.00064912
+
+(uni)
+0("UNKNOWN")	0("UNKNOWN")	2("nn")		-3.83229	0.0216601
+0("UNKNOWN")	0("UNKNOWN")	4("vvinf")	-6.49319	0.00151371
+0("UNKNOWN")	0("UNKNOWN")	9("vvfin")	-5.4679		0.00422008
+
+----
+from utrain.lc.dump [-N1,0,0 -W0,1]
+nglambda1	0.000000e+00 (=1.000000e+00)
+nglambda2	-inf (=nan)
+nglambda3	-inf (=nan)
+wlambda0	-inf (=nan)
+wlambda1	0.000000e+00 (=1.000000e+00)
+
+19693("lachen")	2("nn")		-1.000562e+01	4.514537e-05
+19693("lachen")	9("vvfin")	-8.775473e+00	1.544759e-04
+19693("lachen")	4("vvinf")	-7.344719e+00	6.459949e-04
+
+0("UNKNOWN")	0("UNKNOWN")	2("nn")		-1.571169e+00	2.078021e-01
+0("UNKNOWN")	0("UNKNOWN")	9("vvfin")	-3.206785e+00	4.048658e-02
+0("UNKNOWN")	0("UNKNOWN")	4("vvinf")	-4.232073e+00	1.452226e-02
+
+---
+##: prefer:
+##   + adja  >~ adjd   (sent  7: "heftiger": .lex:adja,adjd)
+##   + nn    >~ adja   (sent 54: "gewissen": .lex:adja,nn)
+##   + vvinf >~ nn     (sent 68: "lachen"  : .lex:nn,vvfin,vvinf)
+##: inferred order:
+##   + vvinf >~ nn >~ adja >~ adjd
+##: how?
+##   + !alphabetic_sort/tag         ("gewissen": nn   >~ adja) 
+##   + !reverse_alphabetic_sort/tag ("heftiger": adja >~ adjd)
+##
+##   + !p_word           	("heftiger": p(w|adja) =5.39e-05 >~ p(w|adjd)=1.57e-04)
+##   + !reverse_p_word          ("lachen"  : p(w|vvinf)=6.46e-04 >~ p(w|nn)  =4.51e-05)
+##
+##   + !p_uni                   ("lachen"  : p(vvinf)=1.45e-02   >~ p(nn)  =2.08e-02)
+##   + !reverse_p_uni           ("heftiger": p(adja) =5.80e-02   >~ p(adjd)=1.20e-02)
+##
+##   + !lex_count               (all equal)
+##   + !uni_count               (equivalent to p_uni)
+##
+##   + !lex_suborder            (equivalent to alphabetic_sort/tag)
+##   + !reverse_lex_suborder    (equivalent to reverse_alphabetic_sort/tag)
+##
+##   + !123_file_order          ("lachen"  : vvinf >~ nn)
+##   + !reverse_123_file_order  ("heftiger": adja  >~ adjd)
+##
+##   + !lex_file_order          ("lachen"  : vvinf >~ nn)
+##   + !reverse_lex_file_order  ("gewissen": nn    >~ adja)
+##
+##   + !tnt_123_file_order      ("gewissen": nn    >~ adja)
+##   + !rev_tnt_123_file_order  ("heftiger": adja  >~ adjd)
+##
+##   + !tnt_lex_file_order      ("lachen"  : vvinf >~ nn)
+##   + !rev_tnt_lex_file_order  ("heftiger": adja  >~ adjd)
+
+##-- (?) locations (utrain.lc.tnt.123)
+adja  @  8
+nn    @  9
+vvfin @ 10
+adjd  @ 21
+vvinf @ 55
+
+##-- (?) locations (utrain.lc.tnt.lex)
+adja  @    7.1
+adjd  @    8.2
+nn    @    8.5
+vvfin @   97.1
+vvinf @ 1380.1
+
+##-- (?) locations (utrain.lc.123)
+adja  @ 14
+adjd  @ 15
+nn    @ 27
+vvfin @ 40
+vvinf @ 42
+
+##-- (?) locations (utrain.lc.lex)
+nn    @ 9
+adja  @ 38
+vvfin @ 93
+adjd  @ 265
+vvinf @ 1381
