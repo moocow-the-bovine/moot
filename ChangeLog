@@ -1,5 +1,8 @@
 ChangeLog for package moot
 
+v1.0.5 Fri, 21 May 2004 14:14:31 +0200
+  + extracting FSM dependencies to 'mootm' package
+	
 moot-v1.0.4 Fri, 12 Dec 2003 02:06:59 +0100
   + renamed from 'dwdst' to 'moot'
   + added additional detection routines for libFSM >= v0.1.1.1

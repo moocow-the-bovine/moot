@@ -1,8 +1,8 @@
 /*-*- Mode: Flex++ -*-*/
 
 /*
-   libmoot version 1.0.4 : moocow's part-of-speech tagging library
-   Copyright (C) 2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   libmoot : moocow's part-of-speech tagging library
+   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@
     char *stringbuf; \
   public: \
     /** virtual destructor to shut up gcc */\
-    virtual ~mootNgramsLexer(void) {};\
+    virtual ~mootNgramsLexer(void) {}; \
     /** use stream input */\
     void select_streams(FILE *in=stdin, FILE *out=stdout); \
     /** use string input */\
@@ -79,7 +79,7 @@
 
 %define CONSTRUCTOR_INIT :\
   theLine(1), \
-  theColumn(1), \
+  theColumn(0), \
   use_string(false), \
   stringbuf(NULL)
 

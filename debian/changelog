@@ -1,3 +1,9 @@
+moot (1.0.5) unstable; urgency=low
+
+  * removing FSM dependencies to package 'mootm'
+
+ -- Bryan Jurish <moocow@ling.uni-potsdam.de>  Fri, 21 May 2004 14:17:07 +0200
+
 moot (1.0.4) unstable; urgency=low
 
   * renamed to "moot" from "dwdst".

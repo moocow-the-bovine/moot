@@ -1,8 +1,8 @@
 /*-*- Mode: C++ -*-*/
 
 /*
-   libmoot version 1.0.4 : moocow's part-of-speech tagging library
-   Copyright (C) 2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   libmoot : moocow's part-of-speech tagging library
+   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -39,6 +39,8 @@
 #include <map>
 #include <set>
 
+#include "mootToken.h"
+
 #if defined(__GNUC__)
 #  if __GNUC__ >= 3
 #    if __GNUC_MINOR__ == 0
@@ -53,21 +55,26 @@
 #    include <hash_map>
 #    include <hash_set>
 #  endif /* __GNUC__ >= 3 */
+
+/*-- hack for string hashing --*/
+namespace moot_STL_NAMESPACE {
+      template<> struct hash<std::string> {
+        std::size_t operator()(const std::string &__s) const {
+          return __stl_hash_string(__s.c_str());
+        }
+      };
+};
+
 #else  /* defined(__GNUC__) */
 #  include <hash_map>
 #  include <hash_set>
 #  define moot_STL_NAMESPACE std
 #endif /* defiend(__GNUC__) */
 
-#include <mootFSM.h>
-
 /** Maximum weight */
 #ifndef MAXFLOAT
 #include <values.h>
 #endif
-
-/** Whether to load symspecs in AT&T-compatibility mode */
-#define moot_SYM_ATT_COMPAT true
 
 /* Namespace definitions: not yet ready */
 #define moot_NAMESPACE moot
@@ -85,12 +92,6 @@ using namespace moot_STL_NAMESPACE;
 /*----------------------------------------------------------------------
  * Basic Types
  *----------------------------------------------------------------------*/
-
-/** Tag-string type */
-typedef string mootTagString;
-
-/** Token-string type */
-typedef string mootTokString;
 
 /** Count types (for raw frequencies) */
 typedef float CountT;
@@ -159,47 +160,6 @@ typedef float CountT;
 
 //}; //-- namespace mootTokUtils
 
-/*----------------------------------------------------------------------
- * Symbol Vectors (binary)
- *----------------------------------------------------------------------*/
-
-/** \brief unused
- *
- *  STL symbol-vector utilities
- */
-class mootSymbolVectorUtils {
-public:
-    struct HashFcn {
-	inline size_t operator()(const FSM::FSMSymbolVector &x) const {
-	    size_t hv = 0;
-	    for (FSM::FSMSymbolVector::const_iterator xi = x.begin(); xi != x.end(); xi++) {
-		hv += 5*hv + *xi;
-	    }
-	    return hv;
-	}
-    };
-    struct EqualFcn {
-	inline size_t operator()(const FSM::FSMSymbolVector &x, const FSM::FSMSymbolVector &y) const
-	{
-	    return x==y;
-	}
-    };
-};
-
-/*----------------------------------------------------------------------
- * Symbol Vector -> Symbol mapping
- *----------------------------------------------------------------------*/
-
-/** \brief unused
- *
- * Maps a symbol-vector (sorted ambiguity-set) to a single symbol (ambiguity class)
- */
-typedef
-  hash_map<FSM::FSMSymbolVector,
-	   FSMSymbol,
-	   mootSymbolVectorUtils::HashFcn,
-	   mootSymbolVectorUtils::EqualFcn>
-  mootSymbolVector2SymbolMap;
 
 moot_END_NAMESPACE
 

@@ -16,6 +16,8 @@ mootPPLexer.cc
 mootPPLexer.h
 mootTaggerLexer.cc
 mootTaggerLexer.h
+mootTokenLexer.cc
+mootTokenLexer.h
 mootTaglistLexer.cc
 mootTaglistLexer.h
 mootParamLexer.cc

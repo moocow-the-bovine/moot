@@ -8,7 +8,7 @@ Package: moot
 Section: devel
 Architecture: any
 Depends: ${shlibs:Depends}
-Description: moocow's part-of-speech tagger using libFSM.
+Description: moocow's part-of-speech tagger.
 
 Package: moot-doc
 Section: doc

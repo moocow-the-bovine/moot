@@ -1,4 +1,4 @@
-usr/bin/dwds*
-usr/lib/libmoot*
-usr/lib/pkgconfig/moot*
-usr/share/man/man1/dwds*
+usr/bin/moot[^m]*
+usr/lib/libmoot[^m]*
+usr/lib/pkgconfig/moot[^m]*
+usr/share/man/man1/moot[^m]*

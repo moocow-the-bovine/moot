@@ -37,8 +37,8 @@ lib_LTLIBRARIES = libmoot.la
 #${prog_i}_SOURCES =
 #${lib_i}_la_SOURCES =
 libmoot_la_SOURCES = \
-	mootFSM.cc \
-	mootTaggerLexer.cc \
+	mootTokenIO.cc \
+	mootTokenLexer.cc \
 	mootPPLexer.cc \
 	mootNgrams.cc \
 	mootNgramsLexer.cc \
@@ -48,19 +48,26 @@ libmoot_la_SOURCES = \
 	mootLexfreqsLexer.cc \
 	mootLexfreqsParser.cc \
 	mootLexfreqsCompiler.cc \
-	mootMorph.cc \
+	mootHMM.cc \
+	mootHMMTrainer.cc
+
+#	mootCHMM.cc
+#	mootTokenParser.cc 
+
+libmoot_la_SOURCES_old = \
+	mootTokenLexer.cc \
+	mootPPLexer.cc \
+	mootNgrams.cc \
+	mootNgramsLexer.cc \
+	mootNgramsParser.cc \
+	mootNgramsCompiler.cc \
+	mootLexfreqs.cc \
+	mootLexfreqsLexer.cc \
+	mootLexfreqsParser.cc \
+	mootLexfreqsCompiler.cc \
 	mootHMM.cc \
 	mootCHMM.cc \
 	mootHMMTrainer.cc
-
-libmoot_old = \
-	mootTagger.cc \
-	mootTaglistLexer.cc \
-	mootTrainer.cc \
-	mootAlphabetLexer.cc \
-	mootAlphabetParser.cc \
-	mootAlphabetCompiler.cc \
-	mootDisambiguator.cc
 
 
 ## --- Extra (possible) sources
@@ -90,6 +97,16 @@ mootLexfreqsLexer.cc: $(FLEXXX_DEPS)
 mootLexfreqsParser.h: $(BISONXX_DEPS)
 mootLexfreqsParser.cc: $(BISONXX_DEPS)
 
+mootTokenLexer.lo: mootTokenLexer.h
+mootTokenLexer.o: mootTokenLexer.h
+mootTokenIO.lo: mootTokenLexer.h
+mootTokenIO.o: mootTokenLexer.h
+#mootTokenLexer.lo: mootTokenLexer.h mootTokenParser.h
+#mootTokenLexer.o: mootTokenLexer.h mootTokenParser.h
+#mootTokenLexer.h: $(FLEXXX_DEPS)
+#mootTokenLexer.cc: $(FLEXXX_DEPS)
+#mootTokenParser.h: $(BISONXX_DEPS)
+#mootTokenParser.cc: $(BISONXX_DEPS)
 
 #mootDisambiguator.o: mootAlphabetCompiler.h
 #mootDisambiguator.lo: mootAlphabetCompiler.h
@@ -109,12 +126,13 @@ mootLexfreqsParser.cc: $(BISONXX_DEPS)
 ## --- installable headers: @includedir@/@pkgname@
 #pkginclude_HEADERS = ${hfile_1} ... ${hfile_N}
 pkginclude_HEADERS = \
+	mootToken.h \
+	mootTokenIO.h \
 	mootBinIO.h \
 	mootBinStream.h \
 	mootEnum.h \
 	mootTypes.h \
-	mootFSM.h \
-	mootTaggerLexer.h \
+	mootTokenLexer.h \
 	mootPPLexer.h \
 	mootNgramsLexer.h \
 	mootNgramsParser.h \
@@ -125,19 +143,10 @@ pkginclude_HEADERS = \
 	mootLexfreqsCompiler.h \
 	mootLexfreqs.h \
 	mootHMM.h \
-	mootMorph.h \
 	mootCHMM.h \
 	mootHMMTrainer.h
 
-pkgheaders_old = \
-	mootTagger.h \
-	mootTrainer.h \
-	mootTaglistLexer.h \
-	mootAlphabetLexer.h \
-	mootAlphabetParser.h \
-	mootAlphabetCompiler.h \
-	mootDisambiguator.h
-
+#	mootTokenParser.h
 
 ## --- no-install headers
 #noinst_HEADERS = nopackage.h
@@ -150,18 +159,18 @@ SRCDIR = @srcdir@
 
 ## --- flex++/bison++ flags
 FLEXXX ?= flex++
-FLEXXX_SKEL = $(SRCDIR)/flexskel.cc
-FLEXXX_HSKEL = $(SRCDIR)/flexskel.h
-FLEXXX_DEPS = $(FLEXXX_SKEL) $(FLEXXX_HSKEL)
-FLEXXX_FLAGS = -8 -S$(FLEXXX_SKEL) -H$(FLEXXX_HSKEL)
-#FLEXXX_FLAGS = -8
+#FLEXXX_SKEL = $(SRCDIR)/flexskel.cc
+#FLEXXX_HSKEL = $(SRCDIR)/flexskel.h
+#FLEXXX_DEPS = $(FLEXXX_SKEL) $(FLEXXX_HSKEL)
+#FLEXXX_FLAGS = -8 -S$(FLEXXX_SKEL) -H$(FLEXXX_HSKEL)
+FLEXXX_FLAGS = -8
 
 BISONXX ?= bison++
-BISONXX_SKEL = $(SRCDIR)/bison.cc
-BISONXX_HSKEL = $(SRCDIR)/bison.h
-BISONXX_DEPS = $(BISONXX_SKEL) $(BISONXX_HSKEL)
-BISONXX_FLAGS = $(BISONXX_DFLAGS) -d -v -S$(BISONXX_SKEL) -H$(BISONXX_HSKEL)
-#BISONXX_FLAGS = -d -v
+#BISONXX_SKEL = $(SRCDIR)/bison.cc
+#BISONXX_HSKEL = $(SRCDIR)/bison.h
+#BISONXX_DEPS = $(BISONXX_SKEL) $(BISONXX_HSKEL)
+#BISONXX_FLAGS = $(BISONXX_DFLAGS) -d -v -S$(BISONXX_SKEL) -H$(BISONXX_HSKEL)
+BISONXX_FLAGS = -d -v
 #BISONXX_FLAGS = --debug -d -v
 
 .ll.h: $(FLEXXX_DEPS)
@@ -183,7 +192,7 @@ BISONXX_FLAGS = $(BISONXX_DFLAGS) -d -v -S$(BISONXX_SKEL) -H$(BISONXX_HSKEL)
 #SRCINCLUDE = $(SRCDIR)/../include
 
 ## --- preprocessor flags
-AM_CPPFLAGS = $(FSM_IFLAGS)
+#AM_CPPFLAGS = $(FSM_IFLAGS)
 
 ## --- compiler flags (c++)
 AM_CXXFLAGS = $(moot_WFLAGS) $(moot_OFLAGS)
@@ -195,16 +204,16 @@ AM_CXXFLAGS = $(moot_WFLAGS) $(moot_OFLAGS)
 ##-----------------------------------------------------------------------
 
 ## --- The most recent interface number that this library implements.
-LIBCUR = 1
-
-## --- The implementation number of the CURRENT interface.
-LIBREV = 1
+LIBCUR = 2
 
 ## --- The difference between the newest and oldest interfaces that this
 ##     library implements.  In other words, the library implements all the
 ##     interface numbers in the range from number `CURRENT - AGE' to
 ##     `CURRENT'.
 LIBAGE = 0
+
+## --- The implementation number of the CURRENT interface.
+LIBREV = 0
 
 ##-----------------------------------------------------------------------
 ## linker flags
@@ -224,7 +233,8 @@ libmoot_la_LDFLAGS = -version-info $(LIBCUR):$(LIBREV):$(LIBAGE)
 #libmoot_la_LDFLAGS =
 #libmoot_la_LIBADD  = -lFSMExt -lFSM -lFSMSymSpec -lbumble++ @STL_LIBS@ -lz
 
-libmoot_la_LIBADD = @FSMEXT_LIBS@
+#libmoot_la_LIBADD = @FSMEXT_LIBS@
+#libmoot_la_LIBADD =
 
 ##-----------------------------------------------------------------------
 ## Variables: cleanup
@@ -242,7 +252,8 @@ libmoot_la_LIBADD = @FSMEXT_LIBS@
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = \
 	*~ .*~ Makefile Makefile.in \
-	mootTaggerLexer.cc mootTaggerLexer.h \
+	mootTokenLexer.cc mootTokenLexer.h \
+	mootTokenParser.cc mootTokenParser.h \
 	mootPPLexer.cc mootPPLexer.h \
 	mootTaglistLexer.cc mootTaglistLexer.h \
 	mootAlphabetLexer.cc mootAlphabetLexer.h \
@@ -261,19 +272,20 @@ MAINTAINERCLEANFILES = \
 
 ## --- extra distribution files
 EXTRA_DIST = \
-	mootTaggerLexer.ll \
 	mootPPLexer.ll \
+	mootTokenLexer.ll \
 	mootNgramsLexer.ll \
 	mootNgramsParser.yy \
 	mootLexfreqsLexer.ll \
-	mootLexfreqsParser.yy \
-	flexskel.cc flexskel.h \
-	bison.cc bison.h
+	mootLexfreqsParser.yy
 
 dist_old = \
+	mootTokenParser.yy \
 	mootTaglistLexer.ll \
 	mootAlphabetLexer.ll \
-	mootAlphabetParser.yy
+	mootAlphabetParser.yy \
+	flexskel.cc flexskel.h \
+	bison.cc bison.h
 
 
 #	moot.sym 

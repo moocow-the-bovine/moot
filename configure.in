@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [1.0.4])
+define([THE_PACKAGE_VERSION], [2.0.0])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
@@ -114,98 +114,48 @@ AC_CHECK_HEADERS([time.h sys/time.h],
 dnl time headers
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
-dnl ------------------------------------------------------------
-dnl libFSM (user argument + pkg-config)
+dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+dnl check for zlib
 dnl
-AC_ARG_ENABLE(fsm,
-	AC_HELP_STRING([--disable-fsm],
-		[Disable use of of Thomas Hanneforth's FSMlib (some functionality lost)]),
-	[ac_cv_enable_fsm="$enableval"], [ac_cv_enable_fsm="yes"])
+AC_ARG_WITH(zlib-include,
+	AC_HELP_STRING([--with-zlib-include=DIR],
+		[specify location of zlib headers (default=none)]),
+	[ac_cv_zlib_iflags="-I$withval"])
+if test -n "$ac_cv_zlib_iflags" ; then
+  CPPFLAGS="$CPPFLAGS $ac_cv_zlib_iflags"
+fi
 
-if test "$ac_cv_enable_fsm" = "yes" ; then
-  PKG_CHECK_MODULES(FSMLIB, libFSM >= 0.1.0.6,
-	[PC_HAVE_FSMLIB="yes"],
-	[PC_HAVE_FSMLIB=""])
-  
-  if test -z "$PC_HAVE_FSMLIB" ; then
-    ac_cv_enable_fsm="no"
-    ac_cv_fsm_version="-1"
-    enable_fsm_errors="$PKG_CONFIG_ERRORS"
-  else
-    ac_cv_fsm_version=`pkg-config --modversion libFSM`
+dnl zlib: headers
+for h in zlib.h ; do
+  AC_CHECK_HEADER($h,
+	[fsm_have_header="yes"], [fsm_have_header="no"], [ ])
+  if test "$fsm_have_header" = "no" ; then
+    AC_MSG_WARN([Required zlib header '$h' not found!])
+    AC_MSG_WARN([Are the zlib headers in your 'CPPFLAGS' environment variable?])
+    AC_MSG_ERROR([Required package not found -- aborting.])
   fi
+done
+
+dnl zlib: library
+AC_ARG_WITH(zlib-libdir,
+	AC_HELP_STRING([--with-zlib-libdir=DIR],
+		       [specify location of zlib library (default=none)]),
+	[ac_cv_zlib_libdir="$withval"])
+
+if test -n "$ac_cv_zlib_libdir" -a "$ac_cv_zlib_libdir" != "no" ; then
+  LDFLAGS="$LDFLAGS -L$ac_cv_zlib_libdir"
+fi
+
+dnl zlib: library: compile
+AC_CHECK_LIB(z,deflate,[ac_cv_have_libz="yes"])
+if test "$ac_cv_have_libz" != "yes" ; then
+  AC_MSG_WARN([zlib library (-lz) not found!])
+  AC_MSG_WARN([Is the directory containing 'libz.a' in your LDFLAGS environment variable?])
+  AC_MSG_ERROR([Required package not found -- aborting.])
 else
-  enable_fsm_errors="(disabled by user)"
-fi ## test "$ac_cv_enable_fsm" = "yes"
-
-dnl AC_SUBST(FSM_LIBS)
-
-dnl libFSM
-dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-# ------------------------------------------------------------
-# libFSMext (via pkg-config)
-
-case "$ac_cv_fsm_version" in
-  0.1.0.*)
-    PKG_CHECK_MODULES(FSMEXT, libFSMext >= 0.0.1,
-	[PC_HAVE_LIBFSMEXT=1],
-	[PC_HAVE_LIBFSMEXT=""])
-    if test "$ac_cv_enable_fsm" = "yes" -a -n "$PC_HAVE_LIBFSMEXT" ; then
-       CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I libFSMext`"
-       LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L libFSMext`"
-       FSMEXT_LIBS="`$PKG_CONFIG --libs-only-l libFSMext`"
-    elif test "$ac_cv_enable_fsm" = "yes" ; then
-       ac_cv_enable_fsm="no"
-       enable_fsm_errors="$PKG_CONFIG_ERRORS"
-    fi
-    FSM_API_REVISION=0
-    ;;
-
-  0.1.1.*)
-    CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I libFSM`"
-    LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L libFSM`"
-    FSMEXT_LIBS="`$PKG_CONFIG --libs-only-l libFSM`"
-    FSM_API_REVISION=1
-    ;;
-
-  *)
-     FSM_API_REVISION=-1
-
-     ##-- check for zlib
-     AC_CHECK_LIB(z,deflate,[ac_cv_have_libz="yes"])
-     if test "$ac_cv_have_libz" != "yes" ; then
-       AC_MSG_WARN([zlib library (-lz) not found!])
-       AC_MSG_WARN([Is the directory containing 'libz.a' in your LDFLAGS environment variable?])
-       AC_MSG_ERROR([Required package not found -- aborting.])
-     else
-       LIBS="$LIBS -lz"
-     fi
+  LIBS="$LIBS -lz"
+fi
 dnl zlib
-dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-     ;;
-esac
-AC_SUBST(FSMEXT_LIBS)
-dnl libFSMext
-dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-dnl ------------------------------------------------------------
-dnl libFSM (defines)
-if test "$ac_cv_enable_fsm" = "yes" ; then
-    AC_DEFINE([HAVE_LIBFSM],1,[Define this to use Thomas Hanneforth's libFSM])
-    AC_DEFINE_UNQUOTED([FSM_API_REVISION], $FSM_API_REVISION, [The revision of your libFSM API])
-else
-    AC_MSG_WARN()
-    AC_MSG_WARN()
-    AC_MSG_WARN(Use of libFSM disabled -- some functionality will be lost!)
-    AC_MSG_WARN(Errors: $enable_fsm_errors)
-    AC_MSG_WARN()
-    AC_MSG_WARN()
-fi ; ## "$ac_cv_enable_fsm" != "yes"
-
-dnl libFSM (defines)
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
@@ -222,8 +172,8 @@ PKG_CHECK_MODULES(FBXX, flex++bison++ >= 0.0.5,
 if test "$ac_cv_have_pkg_fbxx" = "yes"; then
   PATH="$PATH:`$PKG_CONFIG --variable=prefix flex++bison++`/bin"
   export PATH
-  ###--- libFSMext should already get us this ---
-  #CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I flex++bison++`"
+  ###--- libFSMext would already get us this, but it's being removed ---
+  CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I flex++bison++`"
 fi
 
 
@@ -362,7 +312,8 @@ if test "$moot_doc_formats" != "none" ; then
 
   ### -- docs: .gog file linkup
   #moot_program_gogs="moot.gog mootpp.gog moot-fstgen.gog moot-pargen.gog"
-  moot_program_gogs="mootpp.gog mootrain.gog moothmm.gog mootm.gog moot.gog"
+  #moot_program_gogs="mootpp.gog mootrain.gog moothmm.gog mootm.gog moot.gog"
+  moot_program_gogs="mootpp.gog mootrain.gog moothmm.gog moot.gog"
   for g in $moot_program_gogs ; do
     AC_CONFIG_LINKS(doc/programs/${g}:src/programs/${g})  
   done
@@ -472,7 +423,7 @@ if test "$moot_doc_formats" != "none" ; then
 
 
   # -- check for tag-files (this needs an overhaul!)
-  for ext in FSM FSMext ; do
+  for ext in mootm ; do
     extdocdir="`$PKG_CONFIG --variable=pkgdocdir lib${ext}`"
     if test -n "$extdocdir" -a "$extdocdir" != "no" ; then
       if test \

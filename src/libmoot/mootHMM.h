@@ -1,7 +1,7 @@
 /* -*- Mode: C++ -*- */
 
 /*
-   libmoot version 1.0.4 : moocow's part-of-speech tagging library
+   libmoot : moocow's part-of-speech tagging library
    Copyright (C) 2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
@@ -34,6 +34,8 @@
 #include <ctype.h>
 
 #include "mootTypes.h"
+#include "mootToken.h"
+#include "mootTokenIO.h"
 #include "mootLexfreqs.h"
 #include "mootNgrams.h"
 #include "mootEnum.h"
@@ -328,8 +330,8 @@ protected:
   /*---------------------------------------------------------------------*/
   /** \name Low-level tagging data */
   //@{
-  vector<mootTokString> tokens;  /**< Temporarily stores input tokens for tag_stream() */
-  set<TagID>             curtags; /**< Temporarily stores input token-tags for tag_stream() */
+  //vector<mootTokString> tokens;  /**< Temporarily stores input tokens for tag_stream() */
+  //set<TagID>             curtags; /**< Temporarily stores input token-tags for tag_stream() */
   //@}
 
 public:
@@ -594,11 +596,38 @@ public:
   };
 
   //------------------------------------------------------------
+  // public methods: high-level: Viterbi: single iteration: (mootToken)
+
+  /**
+   * Step a single Viterbi iteration, mootToken version.
+   * Really just a wrapper for viterbi_step(TokID tokid,set<TagID>).
+   */
+  inline void viterbi_step(const mootToken &token) {
+    if (token.analyses.empty()) {
+      viterbi_step(token.toktext);
+    }
+    else {
+      set<TagID> tok_tagids;
+      for (mootToken::AnalysisSet::const_iterator ani = token.analyses.begin();
+	   ani != token.analyses.end();
+	   ani++)
+	{
+	  tok_tagids.insert(tagids.name2id(ani->tag));
+	}
+      viterbi_step(token2id(token.toktext), tok_tagids);
+    }
+  };
+
+
+  //------------------------------------------------------------
   // public methods: high-level: Viterbi: single iteration: (TokString)
 
   /**
+   * \bold DEPRECATED
+   *
    * Step a single Viterbi iteration, string version.
    * Really just a wrapper for viterbi_step(TokID tokid).
+   *
    */
   inline void viterbi_step(const mootTokString &token) {
     return viterbi_step(token2id(token));
@@ -606,7 +635,7 @@ public:
 
 
   //------------------------------------------------------------
-  // public methods: high-level: Viterbi: single iteration: (TokID,set<TagID>)
+  // public methods: mid-level: Viterbi: single iteration: (TokID,set<TagID>)
 
   /**
    * Step a single Viterbi iteration, considering only the tags
@@ -672,6 +701,8 @@ public:
   // public methods: high-level: Viterbi: single iteration: (TokString,set<TagString>)
 
   /**
+   * \bold DEPRECATED
+   *
    * Step a single Viterbi iteration, considering only the tags in 'tags'.
    */
   inline void viterbi_step(const mootTokString &token, const set<mootTagString> &tags)
@@ -1103,36 +1134,11 @@ public:
   void tag_strings(int argc, char **argv, FILE *out=stdout, char *infilename=NULL);
 
   /**
-   * Top-level tagging interface: dump best path.
-   * Requires populated 'tokens' vector)
+   * Mid-level tagging interface: mark 'best' tags in sentence
+   * structure: fills 'besttag' data member of each 'mootToken' element
+   * of 'sentence'.
    */
-  inline void tag_print_best_path(FILE *out=stdout)
-  {
-    //-- populate 'vbestpath' with (ViterbiPathNode*)s
-    ViterbiPathNode *pnod = viterbi_best_path();
-    vector<mootTokString>::const_iterator toki;
-
-    if (pnod) pnod = pnod->path_next;  //-- skip boundary tag
-
-    for (toki = tokens.begin(); toki != tokens.end(); toki++) {
-      fputs(toki->c_str(), out);
-      fputc('\t', out);
-
-      if (pnod && pnod->node) {
-	fputs(tagids.id2name(pnod->node->tagid).c_str(), out);
-	pnod = pnod->path_next;
-      }
-      else {
-	//-- this should never actually happen, but it has...
-	carp("%s: Error: no best tag for token '%s'!\n",
-	     "mootHMM::tag_print_best_path()", toki->c_str());
-	fputs(tagids.id2name(0).c_str(), out); //-- use 'unknown' tag
-      }
-
-      fputc('\n', out);
-    }
-    fputc('\n', out);
-  };
+  void tag_mark_best(mootSentence &sentence);
   //@}
 
 

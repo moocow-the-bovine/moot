@@ -39,6 +39,7 @@ vpath %.h $(DOXY_INCLUDES)
 
 DOXY_INPUTS = \
 	mainpage.dox \
+	mootToken.h mootTokenIO.h mootTokenLexer.h \
 	mootBinStream.h \
 	mootBinIO.h \
 	mootConfig.h \
@@ -49,18 +50,10 @@ DOXY_INPUTS = \
 	mootNgramsLexer.h	mootNgramsParser.h	mootNgramsCompiler.h	\
 	mootNgrams.h \
 	mootPPLexer.h \
-	mootTaggerLexer.h \
-	mootMorph.h \
 	mootHMM.h \
 	mootCHMM.h
 
-DOXY_INPUTS_old = \
-	mootCHMM.h \
-	mootTagger.h \
-	mootTaglistLexer.h \
-	mootParamLexer.h \
-	mootParamParser.h \
-	mootTaglistLexer.h
+#	mootMorph.h
 
 #-----------------------------------------------------------------------
 # Additional dependencies

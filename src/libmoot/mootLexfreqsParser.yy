@@ -1,8 +1,8 @@
 /*-*- Mode: Bison++ -*-*/
 
 /*
-   libmoot version 1.0.4 : moocow's part-of-speech tagging library
-   Copyright (C) 2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   libmoot : moocow's part-of-speech tagging library
+   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -42,8 +42,8 @@
 // -- use pure-function errors
 /* %define ERROR_BODY =0 */
 
-// -- use inline error-reporting
-%define ERROR_BODY { yycarp("mootLexfreqsParser: Error: %s", msg); }
+// -- use inline error-reporting : gotta do this below, 'cause msg ain't declared
+/* %define ERROR_BODY { yycarp("mootLexfreqsParser: Error: %s", msg); } */
 
 // -- use pure-function lexer body
 //%define LEX_BODY =0
@@ -101,7 +101,7 @@ typedef struct {
    /** a pointer to the lexfreq-parameter object to hold the data we're parsing */ \
    moot::mootLexfreqs        *lexfreqs; \
    /* to keep track of all possible tags we've parsed (optional). */ \
-   set<moot::mootTagString>  *alltags; \
+   std::set<moot::mootTagString>  *alltags; \
   private: \
    /* private instance members go here */ \
   public: \
@@ -221,6 +221,11 @@ newline:	'\n' { $$=0; }
 /*----------------------------------------------------------------
  * Error Methods
  *----------------------------------------------------------------*/
+
+void mootLexfreqsParser::yyerror(char *msg)
+{
+    yycarp("mootLexfreqsParser: Error: %s\n", msg);
+}
 
 void mootLexfreqsParser::yycarp(char *fmt, ...)
 {

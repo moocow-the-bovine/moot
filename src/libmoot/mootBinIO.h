@@ -1,8 +1,8 @@
 /* -*- Mode: C++ -*- */
 
 /*
-   libmoot version 1.0.4 : moocow's part-of-speech tagging library
-   Copyright (C) 2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   libmoot : moocow's part-of-speech tagging library
+   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -40,11 +40,9 @@
 //#include <hash_map>
 //#include <hash_set>
 #include <mootTypes.h>
-#include <mootFSM.h>
 
 #include <mootEnum.h>
-#include <mootMorph.h>
-#include <mootCHMM.h>
+//#include <mootCHMM.h>
 
 #include <mootBinStream.h>
 
@@ -375,30 +373,6 @@ namespace mootBinIO {
   };
 
   /*------------------------------------------------------------
-   * FSM types: FSMWeightedIOPair
-   */
-  template<class StrType>
-  class Item<FSM::FSMWeightedIOPair<StrType> > {
-  public:
-    Item<StrType>   string_item;
-    Item<FSMWeight> weight_item;
-  public:
-    inline bool load(iBinStream &is, FSM::FSMWeightedIOPair<StrType> &x) const
-    {
-      return (string_item.load(is, x.istr)
-	      && string_item.load(is, x.ostr)
-	      && weight_item.load(is, x.weight));
-    };
-
-    inline bool save(oBinStream &os, const FSM::FSMWeightedIOPair<StrType> &x) const
-    {
-      return (string_item.save(os, x.istr)
-	      && string_item.save(os, x.ostr)
-	      && weight_item.save(os, x.weight));
-    };
-  };
-
-  /*------------------------------------------------------------
    * moot types: mootEnum
    */
   template<class NameT, class HashFunc, class NameEqlFunc>
@@ -431,6 +405,7 @@ namespace mootBinIO {
   /*------------------------------------------------------------
    * moot types: mootCHMM::TagMorphAnalysisSet
    */
+    /*
   template<>
   class Item<mootCHMM::TagMorphAnalysisSet> {
   public:
@@ -447,46 +422,7 @@ namespace mootBinIO {
       return aset_item.save(os, x.analyses) && weight_item.save(os, x.weight);
     };
   };
-
-
-  /*------------------------------------------------------------
-   * moot types: mootMorph (HACK!)
-   */
-  template<>
-  class Item<mootMorph> {
-  public:
-    Item<string> string_item;
-    Item<bool>   bool_item;
-    Item<int>    int_item;
-  public:
-    inline bool load(iBinStream &is, mootMorph &x) const
-    {
-      return (bool_item.load(is, x.want_avm)
-	      && bool_item.load(is, x.want_mabbaw_format)
-	      && bool_item.load(is, x.do_dequote)
-	      && int_item.load(is, x.verbose)
-	      && string_item.load(is, x.syms_filename)
-	      && string_item.load(is, x.mfst_filename)
-	      && string_item.load(is, x.xfst_filename)
-	      //&& (x.sym_filename == "" || x.load_morph_symbols())
-	      //&& (x.mfst_filename == "" || x.load_morph_fst())
-	      //&& (x.xfst_filename == "" || x.load_tagx_fst())
-	      );
-    };
-
-    inline bool save(oBinStream &os, const mootMorph &x) const
-    {
-      return (bool_item.save(os, x.want_avm)
-	      && bool_item.save(os, x.want_mabbaw_format)
-	      && bool_item.save(os, x.do_dequote)
-	      && int_item.save(os, x.verbose)
-	      && string_item.save(os, x.syms ? x.syms_filename : string(""))
-	      && string_item.save(os, x.mfst ? x.mfst_filename : string(""))
-	      && string_item.save(os, x.xfst ? x.xfst_filename : string(""))
-	      );
-    };
-  };
- 
+    */
 
   /*------------------------------------------------------------
    * public typedefs: Generic header information

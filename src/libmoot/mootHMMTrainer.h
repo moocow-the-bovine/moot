@@ -1,8 +1,8 @@
 /* -*- Mode: C++ -*- */
 
 /*
-   libmoot version 1.0.4 : moocow's part-of-speech tagging library
-   Copyright (C) 2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   libmoot : moocow's part-of-speech tagging library
+   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  * File: mootHMMTrainer.h
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + Trainer for KDWDS HMM PoS-tagger: shared headers
+ *   + Trainer for moocow's PoS-tagger: shared headers
  *--------------------------------------------------------------------------*/
 
 #ifndef _moot_HMM_TRAINER_H_
@@ -35,6 +35,7 @@
 #include <deque>
 
 #include "mootTypes.h"
+#include "mootToken.h"
 #include "mootLexfreqs.h"
 #include "mootNgrams.h"
 
@@ -234,7 +235,7 @@ public:
   /// \name Reset / Clear
   //@{
   /** Reset / clear the object. */
-  void clear(void)
+  inline void clear(void)
   {
     lexfreqs.clear();
     ngrams.clear();
@@ -255,93 +256,31 @@ public:
   /// \name Mid-level training methods
   //@{
   /** Initialize training data  */
-  inline void train_init(void)
-  {
-    ngset.resize((size_t)kmax);
-    ng.resize((size_t)kmax);
-    train_bos();
-    //-- count one EOS marker (TnT compatibility hack)
-    if (want_ngrams) {
-      ng.clear();
-      ng.push_back(eos_tag);
-      ngrams.add_count(ng,1);
-    }
-  };
+  void train_init(void);
 
   /** Initialize data for training a new sentence  */
-  inline void train_bos(void)
-  {
-    if (want_ngrams) {
-      for (NgramSet::ngsType::iterator ngsi = ngset.ngs.begin(); ngsi != ngset.ngs.end(); ngsi++) {
-	ngsi->clear();
-	ngsi->insert(eos_tag);
-      }
-    }
-  };
+  void train_bos(void);
 
-  /** Gather training information for a single token. */
-  inline void train_token(const mootTokString &curtok, const TagSet &curtags)
-  {
-    CountT count = 1.0 / ((CountT)curtags.size());
-    TagSet::const_iterator cti;
+  /** Gather training information for a single token, using mootToken */
+  void train_token(const mootToken &curtok);
 
-    if (want_lexfreqs) {
-      //-- count lexical frequencies
-      for (cti = curtags.begin(); cti != curtags.end(); cti++) {
-	lexfreqs.add_count(curtok, *cti, count);
-      }
-    }
-
-    if (want_ngrams) _train_token_ng(curtags);
-  };
+  /** Gather training information for a single token
+   *
+   * DEPRECATED in favor of 'mootToken' interface.
+   */
+  void train_token(const mootTokString &curtok, const TagSet &curtags);
 
   /** Gather ngram-training information for a single token. */
-  inline void _train_token_ng(const TagSet &curtags)
-  {
-    if (!want_ngrams) return;
+  void _train_token_ng(const mootToken &curtok);
 
-    //-- count kmax-grams: add in next tagset
-    ngset.step(curtags);
-
-    //-- count all current ngrams
-    NgramSet::ngIterator ngsi;
-    size_t len;
-    CountT ngcount;
-    for (len = 1; len <= kmax; len++) {
-      //-- get count
-      ngcount = 0;
-      for (ngsi = ngset.iter_begin(len); ngset.iter_valid(ngsi); ngset.iter_next(ngsi)) {
-	ngcount++;
-      }
-      ngcount = 1.0/ngcount; //-- normalize
-    
-      //-- count ngrams
-      for (ngsi = ngset.iter_begin(len); ngset.iter_valid(ngsi); ngset.iter_next(ngsi)) {
-	ngset.iter2ngram(ngsi,ng);
-	//-- ignore redundant n-grams for the boundary tag
-	if (len > 1 && ((ng[0] == eos_tag && ng[1] == eos_tag)
-			|| (ng.back() == eos_tag && ng[len-2] == eos_tag)))
-	  continue;
-	ngrams.add_count(ng,ngcount);
-      }
-    }
-
-    //-- hack
-    last_was_eos = false;
-  };
+  /** Gather ngram-training information for a single token.
+   *
+   * DEPRECATED in favor of 'mootToken' interface.
+   */
+  void _train_token_ng(const TagSet &curtags);
 
   /** Gather training information for a sentence boundary. */
-  void train_eos(void)
-  {
-    if (want_ngrams && !last_was_eos) {
-      TagSet eostags;
-      eostags.insert(eos_tag);
-      for (int i = 1; i < kmax; i++) {
-	_train_token_ng(eostags);
-      }
-    }
-    last_was_eos = true;
-  };
+  void train_eos(void);
   //@}
 
   /*------------------------------------------------------------*/

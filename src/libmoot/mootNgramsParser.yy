@@ -1,8 +1,8 @@
 /*-*- Mode: Bison++ -*-*/
 
 /*
-   libmoot version 1.0.4 : moocow's part-of-speech tagging library
-   Copyright (C) 2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   libmoot : moocow's part-of-speech tagging library
+   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@
 // -- ... so we define yyltype ourselves ... (see %header section)
 %define LTYPE mootNgramsParserLType
 
-// -- debugging (see below (where?))
+// -- debugging (no longer compiles without, for some reason)
 %define DEBUG 1
 %define ERROR_VERBOSE
 
@@ -43,7 +43,7 @@
 /* %define ERROR_BODY =0 */
 
 // -- use inline error-reporting
-%define ERROR_BODY { yycarp("mootNgramsParser: Error: %s", msg); }
+/* %define ERROR_BODY { yycarp("mootNgramsParser: Error: %s", msg); } */
 
 // -- use pure-function lexer body
 //%define LEX_BODY =0
@@ -116,13 +116,11 @@ typedef struct {
       yycarp("mootNgramsParser: Warning: %s", msg);\
    }; \
    /** report anything */\
-   virtual void yycarp(char *fmt, ...);
-   
+   virtual void yycarp(char *fmt, ...);   
 
 %define CONSTRUCTOR_INIT : \
    ngrams(NULL), \
    alltags(NULL)
-
 
 /*------------------------------------------------------------
  * Parser Properties
@@ -143,7 +141,7 @@ typedef struct {
 
 // -- Type declarations
 %token <tagstr>  TAG
-%token <count>   COUNT
+%token <count>   COUNT        TAB NEWLINE
 %type  <tagstr>  tag
 %type  <ngram>   ngram ngtag
 %type  <count>   count        tab newline param params
@@ -252,6 +250,11 @@ newline:	'\n' { $$=0; }
 /*----------------------------------------------------------------
  * Error Methods
  *----------------------------------------------------------------*/
+
+void mootNgramsParser::yyerror(char *msg)
+{
+    yycarp("mootNgramsParser: Error: %s\n", msg);
+}
 
 void mootNgramsParser::yycarp(char *fmt, ...)
 {

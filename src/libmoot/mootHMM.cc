@@ -1,8 +1,8 @@
 /* -*- Mode: C++ -*- */
 
 /*
-   libmoot version 1.0.4 : moocow's part-of-speech tagging library
-   Copyright (C) 2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   libmoot : moocow's part-of-speech tagging library
+   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@
 #include <string.h>
 
 #include "mootHMM.h"
-#include "mootTaggerLexer.h"
 
 #include <zlib.h>
 #include "mootBinIO.h"
@@ -505,59 +504,25 @@ bool mootHMM::estimate_wlambdas(const mootLexfreqs &lf)
  *--------------------------------------------------------------------------*/
 void mootHMM::tag_stream(FILE *in, FILE *out, char *srcname)
 {
-  mootTaggerLexer lexer;
+  TokenReader treader;
+  TokenWriter twriter;
 
-  //-- prepare lexer
-  lexer.step_streams(in,out);
-  lexer.theLine   = 1;
-  lexer.theColumn = 0;
+  treader.select_stream(in,srcname);
+  do {
+    viterbi_clear();
+    mootSentence &sent = treader.get_sentence();
+    if (sent.empty()) break;
 
-  //-- prepare variables
-  int tok;
-  tokens.clear();
-  curtags.clear();
-  viterbi_clear();
+    for (mootSentence::const_iterator si = sent.begin(); si != sent.end(); si++) {
+      viterbi_step(*si);
+      ntokens++;
+    }
+    viterbi_finish();
+    tag_mark_best(sent);
+    twriter.sentence_put(out,sent);
+    nsents++;
 
-  while ((tok = lexer.yylex()) != mootTaggerLexer::DTEOF) {
-      switch (tok) {
-
-      case mootTaggerLexer::TOKEN:
-	tokens.push_back((const char *)lexer.yytext);
-	break;
-
-      case mootTaggerLexer::TAG:
-        curtags.insert(tagids.name2id((const char *)lexer.yytext));
-	break;
-
-      case mootTaggerLexer::EOT:
-	if (curtags.empty()) {
-	  viterbi_step(tokens.back());
-	} else {
-	  viterbi_step(token2id(tokens.back()), curtags);
-	  curtags.clear();
-	}
-        ntokens++;
-        break;
-
-      case mootTaggerLexer::EOS:
-	viterbi_finish();
-	tag_print_best_path(out);
-	tokens.clear();
-	curtags.clear();
-	viterbi_clear();
-	nsents++;
-	break;
-
-      default:
-	carp("%s: Error: unknown token '%s' in file '%s' at line %d, column %d\n",
-	     "mootHMM::tag_stream()",
-	     (srcname ? srcname : "(unknown)"),
-	     lexer.yytext,
-	     lexer.theLine,
-	     lexer.theColumn);
-	break;
-      }
-  }
+  } while (1);
 }
 
 
@@ -567,24 +532,43 @@ void mootHMM::tag_stream(FILE *in, FILE *out, char *srcname)
 void mootHMM::tag_strings(int argc, char **argv, FILE *out, char *infilename)
 {
   //-- prepare variables
-  tokens.clear();
-  curtags.clear();
+  mootSentence sent;
   viterbi_clear();
 
   for ( ; --argc >= 0; argv++) {
-    tokens.push_back((const char *)*argv);
-    viterbi_step(tokens.back());
+    sent.push_back(mootToken(mootTokString((const char *)*argv)));
+    viterbi_step(sent.back());
     ntokens++;
   }
   viterbi_finish();
-  tag_print_best_path(out);
+  tag_mark_best(sent);
   nsents++;
-
-  //-- cleanup
-  tokens.clear();
-  curtags.clear();
-  viterbi_clear();
 }
+
+/*--------------------------------------------------------------------------
+ * Mid-level: output
+ *--------------------------------------------------------------------------*/
+void mootHMM::tag_mark_best(mootSentence &sentence)
+{
+  //-- populate 'vbestpath' with (ViterbiPathNode*)s
+  ViterbiPathNode *pnod = viterbi_best_path();
+  mootSentence::iterator senti;
+
+  if (pnod) pnod = pnod->path_next;  //-- skip boundary tag
+
+  for (senti = sentence.begin(); senti != sentence.end(); senti++) {
+    if (pnod && pnod->node) {
+      senti->besttag = tagids.id2name(pnod->node->tagid);
+      pnod = pnod->path_next;
+    }
+    else {
+      //-- this should never actually happen, but it has...
+      carp("%s: Error: no best tag for token '%s'!\n",
+	   "mootHMM::tag_mark_best()", senti->toktext.c_str());
+      senti->besttag = tagids.id2name(0); //-- use 'unknown' tag
+    }
+  }
+};
 
 
 /*--------------------------------------------------------------------------
