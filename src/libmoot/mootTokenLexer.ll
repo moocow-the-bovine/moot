@@ -122,11 +122,11 @@
    bool first_analysis_is_best; \
    /** whether we're parsing a 'best' analysis */\
    bool current_analysis_is_best; \
-   /** whether first analysis parsed should be ignored */ \
+   /** whether to (otherwise) ignore first analysis */ \
    bool ignore_first_analysis; \
-   /** whether we're parsing an analysis to be ignored */\
+   /** whether to ignore current analysis */\
    bool ignore_current_analysis; \
-   \
+  \
    /* -- token-buffering */\
    /** token-buffer */\
    std::string itokbuf;\
@@ -161,8 +161,6 @@
   lasttyp(TLEOS), \
   first_analysis_is_best(false), \
   current_analysis_is_best(false), \
-  ignore_first_analysis(false), \
-  ignore_current_analysis(false), \
   itokbuf_clear(true), \
   srcname("(unknown)"),\
   use_string(false), \

@@ -79,25 +79,11 @@ string TokenWriter::token_string(const mootToken &token)
 {
   string s = token.text();
 
-  //-- best tag is always first 'analysis'
+  //-- best tag is always standalone first 'analysis'
   s.push_back('\t');
   s.append(token.besttag());
 
-  if (want_tags_only) {
-      //-- +tags,-best: tags-only, all possibilities
-      set<mootTagString> tagset;
-      token.tokExport(NULL,&tagset);
-      for (set<mootTagString>::const_iterator tsi = tagset.begin();
-	   tsi != tagset.end();
-	   tsi++)
-	{
-	  s.push_back('\t');
-	  if (*tsi == token.besttag()) s.push_back('/');
-	  s.append(*tsi);
-	}
-    } //-- /+tags,-best
-  } //-- /+tags
-  else if (want_best_only) {
+  if (want_best_only) {
     //-- best-only, full analyses
     for (mootToken::AnalysisSet::const_iterator ai = token.lower_bound(token.besttag());
 	 ai != token.analyses().end() && ai->tag == token.besttag();
@@ -120,7 +106,6 @@ string TokenWriter::token_string(const mootToken &token)
 	 ai++ )
       {
 	s.push_back('\t');
-	if (ai->tag == token.besttag()) s.push_back('/');
 	s.append(ai->details.empty() ? ai->tag : ai->details);
 	if (ai->cost != 0.0) {
 	  s.push_back('<');
@@ -129,7 +114,7 @@ string TokenWriter::token_string(const mootToken &token)
 	  s.push_back('>');
 	}
       }
-    } //-- -tags,-best
+  } //-- -tags,-best
   return s;
 }
 
@@ -140,27 +125,12 @@ void TokenWriter::token_put(FILE *out, const mootToken &token)
   fputc('\n', out);
   */
   fputs(token.text().c_str(), out);
-  if (want_tags_only || token.analyses().empty()) {
-    if (want_best_only || token.analyses().empty()) {
-      //-- best-only, tags-only: exactly 1 tag/tok
-      fputc('\t',out);
-      fputs(token.besttag().c_str(),out);
-    } //-- /+tags,+best
-    else {
-      //-- tags-only, all possibilities
-      set<mootTagString> tagset;
-      token.tokExport(NULL,&tagset);
-      for (set<mootTagString>::const_iterator tsi = tagset.begin();
-	   tsi != tagset.end();
-	   tsi++)
-	{
-	  fputc('\t',out);
-	  if (*tsi == token.besttag()) fputc('/',out);
-	  fputs(tsi->c_str(),out);
-	}
-    } //-- /+tags,-best
-  } //-- /+tags
-  else if (want_best_only) {
+
+  //-- best tag is always standalone first 'analysis'
+  fputc('\t',out);
+  fputs(token.besttag().c_str(),out);
+
+  if (want_best_only) {
     //-- best-only, full analyses
     for (mootToken::AnalysisSet::const_iterator ai = token.lower_bound(token.besttag());
 	 ai != token.analyses().end() && ai->tag == token.besttag();
@@ -180,7 +150,6 @@ void TokenWriter::token_put(FILE *out, const mootToken &token)
 	 ai++ )
       {
 	fputc('\t',out);
-	if (ai->tag == token.besttag()) fputc('/',out);
 	fputs((ai->details.empty() ? ai->tag.c_str() : ai->details.c_str()), out);
 	if (ai->cost != 0.0) {
 	  fprintf(out,"<%g>",ai->cost);

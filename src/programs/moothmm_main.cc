@@ -109,10 +109,8 @@ void GetMyOptions(int argc, char **argv)
   if (args.verbose_arg > 1) gettimeofday(&istarted, NULL);
 
   // -- i/o format flags
-  //hmm.input_first_analysis_is_best = args.first_is_best_given;
-  //hmm.input_ignore_first_analysis = args.ignore_first_given;
+  hmm.input_ignore_first_analysis = args.ignore_first_given;
   hmm.output_best_only = args.best_given;
-  hmm.output_tags_only = args.tags_given;
 
   // -- assign "unknown" ids & other flags
   hmm.unknown_token_name(args.unknown_token_arg);

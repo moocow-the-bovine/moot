@@ -499,13 +499,250 @@ bool mootHMM::estimate_wlambdas(const mootLexfreqs &lf)
   return true;
 }
 
+/*--------------------------------------------------------------
+ * Viterbi: clear
+ */
+void mootHMM::viterbi_clear(void)
+{
+  //-- move to trash: state-table
+  ViterbiColumn *col, *col_next;
+  ViterbiNode   *nod, *nod_next;
+  for (col = vtable; col != NULL; col = col_next) {
+    col_next      = col->col_prev;
+    col->col_prev = trash_columns;
+    trash_columns = col;
+    for (nod = col->nodes; nod != NULL; nod = nod_next) {
+      nod_next      = nod->row_next;
+      nod->row_next = trash_nodes;
+      trash_nodes   = nod;
+    }
+  }
+
+  //viterbi_clear_bestpath();
+
+  //-- add BOS entry
+  vtable = viterbi_get_column();
+  //vtable->tokid = start_tokid;
+  vtable->col_prev = NULL;
+  nod = vtable->nodes = viterbi_get_node();
+  nod->tagid = start_tagid;
+  nod->prob  = 1.0;
+  nod->row_next = NULL;
+  nod->pth_prev = NULL;
+}
+
+
+/*--------------------------------------------------------------
+ * Viterbi: step : TokID
+ */
+void mootHMM::viterbi_step(TokID tokid)
+{
+  //-- Get next column
+  ViterbiColumn *col = viterbi_get_column();
+  ViterbiNode   *nod;
+  col->col_prev = vtable;
+  col->nodes = NULL;
+
+  //-- sanity check
+  if (tokid >= n_toks) tokid = 0;
+
+  //-- Get map of possible destination tags
+  const LexProbSubTable &lps = lexprobs[tokid];
+
+  //-- for each possible destination tag 'vtagid'
+  for (LexProbSubTable::const_iterator lpsi = lps.begin(); lpsi != lps.end(); lpsi++)
+    {
+      vtagid  = lpsi->first;
+
+      //-- ignore "unknown" tag
+      if (vtagid == 0) continue;
+
+      //-- get lexical probability: p(tok|tag) 
+      vwordpr = ( (wlambda1 * lpsi->second) + wlambda2 );
+
+      //-- find best previous tag by n-gram probabilites: store information in vbestpr,vbestpn
+      viterbi_find_best_prevnode(vtagid, tagp(vtagid));
+
+      //-- skip zero-probabilities
+      //if (vbestpr <= 0) continue;
+
+      //-- update state table column for current destination tag
+      nod           = viterbi_get_node();
+      nod->tagid    = vtagid;
+      nod->prob     = (vbestpr * vwordpr);
+      nod->pth_prev = vbestpn;
+      nod->row_next = col->nodes;
+      col->nodes    = nod;
+    }
+
+  if (col->nodes == NULL) {
+    //-- we might not have found anything...
+    _viterbi_step_fallback(tokid, col);
+  } else{
+    //-- add new column to state table
+    vtable = col;
+  }
+};
+
+/*--------------------------------------------------------------
+ * Viterbi: step : TokID, set<TagID>
+ */
+void mootHMM::viterbi_step(TokID tokid, const set<TagID> &tag_ids)
+{
+  //-- Get next column
+  ViterbiColumn *col = viterbi_get_column();
+  ViterbiNode   *nod;
+  col->col_prev = vtable;
+  col->nodes = NULL;
+
+  //-- sanity check
+  if (tokid >= n_toks) tokid = 0;
+
+  //-- Get map of possible destination tags
+  const LexProbSubTable &lps = lexprobs[tokid];
+  LexProbSubTable::const_iterator lpsi;
+
+  //-- for each possible destination tag 'vtagid'
+  for (set<TagID>::const_iterator tii = tag_ids.begin(); tii != tag_ids.end(); tii++)
+    {
+      vtagid  = *tii;
+
+      //-- ignore "unknown" tag(s)
+      if (vtagid >= n_tags || vtagid == 0) continue;
+
+      //-- get lexical probability: p(tok|tag) 
+      lpsi = lps.find(vtagid);
+      if (lpsi != lps.end()) {
+	vwordpr = ( (wlambda1 * lpsi->second) + wlambda2 );
+      } else {
+	vwordpr = wlambda2;
+      }
+
+      //-- find best previous tag by n-gram probabilites: store information in vbestpr,vbestpn
+      viterbi_find_best_prevnode(vtagid, tagp(vtagid));
+
+      //-- skip zero-probabilities
+      //if (vbestpr <= 0) continue;
+
+      //-- update state table column for current destination tag
+      nod           = viterbi_get_node();
+      nod->tagid    = vtagid;
+      nod->prob     = (vbestpr * vwordpr);
+      nod->pth_prev = vbestpn;
+      nod->row_next = col->nodes;
+      col->nodes    = nod;
+    }
+
+  if (col->nodes == NULL) {
+    //-- we might not have found anything...
+    _viterbi_step_fallback(tokid, col);
+  } else{
+    //-- add new column to state table
+    vtable = col;
+  }
+}
+
+
+/*--------------------------------------------------------------
+ * Viterbi: single iteration: (TokID,TagID,col=NULL)
+ */
+void mootHMM::viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col)
+{
+  ViterbiNode   *nod;
+  if (col==NULL) {
+    //-- Get next column
+    col = viterbi_get_column();
+    col->col_prev = vtable;
+    col->nodes = NULL;
+  }
+
+  //-- sanity check
+  if (tokid >= n_toks) tokid = 0;
+
+  //-- for the destination tag 'vtagid'
+  vtagid = tagid >= n_tags ? 0 : tagid;
+
+  //-- get lexical probability: p(tok|tag) 
+  vwordpr = ( (wlambda1 * wordp(tokid,tagid)) + wlambda2 );
+
+  //-- find best previous tag by n-gram probabilites: store information in vbestpr,vbestpn
+  viterbi_find_best_prevnode(vtagid, tagp(vtagid));
+
+  //-- update state table column for current destination tag
+  nod           = viterbi_get_node();
+  nod->tagid    = vtagid;
+  nod->prob     = (vbestpr * vwordpr);
+  nod->pth_prev = vbestpn;
+  nod->row_next = col->nodes;
+  col->nodes    = nod;
+
+  //-- add new column to state table
+  vtable = col;
+}
+
+
+/*------------------------------------------------------------
+ * Viterbi: fallback
+ */
+void mootHMM::_viterbi_step_fallback(TokID tokid, ViterbiColumn *col)
+{
+  //-- sanity
+  if (tokid >= n_toks) tokid = 0;
+  if (col==NULL) {
+    //-- Get next column
+    col = viterbi_get_column();
+    col->col_prev = vtable;
+    col->nodes = NULL;
+  }
+
+  //-- variables
+  ViterbiNode                     *nod;
+  const LexProbSubTable           &lps = lexprobs[tokid];
+  LexProbSubTable::const_iterator  lpsi;
+
+  //-- for each possible destination tag 'vtagid' (except "UNKNOWN")
+  for (vtagid = 1; vtagid < n_tags; vtagid++) {
+
+    //-- get lexical probability: p(tok|tag) 
+    lpsi = lps.find(vtagid);
+    if (lpsi != lps.end()) {
+      vwordpr = ( (wlambda1 * lpsi->second) + wlambda2 );
+    } else {
+      vwordpr = wlambda2;
+    }
+
+    //-- find best previous tag by n-gram probabilites: store information in vbestpr,vbestpn
+    viterbi_find_best_prevnode(vtagid, tagp(vtagid));
+
+    //-- skip zero-probabilities
+    //if (vbestpr <= 0) continue;
+
+    //-- update state table column for current destination tag
+    nod           = viterbi_get_node();
+    nod->tagid    = vtagid;
+    nod->prob     = (vbestpr * vwordpr);
+    nod->pth_prev = vbestpn;
+    nod->row_next = col->nodes;
+    col->nodes    = nod;
+  }
+
+  if (col->nodes == NULL) {
+    //-- we STILL might not have found anything...
+    viterbi_step(tokid, 0, col);
+  } else{
+    //-- add new column to state table
+    vtable = col;
+  }
+}
+
+
 /*--------------------------------------------------------------------------
  * Top-level: stream
  *--------------------------------------------------------------------------*/
 void mootHMM::tag_stream(FILE *in, FILE *out, char *srcname)
 {
-  TokenReader treader(input_first_analysis_is_best, input_ignore_first_analysis);
-  TokenWriter twriter(output_best_only, output_tags_only);
+  TokenReader treader(false,input_ignore_first_analysis);
+  TokenWriter twriter(output_best_only);
 
   treader.select_stream(in,srcname);
   do {

@@ -57,17 +57,17 @@ group "Format Options"
 #flag "avm"       a "Produce AVM ('vector') output." \
 #    details="Ambiguous-mode only"
 
-flag  "first_is_best" 1 "Assume 1st analysis is 'best' for each input token." \
-    details="Useful for re-analysis."
+#flag  "first_is_best" 1 "Assume 1st analysis is 'best' for each input token." \
+#    details="Useful for re-analysis."
 
-flag  "ignore_first" 2 "Ignore the first analysis for each input token." \
+flag  "ignore-first" 2 "Ignore the first analysis for each input token." \
     details="Useful for re-analysis."
 
 flag  "best"  b "Prune non-optimal tags (analyses) from the output." \
      details="Only meaningful if your input file contains analysis restrictions."
 
-flag  "tags"  t "Output only PoS tags, not detailed analyses." \
-     details="Useful for compatibility with older programs."
+#flag  "tags"  t "Output only PoS tags, not detailed analyses." \
+#     details="Useful for compatibility with older programs."
 
 #-----------------------------------------------------------------------------
 # Compilation Options

@@ -26,6 +26,7 @@ moot-fstgen
 *.fmtt
 *.amtt
 *.damtt
+*.bdamtt
 *.bin
 *.cbin
 *.fbin

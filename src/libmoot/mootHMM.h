@@ -54,10 +54,11 @@
 
 /**
  * \def moot_ADD_ONE_HACK
- * Define this to include the 'add one' hack to avoid float underflows
- * WARNING: this causes major problems with sparse data, and using
+ * Define this to include the 'add one' hack to avoid float underflows.
+ *
+ * \warning this causes major problems with sparse data, and using
  * 'double' as our probability type seems to work just dandy without
- * this hack.
+ * this hack...
  */
 //#define moot_ADD_ONE_HACK 1
 #undef moot_ADD_ONE_HACK
@@ -252,28 +253,23 @@ public:
 
 public:
   /*---------------------------------------------------------------------*/
-  /** \name Input format flags : used by moot::TokenReader */
+  /** \name I/O Format Flags */
   //@{
-  /** Whether to output all given PoS tags (default) or just the 'best' tag. */
-  bool input_first_analysis_is_best;
-  /** Whether to output all analysis details (default), or just the analysis-tag. */
+  /**
+   * Whether to ignore first analysis of each input token (re-analysis).
+   * Default=false.
+   */
   bool input_ignore_first_analysis;
-  //@}
 
-  /*---------------------------------------------------------------------*/
-  /** \name Output format flags : used by moot::TokenWriter */
-  //@{
+  /*---------------------------------------------------------------------
+   * Output format flags : used by moot::TokenWriter
+   */
   /**
    * Whether to output only analyses 
    * corresponding to the 'best' PoS tag (true),
    * or for all given PoS tags (false=default)
    */
   bool output_best_only;
-  /**
-   * Whether to output only PoS tags (true)
-   * or all analysis details (false=default).
-   */
-  bool output_tags_only;
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -365,10 +361,8 @@ public:
   //@{
   /** Default constructor */
   mootHMM(void)
-    : input_first_analysis_is_best(false),
-      input_ignore_first_analysis(false),
+    : input_ignore_first_analysis(false),
       output_best_only(false),
-      output_tags_only(false),
       start_tagid(0),
       unknown_lex_threshhold(1.0),
       nglambda1(mootProbEpsilon),
@@ -532,104 +526,20 @@ public:
   //@}
 
   //------------------------------------------------------------
-  // public methods: high-level: Viterbi: clear
+  // Viterbi: clear
 
   /** \name High-level Viterbi algorithm API */
   //@{
 
   /** Clear Viterbi state table(s) */
-  inline void viterbi_clear(void)
-  {
-    //-- move to trash: state-table
-    ViterbiColumn *col, *col_next;
-    ViterbiNode   *nod, *nod_next;
-    for (col = vtable; col != NULL; col = col_next) {
-      col_next      = col->col_prev;
-      col->col_prev = trash_columns;
-      trash_columns = col;
-      for (nod = col->nodes; nod != NULL; nod = nod_next) {
-	nod_next      = nod->row_next;
-	nod->row_next = trash_nodes;
-	trash_nodes   = nod;
-      }
-    }
-
-    //viterbi_clear_bestpath();
-
-    //-- add BOS entry
-    vtable = viterbi_get_column();
-    //vtable->tokid = start_tokid;
-    vtable->col_prev = NULL;
-    nod = vtable->nodes = viterbi_get_node();
-    nod->tagid = start_tagid;
-    nod->prob  = 1.0;
-    nod->row_next = NULL;
-    nod->pth_prev = NULL;
-  };
-
+  void viterbi_clear(void);
 
   //------------------------------------------------------------
-  // public methods: high-level: Viterbi: single iteration: (TokID)
-
-  /**
-   * Step a single Viterbi iteration, considering all known tags
-   * for 'tokid' as possible analyses.
-   */
-  inline void viterbi_step(TokID tokid)
-  {
-    //-- Get next column
-    ViterbiColumn *col = viterbi_get_column();
-    ViterbiNode   *nod;
-    col->col_prev = vtable;
-    col->nodes = NULL;
-
-    //-- sanity check
-    if (tokid >= n_toks) tokid = 0;
-
-    //-- Get map of possible destination tags
-    const LexProbSubTable &lps = lexprobs[tokid];
-
-    //-- for each possible destination tag 'vtagid'
-    for (LexProbSubTable::const_iterator lpsi = lps.begin(); lpsi != lps.end(); lpsi++)
-      {
-	vtagid  = lpsi->first;
-
-	//-- ignore "unknown" tag
-	if (vtagid == 0) continue;
-
-	//-- get lexical probability: p(tok|tag) 
-	vwordpr = ( (wlambda1 * lpsi->second) + wlambda2 );
-
-	//-- find best previous tag by n-gram probabilites: store information in vbestpr,vbestpn
-	viterbi_find_best_prevnode(vtagid, tagp(vtagid));
-
-	//-- skip zero-probabilities
-	//if (vbestpr <= 0) continue;
-
-	//-- update state table column for current destination tag
-	nod           = viterbi_get_node();
-	nod->tagid    = vtagid;
-	nod->prob     = vbestpr * vwordpr;
-	nod->pth_prev = vbestpn;
-	nod->row_next = col->nodes;
-	col->nodes    = nod;
-      }
-
-    if (col->nodes == NULL) {
-      //-- we might not have found anything...
-      _viterbi_step_fallback(tokid, col);
-    } else{
-      //-- add new column to state table
-      vtable = col;
-    }
-  };
-
-  //------------------------------------------------------------
-  // public methods: high-level: Viterbi: single iteration: (mootToken)
+  // Viterbi: single iteration: (mootToken)
 
   /**
    * Step a single Viterbi iteration, mootToken version.
-   * Really just a wrapper for viterbi_step(TokID tokid,set<TagID>).
+   * Really just a wrapper for viterbi_step(TokID,set<TagID>).
    */
   inline void viterbi_step(const mootToken &token) {
     if (token.analyses().empty()) {
@@ -639,7 +549,7 @@ public:
       set<TagID> tok_tagids;
       for (mootToken::AnalysisSet::const_iterator ani = token.analyses().begin();
 	   ani != token.analyses().end();
-	   ani++)
+	   ani = token.upper_bound(ani->tag))
 	{
 	  tok_tagids.insert(tagids.name2id(ani->tag));
 	}
@@ -649,85 +559,42 @@ public:
 
 
   //------------------------------------------------------------
-  // public methods: high-level: Viterbi: single iteration: (TokString)
+  // Viterbi: single iteration: (TokID)
 
   /**
-   * \bold DEPRECATED
+   * Step a single Viterbi iteration, considering all known tags
+   * for 'tokid' as possible analyses.  Faster in the case
+   * where no futher information (i.e. set of possible tags) is
+   * available.
+   */
+  inline void viterbi_step(TokID tokid);
+
+  //------------------------------------------------------------
+  // Viterbi: single iteration: (TokID,set<TagID>)
+
+  /**
+   * Step a single Viterbi iteration, considering only the tags
+   * in 'tagids' -- useful if you have some a priori information
+   * on the token.
+   */
+  inline void viterbi_step(TokID tokid, const set<TagID> &tag_ids);
+
+
+  //------------------------------------------------------------
+  // Viterbi: single iteration: (TokString)
+
+  /**
+   * \bold DEPRECATED in favor of viterbi_step(moot_token)
    *
    * Step a single Viterbi iteration, string version.
    * Really just a wrapper for viterbi_step(TokID tokid).
-   *
    */
   inline void viterbi_step(const mootTokString &token) {
     return viterbi_step(token2id(token));
   };
 
-
   //------------------------------------------------------------
-  // public methods: mid-level: Viterbi: single iteration: (TokID,set<TagID>)
-
-  /**
-   * Step a single Viterbi iteration, considering only the tags
-   * in 'tagids'.
-   */
-  inline void viterbi_step(TokID tokid, const set<TagID> &tag_ids)
-  {
-    //-- Get next column
-    ViterbiColumn *col = viterbi_get_column();
-    ViterbiNode   *nod;
-    col->col_prev = vtable;
-    col->nodes = NULL;
-
-    //-- sanity check
-    if (tokid >= n_toks) tokid = 0;
-
-    //-- Get map of possible destination tags
-    const LexProbSubTable &lps = lexprobs[tokid];
-    LexProbSubTable::const_iterator lpsi;
-
-    //-- for each possible destination tag 'vtagid'
-    for (set<TagID>::const_iterator tii = tag_ids.begin(); tii != tag_ids.end(); tii++)
-      {
-	vtagid  = *tii;
-
-	//-- ignore "unknown" tag(s)
-	if (vtagid >= n_tags || vtagid == 0) continue;
-
-	//-- get lexical probability: p(tok|tag) 
-	lpsi = lps.find(vtagid);
-	if (lpsi != lps.end()) {
-	  vwordpr = ( (wlambda1 * lpsi->second) + wlambda2 );
-	} else {
-	  vwordpr = wlambda2;
-	}
-
-	//-- find best previous tag by n-gram probabilites: store information in vbestpr,vbestpn
-	viterbi_find_best_prevnode(vtagid, tagp(vtagid));
-
-	//-- skip zero-probabilities
-	//if (vbestpr <= 0) continue;
-
-	//-- update state table column for current destination tag
-	nod           = viterbi_get_node();
-	nod->tagid    = vtagid;
-	nod->prob     = vbestpr * vwordpr;
-	nod->pth_prev = vbestpn;
-	nod->row_next = col->nodes;
-	col->nodes    = nod;
-      }
-
-    if (col->nodes == NULL) {
-      //-- we might not have found anything...
-      _viterbi_step_fallback(tokid, col);
-    } else{
-      //-- add new column to state table
-      vtable = col;
-    }
-  };
-
-
-  //------------------------------------------------------------
-  // public methods: high-level: Viterbi: single iteration: (TokString,set<TagString>)
+  // Viterbi: single iteration: (TokString,set<TagString>)
 
   /**
    * \bold DEPRECATED
@@ -748,50 +615,19 @@ public:
 
 
   //------------------------------------------------------------
-  // public methods: high-level: Viterbi: single iteration: (TokID,TagID)
+  // Viterbi: single iteration: (TokID,TagID,col=NULL)
 
   /**
    * Step a single Viterbi iteration, considering only the tag 'tagid'.
    */
-  inline void viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col=NULL)
-  {
-    ViterbiNode   *nod;
-    if (col==NULL) {
-      //-- Get next column
-      col = viterbi_get_column();
-      col->col_prev = vtable;
-      col->nodes = NULL;
-    }
-
-    //-- sanity check
-    if (tokid >= n_toks) tokid = 0;
-
-    //-- for the destination tag 'vtagid'
-    vtagid = tagid >= n_tags ? 0 : tagid;
-
-    //-- get lexical probability: p(tok|tag) 
-    vwordpr = ( (wlambda1 * wordp(tokid,tagid)) + wlambda2 );
-
-    //-- find best previous tag by n-gram probabilites: store information in vbestpr,vbestpn
-    viterbi_find_best_prevnode(vtagid, tagp(vtagid));
-
-    //-- update state table column for current destination tag
-    nod           = viterbi_get_node();
-    nod->tagid    = vtagid;
-    nod->prob     = vbestpr * vwordpr;
-    nod->pth_prev = vbestpn;
-    nod->row_next = col->nodes;
-    col->nodes    = nod;
-
-    //-- add new column to state table
-    vtable = col;
-  };
-
+  inline void viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col=NULL);
 
   //------------------------------------------------------------
-  // public methods: high-level: Viterbi: single iteration: (TokString,TagString)
+  // Viterbi: single iteration: (TokString,TagString)
 
   /**
+   * \bold DEPRECATED
+   *
    * Step a single Viterbi iteration, considering only the tag 'tag': string version.
    */
   inline void viterbi_step(const mootTokString &token, const mootTagString &tag)
@@ -801,10 +637,10 @@ public:
 
 
   //------------------------------------------------------------
-  // public methods: high-level: Viterbi: finish
+  // Viterbi: finish
 
   /**
-   * Run final Viterbi iteration, using 'final_tagid' as the final tag
+   * Run final Viterbi iteration, using 'final_tagid' as the boundary tag
    */
   inline void viterbi_finish(const TagID final_tagid)
   {
@@ -919,7 +755,6 @@ public:
 
   /** \name Low-level Viterbi utilities */
   //{@
-
   /**
    * Find the best previous node from top column of 'vtable' for destination tag 'curtagid',
    * stores a pointer to the best previous node in 'vbestpn', and the
@@ -936,16 +771,17 @@ public:
     vbestpr = -1.0;
     vbestpn = NULL;
     for (pnod = vtable->nodes; pnod != NULL; pnod = pnod->row_next) {
-      vtagpr =
-#ifdef moot_ADD_ONE_HACK
-	(pnod->prob + 1.0)  //-- add 1 to avoid float underflow (not here!)
+      vtagpr = 
+#ifdef moot_ADD_ONE_HACK_BAD
+	1.0 +  //-- add 1 to avoid float underflow (not here!)
 #else
+#endif // moot_ADD_ONE_HACK_BAD
 	pnod->prob
-#endif // moot_ADD_ONE_HACK
 	*
 	( (nglambda1 * curtagp)
 	  +
-	  (nglambda2 * tagp(pnod->tagid, curtagid)) );
+	  (nglambda2 * tagp(pnod->tagid, curtagid)) )
+	;
 
       if (vtagpr > vbestpr) {
 	vbestpr = vtagpr;
@@ -971,62 +807,13 @@ public:
   };
 
   //------------------------------------------------------------
-  // public methods: viterbi: fallback
+  // Viterbi: fallback
 
   /**
    * Step a single Viterbi iteration, last-ditch effort: consider
    * all tags.  Implicitly called by other viterbi_step() methods.
    */
-  inline void _viterbi_step_fallback(TokID tokid, ViterbiColumn *col)
-  {
-    //-- sanity
-    if (tokid >= n_toks) tokid = 0;
-    if (col==NULL) {
-      //-- Get next column
-      col = viterbi_get_column();
-      col->col_prev = vtable;
-      col->nodes = NULL;
-    }
-
-    //-- variables
-    ViterbiNode                     *nod;
-    const LexProbSubTable           &lps = lexprobs[tokid];
-    LexProbSubTable::const_iterator  lpsi;
-
-    //-- for each possible destination tag 'vtagid' (except "UNKNOWN")
-    for (vtagid = 1; vtagid < n_tags; vtagid++) {
-
-	//-- get lexical probability: p(tok|tag) 
-	lpsi = lps.find(vtagid);
-	if (lpsi != lps.end()) {
-	  vwordpr = ( (wlambda1 * lpsi->second) + wlambda2 );
-	} else {
-	  vwordpr = wlambda2;
-	}
-
-	//-- find best previous tag by n-gram probabilites: store information in vbestpr,vbestpn
-	viterbi_find_best_prevnode(vtagid, tagp(vtagid));
-
-	//-- skip zero-probabilities
-	//if (vbestpr <= 0) continue;
-
-	//-- update state table column for current destination tag
-	nod           = viterbi_get_node();
-	nod->tagid    = vtagid;
-	nod->prob     = vbestpr * vwordpr;
-	nod->pth_prev = vbestpn;
-	nod->row_next = col->nodes;
-	col->nodes    = nod;
-      }
-
-    if (col->nodes == NULL) {
-      //-- we STILL might not have found anything...
-      viterbi_step(tokid, 0, col);
-    } else{
-      //-- add new column to state table
-      vtable = col;
-    }
-  };
+  inline void _viterbi_step_fallback(TokID tokid, ViterbiColumn *col);
   //@}
 
   //------------------------------------------------------------
@@ -1061,6 +848,8 @@ public:
   };
 
   /**
+   * \bold DEPRECATED
+   *
    * Looks up and returns lexical probability: p(token|tag)
    * given token, tag.
    */
@@ -1085,6 +874,8 @@ public:
   };
 
   /**
+   * \bold DEPRECATED
+   *
    * Looks up and returns unigram probability: p(tag), string-version.
    */
   inline const ProbT tagp(const mootTagString &tag) const
@@ -1107,6 +898,8 @@ public:
   };
 
   /**
+   * \bold DEPRECATED
+   *
    * Looks up and returns bigram probability: p(tag|prevtag), string-version.
    */
   inline const ProbT tagp(const mootTagString &prevtag, const mootTagString &tag) const
@@ -1120,6 +913,8 @@ public:
   /**
    * Looks up and returns trigram probability: p(tagid|prevtagid2,prevtagid1),
    * given Trigram(prevtagid2,prevtagid1,tagid)
+   *
+   * \bold NOT REALLY IMPLEMENTED.
    */
   inline const ProbT tagp(const Trigram &trigram) const
   {
@@ -1130,6 +925,8 @@ public:
   /**
    * Looks up and returns trigram probability: p(tagid|prevtagid2,prevtagid1),
    * given prevtagid2, prevtagid1, tagid.
+   *
+   * \bold NOT REALLY IMPLEMENTED.
    */
   inline const ProbT tagp(const TagID prevtagid2, const TagID prevtagid1, const TagID tagid) const
   {
@@ -1137,7 +934,11 @@ public:
   };
 
   /**
+   * \bold DEPRECATED
+   *
    * Looks up and returns trigram probability: p(tag|prevtag1,prevtag2), string-version.
+   *
+   * \bold NOT REALLY IMPLEMENTED.
    */
   inline const ProbT tagp(const mootTagString &prevtag2,
 			  const mootTagString &prevtag1,
@@ -1164,7 +965,7 @@ public:
 
   /**
    * Mid-level tagging interface: mark 'best' tags in sentence
-   * structure: fills 'besttag' data member of each 'mootToken' element
+   * structure: fills 'besttag' datum of each 'mootToken' element
    * of 'sentence'.
    */
   void tag_mark_best(mootSentence &sentence);

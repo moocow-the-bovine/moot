@@ -61,7 +61,6 @@ public:
 
   /** Default constructor
    * @param first_analysis_is_best Whether first analysis should be used to instantiate 'besttag'
-   * @param ignore_first_analysis  Whether first analysis should be (otherwise) ignored
    */
   TokenReader(bool first_analysis_is_best=false, bool ignore_first_analysis=false)
   {
@@ -109,10 +108,8 @@ public:
   /*----------------------------------------
    * Wrting: Data
    */
-  /** Whether to output all PoS tags or just the 'best' tag (the default). */
+  /** Whether to output all analyses or just those for the 'best' tag (the default). */
   bool want_best_only;
-  /** Whether to output all analyses (default) for each tag we output, or just the tag. */
-  bool want_tags_only;
       
   /** Temporary buffer for stringification of costs */
   char costbuf[32];
@@ -122,8 +119,8 @@ public:
    * Writing: Methods
    */
   /** Default constructor */
-  TokenWriter(bool i_want_best_only=false, bool i_want_tags_only=false)
-    : want_best_only(i_want_best_only), want_tags_only(i_want_tags_only)
+  TokenWriter(bool i_want_best_only=false)
+    : want_best_only(i_want_best_only)
   {};
 	
   /** Generate canonical string-form of a mootToken (without trailing newline) */
