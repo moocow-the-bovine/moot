@@ -26,7 +26,6 @@
 #include <set>
 
 #include "dwdst.h"
-#include "postag_lexer.h"
 
 using namespace std;
 
@@ -36,7 +35,10 @@ using namespace std;
 class dwds_tagger_trainer : public dwds_tagger {
   // -- typedefs
 public:
-  typedef hash_map<string,float> StringToCountTable;
+  //typedef hash_map<string,float> StringToCountTable;
+  //typedef vector<set<FSMSymbolString> > NGramSetVector;
+  typedef vector<FSMSymbolString>       NGramVector;
+  typedef map<NGramVector,float>        NGramTable;
   typedef deque<set<FSMSymbolString> *> FSMSymbolStringQueue;
 private:
 
@@ -44,24 +46,35 @@ private:
 public:
   // -- tagsets
   set<FSMSymbolString>  opentags;  // set of PoS tags for open-classes (used for unknown-FST generation)
-  set<FSMSymbolString>  alltags;   // set of all PoS tags
+  set<FSMSymbolString>  alltags;   // set of all PoS tags (to be used for disambig-FST generation)
   // -- count parameters
   int kmax;
-  StringToCountTable    strings2counts;
+  //StringToCountTable    strings2counts;
+  NGramTable            ngtable;
   FSMSymbolStringQueue  stringq;
 
 private:
-  StringToCountTable::iterator sci;
+  NGramTable::iterator ngti;
   bool is_eos;
 
   // -- training variables
   set<FSMSymbolString> *curtags;
-  set<FSMSymbolString>::iterator t;
-  set<FSMSymbolString> *curngrams;
-  set<FSMSymbolString> *nextngrams;
-  set<FSMSymbolString>::iterator g_old;
-  set<FSMSymbolString>::iterator g_new;
-  FSMSymbolStringQueue::iterator qi;
+  set<FSMSymbolString>::iterator cti;
+
+  //set<FSMSymbolString> *curngrams;
+  //set<FSMSymbolString> *nextngrams;
+  NGramVector      theNgram;
+  set<NGramVector> *curngrams;
+  set<NGramVector> *nextngrams;
+  set<NGramVector> *tmpngrams;
+
+  //set<FSMSymbolString>::iterator g_old;
+  //set<FSMSymbolString>::iterator g_new;
+  set<NGramVector>::iterator ngi;
+  //set<FSMSymbolString>::iterator g_new;
+
+  FSMSymbolStringQueue::reverse_iterator qi;
+  set<FSMSymbolString>::iterator qii;
 
 
   // -- methods
@@ -85,7 +98,7 @@ public:
   inline void train_next_token(void);
 
   // -- public methods: param-generation: parameter-file read/write
-  bool read_param_file(FILE *in=stdin);  // NYI
+  bool read_param_file(FILE *in=stdin,const char *filename=NULL);  // NYI
   bool write_param_file(FILE *out=stdout);
 
   // -- public methods: mid-level: listfile-reading
@@ -102,6 +115,10 @@ public:
 
   // --- public methods: low-level : taglist file reading
   set<FSMSymbolString> read_taglist_file(set<FSMSymbolString> &tagset, const char *filename=NULL);
+
+  // --- public methods: low-level : initialize & cleanup
+  inline bool init_training_temps(FILE *in=NULL, FILE *out=NULL);
+  inline bool cleanup_training_temps();
 };
 
 #endif // _DWST_TRAINER_H_

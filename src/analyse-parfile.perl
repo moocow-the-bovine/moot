@@ -20,9 +20,11 @@ our $VERSION = 0.01;
 # Command-line processing
 ########################################################################
 $wdsep = "\t";
+$verbose = 1;
 GetOptions(## -- General
 	   'help|h|?'=>\$help,
 	   'man'=>\$man,
+	   'verbose|v=i'=>\$verbose,
 	   'version'=>\$version,
 	   ## -- Format
 	   'wdsep|w'=>\$wdsep,
@@ -49,8 +51,10 @@ pod2usage({-verbose=>0}) if ($help);
 ## -- read in parameter files
 %ngrams = ();
 while (defined($_ = <>)) {
+  chomp($_);
   next if (/^\s*(?:%%.*)?$/); # skip comments and blank lines
-  @sline = split(/\t+/,$_);
+
+  @sline = split(/\s*\t+\s*/,$_);
   ($weight) = pop(@sline);
   $ngram = join($wdsep, @sline);
 
@@ -66,7 +70,8 @@ while (defined($_ = <>)) {
 }
 
 %ambigs = ();
-for (($weight,$ngset) = each(%weights)) {
+while (($weight,$ngset) = each(%weights)) {
+  # examine
   next if (scalar(keys(%$ngset)) <= 1);  # ignore singletons
  NG1:
   foreach $ng1 (keys(%$ngset)) {
@@ -81,11 +86,15 @@ for (($weight,$ngset) = each(%weights)) {
 	next NG2 if ($tags1[$i] ne $tags2[$i]);
       }
       ## -- it's a real ambiguity
-      $ambigs{$weight}{$ng2}
-	= $ambigs{$weight}{$ng1} = undef;
+      $ambigs{"$weight"}{$ng2}
+	= $ambigs{"$weight"}{$ng1} = undef;
 
       ## -- DEBUG:
-      print("> Found ambiguity '$ng1' != '$ng2' for weight=$weight\n");
+      if ($verbose > 0) {
+	print("> Found ambiguity for weight $weight :\n",
+	      ">     Ngram_1: '$ng1'\n",
+	      ">  \!= Ngram_2: '$ng2'\n\n");
+      }
     }
   }
 }
@@ -135,6 +144,7 @@ analyse-parfile.perl - analyse a DWDST parameter file.
    -help
    -man
    -version
+   -verbose LEVEL
 
  Format Options:
    -wdsep WORD_SEPARATOR

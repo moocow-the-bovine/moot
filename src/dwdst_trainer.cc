@@ -9,6 +9,8 @@
 #include <errno.h>
 
 #include "dwdst_trainer.h"
+#include "postag_lexer.h"
+//#include "dwdst_param_lexer.h"
 
 using namespace std;
 
@@ -194,25 +196,10 @@ bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
   int tok, eosi;
 
   // -- sanity check
-  if (!can_tag()) {
+  if (!can_tag() || !init_training_temps(in,out)) {
     fprintf(stderr, "dwds_tagger_trainer::train_from_stream(): cannot run uninitialized trainer!\n");
     return false;
   }
-
-  // -- initialize string-sets
-  for (eosi = 0; eosi < kmax; eosi++) {
-    curtags = new set<FSMSymbolString>();
-    curtags->insert(eos);
-    stringq.push_back(curtags);
-  }
-
-  // -- tmp instance-vars
-  curngrams = new set<FSMSymbolString>;
-  nextngrams = new set<FSMSymbolString>;
-
-  // -- files
-  infile = in;
-  outfile = out;
 
   // -- ye olde guttes
   lexer.step_streams(in,out);
@@ -232,23 +219,7 @@ bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
       train_next_token();
     }
   }
-  // -- cleanup : string-sets
-  for (eosi = 0; eosi < kmax; eosi++) {
-    curtags = stringq.front();
-    stringq.pop_front();
-    curtags->clear();
-    delete curtags;
-  }
-  // -- cleanup : ngram-sets
-  delete curngrams;
-  delete nextngrams;
-  curngrams = NULL;
-  nextngrams = NULL;
-  // -- cleanup : files
-  infile = NULL;
-  outfile = NULL;
-
-  return true;
+  return cleanup_training_temps();
 }
 
 /*
@@ -256,20 +227,39 @@ bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
  */
 bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=stdout)
 {
-  int i;
-
   // -- sanity check
-  if (!can_tag()) {
+  if (!can_tag() || !init_training_temps(NULL,out)) {
     fprintf(stderr, "dwds_tagger_trainer::train_from_strings(): cannot run uninitialized trainer!\n");
     return false;
   }
 
-  // -- tmp instance-vars
-  curngrams = new set<FSMSymbolString>;
-  nextngrams = new set<FSMSymbolString>;
+  // -- ye olde guttes
+  for ( ; --argc >= 0; argv++) {
+    token = *argv;
+    train_next_token();
+  }
+  // -- eos rundown
+  is_eos = true;
+  while (++argc <= kmax) {
+    train_next_token();
+  }
+  return cleanup_training_temps();
+}
+
+
+/*
+ * bool dwds_tagger_trainer::init_training_temps()
+ */
+inline bool dwds_tagger_trainer::init_training_temps(FILE *in=NULL, FILE *out=NULL)
+{
+  int i;
+
+  // -- ngram temps
+  curngrams = new set<NGramVector>();
+  nextngrams = new set<NGramVector>();
 
   // -- files
-  infile = NULL;
+  infile = in;
   outfile = out;
 
   // -- initialize string-sets
@@ -278,36 +268,43 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
     curtags->insert(eos);
     stringq.push_back(curtags);
   }
+  return true;
+}
 
-  // -- ye olde guttes
-  for ( ; --argc >= -1*kmax; argv++) {
-    token = *argv;
-    if (argc <= 0) is_eos = true;
-    else is_eos = false;
-    train_next_token();
 
-    // -- verbosity
-    if (verbose) ntokens++;
-  }
+/*
+ * bool dwds_tagger_trainer::cleanup_training_temps()
+ */
+inline bool dwds_tagger_trainer::cleanup_training_temps()
+{
+  int i;
 
   // -- cleanup string-sets
   for (i = 0; i < kmax; i++) {
     curtags = stringq.front();
     stringq.pop_front();
-    curtags->clear();
-    delete curtags;
+    if (curtags) {
+      curtags->clear();
+      delete curtags;
+    }
   }
-  delete curngrams;
-  curngrams = NULL;
-  delete nextngrams;
-  nextngrams = NULL;
+  // -- cleanup ngram-temps
+  if (curngrams) {
+    curngrams->clear();
+    delete curngrams;
+    curngrams = NULL;
+  }
+  if (nextngrams) {
+    nextngrams->clear();
+    delete nextngrams;
+    nextngrams = NULL;
+  }
+  tmpngrams = NULL;
 
   infile = NULL;
   outfile = NULL;
-
   return true;
 }
-
 
 /*
  * inline void dwds_tagger_trainer::train_next_token(void);
@@ -320,6 +317,8 @@ inline void dwds_tagger_trainer::train_next_token(void)
       s = (char *)token;
       tmp->fsm_clear();
       result = morph->fsm_lookup(s,tmp,true);
+      // -- verbosity
+      if (verbose) ntokens++;
     }
 
     // -- pop 'current' tag-string set (last in queue == oldest)
@@ -341,6 +340,17 @@ inline void dwds_tagger_trainer::train_next_token(void)
       } else {
 	// -- tags only
 	get_fsm_tag_strings(tmp,curtags);
+	/*for (cti = curtags->begin(); cti != curtags->end(); cti++) {
+	  // -- convert to a valid regex
+	  FSMSymbolString hacked_tag = *cti;
+	  if (want_avm && hacked_tag[0] == '_') {
+	    hacked_tag.erase(0,1);
+	  }
+	  if (hacked_tag[0] != '_') { hacked_tag.insert(0,"["); }
+	  if (hacked_tag[hacked_tag.length()] != ']') { hacked_tag.append("]"); }
+	  curtags->erase(cti);
+	  curtags->insert(hacked_tag);
+	  }*/
       }
     } else {
       // -- terminal EOS
@@ -350,16 +360,17 @@ inline void dwds_tagger_trainer::train_next_token(void)
     // -- unknown token?
     if (curtags->empty()) {
       get_fsm_tag_strings(ufsa,curtags);
-      if (want_features) {
-	// HACK
-	for (g_old = curtags->begin(); g_old != curtags->end(); g_old++) {
-	  FSMSymbolString hacked_tag = *g_old;
-	  hacked_tag.insert(0,"[");
-	  hacked_tag.append("]");
-	  curtags->erase(g_old);
-	  curtags->insert(hacked_tag);
+      // -- HACK: make it look like an AVM struct
+      /*for (cti = curtags->begin(); cti != curtags->end(); cti++) {
+	FSMSymbolString hacked_tag = *cti;
+	if (want_avm && hacked_tag[0] == '_') {
+	  hacked_tag.erase(0,1);
 	}
-      }
+	if (hacked_tag[0] != '[') { hacked_tag.insert(0,"["); }
+	if (hacked_tag[hacked_tag.length()] != ']') { hacked_tag.append("]"); }
+	curtags->erase(cti);
+	curtags->insert(hacked_tag);
+	}*/
     }
     
     // -- push 'current' tags onto the queue (front of queue == newest)
@@ -367,35 +378,44 @@ inline void dwds_tagger_trainer::train_next_token(void)
     
     // -- note all 'current' tags in "alltags"
     alltags.insert(curtags->begin(),curtags->end());
-    
-    // -- counting: i <= kmax -grams
+
+    // ----------------------------
+    // counting: i <= kmax -grams
+    // ----------------------------
     curngrams->clear();
-    for (qi = stringq.begin(); qi != stringq.end(); qi++) {
-      // -- grab next ngrams
-      if (curngrams->empty()) *curngrams = **qi;
-      else {
-	// -- get iterator-current tags
-	curtags = *qi;
+    theNgram.clear();
+    for (qi = stringq.rbegin(); qi != stringq.rend(); qi++) {
+      if (curngrams->empty()) {
+	// -- initialize current-ngrams (when qi==stringq.rbegin())
+	//    : curngrams are initialized to oldest string-set
+	for (qii = (*qi)->begin(); qii != (*qi)->end(); qii++) {
+	  curngrams->insert(NGramVector(1,*qii));
+	}
+      } else {
+	// -- we already have some ngrams -- need to extend them
 	nextngrams->clear();
-	for (g_old = curngrams->begin(); g_old != curngrams->end(); g_old++) {
-	  for (g_new = curtags->begin(); g_new != curtags->end(); g_new++) {
-	    nextngrams->insert(*g_new + wdsep + *g_old);
+	for (ngi = curngrams->begin(); ngi != curngrams->end(); ngi++) {
+	  for (qii = (*qi)->begin(); qii != (*qi)->end(); qii++) {
+	    theNgram = *ngi;
+	    theNgram.push_back(*qii);
+	    nextngrams->insert(theNgram);
 	  }
 	}
-	*curngrams = *nextngrams;
+	// -- swap curngrams and nextngrams
+	tmpngrams = curngrams;
+	curngrams = nextngrams;
+	nextngrams = tmpngrams;
       }
       // -- ... and count them
-      for (t = curngrams->begin(); t != curngrams->end(); t++) {
-	if ((sci = strings2counts.find(*t)) != strings2counts.end()) {
-	    strings2counts[*t] += curngrams->size() >= 0 ? 1.0/(float)curngrams->size() : 0;
+      for (ngi = curngrams->begin(); ngi != curngrams->end(); ngi++) {
+	theNgram = *ngi;
+	if (ngtable.find(theNgram) != ngtable.end()) {
+	    ngtable[theNgram] += curngrams->size() >= 0 ? 1.0/(float)curngrams->size() : 0;
 	} else {
-	    strings2counts[*t] = curngrams->size() >= 0 ? 1.0/(float)curngrams->size() : 0;
+	    ngtable[theNgram] = curngrams->size() >= 0 ? 1.0/(float)curngrams->size() : 0;
 	}
       }
     }
-
-    // -- verbosity
-    if (verbose) ntokens++;
 }
 
 
@@ -408,31 +428,57 @@ inline void dwds_tagger_trainer::train_next_token(void)
  */
 bool dwds_tagger_trainer::write_param_file(FILE *out=stdout)
 {
-  // -- sorted string-list
+  // -- use a sorted string-list
   //set<FSMSymbolString> allstrings;
   //for (sci = strings2counts.begin(); sci != strings2counts.end(); sci++) {
   //  allstrings.insert(sci->first);
   //}
-  fputs("%% Parameter File\n", out);
   //for (set<FSMSymbolString>::iterator asi = allstrings.begin(); asi != allstrings.end(); asi++) {
   //  fprintf(out, "%s\t%f\n", asi->c_str(), strings2counts[*asi]);
   //}
 
   // -- unsorted
-  for (sci = strings2counts.begin(); sci != strings2counts.end(); sci++) {
-    fprintf(out, "%s\t%f\n", sci->first.c_str(), sci->second);
+  for (ngti = ngtable.begin(); ngti != ngtable.end(); ngti++) {
+    for (NGramVector::const_iterator ngvi = ngti->first.begin(); ngvi != ngti->first.end(); ngvi++) {
+      fputs(ngvi->c_str(),out);
+      fputc('\t',out);
+    }
+    fprintf(out,"%f\n",ngti->second);
   }
   return true;
 }
 
 /*
- *
+ * read_param_file(file,filename)
+ *  + adds counts from given param file to internal table 'strings2counts'
  */
-bool dwds_tagger_trainer::read_param_file(FILE *in=stdin)
+bool dwds_tagger_trainer::read_param_file(FILE *in=stdin,const char *filename=NULL)
 {
+  //--  MECKER
   fprintf(stderr,"dwdst_tagger_trainer::read_param_file(): not yet implemented!\n");
   abort();
   return false;
+
+  /*
+  int tok;
+  dwdst_param_lexer plexer;
+  plexer.select_streams(in,stdout);
+
+  FSMSymbolString symstr;
+  float symcnt;
+
+  while ((tok = plexer.yylex()) != dwdst_param_lexer.PF_EOF) {
+    switch (tok) {
+    case dwdst_param_lexer::PF_REGEX:
+      symstr.append((char *)lexer.yytext);
+      break;
+    case dwdst_param_lexer::PF_COUNT:
+      symcnt = atof((char *)lexer.yytext);
+      break;
+    default:
+    }
+    }*/
+  return true;
 }
 
 /*--------------------------------------------------------------------------

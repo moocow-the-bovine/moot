@@ -176,12 +176,17 @@ inline void dwds_tagger::tag_token(void)
       /*-- tags-only, madwds native format */
       fprintf(outfile, ": %d Analyse(n)\n", tagresults.size());
       for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
-	fputs("\t[", outfile);
-	fputs(want_avm && *(tri->c_str()) == '_'
-	      ? tri->c_str()+1
-	      : tri->c_str(),
-	      outfile);
-	fputs("]\n", outfile);
+	  /*
+	    fputs("\t[", outfile);
+	    fputs(want_avm && *(tri->c_str()) == '_'
+	       ? tri->c_str()+1
+   	       : tri->c_str(),
+	       outfile);
+	    fputs("]\n", outfile);
+	  */
+	fputc('\t',outfile);
+	fputs(tri->c_str(), outfile);
+	fputc('\n', outfile);
       }
       fputc('\n',outfile);
     }
@@ -317,7 +322,11 @@ set<FSMSymbolString> *dwds_tagger::get_fsm_tag_strings(FSM *fsa, set<FSMSymbolSt
   if (!tag_strings) tag_strings = new set<FSMSymbolString>();
 
   for (set<FSMSymbol>::const_iterator t = fsm_tags_tmp.begin(); t != fsm_tags_tmp.end(); t++) {
-    tag_strings->insert(*(syms->symbol_to_symbolname(*t)));
+      FSMSymbolString tagstr = *(syms->symbol_to_symbolname(*t));
+      if (want_avm && tagstr[0] == '_') { tagstr.replace(0,1,"["); }
+      else { tagstr.insert(0,"["); }
+      tagstr.append("]");
+      tag_strings->insert(tagstr);
   }
 
   fsm_tags_tmp.clear();
