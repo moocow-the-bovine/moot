@@ -1,5 +1,5 @@
 ## File: doc/Makefile.am
-## Package: dwdst
+## Package: moot
 ## Description:
 ##   + automake file for doc/ subdir of KDWDS PoS-tagger library
 ##
@@ -11,7 +11,7 @@
 ##-----------------------------------------------------------------------
 
 ## --- recursion subdirectories
-SUBDIRS = libdwdst programs
+SUBDIRS = libmoot programs
 
 #-----------------------------------------------------------------------
 # Variables: cleanup
@@ -32,7 +32,7 @@ MAINTAINERCLEANFILES = *~ .*~ Makefile Makefile.in
 #-----------------------------------------------------------------------
 # Variables: (un)install
 #-----------------------------------------------------------------------
-pkgdoc_UNINSTALL_FILES = libdwdst programs README.txt
+pkgdoc_UNINSTALL_FILES = libmoot programs README.txt
 uninstall-local:
 	for f in $(pkgdoc_UNINSTALL_FILES) ; do \
 	   rm -rf $(DESTDIR)$(pkgdocdir)/$$f ;\

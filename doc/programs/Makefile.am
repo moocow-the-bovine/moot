@@ -1,5 +1,5 @@
 ## File: doc/programs/Makefile.am
-## Package: dwdst
+## Package: moot
 ## Description:
 ##   + program-doc-level automake file for DWDS PoS tagger programs
 ##
@@ -36,19 +36,19 @@ SUFFIXES = .gog .pod .txt .1 .html .tex .dvi .ps .pdf
 ##-----------------------------------------------------------------------
 all-local: $(man_MANS)
 
-txt: $(dwdst_program_gogs:.gog=.txt)
+txt: $(moot_program_gogs:.gog=.txt)
 
-man: $(dwdst_program_gogs:.gog=.1)
+man: $(moot_program_gogs:.gog=.1)
 
-html: $(dwdst_program_gogs:.gog=.html)
+html: $(moot_program_gogs:.gog=.html)
 
-latex: $(dwdst_program_gogs:.gog=.tex)
+latex: $(moot_program_gogs:.gog=.tex)
 
-dvi: $(dwdst_program_gogs:.gog=.dvi)
+dvi: $(moot_program_gogs:.gog=.dvi)
 
-ps: $(dwdst_program_gogs:.gog=.ps)
+ps: $(moot_program_gogs:.gog=.ps)
 
-pdf: $(dwdst_program_gogs:.gog=.pdf)
+pdf: $(moot_program_gogs:.gog=.pdf)
 
 
 ##-----------------------------------------------------------------------
