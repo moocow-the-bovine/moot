@@ -109,7 +109,7 @@ FSM *dwdstTrainer::generate_unknown_fsa()
   if (ufsa) ufsa->fsm_clear();
   else {
     ufsa = new FSM();
-    ufsa->set_fsm_type(false,false);
+    ufsa->fsm_set_fsm_type(false,false);
   }
 
   // -- add start state
@@ -291,7 +291,7 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
   // -- create & initialize dfsa
   if (dfsa) { delete dfsa; }
   dfsa = new FSM();
-  dfsa->set_fsm_type(false,true);
+  dfsa->fsm_set_fsm_type(false,true);
   FSMRepresentation *rep = dfsa->fsm_representation();
   FSMWeight freecost = rep->cost_structure()->freecost();
 

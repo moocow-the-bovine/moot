@@ -1,5 +1,5 @@
 *~
-k.*par
+.*par
 *.*par.s
 *.o
 *.a
@@ -10,3 +10,7 @@ dwdst_param_lexer.h
 parcpy
 plextest
 trim
+*.dot
+*.ps
+*.dps
+*.fsa

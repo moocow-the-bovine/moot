@@ -27,6 +27,7 @@ all:
 	@echo "  re=REGEX (re|re-ps|re-gv)"
 	@echo "  utags=TAGLIST ufst"
 	@echo "  dfsa=DISAMBIGFSA [par=PARFILE] [atags=ALLTAGS] (dfsa|dfsa-ps|dfsa-gv)"
+	@echo "  word=WORD word"
 	@echo "-----------------------------------------------------"
 
 #-----------------------------------------------------------------------
@@ -88,6 +89,7 @@ ufst  ?= $(utags:.tags=.fst)
 .PHONY: unknown
 
 unknown: $(ufst)
+ufst: $(ufst)
 
 $(ufst): $(FSTGEN) $(sym) $(utags)
 	$(FSTGEN) --unknown \
@@ -214,6 +216,34 @@ agv: $(afst:.afst=.ps)
 
 .sym.scl:
 	lexmakelab $*
+
+#-----------------------------------------------------------------------
+# word-analysis
+#-----------------------------------------------------------------------
+word ?= Wort
+
+.PHONY: word _word
+word: words/$(word).fsa
+_word: words/_$(word).fsa
+
+words/$(word).fsa: $(morph) $(sym)
+	FSMlookup --symbols=$(sym) --fst=$(morph) -F "words/$(word).fsa" "$(word)"
+
+words/_$(word).fsa: words/$(word).fsa $(sym)
+	FSMcompre --symbols=$(sym) "[WordBoundary]" | \
+	  FSMconcat - "words/$(word).fsa" -F "words/_$(word).fsa"
+
+.PHONY: wordps wordgv _wordps _wordgv
+
+wordps: words/$(word).ps
+wordgv: wordps ; gv "words/$(word).ps"
+
+_wordps: words/_$(word).ps
+_wordgv: _wordps ; gv "words/_$(word).ps"
+
+.PHONY: nowords
+nowords:
+	rm -f words/*
 
 #-----------------------------------------------------------------------
 # cleanup
