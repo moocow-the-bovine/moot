@@ -38,8 +38,8 @@ cmdutil_file_info::~cmdutil_file_info()
 }
 
 
-// FILE *cmdutil_file_info::open(mode)
-FILE *cmdutil_file_info::open(const char *mode="r")
+// FILE *cmdutil_file_info::open(mode="r")
+FILE *cmdutil_file_info::open(const char *mode)
 {
   if (file) close();
   if (!name) {

@@ -89,7 +89,7 @@ class dwdstLexfreqsCompiler : public dwdstLexfreqsParser {
    * low-level parsing method: parse all remaining n-grams
    * from the currently selected input source.
    */
-  inline dwdstLexfreqs *parse_lexfreqs();
+  dwdstLexfreqs *parse_lexfreqs();
 
   // -- low-level public methods: ERRORS & WARNINGS
   /** yyerror: report parse errors. */

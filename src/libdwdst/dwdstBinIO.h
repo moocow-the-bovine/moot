@@ -15,17 +15,20 @@
 #include <string>
 #include <map>
 #include <set>
-#include <hash_map>
-#include <hash_set>
+
+/* included in dwdstTypes.h */
+//#include <hash_map>
+//#include <hash_set>
+#include <dwdstTypes.h>
 
 #include <FSM.h>
 #include <FSMTypes.h>
 
-#include "dwdstEnum.h"
-#include "dwdstMorph.h"
-#include "dwdstCHMM.h"
+#include <dwdstEnum.h>
+#include <dwdstMorph.h>
+#include <dwdstCHMM.h>
 
-#include "dwdstBinStream.h"
+#include <dwdstBinStream.h>
 
 /** Namespace for structured binary stream I/O */
 namespace dwdstBinIO {
@@ -172,7 +175,7 @@ namespace dwdstBinIO {
       if (!size_item.save(os, x.size())) return false;
 
       //-- save items
-      for (vector<ValT>::const_iterator xi = x.begin(); xi != x.end(); xi++) {
+      for (typename vector<ValT>::const_iterator xi = x.begin(); xi != x.end(); xi++) {
 	if (!val_item.save(os,*xi)) return false;
       }
       return true;
@@ -214,7 +217,7 @@ namespace dwdstBinIO {
       if (!size_item.save(os, x.size())) return false;
 
       //-- save items
-      for (set<ValT>::const_iterator xi = x.begin(); xi != x.end(); xi++) {
+      for (typename set<ValT>::const_iterator xi = x.begin(); xi != x.end(); xi++) {
 	if (!val_item.save(os,*xi)) return false;
       }
       return true;
@@ -255,7 +258,7 @@ namespace dwdstBinIO {
       if (!size_item.save(os, x.size())) return false;
 
       //-- save items
-      for (hash_set<ValT>::const_iterator xi = x.begin(); xi != x.end(); xi++) {
+      for (typename hash_set<ValT>::const_iterator xi = x.begin(); xi != x.end(); xi++) {
 	if (!val_item.save(os,*xi)) return false;
       }
       return true;
@@ -299,7 +302,7 @@ namespace dwdstBinIO {
       if (!size_item.save(os, x.size())) return false;
 
       //-- save items
-      for (map<KeyT,ValT>::const_iterator xi = x.begin(); xi != x.end(); xi++) {
+      for (typename map<KeyT,ValT>::const_iterator xi = x.begin(); xi != x.end(); xi++) {
 	if (!key_item.save(os,xi->first) || !val_item.save(os,xi->second))
 	  return false;
       }
@@ -345,7 +348,7 @@ namespace dwdstBinIO {
       if (!size_item.save(os, x.size())) return false;
 
       //-- save items
-      for (hash_map<KeyT,ValT>::const_iterator xi = x.begin(); xi != x.end(); xi++) {
+      for (typename hash_map<KeyT,ValT>::const_iterator xi = x.begin(); xi != x.end(); xi++) {
 	if (!key_item.save(os,xi->first) || !val_item.save(os,xi->second))
 	  return false;
       }
@@ -383,14 +386,14 @@ namespace dwdstBinIO {
   template<class NameT, class HashFunc, class NameEqlFunc>
   class Item<dwdstEnum<NameT,HashFunc,NameEqlFunc> > {
   public:
-    Item<dwdstEnum<NameT,HashFunc,NameEqlFunc>::Id2NameMap> i2n_item;
+    Item<typename dwdstEnum<NameT,HashFunc,NameEqlFunc>::Id2NameMap> i2n_item;
   public:
     inline bool load(iBinStream &is, dwdstEnum<NameT,HashFunc,NameEqlFunc> &x) const
     {
       if (i2n_item.load(is, x.ids2names)) {
 	x.names2ids.resize(x.ids2names.size());
 	unsigned u;
-	dwdstEnum<NameT,HashFunc,NameEqlFunc>::Id2NameMap::const_iterator ni;
+	typename dwdstEnum<NameT,HashFunc,NameEqlFunc>::Id2NameMap::const_iterator ni;
 	for (ni = x.ids2names.begin(), u = 0; ni != x.ids2names.end(); ni++, u++)
 	  {
 	    x.names2ids[*ni] = u;

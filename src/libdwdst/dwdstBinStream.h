@@ -122,6 +122,7 @@ namespace dwdstBinStream {
     iccBinStream(istream *ins=NULL) : is(ins) {};
 
     /* Open */
+    /*
     virtual bool dopen(int fd) {
       if (is) {
 	delete is;
@@ -130,6 +131,7 @@ namespace dwdstBinStream {
       is = new ifstream(fd);
       return *is;
     };
+    */
 
     /* Close */
     virtual void close(void) {
@@ -155,6 +157,7 @@ namespace dwdstBinStream {
     occBinStream(ostream *outs=NULL) : os(outs) {};
 
     /* Open */
+    /*
     virtual bool dopen(int fd) {
       if (os) {
 	delete os;
@@ -163,6 +166,7 @@ namespace dwdstBinStream {
       os = new ofstream(fd);
       return *os;
     };
+    */
 
     /* Close */
     virtual void close(void) {

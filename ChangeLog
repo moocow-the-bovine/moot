@@ -1,5 +1,18 @@
 ChangeLog for package dwdst
 
+v1.0.3 Tue,  2 Dec 2003 02:13:52 +0100
+  + changes for compilation with g++-3.2
+    - removed many redundant param-default specifications in non-prototype declarations
+    - liberally sprinkled 'typename' keywords where g++ requested them
+    - removed 'dopen()' method from [io]ccBinStream -- looks like
+      there's no good way to make c++ streams jive with fds: ugly but true.
+  + NOTE:
+    - problems compiling on helios (RedHat) with a newer version
+	of bison++ (i.e. not my 'flex++bison++' package) -- g++ eventually
+	pukes with a complaint about 'YY_BUFFER_STATE' not being a defined
+	type.  SOLUTION: dropping in 'flexskel.*', 'bison.*' from the native
+	flex++ / bison++ distribution(s) seems to have fixed things.
+	
 v1.0.2 Mon, 25 Aug 2003 04:04:44 +0200
   + added dwdstHMMTrainer class and executable 'dwdstrain'
 	- names may change to speed things up for fully supervised training

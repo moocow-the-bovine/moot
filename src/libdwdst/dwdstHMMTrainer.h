@@ -44,6 +44,7 @@ public:
 
   /** Class for on-the-fly computation of n-gram sets */
   class NgramSet {
+  public:
     //-- iteration
     struct ngIteratorItem {
       size_t pos;

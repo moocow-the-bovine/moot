@@ -358,7 +358,10 @@ bool dwdstCHMM::save(const char *filename, int compression_level)
   return rc;
 }
 
-bool dwdstCHMM::save(dwdstBinStream::oBinStream &obs, const char *filename=NULL)
+/*
+ * bool dwdstCHMM::save(dwdstBinStream::oBinStream &obs, const char *filename=NULL)
+ */
+bool dwdstCHMM::save(dwdstBinStream::oBinStream &obs, const char *filename)
 {
   HeaderInfo hi(string("dwdstCHMM"),
 		BINCOMPAT_VER,     BINCOMPAT_REV,
@@ -387,7 +390,7 @@ bool dwdstCHMM::save(dwdstBinStream::oBinStream &obs, const char *filename=NULL)
 }
 
 
-bool dwdstCHMM::_bindump(dwdstBinStream::oBinStream &obs, const char *filename=NULL)
+bool dwdstCHMM::_bindump(dwdstBinStream::oBinStream &obs, const char *filename)
 {
   if (!dwdstHMM::_bindump(obs,filename))
     return false;
@@ -425,7 +428,10 @@ bool dwdstCHMM::_bindump(dwdstBinStream::oBinStream &obs, const char *filename=N
  * Binary I/O: load
  *--------------------------------------------------------------------------*/
 
-bool dwdstCHMM::load(const char *filename=NULL)
+/*
+ * bool dwdstCHMM::load(const char *filename=NULL)
+ */
+bool dwdstCHMM::load(const char *filename)
 {
   //-- setup gzFile
   gzFile gzs = gzopen(filename, "rb");
@@ -443,7 +449,8 @@ bool dwdstCHMM::load(const char *filename=NULL)
   return rc;
 }
 
-bool dwdstCHMM::load(dwdstBinStream::iBinStream &ibs, const char *filename=NULL)
+//bool dwdstCHMM::load(dwdstBinStream::iBinStream &ibs, const char *filename=NULL)
+bool dwdstCHMM::load(dwdstBinStream::iBinStream &ibs, const char *filename)
 {
   clear(true); //-- make sure the object is empty
 
@@ -495,7 +502,8 @@ bool dwdstCHMM::load(dwdstBinStream::iBinStream &ibs, const char *filename=NULL)
 }
 
 
-bool dwdstCHMM::_binload(dwdstBinStream::iBinStream &ibs, const char *filename=NULL)
+//bool dwdstCHMM::_binload(dwdstBinStream::iBinStream &ibs, const char *filename=NULL)
+bool dwdstCHMM::_binload(dwdstBinStream::iBinStream &ibs, const char *filename)
 {
   //-- superclass load
   if (!dwdstHMM::_binload(ibs, filename))

@@ -89,7 +89,7 @@ class dwdstNgramsCompiler : public dwdstNgramsParser {
    * low-level parsing method: parse all remaining n-grams
    * from the currently selected input source.
    */
-  inline dwdstNgrams *parse_ngrams();
+  dwdstNgrams *parse_ngrams();
 
   // -- low-level public methods: ERRORS & WARNINGS
   /** yyerror: report parse errors. */
