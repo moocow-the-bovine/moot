@@ -58,9 +58,9 @@
     /** number of tokens processed (for verbose mode) */\
     unsigned int ntokens; \
     /** output sentence separator */ \
-    dwdstTagString output_sentence_separator; \
+    dwdst::dwdstTagString output_sentence_separator; \
     /** output token separator */ \
-    dwdstTagString output_token_separator; \
+    dwdst::dwdstTagString output_token_separator; \
     \
     /* -- local methods */ \
     /** preprocess a C-stream */\

@@ -30,6 +30,7 @@
 /** Namespace for structured binary stream I/O */
 namespace dwdstBinIO {
   using namespace std;
+  using namespace dwdst;
   using namespace dwdstBinStream;
 
   /*------------------------------------------------------------

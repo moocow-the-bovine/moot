@@ -9,7 +9,9 @@
 #ifndef _DWDST_MORPH_H_
 #define _DWDST_MORPH_H_
 
-/// Define this to enable verbose debugging
+/** \def DWDST_MORPH_DEBUG
+ * Define this to enable verbose debugging
+ */
 #define DWDST_MORPH_DEBUG
 //#undef DWDST_MORPH_DEBUG
 
@@ -21,14 +23,17 @@
 #include <FSM.h>
 
 #include "dwdstTypes.h"
-#include "dwdstTaggerLexer.h"
+
+DWDST_BEGIN_NAMESPACE
 
 
 /*--------------------------------------------------------------------------
  * dwdstMorph : morphological tagger class
  *--------------------------------------------------------------------------*/
 
-/// High-level class to perform morphological analysis.
+/**
+ * \brief High-level class for libFSM morphological analyzers.
+ */
 class dwdstMorph {
 public:
   /*------------------------------------------------------------
@@ -61,30 +66,66 @@ public:
   /*------------------------------------------------------------
    * public data : guts
    */
-    
-  /** The symspec to use for morphological analysis. */
+  /// \name Guts
+  //@{
+  /**
+   * The symspec to use for morphological analysis (and tag-extraction).
+   */
   FSMSymSpec *syms;
     
-  /** Morphology FST to use for analysis. */
+  /** Morphology FST \f$T_{morph}\f$ to use for analysis:
+      \f[
+        \begin{eqnarray*}
+          Morph(w) &:=& \pi_{2}(ID_w \circ T_{morph})\cr
+          Analyses(w) &:=& strings(Morph(w))
+        \end{eqnarray*}
+      \f]
+
+      \warning The analyzer FST \f$T_{morph}\f$ may not contain any input epsilon cycles!
+      \warning The analysis FSAs \f$Morph(w)\f$ may not contain any epsilon cycles!
+  */
   FSM *mfst;
 
   /**
-   * Tag-extraction FST:
-   * tags = project(2,strings(mfst(w) ° tagfst))
-   */
+   * Tag-extraction FST \f$T_{tagx}\f$:
+     \f[
+       \begin{eqnarray*}
+         Tagx(w) &:=&
+           \left\{
+             \begin{array}{ll}
+               \pi_{2}(Morph(w) \circ T_{tagx}) & \textrm{if}\ T_{tagx} \not= NULL\cr
+               Morph(w) & \textrm{otherwise}
+             \end{array}
+           \right.
+         \cr
+         PoS(w) &:=& strings(Tagx(w))
+       \end{eqnarray*}
+
+       \warning The extractor FST \f$T_{tagx}\f$ may not contain any input epsilon cycles!
+       \warning The extracted tag-FSAs \f$Tagx(w)\f$ may not contain any epsilon cycles!
+     \f]
+  */
   FSM *xfst;
+  //@}
+
 
   /*------------------------------------------------------------
    * public data : filenames
    */
-
+  /// \name Filenames
+  /// Used for dwdstCHMM binary model load/save.
+  //@{
   string syms_filename;  /**< Name of the symbols-file (for "binary" save) */
   string mfst_filename;  /**< Name of the FST-file (for "binary" save) */
   string xfst_filename; /**< Name of the tag-extraction FST-file (for "binary" save) */
+  //@}
 
   /*------------------------------------------------------------
    * public data : flags
    */
+
+  /** \name Flags */
+  //@{
   /** Generate output strings in AVM (madwds-"vector") mode? (default = false) */
   bool want_avm;
 
@@ -94,32 +135,44 @@ public:
   /** Do NEGRA-style dequoting in output-string generation ? (default = false) */
   bool do_dequote;
   
-  /** verbosity level (0..2) : see enum dwdstMorph::VerbosityLevel */
+  /** verbosity level (0..2)
+   * \see dwdstMorph::VerbosityLevel
+   */
   int verbose;
-
+  //@}
+  
   /*------------------------------------------------------------
    * public data : statistics
    */
 
+  /** \name Statistics / performance tracking */
+  //@{
   /** number of tokens processed */
   unsigned int ntokens;
 
   /** number of unknown tokens encountered */
   unsigned int nunknown;
-  
+  //@}
+
 protected:
   /*------------------------------------------------------------
    * protected data : flags
    */
+
+  /** \name Houskeeping flags */
+  //@{
   bool i_made_syms;
   bool i_made_mfst;
   bool i_made_xfst;
+  //@}
 
 protected:
   /*------------------------------------------------------------
    * protected data : temporaries
    */
 
+  /** \name Pre-allocated temporaries */
+  //@{
   /** pre-allocated temporary: morphological analysis output FSA */
   FSM *result, *tmp, *tmpx;
   /** pre-allocated temporary: current token */
@@ -144,11 +197,15 @@ protected:
 
   /** pre-allocated temporary: for analysisStrings() */
   TagStringSet analysis_strings;
+  //@}
 
 public:
   /*------------------------------------------------------------
    * public methods: constructor / destructor
    */
+
+  /** \name Construction / Destruction */
+  //@{
   /** constructor */
   dwdstMorph(FSMSymSpec *mysyms=NULL, FSM *myfst=NULL, FSM *myxfst=NULL) :
     syms(mysyms), 
@@ -173,12 +230,14 @@ public:
 
   /** destructor */
   ~dwdstMorph();
-
+  //@}
 
   /*------------------------------------------------------------
    * public methods: initialization
    */
 
+  /** \name Initialization */
+  //@{
   /** Load morphological symbols-file, "filename" defaults to 'syms_filename' */
   FSMSymSpec *load_morph_symbols(const char *filename=NULL);
 
@@ -203,11 +262,14 @@ public:
       }
     return xfst;
   };
+  //@}
 
   /*------------------------------------------------------------
    * public methods: top-level: tagging utilities
    */
 
+  /** \name Tagging: Top-level */
+  //@{
   /** Top-level: tag tokens from a C-stream, using a dwdstTaggerLexer */
   bool tag_stream(FILE *in=stdin, FILE *out=stdout, char *srcname=NULL);
 
@@ -223,18 +285,15 @@ public:
       fputc('\n', out);
     }
   };
-
-  /*------------------------------------------------------------
-   * public methods: low-level: initialization
-   */
-
-  /** Low-level FSTfile loading utility */
-  FSM *load_fsm_file(const char *fsm_file, FSM **fsm, bool *i_made_fsm=NULL);
+  //@}
 
   /*------------------------------------------------------------
    * public methods: analysis
    */
 
+  /** \name Analysis */
+
+  //@{
   /**
    * mid-level tagging utility: tag a single token
    * 'token' defaults to 'curtok_s'.
@@ -295,30 +354,37 @@ public:
 
     return analyses;
   };
+  //@}
 
   /*------------------------------------------------------------
    * public methods: tag-extraction
    */
+
+  /** \name PoS-Tag Extraction */
+  //@{
   /**
    * This method should just be a pair of libFSM calls,
    * but since they don't work (HINT), it's big and slow...
    * Complaints to tom@ling.uni-potsdam.de.
+   * @param morph_w Token-Analysis result FSM.
+   * @param pos_w PoS-analyses to generate (clear it first)
+   * @return pos_w
    */
-  inline void extract_tags(FSM &fsm, MorphAnalysisSet &as)
+  MorphAnalysisSet &extract_tags(FSM &morph_w, MorphAnalysisSet &pos_w)
   {
     //-- QUACK: this should work, but it doesn't (no FSMModeDestructive for compose())
-    //tmp->fsm_compose(*tagx, FSM::FSMModeDestructive);
+    //morph_w->fsm_compose(*tagx, FSM::FSMModeDestructive);
 
     //-- KABOOM: this too should work, but it segfaults (no FSA->compose(FST) ?!)
-    //*tmpx = tmp->fsm_compose(*tagx, FSM::FSMModeConstructive);
+    //*tmpx = morph_w->fsm_compose(*tagx, FSM::FSMModeConstructive);
 
     //-- QUACK/KABOOM: followed by:
-    //tmpx->fsm_symbol_vectors(as, false);
+    //tmpx->fsm_symbol_vectors(pos_w, false);
 
     //-- HACK: this *REALLY* ought to work, because I friggin wrote it!
     //   (unfortunately, it's dog slow!)
     xanalyses.clear();
-    fsm.fsm_symbol_vectors(xanalyses, false);
+    morph_w.fsm_symbol_vectors(xanalyses, false);
     for (MorphAnalysisSet::const_iterator xai = xanalyses.begin(); xai != xanalyses.end(); xai++) {
       tmpx->fsm_clear();
       xfst->fsm_lookup_vector(xai->istr, tmpx, true);
@@ -326,26 +392,33 @@ public:
       tmpx->fsm_symbol_vectors(xxanalyses, false);
       for (MorphAnalysisSet::const_iterator xxai = xxanalyses.begin(); xxai != xxanalyses.end(); xxai++)
 	{
-	  as.insert(MorphAnalysis(xai->istr, xxai->istr, xxai->weight+xai->weight));
+	  pos_w.insert(MorphAnalysis(xai->istr, xxai->istr, xxai->weight+xai->weight));
 	}
     }
+    return pos_w;
   };
+  //@}
+
 
   /*------------------------------------------------------------
    * public methods: sanity checking
    */
-
+  /** \name Sanity checking */
+  //@{
   /** tagging utility: sanity check */
   inline bool can_tag(void) const
   {
     return (syms && mfst && *mfst);
   }
+  //@}
 
 
   /*------------------------------------------------------------
    * public methods: tagging utilities: string-generation
    */
 
+  /** \name Stringification / Output */
+  //@{
   /**
    * Tagging utility: stringify a single token analysis-set.
    */
@@ -368,8 +441,9 @@ public:
 
   /**
    * Prints analyses to the specified output stream.
-   * 'token' defaults to 'curtok',
-   * 'ans' defaults to 'analyses' member, 'out' defaults to STDOUT.
+   * @param out Defaults to 'stdout'
+   * @param token Defaults to current token 'curtok'
+   * @param anls Defaults to current analyses 'analyses'
    */
   inline void print_token_analyses(FILE *out = stdout,
 				   const char *token = NULL,
@@ -445,12 +519,19 @@ public:
 
   /** Convert symbol-vectors to pretty strings: dequoting (ugly, but useful) */
   void symbol_vector_to_string_dq(const vector<FSMSymbol> &vec, FSMSymbolString &str) const;
+  //@}
+
 
   /*------------------------------------------------------------
    * public methods: low-level: errors/warnings
    */
-
-  /** Hack: check, print, & clear messages associated with our FSMSymSpec */
+  /** \name Errors / Warnings */
+  //@{
+  /**
+   * Hack: check, print, & clear messages associated with our FSMSymSpec
+   * We have to keep calling this, otherwise FSMSymSpec would eventually
+   * grab all available memory (argh).
+   */
   inline void check_symspec_messages(void)
   {
     if (syms->messages && !syms->messages->empty()) {
@@ -463,9 +544,24 @@ public:
     }
   };
 
+  /** Error reporting */
+  void carp(char *fmt, ...) const;
+  //@}
+
+
+  /*------------------------------------------------------------
+   * public methods: low-level: initialization
+   */
+  /** \name Various low-level stuff */
+  //@{
+  /** Low-level FSTfile loading utility */
+  FSM *load_fsm_file(const char *fsm_file, FSM **fsm, bool *i_made_fsm=NULL);
+
   /*------------------------------------------------------------
    * checksum
    */
+
+  /** Return a checksum based on morphology-fst properties */
   size_t checksum(void)
   {
     size_t crc = 0;
@@ -477,10 +573,30 @@ public:
     }
     return crc;
   };
+  //@}
 
-  /** Error reporting */
-  void carp(char *fmt, ...) const;
+  /*------------------------------------------------------------
+   * public methods: debugging
+   */
+  /** \name Debugging */
+  //@{
+  /** Convert a symbol-vector to a numeric string */
+  string symbol_vector_to_string_n(const FSM::FSMSymbolVector &v);
 
+  /** Stringify a token-analysis-set (weighted-vector version) */
+  string analyses_to_string(const set<FSM::FSMWeightedSymbolVector> &analyses);
+
+  /** Stringify a token-analysis-set (weighted-string-version) */
+  string analyses_to_string(const set<FSM::FSMStringWeight> &analyses);
+
+  /** Stringify a token-analysis-set (numeric-tags version) */
+  string analyses_to_string(const set<FSMSymbol> &analyses);
+
+  /** Stringify a token-analysis-set (string-tags version) */
+  string analyses_to_string(const set<FSMSymbolString> &analyses);
+  //@}
 };
+
+DWDST_END_NAMESPACE
 
 #endif // _DWDST_MORPH_H_

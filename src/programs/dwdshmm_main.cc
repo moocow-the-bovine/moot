@@ -31,6 +31,7 @@
 #include "dwdshmm_cmdparser.h"
 
 using namespace std;
+using namespace dwdst;
 
 /*--------------------------------------------------------------------------
  * Globals

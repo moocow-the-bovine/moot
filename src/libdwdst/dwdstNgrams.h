@@ -12,19 +12,22 @@
 
 #include <dwdstTypes.h>
 
+DWDST_BEGIN_NAMESPACE
+
 /**
- * Class for storage & retrieval of N-Gram counts
+ * \brief Class for storage & retrieval of raw N-Gram frequencies.
  */
 class dwdstNgrams {
+
 public:
   //------ public typedefs
   
   /** Type for a single N-Gram, string form */
   typedef  deque<dwdstTagString> NgramString;
-  
-  /** Type for an N-Gram count */
-  typedef float NgramCount;
 
+  /** Type for an N-Gram count */
+  typedef CountT NgramCount;
+  
   /** Utilities for dwdstNgrams::NgramString */
   class NgramStringUtils {
   public:
@@ -92,13 +95,15 @@ public:
   /** Add 'count' to the current count for 'ngram', returns new count */
   inline NgramCount add_count(const NgramString &ngram, const NgramCount count)
   {
+    /*
     if (ngtable.find(ngram) != ngtable.end()) {
       ngtable[ngram] = count;
     } else {
       ngtable[ngram] += count;
     }
+    */
     if (ngram.size() == 1) ugtotal += count;
-    return ngtable[ngram];
+    return ngtable[ngram] += count;
   };
 
 
@@ -158,6 +163,6 @@ public:
   bool save(FILE *file, char *filename = NULL, bool compact=false);
 };
 
-
+DWDST_END_NAMESPACE
 
 #endif /* _DWDST_NGRAMS_H */

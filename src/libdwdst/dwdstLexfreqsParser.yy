@@ -65,7 +65,7 @@ typedef struct {
 
 /**
  * \class dwdstLexfreqsParser
- * \brief Bison++ parser for dwdst lexfreq-parameter files.
+ * \brief Bison++ parser for (TnT-style) dwdst lexical frequency parameter files.
  */
 %}
 
@@ -80,9 +80,9 @@ typedef struct {
   public: \
    /* -- public instance members go here */ \
    /** a pointer to the lexfreq-parameter object to hold the data we're parsing */ \
-   dwdstLexfreqs        *lexfreqs; \
+   dwdst::dwdstLexfreqs        *lexfreqs; \
    /* to keep track of all possible tags we've parsed (optional). */ \
-   set<dwdstTagString>  *alltags; \
+   set<dwdst::dwdstTagString>  *alltags; \
   private: \
    /* private instance members go here */ \
   public: \
@@ -104,8 +104,8 @@ typedef struct {
  *------------------------------------------------------------*/
 
 %union {
-  dwdstTokString                   *tokstr;         ///< for single tokens or tags (strings)
-  dwdstLexfreqs::LexfreqCount        count;         ///< for tag-list counts
+  dwdst::dwdstTokString *tokstr;         ///< for single tokens or tags (strings)
+  dwdst::CountT           count;         ///< for tag-list counts
 }
 
 %header{
@@ -157,7 +157,7 @@ token:		TOKEN
 		}
 	|	COUNT
 		{
-		  $$ = new dwdstTokString((const char *)yylloc.text);
+		  $$ = new dwdst::dwdstTokString((const char *)yylloc.text);
 		}
 	;
 

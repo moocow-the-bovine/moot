@@ -2,6 +2,8 @@
 
 README for package 'dwdst'
 
+Last updated for dwdst version 1.0.1
+
 =head1 DESCRIPTION
 
 dwdst - Part-of-Speech tagger using Thomas Hanneforth's libFSM.
@@ -13,6 +15,10 @@ dwdst - Part-of-Speech tagger using Thomas Hanneforth's libFSM.
 =item STLport E<gt>= 4.5.3
 
 Available from http://www.stlport.org
+
+Since libFSM now compiles with gcc >= v3.0, the STLport
+dependency's days may be numbered.  At the moment, STLport
+is still required.
 
 
 =item pkg-config
@@ -44,10 +50,22 @@ get one from the official distribution site of
 this package.
 
 
-=item libFSM
+=item libFSM E<gt>= v0.1.0.6
 
 Currently available only from its original author,
 Thomas Hanneforth E<lt>tom@ling.uni-potsdam.deE<gt>.
+
+You will need a pkg-config metafile (libFSM.pc)
+for this requirement
+in your PKG_CONFIG_PATH in order to compile this
+package -- you can make one yourself, or you can
+get one from
+the official distribution site of this package.
+
+
+=item libFSMext E<gt>= v0.0.1
+
+Should be available wherever you got this package.
 
 You will need a pkg-config metafile (libFSM.pc)
 for this requirement
@@ -89,15 +107,11 @@ these sources.
 
 =head1 KNOWN BUGS
 
-No config-file parsing.
-
-Horribly inaccurate.
-
-Too slow.
+Morphology is still quite slow.
 
 No distribution site.
 
-Many, many more.
+No HMM trainer (use tnt-para(1)).
 
 
 =head1 ACKNOWLEDGEMENTS
@@ -108,10 +122,10 @@ This package was developed as part of the KDWDS project
 at the Berlin-Brandenburgische Akademie der Wissenschaften.
 For details on the DWDS project, visit: http://www.dwds.de.
 
+
 =head1 AUTHORS
 
-Thomas Hanneforth wrote the underlying FSM library and
-the original 'madwds' program.
+Thomas Hanneforth wrote the underlying FSM library.
 
 Bryan Jurish E<lt>moocow@ling.uni-potsdam.deE<gt>
 wrote and maintains the 'dwdst' package itself.

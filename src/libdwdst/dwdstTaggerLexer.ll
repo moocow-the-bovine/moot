@@ -56,11 +56,14 @@
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
-/*!
+/**
  * \class dwdstTaggerLexer
+ * \brief Flex++ lexer for KDWDS tagger.
  *
- * Flex++ lexer for KDWDS tagger.  Assumes pre-tokenized input:
+ * Assumes pre-tokenized input:
  * one token per line,  blank lines = EOS, raw text only (no markup!).
+ * Format: 1 tok/line, comments introduced with '%%'.  Supports
+ * multiple tags/tok.
  */
 
 %}

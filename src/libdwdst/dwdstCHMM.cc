@@ -22,7 +22,8 @@
 #include "dwdstBinIO.h"
 #include "dwdstBinStream.h"
 
-using namespace std;
+DWDST_BEGIN_NAMESPACE
+
 using namespace dwdstBinIO;
 
 /*--------------------------------------------------------------------------
@@ -34,12 +35,29 @@ void dwdstCHMM::clear(bool wipe_everything)
   //-- superclass clear
   dwdstHMM::clear(wipe_everything);
 
+  //-- free used (TagMorphMap)s
+  TmpTagMorphMap *ttmm, *ttmm_next;
+  for (ttmm = ttmms_used; ttmm != NULL; ttmm = ttmm_next) {
+    ttmm_next   = ttmm->next;
+    delete ttmm;
+  }
+  ttmms_used = NULL;
+
+  //-- free unused (TagMorphMap)s
+  for (ttmm = ttmms_free; ttmm != NULL; ttmm = ttmm_next) {
+    ttmm_next   = ttmm->next;
+    delete ttmm;
+  }
+  ttmms_free = NULL;
+
   //-- clear class probabilities
   lcprobs.clear();
 
   //-- clear cache(s)
   morphcache.clear();
-  tmmaps.clear();
+
+  //-- clear fallback(s)
+  tmm_fallback.clear();
 
   //-- check complete reset
   if (wipe_everything) {
@@ -93,8 +111,8 @@ bool dwdstCHMM::compile(const dwdstLexfreqs &lexfreqs,
     const LexProbSubTable   &lps = lexprobs[tokid];
 
     //-- get morph-map (tmm) and lexical class (lc)
-    get_token_morphmap(tokstr, tmm);
-    LexClass &lc = get_morphmap_class(tmm);
+    get_token_morphmap(tokstr, &tmm);
+    LexClass &lc = get_morphmap_class(&tmm);
 
     if (lc.empty()) {
       //-- whoa: it's morph-unknown
@@ -108,7 +126,7 @@ bool dwdstCHMM::compile(const dwdstLexfreqs &lexfreqs,
 	: classids.insert(lc);
       
       //-- possibly cache morphmap
-      if (toktotal > morph_cache_threshhold) morphcache[tokid] = tmm;
+      if (toktotal > morph_cache_threshhold) morphcache[tokid] = TagMorphMap(tmm);
     }
 
     //-- get p(class|tag)-probability subtable
@@ -132,10 +150,17 @@ bool dwdstCHMM::compile(const dwdstLexfreqs &lexfreqs,
   //-- update n_classes
   n_classes = classids.size();
 
+
+  //-- compile fallback morphmap
+  tmm_fallback.clear();
+  for (TagID tagid = 1; tagid < n_tags; tagid++) {
+    tmm_fallback[tagid] = TagMorphAnalysisSet();
+  }
+
   //-- cleanup: reset morphology
   morph.ntokens = 0;
   morph.nunknown = 0;
-  
+ 
   return true;
 }
 
@@ -148,7 +173,7 @@ bool dwdstCHMM::compile_unknown_lclass(void)
   TagMorphMap &ummap = morphcache[0];            //-- "unknown" morph-map
 
   //-- "unknown" class data: morph-map
-  get_token_morphmap(tokids.id2name(0), ummap);  //-- try to lookup "unknown" token
+  get_token_morphmap(tokids.id2name(0), &ummap);  //-- try to lookup "unknown" token
   if (ummap.empty()) {
     //-- ARGH: morphology can't handle "@UNKNOWN" convention: must use FSMRegexCompiler
     string regex;
@@ -189,13 +214,13 @@ bool dwdstCHMM::compile_unknown_lclass(void)
 
     //-- sanity check
     if (!ufsm || !*ufsm || mas.empty()) {
-      carp("dwdstCHMM::compile(): could not populate default ambiguity class!");
+      carp("dwdstCHMM::compile(): could not populate default ambiguity class!\n");
       if (ufsm) delete ufsm;
       return false;
     }
 
     //-- populate ummap
-    analyses2morphmap(mas, ummap);
+    analyses2morphmap(mas, &ummap);
 
     //-- cleanup
     delete ufsm;
@@ -205,7 +230,7 @@ bool dwdstCHMM::compile_unknown_lclass(void)
   //    can't use zero, otherwise we can't recognize previously unknown
   //    REAL classes at runtime!
   //--  no auto-generation allowed!
-  uclassid  = class2classid(get_morphmap_class(ummap), false);
+  uclassid  = class2classid(get_morphmap_class(&ummap), false);
 
   return true;
 }
@@ -232,7 +257,6 @@ bool dwdstCHMM::tag_stream(FILE *in, FILE *out, char *srcname)
   //-- prepare variables
   int tok;
   tokens.clear();
-  tmmaps.clear();
   viterbi_clear();
 
   while ((tok = lexer.yylex()) != dwdstTaggerLexer::DTEOF) {
@@ -300,10 +324,10 @@ void dwdstCHMM::tag_strings(int argc, char **argv, FILE *out, char *infilename)
  *--------------------------------------------------------------------------*/
 
 const HeaderInfo::VersionT BINCOMPAT_MIN_VER = 1;
-const HeaderInfo::VersionT BINCOMPAT_MIN_REV = 4;
+const HeaderInfo::VersionT BINCOMPAT_MIN_REV = 6;
 
 const HeaderInfo::VersionT BINCOMPAT_VER = 1;
-const HeaderInfo::VersionT BINCOMPAT_REV = 4;
+const HeaderInfo::VersionT BINCOMPAT_REV = 6;
 
 bool dwdstCHMM::save(const char *filename, int compression_level)
 {
@@ -319,7 +343,7 @@ bool dwdstCHMM::save(const char *filename, int compression_level)
   //-- open file
   gzFile gzf = gzopen(filename, "wb");
   if (!gzf) {
-    carp("dwdstHMM::save(): open failed for file '%s': %s",
+    carp("dwdstHMM::save(): open failed for file '%s': %s\n",
 	 filename, gzerror(gzf, &errno));
     return false;
   }
@@ -376,9 +400,11 @@ bool dwdstCHMM::_bindump(dwdstBinStream::oBinStream &obs, const char *filename=N
   Item<TokMorphCache>     morphcache_item;
   Item<ClassID>           classid_item;
   Item<ProbT>             probt_item;
+  Item<TagMorphMap>       tmm_item;
 
   if (! (morph_item.save(obs, morph)
 	 && probt_item.save(obs, morph_cache_threshhold)
+	 && tmm_item.save(obs, tmm_fallback)
 	 && size_item.save(obs, n_classes)
 	 && classids_item.save(obs, classids)
 	 && lcprobs_item.save(obs, lcprobs)
@@ -404,7 +430,7 @@ bool dwdstCHMM::load(const char *filename=NULL)
   //-- setup gzFile
   gzFile gzs = gzopen(filename, "rb");
   if (!gzs) {
-    carp("dwdstHMM::load(): could not open file '%s' for read: %s",
+    carp("dwdstHMM::load(): could not open file '%s' for read: %s\n",
 	 filename, strerror(errno));
     return false;
   }
@@ -435,13 +461,13 @@ bool dwdstCHMM::load(dwdstBinStream::iBinStream &ibs, const char *filename=NULL)
 	 && cmt_item.load(ibs, comment)
 	 ))
     {
-      carp("dwdstCHMM::load(): could not load header%s%s",
+      carp("dwdstCHMM::load(): could not load header%s%s\n",
 	   (filename ? " from file " : ""), (filename ? filename : ""));
       return false;
     }
   else if (hi.magic != hi_magic.magic)
     {
-      carp("dwdstCHMM::load(): bad magic 0x%x%s%s",
+      carp("dwdstCHMM::load(): bad magic 0x%x%s%s\n",
 	   hi.magic,
 	   (filename ? " in file " : ""), (filename ? filename : ""));
       return false;
@@ -451,7 +477,7 @@ bool dwdstCHMM::load(dwdstBinStream::iBinStream &ibs, const char *filename=NULL)
 	   || BINCOMPAT_VER < hi.minver
 	   || (BINCOMPAT_VER == hi.minver && BINCOMPAT_MIN_REV < hi.minrev))
     {
-      carp("dwdstCHMM::load(): incompatible file version %u.%u%s%s",
+      carp("dwdstCHMM::load(): incompatible file version %u.%u%s%s\n",
 	   hi.version, hi.revision,
 	   (filename ? " in file " : ""), (filename ? filename : ""));
     }
@@ -460,7 +486,7 @@ bool dwdstCHMM::load(dwdstBinStream::iBinStream &ibs, const char *filename=NULL)
     return false;
 
   if (crc != (start_tagid + n_tags + n_toks + n_classes + uclassid + morph.checksum())) {
-    carp("dwdstCHMM::load(): checksum failed%s%s",
+    carp("dwdstCHMM::load(): checksum failed%s%s\n",
 	 (filename ? " for file " : ""), (filename ? filename : ""));
   }
 
@@ -483,9 +509,11 @@ bool dwdstCHMM::_binload(dwdstBinStream::iBinStream &ibs, const char *filename=N
   Item<TokMorphCache>     morphcache_item;
   Item<ClassID>           classid_item;
   Item<ProbT>             probt_item;
+  Item<TagMorphMap>       tmm_item;
 
   if (! (morph_item.load(ibs, morph)
 	 && probt_item.load(ibs, morph_cache_threshhold)
+	 && tmm_item.load(ibs, tmm_fallback)
 	 && size_item.load(ibs, n_classes)
 	 && classids_item.load(ibs, classids)
 	 && lcprobs_item.load(ibs, lcprobs)
@@ -675,3 +703,5 @@ void dwdstCHMM::txtdump(FILE *file)
  *--------------------------------------------------------------------------*/
 
 //void dwdstCHMM::carp(char *fmt, ...) //-- inherited
+
+DWDST_END_NAMESPACE

@@ -50,8 +50,6 @@
 
 %% here is the declaration from section1 %header{ 
 
-
-
 #ifndef YY_@_TEXT
 #define YY_@_TEXT yytext
 #endif

@@ -49,7 +49,8 @@ libdwdst_la_SOURCES = \
 	dwdstLexfreqsCompiler.cc \
 	dwdstMorph.cc \
 	dwdstHMM.cc \
-	dwdstCHMM.cc
+	dwdstCHMM.cc \
+	dwdstHMMTrainer.cc
 
 libdwdst_old = \
 	dwdstTagger.cc \
@@ -66,8 +67,6 @@ libdwdst_old = \
 #EXTRA_${lib_i}_la_SOURCES = 
 
 ## --- Additional dependencies
-#dwdstTrainer.o: dwdstParamCompiler.h
-#dwdstTrainer.lo: dwdstParamCompiler.h
 dwdstNgrams.lo: dwdstNgramsLexer.h dwdstNgramsParser.h 
 dwdstNgrams.o: dwdstNgramsLexer.h dwdstNgramsParser.h
 dwdstNgramsCompiler.lo: dwdstNgramsLexer.h dwdstNgramsParser.h 
@@ -124,8 +123,9 @@ pkginclude_HEADERS = \
 	dwdstLexfreqsCompiler.h \
 	dwdstLexfreqs.h \
 	dwdstHMM.h \
+	dwdstMorph.h \
 	dwdstCHMM.h \
-	dwdstMorph.h
+	dwdstHMMTrainer.h
 
 pkgheaders_old = \
 	dwdstTagger.h \
@@ -196,7 +196,7 @@ AM_CXXFLAGS = $(DWDST_WFLAGS) $(DWDST_OFLAGS)
 LIBCUR = 1
 
 ## --- The implementation number of the CURRENT interface.
-LIBREV = 0
+LIBREV = 1
 
 ## --- The difference between the newest and oldest interfaces that this
 ##     library implements.  In other words, the library implements all the

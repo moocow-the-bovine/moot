@@ -19,7 +19,9 @@
 #include <FSMTypes.h>
 
 #include "dwdstMorph.h"
+#include "dwdstTaggerLexer.h"
 
+DWDST_BEGIN_NAMESPACE
 using namespace std;
 
 /*--------------------------------------------------------------------------
@@ -102,7 +104,7 @@ FSM *dwdstMorph::load_fsm_file(const char *filename, FSM **fsm, bool *i_made_fsm
  * Tag-extraction (should be inlined eventually)
  *--------------------------------------------------------------------------*/
 
-//void dwdstMorph::extract_tags(FSM &fsm, MorphAnalysisSet &as)
+//dwdstMorph::MorphAnalysisSet& dwdstMorph::extract_tags(FSM &morph_w, MorphAnalysisSet &pos_w)
 
 /*--------------------------------------------------------------------------
  * Top-level tagging methods
@@ -283,3 +285,108 @@ void dwdstMorph::carp(char *fmt, ...) const
     */
   }
 }
+
+
+/*--------------------------------------------------------------------------
+ * Debugging Methods
+ *--------------------------------------------------------------------------*/
+
+/* Convert a symbol-vector to a numeric string */
+string
+dwdstMorph::symbol_vector_to_string_n(const FSM::FSMSymbolVector &v)
+{
+  string vs;
+  char buf[256];
+  for (FSM::FSMSymbolVector::const_iterator vi = v.begin(); vi != v.end(); vi++)
+    {
+      sprintf(buf,"%d",*vi);
+      vs.append(buf);
+    }
+  return vs;
+}
+
+/* Stringify a token-analysis-set (weighted-vector version) */
+string dwdstMorph::analyses_to_string(const set<FSM::FSMWeightedSymbolVector> &analyses)
+{
+  string s = "{";
+  for (set<FSM::FSMWeightedSymbolVector>::const_iterator asi = analyses.begin();
+       asi != analyses.end();
+       asi++)
+    {
+      if (asi != analyses.begin()) s += ", ";
+      s += symbol_vector_to_string_n(asi->istr);
+      if (!asi->ostr.empty()) {
+	s += " : ";
+	s += symbol_vector_to_string_n(asi->istr);
+      }
+      if (asi->weight != 0.0) {
+	char buf[256];
+	sprintf(buf, " <%g>", asi->weight);
+	s += buf;
+      }
+    }
+  s += "}";
+  return s;
+}
+
+
+/* Stringify a token-analysis-set (weighted-string-version) */
+string
+dwdstMorph::analyses_to_string(const set<FSM::FSMStringWeight> &analyses)
+{
+  string s = "{";
+  for (set<FSM::FSMStringWeight>::const_iterator asi = analyses.begin();
+       asi != analyses.end();
+       asi++)
+    {
+      if (asi != analyses.begin()) s += ", ";
+      s += asi->istr;
+      if (!asi->ostr.empty() && asi->ostr != "") {
+	s += " : ";
+	s += asi->ostr;
+      }
+      if (asi->weight != 0.0) {
+	char buf[256];
+	sprintf(buf, " <%g>", asi->weight);
+	s += buf;
+      }
+    }
+  s += "}";
+  return s;
+}
+
+/* Stringify a token-analysis-set (numeric-tags version) */
+string
+dwdstMorph::analyses_to_string(const set<FSMSymbol> &analyses)
+{
+  string s = "{";
+  char buf[256];
+  for (set<FSMSymbol>::const_iterator asi = analyses.begin();
+       asi != analyses.end();
+       asi++)
+    {
+      if (asi != analyses.begin()) s += ", ";
+      sprintf(buf,"%d", *asi);
+      s += buf;
+    }
+  s += "}";
+  return s;
+}
+
+/* Stringify a token-analysis-set (string-tags version) */
+string
+dwdstMorph::analyses_to_string(const set<FSMSymbolString> &analyses)
+{
+  string s = "{";
+  for (set<FSMSymbolString>::const_iterator asi = analyses.begin();
+       asi != analyses.end();
+       asi++)
+    {
+      if (asi != analyses.begin()) s += ", ";
+      s += *asi;
+    }
+  s += "}";
+  return s;
+}
+
+DWDST_END_NAMESPACE

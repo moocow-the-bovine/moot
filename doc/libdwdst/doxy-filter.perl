@@ -23,13 +23,17 @@ GetOptions(
 	   "logfile|l=s"=>\$logfile,
 	  );
 
+$config_cppflags = "";
+do "doxy-filter.cfg";
+
 #-----------------------------------------------------------------------
 # Globals
 #-----------------------------------------------------------------------
 $CPP = $ENV{CPP} || 'cpp';
 $CPPFLAGS = ('-C '         ## -- preserve comments
 	     .'-x c++'     ## -- parse c++ code
-	     .($ENV{CPPFLAGS} || '')
+	     .' '.($ENV{CPPFLAGS} || '')
+	     .' '.$config_cppflags
 	    );
 
 $ppextra = '(?s:\bbison\.h\b)|(?s:\bflexskel\.h\b)';
@@ -58,6 +62,7 @@ sub logopen {
      "> PWD=", `pwd`,
      "> PP_ONLY=", $PP_ONLY ? 1 : 0, "\n",
      "> DO_CPP=", $DO_CPP ? 1 : 0, "\n",
+     "> CPPFLAGS=$CPPFLAGS\n",
     );
 }
 

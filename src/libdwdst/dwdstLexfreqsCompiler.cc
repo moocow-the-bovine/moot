@@ -17,6 +17,8 @@
 #include "dwdstLexfreqsParser.h"
 #include "dwdstLexfreqsCompiler.h"
 
+DWDST_BEGIN_NAMESPACE
+
 /*----------------------------------------------------------------
  * Constructor / Destructors
  *----------------------------------------------------------------*/
@@ -71,3 +73,5 @@ void dwdstLexfreqsCompiler::yywarn(const char *msg) {
 	  (srcname ? srcname : ""),
 	  yylloc.first_line, yylloc.first_column, yylloc.text, msg);
 }
+
+DWDST_END_NAMESPACE

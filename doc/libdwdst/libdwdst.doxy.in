@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 # General configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = "DWDS PoS tagger library"
+PROJECT_NAME           = "libdwdst"
 PROJECT_NUMBER         = 
 OUTPUT_DIRECTORY       = .
 OUTPUT_LANGUAGE        = English
@@ -60,8 +60,9 @@ WARN_LOGFILE           = libdwdst.log
 #---------------------------------------------------------------------------
 INPUT                  = \
 			 @top_srcdir@/src/libdwdst \
-			 ../../src/libdwdst
-FILE_PATTERNS          = *.h
+			 ../../src/libdwdst \
+			 @srcdir@
+FILE_PATTERNS          = *.h *.dox
 RECURSIVE              = NO
 EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO
@@ -77,7 +78,6 @@ IMAGE_PATH             =
 ## macro usage a la flex++/bison++.
 ##
 INPUT_FILTER           = $(PERL) @srcdir@/doxy-filter.perl
-
 ##
 ## Whether to use filtered output for the source browser
 ##

@@ -18,11 +18,12 @@
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
-/*!
- * \class dwdstLexfreqsLexer
- * \brief Flex++ lexer for (TnT-style) dwdst lexical frequency parameter files. 
- * Supports comments introduced with '%%'.
- */
+/**
+\class dwdstLexfreqsLexer
+\brief Flex++ lexer for (TnT-style) dwdst lexical frequency parameter files. 
+
+\details Supports comments introduced with '%%'.
+*/
 %}
 
 %define LEX_PARAM \
@@ -40,7 +41,7 @@
     /** current column*/\
     int theColumn;\
     /** token-buffering */\
-    dwdstTagString tokbuf;\
+    dwdst::dwdstTagString tokbuf;\
     /** whether to clear the token-buffer on 'tokbuf_append()' */\
     bool tokbuf_clear;\
   private: \
@@ -118,7 +119,7 @@ textorsp   [^\n\r\t]
 {textchar}({textorsp}*{textchar})? {
   // -- any other text: append to the token-buffer
   theColumn += yyleng;
-  yylval->tokstr = new dwdstTokString((const char *)yytext);
+  yylval->tokstr = new dwdst::dwdstTokString((const char *)yytext);
   return dwdstLexfreqsParser::TOKEN;
 }
 

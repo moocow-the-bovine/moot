@@ -24,36 +24,47 @@
 #include <zlib.h>
 
 /**
+ * \def DWDST_DEBUG_ARCP
  * Define this for verbose debugging information to stderr.
+ * Actually, arcp() should never be called anymore, so this
+ * probably won't produce any output at all...
  */
 //#define DWDST_DEBUG_ARCP 1
 #undef DWDST_DEBUG_ARCP
 
 /**
+ * \def DWDST_ADD_ONE_HACK
  * Define this to include the 'add one' hack to avoid float underflows
- * WARNING: this can cause problems with sparse data!
+ * WARNING: this causes major problems with sparse data, and using
+ * 'double' as our probability type seems to work just dandy without
+ * this hack.
  */
 //#define DWDST_ADD_ONE_HACK 1
 #undef DWDST_ADD_ONE_HACK
 
 /**
+ * \def dwdstProbEpsilon
  * Constant representing a minimal probability.
+ * Used for default constructor.
  */
 //#define dwdstProbEpsilon FLT_EPSILON
 //#define dwdstProbEpsilon 1e-32
 #define dwdstProbEpsilon DBL_EPSILON
 
 /**
+ * \def DWDST_LEX_UNKNOWN_TOKENS
  * Define this to include real lexical entries for tokens with counts
- * below UnknownLexThreshhold.
+ * <= UnknownLexThreshhold.
  */
 #define DWDST_LEX_UNKNOWN_TOKENS
 
 /**
- * Define this to use trigrams (not yet implemented)
-*/
+ * \def DWDST_USE_TRIGRAMS
+ * Define this to use trigrams (not yet implemented!)
+ */
 #undef DWDST_USE_TRIGRAMS
 
+DWDST_BEGIN_NAMESPACE
 
 /*--------------------------------------------------------------------------
  * dwdstHMM : HMM class
@@ -64,27 +75,26 @@
  */
 class dwdstHMM {
 public:
-  //------ public typedefs
+  /*---------------------------------------------------------------------*/
+  /** \name Atomic Types */
+  //@{
+
   /** Type for a single probability value */
   typedef double ProbT;
   //typedef float ProbT;
 
-  /** Type for a tag-identifier */
+  /** Type for a tag-identifier. Zero indicates an unknown tag. */
   typedef dwdstEnumID TagID;
 
-  /** Type for a token-identider */
+  /** Type for a token-identider. Zero indicates an unknown token. */
   typedef dwdstEnumID TokID;
+  //@}
 
-  /** Enum typedef for token2id */
-  typedef enum {
-    TokTypeAlpha,      /**< (Mostly) alphabetic token: "foo", "bar", "foo2bar" */
-    TokTypeCard,       /**< Digits-only: "42" */
-    TokTypeCardPunct,  /**< Digits with punctuation suffix: "42." */
-    TokTypeCardSuffix, /**< Digits with any suffix: "42nd" */
-    TokTypeCardSeps,   /**< Digits with interpunctuation: "420.24/7" */
-    NTokTypes          /**< Not really a token-type */
-  } TokenType;
 
+  /*---------------------------------------------------------------------*/
+  /** \name Lookup-Table Types */
+  //@{
+  
   /** Typedef for token-id lookup table */
   typedef dwdstEnum<dwdstTokString,
 		    hash<dwdstTokString>,
@@ -100,25 +110,34 @@ public:
   /** Type for lexical probability lookup subtable: tagid->prob */
   typedef map<TagID,ProbT> LexProbSubTable;
 
-  /** Type for lexical probability lookup table: tokid->(tagid->p(tokid|tagid)) */
+  /**
+   * Type for lexical probability lookup table: tokid->(tagid->prob),
+   * where prob==p(tokid|tagid).
+   */
   typedef vector<LexProbSubTable> LexProbTable;
 
   /**
    * Type for unigram probability table: c-style array:
    * probabilities indexed by numeric tag-id.
    */
-  //typedef hash_map<TagID,ProbT> TagProbTable;
-  //typedef vector<ProbT> TagProbTable;
   typedef ProbT *TagProbTable;
+  //typedef vector<ProbT> TagProbTable;
+  //typedef hash_map<TagID,ProbT> TagProbTable;
 
   /**
    * Type for bigram probability lookup table:
    * c-style 2d array: probabilites p(tag|ptag)
    * indexed by ((ntags*ptag)+tag).
+   *
+   * This winds up being a rather sparse table,
+   * but it should fit well in memory even for large
+   * (~= 2K tags) tagsets on contemporary machines,
+   * and lookup is Just Plain Quick.
    */
-  //typedef vector<TagProbTable> BigramProbTable;
   typedef ProbT *BigramProbTable;
+  //typedef vector<TagProbTable> BigramProbTable;
 
+#ifdef DWDST_USE_TRIGRAMS
   /** Key type for a trigram */
   class Trigram {
   public:
@@ -161,39 +180,67 @@ public:
   typedef
     hash_map<Trigram,ProbT,Trigram::HashFcn,Trigram::EqualFcn>
     TrigramProbTable;
+#endif
+  //@}
 
+  /*---------------------------------------------------------------------*/
+  /** \name Viterbi State-Table Types  */
+  //@{
 
   /** Type for a Viterbi state-table entry (linked-list columns) */
-  struct ViterbiNode {
+  class ViterbiNode {
+  public:
     TagID tagid;                   /**< Tag-ID for this node */
     ProbT prob;                    /**< Probability of best path to this node */
     struct ViterbiNode *pth_prev;  /**< Previous node in best path */
     struct ViterbiNode *row_next;  /**< Next node in current column */
-  }; //-- class Trigram
+  };
 
   /**
    * Type for a Viterbi state-table column.
    * A Viterbi state-table is completely represented by its (current)
    * final column.
    */
-  struct ViterbiColumn {
+  class ViterbiColumn {
+  public:
     //TokID          tokid;    /**< Token-ID for this column */
     ViterbiNode   *nodes;    /**< Column nodes */
     ViterbiColumn *col_prev; /**< Previous column */
   };
 
   /**
-   * Type for a Viterbi path.  It's faster to use
-   * the (ViterbiNode*)s directly, if you can deal with reverse order...
+   * Type for a Viterbi path-node.  It's faster to use
+   * the (ViterbiNode*)s directly, if you can deal
+   * with reverse order.
+   *
+   * All relevant allocation (and de-allocation) is handled
+   * internally:
+   * All ViterbiPathNode pointers returned by any dwdstHMM method
+   * call are de-allocated on clear(). 
+   *
+   * Don't rely on the data in your (ViterbiPathNode*)s
+   * remaining the same over multiple dwdstHMM method calls:
+   * get what you need, and then lose the nodes.
    */
-  typedef deque<ViterbiNode*> ViterbiPath;
+  struct ViterbiPathNode {
+  public:
+    ViterbiNode      *node;      /** Corresponding state-table node */
+    ViterbiPathNode  *path_next; /** Next node in this path */
+  };
+  //typedef deque<ViterbiNode*> ViterbiPath;
+  //@}
 
 public:
-  //------ public data: various pragmatic constants
+  /*---------------------------------------------------------------------*/
+  /** \name Pragmatic Constants */
+  //@{
   TagID             start_tagid;  /**< Initial/final tag, used for bootstrapping */
   ProbT             unknown_lex_threshhold;  /**< Unknown lexical threshhold */
+  //@}
 
-  //------ public data: smoothing constants
+  /*---------------------------------------------------------------------*/
+  /** \name Smoothing Constants */
+  //@{
   ProbT             nglambda1;    /**< Smoothing constant for unigrams */
   ProbT             nglambda2;    /**< Smoothing constant for bigrams */
 #ifdef DWDST_USE_TRIGRAMS
@@ -201,14 +248,21 @@ public:
 #endif
   ProbT             wlambda1;     /**< Smoothing constant lexical probabilities */
   ProbT             wlambda2;     /**< Smoothing constant lexical probabilities */
+  //@}
 
-  //------ public data: ID-lookup tables
+  /*---------------------------------------------------------------------*/
+  /** \name ID Lookup Tables */
+  //@{
   TokIDTable        tokids;     /**< Token-ID lookup table */
   TagIDTable        tagids;     /**< Tag-ID lookup table */
 
   TokID             typids[NTokTypes]; /**< Token-type to Token-ID lookup table for non-alphas */
+  dwdstTokString    typnames[NTokTypes]; /**< Names of special tokens */
+  //@}
 
-  //------ public data: probability-lookup tables
+  /*---------------------------------------------------------------------*/
+  /** \name Probability Lookup Tables */
+  //@{
   size_t            n_tags;     /**< Number of known tags: used to compute lookup indices */
   size_t            n_toks;     /**< Number of known tokens: used for sanity checks */
   LexProbTable      lexprobs;   /**< Lexical probability lookup table */
@@ -217,35 +271,53 @@ public:
 #ifdef DWDST_USE_TRIGRAMS
   TrigramProbTable  ngprobs3;   /**< N-gram probability lookup table: trigrams */
 #endif
+  //@}
 
-  //------ low-level data: for Viterbi algorithm
+  /*---------------------------------------------------------------------*/
+  /** \name Viterbi State Data */
+  //@{
   ViterbiColumn     *vtable;    /**< Low-level state table for Viterbi algorithm */
+  //@}
 
-  //------ statistics
+  /*---------------------------------------------------------------------*/
+  /** \name Statistics / Performance Tracking */
+  //@{
   size_t             nsents;    /**< Number of sentenced processed */
   size_t             ntokens;   /**< Number of tokens processed */
+  //@}
 
 protected:
-  //------ protected data: recycling bins
-  ViterbiNode   *trash_nodes;   /**< Recycling bin for Viterbi state-table nodes */
-  ViterbiColumn *trash_columns; /**< Recycling bin for Viterbi state-table columns */
+  /*---------------------------------------------------------------------*/
+  /** \name Low-level: trash stacks */
+  //@{
+  ViterbiNode     *trash_nodes;     /**< Recycling bin for Viterbi state-table nodes */
+  ViterbiColumn   *trash_columns;   /**< Recycling bin for Viterbi state-table columns */
+  ViterbiPathNode *trash_pathnodes; /**< Recycling bin for Viterbi path-nodes */
+  //@}
 
-  //------ protected data: for Viterbi
+  /*---------------------------------------------------------------------*/
+  /** \name Low-level Viterbi data */
+  //@{
   TagID             vtagid;     /**< Current tag-id under consideration for viterbi_step() */
   ProbT             vbestpr;    /**< Best probability for viterbi_step() */
   ProbT             vtagpr;     /**< Probability for current tag-id for viterbi_step() */
   ProbT             vwordpr;    /**< Save word-probability */
   ViterbiNode      *vbestpn;    /**< Best previous node for viterbi_step() */
 
-  ViterbiPath       vbestpath;  /**< Best path constant */
+  ViterbiPathNode  *vbestpath;  /**< For node->path conversion */
+  //@}
 
-  //-- protected data: for tagging
+  /*---------------------------------------------------------------------*/
+  /** \name Low-level tagging data */
+  //@{
   vector<dwdstTokString> tokens;  /**< Temporarily stores input tokens for tag_stream() */
   set<TagID>             curtags; /**< Temporarily stores input token-tags for tag_stream() */
+  //@}
 
 public:
-  //------ public methods: constructor/destructor
-
+  /*---------------------------------------------------------------------*/
+  /** \name Constructor / Destructor */
+  //@{
   /** Default constructor */
   dwdstHMM(void)
     : start_tagid(0),
@@ -262,10 +334,17 @@ public:
       nsents(0),
       ntokens(0),
       trash_nodes(NULL),
-      trash_columns(NULL),
-      vbestpn(NULL)
+      trash_columns(NULL), 
+      trash_pathnodes(NULL),
+      vbestpn(NULL),
+      vbestpath(NULL)
   {
-    for (int i = 0; i < NTokTypes; i++) { typids[i] = 0; }
+    typnames[TokTypeAlpha] = "@UNKNOWN"; // -- ?!
+    typnames[TokTypeCard]  = "@CARD";
+    typnames[TokTypeCardPunct] = "@CARDPUNCT";
+    typnames[TokTypeCardSeps]  = "@CARDSEPS";
+    typnames[TokTypeUnknown] = "@UNKNOWN";
+    for (TokID i = 0; i < NTokTypes; i++) { typids[i] = 0; }
   };
 
   /** Destructor */
@@ -273,9 +352,11 @@ public:
   {
     clear();
   };
+  //@}
 
-  //------------------------------------------------------------
-  // public methods: binary load / save
+  /*------------------------------------------------------------*/
+  /**\name Binary load / save */
+  //@{
 
   /** Save to a binary file */
   bool save(const char *filename, int compression_level=Z_DEFAULT_COMPRESSION);
@@ -294,29 +375,40 @@ public:
 
   /** Low-level: load guts from a binary stream */
   bool _binload(dwdstBinStream::iBinStream &ibs, const char *filename=NULL);
+  //@}
 
-  //------------------------------------------------------------
-  // public methods: access
-
+  /*------------------------------------------------------------*/
+  /** \name Accessors */
+  //@{
   /** Set the unknown token name */
-  inline void unknown_token_name(const dwdstTokString &name) { tokids.unknown_name(name); }
+  inline void unknown_token_name(const dwdstTokString &name)
+  {
+    tokids.unknown_name(name);
+    typnames[TokTypeUnknown] = name;
+  };
 
   /** Set the unknown tag */
-  inline void unknown_tag_name(const dwdstTokString &name) { tagids.unknown_name(name); }
+  inline void unknown_tag_name(const dwdstTokString &name)
+  {
+    tagids.unknown_name(name);
+  };
+  //@}
 
-  //------------------------------------------------------------
-  // public methods: reset / clear
-
+  /*------------------------------------------------------------*/
+  /** \name Reset and clear */
+  //@{
   /**
    * Reset/clear the object, freeing all dynamic data structures.
    * If 'wipe_everything' is false, ID-tables and constants will
    * spared.
    */
   void clear(bool wipe_everything=true);
+  //@}
 
 
   //------------------------------------------------------------
-  // public methods: compilation
+  /** \name Compilation */
+  //@{
 
   /**
    * Compile probabilites from raw frequency counts in 'lexfreqs' and 'ngrams'.
@@ -341,10 +433,12 @@ public:
    * Estimate lexical smoothing constants: NOT called by compile().
    */
   bool estimate_wlambdas(const dwdstLexfreqs &lf);
+  //@}
 
   //------------------------------------------------------------
-  // Viterbi utilities: nodes
+  /** \name Trash-stack Utilities */
 
+  //@{
   /** Returns a pointer to an unused ViterbiNode, possibly allocating a new one. */
   inline ViterbiNode *viterbi_get_node(void) {
     ViterbiNode *nod;
@@ -373,12 +467,31 @@ public:
   };
 
   //------------------------------------------------------------
-  // public methods: high-level: Viterbi: clear state tables
+  // Viterbi utilities: path-nodes
+
+  /** Returns a pointer to an unused ViterbiPathNode, possibly allocating a new one. */
+  inline ViterbiPathNode *viterbi_get_pathnode(void) {
+    ViterbiPathNode *pnod;
+    if (trash_pathnodes != NULL) {
+      pnod            = trash_pathnodes;
+      trash_pathnodes = pnod->path_next;
+    } else {
+      pnod = new ViterbiPathNode();
+    }
+    return pnod;
+  };
+  //@}
+
+  //------------------------------------------------------------
+  // public methods: high-level: Viterbi: clear
+
+  /** \name High-level Viterbi algorithm API */
+  //@{
 
   /** Clear Viterbi state table(s) */
   inline void viterbi_clear(void)
   {
-    //-- move to trash
+    //-- move to trash: state-table
     ViterbiColumn *col, *col_next;
     ViterbiNode   *nod, *nod_next;
     for (col = vtable; col != NULL; col = col_next) {
@@ -392,6 +505,8 @@ public:
       }
     }
 
+    //viterbi_clear_bestpath();
+
     //-- add BOS entry
     vtable = viterbi_get_column();
     //vtable->tokid = start_tokid;
@@ -402,8 +517,6 @@ public:
     nod->row_next = NULL;
     nod->pth_prev = NULL;
   };
-
-
 
 
   //------------------------------------------------------------
@@ -453,11 +566,14 @@ public:
 	col->nodes    = nod;
       }
 
-    //-- add new column to state table
-    vtable = col;
+    if (col->nodes == NULL) {
+      //-- we might not have found anything...
+      _viterbi_step_fallback(tokid, col);
+    } else{
+      //-- add new column to state table
+      vtable = col;
+    }
   };
-
-
 
   //------------------------------------------------------------
   // public methods: high-level: Viterbi: single iteration: (TokString)
@@ -524,8 +640,13 @@ public:
 	col->nodes    = nod;
       }
 
-    //-- add new column to state table
-    vtable = col;
+    if (col->nodes == NULL) {
+      //-- we might not have found anything...
+      _viterbi_step_fallback(tokid, col);
+    } else{
+      //-- add new column to state table
+      vtable = col;
+    }
   };
 
 
@@ -552,15 +673,17 @@ public:
   // public methods: high-level: Viterbi: single iteration: (TokID,TagID)
 
   /**
-   * Step a single Viterbi iteration, considering only the tag 'tagid'
+   * Step a single Viterbi iteration, considering only the tag 'tagid'.
    */
-  inline void viterbi_step(TokID tokid, TagID tagid)
+  inline void viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col=NULL)
   {
-    //-- Get next column
-    ViterbiColumn *col = viterbi_get_column();
     ViterbiNode   *nod;
-    col->col_prev = vtable;
-    col->nodes = NULL;
+    if (col==NULL) {
+      //-- Get next column
+      col = viterbi_get_column();
+      col->col_prev = vtable;
+      col->nodes = NULL;
+    }
 
     //-- sanity check
     if (tokid >= n_toks) tokid = 0;
@@ -617,11 +740,14 @@ public:
   {
     viterbi_step(0, start_tagid);
   };
-
+  //@}
 
 
   //------------------------------------------------------------
   // public methods: mid-level: Viterbi: best node
+
+  /** \name Mid-Level Viterbi State Utilties  */
+  //@{
 
   /**
    * Get best current node from Viterbi state tables, considering all
@@ -663,43 +789,59 @@ public:
   // public methods: mid-level: node-to-path conversion
 
   /**
-   * Useful utility: build a path (in input order) from a ViterbiNode
+   * Useful utility: build a path (in input order) from a ViterbiNode.
+   * See caveats for 'struct ViterbiPathNode' -- return value is non-const
+   * for easy iteration.
+   *
+   * Uses 'vbestpath' to store constructed path.
    */
-  inline const ViterbiPath &viterbi_node_path(ViterbiNode *node)
+  inline ViterbiPathNode *viterbi_node_path(ViterbiNode *node)
   {
-    vbestpath.clear();
-    ViterbiNode *nod;
-    for (nod = node; nod != NULL; nod = nod->pth_prev) {
-      vbestpath.push_front(nod);
+    viterbi_clear_bestpath();
+    ViterbiPathNode *pnod; 
+    for ( ; node != NULL; node = node->pth_prev) {
+      pnod            = viterbi_get_pathnode();
+      pnod->node      = node;
+      pnod->path_next = vbestpath;
+      vbestpath       = pnod;
     }
     return vbestpath;
   };
+  //@}
 
 
   //------------------------------------------------------------
   // public methods: high-level: best path
 
+  /** \name High-level Viterbi Path utilities */
+  //@{
+
   /** Get current best path (in input order), considering all current tags */
-  inline const ViterbiPath &viterbi_best_path(void)
+  inline ViterbiPathNode *viterbi_best_path(void)
   {
     return viterbi_node_path(viterbi_best_node());
   };
 
   /** Get current best path (in input order), considering only tag 'tagid' */
-  inline const ViterbiPath &viterbi_best_path(TagID tagid)
+  inline ViterbiPathNode *viterbi_best_path(TagID tagid)
   {
     return viterbi_node_path(viterbi_best_node(tagid));
   };
 
   /** Get current best path (in input order), considering only tag 'tag' */
-  inline const ViterbiPath &viterbi_best_path(const dwdstTagString &tagstr)
+  inline ViterbiPathNode *viterbi_best_path(const dwdstTagString &tagstr)
   {
     return viterbi_best_path(tagids.name2id(tagstr));
   };
+  //@}
 
 
   //------------------------------------------------------------
   // public methods: low-level: Viterbi
+
+  /** \name Low-level Viterbi utilities */
+  //{@
+
   /**
    * Find the best previous node from top column of 'vtable' for destination tag 'curtagid',
    * stores a pointer to the best previous node in 'vbestpn', and the
@@ -735,61 +877,96 @@ public:
   };
 
   //------------------------------------------------------------
+  // public methods: low-level: Viterbi: clear best-path
+
+  /** Clear Viterbi state table(s) */
+  inline void viterbi_clear_bestpath(void)
+  {
+    //-- move to trash: path-nodes
+    ViterbiPathNode *pnod, *pnod_next;
+    for (pnod = vbestpath; pnod != NULL; pnod = pnod_next) {
+      pnod_next       = pnod->path_next;
+      pnod->path_next = trash_pathnodes;
+      trash_pathnodes = pnod;
+    }
+    vbestpath = NULL;
+  };
+
+  //------------------------------------------------------------
+  // public methods: viterbi: fallback
+
+  /**
+   * Step a single Viterbi iteration, last-ditch effort: consider
+   * all tags.  Implicitly called by other viterbi_step() methods.
+   */
+  inline void _viterbi_step_fallback(TokID tokid, ViterbiColumn *col)
+  {
+    //-- sanity
+    if (tokid >= n_toks) tokid = 0;
+    if (col==NULL) {
+      //-- Get next column
+      col = viterbi_get_column();
+      col->col_prev = vtable;
+      col->nodes = NULL;
+    }
+
+    //-- variables
+    ViterbiNode                     *nod;
+    const LexProbSubTable           &lps = lexprobs[tokid];
+    LexProbSubTable::const_iterator  lpsi;
+
+    //-- for each possible destination tag 'vtagid' (except "UNKNOWN")
+    for (vtagid = 1; vtagid < n_tags; vtagid++) {
+
+	//-- get lexical probability: p(tok|tag) 
+	lpsi = lps.find(vtagid);
+	if (lpsi != lps.end()) {
+	  vwordpr = ( (wlambda1 * lpsi->second) + wlambda2 );
+	} else {
+	  vwordpr = wlambda2;
+	}
+
+	//-- find best previous tag by n-gram probabilites: store information in vbestpr,vbestpn
+	viterbi_find_best_prevnode(vtagid, tagp(vtagid));
+
+	//-- skip zero-probabilities
+	//if (vbestpr <= 0) continue;
+
+	//-- update state table column for current destination tag
+	nod           = viterbi_get_node();
+	nod->tagid    = vtagid;
+	nod->prob     = vbestpr * vwordpr;
+	nod->pth_prev = vbestpn;
+	nod->row_next = col->nodes;
+	col->nodes    = nod;
+      }
+
+    if (col->nodes == NULL) {
+      //-- we STILL might not have found anything...
+      viterbi_step(tokid, 0, col);
+    } else{
+      //-- add new column to state table
+      vtable = col;
+    }
+  };
+  //@}
+
+  //------------------------------------------------------------
   // public methods: low-level: token-type identification
 
+  /** \name TnT compatibility hacks */
+  //@{
   /** Get the TokID for a given token, uses type-based lookup */
   inline TokID token2id(const dwdstTokString &token) const
   {
     TokenType typ = token2type(token);
     return typids[typ]==0 ? tokids.name2id(token) : typids[typ];
   };
-
-  /** Get the TokenType for a given token */
-  inline TokenType token2type(const dwdstTokString &token) const
-  {
-    dwdstTokString::const_iterator ti = token.begin();
-    
-    if (ti==token.end() || !isdigit(*ti))
-      return TokTypeAlpha;
-    
-    //-- ^[:digit:]
-    for (ti++; ti != token.end() && isdigit(*ti); ti++) {;}  //-- find first non-digit
-    //-- ^([:digit:]+)
-    
-    if (ti == token.end())  //-- ^([:digit:]+)$
-      return TokTypeCard;
-    
-    else if (ispunct(*ti)) {
-      //-- ^([:digit:]+)([:punct:])
-      for (ti++; ti != token.end() && ispunct(*ti); ti++) {;}
-      //-- ^([:digit:]+)([:punct:]+)
-      
-      if (ti == token.end())      //-- ^([:digit:]+)([:punct:]+)$
-	return TokTypeCardPunct;
-      
-      else if (isdigit(*ti)) {
-	//-- ^([:digit:]+)([:punct:]+)([:digit:])
-	for (ti++; ti != token.end() && (isdigit(*ti) || ispunct(*ti)); ti++) {;}
-	//-- ^([:digit:]+)([:punct:]+)(([:digit:]|[:punct:]+))
-	if (ti == token.end())
-	  //-- ^([:digit:]+)([:punct:]+)(([:digit:]|[:punct:]+))$
-	  return TokTypeCardSeps;
-      }
-    }
-    
-    //-- ^([:digit:]+)([[:digit:][:punct]]*)([^[:digit:][:punct:]])
-    for (ti++; ti != token.end() && !isdigit(*ti); ti++) {;}
-    //-- ^([:digit:]+)([[:digit:][:punct]]*)([^[:digit:][:punct:]])([^[:digit]]*)
-    
-    if (ti == token.end())
-      //-- ^([:digit:]+)([[:digit:][:punct]]*)([^[:digit:][:punct:]])([^[:digit]]*)$
-      return TokTypeCardSuffix;
-    
-    return TokTypeAlpha;
-  };
+  //@}
 
 
-
+  /** \name Probability lookup */
+  //@{
   //------------------------------------------------------------
   // public methods: low-level: lexical probability lookup
 
@@ -892,9 +1069,14 @@ public:
     return tagp(tagids.name2id(prevtag2), tagids.name2id(prevtag1), tagids.name2id(tag));
   };
 #endif /* DWDST_USE_TRIGRAMS */
+  //@}
+
 
   //------------------------------------------------------------
   // public methods: top-level: tagging
+
+  /** \name Top-level tagging interface */
+  //@{
 
   /** Top-level tagging interface: file input */
   void tag_stream(FILE *in=stdin, FILE *out=stdout, char *srcname=NULL);
@@ -902,41 +1084,66 @@ public:
   /** Top-level tagging interface: string input */
   void tag_strings(int argc, char **argv, FILE *out=stdout, char *infilename=NULL);
 
-  /** Top-level tagging interface: dump best path */
+  /**
+   * Top-level tagging interface: dump best path.
+   * Requires populated 'tokens' vector)
+   */
   inline void tag_print_best_path(FILE *out=stdout)
   {
-    viterbi_best_path(); //-- populate 'vbestpath' with (ViterbiNode*)s
-    for (size_t i = 0; i < tokens.size(); i++) {
-      if (i+1 >= vbestpath.size()) {
-	carp("%s: Error: no tag for token number %u of sentence number %u: '%s'\n",
-	     i, nsents, tokens[i].c_str());
-	continue;
-      }
-      fputs(tokens[i].c_str(), out);
+    //-- populate 'vbestpath' with (ViterbiPathNode*)s
+    ViterbiPathNode *pnod = viterbi_best_path();
+    vector<dwdstTokString>::const_iterator toki;
+
+    if (pnod) pnod = pnod->path_next;  //-- skip boundary tag
+
+    for (toki = tokens.begin(); toki != tokens.end(); toki++) {
+      fputs(toki->c_str(), out);
       fputc('\t', out);
-      fputs(tagids.id2name(vbestpath[i+1]->tagid).c_str(), out);
+
+      if (pnod && pnod->node) {
+	fputs(tagids.id2name(pnod->node->tagid).c_str(), out);
+	pnod = pnod->path_next;
+      }
+      else {
+	//-- this should never actually happen, but it has...
+	carp("%s: Error: no best tag for token '%s'!\n",
+	     "dwdstHMM::tag_print_best_path()", toki->c_str());
+	fputs(tagids.id2name(0).c_str(), out); //-- use 'unknown' tag
+      }
+
       fputc('\n', out);
     }
     fputc('\n', out);
   };
+  //@}
 
 
   //------------------------------------------------------------
   // public methods: low-level: errors
 
+  /** \name Warnings / Errors */
+  //@{
+
   /** Error reporting */
   void carp(char *fmt, ...);
 
+  //@}
 
   //------------------------------------------------------------
   // public methods: low-level: debugging
+
+  /** \name Debugging */
+  //@{
 
   /** Debugging method: dump basic HMM contents to a text file. */
   void txtdump(FILE *file);
 
   /** Debugging method: dump current Viterbi state-table column to a text file */
   void viterbi_txtdump(FILE *file);
+
+  //@}
 };
 
+DWDST_END_NAMESPACE
 
 #endif /* _DWDST_HMM_H */

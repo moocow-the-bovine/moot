@@ -13,6 +13,8 @@
 #include <dwdstLexfreqs.h>
 #include <dwdstLexfreqsCompiler.h>
 
+DWDST_BEGIN_NAMESPACE
+
 /*----------------------------------------------------------------------
  * Manipulators
  *----------------------------------------------------------------------*/
@@ -100,3 +102,6 @@ bool dwdstLexfreqs::save(FILE *file, char *filename)
 
   return 1;
 }
+
+DWDST_END_NAMESPACE
+

@@ -17,7 +17,7 @@
 
 ## --- executable programs
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
-bin_PROGRAMS = dwdspp dwdsm dwdshmm dwdst
+bin_PROGRAMS = dwdspp dwdsm dwdshmm dwdst dwdstrain
 
 old_programs = dwdst-fstgen dwdst-pargen
 
@@ -63,6 +63,13 @@ dwdst_SOURCES = \
 	dwdst_main.cc \
 	dwdst_cmdparser.cc dwdst_cmdparser.h
 
+dwdstrain_SOURCES = \
+	cmdutil.cc cmdutil.h \
+	hmmutil.cc hmmutil.h \
+	dwdstrain_main.cc \
+	dwdstrain_cmdparser.cc dwdstrain_cmdparser.h
+
+
 ## --- Extra (possible)sources
 #EXTRA_${prog_i}_SOURCES = 
 #EXTRA_${lib_i}_la_SOURCES = 
@@ -72,6 +79,7 @@ dwdspp_main.o: dwdspp_cmdparser.h
 dwdsm_main.o: dwdsm_cmdparser.h
 dwdshmm_main.o: dwdshmm_cmdparser.h hmmutil.h
 dwdst_main.o: dwdst_cmdparser.h hmmutil.h
+dwdstrain_main.o: dwdstrain_cmdparser.h hmmutil.h
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -170,6 +178,9 @@ dwdshmm_LDADD = $(LDADD_COMMON)
 dwdst_LDFLAGS = $(LDFLAGS_COMMON)
 dwdst_LDADD = $(LDADD_COMMON)
 
+dwdstrain_LDFLAGS = $(LDFLAGS_COMMON)
+dwdstrain_LDADD = $(LDADD_COMMON)
+
 #${lib_i}_la_LDFLAGS = -L. -version-info ${lib_i_current}:${lib_i_rev}:${lib_i_age}
 #${lib_i}_LIBADD     = -lotherlib
 
@@ -201,7 +212,8 @@ EXTRA_DIST = \
 	dwdst.gog \
 	dwdsm.gog \
 	dwdspp.gog \
-	dwdshmm.gog
+	dwdshmm.gog \
+	dwdstrain.gog
 
 #	dwdst.sym
 

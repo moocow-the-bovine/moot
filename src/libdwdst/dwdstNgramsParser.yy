@@ -64,7 +64,7 @@ typedef struct {
 
 /**
  * \class dwdstNgramsParser
- * \brief Bison++ parser for dwdst ngram-parameter files.
+ * \brief Bison++ parser for (TnT-style) dwdst ngram-parameter files.
  */
 %}
 
@@ -79,13 +79,13 @@ typedef struct {
   public: \
    /* -- public instance members go here */ \
    /** a pointer to the ngram-parameter object to hold the data we're parsing */ \
-   dwdstNgrams              *ngrams; \
+   dwdst::dwdstNgrams              *ngrams; \
    /** to keep track of all possible tags we've parsed (optional). */ \
-   set<dwdstTagString>      *alltags; \
+   std::set<dwdst::dwdstTagString>      *alltags; \
    /** previous  ngram parsed (for brief file format */ \
-   dwdstNgrams::NgramString  prevngram; \
+   dwdst::dwdstNgrams::NgramString  prevngram; \
    /** current ngram being parsed */ \
-   dwdstNgrams::NgramString  curngram; \
+   dwdst::dwdstNgrams::NgramString  curngram; \
   private: \
    /* private instance members go here */ \
   public: \
@@ -110,9 +110,9 @@ typedef struct {
  *------------------------------------------------------------*/
 
 %union {
-  dwdstNgrams::NgramString   *ngram;            ///< for tag-lists
-  dwdstTagString            *tagstr;            ///< for single tags (strings)
-  dwdstNgrams::NgramCount     count;            ///< for tag-list counts
+  dwdst::dwdstNgrams::NgramString   *ngram;            ///< for tag-lists
+  dwdst::dwdstTagString            *tagstr;            ///< for single tags (strings)
+  dwdst::dwdstNgrams::NgramCount     count;            ///< for tag-list counts
 }
 
 %header{
@@ -243,3 +243,4 @@ void dwdstNgramsParser::yycarp(char *fmt, ...)
   fprintf(stderr, " at line %d, column %d, near '%s'\n",
 	  yylloc.last_line, yylloc.last_column, yylloc.text);
 }
+

@@ -28,6 +28,12 @@
  */
 bool hmm_parse_model(char *model, char **binfile, char **lexfile, char **ngfile);
 
+/** As above, text only */
+bool hmm_parse_textmodel(char *model, char **lexfile, char **ngfile);
+
+/** Similar, uses corpus basename  */
+bool hmm_parse_corpusmodel(char *corpus, char **lexfile, char **ngfile);
+
 /**
  * Parse a comma-separated list of doubles (at most 'ndbls') from str into dbls.
  * You should already have allocated 'dbls'.

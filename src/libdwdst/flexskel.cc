@@ -190,7 +190,6 @@ int read();
 #define YY_STATE_EOF(state) (YY_END_OF_BUFFER + state + 1)
 
 
-
 %% section 1 definitions go here
 
 #define yy___text YY_@_TEXT

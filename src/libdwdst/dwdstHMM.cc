@@ -34,7 +34,7 @@ void dwdstHMM::clear(bool wipe_everything)
   ViterbiColumn *col, *col_next;
   ViterbiNode   *nod, *nod_next;
 
-  //-- free columns and nodes
+  //-- free state-table: columns and nodes
   for (col = vtable; col != NULL; col = col_next) {
     col_next      = col->col_prev;
     for (nod = col->nodes; nod != NULL; nod = nod_next) {
@@ -44,17 +44,32 @@ void dwdstHMM::clear(bool wipe_everything)
     delete col;
   }
 
-  //-- free trashed cols
+  //-- free trashed state cols
   for (col = trash_columns; col != NULL; col = col_next) {
     col_next = col->col_prev;
     delete col;
   }
 
-  //-- free trashed nodes
+  //-- free trashed state nodes
   for (nod = trash_nodes; nod != NULL; nod = nod_next) {
     nod_next = nod->row_next;
     delete nod;
   }
+
+  //-- free best-path nodes
+  ViterbiPathNode *pnod, *pnod_next;
+  for (pnod = vbestpath; pnod != NULL; pnod = pnod_next) {
+    pnod_next       = pnod->path_next;
+    delete pnod;
+  }
+  vbestpath = NULL;
+
+  //-- free trashed path nodes
+  for (pnod = trash_pathnodes; pnod != NULL; pnod = pnod_next) {
+    pnod_next       = pnod->path_next;
+    delete pnod;
+  }
+  trash_pathnodes = NULL;
 
   //-- free lexical probabilities
   lexprobs.clear();
@@ -143,6 +158,7 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
 
   //-- compilation variables
   TokID                       tokid;          //-- current token-ID
+  TokenType                   toktyp;         //-- current token-type
   TagID                       tagid;          //-- current tag-ID
   TagID                       ptagid;         //-- previous tag-ID (for bigrams)
 #ifdef DWDST_USE_TRIGRAMS
@@ -153,6 +169,8 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
   dwdstLexfreqs::LexfreqCount unTotal = 0;    //-- total "unknown" token count
   LexProbSubTable             &untagcts       //-- "unknown" tag counts (later, probabilites)
       = lexprobs[0];
+  bool                     is_valid_token;    //-- watch out for special tokens (@CARD & friends)
+  int                      i;
  
   //-- compile lexical probabilities : for all lexical keys (lfti)
   for (dwdstLexfreqs::LexfreqStringTable::const_iterator lfti = lexfreqs.lftable.begin();
@@ -160,6 +178,17 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
        lfti++)
     {
       const dwdstTokString &tokstr = lfti->first.first;
+
+      //-- check for special tokens
+      is_valid_token = true;
+      for (i = 0; i < NTokTypes; i++) {
+	if (tokstr == typnames[i]) {
+	  is_valid_token = false;
+	  break;
+	}
+      }
+      if (!is_valid_token) continue;
+
       const dwdstTagString &tagstr = lfti->first.second;
       const dwdstLexfreqs::LexfreqCount toktotal = lexfreqs.lookup(tokstr);
       const dwdstLexfreqs::LexfreqCount tagtotal = lexfreqs.taglookup(tagstr);
@@ -167,12 +196,15 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
       //-- sanity check
       if (toktotal == 0 || tagtotal == 0) continue;
 
+      //-- continue here?!
+
       //-- get IDs
-      tagid = tagids.name2id(tagstr);
-      tokid = tokids.name2id(tokstr);
+      tagid  = tagids.name2id(tagstr);
+      toktyp = token2type(tokstr);
+      tokid  = toktyp == TokTypeAlpha ? tokids.name2id(tokstr) : typids[toktyp];
 
       //-- "unknown" token check
-      if (toktotal <= unknown_lex_threshhold) {
+      if (toktyp == TokTypeAlpha && toktotal <= unknown_lex_threshhold) {
 	//-- "unknown" token: just store the raw counts for now
 	
 	//-- ... and add to "unknown" counts
@@ -190,7 +222,7 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
       }
     }
 
-  //-- Normakize "unknown" lexical probabilities
+  //-- Normalize "unknown" lexical probabilities
   if (lexprobs.size() == 0) lexprobs.resize(1);
   for (LexProbSubTable::iterator lpsi = untagcts.begin();
        lpsi != untagcts.end();
@@ -268,20 +300,15 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
 void dwdstHMM::assign_ids_lf(const dwdstLexfreqs &lexfreqs)
 {
   //-- add special type-tokens
+  for (TokID i = 0; i < NTokTypes; i++) {
+    if (i == TokTypeAlpha || i == TokTypeUnknown) { continue; }
+    typids[i] =
+      tokids.nameExists(typnames[i])
+      ? tokids.name2id(typnames[i])
+      : tokids.insert(typnames[i]);
+  }
   typids[TokTypeAlpha] = 0;
- 
-  dwdstTokString str;
-  str = "@CARD";
-  typids[TokTypeCard] = tokids.nameExists(str) ? tokids.name2id(str) : tokids.insert(str);
-
-  str = "@CARDPUNCT";
-  typids[TokTypeCardPunct] = tokids.nameExists(str) ? tokids.name2id(str) : tokids.insert(str);
-
-  str = "@CARDSUFFIX";
-  typids[TokTypeCardSuffix] = tokids.nameExists(str) ? tokids.name2id(str) : tokids.insert(str);
-
-  str = "@CARDSEPS";
-  typids[TokTypeCardSeps] = tokids.nameExists(str) ? tokids.name2id(str) : tokids.insert(str);
+  typids[TokTypeUnknown] = 0;
 
   //-- compile lexical IDs
   for (dwdstLexfreqs::LexfreqStringTable::const_iterator lfti = lexfreqs.lftable.begin();
@@ -685,10 +712,10 @@ void dwdstHMM::viterbi_txtdump(FILE *file)
  *--------------------------------------------------------------------------*/
 
 const HeaderInfo::VersionT BINCOMPAT_MIN_VER = 1;
-const HeaderInfo::VersionT BINCOMPAT_MIN_REV = 2;
+const HeaderInfo::VersionT BINCOMPAT_MIN_REV = 3;
 
 const HeaderInfo::VersionT BINCOMPAT_VER = 1;
-const HeaderInfo::VersionT BINCOMPAT_REV = 2;
+const HeaderInfo::VersionT BINCOMPAT_REV = 3;
 
 
 bool dwdstHMM::save(const char *filename, int compression_level)
@@ -705,7 +732,7 @@ bool dwdstHMM::save(const char *filename, int compression_level)
   //-- open file
   gzFile gzf = gzopen(filename, "wb");
   if (!gzf) {
-    carp("dwdstHMM::save(): open failed for file '%s': %s",
+    carp("dwdstHMM::save(): open failed for file '%s': %s\n",
 	 filename, gzerror(gzf, &errno));
     return false;
   }
@@ -758,6 +785,7 @@ bool dwdstHMM::_bindump(dwdstBinStream::oBinStream &obs, const char *filename=NU
   Item<TokIDTable> tokids_item;
   Item<TagIDTable> tagids_item;
   Item<LexProbTable> lexprobs_item;
+  Item<dwdstTokString> tokstr_item;
 
   if (! (tagid_item.save(obs, start_tagid)
 	 && probt_item.save(obs, unknown_lex_threshhold)
@@ -772,11 +800,6 @@ bool dwdstHMM::_bindump(dwdstBinStream::oBinStream &obs, const char *filename=NU
 	 && probt_item.save(obs, wlambda2)
 	 && tokids_item.save(obs, tokids)
 	 && tagids_item.save(obs, tagids)
-	 && (tokid_item.save(obs, typids[TokTypeAlpha])
-	     && tokid_item.save(obs, typids[TokTypeCard])
-	     && tokid_item.save(obs, typids[TokTypeCardPunct])
-	     && tokid_item.save(obs, typids[TokTypeCardSuffix])
-	     && tokid_item.save(obs, typids[TokTypeCardSeps]))
 	 && size_item.save(obs, n_tags)
 	 && size_item.save(obs, n_toks)
 	 && lexprobs_item.save(obs, lexprobs)
@@ -788,6 +811,15 @@ bool dwdstHMM::_bindump(dwdstBinStream::oBinStream &obs, const char *filename=NU
 	   (filename ? " to file " : ""), (filename ? filename : ""));
       return false;
     }
+
+  int i;
+  for (i = 0; i < NTokTypes; i++) {
+    if (!tokid_item.save(obs, typids[i]) && tokstr_item.save(obs, typnames[i])) {
+      carp("dwdstHMM::save(): could not save type data%s%s\n",
+	   (filename ? " to file " : ""), (filename ? filename : ""));
+      return false;
+    }
+  }
 
   return true;
 }
@@ -801,7 +833,7 @@ bool dwdstHMM::load(const char *filename=NULL)
   //-- setup gzFile
   gzFile gzs = gzopen(filename, "rb");
   if (!gzs) {
-    carp("dwdstHMM::load(): could not open file '%s' for read: %s",
+    carp("dwdstHMM::load(): could not open file '%s' for read: %s\n",
 	 filename, strerror(errno));
     return false;
   }
@@ -832,13 +864,13 @@ bool dwdstHMM::load(dwdstBinStream::iBinStream &ibs, const char *filename=NULL)
 	 && cmt_item.load(ibs, comment)
 	 ))
     {
-      carp("dwdstHMM::load(): could not load header%s%s",
+      carp("dwdstHMM::load(): could not load header%s%s\n",
 	   (filename ? " from file " : ""), (filename ? filename : ""));
       return false;
     }
   else if (hi.magic != hi_magic.magic)
     {
-      carp("dwdstHMM::load(): bad magic 0x%x%s%s",
+      carp("dwdstHMM::load(): bad magic 0x%x%s%s\n",
 	   hi.magic,
 	   (filename ? " in file " : ""), (filename ? filename : ""));
       return false;
@@ -848,7 +880,7 @@ bool dwdstHMM::load(dwdstBinStream::iBinStream &ibs, const char *filename=NULL)
 	   || BINCOMPAT_VER < hi.minver
 	   || (BINCOMPAT_VER == hi.minver && BINCOMPAT_MIN_REV < hi.minrev))
     {
-      carp("dwdstHMM::load(): incompatible file version %u.%u%s%s",
+      carp("dwdstHMM::load(): incompatible file version %u.%u%s%s\n",
 	   hi.version, hi.revision,
 	   (filename ? " in file " : ""), (filename ? filename : ""));
     }
@@ -857,7 +889,7 @@ bool dwdstHMM::load(dwdstBinStream::iBinStream &ibs, const char *filename=NULL)
     return false;
 
   if (crc != (start_tagid + n_tags + n_toks)) {
-    carp("dwdstHMM::load(): checksum failed%s%s",
+    carp("dwdstHMM::load(): checksum failed%s%s\n",
 	 (filename ? " for file " : ""), (filename ? filename : ""));
   }
 
@@ -876,6 +908,7 @@ bool dwdstHMM::_binload(dwdstBinStream::iBinStream &ibs, const char *filename=NU
   Item<TokIDTable> tokids_item;
   Item<TagIDTable> tagids_item;
   Item<LexProbTable> lexprobs_item;
+  Item<dwdstTokString>  tokstr_item;
 #ifndef DWDST_USE_TRIGRAMS
   ProbT dummy_nglambda3;
 #endif
@@ -909,14 +942,7 @@ bool dwdstHMM::_binload(dwdstBinStream::iBinStream &ibs, const char *filename=NU
       return false;
     }
 
-  if (! (tokid_item.load(ibs, typids[TokTypeAlpha])
-	 && tokid_item.load(ibs, typids[TokTypeCard])
-	 && tokid_item.load(ibs, typids[TokTypeCardPunct])
-	 && tokid_item.load(ibs, typids[TokTypeCardSuffix])
-	 && tokid_item.load(ibs, typids[TokTypeCardSeps])
-	 && size_item.load(ibs, n_tags)
-	 && size_item.load(ibs, n_toks)
-	 ))
+  if (! (size_item.load(ibs, n_tags) && size_item.load(ibs, n_toks)) )
     {
       carp("dwdstHMM::load(): could not load base data%s%s\n",
 	   (filename ? " from file " : ""), (filename ? filename : ""));
@@ -932,6 +958,15 @@ bool dwdstHMM::_binload(dwdstBinStream::iBinStream &ibs, const char *filename=NU
 	   (filename ? " from file " : ""), (filename ? filename : ""));
       return false;
     }
+
+  int i;
+  for (i = 0; i < NTokTypes; i++) {
+    if (!tokid_item.load(ibs, typids[i]) && tokstr_item.load(ibs, typnames[i])) {
+      carp("dwdstHMM::save(): could not load type data%s%s\n",
+	   (filename ? " to file " : ""), (filename ? filename : ""));
+      return false;
+    }
+  }
   
   return true;
 }

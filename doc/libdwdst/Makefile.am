@@ -37,6 +37,7 @@ all-local: $(STAMPFILE)
 vpath %.h @top_srcdir@/src/libdwdst @top_builddir@/src/libdwdst
 
 DOXY_INPUTS = \
+	mainpage.dox \
 	dwdstBinStream.h \
 	dwdstBinIO.h \
 	dwdstConfig.h \

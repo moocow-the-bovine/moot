@@ -17,6 +17,8 @@
 #include "dwdstNgramsParser.h"
 #include "dwdstNgramsCompiler.h"
 
+DWDST_BEGIN_NAMESPACE
+
 /*----------------------------------------------------------------
  * Constructor / Destructors
  *----------------------------------------------------------------*/
@@ -76,3 +78,5 @@ void dwdstNgramsCompiler::yywarn(const char *msg) {
 	  (srcname ? srcname : ""),
 	  yylloc.first_line, yylloc.first_column, yylloc.text, msg);
 }
+
+DWDST_END_NAMESPACE

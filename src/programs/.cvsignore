@@ -1,3 +1,4 @@
+dwdstrain
 dwdspp
 dwdst
 dwdstt
@@ -61,3 +62,6 @@ Makefile.in
 README.txt
 configure
 data
+*.123
+*.lex
+*.log

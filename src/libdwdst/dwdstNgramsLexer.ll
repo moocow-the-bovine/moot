@@ -23,9 +23,10 @@
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
-/*!
+/**
  * \class dwdstNgramsLexer
  * \brief Flex++ lexer for (TnT-style) dwdst n-gram parameter files. 
+ *
  * Supports comments introduced with '%%'.
  */
 %}
@@ -45,7 +46,7 @@
     /** current column*/\
     int theColumn;\
     /** token-buffering */\
-    dwdstTagString tokbuf;\
+    dwdst::dwdstTagString tokbuf;\
     /** whether to clear the token-buffer on 'tokbuf_append()' */\
     bool tokbuf_clear;\
   private: \
@@ -123,7 +124,7 @@ textorsp   [^\n\r\t]
 {textchar}({textorsp}*{textchar})? {
   // -- any other text: append to the token-buffer
   theColumn += yyleng;
-  yylval->tagstr = new dwdstTagString((const char *)yytext);
+  yylval->tagstr = new dwdst::dwdstTagString((const char *)yytext);
   return dwdstNgramsParser::TAG;
 }
 

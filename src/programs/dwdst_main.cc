@@ -32,6 +32,7 @@
 #include "dwdst_cmdparser.h"
 
 using namespace std;
+using namespace dwdst;
 
 /*--------------------------------------------------------------------------
  * Globals
@@ -104,6 +105,7 @@ void GetMyOptions(int argc, char **argv)
   hmm.unknown_tag_name(args.unknown_tag_arg);
   hmm.unknown_lex_threshhold = args.unknown_threshhold_arg;
   hmm.morph_cache_threshhold = args.morph_cache_threshhold_arg;
+  hmm.want_pos_only = args.pos_only_given;
 
   // -- parse model spec
   char *binfile=NULL;
@@ -319,6 +321,7 @@ void GetMyOptions(int argc, char **argv)
 	  morph.xfst ? morph.xfst_filename.c_str() : "(none)");
   fprintf(out.file, "%s   ULex Threshhold   : %g\n", cmts, hmm.unknown_lex_threshhold);
   fprintf(out.file, "%s   MCache Threshhold : %g\n", cmts, hmm.morph_cache_threshhold);
+  fprintf(out.file, "%s   MCache Size       : %u\n", cmts, hmm.morphcache.size());
   fprintf(out.file, "%s   Unknown Token     : %s\n", cmts, hmm.tokids.id2name(0).c_str());
   fprintf(out.file, "%s   Unknown Tag       : %s\n", cmts, hmm.tagids.id2name(0).c_str());
   fprintf(out.file, "%s   Boundary Tag      : %s\n", cmts, hmm.tagids.id2name(hmm.start_tagid).c_str());

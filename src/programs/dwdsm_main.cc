@@ -26,6 +26,7 @@
 #include "dwdsm_cmdparser.h"
 
 using namespace std;
+using namespace dwdst;
 
 /*--------------------------------------------------------------------------
  * Globals

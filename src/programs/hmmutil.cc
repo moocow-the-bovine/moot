@@ -19,15 +19,9 @@
  * utility functions: parsing
  *---------------------------------------------------------------------*/
 
-bool hmm_parse_model(char *model, char **binfile, char **lexfile, char **ngfile)
-{
-  //-- binary file: easy
-  if (file_exists(model)) {
-    if (!*binfile) *binfile = (char *)malloc(strlen(model)+1);
-    strcpy(*binfile, model);
-    return true;
-  }
 
+bool hmm_parse_textmodel(char *model, char **lexfile, char **ngfile)
+{
   char *comma = strchr(model, ',');
   if (comma) {
     *comma = '\0';
@@ -50,6 +44,33 @@ bool hmm_parse_model(char *model, char **binfile, char **lexfile, char **ngfile)
   strcat(*ngfile, ".123");
   return true;
 }
+
+bool hmm_parse_corpusmodel(char *corpus, char **lexfile, char **ngfile)
+{
+  char *dot   = strrchr(corpus, '.');
+  *dot = '\0';
+  if (!*lexfile) *lexfile = (char *)malloc(strlen(corpus)+4);
+  if (!*ngfile)  *ngfile = (char *)malloc(strlen(corpus)+4);
+  strcpy(*lexfile, corpus);
+  strcpy(*ngfile, corpus);
+  strcat(*lexfile, ".lex");
+  strcat(*ngfile, ".123");
+  *dot = '.';
+  return true;
+}
+
+bool hmm_parse_model(char *model, char **binfile, char **lexfile, char **ngfile)
+{
+  //-- binary file: easy
+  if (file_exists(model)) {
+    if (!*binfile) *binfile = (char *)malloc(strlen(model)+1);
+    strcpy(*binfile, model);
+    return true;
+  }
+  return hmm_parse_textmodel(model, lexfile, ngfile);
+}
+
+
 
 bool hmm_parse_doubles(char *str, double *dbls, size_t ndbls)
 {

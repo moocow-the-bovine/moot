@@ -11,16 +11,17 @@
 #define _DWDST_LEXFREQS_H
 
 #include <dwdstTypes.h>
+DWDST_BEGIN_NAMESPACE
 
 /**
- * Class for storage & retrieval of N-Gram counts
+ * \brief Class for storage and retrieval of raw lexical frequencies.
  */
 class dwdstLexfreqs {
 public:
   //------ public typedefs
 
   /** Type for a single lexeme+tag co-occurrence count */
-  typedef float LexfreqCount;
+  typedef CountT LexfreqCount;
 
   /**
    * Type for the lexical total-frequency lookup table.
@@ -176,5 +177,6 @@ public:
 };
 
 
+DWDST_END_NAMESPACE
 
 #endif /* _DWDST_LEXFREQS_H */

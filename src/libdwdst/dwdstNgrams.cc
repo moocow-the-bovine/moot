@@ -13,6 +13,8 @@
 #include <dwdstNgrams.h>
 #include <dwdstNgramsCompiler.h>
 
+DWDST_BEGIN_NAMESPACE
+
 /*----------------------------------------------------------------------
  * Manipulators
  *----------------------------------------------------------------------*/
@@ -106,3 +108,5 @@ bool dwdstNgrams::save(FILE *file, char *filename, bool compact)
 
   return 1;
 }
+
+DWDST_END_NAMESPACE
