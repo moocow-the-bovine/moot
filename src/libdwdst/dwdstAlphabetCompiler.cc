@@ -72,8 +72,8 @@ dwdstSymbolVector2SymbolMap *dwdstAlphabetCompiler::parse_alphabet()
  * parse a single class-entry
  */
 void dwdstAlphabetCompiler::compile_alphabet_class(FSMSymbolString *shortName,
-                                                 FSMSymbolString *longName,
-                                                 FSMSymbolString *regex)
+						   FSMSymbolString *longName,
+						   FSMSymbolString *regex)
 {
   v.clear();
 

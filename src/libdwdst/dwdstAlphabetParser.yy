@@ -141,6 +141,7 @@ typedef struct {
 %token <symstr>  SYMBOL
 %type  <symstr>  typeID
 %type  <symstr>  shortName longName
+%type  <symstr>  regexList
 %type  <symstr>  regex
 %type  <symstr>  alphaline alphalines
 %type  <symstr>  tab newline
@@ -158,7 +159,7 @@ alphalines:	/* empty */ { $$ = NULL; }
 	;
 
 alphaline:	newline { $$=NULL; }
-	|	typeID tab shortName tab longName tab regex
+	|	typeID tab shortName tab longName tab regexList
 		{
 		    // -- index the parsed alphabet-line
 		    if (*($1) == "Class") {
@@ -181,6 +182,17 @@ shortName:     SYMBOL { $$=$1; }
 
 longName:	SYMBOL { $$=$1; }
 		;
+
+regexList:	/* empty */ { $$ = new FSMSymbolString(""); }
+	|	regexList SYMBOL {
+                  if ($1->empty()) $1->push_back('|');
+                  $1->push_back('(');
+                  $1->append((const FSMSymbolString)*$2);
+                  $1->push_back(')');
+                  delete $2;
+                  $$ = $1;
+		}
+	;
 
 regex:		SYMBOL { $$=$1; }
 		;
