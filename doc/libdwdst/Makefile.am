@@ -126,7 +126,8 @@ install-latex-sub:
 #-----------------------------------------------------------------------
 
 ## --- extra distribution files
-#EXTRA_DIST = $(man3_MANS)
+EXTRA_DIST = \
+	doxy-filter.perl
 
 ## --- recursion subdirectories for 'make dist'
 #DIST_SUBDIRS =

@@ -10,7 +10,7 @@
 %name dwdstParamParser
 
 /* -- bison++ flags --- */
-// -- force use of location stack : defines global 'yyltype' by default
+/* -- force use of location stack : defines global 'yyltype' by default */
 %define LSP_NEEDED
 
 // -- ... so we define yyltype ourselves ... (see %header section)
@@ -21,31 +21,30 @@
 %define ERROR_VERBOSE
 
 // -- use pure-function errors
-%define ERROR_BODY =0
+/* %define ERROR_BODY =0 */
 
 // -- use inline error-reporting
-//%define ERROR_BODY { fprintf(stderr,"dwdstParamParser error: %s\n", msg); }
+%define ERROR_BODY { yycarp("dwdstParamParser: Error: %s", msg); }
 
 // -- use pure-function lexer body
 //%define LEX_BODY =0
 %define LEX_BODY =0
 
-%{
-#ifdef HAVE_CONFIG_H
-# include <dwdstConfig.h>
-#endif
-%}
+
 
 %header{
-# include <stdio.h>
-# include <stdlib.h>
-# include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <math.h>
 
-# include <string>
-# include <string.h>
+#include <string>
+#include <string.h>
 
-# include <FSMSymSpec.h>
-# include "dwdstTypes.h"
+#include <FSMSymSpec.h>
+#include <FSMTypes.h>
+
+#include "dwdstTypes.h"
 
 // -- get rid of bumble's macros
 #undef YYACCEPT
@@ -53,7 +52,9 @@
 #undef YYERROR
 #undef YYRECOVERING
 
-/// \brief Location-stack element type for bison++ parser.
+/* ?
+ *  Location-stack element type for bison++ parser.
+ */
 typedef struct {
   int timestamp;
   int first_line;
@@ -69,22 +70,30 @@ typedef struct {
  */
 %}
 
+%{
+#ifdef HAVE_CONFIG_H
+# include <dwdstConfig.h>
+#endif
+%}
+
 %define CLASS dwdstParamParser
 %define MEMBERS \
   public: \
    /* -- public instance members go here */ \
-   /** \brief a pointer to the parameter map we are constructing. */ \
+   /** a pointer to the parameter map we are constructing. */ \
    NGramTable *ngtable; \
-   /** \brief to keep track of all possible tags we've parsed. */ \
+   /** to keep track of all possible tags we've parsed. */ \
    set<FSMSymbolString> *alltags; \
   private: \
    /* private instance members go here */ \
   public: \
    /* public methods */ \
-   /** \brief report warnings */ \
+   /* report warnings */\
    virtual void yywarn(const char *msg) { \
-      fprintf(stderr,"dwdstParamParser warning: %s\n", msg); \
-   };
+      yycarp("dwdstParamParser: Warning: %s", msg);\
+   }; \
+   /** report anything */\
+   virtual void yycarp(char *fmt, ...);
    
 
 %define CONSTRUCTOR_INIT : ngtable(NULL), alltags(NULL)
@@ -202,8 +211,15 @@ newline:	'\n' { $$=0; }
 /* -------------- body section -------------- */
 
 /*----------------------------------------------------------------
- * Parsing Methods
+ * Error Methods
  *----------------------------------------------------------------*/
-void dwdstParamParser::yyerror(const char *msg) {
-    fprintf(stderr, "dwdstParamParser Error: %s\n", msg);
+
+void dwdstParamParser::yycarp(char *fmt, ...)
+{
+  va_list ap;
+  va_start(ap, fmt);
+  vfprintf(stderr, fmt, ap);
+  va_end(ap);
+  fprintf(stderr, " at line %d, column %d, near '%s'\n",
+	  yylloc.last_line, yylloc.last_column, yylloc.text);
 }

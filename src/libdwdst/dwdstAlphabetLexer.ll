@@ -21,7 +21,7 @@
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
-/*!
+/**
  * \class dwdstAlphabetLexer
  * \brief Lexer for intermediate alphabet files as produced by 'kempe-alphagen.perl'.
  * Supports comments introduced with '#'.
@@ -38,28 +38,28 @@
     /* -- public typedefs */\
   public: \
    /* -- positional parameters */\
-    /** \brief current line*/\
+    /** current line*/\
     int theLine;\
-    /** \brief current column*/\
+    /** current column*/\
     int theColumn;\
-    /** \brief tab-width for location-computation */\
+    /** tab-width for location-computation */\
     int tabWidth; \
-    /** \brief token-buffering */\
+    /** token-buffering */\
     FSMSymbolString tokbuf;\
-    /** \brief whether to clear the token-buffer on 'tokbuf_append()' */\
+    /** whether to clear the token-buffer on 'tokbuf_append()' */\
     bool tokbuf_clear;\
   private: \
     /* private local data */ \
     bool use_string; \
     char *stringbuf; \
   public: \
-    /** \brief virtual destructor to shut up gcc */\
+    /** virtual destructor to shut up gcc */\
     virtual ~dwdstAlphabetLexer(void) {};\
-    /** \brief use stream input */\
+    /** use stream input */\
     void select_streams(FILE *in=stdin, FILE *out=stdout); \
-    /** \brief use string input */\
+    /** use string input */\
     void select_string(const char *in, FILE *out=stdout); \
-    /** \brief for token-buffering: append yyleng characters of yytext to 'tokbuf' */\
+    /** for token-buffering: append yyleng characters of yytext to 'tokbuf' */\
     inline void tokbuf_append(char *text, int leng);
 
 %define CONSTRUCTOR_INIT :\

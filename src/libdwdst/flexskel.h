@@ -282,20 +282,20 @@ class YY_@_CLASS YY_@_INHERIT
 #endif
   ;
  public:
- /** \brief text of current token */
+ /** text of current token */
  YY_@_CHAR  *YY_@_TEXT;
- /** \brief length of current token */
+ /** length of current token */
  int YY_@_LENG;
- /** \brief current input stream (must not be NULL!) */
+ /** current input stream (must not be NULL!) */
  FILE *YY_@_IN;
- /** \brief current output stream */
+ /** current output stream */
  FILE *YY_@_OUT;
- /** \brief get the next token from the input stream */
+ /** get the next token from the input stream */
  YY_@_LEX_RETURN YY_@_LEX ( YY_@_LEX_PARAM);
- /** \brief constructor */
+ /** constructor */
  YY_@_CLASS(YY_@_CONSTRUCTOR_PARAM) ;
 #if YY_@_DEBUG != 0
- /** \brief debug flags */
+ /** debug flags */
  int YY_@_DEBUG_FLAG;
 #endif
  public: /* added members */

@@ -11,11 +11,24 @@
 /* --- Lexer name --- */
 %name dwdstPPLexer
 
+%header{
+/*============================================================================
+ * Doxygen docs
+ *============================================================================*/
+/*!
+ * \class dwdstPPLexer
+ * \brief Flex++ lexer for 'dwdspp' raw-text preprocessor:
+ * Does rudimentary end-of-sentence and abbreviation recognition,
+ * and filters out XML markup.
+ */
+
+%}
+
 %define CLASS dwdstPPLexer
 %define MEMBERS \
   public: \
   /* -- public typedefs */\
-  /** \brief typedef for token-types */ \
+  /** typedef for token-types */\
   typedef enum { \
     PPEOF, \
     UNKNOWN, \
@@ -33,32 +46,20 @@
   \
   public: \
     /* -- public local data */ \
-    /** \brief enable verbose reporting (track ntokens)?  */\
+    /** enable verbose reporting (track ntokens)?  */\
     bool verbose; \
-    /** \brief number of tokens processed (for verbose mode) */\
+    /** number of tokens processed (for verbose mode) */\
     unsigned int ntokens; \
     \
     /* -- local methods */ \
-    /** \brief preprocess a C-stream */\
+    /** preprocess a C-stream */\
     bool tokenize_stream(FILE *in=stdin, FILE *out=stdout); \
-    /** \brief hack for non-global yywrap() */\
+    /** hack for non-global yywrap() */\
     void step_streams(FILE *in, FILE *out);
 
 %define CONSTRUCTOR_CODE \
   ntokens = 0;
 
-%header{
-/*============================================================================
- * Doxygen docs
- *============================================================================*/
-/*!
- * \class dwdstPPLexer
- * \brief Flex++ lexer for 'dwdspp' raw-text preprocessor:
- * Does rudimentary end-of-sentence and abbreviation recognition,
- * and filters out XML markup.
- */
-
-%}
 
 /*----------------------------------------------------------------------
  * Definitions

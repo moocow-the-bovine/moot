@@ -160,25 +160,25 @@ class YY_@_CLASS YY_@_INHERIT
 public: /* static const int token ... */
 $ /* decl const */
 public:
- /** \brief Perform parsing */
+ /** Perform parsing */
  int YY_@_PARSE(YY_@_PARSE_PARAM);
- /** \brief report errors */
+ /** report errors */
  virtual void YY_@_ERROR(const char *msg) YY_@_ERROR_BODY;
 #ifdef YY_@_PURE
 #ifdef YY_@_LSP_NEEDED
- /** \brief get next token from input stream */
+ /** get next token from input stream */
  virtual int  YY_@_LEX(YY_@_STYPE *YY_@_LVAL,YY_@_LTYPE *YY_@_LLOC) YY_@_LEX_BODY;
 #else
- /** \brief get next token from input stream */
+ /** get next token from input stream */
  virtual int  YY_@_LEX(YY_@_STYPE *YY_@_LVAL) YY_@_LEX_BODY;
 #endif
 #else
- /** \brief get next token from input stream */
+ /** get next token from input stream */
  virtual int YY_@_LEX() YY_@_LEX_BODY;
- /** \brief semantic value of current token */
+ /** semantic value of current token */
  YY_@_STYPE YY_@_LVAL;
 #ifdef YY_@_LSP_NEEDED
- /** \brief current parser location */
+ /** current parser location */
  YY_@_LTYPE YY_@_LLOC;
 #endif
  int YY_@_NERRS;
@@ -186,11 +186,11 @@ public:
 #endif
 #if YY_@_DEBUG != 0
 public:
- /** \brief debug flag: nonzero means print parse trace */
+ /** debug flag: nonzero means print parse trace */
  int YY_@_DEBUG_FLAG;
 #endif
 public:
- /** \brief constructor */
+ /** constructor */
  YY_@_CLASS(YY_@_CONSTRUCTOR_PARAM);
 public:
  YY_@_MEMBERS 

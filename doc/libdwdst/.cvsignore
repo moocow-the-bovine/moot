@@ -4,6 +4,7 @@ man
 libdwdst.doxy
 libdwdst.log
 libdwdst.tag
+doxy-filter.log
 *.stamp
 *~
 .*~

@@ -30,6 +30,8 @@
 //%define LEX_BODY =0
 %define LEX_BODY =0
 
+
+
 %header{
 # include <stdio.h>
 # include <stdlib.h>
@@ -104,7 +106,7 @@ typedef struct {
    virtual void compile_alphabet_class(FSMSymbolString *shortName,\
                                        FSMSymbolString *longName,\
                                        FSMSymbolString *regex);\
-   /* report warnings */ \
+   /** report warnings */ \
    virtual void yywarn(const char *msg) { \
       yycarp("dwdstAlphabetParser: Warning: %s", msg);\
    }; \
