@@ -17,7 +17,9 @@
 
 ## --- executable programs
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
-bin_PROGRAMS = dwdspp dwdst dwdst-fstgen dwdst-pargen
+bin_PROGRAMS = dwdspp dwdst
+
+old_programs = dwdst-fstgen dwdst-pargen
 
 ## --- libtool libraries
 #lib_LTLIBRARIES = ${lib_1}.la ... ${lib_N}.la
@@ -49,15 +51,6 @@ dwdst_SOURCES = \
 	dwdst_main.cc \
 	dwdst_cmdparser.cc dwdst_cmdparser.h
 
-dwdst_fstgen_SOURCES = \
-	dwdst-fstgen_main.cc \
-	dwdst-fstgen_cmdparser.cc dwdst-fstgen_cmdparser.h
-
-dwdst_pargen_SOURCES = \
-	cmdutil.cc cmdutil.h \
-	dwdst-pargen_main.cc \
-	dwdst-pargen_cmdparser.cc dwdst-pargen_cmdparser.h
-
 ## --- Extra (possible) sources
 #EXTRA_${prog_i}_SOURCES = 
 #EXTRA_${lib_i}_la_SOURCES = 
@@ -65,8 +58,6 @@ dwdst_pargen_SOURCES = \
 ## --- Additional dependencies
 dwdspp_main.o: dwdspp_cmdparser.h
 dwdst_main.o: dwdst_cmdparser.h
-dwdst-fstgen_main.o: dwdst-fstgen_cmdparser.h
-dwdst-pargen_main.o: dwdst-pargen_cmdparser.h
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -153,17 +144,11 @@ LDFLAGS_COMMON = -L../libdwdst
 
 LDADD_COMMON   = ../libdwdst/libdwdst.la
 
-dwdst_LDFLAGS = $(LDFLAGS_COMMON)
-dwdst_LDADD = $(LDADD_COMMON)
-
-dwdst_fstgen_LDFLAGS = $(LDFLAGS_COMMON)
-dwdst_fstgen_LDADD = $(LDADD_COMMON)
-
-dwdst_pargen_LDFLAGS = $(LDFLAGS_COMMON)
-dwdst_pargen_LDADD = $(LDADD_COMMON)
-
 dwdspp_LDFLAGS = $(LDFLAGS_COMMON)
 dwdspp_LDADD = $(LDADD_COMMON)
+
+dwdst_LDFLAGS = $(LDFLAGS_COMMON)
+dwdst_LDADD = $(LDADD_COMMON)
 
 #${lib_i}_la_LDFLAGS = -L. -version-info ${lib_i_current}:${lib_i_rev}:${lib_i_age}
 #${lib_i}_LIBADD     = -lotherlib
@@ -193,11 +178,10 @@ MAINTAINERCLEANFILES = \
 
 ## --- extra distribution files
 EXTRA_DIST = \
-	dwdst.sym \
 	dwdst.gog \
-	dwdst-fstgen.gog \
-	dwdst-pargen.gog \
 	dwdspp.gog
+
+#	dwdst.sym
 
 ## --- recursion subdirectories for 'make dist'
 #DIST_SUBDIRS = $(SUBDIRS)

@@ -35,8 +35,8 @@ string	"output" o "Write output to FILE." \
     arg="FILE" \
     default="-" \
     details="
-Output files are in Brill format: one sentence per line, tokens
-separated by whitespace.
+Output files are in TnT format: one token per line, a blank line
+indicates a sentence boundary.
 "
 
 flag "list" l "Arguments are input-file lists." \

@@ -95,7 +95,7 @@ int main (int argc, char **argv)
 	  fflush(stderr);
 	}
       }
-      fprintf(out.file, "\n# %s: File: %s\n\n", PROGNAME, churner.in.name);
+      fprintf(out.file, "\n%%%% %s: File: %s\n\n", PROGNAME, churner.in.name);
 
       lexer.tokenize_stream(churner.in.file, out.file);
 

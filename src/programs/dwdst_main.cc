@@ -62,7 +62,7 @@ void GetMyOptions(int argc, char **argv)
   cmdline_parser_envdefaults(&args);
 
   // -- show banner
-  if (args.verbose_arg > 0)
+  if (args.verbose_arg > 1)
     fprintf(stderr,
 	    "\n%s version %s by Bryan Jurish <moocow@ling.uni-potsdam.de>\n\n",
 	    PROGNAME, VERSION);
@@ -83,34 +83,32 @@ void GetMyOptions(int argc, char **argv)
   churner.use_list = args.list_given;
 
   // -- get initialization start-time
-  if (args.verbose_arg > 0) gettimeofday(&istarted, NULL);
+  if (args.verbose_arg > 1) gettimeofday(&istarted, NULL);
 
   // -- tagger object setup : flags
   dwdst.want_avm = args.avm_given;
-  dwdst.want_numeric = args.numeric_given;
-  //dwdst.want_binary = args.binary_given;
-  dwdst.want_features = !args.tags_only_given;
-  dwdst.want_tnt_format = args.tnt_format_given || !args.mabbaw_format_given;
+  dwdst.want_mabbaw_format = args.mabbaw_format_given;
   dwdst.verbose  = args.verbose_arg;
+  dwdst.track_statistics = args.verbose_arg > 1;
 
   // -- tagger object setup : symbols
-  if (args.verbose_arg > 0)
+  if (args.verbose_arg > 1)
     fprintf(stderr, "%s: loading morphological symbols-file '%s'...", PROGNAME, args.symbols_arg);
   if (!dwdst.load_morph_symbols(args.symbols_arg)) {
     fprintf(stderr,"\n%s: load FAILED for morphological symbols-file '%s'\n",
 	    PROGNAME, args.symbols_arg);
     exit(1);
-  } else if (args.verbose_arg > 0) {
+  } else if (args.verbose_arg > 1) {
     fprintf(stderr," loaded.\n");
   }
 
   // -- tagger object setup : morphology FST
-  if (args.verbose_arg > 0)
+  if (args.verbose_arg > 1)
     fprintf(stderr, "%s: loading morphological FST '%s'...", PROGNAME, args.morph_arg);
   if (!dwdst.load_morph(args.morph_arg)) {
     fprintf(stderr,"\n%s: load FAILED for morphological FST '%s'\n", PROGNAME, args.morph_arg);
     exit(1);
-  } else if (args.verbose_arg > 0) {
+  } else if (args.verbose_arg > 1) {
     fprintf(stderr," loaded.\n");
   }
 
@@ -121,66 +119,10 @@ void GetMyOptions(int argc, char **argv)
     exit(1);
   }
 
-  // -- disambiguator setup
-  if (args.no_disambig_given) {
-    dwdst.dis = NULL;
-  }
-  else {
-    dwdst.dis = new dwdstDisambiguator();
-    if (!dwdst.dis) {
-      fprintf(stderr, "%s: could not create disambiguator!\n", PROGNAME);
-      exit(2);
-    }
-
-    // -- disambiguator setup : flags
-    dwdst.dis->bottom = args.bottom_arg;
-    dwdst.dis->verbose = args.verbose_arg;
-
-    // -- disambiguator setup : symbols
-    if (args.verbose_arg > 0)
-      fprintf(stderr, "%s: loading disambiguation symbols-file '%s'...",
-	      PROGNAME, args.dsymbols_arg);
-    if (!dwdst.load_disambig_symbols(args.dsymbols_arg)) {
-      fprintf(stderr,"\n%s: load FAILED for disambiguation symbols-file '%s'\n",
-	      PROGNAME, args.dsymbols_arg);
-      exit(2);
-    } else if (args.verbose_arg > 0) {
-      fprintf(stderr," loaded.\n");
-    }
-
-    // -- disambiguator setup : disambig FST
-    if (args.verbose_arg > 0)
-      fprintf(stderr, "%s: loading disambiguation FST '%s'...", PROGNAME, args.disambig_arg);
-    if (!dwdst.load_disambig_fst(args.disambig_arg)) {
-      fprintf(stderr,"\n%s: load FAILED for disambiguation FST '%s'\n", PROGNAME, args.disambig_arg);
-      exit(2);
-    } else if (args.verbose_arg > 0) {
-      fprintf(stderr," loaded.\n");
-    }
-
-    // -- link disambig-FST to dsymbols file (unnecessary)
-    if (!dwdst.dis->dfst->fsm_use_symbol_spec(dwdst.dis->syms)) {
-      fprintf(stderr,"%s ERROR: could not use symbols from '%s' in FST from '%s'\n",
-	      PROGNAME, args.symbols_arg, args.morph_arg);
-      exit(2);
-    }
-
-    // -- load alphabet file
-    if (args.verbose_arg > 0)
-      fprintf(stderr, "%s: loading disambiguation alphabet file '%s'...", PROGNAME, args.alphabet_arg);
-    if (!dwdst.load_disambig_alphabet(args.alphabet_arg, (args.compact_arg > 0))) {
-      fprintf(stderr,"\n%s ERROR: load FAILED for disambiguation alphabet '%s'\n",
-	      PROGNAME, args.alphabet_arg);
-      exit(2);
-    } else if (args.verbose_arg > 0) {
-      fprintf(stderr," loaded %d ambiguity classes.\n", dwdst.dis->class2sym.size());
-    }
-  }
-  // DEBUG
-  //dwdst.dis->dump_class_map(stdout);
+  // -- disambiguator setup [REMOVED]
 
   // -- report
-  if (args.verbose_arg > 0) {
+  if (args.verbose_arg > 1) {
     fprintf(stderr, "%s: Initialization complete\n\n", PROGNAME);
   }
 }
@@ -197,7 +139,7 @@ int main (int argc, char **argv)
   GetMyOptions(argc,argv);
 
   // -- get init-stop time = analysis-start time
-  if (args.verbose_arg > 0) gettimeofday(&astarted, NULL);
+  if (args.verbose_arg > 1) gettimeofday(&astarted, NULL);
 
 
   // -- the guts
@@ -207,21 +149,23 @@ int main (int argc, char **argv)
   } else {
     // -- big loop
     for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
-      if (args.verbose_arg > 0) {
+      if (args.verbose_arg > 1) {
 	nfiles++;
-	if (args.verbose_arg > 1) {
+	if (args.verbose_arg > 2) {
 	  fprintf(stderr,"%s: analyzing file '%s'... ", PROGNAME, churner.in.name);
 	  fflush(stderr);
 	}
       }
-      fprintf(out.file, "\n%s %s: File: %s\n\n",
-	      (args.tnt_format_given ? "%%" : "#"),
-	      PROGNAME,
-	      churner.in.name);
+      if (args.verbose_arg > 1) {
+	fprintf(out.file, "\n%s %s: File: %s\n\n",
+		(args.mabbaw_format_given ? "#" : "%%"),
+		PROGNAME,
+		churner.in.name);
+      }
       
       dwdst.tag_stream(churner.in.file, out.file);
       
-      if (args.verbose_arg > 1) {
+      if (args.verbose_arg > 2) {
 	fprintf(stderr," done.\n");
 	fflush(stderr);
       }
@@ -230,7 +174,7 @@ int main (int argc, char **argv)
   }
 
   // -- summary
-  if (args.verbose_arg > 0) {
+  if (args.verbose_arg > 1) {
       // -- timing
       gettimeofday(&astopped, NULL);
 
@@ -250,6 +194,7 @@ int main (int argc, char **argv)
       } else {
 	fprintf(stderr, "    - Recognition Rate    : -NaN-\n");
       }
+      /*
       if (!args.no_disambig_given) {
 	fprintf(stderr, "  + Disambiguation\n");
 	fprintf(stderr, "    - Unknown classes     : %d\n", dwdst.dis->nunknown_classes);
@@ -271,6 +216,7 @@ int main (int argc, char **argv)
 	  fprintf(stderr, "    - Sentence Coverage   : -NaN-\n");
 	}
       }
+      */
       fprintf(stderr, "  + General\n");
       fprintf(stderr, "    - Files processed     : %d\n", nfiles);
       fprintf(stderr, "    - Initialize Time     : %.2f sec\n", ielapsed);

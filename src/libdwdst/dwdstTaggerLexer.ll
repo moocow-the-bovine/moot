@@ -7,6 +7,7 @@
  *   + assumes pre-tokenized input
  *     - one token per line
  *     - blank lines mark end-of-sentence
+ *     - supports line-comments introduced by '%%'
  *     - raw text (no markup!)
  *   + process with Coetmeur's flex++ to produce 'dwdstTaggerLexer.cc'
  *----------------------------------------------------------------------*/
@@ -58,7 +59,7 @@
  * Definitions
  *----------------------------------------------------------------------*/
 space      [ \t]
-newline    (\r?\n)
+newline    [\n\r]
 wchar      [^ \t\n\r]
 
 /*----------------------------------------------------------------------
@@ -67,9 +68,9 @@ wchar      [^ \t\n\r]
 %%
 
 {newline}{newline}+            { theLine += yyleng; theColumn = 0; return EOS; }
-{space}+                       { theColumn += yyleng; /* ignore spaces */ }
+({newline}|{space})+           { theColumn += yyleng; /* ignore spaces */ }
 
-^{space}*\#([^\r\n]*){newline} { theLine++; theColumn = 0; /* ignore comments */ }
+^{space}*"%%"([^\r\n]*){newline} { theLine++; theColumn = 0; /* ignore comments */ }
 
 {wchar}+                       { theColumn += yyleng; return TOKEN; }
 .                              { theColumn += yyleng; return UNKNOWN; }

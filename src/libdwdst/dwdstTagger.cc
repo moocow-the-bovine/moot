@@ -135,7 +135,7 @@ inline void dwdstTagger::tag_eos(void) {
       fputs("\n\n", outfile);
     }
     else {
-      fputc('\n', outfile);
+	fputc('\n', outfile);
     }
   }
 }

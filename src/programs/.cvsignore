@@ -3,6 +3,9 @@ dwdst
 dwdstt
 dwdst-pargen
 dwdst-fstgen
+*.pod
+*.1
+*.xml
 *.list
 *.par
 *.apar
