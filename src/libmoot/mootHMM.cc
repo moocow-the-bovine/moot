@@ -66,8 +66,10 @@ mootHMM::mootHMM(void)
     n_tags(0),
     n_toks(0),
     n_classes(0),
-#ifndef MOOT_USE_TRIGRAMS
+#if !defined(MOOT_USE_TRIGRAMS)
     ngprobs2(NULL),
+#elif !defined(MOOT_HASH_TRIGRAMS)
+    ngprobs3(NULL),
 #endif
     vtable(NULL),
     nsents(0),
@@ -170,7 +172,14 @@ void mootHMM::clear(bool wipe_everything)
 
   //-- free n-gram probabilitiy table(s)
 #ifdef MOOT_USE_TRIGRAMS
+# ifdef MOOT_HASH_TRIGRAMS
   ngprobs3.clear();
+# else
+  if (ngprobs3) {
+    free(ngprobs3);
+    ngprobs3 = NULL;
+  }
+# endif
 #else
   if (ngprobs2) {
     free(ngprobs2);
@@ -384,7 +393,7 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
   //-- allocate lookup tables : classes
   lcprobs.resize(classids.size());
 
-#ifndef MOOT_USE_TRIGRAMS
+#if !defined(MOOT_USE_TRIGRAMS)
   //-- allocate: bigrams
   ngprobs2 = (ProbT *)malloc((n_tags*n_tags)*sizeof(ProbT));
   if (!ngprobs2) {
@@ -392,6 +401,14 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
     return false;
   }
   memset(ngprobs2, 0, (n_tags*n_tags)*sizeof(ProbT));
+#elif !defined(MOOT_HASH_TRIGRAMS)
+  //-- allocate: bigrams
+  ngprobs3 = (ProbT *)malloc((n_tags*n_tags*n_tags)*sizeof(ProbT));
+  if (!ngprobs3) {
+    carp("mootHMM::compile(): Error: could not allocate trigram table.\n");
+    return false;
+  }
+  memset(ngprobs3, 0, (n_tags*n_tags*n_tags)*sizeof(ProbT));
 #endif // MOOT_USE_TRIGRAMS
 
   //-- compilation variables
@@ -556,7 +573,11 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
       //-- compute unigram probability
 #ifdef MOOT_USE_TRIGRAMS
       //   : store as bigram 'UNKNOWN $tagid'
+# ifdef MOOT_HASH_TRIGRAMS
       ngprobs3[Trigram(0,0,tagid)] = ngi1->second.count / ngrams.ugtotal;
+# else //!MOOT_HASH_TRIGRAMS
+      ngprobs3[tagid] = ngi1->second.count / ngrams.ugtotal;
+# endif //MOOT_HASH_TRIGRAMS
 #else // !MOOT_USE_TRIGRAMS
       //   : store as bigram 'UNKNOWN $tagid'
       //ngprobs1[tagid] = ngi1->second.count / ngrams.ugtotal;
@@ -578,7 +599,11 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	  //-- compute bigram probability
 #ifdef MOOT_USE_TRIGRAMS
 	  //   : store as trigram(0,tagid1,tagid2)
+# ifdef MOOT_HASH_TRIGRAMS
 	  ngprobs3[Trigram(0,tagid,tagid2)] = ngi2->second.count / ngi1->second.count;
+# else // !MOOT_HASH_TRIGRAMS
+	  ngprobs3[(n_tags*tagid)+tagid2] = ngi2->second.count / ngi1->second.count;
+# endif // MOOT_HASH_TRIGRAMS
 #else // !MOOT_USE_TRIGRAMS
 	  //   : store as bigram[tagid1][tagid2]
 	  ngprobs2[(n_tags*tagid)+tagid2] = ngi2->second.count / ngi1->second.count;
@@ -595,7 +620,11 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	      tagid3 = tagids.name2id(ngi3->first);
 
 	      //-- compute trigram probability
+# ifdef MOOT_HASH_TRIGRAMS
 	      ngprobs3[Trigram(tagid,tagid2,tagid3)] = ngi3->second / ngi2->second.count;
+# else // !MOOT_HASH_TRIGRAMS
+	      ngprobs3[(n_tags*((n_tags*tagid)+tagid2))+tagid3] = ngi3->second / ngi2->second.count;
+# endif // MOOT_HASH_TRIGRAMS
 	    }
 #endif // MOOT_USE_TRIGRAMS
 	}
@@ -773,7 +802,6 @@ void mootHMM::assign_ids_cf(const mootClassfreqs &classfreqs)
 /*--------------------------------------------------------------------------
  * Compilation utilities: smoothing constant estimation : ngrams
  *--------------------------------------------------------------------------*/
-/** TODO: add better MOOT_USE_TRIGRAMS check here. */
 bool mootHMM::estimate_lambdas(const mootNgrams &ngrams)
 {
   //-- sanity check
@@ -900,6 +928,7 @@ bool mootHMM::compute_logprobs(void)
 {
 
 #ifdef MOOT_USE_TRIGRAMS
+# ifdef MOOT_HASH_TRIGRAMS
   ProbT   t3p = 0, t23p = 0, t123p = 0;
   Trigram tg3(0,0,0), tg23(0,0,0), tg123(0,0,0);
 
@@ -943,6 +972,60 @@ bool mootHMM::compute_logprobs(void)
     t3p = nglambda1 * tagp(tg3,0);
     if (t3p != 0.0) ngprobs3[tg3] = log(t3p);
   }
+
+# else //-- !MOOT_HASH_TRIGRAMS
+
+  ProbT   t3p = 0, t23p = 0, t123p = 0;
+  TagID   tag1 = 0, tag2 = 0, tag3 = 0;
+
+  //-- trigram probabilities: stored as '$tagid1,$tagid2,$tagid3'
+  for (tag1 = 1; tag1 < n_tags; tag1++) {
+    for (tag2 = 1; tag2 < n_tags; tag2++) {
+      for (tag3 = 0; tag3 < n_tags; tag3++) {
+
+	t123p = ( (nglambda1 * tagp(tag3))
+		  +
+		  (nglambda2 * tagp(tag2,tag3))
+		  +
+		  (nglambda3 * tagp(tag1,tag2,tag3)) );
+
+	if (t123p != 0.0)
+	  ngprobs3[(n_tags*((n_tags*tag1)+tag2))+tag3] = log(t123p);
+	else
+	  ngprobs3[(n_tags*((n_tags*tag1)+tag2))+tag3] = MOOT_PROB_ZERO;
+      }
+    }
+  }
+
+  //-- bigram probabilities: stored as '0 $tagid1 $tagid2'
+  for (tag2 = 1; tag2 < n_tags; tag2++) {
+
+    for (tag3 = 0; tag3 < n_tags; tag3++) {
+
+      t23p = ( (nglambda1 * tagp(tag3))
+	       +
+	       (nglambda2 * tagp(tag2,tag3)) );
+
+      if (t23p != 0.0)
+	ngprobs3[(n_tags*tag2)+tag3] = log(t23p);
+      else
+	ngprobs3[(n_tags*tag2)+tag3] = MOOT_PROB_ZERO;
+
+      //-- catch in-between probs: (tag2,UNKNOWN,tag3)
+      ngprobs3[(n_tags*((n_tags*tag2)+0))+tag3] = MOOT_PROB_ZERO;
+    }
+  }
+
+  //-- unigram probabilities: stored as '0 0 $tagid'
+  for (tag3 = 0; tag3 < n_tags; tag3++) {
+    t3p = nglambda1 * tagp(tag3);
+    if (t3p != 0.0)
+      ngprobs3[tag3] = log(t3p);
+    else
+      ngprobs3[tag3] = MOOT_PROB_ZERO;
+  }
+
+# endif //-- MOOT_HASH_TRIGRAMS
 
 #else //-- !MOOT_USE_TRIGRAMS
 
@@ -1420,30 +1503,31 @@ void mootHMM::txtdump(FILE *file)
   fprintf(file, "%%%% PrevPrevPrevTagID(\"PrevPrevTagStr\")\tPrevTagID(\"PrevTagStr\")\tTagID(\"TagStr\")\tlog(p(TagID|PrevPrevTagID,PrevTagID))\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   TagID pptagid;
-  Trigram tg123(0,0,0);
-  if (!ngprobs3.empty()) {
-    for (tg123.tag1 = 0; tg123.tag1 < n_tags; tg123.tag1++) {
-      for (tg123.tag2 = 0; tg123.tag2 < n_tags; tg123.tag2++) {
-	for (tg123.tag3 = 0; tg123.tag3 < n_tags; tg123.tag3++) {
-	  TrigramProbTable::const_iterator tgti = ngprobs3.find(tg123);
-	  if (tgti != ngprobs3.end()) {
-	    pptagid = tg123.tag1;
-	    ptagid = tg123.tag2;
-	    tagid = tg123.tag3;
-	    prob = tgti->second;
-	    fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%u(\"%s\")\t%g\n",
-		    pptagid,  tagids.id2name(pptagid).c_str(),
-		    ptagid,  tagids.id2name(ptagid).c_str(),
-		    tagid, tagids.id2name(tagid).c_str(),
-		    prob);
+# ifdef MOOT_HASH_TRIGRAMS
+  if (!ngprobs3.empty())
+# else
+  if (ngprobs3 != NULL)
+# endif
+    {
+      for (pptagid = 0; pptagid < n_tags; pptagid++) {
+	for (ptagid = 0; ptagid < n_tags; ptagid++) {
+	  for (tagid = 0; tagid < n_tags; tagid++) {
+	    prob = tagp(pptagid, ptagid, tagid);
+	    if (prob != MOOT_PROB_ZERO) {
+	      fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%u(\"%s\")\t%g\n",
+		      pptagid,  tagids.id2name(pptagid).c_str(),
+		      ptagid,  tagids.id2name(ptagid).c_str(),
+		      tagid, tagids.id2name(tagid).c_str(),
+		      prob);
+	    }
 	  }
 	}
       }
     }
-  }
-  else {
-    fprintf(file, "%% (empty)\n");
-  }
+  else
+    {
+      fprintf(file, "%%%% (NULL | empty)\n");
+    }
 
 #else // !MOOT_USE_TRIGRAMS
 
@@ -1604,8 +1688,14 @@ bool mootHMM::save(mootio::mostream *obs, const char *filename)
 
 #ifdef MOOT_USE_TRIGRAMS
   bool using_trigrams = true;
+# ifdef MOOT_HASH_TRIGRAMS
+  bool using_hash = true;
+# else
+  bool using_hash = false;
+# endif
 #else
   bool using_trigrams = false;
+  bool using_hash     = false;
 #endif
 
   //-- get checksum
@@ -1613,6 +1703,7 @@ bool mootHMM::save(mootio::mostream *obs, const char *filename)
   if (! (hi_item.save(obs, hi)
 	 && size_item.save(obs, crc)
 	 && bool_item.save(obs, using_trigrams)
+	 && bool_item.save(obs, using_hash)
 	 && cmt_item.save(obs, comment)
 	 ))
     {
@@ -1638,7 +1729,7 @@ bool mootHMM::_bindump(mootio::mostream *obs, const char *filename)
   Item<ClassIDTable> classids_item;
   Item<LexProbTable> lexprobs_item;
   Item<LexClassProbTable> lcprobs_item;
-#ifdef MOOT_USE_TRIGRAMS
+#if defined(MOOT_USE_TRIGRAMS) && defined(MOOT_HASH_TRIGRAMS)
   Item<TrigramProbTable> trigrams_item;
 #endif
 
@@ -1648,8 +1739,6 @@ bool mootHMM::_bindump(mootio::mostream *obs, const char *filename)
 	 && probt_item.save(obs, nglambda2)
 #ifdef MOOT_USE_TRIGRAMS
 	 && probt_item.save(obs, nglambda3)
-#else
-	 && probt_item.save(obs, 0.0)
 #endif
 	 && probt_item.save(obs, wlambda0)
 	 && probt_item.save(obs, wlambda1)
@@ -1668,7 +1757,11 @@ bool mootHMM::_bindump(mootio::mostream *obs, const char *filename)
 	 && lexprobs_item.save(obs, lexprobs)
 	 && lcprobs_item.save(obs, lcprobs)
 #ifdef MOOT_USE_TRIGRAMS
+# ifdef MOOT_HASH_TRIGRAMS
 	 && trigrams_item.save(obs, ngprobs3)
+# else
+	 && probt_item.save_n(obs, ngprobs3, n_tags*n_tags*n_tags)
+# endif
 #else
 	 && probt_item.save_n(obs, ngprobs2, n_tags*n_tags)
 #endif //MOOT_USE_TRIGRAMS
@@ -1724,10 +1817,17 @@ bool mootHMM::load(mootio::mistream *ibs, const char *filename)
   HeaderInfo hi, hi_magic(string("mootHMM"));
   size_t     crc;
   bool       saved_uses_trigrams;
+  bool       saved_hashes_trigrams;
 #ifdef MOOT_USE_TRIGRAMS
   bool       i_use_trigrams = true;
+# ifdef MOOT_HASH_TRIGRAMS
+  bool       i_hash_trigrams = true;
+# else
+  bool       i_hash_trigrams = false;
+# endif
 #else
   bool       i_use_trigrams = false;
+  bool       i_hash_trigrams = false;
 #endif
 
   Item<HeaderInfo> hi_item;
@@ -1740,6 +1840,7 @@ bool mootHMM::load(mootio::mistream *ibs, const char *filename)
   if (! (hi_item.load(ibs, hi)
 	 && size_item.load(ibs, crc)
 	 && bool_item.load(ibs, saved_uses_trigrams)
+	 && bool_item.load(ibs, saved_hashes_trigrams)
 	 && cmt_item.load(ibs, comment)
 	 ))
     {
@@ -1765,10 +1866,17 @@ bool mootHMM::load(mootio::mistream *ibs, const char *filename)
     }
   else if (saved_uses_trigrams != i_use_trigrams)
     {
-      carp("mootHMM::load(): incompatible trigram-usage flags (local=%u / saved=%u)%s%s\n",
+      carp("mootHMM::load(): incompatible use_trigam flag (local=%u / saved=%u)%s%s\n",
 	   i_use_trigrams, saved_uses_trigrams,
 	   (filename ? " in file " : ""), (filename ? filename : ""));
     }
+  else if (saved_hashes_trigrams != i_hash_trigrams)
+    {
+      carp("mootHMM::load(): incompatible hash_trigrams flag (local=%u / saved=%u)%s%s\n",
+	   i_hash_trigrams, saved_hashes_trigrams,
+	   (filename ? " in file " : ""), (filename ? filename : ""));
+    }
+
 
   if(!_binload(ibs, filename))
     return false;
@@ -1799,9 +1907,12 @@ bool mootHMM::_binload(mootio::mistream *ibs, const char *filename)
   Item<LexClassProbTable> lcprobs_item;
   //Item<mootTokString>  tokstr_item;
 #ifdef MOOT_USE_TRIGRAMS
+# ifdef MOOT_HASH_TRIGRAMS
   Item<TrigramProbTable> trigrams_item;
+# else
+  size_t ngprobs3_size = 0;
+# endif
 #else
-  ProbT dummy_nglambda3;
   size_t ngprobs2_size  = 0;
 #endif
 
@@ -1812,8 +1923,6 @@ bool mootHMM::_binload(mootio::mistream *ibs, const char *filename)
 	 && probt_item.load(ibs, nglambda2)
 #ifdef MOOT_USE_TRIGRAMS
 	 && probt_item.load(ibs, nglambda3)
-#else
-	 && probt_item.load(ibs, dummy_nglambda3)
 #endif
 	 && probt_item.load(ibs, wlambda0)
 	 && probt_item.load(ibs, wlambda1)
@@ -1850,7 +1959,11 @@ bool mootHMM::_binload(mootio::mistream *ibs, const char *filename)
   if (! (lexprobs_item.load(ibs, lexprobs)
 	 && lcprobs_item.load(ibs, lcprobs)
 #ifdef MOOT_USE_TRIGRAMS
+# ifdef MOOT_HASH_TRIGRAMS
 	 && trigrams_item.load(ibs, ngprobs3)
+# else
+	 && probt_item.load_n(ibs, ngprobs3, ngprobs3_size)
+# endif
 #else
 	 && probt_item.load_n(ibs, ngprobs2, ngprobs2_size)
 #endif // MOOT_USE_TRIGRAMS

@@ -737,6 +737,27 @@ fi
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## trigram-hash ?
+##
+AC_MSG_CHECKING([whether to hash trigrams])
+AC_ARG_ENABLE(trigram-hash,
+	AC_HELP_STRING([--enable-trigram-hash],
+	               [Save space but lose speed by hashing trigram (default=no)]),
+	[ac_cv_enable_trigram_hash="$enableval"],[ac_cv_enable_trigram_hash="no"])
+
+if test "$ac_cv_enable_trigram_hash" != "no" ; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(MOOT_HASH_TRIGRAMS,1,
+	    [Define this to enable slow but memory-friendly trigram hash])
+  build_options="$build_options TRIGRAM_HASH"
+else
+  AC_MSG_RESULT(no)
+fi
+##
+## /trigram-hash ?
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## relax ?
 ##
 AC_MSG_CHECKING([whether to relax])

@@ -99,6 +99,14 @@
  */
 
 /**
+ * \def MOOT_HASH_TRIGRAMS
+ * If defined (and if MOOT_USE_TRIGRAMS is defined), then
+ * trigrams will be stored in a hash table.
+ * Otherwise, trigrams will be stored in a sparse and
+ * memory-hogging (but fast) C array
+ */
+
+/**
  * \def MOOT_LEX_UNKNOWN_CLASSES
  * Define this to include real lexical-class entries for classes with counts
  * <= UnknownClassThreshhold.  Not entirely kosher, but it works well, so
@@ -254,7 +262,8 @@ public:
    */
   typedef ProbT *BigramProbTable;
 
-#ifdef MOOT_USE_TRIGRAMS
+#if defined(MOOT_USE_TRIGRAMS)
+# if defined(MOOT_HASH_TRIGRAMS)
   /// \brief Key type for a uni-, bi-, or trigram
   class Trigram {
   public:
@@ -302,7 +311,31 @@ public:
 	     Trigram::HashFcn,
 	     Trigram::EqualFcn>
     TrigramProbTable;
-#endif
+
+# else //! MOOT_HASH_TRIGRAMS
+
+  /**
+   * \brief Type for uni-, bi- and trigram probability lookup table.
+   *
+   * C-style 3d array:
+   *
+   * trigram probabilities \c log(p(tagid|pptagid,ptagid))
+   * indexexed by \c ((n_tags*((ntags*pptagid)+ptagid))+tagid)
+   *
+   * bigram probabilites \c log(p(tagid|ptagid))
+   * indexed by \c ((ntags*ptagid)+tagid)
+   *
+   * unigram probabilities \c log(p(tagid)) indexed by \c tagid .
+   *
+   * This winds up being a rather sparse table,
+   * but it should fit well in memory even for small
+   * (~= 200 tags) tagsets on contemporary machines,
+   * and lookup is Just Plain Quick.
+   */
+  typedef ProbT* TrigramProbTable;
+# endif // MOOT_HASH_TRIGRAMS
+
+#endif // MOOT_USE_TRIGRAMS
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -1110,9 +1143,9 @@ public:
 
   //------------------------------------------------------------
   // Viterbi: trash utilities: Rows
-#ifdef MOOT_USE_TRIGRAMS
   /** Returns a pointer to an unused ViterbiRow, possibly allocating a new one. */
   inline ViterbiRow *viterbi_get_row(void) {
+#ifdef MOOT_USE_TRIGRAMS
     ViterbiRow *row;
     if (trash_rows != NULL) {
       row        = trash_rows;
@@ -1121,8 +1154,10 @@ public:
       row = new ViterbiRow();
     }
     return row;
-  };
+#else
+    return viterbi_get_node();
 #endif //MOOT_USE_TRIGRAMS
+  };
 
   //------------------------------------------------------------
   // Viterbi: trash utilities: columns
@@ -1367,12 +1402,13 @@ public:
    *
    * \bold WORK IN PROGRESS
    */
+#ifdef MOOT_HASH_TRIGRAMS
   inline const ProbT tagp(const Trigram &trigram, ProbT ProbZero=MOOT_PROB_ZERO) const
   {
     TrigramProbTable::const_iterator tgti = ngprobs3.find(trigram);
     return tgti != ngprobs3.end() ? tgti->second : ProbZero;
   };
-
+#endif //MOOT_HASH_TRIGRAMS
 
   /**
    * Looks up and returns trigram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
@@ -1382,7 +1418,15 @@ public:
    */
   inline const ProbT tagp(const TagID prevtagid2, const TagID prevtagid1, const TagID tagid) const
   {
-    return tagp(Trigram(prevtagid2,prevtagid1,tagid));
+    return
+#ifdef MOOT_HASH_TRIGRAMS
+      tagp(Trigram(prevtagid2,prevtagid1,tagid))
+#else
+      ngprobs3 && prevtagid2 < n_tags && prevtagid1 < n_tags && tagid < n_tags
+      ? ngprobs3[(n_tags*((n_tags*prevtagid2)+prevtagid1))+tagid]
+      : MOOT_PROB_ZERO;
+#endif
+      ;
   };
 
   /**

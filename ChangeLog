@@ -20,6 +20,9 @@ v2.0.2 Mon, 19 Jul 2004 15:51:53 +0200
 	     * makes no difference to rare (*.tt) tagging
 	     * reduces -classfreq medium-rare (*.dmt) tagging to 'rare' case (hurts)
 	     * helps with +classfreq medium-rare (*.cmt) tagging
+	+ added build option '--enable-trigram-hash'
+	  - use slow but memory-friendly hash for sparse trigram table
+	  - only meaningful if '--enable-trigrams=yes'
 	+ added pkg-config variable 'build_options'
 	  - for easy access to compile-time options for an installed distribution
 	+ pre-compute log-probabilities
