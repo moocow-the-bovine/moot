@@ -139,8 +139,9 @@ void GetMyOptions(int argc, char **argv)
     fprintf(stderr," loaded.\n");
   }
 
-  // -- tagger-trainer object setup : kmax
+  // -- tagger-trainer object setup : kmax , eos
   dwdstt.kmax = args.kgram_max_arg;
+  dwdstt.eos = args.eos_string_arg;
 
   // -- tagger-trainer object setup : link morph-FST to symbols file
   if (!dwdstt.morph->fsm_use_symbol_spec(dwdstt.syms)) {
@@ -230,14 +231,14 @@ int main (int argc, char **argv)
       fprintf(stderr, "%s Summary:\n", PROGNAME);
       fprintf(stderr, "  + Files processed  : %d\n", nfiles);
       fprintf(stderr, "  + Tokens processed : %d\n", dwdstt.ntokens);
-      fprintf(stderr, "  + Unknown tokens   : %d\n", dwdstt.nunknown);
+      /*fprintf(stderr, "  + Unknown tokens   : %d\n", dwdstt.nunknown);
       fprintf(stderr, "  + Recognition Rate : ");
       if (dwdstt.ntokens > 0) {
 	// -- avoid div-by-zero errors
 	fprintf(stderr, "%.2f %%\n", 100.0*(double)(dwdstt.ntokens-dwdstt.nunknown)/(double)dwdstt.ntokens);
       } else {
 	fprintf(stderr, "-NaN-\n");
-      }
+	}*/
       //fprintf(stderr, "  + Initialize Time  : %.2f sec\n", ielapsed);
       //fprintf(stderr, "  + Analysis Time    : %.2f sec\n", aelapsed);
       //fprintf(stderr, "  + Throughput       : %.2f tok/sec\n", (float)dwdstt.ntokens/aelapsed);

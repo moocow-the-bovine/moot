@@ -237,7 +237,6 @@ bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
       // -- verbosity
       if (verbose) {
 	ntokens++;
-	if (results.empty()) nunknown++;
       }
     }
   }
@@ -367,7 +366,6 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
     // -- verbosity
     if (verbose) {
       ntokens++;
-      if (results.empty()) nunknown++;
     }
   }
 

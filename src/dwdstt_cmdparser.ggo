@@ -10,6 +10,7 @@ option	"words"		w	"Args are input tokens, not filenames"	    no
 
 option	"tags-only"	t	"Analyze only PoS tags, not morpho-syntactic features"			no
 option	"kgram-max"	k	"Size of k-gram window"                     int default="2"		no
+option	"eos-string"	e	"Use STRING as the EOS marker"		    string default="EOS"	no
 
 # -- unknown-FSA generation (FSA used as analysis for unknown tokens)
 option  "unknown-output" u	"Specify unknown-FSA output file"	string				no
