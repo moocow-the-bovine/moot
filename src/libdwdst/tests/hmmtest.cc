@@ -40,7 +40,7 @@ int main (int argc, char **argv) {
 
   //-- compile HMM
   fprintf(stderr, "%s: compiling HMM... ", progname);
-  if (!hmm.compile(lf,ng,1)) {
+  if (!hmm.compile(lf,ng,"",1)) {
     fprintf(stderr, "FAILED.\n");
     exit(3);
   }

@@ -20,6 +20,7 @@ using namespace std;
 
 void dwdstHMM::clear(void)
 {
+  viterbi_clear();
   tokids.clear();
   tagids.clear();
   lexprobs.clear();
@@ -33,6 +34,7 @@ void dwdstHMM::clear(void)
  *--------------------------------------------------------------------------*/
 bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
 		       const dwdstNgrams &ngrams,
+		       const dwdstTagString &start_tag_str,
 		       const dwdstLexfreqs::LexfreqCount unknownLexThreshhold)
 {
   //-- sanity check
@@ -139,18 +141,29 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
 	if (ptTotal == 0) continue;
 
 	//-- compute bigram probability
-	ngprobs2[IDPair(tagid,ptagid)] = ngti->second / ptTotal;
+	ngprobs2[IDPair(ptagid,tagid)] = ngti->second / ptTotal;
       }
       //-- Otherwise, it's neither unigram nor bigram: ignore it
     }
+
+  //-- get or assign start-tag-ID
+  start_tagid = tagids.nameExists(start_tag_str)
+    ? tagids.name2id(start_tag_str)
+    : tagids.insert(start_tag_str);
+
+  //-- allocate Viterbi state table(s)
+  vtable.resize(tagids.size());
+  pvtable.resize(tagids.size());
+  viterbi_clear();
 
   return true;
 }
 
 void dwdstHMM::txtdump(FILE *file)
 {
-  fprintf(file, "%% dwdstHMM text dump\n\n");
+  fprintf(file, "%% dwdstHMM text dump\n");
 
+  fprintf(file, "\n");
   fprintf(file, "%%-----------------------------------------------------\n");
   fprintf(file, "%% Lexical Probabilities\n");
   fprintf(file, "%% TokID(\"TokStr\")\tTagID(\"TagStr\")\tp(TokID|TagID)\n");
@@ -180,10 +193,30 @@ void dwdstHMM::txtdump(FILE *file)
   fprintf(file, "%%-----------------------------------------------------\n");
   for (BigramProbTable::const_iterator bpi = ngprobs2.begin(); bpi != ngprobs2.end(); bpi++) {
     fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%g\n",
-	    bpi->first.second, tagids.id2name(bpi->first.second).c_str(),
 	    bpi->first.first,  tagids.id2name(bpi->first.first).c_str(),
+	    bpi->first.second, tagids.id2name(bpi->first.second).c_str(),
 	    bpi->second);
   }
 
   fprintf(file, "\n");
+}
+
+void dwdstHMM::viterbi_txtdump(FILE *file)
+{
+  fprintf(file, "%% dwdstHMM Viterbi table text dump\n");
+  fprintf(file, "%% TagID(\"TagString\")\t:\t< PATH >\t:\tProb\n");
+
+    for (vtagid = 0             , vsi  = vtable.begin();
+	 vtagid < tagids.size() , vsi != vtable.end();
+	 vtagid ++              , vsi ++)
+      {
+	fprintf(file, "%u(%s)\t:\t< ", vtagid, tagids.id2name(vtagid).c_str());
+	for (StateSeq::const_iterator pathi = vsi->path.begin();
+	     pathi != vsi->path.end();
+	     pathi++)
+	  {
+	    fprintf(file, "%u(\"%s\") ", *pathi, tagids.id2name(*pathi).c_str());
+	  }
+	fprintf(file, ">\t:\t%g\n", vsi->prob);
+      }
 }
