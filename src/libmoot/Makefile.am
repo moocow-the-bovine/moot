@@ -37,9 +37,19 @@ lib_LTLIBRARIES = libmoot.la
 #${prog_i}_SOURCES =
 #${lib_i}_la_SOURCES =
 libmoot_la_SOURCES = \
+	\
 	mootToken.cc \
-	mootTokenIO.cc \
+	\
 	mootTokenLexer.cc \
+	mootTokenIO.cc \
+	\
+	mootExpatParser.cc \
+	mootTokenExpatIO.cc \
+	\
+	mootXmlDoc.cc \
+	mootTokenXmlDoc.cc \
+	\
+	mootGenericLexer.cc \
 	mootPPLexer.cc \
 	\
 	mootNgrams.cc \
@@ -61,11 +71,11 @@ libmoot_la_SOURCES = \
 	mootHMMTrainer.cc \
 	mootEval.cc \
 	\
-	mootUtils.cc \
-	\
-	mootXmlParser.cc
+	mootUtils.cc
 
 #	mootCHMM.cc
+#	mootEvent.cc
+#	mootEventLexer.cc
 
 
 ## --- Extra (possible) sources
@@ -106,15 +116,20 @@ mootClassfreqsLexer.cc: $(FLEXXX_DEPS)
 mootClassfreqsParser.h: $(BISONXX_DEPS)
 mootClassfreqsParser.cc: $(BISONXX_DEPS)
 
-mootTokenLexer.lo: mootTokenLexer.h
-mootTokenLexer.o: mootTokenLexer.h
+mootTokenLexer.lo: mootTokenLexer.h mootToken.h
+mootTokenLexer.o: mootTokenLexer.h mootToken.h
 mootTokenIO.lo: mootTokenLexer.h
 mootTokenIO.o: mootTokenLexer.h
 
-#mootTokenLexer.lo: mootTokenLexer.h mootTokenParser.h
-#mootTokenLexer.o: mootTokenLexer.h mootTokenParser.h
-#mootTokenLexer.h: $(FLEXXX_DEPS)
-#mootTokenLexer.cc: $(FLEXXX_DEPS)
+mootEventLexer.lo: mootEventLexer.h mootEvent.h
+mootEventLexer.o: mootEventLexer.h mootEvent.h
+#mootEventIO.lo: mootEventIO.h mootEventLexer.h
+#mootEventIO.o: mootEventIO.h mootEventLexer.h
+
+#mootEventLexer.lo: mootEventLexer.h mootTokenParser.h
+#mootEventLexer.o: mootEventLexer.h mootTokenParser.h
+#mootEventLexer.h: $(FLEXXX_DEPS)
+#mootEventLexer.cc: $(FLEXXX_DEPS)
 #mootTokenParser.h: $(BISONXX_DEPS)
 #mootTokenParser.cc: $(BISONXX_DEPS)
 
@@ -136,14 +151,31 @@ mootTokenIO.o: mootTokenLexer.h
 ## --- installable headers: @includedir@/@pkgname@
 #pkginclude_HEADERS = ${hfile_1} ... ${hfile_N}
 pkginclude_HEADERS = \
-	mootToken.h \
-	mootTokenIO.h \
+	\
+	mootIO.h \
+	mootCIO.h \
+	mootZIO.h \
+	mootBufferIO.h \
+	mootCxxIO.h \
 	mootBinIO.h \
-	mootBinStream.h \
+	\
+	mootToken.h \
+	\
+	mootTokenIO.h \
+	mootTokenLexer.h \
+	\
+	mootExpatParser.h \
+	mootTokenExpatIO.h \
+	mootRecode.h \
+	\
+	mootXmlDoc.h \
+	mootTokenXmlDoc.h \
+	\
 	mootEnum.h \
 	mootTypes.h \
-	mootTokenLexer.h \
+	\
 	mootPPLexer.h \
+	mootGenericLexer.h \
 	\
 	mootNgrams.h \
 	mootNgramsLexer.h \
@@ -164,9 +196,8 @@ pkginclude_HEADERS = \
 	mootHMMTrainer.h \
 	mootEval.h \
 	\
-	mootUtils.h \
-	\
-	mootXmlParser.h
+	mootUtils.h
+
 
 #	mootCHMM.h 
 #	mootTokenParser.h
@@ -276,6 +307,7 @@ libmoot_la_LDFLAGS = -version-info $(LIBCUR):$(LIBREV):$(LIBAGE)
 MAINTAINERCLEANFILES = \
 	*~ .*~ Makefile Makefile.in \
 	\
+	mootEventLexer.cc mootEventLexer.h \
 	mootTokenLexer.cc mootTokenLexer.h \
 	mootTokenParser.cc mootTokenParser.h \
 	\
@@ -315,6 +347,7 @@ EXTRA_DIST = \
 	mootClassfreqsParser.yy
 
 dist_old = \
+	mootTokenLexer.ll \
 	mootTokenParser.yy \
 	mootTaglistLexer.ll \
 	mootAlphabetLexer.ll \
