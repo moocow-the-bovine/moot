@@ -378,6 +378,7 @@ An example "refried" file is:
 =back
 
 =cut
+
 ## /Text File Formats
 ##==============================================================
 
@@ -529,6 +530,7 @@ An example "cooked" XML document is the following:
  </doc>
 
 =cut
+
 ## /XML File Formats
 ##==============================================================
 
@@ -540,9 +542,12 @@ An example "cooked" XML document is the following:
 
 Several moot utilities are capable of processing input
 in a number of different formats, typically specified
-by '-I' and '-O' command-line options.
+by '--input-format' (-I) and '--output-format' (-O) command-line options
 The following list briefly describes the (case-insensitive)
-format flags which may be passed to such format options.
+format flags which may occur as individual elements of the
+comma-separated list passed as an argument to these format options.
+Each format flag may be preceeded by an exclamation point "!" to indicate
+the negation of the respective format property.
 Note that at the current time, not all formats support
 all available flags.
 
@@ -567,7 +572,7 @@ and should cause a default format to be assumed.
 
 If you specify 'null' as an output format,
 no output will actually be written
-(useful for testing input layer).
+(useful for testing and benchmarking the input layer).
 
 =item Unknown
 
@@ -577,11 +582,11 @@ and should cause a reversion to some default format.
 
 =item Native
 
-Specifies native text format I/O.
+Specifies native text format I/O, as opposed to XML.
 
 =item XML
 
-Specifies XML format I/O.
+Specifies XML format I/O, as opposed to a native text format.
 
 =item Pretty
 
@@ -602,11 +607,11 @@ Read/write token text (all formats).
 
 =item Analyzed
 
-Read/write token analyses ('medium rare' or 'well done' formats).
+Read/write token analyses ('medium rare' or 'well done' formats only).
 
 =item Tagged
 
-Read/write 'best tags' ('medium' or 'well done' formats).
+Read/write 'best tags' ('medium' or 'well done' formats only).
 
 =item Pruned
 
@@ -651,9 +656,43 @@ Alias for 'Text,Tagged,Analyzed'
 
 =back
 
+=item Examples
+
+=over 4
+
+=item *
+Read input as native rare text (tokens only), write output as
+medium (best-tagged) native text:
+
+ moot --input-format=native,text --output-format=native,text,tagged
+
+Same thing, only shorter:
+
+ moot --input-format=rare --output-format=medium
+
+Same thing, even shorter:
+
+ moot -Ir -Om
+
+Same thing, using filename conventions:
+
+ moot input.moot.t output.moot.tt
+
+=item *
+Read medium rare (pre-analyzed) XML, write well-done native text:
+
+ moot -I xml,mediumrare -O native,welldone
+
+Same thing, using filename conventions:
+
+ moot input.mr.xml output.wd.moot
+
+=back
+
 =back
 
 =cut
+
 ## Input : I/O Format Flags
 ##==============================================================
 

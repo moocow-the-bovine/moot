@@ -87,6 +87,7 @@ int TokenIO::parse_format_string(const std::string &fmtString)
       else if (s=="analyzed") flag = tiofAnalyzed;
       else if (s=="tagged") flag = tiofTagged;
       else if (s=="user") flag = tiofUser;
+      else if (s=="pruned") flag = tiofPruned;
       //-- aliases
       else if (s=="rare" || s=="r") flag = tiofRare;
       else if (s=="mediumrare" || s=="mr") flag = tiofMediumRare;
@@ -121,13 +122,23 @@ int TokenIO::guess_filename_format(const char *filename)
        exti++)
     {
       if      (*exti == "t"   ) flags |= tiofRare;
+      else if (*exti == "r"   ) flags |= tiofRare;
+      else if (*exti == "rt"  ) flags |= tiofRare;
+
       else if (*exti == "tt"  ) flags |= tiofMedium;
       else if (*exti == "ttt" ) flags |= tiofMedium;
+      else if (*exti == "m"   ) flags |= tiofMedium;
+      else if (*exti == "mt"  ) flags |= tiofMedium;
+
       else if (*exti == "mr"  ) flags |= tiofMediumRare;
+      else if (*exti == "mrt" ) flags |= tiofMediumRare;
+
       else if (*exti == "wd"  ) flags |= tiofWellDone;
       else if (*exti == "wdt" ) flags |= tiofWellDone;
+
       else if (*exti == "xml" ) flags |= tiofXML;
       else if (*exti == "moot") flags |= tiofNative;
+
       else {
 	//-- unknown extension - break off search
 	break;
