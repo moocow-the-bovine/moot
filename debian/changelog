@@ -1,9 +1,13 @@
 moot (1.0.4) unstable; urgency=low
 
   * renamed to "moot" from "dwdst".
-  * cleaned up configure.in a tad.
+  * added additional detection routines for libFSM >= v0.1.1.1
+  * added --disable-fsm flag to ./configure
+  * added placebo classes methods in src/libmoot/mootFSM.h
+	- now compiles without libFSM: nothing much interesting works,
+	  but at least it compiles...
 
- -- Bryan Jurish <moocow@ling.uni-potsdam.de>  Tue,  2 Dec 2003 13:24:39 +0100
+ -- Bryan Jurish <moocow@ling.uni-potsdam.de>  Fri, 12 Dec 2003 02:20:26 +0100
 
 dwdst (1.0.3) unstable; urgency=low
 

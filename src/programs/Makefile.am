@@ -213,7 +213,8 @@ EXTRA_DIST = \
 	mootm.gog \
 	mootpp.gog \
 	moothmm.gog \
-	mootrain.gog
+	mootrain.gog \
+	acknowledge.pod
 
 #	moot.sym
 

@@ -43,6 +43,7 @@
 # include <FSM.h>
 # include <FSMSymSpec.h>
 # include <FSMCost.h>
+# include <FSMRegexCompiler.h>
 #else /* HAVE_LIBFSM */
 
 #include <vector>
