@@ -218,6 +218,8 @@ EXTRA_DIST = \
 	flexskel.cc flexskel.h \
 	bison.cc bison.h
 
+#	dwdst.sym 
+
 ## --- recursion subdirectories for 'make dist'
 #DIST_SUBDIRS = $(SUBDIRS)
 

@@ -31,8 +31,8 @@ gengetopt_args_info args;
 cmdutil_file_churner churner;
 
 // -- filenames
-char *symfile = "dwdst.sym";
-char *fstfile = "dwdst.fst";
+char *symfile = NULL;
+char *fstfile = NULL;
 
 // -- files
 cmdutil_file_info out;
@@ -75,6 +75,34 @@ void GetMyOptions(int argc, char **argv)
 
   // -- get initialization start-time
   if (args.verbose_arg > 0) gettimeofday(&istarted, NULL);
+
+  // -- global setup: environment variables : tagger
+  if (!args.symbols_given)
+    args.symbols_arg = get_from_environment("DWDST_SYMBOLS","dwdst.sym");
+  if (!args.morph_given)
+    args.morph_arg = get_from_environment("DWDST_MORPH","dwdst.fst");
+
+  if (strcmp(get_from_environment("DWDST_OUTPUT_FORMAT",""),"MABBAW") != 0)
+    args.tnt_format_given = 1;
+  if (strcmp(get_from_environment("DWDST_AVM_FORMAT",""),"yes") == 0)
+    args.avm_given = 1;
+  if (strcmp(get_from_environment("DWDST_NUMERIC_FORMAT",""),"yes") == 0)
+    args.numeric_given = 1;
+  if (strcmp(get_from_environment("DWDST_TAGS_ONLY",""),"yes") == 0)
+    args.tags_only_given = 1;
+  
+  /*if (!args.eos_given)
+    args.eos_arg = get_from_environment("DWDST_EOS","--EOS--");*/
+
+  // -- global setup: environment variables: disambiguator
+  if (!args.alphabet_given)
+    args.alphabet_arg = get_from_environment("DWDST_ALPHABET", "dwdstd.alph");
+  if (!args.dsymbols_given)
+    args.dsymbols_arg = get_from_environment("DWDST_DSYMBOLS", "dwdstd.sym");
+  if (!args.disambig_given)
+    args.disambig_arg = get_from_environment("DWDST_DISAMBIG", "dwdstd.fst");
+  if (!args.bottom_given)
+    args.bottom_arg = get_from_environment("DWDST_BOTTOM", "BOTTOM");
 
   // -- tagger object setup : flags
   dwdst.want_avm = args.avm_given;

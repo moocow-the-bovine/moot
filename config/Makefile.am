@@ -34,8 +34,9 @@ MAINTAINERCLEANFILES = \
 	ltmain.sh \
 	missing \
 	mkinstalldirs \
-	texinfo.tex \
-	ylwrap
+	texinfo.tex
+
+#	ylwrap
 
 
 ##-----------------------------------------------------------------------
@@ -51,7 +52,6 @@ EXTRA_DIST = \
 	missing
 
 #	ylwrap
-
 #	ltmain.sh
 #	config.guess 
 #	config.sub 

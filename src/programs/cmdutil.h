@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 
+
 class cmdutil_file_info {
 public:
   // -- data
@@ -61,5 +62,17 @@ private:
   // -- list-file stepping
   FILE *next_list_file();
 };
+
+
+/*--------------------------------------------------------------------
+ * Global utility functions
+ *---------------------------------------------------------------------*/
+
+/*
+ * const char *get_from_environment(VAR_NAME,VAR_DEFAULT)
+ *   + uses strdup()
+ */
+extern char *get_from_environment(const char *varname, const char *vardefault=NULL);
+
 
 #endif // _CMDUTIL_H

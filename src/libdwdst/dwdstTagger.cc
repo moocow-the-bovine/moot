@@ -66,8 +66,6 @@ dwdstTagger::dwdstTagger(FSMSymSpec *mysyms, FSM *mymorph)
   srcname = NULL;
 }
 
-
-
 /*
  * FSMSymSpec *dwdstTagger::load_morph_symbols(const char *filename)
  */
