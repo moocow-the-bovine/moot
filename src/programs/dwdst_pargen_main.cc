@@ -74,8 +74,6 @@ void GetMyOptions(int argc, char **argv)
   //dwdstt.want_avm = false;
   dwdstt.want_features = !args.tags_only_given;
   dwdstt.verbose  = (args.verbose_arg > 0);
-  //dwdstt.wdsep = args.word_separator_arg;
-  dwdstt.wdsep = "\t";
 
   // -- trainer object setup : symbols
   if (args.verbose_arg > 0) fprintf(stderr, "%s: loading symbols-file '%s'...", PROGNAME, args.symbols_arg);

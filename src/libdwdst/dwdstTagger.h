@@ -56,8 +56,8 @@ public:
   /// end-of-sentence marker for tagger output
   string eos;
 
-  /// word-separator for TnT-style output
-  string wdsep;
+  /// Word-separator symbol, used for disambiguation.
+  FSMSymbolString wordSeparator;
 
   // ------- flags
 

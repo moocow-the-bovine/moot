@@ -140,12 +140,6 @@ FSM *dwdstTrainer::generate_disambig_fsa()
   // -- for error reporting
   const char methodName[] = "dwdstTrainer::generate_disambig_fsa()";
 
-  /*
-    // -- Mecker!
-    fprintf(stderr,"%s: not yet implemented!\n", methodName);
-    return NULL;
-  */
-
   // -- sanity check: symbols
   if (!syms) {
     fprintf(stderr,"%s: cannot generate disambiguation fsa without an FSMSymSpec!\n", methodName);
@@ -175,7 +169,9 @@ FSM *dwdstTrainer::generate_disambig_fsa()
   if (!generate_tag_map()) return NULL;
 
 #ifdef DWDST_DFSA_DEBUG
-  fprintf(stderr, "dwdstTrainer::generate_tag_map(): generated %d skeleton tag-symbols.\n", tags2symbols.size());
+  fprintf(stderr,
+	  "dwdstTrainer::generate_tag_map(): generated %d skeleton tag-symbols.\n",
+	  tags2symbols.size());
 #endif
 
   // -- generate the skeleton dfsa
@@ -247,7 +243,7 @@ FSM *dwdstTrainer::expand_disambig_skeleton()
     recomp.theLexer.theLine++;
     recomp.theLexer.theColumn = 0;
     if (!recomp.parse_from_string(t2si->first.c_str())) {
-      fprintf(stderr, "%s: could not compile pseudo-tag '%s' as a regular expression -- using <epsilon>!\n",
+      fprintf(stderr, "%s: could not compile pseudo-tag '%s' as a regular expression -- using epsilon-FSM!\n",
 	      methodName, t2si->first.c_str());
       recomp.result_fsm = recomp.epsilon_fsm();
     }
@@ -306,6 +302,15 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
   rep->set_start_state(q0);
   rep->mark_state_as_final(q0,freecost);
 
+  // lookup our word-separator symbol
+  FSMSymbol wsSymbol = syms->symbolname_to_symbol(wordSeparator);
+  if (wsSymbol == FSMNOLABEL) {
+    fprintf(stderr,"%s: undefined word-separator symbol '%s': using EPSILON instead!\n",
+	    methodName, wordSeparator.c_str());
+    wsSymbol = EPSILON;
+  }
+
+  // set up nGram2State map
   NGramToStateMap nGram2State;
   theNgram.clear();
   theNgram.push_back(eos);
@@ -347,11 +352,11 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
 	fprintf(stderr, ">\n");
 # endif
 
-	// -- add a non-final state for the current nGram's cost: [context="<cost>.nGram"]
+	// -- add a non-final state for the current nGram's cost: [context="wordSep@<cost>.nGram"]
 	FSMState costState = rep->new_state();
 	rep->add_state(costState);
 
-	// -- add a final state for the current nGram itself: [context="<cost>nGram."]
+	// -- add a final state for the current nGram itself: [context="wordSep@<cost>nGram."]
 	FSMState ngramState = rep->new_state();
 	rep->add_state(ngramState);
 	rep->mark_state_as_final(ngramState, freecost);
@@ -366,7 +371,7 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
 	//     costState  : [context="<cost>.nGram."]
 	//     ngramState : [context="<cost>nGram."]
 	//    Transits:
-	//      prevState --(eps/0)--> costState --($tag/$cost)--> ngramState
+	//      prevState --($wordSeparator/$cost)--> costState --($tag/0)--> ngramState
 	prevNgram = theNgram;
 	prevNgram.pop_back();
 	if (prevNgram[0] != eos) { prevNgram.push_front(eos); }
@@ -376,7 +381,7 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
 	  FSMSymbolString  theTag    = theNgram[theNgram.size()-1];
 	  FSMSymbol        tagSymbol = tags2symbols[theTag];
 	  FSMWeight        arcCost   = disambigArcCost(prevNgram, theTag, uniGramCount);
-	  rep->add_transition(prevState,  costState,   EPSILON,   EPSILON,  arcCost);
+	  rep->add_transition(prevState,  costState,  wsSymbol,  wsSymbol,  arcCost);
 	  rep->add_transition(costState, ngramState, tagSymbol, tagSymbol, freecost);
 	} else {
 	  // -- this should never happen!
@@ -440,7 +445,7 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
 	if (nngi != nGram2State.end()) {
 	  FSMState   costState  = nngi->second.first;
 	  FSMWeight  arcCost    = disambigArcCost(prevNgram, theTag, uniGramCount);
-	  rep->add_transition(prevState, costState,   EPSILON,  EPSILON,   arcCost);
+	  rep->add_transition(prevState, costState, wsSymbol, wsSymbol, arcCost);
 # ifdef DWDST_DFSA_DEBUG_VERBOSE
 	  fprintf(stderr, "%s:     > cost='%f'\n", methodName, arcCost);
 # endif

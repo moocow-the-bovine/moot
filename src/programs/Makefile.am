@@ -93,7 +93,7 @@ noinst_HEADERS = config.h
 ##-----------------------------------------------------------------------
 
 ## --- preprocessor flags
-AM_CPPFLAGS = $(FSM_IFLAGS) -I@srcdir@/../libdwdst -I@builddir@/../libdwdst
+AM_CPPFLAGS = $(FSM_IFLAGS) -I@srcdir@/../libdwdst -I../libdwdst
 
 ## --- compiler flags (c++)
 AM_CXXFLAGS = $(FSM_WFLAGS) $(FSM_OFLAGS)

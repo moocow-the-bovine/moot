@@ -58,7 +58,7 @@ WARN_LOGFILE           = libdwdst.log
 #---------------------------------------------------------------------------
 INPUT                  = \
 			 @top_srcdir@/src/libdwdst \
-			 @top_builddir@src/libdwdst
+			 ../../src/libdwdst
 FILE_PATTERNS          = *.h
 RECURSIVE              = NO
 EXCLUDE                = 
