@@ -126,7 +126,7 @@ POD2MANFLAGS = --center="KDWDS PoS Tagging Tools"
 AM_CPPFLAGS = $(FSM_IFLAGS) -I@srcdir@/../libdwdst -I../libdwdst
 
 ## --- compiler flags (c++)
-AM_CXXFLAGS = $(FSM_WFLAGS) $(FSM_OFLAGS)
+AM_CXXFLAGS = $(DWDST_WFLAGS) $(DWDST_OFLAGS)
 
 ##-----------------------------------------------------------------------
 ## linker flags

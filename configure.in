@@ -433,7 +433,6 @@ AC_SUBST(BINDIST_OS)
 # Binary distribution
 #---------------------------------------------------------------
 
-
 dnl ------------------------------------------------------------
 dnl debug ?
 dnl
@@ -443,13 +442,23 @@ AC_ARG_ENABLE(debug,
 
 if test "$enable_debug" == "yes" ; then
    AC_MSG_RESULT(yes)
-   FSM_OFLAGS="-g"
+   DWDST_OFLAGS="-g"
 else
   AC_MSG_RESULT(no)
-  #FSM_OFLAGS="-O2"
-  FSM_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
+  #DWDST_OFLAGS="-O2"
+  DWDST_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
 fi
-AC_SUBST(FSM_OFLAGS)
+AC_SUBST(DWDST_OFLAGS)
+
+
+dnl ---------------------------------------------------------------
+dnl cxxflags: template depth
+dnl
+CXXFLAGS="$DWDST_OFLAGS -ftemplate-depth-24"
+dnl
+dnl cxxflags: template depth
+dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 dnl ------------------------------------------------------------
 dnl warnings ?
@@ -460,12 +469,12 @@ AC_ARG_ENABLE(warnings,
 
 if test "$enable_warnings" != "no" ; then
    AC_MSG_RESULT(yes)
-   FSM_WFLAGS="-Wall"
+   DWDST_WFLAGS="-Wall"
 else
   AC_MSG_RESULT(no)
-  FSM_WFLAGS=""
+  DWDST_WFLAGS=""
 fi
-AC_SUBST(FSM_WFLAGS)
+AC_SUBST(DWDST_WFLAGS)
 
 
 dnl

@@ -74,3 +74,4 @@ DIST_SUBDIRS = $(SUBDIRS)
 .PHONY: cvsclean cvsclean-hook
 
 cvsclean: maintainer-clean ;
+
