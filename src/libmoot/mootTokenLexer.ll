@@ -232,6 +232,14 @@ detchar    [^\t\n\r]
   BEGIN(TAG);
 }
 
+<TAG>"/"({tagchar}*) {
+   //-- TAG: best tag
+   theColumn += yyleng;
+   manalysis.tag.append((const char *)yytext+1);
+   mtoken.besttag.append((const char *)yytext+1);
+   lasttyp = TLTAG;
+}
+
 <TAG>{tagchar}* {
   //--  TAG: set in analysis
   theColumn += yyleng;
@@ -239,16 +247,16 @@ detchar    [^\t\n\r]
   lasttyp = TLTAG;
 }
 
-<TAG>":" {
+<TAG>(" "*)":"(" "*) {
   //-- COLON: switch to detail-mode
   theColumn += yyleng;
   lasttyp = TLDETAILS;
   BEGIN(DETAILS);
 }
 
-<TAG>""/{newline} { BEGIN(DETAILS); }
+<TAG>(" "*)/{newline} { BEGIN(DETAILS); }
 
-<DETAILS>{newline} {
+<DETAILS>(" "*){newline} {
   //-- NEWLINE: add & clear current analysis, if any */
   theLine++; theColumn = 0;
   //-- add & clear current analysis, if any
@@ -263,7 +271,7 @@ detchar    [^\t\n\r]
   return TLTOKEN;
 }
 
-<TAG>"<"[0-9]*(\.?)([0-9]+)">" {
+<TAG>"<"[0-9]*(\.?)([0-9]+)">"(" "*) {
   //-- COST: add cost to current analysis
   theColumn += yyleng;
   moot::mootToken::Cost cost;

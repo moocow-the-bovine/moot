@@ -76,7 +76,7 @@ string TokenWriter::token_string(const mootToken &token)
 {
   string s = token.toktext;
   if (!token.besttag.empty()) {
-    s.push_back('\t');
+    s.append("\t/");
     s.append(token.besttag);
   }
   for (mootToken::AnalysisSet::const_iterator ai = token.analyses.begin();
@@ -103,7 +103,7 @@ void TokenWriter::token_put(FILE *out, const mootToken &token)
 {
   fputs(token.toktext.c_str(), out);
   if (!token.besttag.empty()) {
-    fputc('\t',out);
+    fputs("\t/",out);
     fputs(token.besttag.c_str(), out);
   }
   for (mootToken::AnalysisSet::const_iterator ai = token.analyses.begin();
