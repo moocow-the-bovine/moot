@@ -34,8 +34,9 @@
 
 #include <mootTokenIO.h>
 #include <mootEval.h>
+
+#include <mootUtils.h>
 #include "mooteval_cmdparser.h"
-#include "cmdutil.h"
 
 using namespace std;
 using namespace moot;

@@ -16,10 +16,10 @@ moocow's part-of-speech tagger.
 
 %package doc
 Group: doc
-Summary: HTML documentation for moot PoS tagging package.
+Summary: HTML documentation for moot part-of-speech tagger.
 
 %description doc
-HTML documentation for moot PoS tagging package.
+HTML documentation for moot part-of-speech tagger.
 
 
 %prep
@@ -51,11 +51,12 @@ ldconfig
 
 %files
 %defattr(-,root,root)
-/usr/bin/moot*
+/usr/bin/moot[^m]*
 /usr/lib/libmoot.*
 /usr/lib/pkgconfig/moot.*
 /usr/include/moot/*
-/usr/man/man1/moot*
+/usr/man/man1/moot[^m]*
+/usr/man/man5/moot*
 %doc /usr/share/doc/moot/AUTHORS
 %doc /usr/share/doc/moot/ChangeLog
 %doc /usr/share/doc/moot/COPYING

@@ -109,6 +109,16 @@ public:
   /** \name Atomic Types */
   //@{
 
+  /** Symbolic verbosity level typedef */
+  typedef enum {
+    vlSilent,     /**< Be silent */
+    vlErrors,     /**< Report errors */
+    vlWarnings,   /**< Report warnings */
+    vlProgress,   /**< Report progess */
+    vlEverything  /**< Report everything we can */
+  } VerbosityLevel;
+
+
   /**
    * Type for a single probability value.
    * We use \c double here, since our probabilties can get wee tiny small
@@ -334,6 +344,18 @@ public:
   /** \name I/O Format Flags */
   //@{
   /**
+   * Verbosity level.  See \c VerbosityLevel typedef.
+   * Default=1.  Not yet respected by all warnings.
+   */
+  int verbose;
+
+  /**
+   * Print a dot for every \c ndots tokens processed if reporting progess.
+   * Default=0 (no dot printing).
+   */
+  size_t ndots;
+
+  /**
    * Whether to ignore first analysis of each input token (re-analysis).
    * Default=false.
    */
@@ -367,6 +389,7 @@ public:
    * Boundary tag, used during compilation, viterbi_start(), and viterbi_finish()
    * This gets set by the \c start_tag_str argument to compile().
    * Whatever it is, it should be consistend with what you trained on.
+   * Default = \c "__$" .
    */
   TagID     start_tagid;
 
@@ -408,8 +431,13 @@ public:
 #endif
   ProbT             wlambda1;     /**< Smoothing constant for lexical probabilities */
   ProbT             wlambda2;     /**< Smoothing constant for lexical probabilities */
+
   ProbT             clambda1;     /**< Smoothing constant for class probabilities */
   ProbT             clambda2;     /**< Smoothing constant for class probabilities */
+
+  //ProbT             ngscale;      /* N-gram Scaling factor for exportFreqs() */
+  //ProbT             lscale;       /* Lexical Scaling factor for exportFreqs() */
+  //ProbT             lcscale;      /* Class Scaling factor for exportFreqs() */
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -483,7 +511,9 @@ public:
   //@{
   /** Default constructor */
   mootHMM(void)
-    : input_ignore_first_analysis(false),
+    : verbose(1),
+      ndots(0),
+      input_ignore_first_analysis(false),
       output_best_only(false),
       use_lex_classes(true),
       start_tagid(0),
@@ -495,6 +525,9 @@ public:
       wlambda2(mootProbEpsilon),
       clambda1(1.0 - mootProbEpsilon),
       clambda2(mootProbEpsilon),
+      //ngscale(1.0),
+      //lscale(1.0),
+      //lcscale(1.0),
       n_tags(0),
       n_toks(0),
       n_classes(0),
@@ -514,7 +547,11 @@ public:
       vbestpn(NULL),
       vbestpath(NULL)
   {
+    //-- create special token entries
     for (TokID i = 0; i < NTokTypes; i++) { typids[i] = 0; }
+    unknown_token_name("@UNKNOWN");
+    unknown_tag_name("UNKNOWN");
+    uclass = LexClass();
   };
 
   /** Destructor */
@@ -587,13 +624,29 @@ public:
   /** \name Compilation / Initialization */
   //@{
   /**
+   * Top-level: load and compile a single model, and estimate all
+   * smoothing constants.  Returns true on success, false on failure.
+   *
+   * @param modelname is a model name following the conventions in mootfiles(5)
+   * @param start_tag_str is the string form of the boundary tag.
+   * @param myname name to use for warnings/errors/info
+   *
+   * If you want to load multiple models, you will need to first
+   * load the raw-freqency objects, then call compile() and
+   * smoothing estimation methods yourself.
+   */
+  bool load_model(const string &modelname,
+		  const mootTagString &start_tag_str="__$",
+		  const char *myname="mootHMM::load_model()");
+
+  /**
    * Compile probabilites from raw frequency counts in 'lexfreqs' and 'ngrams'.
    * Returns false on failure.
    */
   bool compile(const mootLexfreqs &lexfreqs,
 	       const mootNgrams &ngrams,
 	       const mootClassfreqs &classfreqs,
-	       const mootTagString &start_tag_str=mootTagString());
+	       const mootTagString &start_tag_str="__$");
 
   /** Assign IDs for tokens and tags from lexfreqs: called by compile() */
   void assign_ids_lf(const mootLexfreqs &lexfreqs);
@@ -637,6 +690,7 @@ public:
     viterbi_clear();
     for (mootSentence::const_iterator si = sentence.begin(); si != sentence.end(); si++) {
       viterbi_step(*si);
+      if (ndots && verbose >= vlProgress && (ntokens % ndots)==0) fputc('.', stderr);
     }
     viterbi_finish();
     tag_mark_best(sentence);

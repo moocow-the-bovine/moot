@@ -1,11 +1,11 @@
 # -*- Mode: Shell-Script -*-
 #
-# Getopt::Gen specification for moot
+# Getopt::Gen specification for mootcompile
 #-----------------------------------------------------------------------------
-program "moot"
+program "mootcompile"
 #program_version "0.01"
 
-purpose	"moocow's HMM part-of-speech tagger/disambiguator."
+purpose	"moocow's HMM part-of-speech tagger/disambiguator: model compiler."
 author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
 on_reparse "warn"
 
@@ -13,34 +13,25 @@ on_reparse "warn"
 # Details
 #-----------------------------------------------------------------------------
 details "
-'moot' is a Hidden Markov Model (HMM) Part-of-Spech (PoS)
-tagger / disambiguator program based on the 'libmoot' library.
+'mootcompile' compiles binary Hidden Markov Model parameter
+files for use with the 'moot(1)' program
+from one or more text model files.
 
-It takes as its input one or more 'rare' (-tagged,-analyzed)
-or 'medium rare' (-tagged,+analyzed) files and produces a
-'medium' (+tagged,-analyzed) or 'well done' (+tagged,+analyzed)
-file, respectively.  See L<mootfiles> for details on moot file
-formats.
+See L<mootfiles> for details on moot model file formats.
 "
 
 #-----------------------------------------------------------------------------
 # Files
 #-----------------------------------------------------------------------------
-rcfile "/etc/mootrc"
-rcfile "~/.mootrc"
+rcfile "/etc/mootcompilerc"
+rcfile "~/.mootcompilerc"
 
 
 #-----------------------------------------------------------------------------
 # Arguments
 #-----------------------------------------------------------------------------
-argument "INPUT(s)" "Input files / file-lists." \
+argument "MODEL(s)" "Text-format input models." \
     details="
-Input files should be 'cooked' text files
-of either the 'rare' (-tagged,-analyzed) or
-'medium rare' (-tagged,+analyzed) variety.
-
-See also the '--list' option.
-
 For details on moot file formats, see L<mootfiles>.
 "
 
@@ -53,66 +44,22 @@ int "verbose" v "Verbosity level." \
     default="2" \
     details="Be more or less verbose.  Recognized values are in the range 0..3."
 
-#flag  "words"  w  "INPUTs are input tokens, not filenames." \
-#    details="Useful for testing."
-
-flag  "list"   l  "INPUTs are file-lists, not filenames." \
-    details="Useful for large batch-processing jobs."
-
 string "output"	o "Specify output file (default=stdout)." \
     arg="FILE" \
-    default="-"
+    default="-" \
+    details="
+Binary model will be written to FILE.
+"
 
-#---------------------------------------------------
-# Format options
-#---------------------------------------------------
-group "Format Options"
-
-flag  "ignore-first" 2 "Ignore the first analysis for each input token." \
-    details="Useful for re-analysis."
-
-flag  "best"  b "Prune non-optimal tags (analyses) from the output." \
-     details="Only meaningful if your input file contains analysis restrictions."
-
-#flag  "tags"  t "Output only PoS tags, not detailed analyses." \
-#     details="Useful for compatibility with older programs."
-
-#-----------------------------------------------------------------------------
-# Compilation Options
-#-----------------------------------------------------------------------------
-#group "Compilation Options"
-#
-#string "compile" C "Compile binary HMM model file." \
-#  arg="BINMODEL" \
-#  details="
-#Do not perform tagging, but compile the binary model
-#file BINMODEL from the specified parameters, and then exit.
-#
-#See L<mootfiles> for details.
-#"
-#
-#int "compress" z "Compression level for compile-mode." \
-#    arg="LEVEL" \
-#    default="-1"
-#
-#flag "dump" D "Produce a text dump of the compiled HMM." \
-#    details="
-#For debugging.
-#"
+int "compress" z "Compression level for output file." \
+    arg="LEVEL" \
+    default="-1"
 
 #-----------------------------------------------------------------------------
 # HMM Options
 #-----------------------------------------------------------------------------
 
 group "HMM Options"
-
-string "model" M "Use HMM model file(s) MODEL." \
-  arg="MODEL" \
-  default="moothmm" \
-  details="
-See 'HMM MODEL FILE FORMATS' in L<mootfiles> for details
-on model file formats.
-"
 
 int "use-classes" L "Whether to use lexical class-probabilities." \
     arg="BOOL" \
@@ -210,10 +157,8 @@ acknowledge `cat acknowledge.pod`
 
 seealso "
 L<mootfiles>
-L<mootpp>,
 mootm(1),
 L<mootrain>,
-L<mootcompile>,
 L<mootdump>,
-L<mooteval>,
+L<moot>
 "

@@ -17,6 +17,8 @@ MOOTRAIN = ../mootrain
 MOOTHMM = ../moot
 MOOTHMM_FLAGS =
 MOOTEVAL = ../mooteval
+MOOTCOMPILE = ../mootcompile
+MOOTDUMP = ../mootdump
 
 all:
 	@echo "Usage: make TEST=test TRAIN=train label=label save"
@@ -147,16 +149,29 @@ model: $(MODEL).model
 
 %.clx: ; $(MAKE) $*.model
 
+##-- binary models
+
+hmm: $(MODEL).hmm
+
+chmm: $(MODEL).chmm
+
+%.hmm: %.model $(MOOTCOMPILE)
+	$(MOOTCOMPILE) -o $@ "$*.lex,$*.123"
+
+%.chmm: %.model $(MOOTDUMP)
+	$(MOOTCOMPILE) -o $@ "$*.lex,$*.123,$*.clx"
+
+
 ##-- dumps
 
 dump: $(MODEL).dump
 cdump: $(MODEL).cdump
 
-%.dump: %.model $(MOOTHMM)
-	$(MOOTHMM) -M$*.lex,$*.123 -D -o $@
+%.dump: %.model $(MOOTDUMP)
+	$(MOOTDUMP) -o $@ "$*.lex,$*.123"
 
-%.cdump: %.model $(MOOTHMM)
-	$(MOOTHMM) -M$*.lex,$*.123,$*.clx -D -o $@
+%.cdump: %.model $(MOOTDUMP)
+	$(MOOTDUMP) -o $@ "$*.lex,$*.123,$*.clx"
 
 ##-- cleanup
 clean:

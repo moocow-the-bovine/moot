@@ -291,16 +291,16 @@ public:
   //------ public methods: i/o
 
   /** Load n-grams from a TnT-style parameter file */
-  bool load(char *filename);
+  bool load(const char *filename);
 
   /** Load n-grams from a TnT-style parameter file (stream version) */
-  bool load(FILE *file, char *filename = NULL);
+  bool load(FILE *file, const char *filename = NULL);
 
   /** Save n-grams to a TnT-style paramater file */
-  bool save(char *filename, bool compact=false);
+  bool save(const char *filename, bool compact=false);
 
   /** Save n-grams to a TnT-style paramater file (stream version) */
-  bool save(FILE *file, char *filename = NULL, bool compact=false);
+  bool save(FILE *file, const char *filename = NULL, bool compact=false);
 };
 
 moot_END_NAMESPACE

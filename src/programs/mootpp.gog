@@ -61,4 +61,8 @@ as filenames of the input files themselves.
 #-----------------------------------------------------------------------------
 acknowledge `cat acknowledge.pod`
 
-seealso "mootm(1), L<moot>."
+seealso "
+L<mootfiles>,
+mootm(1),
+L<moot>
+"

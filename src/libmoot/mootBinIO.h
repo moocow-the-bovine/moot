@@ -403,28 +403,6 @@ namespace mootBinIO {
 
 
   /*------------------------------------------------------------
-   * moot types: mootCHMM::TagMorphAnalysisSet
-   */
-    /*
-  template<>
-  class Item<mootCHMM::TagMorphAnalysisSet> {
-  public:
-    Item<set<mootCHMM::TagMorphAnalysis> > aset_item;
-    Item<FSMWeight>                         weight_item;
-  public:
-    inline bool load(iBinStream &is, mootCHMM::TagMorphAnalysisSet &x) const
-    {
-      return aset_item.load(is, x.analyses) && weight_item.load(is, x.weight);
-    };
-
-    inline bool save(oBinStream &os, const mootCHMM::TagMorphAnalysisSet &x) const
-    {
-      return aset_item.save(os, x.analyses) && weight_item.save(os, x.weight);
-    };
-  };
-    */
-
-  /*------------------------------------------------------------
    * public typedefs: Generic header information
    */
   /** Header information struct */

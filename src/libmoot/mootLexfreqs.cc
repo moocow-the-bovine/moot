@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 
 #include <mootLexfreqs.h>
 #include <mootLexfreqsCompiler.h>
@@ -111,7 +112,7 @@ size_t mootLexfreqs::n_pairs(void)
 /*----------------------------------------------------------------------
  * I/O
  *----------------------------------------------------------------------*/
-bool mootLexfreqs::load(char *filename)
+bool mootLexfreqs::load(const char *filename)
 {
   FILE *file = fopen(filename, "r");
   if (!file) {
@@ -120,20 +121,23 @@ bool mootLexfreqs::load(char *filename)
 	    strerror(errno));
     return 0;
   }
-  bool rc = load(file);
+  bool rc = load(file,filename);
   fclose(file);
   return rc;
 }
 
-bool mootLexfreqs::load(FILE *file, char *filename)
+bool mootLexfreqs::load(FILE *file, const char *filename)
 {
   mootLexfreqsCompiler lfcomp;
-  lfcomp.srcname = filename;
+  lfcomp.srcname = strdup(filename);
   lfcomp.lexfreqs  = this;
-  return (lfcomp.parse_from_file(file) != NULL);
+  bool rc = (lfcomp.parse_from_file(file) != NULL);
+  free(lfcomp.srcname);
+  lfcomp.srcname = NULL;
+  return rc;
 }
 
-bool mootLexfreqs::save(char *filename)
+bool mootLexfreqs::save(const char *filename)
 {
   FILE *file = fopen(filename, "w");
   if (!file) {
@@ -147,7 +151,7 @@ bool mootLexfreqs::save(char *filename)
   return rc;
 }
 
-bool mootLexfreqs::save(FILE *file, char *filename)
+bool mootLexfreqs::save(FILE *file, const char *filename)
 {
   set<mootTokString> toks;
 

@@ -46,8 +46,7 @@
 #include <mootClassfreqs.h>
 #include <mootHMMTrainer.h>
 
-#include "cmdutil.h"
-#include "hmmutil.h"
+#include <mootUtils.h>
 #include "mootrain_cmdparser.h"
 
 using namespace std;
@@ -106,17 +105,19 @@ void GetMyOptions(int argc, char **argv)
   churner.use_list = 0;
 
   // -- parse model spec
-  char *lexfile=NULL;
-  char *ngfile=NULL;
-  char *lcfile=NULL;
+  string lexfile;
+  string ngfile;
+  string lcfile;
   if (args.output_given) {
-    if (!hmm_parse_textmodel(args.output_arg, &lexfile, &ngfile, &lcfile)) {
+    if (!hmm_parse_model_name_text(args.output_arg, lexfile, ngfile, lcfile)) {
       fprintf(stderr, "%s: could not parse output model specification '%s'\n",
 	      PROGNAME, args.output_arg);
       exit(1);
     }
   } else if (args.inputs_num > 0) {
-    if (!hmm_parse_corpusmodel(args.inputs[0], &lexfile, &ngfile, &lcfile)) {
+    string mymodel = unextend(args.inputs[0]);
+
+    if (!hmm_parse_model_name_text(mymodel, lexfile, ngfile, lcfile)) {
       fprintf(stderr, "%s: could not get output model from corpus-name '%s'\n",
 	      PROGNAME, args.inputs[0]);
       exit(1);
@@ -144,7 +145,7 @@ void GetMyOptions(int argc, char **argv)
 
   // -- open output files
   if (hmmt.want_lexfreqs) {
-    lfout.name = lexfile;
+    lfout.name = strdup(lexfile.c_str());
     if (!lfout.open("w")) {
       fprintf(stderr, "%s: open failed for lexical frequency file '%s': %s\n",
 	      PROGNAME, lfout.name, strerror(errno));
@@ -152,7 +153,7 @@ void GetMyOptions(int argc, char **argv)
     }
   }
   if (hmmt.want_ngrams) {
-    ngout.name = ngfile;
+    ngout.name = strdup(ngfile.c_str());
     if (!ngout.open("w")) {
       fprintf(stderr, "%s: open failed for ngram frequency file '%s': %s\n",
 	      PROGNAME, ngout.name, strerror(errno));
@@ -160,7 +161,7 @@ void GetMyOptions(int argc, char **argv)
     }
   }
   if (hmmt.want_classfreqs) {
-    lcout.name = lcfile;
+    lcout.name = strdup(lcfile.c_str());
     if (!lcout.open("w")) {
       fprintf(stderr, "%s: open failed for class frequency file '%s': %s\n",
 	      PROGNAME, lcout.name, strerror(errno));

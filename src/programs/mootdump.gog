@@ -1,10 +1,11 @@
 # -*- Mode: Shell-Script -*-
-# Getopt::Gen specification for 'mooteval'
+#
+# Getopt::Gen specification for mootdump
 #-----------------------------------------------------------------------------
-program "mooteval"
+program "mootdump"
 #program_version "0.01"
 
-purpose	"Output evaluator for moocow's PoS tagger."
+purpose	"moocow's HMM part-of-speech tagger/disambiguator: model dumper."
 author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
 on_reparse "warn"
 
@@ -12,53 +13,57 @@ on_reparse "warn"
 # Details
 #-----------------------------------------------------------------------------
 details "
-mooteval compares two  'medium' (+tagged,-analyzed) and/or
-'well done' (+tagged,+analyzed) input files, and summarizes
-the differences between them.
-See L<mootfiles> for details on moot file formats.
+'mootdump' creates text-dumps of compile HMM models for debugging.
+
+See L<mootfiles> for details on moot model file formats.
 "
+
+#-----------------------------------------------------------------------------
+# Files
+#-----------------------------------------------------------------------------
+rcfile "/etc/mootdumprc"
+rcfile "~/.mootdumprc"
+
 
 #-----------------------------------------------------------------------------
 # Arguments
 #-----------------------------------------------------------------------------
-argument "FILE1 FILE2" "Files to compare."
+argument "MODEL" "Input model." \
+    details="
+MODEL may be either a binary or a text model.
 
+For details on moot file formats, see L<mootfiles>.
+"
 
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
-
+#group "Basic Options"
 int "verbose" v "Verbosity level." \
     arg="LEVEL" \
-    default="2" \
-    details="Range: 0..4"
+    default="3" \
+    details="Be more or less verbose.  Recognized values are in the range 0..3."
 
-flag "eval-first" 1 "Evaluate FILE1 vs. baseline FILE2" \
-    details="
-Only useful if --verbose >= 2.
-
-If neither --eval-first nor --eval-second
-is given, both input files are evaluated against one another.
-"
-
-flag "eval-second" 2 "Evaluate FILE2 vs. baseline FILE1" \
-    details="
-Only useful if --verbose >= 2.
-
-If neither --eval-first nor --eval-second
-is given, both input files are evaluated against one another.
-"
-
-string	"output" o "Write output to FILE." \
+string "output"	o "Specify output file (default=stdout)." \
     arg="FILE" \
     default="-" \
     details="
-If --verbose >= 1, a summary will always be printed to stderr.
+Text dump will be written to FILE.
 "
 
 #-----------------------------------------------------------------------------
 # Addenda
 #-----------------------------------------------------------------------------
+#addenda ""
+
+#-----------------------------------------------------------------------------
+# Bugs
+#-----------------------------------------------------------------------------
+bugs "
+
+None known.
+
+"
 
 #-----------------------------------------------------------------------------
 # Footer
@@ -67,6 +72,7 @@ acknowledge `cat acknowledge.pod`
 
 seealso "
 L<mootfiles>,
-mootm(1),
+L<mootrain>,
+L<mootcompile>,
 L<moot>
 "

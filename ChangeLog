@@ -1,20 +1,52 @@
 ChangeLog for package moot
 
 Todo:
-	+ (added, untested) add & test binary I/O for mootClassfreqs
-	+ rename 'moothmm' -> 'moot'
-	+ move compilation / dump to a separate program 'mootcompile' ?
 	+ add XML I/O (subclass of mootToken(Reader|Writer) ?)
 	  - test effect of virtuals here
-	+ find gaspode bug
 	+ optimize class-based tagging: pre-prune classfreqs
 	  and merge viterbi_step()s into one iterator-based
-	  method
+	  method ?
+	  - nope, we lose either efficiency or strictness
+	    with our current data structs: problem are
+	    known tokens with known classes -- these would
+	    have to be restricted at training time, since
+	    after that, we lose the relation between
+	    tokens and their classes (in principle, this
+	    relation can be dynamic, which is a Feature...)
 
+v2.0.0pre5 Sun,  6 Jun 2004 12:07:11 +0200
+	+ re-added & tested binary model I/O
+	+ added new 'mootcompile' and 'mootdump' programs
+	  to clean up 'moot' itself a bit
+	+ moved old 'programs/cmdutil.*' and 'programs/hmmutil.*'
+	  structs and functions into library: 'mootUtils.h';
+	  redefined in terms of 'string'
+	
+v2.0.0pre4 Sun,  6 Jun 2004 02:52:24 +0200
+	+ gaspode bughunt
+	  - re-added 'uclass' item and threshhold-sensitive
+	    uclass compiling (need a populated class for iteration);
+	    gained a smidgeon of accuracy:
+	    * 94.91% (-classfreqs,-analyses)
+	    * 96.30% (-classfreqs,+analyses)
+	    * 96.52% (+classfreqs,+analyses)
+	  - best results (read: "the above") come (intuitively)
+	    when using class-probabilities for totally unknown
+	    tokens (i.e. the probabilities associated with
+	    the empty class)
+	+ added mootHMM flag 'use_lex_classes' : things go way
+	  wrong tagging classless inputs if we try and use
+	  class probabilities (well, duh...)
+	+ removed some debugging code in mootHMM.(h|cc)
+	
 v2.0.0pre3 Sat, 05 Jun 2004 18:33:07 +0200
+	+ renamed 'moothmm' -> 'moot'
 	+ added perl script 'morphhack.perl' to make
 	  (old) morph output more negra-compatible
-	  - raises accuracy on test corpus to 96.51%
+	  - raises accuracy on test corpus to
+	    * 94.91% (-classfreqs,-analyses)
+	    * 96.12% (-classfreqs,+analyses)
+	    * 96.51% (+classfreqs,+analyses)
 	
 v2.0.0pre2 Fri, 04 June 2004 15:49:23 +0200
 	+ added class 'mootEval'
@@ -48,7 +80,7 @@ v2.0.0pre1 Sat, 29 May 2004 01:59:14 +0200
 	    restriction for @CARDSUFFIX types
 	+ reduced old mootCHMM to mootHMM (still untested)
 	+ added class mootClassfreqs : raw class frequency counter (untested)
-	+ added mootClassfreqs(Lexer|Parser|Compiler) for text
+	+ added mootClassfreqs(Lexer|Parser|Compiler) for
 	  lexical-class parameter text I/O
 	+ added section 5 manpage 'mootfiles' documenting various
 	  file formats

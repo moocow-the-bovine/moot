@@ -170,16 +170,16 @@ public:
   //------ public methods: i/o
 
   /** Load data from a text-format parameter file */
-  bool load(char *filename);
+  bool load(const char *filename);
 
   /** Load data from a text-format parameter file (stream version) */
-  bool load(FILE *file, char *filename = NULL);
+  bool load(FILE *file, const char *filename = NULL);
 
   /** Save data to a text-format paramater file */
-  bool save(char *filename);
+  bool save(const char *filename);
 
   /** Save data to a text-format paramater file (stream version) */
-  bool save(FILE *file, char *filename = NULL);
+  bool save(FILE *file, const char *filename = NULL);
 };
 
 

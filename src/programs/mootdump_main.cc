@@ -18,10 +18,10 @@
 */
 
 /*--------------------------------------------------------------------------
- * File: mootpp_main.cc
+ * File: mootdump_main.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + moocow's tagger: preprocessor : main()
+ *   + HMM PoS tagger/disambiguator for DWDS project : model dumper
  *--------------------------------------------------------------------------*/
 
 #ifdef HAVE_CONFIG_H
@@ -32,16 +32,15 @@
 #include <errno.h>
 #include <string.h>
 
-#ifdef HAVE_TIME_H
-#include <time.h>
-#endif
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
+#include <string>
 
-#include <mootPPLexer.h>
+#include <mootHMM.h>
+#include <mootLexfreqs.h>
+#include <mootClassfreqs.h>
+#include <mootNgrams.h>
+
 #include <mootUtils.h>
-#include "mootpp_cmdparser.h"
+#include "mootdump_cmdparser.h"
 
 using namespace std;
 using namespace moot;
@@ -49,14 +48,16 @@ using namespace moot;
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-char *PROGNAME = "mootpp";
-
-// files
-cmdutil_file_info out;
+char *PROGNAME = "mootdump";
 
 // options & file-churning
-gengetopt_args_info args;
-cmdutil_file_churner churner;
+gengetopt_args_info  args;
+
+// -- files
+cmdutil_file_info out;
+
+// -- global classes/structs
+mootHMM        hmm;
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -66,13 +67,26 @@ void GetMyOptions(int argc, char **argv)
   if (cmdline_parser(argc, argv, &args) != 0)
     exit(1);
 
-  // -- show banner
-  if (args.verbose_arg > 0)
+  //-- load environmental defaults
+  cmdline_parser_envdefaults(&args);
+
+  //-- sanity check
+  if (args.inputs_num <= 0) {
+    fprintf(stderr, "%s: no input model specified!\n", PROGNAME);
+    exit(1);
+  }
+  else if (args.inputs_num > 1) {
+    fprintf(stderr, "%s: multiple input models specified -- ignoring all but first!\n",
+	    PROGNAME);
+  }
+
+  //-- show banner
+  if (args.verbose_arg > 1)
     fprintf(stderr,
-	    "\n%s version %s by Bryan Jurish <jurish@ling.uni-potsdam.de>\n\n",
+	    "\n%s version %s by Bryan Jurish <moocow@ling.uni-potsdam.de>\n\n",
 	    PROGNAME, VERSION);
 
-  // -- output file
+  //-- output file
   out.name = args.output_arg;
   if (strcmp(out.name,"-") == 0) out.name = "<stdout>";
   if (!out.open("w")) {
@@ -81,11 +95,12 @@ void GetMyOptions(int argc, char **argv)
     exit(1);
   }
 
-  // -- set up file-churner
-  churner.progname = PROGNAME;
-  churner.inputs = args.inputs;
-  churner.ninputs = args.inputs_num;
-  churner.use_list = args.list_given;
+  // -- assign "verbose" flag
+  if (args.verbose_arg <= 0) hmm.verbose = mootHMM::vlSilent;
+  else if (args.verbose_arg <= 1) hmm.verbose = mootHMM::vlErrors;
+  else if (args.verbose_arg <= 2) hmm.verbose = mootHMM::vlWarnings;
+  else if (args.verbose_arg <= 3) hmm.verbose = mootHMM::vlProgress;
+  else hmm.verbose = mootHMM::vlEverything;
 }
 
 /*--------------------------------------------------------------------------
@@ -93,55 +108,23 @@ void GetMyOptions(int argc, char **argv)
  *--------------------------------------------------------------------------*/
 int main (int argc, char **argv)
 {
-  mootPPLexer lexer;
-  int nfiles = 0;
-  timeval started,stopped;
-  double elapsed;
-
   GetMyOptions(argc,argv);
-  lexer.verbose = args.verbose_arg;
 
-  // -- get start time
-  if (args.verbose_arg > 0) {
-      gettimeofday(&started, NULL);
+  //-- the guts : load input model
+  if (!hmm.load_model(args.inputs[0], "__$", PROGNAME)) {
+    fprintf(stderr, "%s: load FAILED for model `%s' -- aborting!\n",
+	    PROGNAME, args.inputs[0]);
+    exit(1);
   }
 
-  // -- big loop
-  for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
-      if (args.verbose_arg > 0) {
-	nfiles++;
-	if (args.verbose_arg > 1) {
-	  fprintf(stderr,"%s: processing file '%s'... ", PROGNAME, churner.in.name);
-	  fflush(stderr);
-	}
-      }
-      fprintf(out.file, "\n%%%% %s: File: %s\n\n", PROGNAME, churner.in.name);
+  //-- produce text dump
+  if (args.verbose_arg > 1)
+    fprintf(stderr, "%s: writing HMM text dump to '%s' ...", PROGNAME, out.name);
 
-      lexer.tokenize_stream(churner.in.file, out.file);
+  hmm.txtdump(out.file);
 
-      if (args.verbose_arg > 1) {
-	fprintf(stderr," done.\n");
-	fflush(stderr);
-      }
-  }
-  out.close();
-
-  // -- summary
-  if (args.verbose_arg > 0) {
-      // -- timing
-      gettimeofday(&stopped, NULL);
-      elapsed = stopped.tv_sec-started.tv_sec + (stopped.tv_usec-started.tv_usec)/1000000.0;
-
-      // -- print summary
-      fprintf(stderr, "\n-----------------------------------------------------\n");
-      fprintf(stderr, "%s Summary:\n", PROGNAME);
-      fprintf(stderr, "  + Files processed : %d\n", nfiles);
-      fprintf(stderr, "  + Tokens found    : %d\n", lexer.ntokens);
-      fprintf(stderr, "  + Time Elsapsed   : %.2f sec\n", elapsed);
-      fprintf(stderr, "  + Throughput      : %.2f toks/sec\n", (float)lexer.ntokens/elapsed);
-      fprintf(stderr, "-----------------------------------------------------\n");
-  }
+  if (args.verbose_arg > 1)
+    fprintf(stderr," dumped.\n");
 
   return 0;
 }
-

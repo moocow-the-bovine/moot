@@ -5,7 +5,7 @@
 program "mootrain"
 #program_version "0.01"
 
-purpose	"moocow's PoS tagger : HMM trainer."
+purpose	"moocow's part-of-speech tagger : HMM trainer"
 author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
 on_reparse "warn"
 
@@ -108,4 +108,9 @@ strangeness.
 #-----------------------------------------------------------------------------
 acknowledge `cat acknowledge.pod`
 
-seealso "L<mootpp>, mootm(1), L<moot>, L<mooteval>, L<mootfiles>"
+seealso "
+L<mootfiles>,
+mootm(1),
+L<mootcompile>,
+L<moot>
+"

@@ -46,8 +46,7 @@
 #include <mootClassfreqs.h>
 #include <mootNgrams.h>
 
-#include "cmdutil.h"
-#include "hmmutil.h"
+#include <mootUtils.h>
 #include "moot_cmdparser.h"
 
 using namespace std;
@@ -68,9 +67,6 @@ size_t nfiles = 0;
 
 // -- global classes/structs
 mootHMM        hmm;
-mootNgrams     ngrams;
-mootLexfreqs   lexfreqs(32768);
-mootClassfreqs classfreqs(512);
 
 // -- for verbose timing info
 timeval istarted, astarted, astopped;
@@ -84,16 +80,16 @@ void GetMyOptions(int argc, char **argv)
   if (cmdline_parser(argc, argv, &args) != 0)
     exit(1);
 
-  // -- load environmental defaults
+  //-- load environmental defaults
   cmdline_parser_envdefaults(&args);
 
-  // -- show banner
+  //-- show banner
   if (args.verbose_arg > 1)
     fprintf(stderr,
 	    "\n%s version %s by Bryan Jurish <moocow@ling.uni-potsdam.de>\n\n",
 	    PROGNAME, VERSION);
 
-  // -- output file
+  //-- output file
   out.name = args.output_arg;
   if (strcmp(out.name,"-") == 0) out.name = "<stdout>";
   if (!out.open("w")) {
@@ -102,199 +98,68 @@ void GetMyOptions(int argc, char **argv)
     exit(1);
   }
 
-  // -- set up file-churner
+  //-- set up file-churner
   churner.progname = PROGNAME;
   churner.inputs = args.inputs;
   churner.ninputs = args.inputs_num;
   churner.use_list = args.list_given;
 
-  // -- get initialization start-time
+  //-- get initialization start-time
   if (args.verbose_arg > 1) gettimeofday(&istarted, NULL);
 
-  // -- i/o format flags
+  //-- i/o format flags
   hmm.input_ignore_first_analysis = args.ignore_first_given;
   hmm.output_best_only = args.best_given;
 
-  // -- assign "unknown" ids & other flags
-  hmm.use_lex_classes = args.use_lex_classes_arg;
+  //-- assign "unknown" ids & other flags
+  hmm.use_lex_classes = args.use_classes_arg;
   hmm.unknown_token_name(args.unknown_token_arg);
   hmm.unknown_tag_name(args.unknown_tag_arg);
   hmm.unknown_lex_threshhold = args.unknown_threshhold_arg;
-  hmm.unknown_class_threshhold = args.unknown_class_threshhold_arg;
+  hmm.unknown_class_threshhold = args.class_threshhold_arg;
 
-  // -- parse model spec
-  char *binfile=NULL;
-  char *lexfile=NULL;
-  char *classfile=NULL;
-  char *ngfile=NULL;
-  if (!hmm_parse_model(args.model_arg, &binfile, &lexfile, &ngfile, &classfile)) {
-    fprintf(stderr, "%s: could not parse model specification '%s'\n",
-	    PROGNAME, args.model_arg);
-    exit(1);
+  // -- assign "verbose" flag
+  if (args.verbose_arg <= 0) hmm.verbose = mootHMM::vlSilent;
+  else if (args.verbose_arg <= 1) hmm.verbose = mootHMM::vlErrors;
+  else if (args.verbose_arg <= 2) hmm.verbose = mootHMM::vlWarnings;
+  else if (args.verbose_arg <= 3) hmm.verbose = mootHMM::vlProgress;
+  else hmm.verbose = mootHMM::vlEverything;
+
+  //-- load model spec
+  if (!hmm.load_model(args.model_arg, args.eos_tag_arg, PROGNAME)) {
+    fprintf(stderr, "%s: could not load model `%s'\n", PROGNAME, args.model_arg);
   }
 
-  // -- load model: binary
-  if (binfile) {
-    if (args.verbose_arg > 1)
-      fprintf(stderr, "%s: loading binary HMM model file '%s'...", PROGNAME, binfile);
-    if (!hmm.load(binfile)) {
-      fprintf(stderr,"\n%s: load FAILED for binary HMM model file '%s'\n",
-	      PROGNAME, binfile);
+  // -- parse and assign n-gram smoothing constants (nlambdas)
+  if (args.nlambdas_arg) {
+    double nlambdas[3] = {0,1,0};
+    if (!moot_parse_doubles(args.nlambdas_arg, nlambdas, 3)) {
+      fprintf(stderr, "%s: could not parse N-Gram smoothing constants '%s'\n",
+	      PROGNAME, args.nlambdas_arg);
       exit(1);
-    } else if (args.verbose_arg > 1) {
-      fprintf(stderr," loaded.\n");
     }
-  }
-
-  // -- load model: lexical frequencies
-  if (lexfile) {
-    if (args.verbose_arg > 1)
-      fprintf(stderr, "%s: loading lexical frequency file '%s'...", PROGNAME, lexfile);
-    if (!lexfreqs.load(lexfile)) {
-      fprintf(stderr,"\n%s: load FAILED for lexical frequency file '%s'\n",
-	      PROGNAME, lexfile);
-      exit(1);
-    } else if (args.verbose_arg > 1) {
-      fprintf(stderr," loaded.\n");
-    }
-  }
-
-  // -- load model: n-gram frequencies
-  if (ngfile) {
-    if (args.verbose_arg > 1)
-      fprintf(stderr, "%s: loading n-gram frequency file '%s'...", PROGNAME, ngfile);
-    if (!ngrams.load(ngfile)) {
-      fprintf(stderr,"\n%s: load FAILED for n-gram frequency file '%s'\n",
-	      PROGNAME, ngfile);
-      exit(1);
-    } else if (args.verbose_arg > 1) {
-      fprintf(stderr," loaded.\n");
-    }
-  }
-
-  // -- load model: class frequencies
-  if (classfile && *classfile) {
-    if (file_exists(classfile)) {
-      if (args.verbose_arg > 1)
-	fprintf(stderr, "%s: loading class frequency file '%s'...", PROGNAME, classfile);
-
-      if (!classfreqs.load(classfile)) {
-	fprintf(stderr,"\n%s: load FAILED for class frequency file '%s'\n",
-		PROGNAME, classfile);
-	exit(1);
-      } else if (args.verbose_arg > 1) {
-	fprintf(stderr," loaded.\n");
-      }
-    }
-    else {
-      hmm.use_lex_classes = false;
-      if (args.verbose_arg > 1)
-	fprintf(stderr, "%s: no class frequency file '%s' -- skipping.\n",
-		PROGNAME, classfile);
-    }
-  } else {
-    hmm.use_lex_classes = false;
-    if (args.verbose_arg > 1)
-      fprintf(stderr, "%s: no class frequency file '%s' -- not using lexical classes.\n",
-	      PROGNAME, classfile);
-  }
-
-  // -- compile HMM
-  if (!binfile) {
-    if (args.verbose_arg > 1)
-      fprintf(stderr, "%s: compiling HMM...", PROGNAME);
-    lexfreqs.compute_specials();
-    if (!hmm.compile(lexfreqs, ngrams, classfreqs, args.eos_tag_arg)) {
-      fprintf(stderr,"\n%s: HMM compilation FAILED\n", PROGNAME);
-      exit(1);
-    } else if (args.verbose_arg > 1) {
-      fprintf(stderr," compiled.\n");
-    }
-
-    // -- parse n-gram smoothing constants (nlambdas)
-    if (args.nlambdas_arg) {
-      double nlambdas[3] = {0,1,0};
-      if (!hmm_parse_doubles(args.nlambdas_arg, nlambdas, 3)) {
-	fprintf(stderr, "%s: could not parse N-Gram smoothing constants '%s'\n",
-		PROGNAME, args.nlambdas_arg);
-	exit(1);
-      }
-      hmm.nglambda1 = nlambdas[0];
-      hmm.nglambda2 = nlambdas[1];
+    hmm.nglambda1 = nlambdas[0];
+    hmm.nglambda2 = nlambdas[1];
 #ifdef moot_USE_TRIGRAMS
-      hmm.nglambda3 = nlambdas[2];
+    hmm.nglambda3 = nlambdas[2];
 #endif
-    } else {
-      if (args.verbose_arg > 1)
-	fprintf(stderr, "%s: estimating n-gram lambdas...", PROGNAME);
-      if (!hmm.estimate_lambdas(ngrams)) {
-	fprintf(stderr,"\n%s: n-gram lambda estimation FAILED.\n", PROGNAME);
-	exit(1);
-      } else if (args.verbose_arg > 1) {
-	fprintf(stderr," done.\n");
-      }
-    }
+  }
 
-    // -- parse lexical smoothing constants (wlambdas)
-    if (args.wlambdas_arg) {
-      double wlambdas[2] = {1,0};
-      if (!hmm_parse_doubles(args.wlambdas_arg, wlambdas, 2)) {
-	fprintf(stderr, "%s: could not parse lexical smoothing constants '%s'\n",
-		PROGNAME, args.wlambdas_arg);
-	exit(1);
-      }
-      hmm.wlambda1 = wlambdas[0];
-      hmm.wlambda2 = wlambdas[1];
-    } else {
-      if (args.verbose_arg > 1)
-	fprintf(stderr, "%s: estimating lexical lambdas...", PROGNAME);
-      if (!hmm.estimate_wlambdas(lexfreqs)) {
-	fprintf(stderr,"\n%s: lexical lambda estimation FAILED.\n", PROGNAME);
-	exit(1);
-      } else if (args.verbose_arg > 1) {
-	fprintf(stderr," done.\n");
-      }
-    }
-
-    //-- estimate class lambdas
-    if (args.verbose_arg > 1)
-      fprintf(stderr, "%s: estimating class lambdas...", PROGNAME);
-    if (!hmm.estimate_clambdas(classfreqs)) {
-      fprintf(stderr,"\n%s: class lambda estimation FAILED.\n", PROGNAME);
+  // -- parse and assign lexical smoothing constants (wlambdas)
+  if (args.wlambdas_arg) {
+    double wlambdas[2] = {1,0};
+    if (!moot_parse_doubles(args.wlambdas_arg, wlambdas, 2)) {
+      fprintf(stderr, "%s: could not parse lexical smoothing constants '%s'\n",
+	      PROGNAME, args.wlambdas_arg);
       exit(1);
-    } else if (args.verbose_arg > 1) {
-      fprintf(stderr," done.\n");
     }
-
-    if (args.compile_given) {
-      if (args.verbose_arg > 1)
-	fprintf(stderr, "%s: saving binary HMM model '%s' ...", PROGNAME, args.compile_arg);
-      if (!hmm.save(args.compile_arg, args.compress_arg)) {
-	fprintf(stderr,"\n%s: binary HMM dump FAILED\n", PROGNAME);
-	exit(1);
-      } else if (args.verbose_arg > 1) {
-	fprintf(stderr," saved.\n");
-      }
-      exit(0);
-    }
+    hmm.wlambda1 = wlambdas[0];
+    hmm.wlambda2 = wlambdas[1];
   }
 
   // -- report
   if (args.verbose_arg > 1) {
     fprintf(stderr, "%s: Initialization complete\n", PROGNAME);
-  }
-
-  //-- dump if requested
-  if (args.dump_given) {
-    if (args.verbose_arg > 1)
-      fprintf(stderr, "%s: dumping HMM debugging output to '%s' ...", PROGNAME, out.name);
-
-    hmm.txtdump(out.file);
-
-    if (args.verbose_arg > 1)
-      fprintf(stderr," dumped.\n");
-
-    exit(0);
   }
 
   //-- get comment-string
@@ -308,7 +173,6 @@ void GetMyOptions(int argc, char **argv)
   //-- report to output-file
   fprintf(out.file, "%s %s output file generated on %s", cmts, PROGNAME, asctime(&now_tm));
   fprintf(out.file, "%s Configuration:\n", cmts);
-  fprintf(out.file, "%s   Lex. Threshhold   : %g\n", cmts, hmm.unknown_lex_threshhold);
   fprintf(out.file, "%s   Unknown Token     : %s\n", cmts, hmm.tokids.id2name(0).c_str());
   fprintf(out.file, "%s   Unknown Tag       : %s\n", cmts, hmm.tagids.id2name(0).c_str());
   fprintf(out.file, "%s   Border Tag        : %s\n", cmts, hmm.tagids.id2name(hmm.start_tagid).c_str());
@@ -318,10 +182,15 @@ void GetMyOptions(int argc, char **argv)
   fprintf(out.file, " lambda3=%g", hmm.nglambda3);
 #endif
   fprintf(out.file, "\n");
-  fprintf(out.file, "%s   Lexical lambdas  : lambdaw1=%g, lambdaw2=%g\n",
+  fprintf(out.file, "%s   Lex. Threshhold   : %g\n", cmts, hmm.unknown_lex_threshhold);
+  fprintf(out.file, "%s   Lexical lambdas   : lambdaw1=%g, lambdaw2=%g\n",
 	  cmts, hmm.wlambda1, hmm.wlambda2);
+  fprintf(out.file, "%s   Use classes?      : %s\n",
+	  cmts, hmm.use_lex_classes ? "yes" : "no");
+  fprintf(out.file, "%s   Class Threshhold  : %g\n", cmts, hmm.unknown_class_threshhold);
+  fprintf(out.file, "%s   Class lambdas     : lambdac1=%g, lambdac2=%g\n",
+	  cmts, hmm.clambda1, hmm.clambda2);
 }
-
 
 /*--------------------------------------------------------------------------
  * Summary
@@ -405,8 +274,13 @@ int main (int argc, char **argv)
       // -- timing
       gettimeofday(&astopped, NULL);
 
-      aelapsed = astopped.tv_sec-astarted.tv_sec + (double)(astopped.tv_usec-astarted.tv_usec)/1000000.0;
-      ielapsed = astarted.tv_sec-istarted.tv_sec + (double)(astarted.tv_usec-istarted.tv_usec)/1000000.0;
+      aelapsed =
+	astopped.tv_sec-astarted.tv_sec
+	+ (double)(astopped.tv_usec-astarted.tv_usec)/1000000.0;
+
+      ielapsed =
+	astarted.tv_sec-istarted.tv_sec
+	+ (double)(astarted.tv_usec-istarted.tv_usec)/1000000.0;
 
       print_summary(stderr);
       if (out.file != stdout) print_summary(out.file);

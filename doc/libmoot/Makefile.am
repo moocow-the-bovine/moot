@@ -103,7 +103,7 @@ clean-local:
 	rm -rf html latex man
 
 ## --- distclean: built by 'configure'
-#DISTCLEANFILES =
+DISTCLEANFILES =
 
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = \
@@ -151,6 +151,7 @@ install-latex-sub:
 
 ## --- extra distribution files
 EXTRA_DIST = \
+	mainpage.dox \
 	doxy-filter.perl
 
 ## --- recursion subdirectories for 'make dist'

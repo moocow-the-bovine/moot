@@ -1,6 +1,6 @@
 =pod
 
-README for package 'moot' (formerly 'dwdst')
+README for package 'moot'
 
 Last updated for moot version 2.0.0pre3
 
@@ -11,16 +11,6 @@ moot - moocow's part-of-speech tagger.
 =head1 REQUIREMENTS
 
 =over 4
-
-=item STLport E<gt>= 4.5.3
-
-Available from http://www.stlport.org
-
-Only required for building with gcc-2.x.
-You will have to set the environment variables
-CPPFLAGS, LDFLAGS, and LIBS according to
-your installation.
-
 
 =item pkg-config
 
@@ -42,6 +32,16 @@ from the official distribution site of this package.
 
 Tested with flex++-v2.3.8-4 and bison++-v1.21-5.
 
+=item STLport E<gt>= 4.5.3
+
+Available from http://www.stlport.org
+
+Only required for building with gcc-2.x.
+You will have to set the environment variables
+CPPFLAGS, LDFLAGS, and LIBS according to
+your installation.
+
+=back
 
 
 
@@ -68,7 +68,7 @@ script:
 This will create the 'configure' script and other
 necessary build files.
 
-You will also need the Getopt::Gen perl module,
+You will also need Perl and the Getopt::Gen Perl module,
 which should be available from wherever you acquired
 these sources.
 

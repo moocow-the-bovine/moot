@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 
 #include <mootNgrams.h>
 #include <mootNgramsCompiler.h>
@@ -77,7 +78,7 @@ size_t mootNgrams::n_trigrams(void)
 /*----------------------------------------------------------------------
  * I/O
  *----------------------------------------------------------------------*/
-bool mootNgrams::load(char *filename)
+bool mootNgrams::load(const char *filename)
 {
   FILE *file = fopen(filename, "r");
   if (!file) {
@@ -91,15 +92,18 @@ bool mootNgrams::load(char *filename)
   return rc;
 }
 
-bool mootNgrams::load(FILE *file, char *filename)
+bool mootNgrams::load(FILE *file, const char *filename)
 {
   mootNgramsCompiler ngcomp;
-  ngcomp.srcname = filename;
+  ngcomp.srcname = strdup(filename);
   ngcomp.ngrams  = this;
-  return (ngcomp.parse_from_file(file) != NULL);
+  bool rc = ngcomp.parse_from_file(file) != NULL;
+  free(ngcomp.srcname);
+  ngcomp.srcname = NULL;
+  return rc;
 }
 
-bool mootNgrams::save(char *filename, bool compact)
+bool mootNgrams::save(const char *filename, bool compact)
 {
   FILE *file = fopen(filename, "w");
   if (!file) {
@@ -113,7 +117,7 @@ bool mootNgrams::save(char *filename, bool compact)
   return rc;
 }
 
-bool mootNgrams::save(FILE *file, char *filename, bool compact)
+bool mootNgrams::save(FILE *file, const char *filename, bool compact)
 {
   NgramTable::const_iterator ngi1;
   BigramTable::const_iterator ngi2;

@@ -43,6 +43,8 @@
 #include "mootBinIO.h"
 #include "mootBinStream.h"
 
+#include "mootUtils.h"
+
 using namespace std;
 using namespace mootBinIO;
 
@@ -139,6 +141,123 @@ void mootHMM::clear(bool wipe_everything)
 /*--------------------------------------------------------------------------
  * Compilation
  *--------------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------------
+ * Compilation : load_model()
+ */
+bool mootHMM::load_model(const string &modelname,
+			 const mootTagString &start_tag_str,
+			 const char *myname)
+{
+  string binfile, lexfile, ngfile, lcfile;
+  hmm_parse_model_name(modelname, binfile,lexfile,ngfile,lcfile);
+
+  //-- sanity check
+  if (binfile.empty() && lexfile.empty() && ngfile.empty() && lcfile.empty()) {
+    carp("%s: Error: no model found for `%s'!\n", myname, modelname.c_str());
+    return false;
+  }
+
+  //-- load model: binary
+  if (!binfile.empty()) {
+    if (verbose >= vlProgress)
+      carp("%s: loading binary HMM model file '%s'...", myname, binfile.c_str());
+    if (!load(binfile.c_str())) {
+      carp("\n%s: load FAILED for binary HMM model file '%s'\n", myname, binfile.c_str());
+      return false;
+    }
+    else if (verbose >= vlProgress) carp(" loaded.\n");
+  }
+  else {
+    //-- load model: frequency data
+    mootLexfreqs   lexfreqs(32767);
+    mootClassfreqs classfreqs(512);
+    mootNgrams     ngfreqs;
+
+    //-- load model: lexical frequencies
+    if (!lexfile.empty() && file_exists(lexfile.c_str())) {
+      if (verbose >= vlProgress)
+	carp("%s: loading lexical frequency file '%s'...", myname, lexfile.c_str());
+
+      if (!lexfreqs.load(lexfile.c_str())) {
+	carp("\n%s: load FAILED for lexical frequency file `%s'\n", myname, lexfile.c_str());
+	return false;
+      }
+      else if (verbose >= vlProgress) carp(" loaded.\n");
+    }
+
+    // -- load model: n-gram frequencies
+    if (!ngfile.empty() && file_exists(ngfile.c_str())) {
+      if (verbose >= vlProgress)
+	carp("%s: loading n-gram frequency file '%s'...", myname, ngfile.c_str());
+
+      if (!ngfreqs.load(ngfile.c_str())) {
+	carp("\n%s: load FAILED for n-gram frequency file `%s'\n", myname, ngfile.c_str());
+	return false;
+      }
+      else if (verbose >= vlProgress) carp(" loaded.\n");
+    }
+
+    // -- load model: class frequencies
+    if (!lcfile.empty() && file_exists(lcfile.c_str())) {
+      if (verbose >= vlProgress)
+	carp("%s: loading class frequency file '%s'...", myname, lcfile.c_str());
+
+      if (!classfreqs.load(lcfile.c_str())) {
+	carp("\n%s: load FAILED for class frequency file `%s'\n", myname, lcfile.c_str());
+	return false;
+      }
+      else if (verbose >= vlProgress) carp(" loaded.\n");
+    }
+
+    //-- compile HMM
+    if (verbose >= vlProgress) carp("%s: compiling HMM...", myname);
+
+    lexfreqs.compute_specials();
+
+    if (!compile(lexfreqs,ngfreqs,classfreqs,start_tag_str)) {
+      carp("\n%s: HMM compilation FAILED\n", myname);
+      return false;
+    }
+    else if (verbose >= vlProgress) carp(" compiled.\n");
+
+    //-- estimate smoothing constants: lexical probabiltiies (wlambdas)
+    if (verbose >= vlProgress)
+      carp("%s: estimating lexical lambdas...", myname);
+    if (!estimate_wlambdas(lexfreqs)) {
+      carp("\n%s: lexical lambda estimation FAILED.\n", myname);
+      return false;
+    }
+    else if (verbose >= vlProgress) carp(" done.\n");
+
+    //-- estimate smoothing constants: n-gram probabiltiies (nglambdas)
+    if (verbose >= vlProgress)
+      carp("%s: estimating n-gram lambdas...", myname);
+    if (!estimate_lambdas(ngfreqs)) {
+      carp("\n%s: n-gram lambda estimation FAILED.\n", myname);
+      return false;
+    }
+    else if (verbose >= vlProgress) carp(" done.\n");
+
+    //-- estimate smoothing constants: class probabiltiies (clambdas)
+    if (use_lex_classes) {
+      if (verbose >= vlProgress)
+	carp("%s: estimating class lambdas...", myname);
+      if (!estimate_clambdas(classfreqs)) {
+	carp("\n%s: class lambda estimation FAILED.\n", myname);
+	return false;
+      }
+      else if (verbose >= vlProgress) carp(" done.\n");
+    }
+  }
+
+  return true;
+}
+
+
+/*--------------------------------------------------------------------------
+ * Compilation : compile()
+ */
 bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 		      const mootNgrams &ngrams,
 		      const mootClassfreqs &classfreqs,
@@ -164,6 +283,11 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
   start_tagid = tagids.nameExists(start_tag_str)
     ? tagids.name2id(start_tag_str)
     : tagids.insert(start_tag_str);
+
+  //-- set scaling factor(s)
+  //lscale = lexfreqs.n_tokens;
+  //ngscale = ngrams.ugtotal;
+  //lcscale = classfreqs.totalcount;
 
   //-- save n_tags, n_toks, n_classes
   n_tags = tagids.size();
@@ -961,6 +1085,8 @@ void mootHMM::tag_stream(FILE *in, FILE *out, char *srcname)
 
     twriter.sentence_put(out,sent);
   } while (1);
+
+  if (ndots && verbose >= vlProgress) fputc('\n', stderr);
 }
 
 
@@ -976,6 +1102,8 @@ void mootHMM::tag_strings(int argc, char **argv, FILE *out, char *infilename)
   }
   tag_sentence(sent);
   nsents++;
+
+  if (ndots && verbose >= vlProgress) fputc('\n', stderr);
 }
 
 /*--------------------------------------------------------------------------
@@ -1202,7 +1330,7 @@ const HeaderInfo::VersionT BINCOMPAT_MIN_REV = 3;
 const HeaderInfo::VersionT BINCOMPAT_VER = 1;
 const HeaderInfo::VersionT BINCOMPAT_REV = 3;
 */
-const HeaderInfo::VersionT BINCOMPAT_MIN_VER = 65535;
+const HeaderInfo::VersionT BINCOMPAT_MIN_VER = 2;
 const HeaderInfo::VersionT BINCOMPAT_MIN_REV = 0;
 
 const HeaderInfo::VersionT BINCOMPAT_VER = 2;
@@ -1272,6 +1400,8 @@ bool mootHMM::_bindump(mootBinStream::oBinStream &obs, const char *filename)
   Item<TagID> tagid_item;
   Item<TokID> tokid_item;
   Item<ProbT> probt_item;
+  Item<bool> bool_item;
+  Item<LexClass> lclass_item;
   Item<TokIDTable> tokids_item;
   Item<TagIDTable> tagids_item;
   Item<ClassIDTable> classids_item;
@@ -1289,8 +1419,12 @@ bool mootHMM::_bindump(mootBinStream::oBinStream &obs, const char *filename)
 #endif
 	 && probt_item.save(obs, wlambda1)
 	 && probt_item.save(obs, wlambda2)
+
+	 && bool_item.save(obs, use_lex_classes)
+	 && lclass_item.save(obs, uclass)
 	 && probt_item.save(obs, clambda1)
 	 && probt_item.save(obs, clambda2)
+
 	 && tokids_item.save(obs, tokids)
 	 && tagids_item.save(obs, tagids)
 	 && classids_item.save(obs, classids)
@@ -1401,6 +1535,8 @@ bool mootHMM::_binload(mootBinStream::iBinStream &ibs, const char *filename)
   Item<TagID> tagid_item;
   Item<TokID> tokid_item;
   Item<ProbT> probt_item;
+  Item<bool> bool_item;
+  Item<LexClass> lclass_item;
   Item<TokIDTable> tokids_item;
   Item<TagIDTable> tagids_item;
   Item<ClassIDTable> classids_item;
@@ -1415,7 +1551,6 @@ bool mootHMM::_binload(mootBinStream::iBinStream &ibs, const char *filename)
   size_t ngprobs2_size  = 0;
 
   if (! (tagid_item.load(ibs, start_tagid)
-	 //&& tagid_item.load(ibs, uclassid)
 	 && probt_item.load(ibs, unknown_lex_threshhold)
 	 && probt_item.load(ibs, nglambda1)
 	 && probt_item.load(ibs, nglambda2)
@@ -1426,6 +1561,9 @@ bool mootHMM::_binload(mootBinStream::iBinStream &ibs, const char *filename)
 #endif
 	 && probt_item.load(ibs, wlambda1)
 	 && probt_item.load(ibs, wlambda2)
+
+	 && bool_item.load(ibs, use_lex_classes)
+	 && lclass_item.load(ibs, uclass)
 	 && probt_item.load(ibs, clambda1)
 	 && probt_item.load(ibs, clambda2)
 	 ))

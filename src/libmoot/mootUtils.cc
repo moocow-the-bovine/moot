@@ -1,7 +1,8 @@
 /* -*- Mode: C++ -*- */
+
 /*
-   moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   libmoot : moocow's part-of-speech tagging library
+   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,30 +18,139 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
+
 /*--------------------------------------------------------------------------
- * File: cmdutil.cc
+ * File: mootUtils.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + command-line parsing utilities
+ *   + moocow's PoS tagger : useful utilities
  *--------------------------------------------------------------------------*/
+
+#include "mootUtils.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
 
-#include "cmdutil.h"
+#define CMDUTIL_CHURN_DEFAULT_BUFSIZE 2048
 
 extern "C" int getline(char **, size_t *, FILE *);
+
+
+namespace moot {
+
+/*--------------------------------------------------------------------
+ * Global utility functions
+ *---------------------------------------------------------------------*/
+bool file_exists(const char *filename)
+{
+  FILE *f = fopen(filename, "r");
+  if (f) {
+    fclose(f);
+    return true;
+  }
+  return false;
+}
+
+string unextend(const char *filename)
+{
+  string fn = filename;
+  fn.erase(fn.rfind('.'));
+  return fn;
+}
+
+/*----------------------------------------------------------------------
+ * parse_doubles
+ *----------------------------------------------------------------------*/
+bool moot_parse_doubles(char *str, double *dbls, size_t ndbls)
+{
+  size_t i;
+  char  *s, *comma;
+  if (!str) return false;
+  for (i = 0, s = str; i < ndbls; i++, s = comma+1) {
+    dbls[i] = strtod(s, &comma);
+    comma = strchr(comma, ',');
+    if (!comma) break;
+  }
+  return true;
+}
+
+
+/*--------------------------------------------------------------------------
+ * utilities: parse_model_name()
+ */
+bool hmm_parse_model_name(const string &modelname,
+			  string &binfile,
+			  string &lexfile,
+			  string &ngfile,
+			  string &lcfile)
+{
+  if (file_exists(modelname.c_str())) {
+    binfile = modelname;
+    lexfile.clear();
+    ngfile.clear();
+    lcfile.clear();
+  }
+  else {
+    binfile.clear();
+    return hmm_parse_model_name_text(modelname,lexfile,ngfile,lcfile);
+  }
+
+  return !(binfile.empty() && lexfile.empty() && ngfile.empty() && lcfile.empty());
+}
+
+/*--------------------------------------------------------------------------
+ * utilities: parse_model_name_text()
+ */
+bool hmm_parse_model_name_text(const string &modelname,
+			       string &lexfile,
+			       string &ngfile,
+			       string &lcfile)
+{
+  size_t icomma1 = modelname.find(',',0);
+
+  //-- lexfile
+  if (icomma1 != modelname.npos) {
+    lexfile.assign(modelname,0,icomma1);
+
+    //-- ngfile
+    size_t icomma2 = modelname.find(',',icomma1+1);
+    if (icomma2 != modelname.npos) {
+      ngfile.assign(modelname,icomma1+1,icomma2-icomma1-1);
+
+      //-- lcfile
+      lcfile.assign(modelname,icomma2+1,modelname.size()-(icomma2+1));
+    }
+    else {
+      ngfile.assign(modelname,icomma1+1,modelname.size()-(icomma1+1));
+      lcfile.clear();
+    }
+  }
+  else {
+    //-- no commas: expand modelname as basename
+    lexfile = modelname;
+    lexfile.append(".lex");
+    //if (!file_exists(lexfile.c_str())) lexfile.clear();  //-- not here: (used for training!)
+
+    ngfile = modelname;
+    ngfile.append(".123");
+    //if (!file_exists(ngfile.c_str())) ngfile.clear(); //-- not here: (used for training!)
+
+    lcfile = modelname;
+    lcfile.append(".clx");
+    //if (!file_exists(lcfile.c_str())) lcfile.clear(); //-- not here: (used for training!)
+  }
+
+  return !(lexfile.empty() && ngfile.empty() && lcfile.empty());
+}
+
+
 
 /*----------------------------------------------------------------------
  * cmdutil_file_info
  *----------------------------------------------------------------------*/
-
 // cmdutil_file_info::cmdutil_file_info(name,file);
 cmdutil_file_info::cmdutil_file_info(char *myname, FILE *myfile)
 {
@@ -249,17 +359,6 @@ FILE *cmdutil_file_churner::next_list_file() {
   return list.file;
 }
 
+}; //-- namespace moot
 
-/*--------------------------------------------------------------------
- * Global utility functions
- *---------------------------------------------------------------------*/
-
-bool file_exists(const char *filename)
-{
-  FILE *f = fopen(filename, "r");
-  if (f) {
-    fclose(f);
-    return true;
-  }
-  return false;
-}
+#undef CMDUTIL_CHURN_DEFAULT_BUFSIZE

@@ -4,7 +4,7 @@
 
 \author Bryan Jurish <moocow@ling.uni-potsdam.de>
 
-\version 2.0.0pre3
+\version 2.0.0
 
 
 \section Intro Introduction
@@ -31,15 +31,24 @@ markup.
 \section HMM HMM Tagging
 
 The \link moot::mootHMM mootHMM\endlink class provides
-a fast interface to traditional HMM tagging and disambiguation,
-optionally extended by lexical-class probabilities, which can be
+an implementation of a traditional HMM tagging and disambiguation,
+optionally extended by lexical-class probabilities -- these can be
 helpful if you have some prior information on what sorts of
 tags your input tokens might in fact happen to carry.
 
 \see \link moot::mootHMM mootHMM\endlink
 \see <A HREF="../../programs/mootrain.html">mootrain(1)</A>
-\see <A HREF="../../programs/moothmm.html">moot(1)</A>
+\see <A HREF="../../programs/moot.html">moot(1)</A>
 
+
+\section Eval Tagger Evaluation
+
+The \link moot::mootEval mootEval\endlink class provides
+an API for (cross-)evaluation of parallel tagged files,
+optionally extended by prior analyses. 
+
+\see \link moot::mootEval mootEval\endlink
+\see <A HREF="../../programs/mooteval.html">mooteval(1)</A>
 
 
 
@@ -77,8 +86,10 @@ class-based HMM tagger / disambiguator.
 
 \see FSM
 \see <A HREF="../../programs/mootpp.html">mootpp(1)</A>
-\see <A HREF="../../programs/mootm.html">mootm(1)</A>
+\see <A HREF="../../../mootm/programs/mootm.html">mootm(1)</A>
 \see <A HREF="../../programs/mootrain.html">mootrain(1)</A>
+\see <A HREF="../../programs/mootcompile.html">mootcompile(1)</A>
+\see <A HREF="../../programs/mootdump.html">moodump(1)</A>
 \see <A HREF="../../programs/moot.html">moot(1)</A>
 \see <A HREF="../../programs/mooteval.html">mooteval(1)</A>
 

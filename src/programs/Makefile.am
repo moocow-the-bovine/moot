@@ -19,7 +19,7 @@
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
 #bin_PROGRAMS = mootpp mootm moothmm moot mootrain
 #bin_PROGRAMS = mootpp moothmm moot mootrain
-bin_PROGRAMS = mootpp moot mootrain mooteval
+bin_PROGRAMS = mootpp mootrain mootcompile mootdump moot mooteval
 
 ## --- libtool libraries
 #lib_LTLIBRARIES = ${lib_1}.la ... ${lib_N}.la
@@ -42,24 +42,26 @@ SUFFIXES = \
 #${prog_i}_SOURCES =
 #${lib_i}_la_SOURCES =
 mootpp_SOURCES = \
-	cmdutil.cc cmdutil.h \
 	mootpp_main.cc \
 	mootpp_cmdparser.cc mootpp_cmdparser.h
 
-moot_SOURCES = \
-	cmdutil.cc cmdutil.h \
-	hmmutil.cc hmmutil.h \
-	moot_main.cc \
-	moot_cmdparser.cc moot_cmdparser.h
-
 mootrain_SOURCES = \
-	cmdutil.cc cmdutil.h \
-	hmmutil.cc hmmutil.h \
 	mootrain_main.cc \
 	mootrain_cmdparser.cc mootrain_cmdparser.h
 
+mootcompile_SOURCES = \
+	mootcompile_main.cc \
+	mootcompile_cmdparser.cc mootcompile_cmdparser.h
+
+mootdump_SOURCES = \
+	mootdump_main.cc \
+	mootdump_cmdparser.cc mootdump_cmdparser.h
+
+moot_SOURCES = \
+	moot_main.cc \
+	moot_cmdparser.cc moot_cmdparser.h
+
 mooteval_SOURCES = \
-	cmdutil.cc cmdutil.h \
 	mooteval_main.cc \
 	mooteval_cmdparser.cc mooteval_cmdparser.h
 
@@ -70,8 +72,10 @@ mooteval_SOURCES = \
 
 ## --- Additional dependencies
 mootpp_main.o: mootpp_cmdparser.h
-moot_main.o: moot_cmdparser.h hmmutil.h
-mootrain_main.o: mootrain_cmdparser.h hmmutil.h
+mootrain_main.o: mootrain_cmdparser.h
+mootcompile_main.o: mootcompile_cmdparser.h
+mootdump_main.o: mootdump_cmdparser.h
+moot_main.o: moot_cmdparser.h
 mooteval_main.o: mooteval_cmdparser.h
 
 ##-----------------------------------------------------------------------
@@ -162,14 +166,17 @@ LDADD_COMMON   = ../libmoot/libmoot.la
 mootpp_LDFLAGS = $(LDFLAGS_COMMON)
 mootpp_LDADD = $(LDADD_COMMON)
 
-moot_LDFLAGS = $(LDFLAGS_COMMON)
-moot_LDADD = $(LDADD_COMMON)
-
-#moot_LDFLAGS = $(LDFLAGS_COMMON)
-#moot_LDADD = $(LDADD_COMMON)
-
 mootrain_LDFLAGS = $(LDFLAGS_COMMON)
 mootrain_LDADD = $(LDADD_COMMON)
+
+mootcompile_LDFLAGS = $(LDFLAGS_COMMON)
+mootcompile_LDADD = $(LDADD_COMMON)
+
+mootdump_LDFLAGS = $(LDFLAGS_COMMON)
+mootdump_LDADD = $(LDADD_COMMON)
+
+moot_LDFLAGS = $(LDFLAGS_COMMON)
+moot_LDADD = $(LDADD_COMMON)
 
 mooteval_LDFLAGS = $(LDFLAGS_COMMON)
 mooteval_LDADD = $(LDADD_COMMON)
@@ -203,9 +210,11 @@ MAINTAINERCLEANFILES = \
 
 ## --- extra distribution files
 EXTRA_DIST = \
-	moot.gog \
 	mootpp.gog \
 	mootrain.gog \
+	mootcompile.gog \
+	mootdump.gog \
+	moot.gog \
 	mooteval.gog \
 	acknowledge.pod
 

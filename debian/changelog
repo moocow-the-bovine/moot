@@ -1,3 +1,78 @@
+moot (2.0.0) unstable; urgency=low
+
+  * re-added & tested binary model I/O
+  * added new 'mootcompile' and 'mootdump' programs
+    to clean up 'moot' itself a bit
+  * moved old 'programs/cmdutil.*' and 'programs/hmmutil.*'
+    structs and functions into library: 'mootUtils.h';
+    redefined in terms of 'string'
+
+  * gaspode bughunt
+	  - re-added 'uclass' item and threshhold-sensitive
+	    uclass compiling (need a populated class for iteration);
+	    gained a smidgeon of accuracy:
+	    * 94.91% (-classfreqs,-analyses)
+	    * 96.30% (-classfreqs,+analyses)
+	    * 96.52% (+classfreqs,+analyses)
+	  - best results (read: "the above") come (intuitively)
+	    when using class-probabilities for totally unknown
+	    tokens (i.e. the probabilities associated with
+	    the empty class)
+  * added mootHMM flag 'use_lex_classes' : things go way
+	  wrong tagging classless inputs if we try and use
+	  class probabilities (well, duh...)
+  * removed some debugging code in mootHMM.(h|cc)
+	
+	+ renamed 'moothmm' -> 'moot'
+	+ added perl script 'morphhack.perl' to make
+	  (old) morph output more negra-compatible
+	  - raises accuracy on test corpus to
+	    * 94.91% (-classfreqs,-analyses)
+	    * 96.12% (-classfreqs,+analyses)
+	    * 96.51% (+classfreqs,+analyses)
+	
+  * added class 'mootEval'
+  * added evaluator program 'mooteval' - better than tnt-diff
+  * added verbose information tracking to HMM
+
+  * added mootToken.h: mootToken, mootSentence interface classes
+  	  - old string-based methods now deprecated
+  * added mootTokenLexer - replaces old 'mootTaggerLexer'
+	  - parses new MorphConsole output (with TAB separators, at least)
+  * added mootTokenIO.h : classes mootToken(Reader|Writer)
+	  - for file and/or string I/O in native format(s)
+  * (re-)added 'best-only' output as option to moothmm
+  * added best-tag marking with prefix '/' (and removed it again)
+  * fixed some smallish bugs in 'mootrain' causing
+	  segfaults when:
+	  - "--ngrams-only" or "--lex-only" were given
+	  - training corpus filename contained no dot
+  * re-wrote mootNgrams, mootLexfreqs
+	  - use nested maps for data: faster
+  * re-wrote mootHMMTrainer
+	  - (kmax=3) now hard-coded in (use uni-, bi-, and trigrams)
+	  - training from ambiguous data no longer possible
+  * fixed token-typification code (now in mootToken.h)
+	  - should now be ca. 99.998% TnT-compatible with moot_TNT_COMPAT
+	    macro defined (can't find the last bugger)
+	  - Today's Most Annoying Undocumented Feature Award goes to
+	    Thorsten Brants for failing to document TnT's (length<=3)
+	    restriction for @CARDSUFFIX types
+  * reduced old mootCHMM to mootHMM (still untested)
+  * added class mootClassfreqs : raw class frequency counter (untested)
+  * added mootClassfreqs(Lexer|Parser|Compiler) for
+	  lexical-class parameter text I/O
+  * added section 5 manpage 'mootfiles' documenting various
+	  file formats
+  * added class-counting to mootHMMTrainer (tests ok)
+  * added class compilation to mootHMM (tests ok)
+	  - old mootHMM behavior can be emulated by achieved
+	    by removing .clx (class-frequency) file
+  * CHMM behavior reduced to HMM tests OK (good ol' 95.67% correct)
+	  - weirdness: gaspode class fixes bungled... must investigate
+
+ -- Bryan Jurish <moocow@ling.uni-potsdam.de>  Sun,  6 Jun 2004 17:32:25 +0200
+
 moot (1.0.5) unstable; urgency=low
 
   * removing FSM dependencies to package 'mootm'

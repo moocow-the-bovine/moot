@@ -58,7 +58,9 @@ libmoot_la_SOURCES = \
 	\
 	mootHMM.cc \
 	mootHMMTrainer.cc \
-	mootEval.cc
+	mootEval.cc \
+	\
+	mootUtils.cc
 
 #	mootCHMM.cc
 
@@ -157,7 +159,9 @@ pkginclude_HEADERS = \
 	\
 	mootHMM.h \
 	mootHMMTrainer.h \
-	mootEval.h
+	mootEval.h \
+	\
+	mootUtils.h
 
 #	mootCHMM.h 
 #	mootTokenParser.h

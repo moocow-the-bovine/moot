@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 
 #include <mootClassfreqs.h>
 #include <mootClassfreqsCompiler.h>
@@ -89,7 +90,7 @@ size_t mootClassfreqs::n_impossible(void)
 /*----------------------------------------------------------------------
  * I/O
  *----------------------------------------------------------------------*/
-bool mootClassfreqs::load(char *filename)
+bool mootClassfreqs::load(const char *filename)
 {
   FILE *file = fopen(filename, "r");
   if (!file) {
@@ -98,20 +99,23 @@ bool mootClassfreqs::load(char *filename)
 	    strerror(errno));
     return 0;
   }
-  bool rc = load(file);
+  bool rc = load(file,filename);
   fclose(file);
   return rc;
 }
 
-bool mootClassfreqs::load(FILE *file, char *filename)
+bool mootClassfreqs::load(FILE *file, const char *filename)
 {
   mootClassfreqsCompiler lccomp;
-  lccomp.srcname  = filename;
+  lccomp.srcname  = strdup(filename);
   lccomp.cfreqs  = this;
-  return (lccomp.parse_from_file(file) != NULL);
+  bool rc = (lccomp.parse_from_file(file) != NULL);
+  free(lccomp.srcname);
+  lccomp.srcname = NULL;
+  return rc;
 }
 
-bool mootClassfreqs::save(char *filename)
+bool mootClassfreqs::save(const char *filename)
 {
   FILE *file = fopen(filename, "w");
   if (!file) {
@@ -125,7 +129,7 @@ bool mootClassfreqs::save(char *filename)
   return rc;
 }
 
-bool mootClassfreqs::save(FILE *file, char *filename)
+bool mootClassfreqs::save(FILE *file, const char *filename)
 {
   //-- iterate through table
   for (ClassfreqTable::const_iterator lcti = lctable.begin(); lcti != lctable.end(); lcti++) {
