@@ -30,6 +30,8 @@
 #define _moot_LEXFREQS_H
 
 #include <mootTypes.h>
+#include <mootToken.h>
+
 moot_BEGIN_NAMESPACE
 
 /**
@@ -137,7 +139,7 @@ public:
     }
 
     //-- adjust total token-count
-    n_tokens += count;
+    if (!isTokFlavorName(text)) n_tokens += count;
   };
 
   //------ public methods: lookup

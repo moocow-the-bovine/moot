@@ -37,17 +37,20 @@ namespace moot {
   // AssocVectorNode
   /// \brief template class for individual AssocVector nodes
   template<typename KeyT, typename ValT>
-  struct AssocVectorNode {
+  struct AssocVectorNode
+    : public std::pair<KeyT,ValT>
+  {
     //----------------------------------------------------------
     // Node: types
     typedef KeyT                        key_type;
     typedef ValT                        value_type;
+    typedef std::pair<KeyT,ValT>        PairT;
     typedef AssocVectorNode<KeyT,ValT>  ThisT;
 
     //----------------------------------------------------------
     // Node: Data
-    KeyT  node_key;
-    ValT  node_val;
+    //KeyT  node_key;
+    //ValT  node_val;
 
     //----------------------------------------------------------
     // Node: Methods
@@ -60,17 +63,17 @@ namespace moot {
 
     /** Constructor given key only */
     inline AssocVectorNode(const KeyT &key)
-      : node_key(key)
+      : PairT(key,ValT())
     {};
 
     /** Constructor given key & data */
     inline AssocVectorNode(const KeyT &key, const ValT &val)
-      : node_key(key), node_val(val)
+      : PairT(key,val)
     {};
 
     /** Copy constructor */
     inline AssocVectorNode(const ThisT &x)
-      : node_key(x.node_key), node_val(x.node_val)
+      : PairT(x.first,x.second)
     {};
 
     /** Destructor */
@@ -80,35 +83,23 @@ namespace moot {
     //--------------------------------------------------
     /// \name Accessors
     //@{
-    inline       key_type   &key   (void)       { return node_key; };
-    inline const key_type   &key   (void) const { return node_key; };
+    inline       key_type   &key   (void)       { return first; };
+    inline const key_type   &key   (void) const { return first; };
 
-    inline       value_type &value (void)       { return node_val; };
-    inline const value_type &value (void) const { return node_val; };
+    inline       value_type &value (void)       { return second; };
+    inline const value_type &value (void) const { return second; };
     //@}
 
     //--------------------------------------------------
     /// \name Operators
     //@{
-    inline ThisT& operator=(const ThisT &x)
-    {
-      if (&x != this) {
-	node_key = x.node_key;
-	node_val = x.node_val;
-      }
-      return *this;
-    };
-
-    inline bool operator==(const ThisT &x) const
-    { return node_key==x.node_key && node_val==x.node_val; };
-
     inline bool operator<(const ThisT &x) const
     {
-      return (node_key < x.node_key
+      return (first < x.first
 	      ? true
-	      : (node_key > x.node_key
+	      : (first > x.first
 		 ? false
-		 : node_val < x.node_val));
+		 : second < x.second));
     };
     //@}
   }; //-- /AssocVectorNode
@@ -178,7 +169,7 @@ namespace moot {
     inline iterator find(const KeyT &key)
     {
       iterator i;
-      for (i = begin(); i != end() && i->node_key != key; i++) ;
+      for (i = begin(); i != end() && i->first != key; i++) ;
       return i;
     };
 
@@ -187,7 +178,7 @@ namespace moot {
     inline const_iterator find(const KeyT &key) const
     {
       const_iterator i;
-      for (i = begin(); i != end() && i->node_key != key; i++) ;
+      for (i = begin(); i != end() && i->first != key; i++) ;
       return i;
     };
 
@@ -207,7 +198,7 @@ namespace moot {
     inline iterator insert(const KeyT &key, const ValT &val)
     {
       iterator i  = get(key);
-      i->node_val = val;
+      i->second = val;
       return i;
     };
     //@}
@@ -222,9 +213,9 @@ namespace moot {
     inline assoc_node_type &get_node(const KeyT &key)
     { return *(get(key)); };
 
-    /** Alias for get_node(key)->node_val */
+    /** Alias for get_node(key)->second */
     inline assoc_value_type &get_value(const KeyT &key)
-    { return get_node(key).node_val; };
+    { return get_node(key).second; };
 
     /** Get/insert the @n th node */
     inline assoc_node_type &nth(const size_t n)
@@ -236,11 +227,11 @@ namespace moot {
     //@{
     /** Alias for get_data(key) */
     inline assoc_value_type &operator[](const KeyT &key)
-    { return get_node(key).node_val; };
+    { return get_node(key).second; };
 
     /** Alias for find_data(key) */
     inline const assoc_value_type &operator[](const KeyT &key) const
-    { return find(key)->node_val; };
+    { return find(key)->second; };
     //@}
 
   }; //-- /AssocVector

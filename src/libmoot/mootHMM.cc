@@ -248,8 +248,8 @@ bool mootHMM::load_model(const string &modelname,
 			 bool  do_estimate_nglambdas,
 			 bool  do_estimate_wlambdas,
 			 bool  do_estimate_clambdas,
+			 bool  do_build_suffix_trie,
 			 bool  do_compute_logprobs)
-
 {
   string binfile, lexfile, ngfile, lcfile;
   hmm_parse_model_name(modelname, binfile,lexfile,ngfile,lcfile);
@@ -316,7 +316,6 @@ bool mootHMM::load_model(const string &modelname,
     if (verbose >= vlProgress) carp("%s: compiling HMM...", myname);
 
     lexfreqs.compute_specials();
-
     if (!compile(lexfreqs,ngfreqs,classfreqs,start_tag_str)) {
       carp("\n%s: HMM compilation FAILED\n", myname);
       return false;
@@ -357,6 +356,19 @@ bool mootHMM::load_model(const string &modelname,
 	return false;
       }
       else if (verbose >= vlProgress) carp(" done.\n");
+    }
+
+    //-- build suffix trie
+    if (do_build_suffix_trie && suftrie.maxlen() != 0) {
+      if (verbose >= vlProgress)
+	carp("%s: Building suffix trie ", myname);
+      if (!build_suffix_trie(lexfreqs, ngfreqs, (verbose>=vlProgress)))
+	{
+	  carp("\n%s: suffix trie construction FAILED.\n", myname);
+	  return false;
+	}
+      else if (verbose >= vlProgress)
+	carp(": built.\n");
     }
 
     //-- compute log-probabilities
@@ -589,6 +601,7 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
   }
 
   //-- Compute ngram probabilites
+  ProbT ugtotal = ngrams.ugtotal - ngrams.lookup(start_tag_str);
   for (mootNgrams::NgramTable::const_iterator ngi1 = ngrams.ngtable.begin();
        ngi1 != ngrams.ngtable.end();
        ngi1++)
@@ -600,15 +613,15 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 #ifdef MOOT_USE_TRIGRAMS
       //   : store as bigram 'UNKNOWN $tagid'
 # ifdef MOOT_HASH_TRIGRAMS
-      ngprobs3[Trigram(0,0,tagid)] = ngi1->second.count / ngrams.ugtotal;
+      ngprobs3[Trigram(0,0,tagid)] = ngi1->second.count / ugtotal;
 # else //!MOOT_HASH_TRIGRAMS
-      ngprobs3[tagid] = ngi1->second.count / ngrams.ugtotal;
+      ngprobs3[tagid] = ngi1->second.count / ugtotal;
 # endif //MOOT_HASH_TRIGRAMS
 #else // !MOOT_USE_TRIGRAMS
       //   : store as bigram 'UNKNOWN $tagid'
-      //ngprobs1[tagid] = ngi1->second.count / ngrams.ugtotal;
-      //ngprobs2[n_tags*tagid] = ngi1->second.count / ngrams.ugtotal;
-      ngprobs2[tagid] = ngi1->second.count / ngrams.ugtotal;
+      //ngprobs1[tagid] = ngi1->second.count / ugtotal;
+      //ngprobs2[n_tags*tagid] = ngi1->second.count / ugtotal;
+      ngprobs2[tagid] = ngi1->second.count / ugtotal;
 #endif // MOOT_USE_TRIGRAMS
 
       //-- ignore zero probabilities
@@ -1150,6 +1163,13 @@ bool mootHMM::compute_logprobs(void)
       }
   }
 
+  //-- suffix-trie probabilities
+  for (SuffixTrie::iterator sti = suftrie.begin(); sti != suftrie.end(); sti++) {
+    for (SuffixTrieDataT::iterator stdi = sti->data.begin(); stdi != sti->data.end(); stdi++) {
+      stdi->second = log(stdi->second);
+    }
+  }
+
   //-- smoothing constants
   nglambda1 = log(nglambda1);
   nglambda2 = log(nglambda2);
@@ -1239,7 +1259,7 @@ void mootHMM::viterbi_clear(void)
 /*--------------------------------------------------------------
  * Viterbi: step : TokID
  */
-void mootHMM::viterbi_step(TokID tokid)
+void mootHMM::viterbi_step(TokID tokid, const mootTokString &toktext)
 {
   //-- pointer to next trellis column
   ViterbiColumn *col = NULL;
@@ -1249,28 +1269,34 @@ void mootHMM::viterbi_step(TokID tokid)
 
   //-- info: check for "unknown" token
   if (tokid==0) nnewtokens++;
-
-  //-- Get map of possible destination tags
-  const LexProbSubTable &lps = lexprobs[tokid];
-
+    
   //-- Update beam-pruning variables
   bpprmin = bbestpr - beamwd;
   bbestpr = MOOT_PROB_NEG;
 
+  //-- get map of possible tags
+  const LexProbSubTable *lps;
+  if (tokid != 0) {
+    lps = &(lexprobs[tokid]);
+  } else {
+    size_t matchlen;
+    lps = &(suftrie.sufprobs(toktext,&matchlen));
+    if (!matchlen) lps = &lexprobs[tokid];
+  }
+
   //-- for each possible destination tag 'vtagid'
-  for (LexProbSubTable::const_iterator lpsi = lps.begin(); lpsi != lps.end(); lpsi++)
-    {
-      vtagid  = lpsi->first;
+  for (LexProbSubTable::const_iterator lpsi = lps->begin(); lpsi != lps->end(); lpsi++) {
+    vtagid  = lpsi->first;
 
-      //-- ignore "unknown" tag
-      if (vtagid == 0) continue;
+    //-- ignore "unknown" tag
+    if (vtagid == 0) continue;
 
-      //-- get lexical probability: p(tok|tag) 
-      vwordpr = lpsi->second;
+    //-- get lexical probability
+    vwordpr = lpsi->second;
 
-      //-- populate a new row for this tag
-      col = viterbi_populate_row(vtagid, vwordpr, col);
-    }
+    //-- populate new row for this tag
+    col = viterbi_populate_row(vtagid, vwordpr, col);
+  }
 
   if (!viterbi_column_ok(col)) {
     //-- we might not have found anything...
@@ -1284,7 +1310,10 @@ void mootHMM::viterbi_step(TokID tokid)
 /*--------------------------------------------------------------
  * Viterbi: step : (TokID,ClassID,LexClass)
  */
-void mootHMM::viterbi_step(TokID tokid, ClassID classid, const LexClass &lclass)
+void mootHMM::viterbi_step(TokID tokid,
+			   ClassID classid,
+			   const LexClass &lclass,
+			   const mootTokString &toktext)
 {
   //-- sanity check(s)
   if (tokid >= n_toks) tokid = 0;
@@ -1300,16 +1329,30 @@ void mootHMM::viterbi_step(TokID tokid, ClassID classid, const LexClass &lclass)
   }
 
   //-- set constants
-  LexProbSubTable *lps;
+  const LexProbSubTable *lps;
   ProbT wclambda0, wclambda1;
-  if (tokid != 0 || !use_lex_classes) {
-    lps = &lexprobs[tokid];
+  if (tokid != 0) {
+    lps   = &(lexprobs[tokid]);
     wclambda0 = wlambda0;
     wclambda1 = wlambda1;
-  } else {
-    lps = &lcprobs[classid];
-    wclambda0 = clambda0;
-    wclambda1 = clambda1;
+  }
+  else if (use_lex_classes) {
+    wclambda0 = wlambda0;
+    wclambda1 = wlambda1;
+    if (classid != 0) {
+      lps   = &(lcprobs[classid]);
+    } else {
+      size_t matchlen;
+      lps = &(suftrie.sufprobs(toktext,&matchlen));
+      if (!matchlen) lps = &(lcprobs[classid]);
+    }
+  }
+  else {
+    size_t matchlen;
+    lps = &(suftrie.sufprobs(toktext,&matchlen));
+    if (!matchlen) lps = &(lexprobs[0]);
+    wclambda0 = wlambda0;
+    wclambda1 = wlambda1;
   }
 
   //-- Get next column
@@ -1648,6 +1691,24 @@ void mootHMM::txtdump(FILE *file)
 #endif // MOOT_USE_TRIGRAMS
 
   fprintf(file, "\n");
+  fprintf(file, "%%%%-----------------------------------------------------\n");
+  fprintf(file, "%%%% Suffix Trie\n");
+  fprintf(file, "%%%% maxlen=%u ; theta=%g\n", suftrie.maxlen(), suftrie.theta);
+  fprintf(file, "%%%% \"Suffix\"\tTagID(\"TagStr\")\tlog(p(Suffix|TagID))\n");
+  fprintf(file, "%%%%-----------------------------------------------------\n");
+  for (SuffixTrie::const_iterator sti = suftrie.begin(); sti != suftrie.end(); sti++) {
+    string suf = suftrie.node_string(*sti);
+    for (SuffixTrieDataT::const_iterator stdi=sti->data.begin(); stdi != sti->data.end(); stdi++)
+      {
+	fprintf(file, "\"%s\"\t%u(\"%s\")\t%g\n",
+		suf.c_str(),
+		stdi->first,
+		tagids.id2name(stdi->first).c_str(),
+		stdi->second);
+      }
+  }
+
+  fprintf(file, "\n");
 }
 
 void mootHMM::viterbi_txtdump(FILE *file)
@@ -1738,10 +1799,10 @@ const HeaderInfo::VersionT BINCOMPAT_VER = 1;
 const HeaderInfo::VersionT BINCOMPAT_REV = 3;
 */
 const HeaderInfo::VersionT BINCOMPAT_MIN_VER = 2;
-const HeaderInfo::VersionT BINCOMPAT_MIN_REV = 3;
+const HeaderInfo::VersionT BINCOMPAT_MIN_REV = 5;
 
 const HeaderInfo::VersionT BINCOMPAT_VER = 2;
-const HeaderInfo::VersionT BINCOMPAT_REV = 3;
+const HeaderInfo::VersionT BINCOMPAT_REV = 5;
 
 bool mootHMM::save(const char *filename, int compression_level)
 {
@@ -1794,7 +1855,7 @@ bool mootHMM::save(mootio::mostream *obs, const char *filename)
 #endif
 
   //-- get checksum
-  size_t crc = start_tagid + n_tags + n_toks + n_classes;
+  size_t crc = start_tagid + n_tags + n_toks + n_classes + suftrie.size();
   if (! (hi_item.save(obs, hi)
 	 && size_item.save(obs, crc)
 	 && bool_item.save(obs, using_trigrams)
@@ -1827,6 +1888,7 @@ bool mootHMM::_bindump(mootio::mostream *obs, const char *filename)
 #if defined(MOOT_USE_TRIGRAMS) && defined(MOOT_HASH_TRIGRAMS)
   Item<TrigramProbTable> trigrams_item;
 #endif
+  Item<SuffixTrie> trie_item;
 
   if (! (tagid_item.save(obs, start_tagid)
 	 && probt_item.save(obs, unknown_lex_threshhold)
@@ -1865,6 +1927,13 @@ bool mootHMM::_bindump(mootio::mostream *obs, const char *filename)
 	 ))
     {
       carp("mootHMM::save(): could not save data%s%s\n",
+	   (filename ? " to file " : ""), (filename ? filename : ""));
+      return false;
+    }
+
+  if (!trie_item.save(obs, suftrie))
+    {
+      carp("mootHMM::save(): could not save suffix trie%s%s\n",
 	   (filename ? " to file " : ""), (filename ? filename : ""));
       return false;
     }
@@ -1978,7 +2047,7 @@ bool mootHMM::load(mootio::mistream *ibs, const char *filename)
   if(!_binload(ibs, filename))
     return false;
 
-  if (crc != (start_tagid + n_tags + n_toks + n_classes)) {
+  if (crc != (start_tagid + n_tags + n_toks + n_classes + suftrie.size())) {
     carp("mootHMM::load(): checksum failed%s%s\n",
 	 (filename ? " for file " : ""), (filename ? filename : ""));
   }
@@ -2012,6 +2081,7 @@ bool mootHMM::_binload(mootio::mistream *ibs, const char *filename)
 #else
   size_t ngprobs2_size  = 0;
 #endif
+  Item<SuffixTrie> trie_item;
 
 
   if (! (tagid_item.load(ibs, start_tagid)
@@ -2069,6 +2139,13 @@ bool mootHMM::_binload(mootio::mistream *ibs, const char *filename)
 	 ))
     {
       carp("mootHMM::load(): could not load table data%s%s\n",
+	   (filename ? " from file " : ""), (filename ? filename : ""));
+      return false;
+    }
+
+  if (!trie_item.load(ibs, suftrie))
+    {
+      carp("mootHMM::load(): could not load trie data%s%s\n",
 	   (filename ? " from file " : ""), (filename ? filename : ""));
       return false;
     }

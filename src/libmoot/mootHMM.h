@@ -45,16 +45,8 @@
 #include <mootClassfreqs.h>
 #include <mootNgrams.h>
 #include <mootEnum.h>
+#include <mootAssocVector.h>
 #include <mootSuffixTrie.h>
-
-/**
- * \def MOOT_LEX_UNKNOWN_TOKENS
- * Define this to include real lexical entries for tokens with counts
- * <= UnknownLexThreshhold.  Not entirely correct, but it actually
- * seems to help.
- */
-#define MOOT_LEX_UNKNOWN_TOKENS
-//#undef MOOT_LEX_UNKNOWN_TOKENS
 
 /**
  * \def MOOT_USE_TRIGRAMS
@@ -80,6 +72,15 @@
  *
  * \see mootConfig.h
  */
+
+/**
+ * \def MOOT_LEX_UNKNOWN_TOKENS
+ * Define this to include real lexical entries for tokens with counts
+ * <= UnknownLexThreshhold.  Not entirely correct, but it actually
+ * seems to help.
+ */
+#define MOOT_LEX_UNKNOWN_TOKENS
+//#undef MOOT_LEX_UNKNOWN_TOKENS
 
 /**
  * \def MOOT_LEX_UNKNOWN_CLASSES
@@ -195,7 +196,8 @@ public:
           ClassIDTable;
 
   /** Type for lexical probability lookup subtable: \c tagid=>log(p(·|tagid)) */
-  typedef map<TagID,ProbT> LexProbSubTable;
+  //typedef map<TagID,ProbT> LexProbSubTable;
+  typedef AssocVector<TagID,ProbT> LexProbSubTable;
 
   /**
    * Type for lexical-class probability lookup subtable:
@@ -502,6 +504,8 @@ public:
 #else
   BigramProbTable   ngprobs2;   /**< N-gram (log-)probability lookup table: bigrams */
 #endif
+
+  SuffixTrie        suftrie;    /**< string-suffix (log-)probability trie */
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -632,7 +636,8 @@ public:
    *
    * If you want to load multiple models, you will need to first
    * load the raw-freqency objects, then call the compile(),
-   * estimate_*(), and compute_logprobs() methods yourself.
+   * estimate_*(), build_suffix_trie(), and compute_logprobs()
+   * methods yourself.
    */
   bool load_model(const string &modelname,
 		  const mootTagString &start_tag_str="__$",
@@ -640,6 +645,7 @@ public:
 		  bool  do_estimate_nglambdas=true,
 		  bool  do_estimate_wlambdas=true,
 		  bool  do_estimate_clambdas=true,
+		  bool  do_build_suffix_trie=true,
 		  bool  do_compute_logprobs=true);
 
   /**
@@ -673,7 +679,13 @@ public:
   /** Estimate class smoothing constants: NOT called by compile(). */
   bool estimate_clambdas(const mootClassfreqs &cf);
 
-  /** Pre-compute runtime probability tables: NOT called by compile(). */
+  /** Build suffix trie for unknown-word handling: NOT called by compile(). */
+  bool build_suffix_trie(const mootLexfreqs &lf,
+			 const mootNgrams   &ng,
+			 bool  verbose=false)
+  { return suftrie.build(lf,ng,tagids,start_tagid,verbose); };
+
+  /** Pre-compute runtime log-probability tables: NOT called by compile(). */
   bool compute_logprobs(void);
   //@}
 
@@ -749,7 +761,7 @@ public:
       {
 	tok_class.insert(tagids.name2id(ani->tag));
       }
-    viterbi_step(token2id(token.text()), tok_class);
+    viterbi_step(token2id(token.text()), tok_class, token.text());
   };
 
   //------------------------------------------------------------
@@ -759,24 +771,26 @@ public:
    * in \c lexclass -- useful if you have some a priori information
    * on the token.
    */
-  inline void viterbi_step(TokID tokid, const LexClass &lexclass)
+  inline void viterbi_step(TokID tokid,
+			   const LexClass &lexclass,
+			   const mootTokString &toktext="")
   {
     if (use_lex_classes) {
       if (lexclass.empty()) {
 	nunclassed++;
-	viterbi_step(tokid, 0, uclass);
+	viterbi_step(tokid, 0, uclass, toktext);
       } else {
 	//-- non-empty class : get ID (assign empty distribution if unknown)
 	ClassID classid = class2id(lexclass,0,1);
-	viterbi_step(tokid,classid,lexclass);
+	viterbi_step(tokid, classid, lexclass, toktext);
       }
     } else {
       //-- !use_lex_classes
       if (lexclass.empty()) {
 	nunclassed++;
-	viterbi_step(tokid);
+	viterbi_step(tokid, toktext);
       } else {
-	viterbi_step(tokid,0,lexclass);
+	viterbi_step(tokid, 0, lexclass, toktext);
       }
     }
   };
@@ -787,7 +801,10 @@ public:
    * Step a single Viterbi iteration, considering only the tags
    * in \c lclass
    */
-  void viterbi_step(TokID tokid, ClassID classid, const LexClass &lclass);
+  void viterbi_step(TokID tokid,
+		    ClassID classid,
+		    const LexClass &lclass,
+		    const mootTokString &toktext="");
 
   //------------------------------------------------------------
   // Viterbi: single iteration: (TokID)
@@ -797,7 +814,7 @@ public:
    * where no futher information (i.e. set of possible tags) is
    * available.
    */
-  void viterbi_step(TokID tokid);
+  void viterbi_step(TokID tokid, const mootTokString &toktext="");
 
   //------------------------------------------------------------
   // Viterbi: single iteration: (TokString)
@@ -808,7 +825,7 @@ public:
    * Really just a wrapper for \c viterbi_step(TokID tokid).
    */
   inline void viterbi_step(const mootTokString &token_text) {
-    return viterbi_step(token2id(token_text));
+    return viterbi_step(token2id(token_text), token_text);
   };
 
   //------------------------------------------------------------
@@ -822,7 +839,7 @@ public:
   {
     LexClass lclass;
     tagset2lexclass(tags,&lclass);
-    viterbi_step(token2id(token_text), lclass);
+    viterbi_step(token2id(token_text), lclass, token_text);
   };
 
   //------------------------------------------------------------
@@ -839,9 +856,9 @@ public:
    *
    * Step a single Viterbi iteration, considering only the tag \c tag : string version.
    */
-  inline void viterbi_step(const mootTokString &token, const mootTagString &tag)
+  inline void viterbi_step(const mootTokString &toktext, const mootTagString &tag)
   {
-    return viterbi_step(token2id(token), tagids.name2id(tag));
+    return viterbi_step(token2id(toktext), tagids.name2id(tag));
   };
 
 
@@ -1282,7 +1299,7 @@ public:
 	  ProbT lpprob = log(1.0/((ProbT)lps.size()));
 
 	  for (LexProbSubTable::const_iterator lpsi = lps.begin(); lpsi != lps.end(); lpsi++) {
-	    lcps[lpsi->first] = lpprob;
+	    lcps[lpsi->key()] = lpprob;
 	  }
 	}
       }
@@ -1299,6 +1316,44 @@ public:
   /*------------------------------------------------------------
    * Lexical Probability Lookup
    */
+  /** Get primary and secondary lexical-probability maps */
+  /*
+  inline void get_wordp_maps(TokID   tokid,
+			     ClassID classid,
+			     const mootTokString &toktext,
+			     LexProbSubTable* const* primary,
+			     LexProbSubTable* const* secondary)
+    const
+  {
+    if (tokid != 0 || !use_lex_classes) {
+      if (primary)   *primary   = &lexprobs[tokid];
+      if (secondary) *secondary = NULL;
+    }
+    else if (use_lex_classes) {
+      if (primary)   *primary   = &lcprobs[classid];
+      if (secondary) {
+	size_t matchlen;
+	*secondary = &(suftrie.sufprobs(toktext,&matchlen));
+	if (matchlen == 0) *secondary = NULL;
+      }
+    }
+    else { //-- tokid==0 && !use_lex_classes
+      if (primary) {
+	size_t matchlen;
+	*primary = &(suftrie.sufprobs(toktext,&matchlen));
+	if (matchlen == 0) {
+	  *primary = &lexprobs[tokid];
+	  *secondary = NULL;
+	}
+	else if (secondary) {
+	  *secondary = &lexprobs[tokid];
+	}
+      }
+    }
+  };
+  */
+
+
   /**
    * Looks up and returns lexical probability: p(tokid|tagid)
    * given tokid, tagid.
@@ -1308,7 +1363,7 @@ public:
     if (tokid >= lexprobs.size()) return MOOT_PROB_ZERO;
     const LexProbSubTable &lps = lexprobs[tokid];
     LexProbSubTable::const_iterator lpsi = lps.find(tagid);
-    return lpsi != lps.end() ? lpsi->second : MOOT_PROB_ZERO;
+    return lpsi != lps.end() ? lpsi->value() : MOOT_PROB_ZERO;
   };
 
   /**
@@ -1333,7 +1388,7 @@ public:
     if (classid >= lcprobs.size()) return MOOT_PROB_ZERO;
     const LexClassProbSubTable &lps = lcprobs[classid];
     LexClassProbSubTable::const_iterator lpsi = lps.find(tagid);
-    return lpsi != lps.end() ? lpsi->second : MOOT_PROB_ZERO;
+    return lpsi != lps.end() ? lpsi->value() : MOOT_PROB_ZERO;
   };
 
   /**

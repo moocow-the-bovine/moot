@@ -40,6 +40,8 @@
 #include <mootEnum.h>
 #include <mootIO.h>
 #include <mootHMM.h>
+#include <mootAssocVector.h>
+#include <mootSuffixTrie.h>
 
 /** \brief Namespace for structured binary stream I/O */
 namespace mootBinIO {
@@ -389,6 +391,27 @@ namespace mootBinIO {
   };
 
   /*------------------------------------------------------------
+   * STL: pair
+   */
+  /** \brief Binary I/O template instantiation for STL map<> */
+  template<class T1, class T2>
+  class Item<std::pair<T1,T2> > {
+  public:
+    Item<T1>   item1;
+    Item<T2>   item2;
+  public:
+    inline bool load(mootio::mistream *is, std::pair<T1,T2> &x) const
+    {
+      return (item1.load(is,x.first) && !item2.load(is,x.second));
+    };
+
+    inline bool save(mootio::mostream *os, const std::pair<T1,T2> &x) const
+    {
+      return (item1.save(os,x.first) && item2.save(os,x.second));
+    };
+  };
+
+  /*------------------------------------------------------------
    * moot types: Trigram
    */
 #if defined(MOOT_USE_TRIGRAMS) && defined(MOOT_HASH_TRIGRAMS)
@@ -443,6 +466,77 @@ namespace mootBinIO {
     };
   };
 
+  /*------------------------------------------------------------
+   * moot types: AssocVector
+   */
+  template<typename KeyT, typename ValT>
+  class Item<AssocVector<KeyT,ValT> >
+  {
+  public:
+    typedef typename AssocVector<KeyT,ValT>::assoc_vector_type assoc_vector_type;
+    Item<assoc_vector_type> vec_item;
+  public:
+    inline bool load(mootio::mistream *is, AssocVector<KeyT,ValT> &x) const
+    { return vec_item.load(is,x); };
+    inline bool save(mootio::mostream *os, const AssocVector<KeyT,ValT> &x) const
+    { return vec_item.save(os,x); };
+  };
+
+  /*------------------------------------------------------------
+   * moot types: TrieVectorNode
+   */
+  template <typename DataT, typename CharT, typename UCharT>
+  class Item<TrieVectorNode<DataT,CharT,UCharT> > {
+  public:
+    Item<CharT> char_item;
+    Item<UCharT> uchar_item;
+    Item<DataT> data_item;
+    Item<size_t> size_item;
+  public:
+    inline bool load(mootio::mistream *is, TrieVectorNode<DataT,CharT,UCharT> &x) const
+    {
+      return (size_item.load(is,x.mother)
+	      && size_item.load(is,x.mindtr)
+	      && char_item.load(is,x.label)
+	      && uchar_item.load(is,x.ndtrs)
+	      && data_item.load(is,x.data));
+    };
+    inline bool save(mootio::mostream *os, const TrieVectorNode<DataT,CharT,UCharT> &x) const
+    {
+      return (size_item.save(os,x.mother)
+	      && size_item.save(os,x.mindtr)
+	      && char_item.save(os,x.label)
+	      && uchar_item.save(os,x.ndtrs)
+	      && data_item.save(os,x.data));
+    };
+  };
+  
+
+  /*------------------------------------------------------------
+   * moot types: SuffixTrie
+   */
+  /** \brief Binary I/O template instantiation for SuffixTrie */
+  template<>
+  class Item<SuffixTrie> {
+  public:
+    Item<SuffixTrie::vector_type> vec_item;
+    Item<CountT>                  maxcount_item;
+    Item<ProbT>                   theta_item;
+  public:
+    inline bool load(mootio::mistream *is, SuffixTrie &x) const
+    {
+      x.clear();
+      return (maxcount_item.load(is, x.maxcount)
+	      && theta_item.load(is, x.theta)
+	      && vec_item.load(is,x));
+    };
+    inline bool save(mootio::mostream *os, const SuffixTrie &x) const
+    {
+      return (maxcount_item.save(os, x.maxcount)
+	      && theta_item.save(os, x.theta)
+	      && vec_item.save(os, x));
+    };
+  };
 
   /*------------------------------------------------------------
    * public typedefs: Generic header information

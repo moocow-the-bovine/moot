@@ -36,21 +36,24 @@ XMLIFY ?= ./xmlify.perl
 OF_XML=xml,pretty
 
 ##-- Globals: programs: moot
+SUFFIX_TRIE_LEN ?= 10
 MOOT_BINDIR   ?= $(shell cd .. ; pwd -P)
 MOOTRAIN      ?= $(MOOT_BINDIR)/mootrain
 MOOTHMM       ?= $(MOOT_BINDIR)/moot
-#MOOTHMM_FLAGS ?= -d1024
+MOOTHMM_FLAGS ?= -a$(SUFFIX_TRIE_LEN)
+#-d1024
 
 MOOTEVAL      ?= $(MOOT_BINDIR)/mooteval
 
 MOOTCOMPILE   ?= $(MOOT_BINDIR)/mootcompile
 ZFLAGS        ?= -z3
-MOOTCOMPILE_FLAGS ?= $(ZFLAGS)
+MOOTCOMPILE_FLAGS ?= $(ZFLAGS) -a$(SUFFIX_TRIE_LEN)
 
 MOOTDUMP      ?= $(MOOT_BINDIR)/mootdump
 
 MOOTCHURN     ?= $(MOOT_BINDIR)/mootchurn
 MOOTCHURN_FLAGS ?= -d1024
+
 
 all:
 	@echo "Usage: make TEST=test TRAIN=train label=label {save|test}"
@@ -360,12 +363,12 @@ save/%.xml_stamp: $(TEST).ttt $(TEST).mt.xml $(TRAIN).xml.model
 lower: $(TEST)-lower.ttt $(TRAIN)-lower.ttt
 
 %-lower.ttt: %.ttt
-	tr A-ZAÄÖÜ a-zäöü < $< > $@
+	tr A-ZÄÖÜ a-zäöü < $< > $@
 
 lower_model: $(TRAIN)-lower.model
 
 %-lower.model: %-lower.ttt $(MOOTRAIN)
-	$(MOOTRAIN) -Imedium -ln $< -o $*
+	$(MOOTRAIN) -Imedium -ln $< -o $*-lower
 	touch $@
 
 ##-- tnt-tagging

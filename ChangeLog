@@ -14,7 +14,15 @@ v2.0.4-pre1 Sat, 31 Jul 2004 13:56:22 +0200
 	  - linear time search, but faster than map<> for small arrays
 	+ added mootSuffixTrie
 	  - TnT-style suffix trie using mootTrieVector and mootAssocVector
-	  - compiles ok, not yet used
+	+ added suffix-trie use to mootHMM : works (kinda),
+	  but not TnT-compatible:
+	  - moot_theta(~=0.03) != tnt_theta(~=0.107)
+	  - best smoothing method: sqrt(N) a la Brants&Samuelsson(1995)
+	  - even without case (data/*-tolower*) or class-restrictions,
+	    TnT gets only 1120 vs. moot's 1265 errors
+	    (tnt=96.83 vs. moot=96.42% correct)
+	  - TnT suffix trie has different size, with same nominal
+	    maximum depth: tnt=125958 vs. moot=124435
 
 v2.0.3 Tue, 20 Jul 2004 19:49:58 +0200
 	+ added shell-script 'mootconfig' to report compile-time

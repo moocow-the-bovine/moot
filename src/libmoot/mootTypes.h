@@ -37,7 +37,7 @@
 #include <map>
 #include <set>
 
-#include "mootToken.h"
+#include <mootToken.h>
 
 #if defined(__GNUC__)
 #  if __GNUC__ >= 3

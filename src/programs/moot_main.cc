@@ -174,6 +174,7 @@ void GetMyOptions(int argc, char **argv)
   hmm.unknown_tag_name(args.unknown_tag_arg);
   hmm.unknown_lex_threshhold = args.unknown_threshhold_arg;
   hmm.unknown_class_threshhold = args.class_threshhold_arg;
+  hmm.suftrie.maxlen() = args.trie_depth_arg;
 
   // -- assign "verbose" flag
   hmm.ndots = args.dots_arg;
@@ -287,6 +288,8 @@ void GetMyOptions(int argc, char **argv)
   writer->printf_raw("   Class lambdas     : lambdac0=%g, lambdac1=%g\n",
 	  exp(hmm.clambda0), exp(hmm.clambda1));
   writer->printf_raw("   Beam Width        : %g\n", exp(hmm.beamwd));
+  writer->printf_raw("   Suffix theta      : %g\n", hmm.suftrie.theta);
+  writer->printf_raw("   Suffix trie size  : %u\n", hmm.suftrie.size());
   writer->printf_raw("\n");
   writer->put_comment_block_end();
 }

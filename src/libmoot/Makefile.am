@@ -38,6 +38,8 @@ lib_LTLIBRARIES = libmoot.la
 #${lib_i}_la_SOURCES =
 libmoot_la_SOURCES = \
 	\
+	mootSuffixTrie.cc \
+	\
 	mootToken.cc \
 	\
 	mootTokenLexer.cc \
@@ -70,7 +72,6 @@ libmoot_la_SOURCES = \
 	mootHMM.cc \
 	mootHMMTrainer.cc \
 	mootEval.cc \
-	mootSuffixTrie.cc \
 	\
 	mootUtils.cc
 

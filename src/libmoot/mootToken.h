@@ -556,6 +556,16 @@ inline mootTokenFlavor tokenFlavor(const mootTokString &token)
   return TokFlavorAlpha;
 };
 
+/** Returns true iff @tokstr is a pseudo-identifier for a non-alpha type
+ *  Used during HMM and trie compilation */
+inline bool isTokFlavorName(const mootTokString &tokstr)
+{
+  int i;
+  for (i = 0; i < NTokFlavors; i++) {
+    if (tokstr == mootTokenFlavorNames[i]) return true;
+  }
+  return (tokstr == "@USE_CASE");
+};
 
 }; /* namespace moot */
 

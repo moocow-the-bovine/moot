@@ -162,6 +162,14 @@ See 'HMM MODEL FILE FORMATS' in L<mootfiles> for details
 on model file formats.
 "
 
+int "trie-depth"  a "Maximum depth of suffix trie." \
+    arg="LEN" \
+    default="10" \
+    details="
+Use suffixes of up to LEN characters to estimate probabilities
+of unknown words.
+"
+
 int "use-classes" L "Whether to use lexical class-probabilities." \
     arg="BOOL" \
     default="1" \

@@ -61,6 +61,14 @@ int "compress" z "Compression level for output file." \
 
 group "HMM Options"
 
+int "trie-depth"  a "Maximum depth of suffix trie." \
+    arg="LEN" \
+    default="10" \
+    details="
+Use suffixes of up to LEN characters to estimate probabilities
+of unknown words.
+"
+
 int "use-classes" L "Whether to use lexical class-probabilities." \
     arg="BOOL" \
     default="1" \

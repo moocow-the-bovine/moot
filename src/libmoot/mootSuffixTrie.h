@@ -32,6 +32,7 @@
 #include <mootTypes.h>
 #include <mootToken.h>
 #include <mootLexfreqs.h>
+#include <mootNgrams.h>
 #include <mootEnum.h>
 #include <mootAssocVector.h>
 #include <mootTrieVector.h>
@@ -45,6 +46,11 @@ typedef AssocVector<mootEnumID,ProbT> SuffixTrieDataT;
 //template<>
 class SuffixTrie : public TrieVector<SuffixTrieDataT>
 {
+public:
+  //------------------------------------------------------------
+  // SuffixTrie: Static Data
+  static const size_t SuffixTrieDefaultMaxLen = 10;
+
 public:
   //------------------------------------------------------------
   // SuffixTrie: Types
@@ -73,7 +79,10 @@ public:
   /// \name Constructors etc.
   //@{
   /** Default constructor */
-  SuffixTrie(void) : maxcount(10), theta(0) {};
+  SuffixTrie(size_t max_length=SuffixTrieDefaultMaxLen, bool use_case=true, size_t max_count=10)
+    : TrieType(max_length,use_case),
+      maxcount(max_count)
+  {};
 
   /** Destructor */
   ~SuffixTrie(void) {};
@@ -84,9 +93,11 @@ public:
   //@{
   /** Construct a suffix trie from a mootLexfreqs object
    *  and a mootEnum object for tagids */
-  void compile(const mootLexfreqs &lf,
-	       const TagIDTable   &tagids,
-	       bool  verbose=false);
+  bool build(const mootLexfreqs &lf,
+	     const mootNgrams   &ng,
+	     const TagIDTable   &tagids,
+	     TagID eos_tagid,
+	     bool  verbose=false);
   //@}
 
   //--------------------------------------------------
@@ -94,24 +105,26 @@ public:
   //@{
   /** Get (log-) probability table tagid=>log(P(tokstr|tagid))
    *  based on longest matched suffix */
-  inline const SuffixTrieDataT& sufprobs(const mootTokString &tokstr) const
+  inline const SuffixTrieDataT& sufprobs(const mootTokString &tokstr, size_t *matchlen=NULL)
+    const
   {
-    const_iterator ti = rfind_longest(tokstr);
+    const_iterator ti = rfind_longest(tokstr, matchlen);
     return (ti==end() ? default_data() : ti->data);
   };
 
   /** Get (log-) probability table tagid=>log(P(token.text()|tagid))
    *  based on longest matched suffix */
-  inline const SuffixTrieDataT& sufprobs(const mootToken &token) const
-  { return sufprobs(token.text()); };
+  inline const SuffixTrieDataT& sufprobs(const mootToken &token, size_t *matchlen=NULL) const
+  { return sufprobs(token.text(), matchlen); };
 
 
 
   /** Get (log-) probability log(P(tokstr|tagid))
    *  based on longest matched suffix */
-  inline ProbT sufprob(const mootTokString &tokstr, const TagID tagid) const
+  inline ProbT sufprob(const mootTokString &tokstr, const TagID tagid, size_t *matchlen=NULL)
+    const
   {
-    const_iterator ti = rfind_longest(tokstr);
+    const_iterator ti = rfind_longest(tokstr,matchlen);
     if (ti==end()) return MOOT_PROB_ZERO;
     SuffixTrieDataT::const_iterator tdi = ti->data.find(tagid);
     return (tdi==ti->data.end() ? MOOT_PROB_ZERO : tdi->value());
@@ -119,8 +132,9 @@ public:
 
   /** Get (log-) probability log(P(token.text()|tagid))
    *  based on longest matched suffix */
-  inline ProbT sufprob(const mootToken &token, const TagID tagid) const
-  { return sufprob(token.text(),tagid); };
+  inline ProbT sufprob(const mootToken &token, const TagID tagid, size_t *matchlen=NULL)
+    const
+  { return sufprob(token.text(),tagid,matchlen); };
   //@}
 }; //-- /class SuffixTrie
 

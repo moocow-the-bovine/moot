@@ -101,6 +101,7 @@ void GetMyOptions(int argc, char **argv)
   hmm.unknown_tag_name(args.unknown_tag_arg);
   hmm.unknown_lex_threshhold = args.unknown_threshhold_arg;
   hmm.unknown_class_threshhold = args.class_threshhold_arg;
+  hmm.suftrie.maxlen() = args.trie_depth_arg;
 }
 
 /*--------------------------------------------------------------------------
@@ -298,6 +299,18 @@ int main (int argc, char **argv)
   //-- assign beam-width
   hmm.beamwd = args.beam_width_arg;
 
+  //-- build suffix trie
+  if (args.trie_depth_arg > 0) {
+    if (args.verbose_arg > 1) fprintf(stderr, "%s: Building suffix trie ", PROGNAME);
+    if (!hmm.build_suffix_trie(lexfreqs, ngrams, args.verbose_arg>1)) {
+      fprintf(stderr,"\n%s: suffix trie construction FAILED.\n", PROGNAME);
+      exit(1);
+    }
+    else if (args.verbose_arg > 1) {
+      fprintf(stderr, ": built.\n");
+    }
+  }
+
   //-- compute logprobs
   if (args.verbose_arg > 1)
     fprintf(stderr, "%s: computing log-probabilities...", PROGNAME);
@@ -307,6 +320,7 @@ int main (int argc, char **argv)
   } else if (args.verbose_arg > 1) {
     fprintf(stderr," done.\n");
   }
+
 
   //-- dump binary model
   if (args.verbose_arg > 1)

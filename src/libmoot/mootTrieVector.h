@@ -118,12 +118,12 @@ public:
 
 public:
   size_t   trie_maxlen;        ///< maximum trie depth
-  //bool     trie_compiled;      ///< whether this trie has been compiled
+  bool     trie_use_case;      ///< whether to use case
 
 public:
-  TrieVectorBase(size_t maxlen=NoMaxLen)
-    : trie_maxlen(maxlen)
-    //, trie_compiled(false)
+  TrieVectorBase(size_t maxlen=NoMaxLen, bool use_case=false)
+    : trie_maxlen(maxlen),
+      trie_use_case(use_case)
   {};
 
 }; //-- /TrieVectorBase
@@ -192,8 +192,8 @@ public:
   /// \name Constructors etc.
   //@{
   /** Default constructor */
-  TrieVector(void)
-    : TrieVectorBase()
+  TrieVector(size_t max_len=NoMaxLen, bool use_case=false)
+    : TrieVectorBase(max_len,use_case)
   {};
 
   /** Destructor */
@@ -240,17 +240,35 @@ public:
   /// \name Utilties
   //@{
 
+  /** Canonicalize case of a string @s */
+  inline string_type trie_canonicalize(string_type &s) const
+  {
+    if (!trie_use_case) {
+      for (string_iterator si = s.begin(); si != s.end(); si++) {
+	*si = tolower(*si);
+      }
+    }
+    return s;
+  };
+
   /** Assign valid prefix-key of up to @max_len characters from @s to @dst */
   inline void trie_key(const string_type &s,
 		       const size_t max_len,
 		       string_type &dst)
     const
-  { dst.assign(s,0,max_len); };
+  {
+    dst.assign(s,0,max_len);
+    trie_canonicalize(dst);
+  };
 
   /** Create and return a valid prefix-key of up to @max_len characters from @s */
   inline string_type trie_key(const string_type &s, const size_t max_len)
     const
-  { return string_type(s,0,max_len); };
+  { 
+    string_type key;
+    trie_key(s,max_len,key);
+    return key;
+  };
 
   /** Create and return a valid prefix-key of up to @trie_maxlen characters from @s */
   inline string_type trie_key(const string_type &s) const
@@ -266,15 +284,15 @@ public:
     dst.assign(s.rbegin(), s.rbegin() + (max_len > s.size() ?
 					 s.size() :
 					 max_len));
-    return dst;
+    trie_canonicalize(dst);
   };
 
   /** Create and return a valid suffix-key of up to @max_len characters from @s */
   inline string_type trie_rkey(const string_type &s, size_t max_len) const
   {
-    return string_type(s.rbegin(), s.rbegin() + (max_len > s.size() ?
-						 s.size() :
-						 max_len));
+    string_type key;
+    trie_rkey(s, max_len, key);
+    return key;
   };
   
   /** Create and return a valid suffix-key of up to @trie_maxlen characters from @s */
@@ -319,6 +337,7 @@ public:
   {
     UCharT    dn;
     iterator  di;
+    if (!trie_use_case) label = tolower(label);
     for (dn=0, di=begin()+from.mindtr; di != end() && dn < from.ndtrs; di++, dn++) {
       if (di->label == label) return di;
     }
@@ -330,6 +349,7 @@ public:
   {
     UCharT         dn;
     const_iterator di;
+    if (!trie_use_case) label = tolower(label);
     for (dn=0, di=begin()+from.mindtr; di != end() && dn < from.ndtrs; di++, dn++) {
       if (di->label == label) return di;
     }
@@ -452,7 +472,7 @@ public:
 	NodeId            &knodid = pi->second;
 	if (kstr.size() <= pos) continue;           //-- we've exhausted this string
 
-	dlabel           = kstr[pos];               //-- get daughter-label
+	dlabel           = kstr[pos];                  //-- get daughter-label
 	dnodid           = find_dtr_id(knodid,dlabel); //-- check for extant daughter
 
 	if (dnodid == NoNode) {                     //-- Ye Olde Guttes: add a daughter

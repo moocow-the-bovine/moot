@@ -76,7 +76,8 @@ void mootLexfreqs::compute_specials(void)
        lfti++)
     {
       flav = tokenFlavor(lfti->first);
-      if (lfti->first[0] == '@' || flav == TokFlavorAlpha) // || typ == TokTypeUnknown
+      if (isTokFlavorName(lfti->first) || flav==TokFlavorAlpha)
+	// || typ == TokTypeUnknown
 	continue;
       
       //-- found a special: add its counts to proper subtable
@@ -102,7 +103,7 @@ size_t mootLexfreqs::n_pairs(void)
        lfti != lftable.end();
        lfti++)
     {
-      if (lfti->first[0] == '@') continue; //-- ignore specials
+      if (isTokFlavorName(lfti->first)) continue; //-- ignore specials
       n += lfti->second.freqs.size();
     }
   return n;
