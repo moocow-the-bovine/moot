@@ -58,7 +58,7 @@ void GetMyOptions(int argc, char **argv)
   if (args.verbose_given)
     fprintf(stderr,
 	    "\n%s version %s by Bryan Jurish <moocow@ling.uni-potsdam.de>\n\n",
-	    PROGNAME, PACKAGE_VERSION);
+	    PROGNAME, VERSION);
 
   // -- output file
   if (strcmp(args.output_arg,"-") != 0) {

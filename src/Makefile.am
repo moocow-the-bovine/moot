@@ -32,6 +32,8 @@ bin_PROGRAMS = dwdst
 ## sources
 ##-----------------------------------------------------------------------
 
+SUFFIXES = .ggo
+
 ## --- Required sources
 #${prog_i}_SOURCES =
 #${lib_i}_la_SOURCES =
@@ -44,6 +46,9 @@ dwdst_SOURCES = \
 ## --- Extra (possible) sources
 #EXTRA_${prog_i}_SOURCES = 
 #EXTRA_${lib_i}_la_SOURCES = 
+
+## --- Additional dependencies
+dwdst.o: dwdst_cmdparser.h
 
 ##-----------------------------------------------------------------------
 ## headers
