@@ -836,6 +836,7 @@ bool mootHMM::estimate_lambdas(const mootNgrams &ngrams)
     return false;
   }
 
+#ifdef MOOT_USE_TRIGRAMS
   ProbT   f_t123;                     //-- current  trigram  count: f(t1,t2,t3)
   ProbT   f_t23;                      //-- current  bigram   count: f(t2,t3)
   ProbT   f_t12;                      //-- previous bigram   count: f(t1,t2)
@@ -851,11 +852,7 @@ bool mootHMM::estimate_lambdas(const mootNgrams &ngrams)
   f_N       = ngrams.ugtotal;
   nglambda1 = 0.0;
   nglambda2 = 0.0;
-#ifdef MOOT_USE_TRIGRAMS
   nglambda3 = 0.0;
-#else
-  ProbT nglambda3 = 0.0; //-- Hack!
-#endif
 
   //-- adjust lambdas
   for (mootNgrams::NgramTable::const_iterator ngi1 = ngrams.ngtable.begin();
@@ -902,14 +899,63 @@ bool mootHMM::estimate_lambdas(const mootNgrams &ngrams)
     }
 
   //-- normalize lambdas
-  ProbT nglambda_total = nglambda1 + nglambda2;
-#ifdef MOOT_USE_TRIGRAMS
-  nglambda_total += nglambda3;
+  ProbT nglambda_total = nglambda1 + nglambda2 + nglambda3;
   nglambda3 /= nglambda_total;
-#endif // MOOT_USE_TRIGRAMS
-
   nglambda2 /= nglambda_total;
   nglambda1 /= nglambda_total;
+
+#else //-- !MOOT_USE_TRIGRAMS
+
+  ProbT   f_t12;                      //-- current  biigram  count: f(t1,t2)
+  ProbT   f_t2;                       //-- current  unigram  count: f(t2)
+  ProbT   f_t1;                       //-- previous unigram  count: f(t1)
+  ProbT   f_N;                        //-- corpus size (unigram total)
+
+  ProbT ngp12;   //-- adjusted bigram probability  : (f(t1,t2)    - 1) / (f(t1)       - 1)
+  ProbT ngp2;    //-- adjusted unigram probability : (f(t2)       - 1) / (corpus_size - 1)
+
+  //-- initialize
+  f_N       = ngrams.ugtotal;
+  nglambda1 = 0.0;
+  nglambda2 = 0.0;
+
+  //-- adjust lambdas
+  for (mootNgrams::NgramTable::const_iterator ngi1 = ngrams.ngtable.begin();
+       ngi1 != ngrams.ngtable.end();
+       ngi1++)
+    {
+      //-- previous unigram count: f(t1)
+      f_t1 = ngi1->second.count;
+
+      for (mootNgrams::BigramTable::const_iterator ngi2 = ngi1->second.freqs.begin();
+	   ngi2 != ngi1->second.freqs.end();
+	   ngi2++)
+	{
+	  //-- current bigram count: f(t1,t2)
+	  f_t12 = ngi2->second.count;
+
+	  //-- current unigram count : f(t2)
+	  f_t2 = ngrams.lookup(ngi2->first);
+
+	  
+	  //-- compute adjusted probabilities
+	  ngp12  =  f_t12 == 1  ?  0  : (f_t12  - 1.0) / (f_t1  - 1.0);
+	  ngp2   =  f_N   == 1  ?  0  : (f_t2   - 1.0) / (f_N   - 1.0);
+
+	  //-- adjust lambdas
+	  if (ngp12 >= ngp2)
+	    nglambda2 += f_t12;
+	  else
+	    nglambda1 += f_t12;
+	}
+    }
+
+  //-- normalize lambdas
+  ProbT nglambda_total = nglambda1 + nglambda2;
+  nglambda2 /= nglambda_total;
+  nglambda1 /= nglambda_total;
+
+#endif // MOOT_USE_TRIGRAMS
 
   return true;
 }

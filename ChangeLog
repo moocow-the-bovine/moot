@@ -4,6 +4,10 @@ Todo:
 	+ write perl-XS interface & utilities
 
 v2.0.2 Mon, 19 Jul 2004 15:51:53 +0200
+	+ fixed a bug in mootBufferIO.h causing bad read/write buffers
+	  (force cb_rdata==cb_wdata)
+	+ changed n-gram lambda-estimation algorithm for bigrams-only mode
+	  - actually appears to work better
 	+ added build option '--enable-trigrams'
 	  - use trigram probabilities in addition to uni- and bigram probabilities
 	  - helps with rare (*.tt) and -classfreq medium-rare (*.dmt) tagging

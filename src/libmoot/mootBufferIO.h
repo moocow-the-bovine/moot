@@ -115,10 +115,10 @@ namespace mootio {
     /// \name Checks and Properties
     //@{
     /** Check for buffer validity */
-    virtual bool valid(void) const { return true; };
+    virtual bool valid(void) { return true; };
 
     /** Check for end-of-buffer (only meaningful for read operations) */
-    virtual bool eof(void) const { return cb_offset >= cb_used; };
+    virtual bool eof(void) { return cb_offset >= cb_used; };
     //@}
 
     /*----------------------------------------------------------
@@ -281,6 +281,7 @@ namespace mootio {
 	cb_created(false)
     {
       if (!alloc) cb_alloc = cb_used;
+      cb_rdata = cb_wdata;
     };
 
     /** Copy constructor */

@@ -194,7 +194,7 @@ void GetMyOptions(int argc, char **argv)
     }
     hmm.nglambda1 = nlambdas[0];
     hmm.nglambda2 = nlambdas[1];
-#ifdef moot_USE_TRIGRAMS
+#ifdef MOOT_USE_TRIGRAMS
     hmm.nglambda3 = nlambdas[2];
 #else
     if (nlambdas[2] != 0) {
@@ -270,23 +270,23 @@ void GetMyOptions(int argc, char **argv)
   writer->printf_raw("   Unknown Token     : %s\n", hmm.tokids.id2name(0).c_str());
   writer->printf_raw("   Unknown Tag       : %s\n", hmm.tagids.id2name(0).c_str());
   writer->printf_raw("   Border Tag        : %s\n", hmm.tagids.id2name(hmm.start_tagid).c_str());
-#ifdef moot_USE_TRIGRAMS
+#ifdef MOOT_USE_TRIGRAMS
   writer->printf_raw("   N-Gram lambdas    : lambda1=%g, lambda2=%g, lambda3=%g\n",
-	    hmm.nglambda1, hmm.nglambda2, hmm.nglamda3);
+	    exp(hmm.nglambda1), exp(hmm.nglambda2), exp(hmm.nglamda3));
 #else
   writer->printf_raw("   N-Gram lambdas    : lambda1=%g, lambda2=%g\n",
-	    hmm.nglambda1, hmm.nglambda2);
+	    exp(hmm.nglambda1), exp(hmm.nglambda2));
 #endif
   writer->printf_raw("\n");
   writer->printf_raw("   Lex. Threshhold   : %g\n", hmm.unknown_lex_threshhold);
   writer->printf_raw("   Lexical lambdas   : lambdaw0=%g, lambdaw1=%g\n",
-	  hmm.wlambda0, hmm.wlambda1);
+	  exp(hmm.wlambda0), exp(hmm.wlambda1));
   writer->printf_raw("   Use classes?      : %s\n",
 	  hmm.use_lex_classes ? "yes" : "no");
   writer->printf_raw("   Class Threshhold  : %g\n", hmm.unknown_class_threshhold);
   writer->printf_raw("   Class lambdas     : lambdac0=%g, lambdac1=%g\n",
-	  hmm.clambda0, hmm.clambda1);
-  writer->printf_raw("   Beam Width        : %g\n", hmm.beamwd);
+	  exp(hmm.clambda0), exp(hmm.clambda1));
+  writer->printf_raw("   Beam Width        : %g\n", exp(hmm.beamwd));
   writer->printf_raw("\n");
   writer->put_comment_block_end();
 }
