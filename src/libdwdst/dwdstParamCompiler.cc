@@ -60,7 +60,7 @@ void dwdstParamCompiler::yyerror(const char *msg) {
     fprintf(stderr,"%s: error:%s%s at line %d, column %d, near token '%s': %s\n",
 	    (objname ? objname : "dwdstParamCompiler"),
 	    (srcname ? " in file " : ""),
-	    (srcname ? srcname : "(unknown)"),
+	    (srcname ? srcname : ""),
 	    yylloc.first_line, yylloc.first_column, yylloc.text, msg);
 }
 void dwdstParamCompiler::yywarn(const char *msg) {

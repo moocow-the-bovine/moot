@@ -11,7 +11,7 @@
 #include "dwdstTypes.h"
 #include "dwdstTrainer.h"
 #include "dwdstTaglistLexer.h"
-#include "dwdstParamLexer.h"
+#include "dwdstParamCompiler.h"
 
 using namespace std;
 
@@ -22,10 +22,15 @@ using namespace std;
 /*
  * dwdstTrainer::~dwdstTrainer()
  */
-dwdstTrainer::~dwdstTrainer()
-{
-  // -- do nothing
-  ;
+dwdstTrainer::~dwdstTrainer() {
+    // -- clear any leftover training-temps
+    cleanup_training_temps();
+
+    // -- clear param table
+    ngtable.clear();
+
+    // -- clear alltags-list
+    alltags.clear();
 }
 
 /*--------------------------------------------------------------------------
@@ -259,9 +264,9 @@ inline bool dwdstTrainer::init_training_temps(FILE *in=NULL, FILE *out=NULL)
 
   // -- initialize string-sets
   for (i = 0; i < kmax; i++) {
-    curtags = new set<FSMSymbolString>();
-    stringq.push_back(curtags);
+    stringq.push_back(new set<FSMSymbolString>());
   }
+  tmptags = new set<FSMSymbolString>();
   return true;
 }
 
@@ -273,16 +278,8 @@ inline bool dwdstTrainer::cleanup_training_temps()
 {
   int i;
 
-  // -- cleanup string-sets
-  for (i = 0; i < kmax; i++) {
-    curtags = stringq.front();
-    stringq.pop_front();
-    if (curtags) {
-      curtags->clear();
-      delete curtags;
-    }
-  }
   // -- cleanup ngram-temps
+  theNgram.clear();
   if (curngrams) {
     curngrams->clear();
     delete curngrams;
@@ -294,6 +291,22 @@ inline bool dwdstTrainer::cleanup_training_temps()
     nextngrams = NULL;
   }
   tmpngrams = NULL;
+
+  // -- cleanup string-sets
+  if (tmptags) {
+      tmptags->clear();
+      delete tmptags;
+      tmptags = NULL;
+  }
+  for (i = 0; i < kmax; i++) {
+    curtags = stringq.front();
+    stringq.pop_front();
+    if (curtags) {
+      curtags->clear();
+      delete curtags;
+    }
+  }
+  curtags = NULL;
 
   infile = NULL;
   outfile = NULL;
@@ -362,6 +375,16 @@ inline void dwdstTrainer::train_next_token(void)
   if (curtags->empty()) {
     get_fsm_tag_strings(ufsa,curtags);
   }
+
+  // -- HACK: trim extraneous spaces from each string in 'curtags'
+  tmptags->clear();
+  for (cti = curtags->begin(); cti != curtags->end(); cti++) {
+      tmptags->insert(cti->substr(cti->find_first_not_of(" ",0),
+				  cti->find_last_not_of(" ")+1));
+  }
+  swaptags = curtags;
+  curtags = tmptags;
+  tmptags = swaptags;
     
   // -- push 'current' tags onto the queue (front of queue == newest)
   stringq.push_front(curtags);
@@ -474,47 +497,24 @@ bool dwdstTrainer::save_param_file(FILE *out=stdout)
  */
 bool dwdstTrainer::load_param_file(FILE *in=stdin,const char *filename=NULL)
 {
-  //--  MECKER
+  /*//--  MECKER
   fprintf(stderr,"dwdst_tagger_trainer::load_param_file(): not yet implemented!\n");
   abort();
   return false;
-
-  /*
-  int tok;
-  dwdstParamLexer plexer;
-  NGramVector     ng;
-  //FSMSymbolString symstr;
-  float           count;
-
-  plexer.select_streams(in,stdout);
-
-  while ((tok = plexer.yylex()) != dwdstParamLexer::PF_EOF) {
-    switch (tok) {
-    case dwdstParamLexer::PF_REGEX:
-      ng.push_back(plexer.tokbuf);
-      // -- add to alltags
-      alltags.insert(plexer.tokbuf);
-      break; 
-    case dwdstParamLexer::PF_COUNT:
-      count = atof((char *)plexer.yytext);
-      // -- add loaded count
-      if (ngtable.find(ng) != ngtable.end()) {
-	ngtable[ng] = count;
-      }
-      else {
-	ngtable[ng] += count;
-      }
-      // -- clean up
-      ng.clear();
-      count = 0;
-      break;
-    default:
-      fprintf(stderr, "dwdstTrainer::load_param_file: unknown token '%s' -- ignored.\n", plexer.yytext);
-      break;
-    }
-  }
-  return true;
   */
+
+ dwdstParamCompiler parcomp;
+
+ // -- setup param-compiler
+ parcomp.objname = "dwdstTrainer::load_param_file";
+ parcomp.ngtable = &ngtable;
+ parcomp.alltags = &alltags;
+
+ if (!parcomp.parse_from_file(in,filename)) {
+   fprintf(stderr, "dwdstTrainer::load_param_file: could not load file '%s'.\n", filename);
+   return false;
+ }
+ return true;
 }
 
 /*--------------------------------------------------------------------------

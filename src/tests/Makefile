@@ -5,12 +5,12 @@ CXX_IFLAGS = \
 	-I/usr/local/include/FSMlib \
 	-I/usr/local/include/stlport \
 	-I/usr/local/include/bumblelib \
-	-I..
+	-I$(SRCDIR)
 CXXFLAGS = $(CXX_WFLAGS) $(CXX_OFLAGS) $(CXX_IFLAGS)
-LDFLAGS  = -L/usr/local/lib
-LIBS     = -lFSMExt -lFSM -lFSMSymSpec -lbumble++ -lstlport_gcc -lpthread -lz -lm
+LDFLAGS  = -L/usr/local/lib -L$(SRCDIR)/.libs
+LIBS     = -static -ldwdst -lFSMExt -lFSM -lFSMSymSpec -lbumble++ -lstlport_gcc -lpthread -lz -lm
 
-SRCDIR ?= ..
+SRCDIR ?= ../libdwdst
 FLEXXX ?= flex++
 #FLEXXX_SKEL = $(SRCDIR)/flexskel.cc
 #FLEXXX_HSKEL = $(SRCDIR)/flexskel.h
@@ -25,35 +25,44 @@ BISONXX ?= bison++
 BISONXX_FLAGS = $(BISONXX_DFLAGS) -d -v
 
 
-TARGETS = plextest parcpy
+TARGETS = parcpy trim
 
 all: $(TARGETS)
 
 # deps
-plextest_DEPS = plextest.o dwdst_param_lexer.o
-parcpy_DEPS = parcpy.o \
-	dwdst_param_lexer.o \
-	$(SRCDIR)/dwdst_trainer.o \
-	$(SRCDIR)/dwdst.o \
-	$(SRCDIR)/dwdst_lexer.o \
-	$(SRCDIR)/postag_lexer.o
+#plextest_DEPS = plextest.o
+parcpy_OBJS = parcpy.o
+parcpy_DEPS = $(SRCDIR)/libdwdst.la
 
-parcpy.o: parcpy.cc dwdst_param_lexer.h $(SRCDIR)/dwdst_trainer.h
-plextest.o: plextest.cc dwdst_param_lexer.h
+trim_OBJS = trim.o
+
+#parcpy.o: parcpy.cc
+#plextest.o: plextest.cc
 
 .SUFFIXES: .ll .yy .cc .h .o
 
-plextest: $(plextest_DEPS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
+#plextest: $(plextest_DEPS)
+#	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
-parcpy: $(parcpy_DEPS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+parcpy: $(parcpy_OBJS) $(parcpy_DEPS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(parcpy_OBJS) $(LIBS)
+
+trim: $(trim_OBJS) $(trim_DEPS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(trim_OBJS) -lstlport_gcc -lpthread
+
+$(SRCDIR)/libdwdst.la:
+	$(MAKE) -C $(SRCDIR) libdwdst.la
 
 $(SRCDIR)/%: ;
 	$(MAKE) -C $(SRCDIR) $*
 
+
+
 .cc.o:
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+
 
 .ll.cc: $(FLEXXX_SKEL)
 	$(FLEXXX) $(FLEXXX_FLAGS) -h$*.h -o$*.cc $<
@@ -62,7 +71,24 @@ $(SRCDIR)/%: ;
 	$(FLEXXX) $(FLEXXX_FLAGS) -h$*.h -o$*.cc $<
 
 
+# --- checking
+.PHONY: pardiff_check
+
+par ?= test.par
+
+pardiff: parcpy $(par) pardiff_check
+
+pardiff_check:
+	grep -v '^%%' $(par) | sort - > $(par).in
+	./parcpy < $(par).in | sort - > $(par).out
+	@echo "--------------------------------------------"
+	diff -sq $(par).in $(par).out
+	@echo "--------------------------------------------"
+	echo "rm $(par).in $(par).out"
+
 clean:
 	rm -f $(TARGETS) *.o *~ \
 	  $(patsubst %.ll,%.cc,$(wildcard *.ll)) \
-	  $(patsubst %.ll,%.h,$(wildcard *.ll))
+	  $(patsubst %.ll,%.h,$(wildcard *.ll)) \
+	  $(patsubst %.yy,%.cc,$(wildcard *.yy)) \
+	  $(patsubst %.yy,%.h,$(wildcard *.yy))

@@ -9,3 +9,4 @@ dwdst_param_lexer.cc
 dwdst_param_lexer.h
 parcpy
 plextest
+trim

@@ -2,6 +2,8 @@ html
 latex
 man
 libdwdst.doxy
+libdwdst.log
+libdwdst.tag
 *.stamp
 *~
 .*~

@@ -14,8 +14,8 @@
 %define LSP_NEEDED
 
 // -- debugging (see below)
-//%define DEBUG 1
-//%define ERROR_VERBOSE
+%define DEBUG 1
+%define ERROR_VERBOSE
 
 // -- use pure-function errors
 %define ERROR_BODY =0
@@ -60,6 +60,8 @@
    /* -- public instance members go here */ \
    /** \brief a pointer to the parameter map we are constructing. */ \
    NGramTable *ngtable; \
+   /** \brief to keep track of all possible tags we've parsed. */ \
+   set<FSMSymbolString> *alltags; \
   private: \
    /* private instance members go here */ \
   public: \
@@ -70,7 +72,7 @@
    };
    
 
-%define CONSTRUCTOR_INIT : ngtable(NULL)
+%define CONSTRUCTOR_INIT : ngtable(NULL), alltags(NULL)
 
 
 
@@ -108,6 +110,7 @@
 
 params:		/* empty */ { $$ = 0; }
 	|	params param { $$ = 0; }
+	|	newline params { $$ = 0; }
 	;
 
 param:		ngram tab count newline
@@ -142,7 +145,11 @@ ngram:		regex
 		}
 	;
 
-regex:		REGEX { $$ = $1; }
+regex:		REGEX
+		{
+		    alltags->insert(*$1);
+		    $$ = $1;
+		}
 /*	|	// empty
 		{
 		    yyerror("expected a regex");
@@ -154,7 +161,7 @@ regex:		REGEX { $$ = $1; }
 count:		COUNT { $$ = $1; }
 	|	/* empty */
 		{
-		    yyerror("expected a count");
+		    yyerror("expected a count.");
                     YYABORT;
 		}
 	;
@@ -162,17 +169,16 @@ count:		COUNT { $$ = $1; }
 tab:		'\t' { $$=0; }
 	|	/* empty */
 		{
-		    yyerror("expected a TAB");
+		    yyerror("expected a TAB.");
                     YYABORT;
                 }
 	;
 
 newline:	'\n' { $$=0; }
-	|	'\0' { $$=0; }
 	|	newline '\n'
 	|	/* empty */
 		{
-		    yyerror("expected a NEWLINE");
+		    yyerror("expected a NEWLINE.");
                     YYABORT;
 		}
 	;
@@ -183,7 +189,6 @@ newline:	'\n' { $$=0; }
 /*----------------------------------------------------------------
  * Parsing Methods
  *----------------------------------------------------------------*/
-void dwdstParamParser::yyerror(char *msg) {
-  fprintf(stderr, "dwdstParamParser Error: %s\n", msg);
+void dwdstParamParser::yyerror(const char *msg) {
+    fprintf(stderr, "dwdstParamParser Error: %s\n", msg);
 }
-

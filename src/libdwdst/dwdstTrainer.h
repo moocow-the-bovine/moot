@@ -64,6 +64,7 @@ private:
 
   // -- training variables
   set<FSMSymbolString> *curtags;
+  set<FSMSymbolString> *tmptags, *swaptags;
   set<FSMSymbolString>::iterator cti;
 
   NGramVector      theNgram;

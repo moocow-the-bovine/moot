@@ -163,7 +163,7 @@ public:
  /** \brief Perform parsing */
  int YY_@_PARSE(YY_@_PARSE_PARAM);
  /** \brief report errors */
- virtual void YY_@_ERROR(char *msg) YY_@_ERROR_BODY;
+ virtual void YY_@_ERROR(const char *msg) YY_@_ERROR_BODY;
 #ifdef YY_@_PURE
 #ifdef YY_@_LSP_NEEDED
  /** \brief get next token from input stream */

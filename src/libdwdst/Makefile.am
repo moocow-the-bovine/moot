@@ -53,10 +53,14 @@ libdwdst_la_SOURCES = \
 ## --- Additional dependencies
 dwdstTrainer.o: dwdstParamCompiler.h
 dwdstTrainer.lo: dwdstParamCompiler.h
-dwdstParamCompiler.lo: dwdstParamLexer.h dwdstParamParser.h
+dwdstParamCompiler.lo: dwdstParamLexer.h dwdstParamParser.h 
 dwdstParamCompiler.o: dwdstParamLexer.h dwdstParamParser.h
 dwdstParamLexer.lo: dwdstParamLexer.h dwdstParamParser.h
 dwdstParamLexer.o: dwdstParamLexer.h dwdstParamParser.h
+dwdstParamLexer.h: $(FLEXXX_DEPS)
+dwdstParamLexer.cc: $(FLEXXX_DEPS)
+dwdstParamParser.h: $(BISONXX_DEPS)
+dwdstParamParser.cc: $(BISONXX_DEPS)
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -88,26 +92,28 @@ SRCDIR = @srcdir@
 FLEXXX ?= flex++
 FLEXXX_SKEL = $(SRCDIR)/flexskel.cc
 FLEXXX_HSKEL = $(SRCDIR)/flexskel.h
+FLEXXX_DEPS = $(FLEXXX_SKEL) $(FLEXXX_HSKEL)
 FLEXXX_FLAGS = -8 -S$(FLEXXX_SKEL) -H$(FLEXXX_HSKEL)
 #FLEXXX_FLAGS = -8
 
 BISONXX ?= bison++
 BISONXX_SKEL = $(SRCDIR)/bison.cc
 BISONXX_HSKEL = $(SRCDIR)/bison.h
+BISONXX_DEPS = $(BISONXX_SKEL) $(BISONXX_HSKEL)
 BISONXX_FLAGS = $(BISONXX_DFLAGS) -d -v -S$(BISONXX_SKEL) -H$(BISONXX_HSKEL)
 #BISONXX_FLAGS = -d -v
 #BISONXX_FLAGS = --debug -d -v
 
-.ll.h:
+.ll.h: $(FLEXXX_DEPS)
 	$(FLEXXX) $(FLEXXX_FLAGS) -h$*.h -o$*.cc $<
 
-.ll.cc:
+.ll.cc: $(FLEXXX_DEPS)
 	$(FLEXXX) $(FLEXXX_FLAGS) -h$*.h -o$*.cc $<
 
-.yy.cc:
+.yy.cc: $(BISONXX_DEPS)
 	$(BISONXX) $(BISONXX_FLAGS) -o $*.cc -h $*.h  $<
 
-.yy.h:
+.yy.h: $(BISONXX_DEPS)
 	$(BISONXX) $(BISONXX_FLAGS) -o $*.cc -h $*.h  $<
 
 ##-----------------------------------------------------------------------

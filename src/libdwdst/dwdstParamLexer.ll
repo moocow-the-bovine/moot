@@ -105,8 +105,17 @@ textorsp   [^\n\r\t]
 
 ({whitespace}*)"\t"({whitespace}*) {
   // -- tab: return the current token-buffer
-  theColumn += yyleng;
+  //theColumn += yyleng+7; // -- interpret tab as 8 spaces
+  theColumn += yyleng; // -- interpret tab as 8 spaces
   return '\t';
+}
+
+([\-\+]?)([0-9]*)(\.?)([0-9]+) {
+  // -- count : return it
+  //theLine++; theColumn = 0;
+  theColumn += yyleng;
+  yylval->count = atof((const char *)yytext);
+  return dwdstParamParser::COUNT;
 }
 
 {textchar}({textorsp}*{textchar})? {
@@ -114,13 +123,6 @@ textorsp   [^\n\r\t]
   theColumn += yyleng;
   yylval->symstr = new FSMSymbolString((const char *)yytext);
   return dwdstParamParser::REGEX;
-}
-
-([\-\+]?)([0-9]*)(\.?)([0-9]+) {
-  // -- count : return it
-  theLine++; theColumn = 0;
-  yylval->count = atof((const char *)yytext);
-  return dwdstParamParser::COUNT;
 }
 
 {newline} {
