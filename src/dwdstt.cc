@@ -16,15 +16,6 @@ using namespace std;
  *--------------------------------------------------------------------------*/
 
 /*
- * dwds_tagger_trainer::dwds_tagger_trainer(FSM *mymorph=NULL, FSMSymSpec *mysmys=NULL)
- */
-dwds_tagger_trainer::dwds_tagger_trainer(FSM *mymorph, FSMSymSpec *mysyms)
-{
-    kmax = 2;
-}
-
-
-/*
  * dwds_tagger_trainer::~dwds_tagger_trainer()
  */
 dwds_tagger_trainer::~dwds_tagger_trainer()
@@ -34,7 +25,20 @@ dwds_tagger_trainer::~dwds_tagger_trainer()
 }
 
 /*--------------------------------------------------------------------------
- * Tagging Methods
+ * Unknown-Analysis FSA generation
+ *--------------------------------------------------------------------------*/
+
+/*
+ * FSM *dwds_tagger_trainer::generate_unknown_fsa(set<FSMSymbol> pos_tags);
+ */
+FSM *dwds_tagger_trainer::generate_unknown_fsa(set<FSMSymbol> pos_tags)
+{
+  // ???
+  return ufsa;
+}
+
+/*--------------------------------------------------------------------------
+ * Training Methods
  *--------------------------------------------------------------------------*/
 
 /*

@@ -31,17 +31,21 @@ private:
 
   // -- data members
 public:
+  int kmax;
   StringToCountTable strings2counts;
   StringWeightQueue  stringq;
-  int kmax;
+  FSM                *ufsa;
   
 private:
 
   // -- methods
 public:
   // -- public methods: constructor/destructor
-  dwds_tagger_trainer(FSM *mymorph=NULL, FSMSymSpec *mysyms=NULL);
+  dwds_tagger_trainer(FSM *mymorph=NULL, FSMSymSpec *mysyms=NULL) : kmax(2), ufsa(NULL) {};
   ~dwds_tagger_trainer();
+
+  // -- public methods: unknown FSM generation
+  FSM *generate_unknown_fsa(set<FSMSymbol> pos_tags);
 
   // -- public methods: training
   bool train_from_strings(int argc, char **argv, FILE *out=stdout);
