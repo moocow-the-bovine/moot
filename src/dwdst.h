@@ -9,6 +9,10 @@
 #ifndef _DWDST_H_
 #define _DWDST_H_
 
+#define DWDST_DEBUG
+//#undef DWDST_DEBUG
+
+
 #ifdef HAVE_CONFIG_H
 # include "nopackage.h"
 # include <config.h>
@@ -62,9 +66,14 @@ private:
   set<FSMSymbol>        fsm_tags_tmp;
 
 protected:
+  // -- file variables
+  FILE *infile;
+  FILE *outfile;
+
   // -- temporary variables
   FSM *result, *tmp;
   FSMSymbolString s;
+  char *token;
 
   // -- all features, string-mode
   set<FSMStringWeight> results;
@@ -111,6 +120,9 @@ public:
   bool tag_strings(int argc, char **argv, FILE *out=stdout);
   bool tag_stream(FILE *in=stdin, FILE *out=stdout);
 
+  // -- public methods: mid-level: tagging : i/o
+  inline void tag_token(void);
+
   // -- public methods: sanity checks
   bool can_tag(void) const { return morph && syms; }
 
@@ -121,6 +133,3 @@ public:
 };
 
 #endif // _DWDST_H_
-
-
-

@@ -125,6 +125,75 @@ dwds_tagger::~dwds_tagger() {
 }
 
 /*--------------------------------------------------------------------------
+ * Tagging Macros
+ *--------------------------------------------------------------------------*/
+
+/*
+ * inline void dwds_tagger::tag_token(void)
+ *  + tags the input-token in this->token
+ *  + ouputs to this->outfile
+ *  + formats according to this->want_* data members
+ */
+inline void dwds_tagger::tag_token(void)
+{
+  tmp->fsm_clear();
+  s = (char *)token;
+  result = morph->fsm_lookup(s,tmp,true);
+  
+  fputs(token, outfile);
+  if (want_features) {
+    /*-- all features */
+    results.clear();
+    
+    /*--all features, strings */
+    tmp->fsm_strings(syms, &results, false, want_avm);
+    if (verbose && results.empty()) nunknown++;
+    if (want_tnt_format) {
+      /*-- all features, one tok/line */
+      for (ri = results.begin(); ri != results.end(); ri++) {
+	fputs("\t", outfile);
+	fputs(ri->istr.c_str(), outfile);
+	if (ri->weight) fprintf(outfile, "<%f>", ri->weight);
+      }
+      fputc('\n',outfile);
+    } else { /*-- want_tnt_format */
+      /*-- all features, madwds-style */
+      fprintf(outfile, ": %d Analyse(n)\n", results.size());
+      for (ri = results.begin(); ri != results.end(); ri++) {
+	fputs("\t", outfile);
+	fputs(ri->istr.c_str(), outfile);
+	fprintf(outfile, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
+      }
+      fputc('\n',outfile);
+    }
+  } else { /*-- want_features */
+    /*-- tags only, strings */
+    tagresults.clear();
+    get_fsm_tag_strings(tmp, &tagresults);
+    if (verbose && tagresults.empty()) nunknown++;
+    
+    if (want_tnt_format) {
+      /*-- tags-only, one tok/line */
+      for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
+	fputc('\t', outfile);
+	fputs(*(tri->c_str()) == '_' ? tri->c_str()+1 : tri->c_str(), outfile);
+      }
+      fputc('\n', outfile);
+    } else { /*-- want_tnt_format */
+      /*-- tags-only, madwds native format */
+      fprintf(outfile, ": %d Analyse(n)\n", tagresults.size());
+      for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
+	fputs("\t[", outfile);
+	fputs(tri->c_str(), outfile);
+	fputs("]\n", outfile);
+      }
+      fputc('\n',outfile);
+    }
+  }
+}
+
+
+/*--------------------------------------------------------------------------
  * Tagging Methods
  *--------------------------------------------------------------------------*/
 
@@ -140,6 +209,10 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
     fprintf(stderr, "dwds_tagger::tag_stream(): cannot run uninitialized tagger!\n");
     return false;
   }
+
+  // -- files
+  infile = in;
+  outfile = out;
 
   lexer.step_streams(in,out);
   while ((tok = lexer.yylex()) != DTEOF) {
@@ -159,62 +232,15 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
       if (verbose) ntokens++;
 
       tmp->fsm_clear();
-      s = (char *)lexer.yytext;
-      result = morph->fsm_lookup(s,tmp,true);  // v0.0.2 -- getting leaks here!
-
-      fputs((char *)lexer.yytext, out);
-
-      if (want_features) {
-	// -- all features
-	results.clear();
-	// -- all features, strings
-	tmp->fsm_strings(syms, &results, false, want_avm);
-	if (verbose && results.empty()) nunknown++;
-
-	if (want_tnt_format) {
-	  // -- all features, one tok/line
-	  for (ri = results.begin(); ri != results.end(); ri++) {
-	    fputs("\t", out);
-	    fputs(ri->istr.c_str(), out);
-	    if (ri->weight) fprintf(out, "<%f>", ri->weight);
-	  }
-	  fputc('\n',out);
-	} else { // want_tnt_format
-	  // -- all features, madwds-style
-	  fprintf(out, ": %d Analyse(n)\n", results.size());
-	  for (ri = results.begin(); ri != results.end(); ri++) {
-	    fputs("\t", out);
-	    fputs(ri->istr.c_str(), out);
-	    fprintf(out, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
-	  }
-	  fputc('\n',out);
-	} 
-      } else { // want_features
-	// -- tags only, strings
-	tagresults.clear();
-	get_fsm_tag_strings(tmp, &tagresults);
-	if (verbose && tagresults.empty()) nunknown++;
-	
-	if (want_tnt_format) {
-	  // -- tags-only, one tok/line
-	  for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
-	    fputc('\t', out);
-	    fputs(*(tri->c_str()) == '_' ? tri->c_str()+1 : tri->c_str(), out);
-	  }
-	  fputc('\n', out);
-	} else { // want_tnt_format
-	  // -- tags-only, madwds native format
-	  fprintf(out, ": %d Analyse(n)\n", tagresults.size());
-	  for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
-	    fputs("\t[", out);
-	    fputs(tri->c_str(), out);
-	    fputs("]\n", out);
-	  }
-	  fputc('\n',out);
-	}
-      }
+      token = (char *)lexer.yytext;
+      tag_token();
     }
   }
+
+  // -- cleanup
+  infile = NULL;
+  outfile = NULL;
+
   return true;
 }
 
@@ -228,69 +254,24 @@ bool dwds_tagger::tag_strings(int argc, char **argv, FILE *out=stdout)
     fprintf(stderr, "dwds_tagger::tag_strings(): cannot run uninitialized tagger!\n");
     return false;
   }
+
+  // -- files
+  infile = NULL;
+  outfile = out;
   
   // -- ye olde guttes
   for ( ; --argc >= 0; argv++) {
     // -- verbosity
     if (verbose) ntokens++;
 
-    tmp->fsm_clear();
-    results.clear();
-    s = *argv;
-
-    result = morph->fsm_lookup(s,tmp,true);
-
-    fputs(*argv, out);
-    if (want_features) {
-      // -- all features
-      results.clear();
-
-      // -- all features, strings
-      tmp->fsm_strings(syms, &results, false, want_avm);
-      if (verbose && results.empty()) nunknown++;
-      if (want_tnt_format) {
-	// -- all features, one tok/line
-	for (ri = results.begin(); ri != results.end(); ri++) {
-	  fputs("\t", out);
-	  fputs(ri->istr.c_str(), out);
-	  if (ri->weight) fprintf(out, "<%f>", ri->weight);
-	}
-	fputc('\n',out);
-      } else { // want_tnt_format
-	// -- all features, madwds-style
-	fprintf(out, ": %d Analyse(n)\n", results.size());
-	for (ri = results.begin(); ri != results.end(); ri++) {
-	  fputs("\t", out);
-	  fputs(ri->istr.c_str(), out);
-	  fprintf(out, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
-	}
-	fputc('\n',out);
-      } 
-    } else { // want_features
-      // -- tags only, strings
-      tagresults.clear();
-      get_fsm_tag_strings(tmp, &tagresults);
-      if (verbose && tagresults.empty()) nunknown++;
-      
-      if (want_tnt_format) {
-	// -- tags-only, one tok/line
-	for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
-	  fputc('\t', out);
-	  fputs(*(tri->c_str()) == '_' ? tri->c_str()+1 : tri->c_str(), out);
-	}
-	fputc('\n', out);
-      } else { // want_tnt_format
-	// -- tags-only, madwds native format
-	fprintf(out, ": %d Analyse(n)\n", tagresults.size());
-	for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
-	  fputs("\t[", out);
-	  fputs(tri->c_str(), out);
-	  fputs("]\n", out);
-	}
-	fputc('\n',out);
-      }
-    }
+    token = *argv;
+    tag_token();
   }
+
+  // -- cleanup
+  infile = NULL;
+  outfile = NULL;
+
   return true;
 }
 
