@@ -30,6 +30,11 @@ int main (int argc, char **argv) {
   ng.push_back("X");
   fprintf(stderr, "lookup(a,b,X) = %g\n", ngrams.lookup(ng));
 
+  ng.clear();
+  ng.push_back("__$");
+  ng.push_back("VMFIN");
+  ng.push_back("NN");
+  fprintf(stderr, "lookup(__$,VMFIN,NN) = %g\n", ngrams.lookup(ng));
 
 
   if (!ngrams.save(stdout, "STDOUT", compact)) {

@@ -3,6 +3,7 @@ dwdspp.pod
 dwdst.pod
 dwdst-pargen.pod
 dwdst-fstgen.pod
+dwdshmm.pod
 *.gog
 *.html
 *.txt

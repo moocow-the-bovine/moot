@@ -16,7 +16,7 @@
 // -- ... so we define yyltype ourselves ... (see %header section)
 %define LTYPE dwdstNgramsParserLType
 
-// -- debugging (see below)
+// -- debugging (see below (where?))
 %define DEBUG 1
 %define ERROR_VERBOSE
 
@@ -146,9 +146,8 @@ param:		ngram tab count newline
 		{
 		  // -- single-parameter: add the parsed parameter to our table
 		  ngrams->add_count(curngram, $3);
-                  // -- remember current ngram
+                  // -- remember that we've read this ngram
                   prevngram.swap(curngram);
-                  //prevngram = curngram;
 		  // -- ... and then clear it
 		  curngram.clear();
 		  $$ = 0;
@@ -183,7 +182,8 @@ ngtag:		/* empty */
 		    // -- single tag: add it to the current ngram
 		    curngram.push_back(*$1);
                     delete $1;
-                    // -- pop previous ngram for purity
+
+                    // -- pop previous ngram if we can, for purity
                     if (!prevngram.empty()) prevngram.pop_front();
                     $$ = &curngram;                  
 		}

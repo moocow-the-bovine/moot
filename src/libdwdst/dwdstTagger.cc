@@ -154,6 +154,10 @@ bool dwdstTagger::tag_stream(FILE *in, FILE *out, char *infilename)
       tag_eos();
       break;
 
+    case dwdstTaggerLexer::TAG:
+    case dwdstTaggerLexer::EOT:
+      break;
+
     case dwdstTaggerLexer::TOKEN:
     default:
       if (track_statistics) ntokens++;

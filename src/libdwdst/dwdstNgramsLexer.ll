@@ -86,7 +86,7 @@
  *----------------------------------------------------------------------*/
 newline    [\n\r]
 nonnewline [^\n\r]
-whitespace [ \t]
+whitespace [ ]
 textchar   [^ \n\r\t]
 textorsp   [^\n\r\t]
 

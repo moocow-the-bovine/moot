@@ -1,6 +1,7 @@
 dwdspp
 dwdst
 dwdstt
+dwdshmm
 dwdst-pargen
 dwdst-fstgen
 *.pod
@@ -11,7 +12,11 @@ dwdst-fstgen
 *.apar
 *.tpar
 *.atpar
+*.ttt
 *.tt
+*.t
+negra*.lex
+negra*.123
 *.pp
 *.out
 *.tmp

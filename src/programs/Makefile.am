@@ -17,7 +17,7 @@
 
 ## --- executable programs
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
-bin_PROGRAMS = dwdspp dwdst
+bin_PROGRAMS = dwdspp dwdst dwdshmm
 
 old_programs = dwdst-fstgen dwdst-pargen
 
@@ -46,6 +46,12 @@ dwdspp_SOURCES = \
 	dwdspp_main.cc \
 	dwdspp_cmdparser.cc dwdspp_cmdparser.h
 
+dwdshmm_SOURCES = \
+	cmdutil.cc cmdutil.h \
+	hmmutil.cc hmmutil.h \
+	dwdshmm_main.cc \
+	dwdshmm_cmdparser.cc dwdshmm_cmdparser.h
+
 dwdst_SOURCES = \
 	cmdutil.cc cmdutil.h \
 	dwdst_main.cc \
@@ -57,6 +63,7 @@ dwdst_SOURCES = \
 
 ## --- Additional dependencies
 dwdspp_main.o: dwdspp_cmdparser.h
+dwdshmm_main.o: dwdshmm_cmdparser.h hmmutil.h
 dwdst_main.o: dwdst_cmdparser.h
 
 ##-----------------------------------------------------------------------
@@ -150,6 +157,9 @@ dwdspp_LDADD = $(LDADD_COMMON)
 dwdst_LDFLAGS = $(LDFLAGS_COMMON)
 dwdst_LDADD = $(LDADD_COMMON)
 
+dwdshmm_LDFLAGS = $(LDFLAGS_COMMON)
+dwdshmm_LDADD = $(LDADD_COMMON)
+
 #${lib_i}_la_LDFLAGS = -L. -version-info ${lib_i_current}:${lib_i_rev}:${lib_i_age}
 #${lib_i}_LIBADD     = -lotherlib
 
@@ -179,7 +189,8 @@ MAINTAINERCLEANFILES = \
 ## --- extra distribution files
 EXTRA_DIST = \
 	dwdst.gog \
-	dwdspp.gog
+	dwdspp.gog \
+	dwdshmm.gog
 
 #	dwdst.sym
 

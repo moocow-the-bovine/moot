@@ -1,4 +1,4 @@
-EOS	4
+__$	4
 	ATAG	2
 	BTAG	1
 	CTAG	1
@@ -14,4 +14,4 @@ CTAG	5
 	ATAG	1
 	BTAG	1
 	CTAG	1
-	EOS	2
+	__$	2

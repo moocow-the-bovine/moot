@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.5)
 
-AC_INIT(dwdst, [1.0.0-pre2], [moocow@ling.uni-potsdam.de])
+AC_INIT(dwdst, [1.0.0-pre3], [moocow@ling.uni-potsdam.de])
 
 dnl source && aux dir
 AC_CONFIG_AUX_DIR(config)
@@ -10,7 +10,7 @@ dnl canonical target (sets $target, $target_(cpu|vendor|os) : used for bindist)
 AC_CANONICAL_TARGET
 
 dnl use automake
-AM_INIT_AUTOMAKE(dwdst, [1.0.0-pre2])
+AM_INIT_AUTOMAKE(dwdst, [1.0.0-pre3])
 
 dnl use autoheader
 AM_CONFIG_HEADER([src/libdwdst/dwdstConfig.h])
@@ -284,7 +284,7 @@ if test "$dwdst_doc_formats" != "none" ; then
 
   ### -- docs: .gog file linkup
   #dwdst_program_gogs="dwdst.gog dwdspp.gog dwdst-fstgen.gog dwdst-pargen.gog"
-  dwdst_program_gogs="dwdst.gog dwdspp.gog"
+  dwdst_program_gogs="dwdst.gog dwdspp.gog dwdshmm.gog"
   for g in $dwdst_program_gogs ; do
     AC_CONFIG_LINKS(doc/programs/${g}:src/programs/${g})  
   done
@@ -447,7 +447,8 @@ if test "$enable_debug" == "yes" ; then
 else
   AC_MSG_RESULT(no)
   #DWDST_OFLAGS="-O2"
-  DWDST_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
+  #DWDST_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
+  DWDST_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops"
 fi
 AC_SUBST(DWDST_OFLAGS)
 

@@ -50,8 +50,25 @@ README.txt
 configure
 graveyard
 
-negra.lex
-negra.123
+negra*
+*.hmm
+*.lfr
+*.123
+*.t
+*.tt
+*.ttt
+*.out
+
+DWDS
+DWDS-POS
 
 prof
 save
+
+hmmtest
+isalph-test
+ngchurn
+lxchurn
+test.*
+*test
+

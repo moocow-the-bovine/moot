@@ -7,9 +7,16 @@
 #include "dwdstNgrams.h"
 #include "dwdstHMM.h"
 
+#define ESTIMATE_LAMBDAS 1
+
+//#define UNKNOWN_LEX_THRESH 0
+#define UNKNOWN_LEX_THRESH 1
+
+
 dwdstLexfreqs lf;
 dwdstNgrams   ng;
-dwdstHMM hmm;
+dwdstHMM     hmm;
+
 
 int main (int argc, char **argv) {
   char *progname = *argv;
@@ -40,11 +47,20 @@ int main (int argc, char **argv) {
 
   //-- compile HMM
   fprintf(stderr, "%s: compiling HMM... ", progname);
-  if (!hmm.compile(lf,ng,"",1)) {
+  if (!hmm.compile(lf, ng, "", UNKNOWN_LEX_THRESH)) {
     fprintf(stderr, "FAILED.\n");
     exit(3);
   }
   fprintf(stderr, "compiled.\n");
+
+#ifdef ESTIMATE_LAMBDAS
+  fprintf(stderr, "%s: using estimated lambdas.\n", progname);
+#else
+  //-- dont't estimate lambdas: use constants
+  fprintf(stderr, "%s: NOT estimating lambdas.\n", progname);
+  hmm.nglambda1 = 0.0;
+  hmm.nglambda2 = 1.0;
+#endif /* ESTIMATE_LAMBDAS */
 
   fprintf(stderr, "Done. (Press return to dump) ");
   fgetc(stdin);
@@ -52,5 +68,3 @@ int main (int argc, char **argv) {
   hmm.txtdump(stdout);
   return 0;
 }
-
-

@@ -21,6 +21,7 @@ void dwdstLexfreqs::clear(void)
 {
   lftable.clear();
   lftotals.clear();
+  lftags.clear();
 }
 
 /*----------------------------------------------------------------------

@@ -71,6 +71,14 @@ public:
     clear();
   };
 
+  //------ access
+  /** Set the 'unknown' name */
+  inline void unknown_name(const NameType &name)
+  {
+    names2ids[name] = 0;
+    ids2names[0] = name;
+  };
+
   //------ sanity checking
   /** Check whether 'name' is a registered name. */
   inline bool nameExists(const NameType &name) const

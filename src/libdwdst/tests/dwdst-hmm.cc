@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+#include <sys/time.h>
 
 #include <string>
 
@@ -17,48 +19,60 @@ dwdstNgrams   ng;
 dwdstHMM     hmm;
 dwdstTaggerLexer lexer;
 
-#define ESTIMATE_LAMBDAS 1
-
-void hmm_vdump(const char *token, bool dostep=true) {
-  dwdstTokString tokstr = token;
-  dwdstEnumID    tokid = hmm.tokids.name2id(tokstr);
-  printf("----------------Token: '%s'  ; id=%u ; name='%s'\n",
-	 tokstr.c_str(), tokid, hmm.tokids.id2name(tokid).c_str());
-  if (dostep) {
-    hmm.viterbi_step(tokstr);
-  }
-  hmm.viterbi_txtdump(stdout);
-  printf("\n");
-}
-
+timeval t1, t2, t3;
 
 vector<string> tokens;
-void dump_best(bool force_eos=false) {
+
+
+#define ESTIMATE_LAMBDAS 1
+//#define USE_TNT_LAMBDAS  1
+//#define USE_FLAT_WORDPROBS 1
+
+#define UNKNOWN_LEX_THRESH 1
+//#define UNKNOWN_LEX_THRESH 0
+
+#define USE_TRIGRAMS
+
+
+#ifndef ESTIMATE_LAMBDAS
+
+# ifdef USE_FLAT_WORDPROBS
+   const double WLAMBDA1 = 1.0;
+   const double WLAMBDA2 = 0.0;
+# else // USE_FLAT_WORDPROBS
+# include <float.h>
+   const double WLAMBDA1 = 1 - DBL_EPSILON;
+   const double WLAMBDA2 = DBL_EPSILON;
+# endif // USE_FLAT_WORDPROBS
+
+# ifdef USE_TNT_LAMBDAS
+const double NGLAMBDA1 = 0.1684092;
+const double NGLAMBDA2 = 0.8315908;
+# else
+const double NGLAMBDA1 = 0.0;
+const double NGLAMBDA2 = 1.0;
+# endif // USE_TNT_LAMBDAS
+
+#endif // ESTIMATE_LAMBDAS
+
+
+void dump_best(void) {
   //-- print intermediate best path
 
-  dwdstHMM::ViterbiPath path;
-  if (force_eos) {
-    tokens.push_back("(EOS)");
-    path = hmm.viterbi_best_path(hmm.start_tagid);
-  } else {
-    path = hmm.viterbi_best_path();
-  }
-
-  printf("\n------------------------------------------------\n");
-  printf("Best Path (p=%g)", path.size() == 0 ? 0 : path.back()->prob);
-  printf("\nvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n");
-
+  const dwdstHMM::ViterbiPath &path = hmm.viterbi_best_path();
   unsigned i;
+
   for (i = 0; i < tokens.size(); i++) {
     if (i >= path.size()) {
-      printf("--------Error: no tag for %u-th token '%s'!\n", i, tokens[i].c_str());
+      fprintf(stderr, "--------Error: no tag for %u-th token '%s'!\n", i, tokens[i].c_str());
+      printf("%s\t%s\n", tokens[i].c_str(), "<UNKNOWN>");
       continue;
     }
     printf("%s\t%s\n",
 	   tokens[i].c_str(),
-	   hmm.tagids.id2name(path[i]->tagid).c_str());
+	   hmm.tagids.id2name(path[i+1]->tagid).c_str());
   }
-  printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n");
+  printf("\n");
 }
 
 
@@ -68,11 +82,13 @@ int main (int argc, char **argv) {
     fprintf(stderr, "Usage: %s LEXFREQS NGRAMS [TNTFILE]\n", progname);
     exit(1);
   }
+
+  gettimeofday(&t1, NULL);
+
   char *lexfile = *(++argv);
   char *ngfile  = *(++argv);
   char *infilename  = "-";
   FILE *infile = stdin;
-
   if (argc > 3) {
     infilename = *(++argv);
     infile = fopen(infilename, "r");
@@ -83,7 +99,7 @@ int main (int argc, char **argv) {
   }
 
   //-- report add_one_hack status
-  printf("%s: DWDST_ADD_ONE_HACK %s\n",
+  fprintf(stderr, "%s: DWDST_ADD_ONE_HACK %s\n",
 	 progname,
 #ifdef DWDST_ADD_ONE_HACK
 	 "enabled"
@@ -112,74 +128,84 @@ int main (int argc, char **argv) {
 
   //-- compile HMM
   fprintf(stderr, "%s: compiling HMM... ", progname);
-  if (!hmm.compile(lf,ng,"__$",1)) {
+  if (!hmm.compile(lf, ng, "__$", UNKNOWN_LEX_THRESH)) {
     fprintf(stderr, "FAILED.\n");
     exit(3);
   }
   fprintf(stderr, "compiled.\n");
 
   //-- set lambdas
-#ifndef ESTIMATE_LAMBDAS
-  fprintf(stderr, "%s: NOT estimating lambdas.\n", progname);
-  hmm.nglambda1 = 0.0;
-  hmm.nglambda2 = 1.0;
-  hmm.wlambda1  = 1.0;
-  hmm.wlambda2  = 0.0;
+#ifdef ESTIMATE_LAMBDAS
+  fprintf(stderr, "%s: using estimated lambdas.\n", progname);
+#else
+  fprintf(stderr, "%s: NOT using estimated lambdas.\n", progname);
+  hmm.nglambda1 = NGLAMBDA1;
+  hmm.nglambda2 = NGLAMBDA2;
+# ifdef USE_TRIGRAMS
+   hmm.nglambda3 = NGLAMBDA3;
+# endif /* USE_TRIGRAMS */
+  hmm.wlambda1  = WLAMBDA1;
+  hmm.wlambda2  = WLAMBDA2;
 #endif /* ESTIMATE_LAMBDAS */
 
   //--report
   fprintf(stderr, "%s: start_tag=%u(\"%s\")\n",
 	  progname, hmm.start_tagid, hmm.tagids.id2name(hmm.start_tagid).c_str());
+  fprintf(stderr, "%s: unknownLexThreshhold=%u\n", progname, UNKNOWN_LEX_THRESH);
   fprintf(stderr, "%s: wlambda1=%g\n", progname, hmm.wlambda1);
   fprintf(stderr, "%s: wlambda2=%g\n", progname, hmm.wlambda2);
   fprintf(stderr, "%s: nglambda1=%g\n", progname, hmm.nglambda1);
   fprintf(stderr, "%s: nglambda2=%g\n", progname, hmm.nglambda2);
-
-
-  fprintf(stderr, "%s: reading input:\n", progname);
+#ifdef USE_TRIGRAMS
+  fprintf(stderr, "%s: nglambda3=%g\n", progname, hmm.nglambda3);
+#endif
+  fprintf(stderr, "%s: reading input... \n", progname);
 
   //--prepare lexer
   lexer.step_streams(infile,stdout);
   lexer.theLine = 1;
   lexer.theColumn = 0;
 
-  //--prepare tokens
-  tokens.push_back("(BOS)");
-  hmm.viterbi_clear();
-
-  //--preliminary dump
-  hmm_vdump("--BOF--", false);
-
   //--prepare vars
   int tok;
+  size_t ntoks = 0;
+
+  gettimeofday(&t2, NULL);
+
   while ((tok = lexer.yylex()) != dwdstTaggerLexer::DTEOF) {
       switch (tok) {
       case dwdstTaggerLexer::EOS:
-	//hmm.viterbi_step(0,hmm.start_tagid);
 	hmm.viterbi_finish();
-	hmm_vdump("(EOS)", false);
-	
-	dump_best(true);
+	dump_best();
 	tokens.clear();
-	tokens.push_back("(BOS)");
-
 	hmm.viterbi_clear();
-	hmm_vdump("(BOS)", false);
 	break;
 
       case dwdstTaggerLexer::TOKEN:
-	hmm_vdump((const char *)lexer.yytext, true);
 	tokens.push_back((const char *)lexer.yytext);
-
-	dump_best();
+	hmm.viterbi_step((const char *)lexer.yytext);
+	ntoks++;
 	break;
 
       default:
-	fprintf(stderr, "%s: Error: unknown token '%s' at line %d, column %d\n",
+	fprintf(stderr,
+		"%s: Error: unknown token '%s' at line %d, column %d\n",
 		progname, lexer.yytext, lexer.theLine, lexer.theColumn);
 	break;
       }
   }
+
+  //-- Summarize
+  gettimeofday(&t3, NULL);
+
+  double ielapsed = (t2.tv_sec-t1.tv_sec + (double)(t2.tv_usec-t1.tv_usec)/1000000.0);
+  double relapsed = (t3.tv_sec-t2.tv_sec + (double)(t3.tv_usec-t2.tv_usec)/1000000.0);
+
+  fprintf(stderr, "\n%s Summary:\n", progname);
+  fprintf(stderr, "   Tokens Processed : %u tok\n", ntoks);
+  fprintf(stderr, "    Initialize time : %.2f sec\n", ielapsed);
+  fprintf(stderr, "    Processing time : %.2f sec\n", relapsed);
+  fprintf(stderr, "         Throughput : %.2f tok/sec\n", (double)ntoks/relapsed);
 
   return 0;
 }

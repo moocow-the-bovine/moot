@@ -51,7 +51,7 @@ public:
   };
 
 
-  /** Actual Lexeme->(Tag->Count) lookup table typedef */
+  /** Lookup table:  Lexeme->(Tag->Count) */
   typedef
     hash_map<LexfreqKey,
 	     LexfreqCount,
@@ -59,18 +59,25 @@ public:
 	     LexfreqKeyEqualFcn>
     LexfreqStringTable;
 
+  /** Lookup table: Tag->Count */
+  typedef
+  hash_map<dwdstTagString,LexfreqCount> LexfreqTagTable;
+
 public:
   //------ public data
   /** lexeme->(tag->count) lookup table */
   LexfreqStringTable lftable;
   LexfreqTotalTable  lftotals;
+  LexfreqTagTable    lftags;
 
 public:
   //------ public methods
   /** Default constructor */
   dwdstLexfreqs(size_t initial_bucket_count=0)
   {
-    if (initial_bucket_count != 0) lftable.resize(initial_bucket_count);
+    if (initial_bucket_count != 0) {
+      lftable.resize(initial_bucket_count);
+    }
   };
 
   /** Default destructor */
@@ -100,6 +107,13 @@ public:
     } else {
       toti->second += count;
     }
+    //-- adjust tag-count
+    LexfreqTagTable::iterator tagi = lftags.find(key.second);
+    if (tagi == lftags.end()) {
+      lftags[key.second] = count;
+    } else {
+      tagi->second += count;
+    }
     //-- return
     return ti->second;
   };
@@ -120,21 +134,28 @@ public:
   {
     LexfreqStringTable::const_iterator ti = lftable.find(key);
     return ti == lftable.end() ? 0 : ti->second;
-  }; //-- lookup
+  }; //-- lookup(key)
 
   /** Returns current count for (token,tag), returns 0 if unknown */
   inline const LexfreqCount lookup(const dwdstTokString &token, const dwdstTagString &tag) const
   {
     return lookup(LexfreqKey(token,tag));
-  }; //-- lookup
+  }; //-- lookup(token,tag)
 
   /** Returns current total count for token, returns 0 if unknown */
   inline const LexfreqCount lookup(const dwdstTokString &token) const
   {
     LexfreqTotalTable::const_iterator toti = lftotals.find(token);
     return toti == lftotals.end() ? 0 : toti->second;
-  }; //-- lookup
+  }; //-- lookup(token)
 
+
+  /** Returns current total count for tag, returns 0 if unknown */
+  inline const LexfreqCount taglookup(const dwdstTagString &tag) const
+  {
+    LexfreqTagTable::const_iterator tagi = lftags.find(tag);
+    return tagi == lftags.end() ? 0 : tagi->second;
+  }; //-- taglookup(tag)
 
   //------ public methods: i/o
 
