@@ -30,8 +30,10 @@
 class dwds_tagger {
 public:
   // -- public data
-  FSM *morph;
   FSMSymSpec *syms;
+  FSM *morph;
+  FSM *ufsa;        // -- FSA for unknown-token analyses
+  FSM *dfsa;        // -- disambiguation FSA
 
   dwdst_lexer lexer;
 
@@ -53,8 +55,10 @@ public:
 private:
   // -- private data
   // -- flags
-  bool i_made_morph;
   bool i_made_syms;
+  bool i_made_morph;
+  bool i_made_ufsa;
+  bool i_made_dfsa;
   set<FSMSymbol>        fsm_tags_tmp;
 
 protected:
@@ -82,13 +86,27 @@ protected:
 
 public:
   // -- public methods: constructor/destructor
-  dwds_tagger(FSM *mymorph=NULL, FSMSymSpec *mysyms=NULL);
+  dwds_tagger(FSMSymSpec *mysyms=NULL, FSM *mymorph=NULL);
   ~dwds_tagger();
 
   // -- public methods: loading
   FSMSymSpec *load_symbols(char *syms_file);
-  FSM *load_morph(char *morph_file);
-  
+  FSM *load_morph(char *morph_file)
+  {
+    return load_fsm_file(morph_file, &morph, &i_made_morph);
+  }
+  FSM *load_unknown_fsa(char *ufsa_file)
+  {
+    return load_fsm_file(ufsa_file, &ufsa, &i_made_ufsa);
+  }
+  FSM *load_disambig_fsa(char *dfsa_file)
+  {
+    return load_fsm_file(dfsa_file, &dfsa, &i_made_dfsa);
+  }
+
+  // -- low-level public methods: loading
+  FSM *load_fsm_file(char *fsm_file, FSM **fsm, bool *i_made_fsm=NULL);
+
   // -- public methods: tagging
   bool tag_strings(int argc, char **argv, FILE *out=stdout);
   bool tag_stream(FILE *in=stdin, FILE *out=stdout);

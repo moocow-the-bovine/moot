@@ -23,15 +23,17 @@ using namespace std;
  *--------------------------------------------------------------------------*/
 
 /*
- * dwds_tagger::dwds_tagger(FSM *mymorph=NULL, FSMSymSpec *mysmys=NULL)
+ * dwds_tagger::dwds_tagger(FSMSymSpec *mysmys=NULL, FSM *mymorph=NULL)
  */
-dwds_tagger::dwds_tagger(FSM *mymorph, FSMSymSpec *mysyms)
+dwds_tagger::dwds_tagger(FSMSymSpec *mysyms, FSM *mymorph)
 {
   // -- public data
   morph = mymorph;
   syms = mysyms;
-  eos = "<<EOS>>";
-  wdsep = "=";
+  eos = "--EOS--";
+  wdsep = " ";
+  ufsa = NULL;
+  dfsa = NULL;
 
   // -- public flags
   want_avm = false;
@@ -43,6 +45,8 @@ dwds_tagger::dwds_tagger(FSM *mymorph, FSMSymSpec *mysyms)
   // -- private data
   i_made_morph = false;
   i_made_syms = false;
+  i_made_ufsa = false;
+  i_made_dfsa = false;
 
   // -- temporary variables
   tmp = new FSM();
@@ -75,18 +79,18 @@ FSMSymSpec *dwds_tagger::load_symbols(char *filename)
 }
 
 /*
- * dwds_tagger::load_morph(const char *filename)
+ * FSM *dwds_tagger::load_fsm_file(const char *filename, FSM **fsm, bool *i_made_fsm=NULL);
  */
-FSM *dwds_tagger::load_morph(char *filename)
+FSM *dwds_tagger::load_fsm_file(char *filename, FSM **fsm, bool *i_made_fsm=NULL)
 {
   int fsmtype;
 
   // -- cleanup old FSM first
-  if (morph && i_made_morph) morph->fsm_free();
+  if (*fsm && i_made_fsm && *i_made_fsm) (*fsm)->fsm_free();
 
-  morph = new FSM(filename);
-  fsmtype = morph->fsm_type();
-  if (!morph || !morph->representation()
+  *fsm = new FSM(filename);
+  fsmtype = (*fsm)->fsm_type();
+  if (!*fsm || !(*fsm)->representation()
       // HACK!
       || (fsmtype != FSMTypeTransducer &&
 	  fsmtype != FSMTypeWeightedTransducer &&
@@ -94,11 +98,11 @@ FSM *dwds_tagger::load_morph(char *filename)
 	  fsmtype != FSMTypeAcceptor &&
 	  fsmtype != FSMTypeWeightedAcceptor))
     {   
-      fprintf(stderr,"\ndwds_tagger::load_morph() Error: load failed for FST file '%s'.\n", filename);
-      morph = NULL; // -- invalidate the object
+      fprintf(stderr,"\ndwds_tagger::load_fsm_file() Error: load failed for FST file '%s'.\n", filename);
+      *fsm = NULL; // -- invalidate the object
     }
-  i_made_morph = true;
-  return morph;
+  if (i_made_fsm) { *i_made_fsm = true; }
+  return *fsm;
 }
 
 
@@ -107,11 +111,15 @@ FSM *dwds_tagger::load_morph(char *filename)
  */
 dwds_tagger::~dwds_tagger() {
   if (tmp) tmp->fsm_free();
-  if (morph && i_made_morph) morph->fsm_free();
   if (syms && i_made_syms) delete syms;
+  if (morph && i_made_morph) morph->fsm_free();
+  if (ufsa && i_made_ufsa) ufsa->fsm_free();
+  if (dfsa && i_made_dfsa) dfsa->fsm_free();
 
-  morph = NULL;
   syms = NULL;
+  morph = NULL;
+  ufsa = NULL;
+  dfsa = NULL;
   result = NULL;
   tmp = NULL;
 }

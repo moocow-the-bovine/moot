@@ -1,0 +1,25 @@
+# -*- Mode: Text -*-
+# gengetopt specification for 'dwdst-pargen'
+package "dwdst-pargen"
+purpose	"Parameter-file generator for use with the KDWDS Part-of-Speech tagger."
+
+# ------- Options
+
+# ---- Flags:
+option	"verbose"	v	"Specify verbosity level"		    int default="1"		no
+option  "list"		l       "Args are file-lists, not input filenames"  no
+option	"words"		w	"Args are input tokens, not filenames"	    no
+
+option	"tags-only"	 t	"Analyze only PoS tags, not morpho-syntactic features"			no
+option	"kgram-max"	 k	"Size of k-gram window"                     int default="2"		no
+option	"eos-string"	 e	"Use STRING as the EOS marker"		    string default="EOS"	no
+option  "word-separator" W      "Use STRING as the word-separator"          string default=" "          no
+
+# ---- Output
+option	"output"	 o	"Specify output file"			    string default="-"		no
+
+# --- Tagger-common arguments
+option	"symbols"	s	"Specify symbols file"			    string default="dwdst.sym"	no
+option	"morph"		m	"Specify morphological transducer"	    string default="dwdst.fst"	no
+#option	"morph"		m	"Specify morphological transducer"	    string default="dwdst-debug.fst"	no
+option  "unknown-fsa"	u	"Specify unknown-analysis input FSA file"   string default="dwdst-unknown.fst" no

@@ -1,16 +1,16 @@
 /* -*- Mode: C++ -*- */
 /*--------------------------------------------------------------------------
- * File: dwdstt.h
+ * File: dwdst_pargen.h
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + trainer for PoS tagger for DWDS project : shared headers
+ *   + Parameter-file generator for KDWDS PoS-tagger : shared headers
  *--------------------------------------------------------------------------*/
 
-#ifndef _DWDSTT_H_
-#define _DWDSTT_H_
+#ifndef _DWDST_PARGEN_H_
+#define _DWDST_PARGEN_H_
 
-//#define DWDSTT_DEBUG
-//#undef DWDSTT_DEBUG
+//#define DWDST_PARGEN_DEBUG
+//#undef DWDST_PARGEN_DEBUG
 
 #ifdef HAVE_CONFIG_H
 # include "nopackage.h"
@@ -21,15 +21,14 @@
 #include <deque>
 #include <set>
 
-#include "dwdst.h"
-#include "postag_lexer.h"
+#include "dwdst_fstgen.h"
 
 using namespace std;
 
 /*--------------------------------------------------------------------------
  * dwds_tagger : tagger-trainer class
  *--------------------------------------------------------------------------*/
-class dwds_tagger_trainer : public dwds_tagger {
+class dwds_param_generator : public dwds_fst_generator {
   // -- typedefs
 public:
   typedef hash_map<string,float> StringToCountTable;
@@ -41,9 +40,7 @@ public:
   int kmax;
   StringToCountTable    strings2counts;
   FSMSymbolStringQueue  stringq;
-  FSM                   *ufsa;
   set<FSMSymbolString>  tagset;
-  set<FSMSymbolString>  alltags;
 
 private:
   StringToCountTable::iterator sci;
@@ -51,14 +48,10 @@ private:
   // -- methods
 public:
   // -- public methods: constructor/destructor
-  dwds_tagger_trainer(FSM *mymorph=NULL, FSMSymSpec *mysyms=NULL) : kmax(2), ufsa(NULL) {};
-  ~dwds_tagger_trainer();
+  dwds_param_generator(FSM *mymorph=NULL, FSMSymSpec *mysyms=NULL) : kmax(2) {};
+  ~dwds_param_generator();
 
-  // -- public methods: unknown FSM generation
-  set<FSMSymbolString> get_pos_tags(const char *filename=NULL);
-  FSM *generate_unknown_fsa();
-
-  // -- public methods: training: output = DEBUG
+  // -- public methods: param-generation: (output-file = DEBUG)
   bool train_from_strings(int argc, char **argv, FILE *out=stdout);
   bool train_from_stream(FILE *in=stdin, FILE *out=stdout);
 
@@ -66,7 +59,7 @@ public:
   bool write_param_file(FILE *out=stdout);
 };
 
-#endif // _DWDSTT_H_
+#endif // _DWDST_PARGEN_H_
 
 
 

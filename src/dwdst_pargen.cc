@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------
- * File: dwdstt.cc
+ * File: dwdst_pargen.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
  *   + PoS tagger-trainer for DWDS project : the guts
@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include "dwdstt.h"
+#include "dwdst_pargen.h"
 
 using namespace std;
 
@@ -17,104 +17,13 @@ using namespace std;
  *--------------------------------------------------------------------------*/
 
 /*
- * dwds_tagger_trainer::~dwds_tagger_trainer()
+ * dwds_param_generator::~dwds_param_generator()
  */
-dwds_tagger_trainer::~dwds_tagger_trainer()
+dwds_param_generator::~dwds_param_generator()
 {
     strings2counts.clear();
     stringq.clear();
-    if (ufsa) ufsa->fsm_free();
-    ufsa = NULL;
 }
-
-/*--------------------------------------------------------------------------
- * Unknown-Analysis FSA generation
- *--------------------------------------------------------------------------*/
-
-/*
- * set<FSMSymbolString> dwds_tagger_trainer::get_pos_tags(const char *filename)
- */
-set<FSMSymbolString> dwds_tagger_trainer::get_pos_tags(const char *filename = NULL) {
-  set<FSMSymbolString>::iterator p;
-
-  // -- sanity check
-  if (!syms) {
-    fprintf(stderr, "dwds_tagger_trainer::get_pos_tags(): no symbols loaded!\n");
-    return tagset;
-  }
-
-  tagset.clear();
-
-  if (!filename) {
-    // -- default: all categories
-    const set<FSMSymbolString> *symbols = syms->symbols();
-    for (p = symbols->begin(); p != symbols->end(); p++) {
-      if (!syms->is_category(*p)) continue;
-      tagset.insert("_"+(*p));
-    }
-  } else {
-    // -- load from file
-    FILE *pos_file;
-    postag_lexer lexer;
-    FSMSymbolString s;
-    int  tok;
-    
-    if (!(pos_file = fopen(filename,"r"))) {
-      fprintf(stderr,"dwds_tagger_trainer::get_pos_tags(): could not open file '%s' for read.\n",
-	      filename);
-      return tagset;
-    }
-    // -- parse the pos-tag file
-    lexer.step_streams(pos_file,stdout);
-    while ((tok = lexer.yylex()) != PTEOF) {
-      switch (tok) {
-      case POSTAG:
-	s = (char *)lexer.yytext;
-	tagset.insert(s);
-      case PTEOF:
-	break;
-      default:
-	fprintf(stderr,"dwds_tagger_trainer::get_pos_tags(): Error in input file '%s'.\n",
-		filename);
-      }
-    }
-  }
-  return tagset;
-}
-
-/*
- * FSM *dwds_tagger_trainer::generate_unknown_fsa();
- */
-FSM *dwds_tagger_trainer::generate_unknown_fsa()
-{
-  FSMBaseRepresentation *urep;
-  FSMState q0, qi;
-
-  // -- ensure that ufsa exists
-  if (ufsa) ufsa->fsm_clear();
-  else {
-    ufsa = new FSM();
-    ufsa->set_fsm_type(false,false);
-  }
-
-  // -- add start state
-  urep = ufsa->representation();
-  q0 = urep->set_start_state(urep->add_state(urep->new_state()));
-
-  // -- return an FSA ambiguous between all tags in 'tagset' -- no features!
-  for (set<FSMSymbolString>::iterator p = tagset.begin(); p != tagset.end(); p++) {
-    qi = urep->add_state(urep->new_state());
-    urep->add_transition(q0, qi,
-			 syms->symbolname_to_symbol(*p), 
-			 syms->symbolname_to_symbol(*p),
-			 FSM_default_cost_structure.freecost());
-    urep->mark_state_as_final(qi);
-  }
-
-  return ufsa;
-}
-
-
 
 
 /*--------------------------------------------------------------------------
@@ -122,9 +31,9 @@ FSM *dwds_tagger_trainer::generate_unknown_fsa()
  *--------------------------------------------------------------------------*/
 
 /*
- * bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
+ * bool dwds_param_generator::train_from_stream(FILE *in, FILE *out)
  */
-bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
+bool dwds_param_generator::train_from_stream(FILE *in, FILE *out)
 {
   int tok, eosi;
   bool is_eos;
@@ -141,12 +50,9 @@ bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
 
   // -- sanity check
   if (!can_tag()) {
-    fprintf(stderr, "dwds_tagger_trainer::train_from_stream(): cannot run uninitialized trainer!\n");
+    fprintf(stderr, "dwds_param_generator::train_from_stream(): cannot run uninitialized trainer!\n");
     return false;
   }
-
-  // -- ensure that all-tags contains the tagset-tags
-  alltags.insert(tagset.begin(),tagset.end());
 
   // -- initialize string-sets
   for (eosi = 0; eosi < kmax; eosi++) {
@@ -254,9 +160,9 @@ bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
 }
 
 /*
- * bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=stdout)
+ * bool dwds_param_generator::train_from_strings(int argc, char **argv, FILE *out=stdout)
  */
-bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=stdout)
+bool dwds_param_generator::train_from_strings(int argc, char **argv, FILE *out=stdout)
 {
   int i;
   set<FSMSymbolString> *curtags;
@@ -272,12 +178,9 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
 
   // -- sanity check
   if (!can_tag()) {
-    fprintf(stderr, "dwds_tagger_trainer::train_from_strings(): cannot run uninitialized trainer!\n");
+    fprintf(stderr, "dwds_param_generator::train_from_strings(): cannot run uninitialized trainer!\n");
     return false;
   }
-
-  // -- ensure that all-tags contains the tagset-tags
-  alltags.insert(tagset.begin(),tagset.end());
 
   // -- initialize string-sets
   for (i = 0; i < kmax; i++) {
@@ -326,7 +229,7 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
     // -- note all 'current' tags in "alltags"
     alltags.insert(curtags->begin(),curtags->end());
 
-#  ifdef DWDSTT_DEBUG
+#  ifdef DWDST_PARGEN_DEBUG
     // -- output (debug)
     fprintf(out, "%s", s.c_str());
     for (t = curtags->begin(); t != curtags->end(); t++) {
@@ -335,7 +238,7 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
       fprintf(out, "<%f>", curtags->size() >= 0 ? 1.0/(float)curtags->size() : 0);
     }
     fputc('\n',out);
-#  endif // DWDSTT_DEBUG
+#  endif // DWDST_PARGEN_DEBUG
 
     // -- counting: i <= kmax -grams
     curngrams->clear();
@@ -387,9 +290,9 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
  *--------------------------------------------------------------------------*/
 
 /*
- * bool dwds_tagger_trainer::write_param_file(FILE *out=stdout);
+ * bool dwds_param_generator::write_param_file(FILE *out=stdout);
  */
-bool dwds_tagger_trainer::write_param_file(FILE *out=stdout)
+bool dwds_param_generator::write_param_file(FILE *out=stdout)
 {
   // -- sorted string-list
   set<FSMSymbolString> allstrings;

@@ -188,10 +188,10 @@ int main (int argc, char **argv) {
     ++argv;
 
     //test_type_inference(*argv);
-    //test_subtypes_of(*argv);
+    test_subtypes_of(*argv);
     //test_supertypes_of(*argv);
     //test_features_of_cat(*argv);
-    test_name2sym(*argv);
+    //test_name2sym(*argv);
   }
   //test_signs();
   //test_symbols();

@@ -19,7 +19,7 @@ our $VERSION = 0.01;
 ########################################################################
 # Command-line processing
 ########################################################################
-$wdsep = '=';
+$wdsep = ' ';
 GetOptions(## -- General
 	   'help|h|?'=>\$help,
 	   'man'=>\$man,
@@ -50,7 +50,7 @@ pod2usage({-verbose=>0}) if ($help);
 %ngrams = ();
 while (defined($_ = <>)) {
   next if (/^\s*(?:%%.*)?$/); # skip comments and blank lines
-  ($ngram,$weight) = split(/\s+/,$_);
+  ($ngram,$weight) = split(/\t/,$_);
 
   ## -- forward-index
   if (exists($ngrams{$ngram})) {

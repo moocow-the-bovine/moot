@@ -17,7 +17,7 @@
 
 ## --- executable programs
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
-bin_PROGRAMS = dwdspp dwdst dwdstt
+bin_PROGRAMS = dwdspp dwdst dwdst-fstgen dwdst-pargen
 
 ## --- libtool libraries
 #lib_LTLIBRARIES = ${lib_1}.la ... ${lib_N}.la
@@ -53,16 +53,28 @@ dwdst_SOURCES = \
 	dwdst_main.cc \
 	dwdst_cmdparser.ggo
 
-dwdstt_SOURCES = \
+dwdst_fstgen_SOURCES = \
+	dwdst_lexer.ll \
+	dwdst.cc \
+	dwdst.h \
+	dwdst_fstgen.cc \
+	dwdst_fstgen.h \
+	dwdst_fstgen_main.cc \
+	dwdst_fstgen_cmdparser.ggo \
+	postag_lexer.ll
+
+dwdst_pargen_SOURCES = \
 	cmdutil.cc \
 	cmdutil.h \
 	dwdst_lexer.ll \
 	dwdst.cc \
 	dwdst.h \
-	dwdstt.cc \
-	dwdstt.h \
-	dwdstt_main.cc \
-	dwdstt_cmdparser.ggo \
+	dwdst_fstgen.cc \
+	dwdst_fstgen.h \
+	dwdst_pargen.cc \
+	dwdst_pargen.h \
+	dwdst_pargen_main.cc \
+	dwdst_pargen_cmdparser.ggo \
 	postag_lexer.ll
 
 ## --- Extra (possible) sources
@@ -72,7 +84,8 @@ dwdstt_SOURCES = \
 ## --- Additional dependencies
 dwdspp_main.o: dwdspp_cmdparser.h dwdspp_lexer.h
 dwdst.o: dwdst_cmdparser.h dwdst_lexer.h
-dwdstt.o: dwdstt_cmdparser.h dwdst_lexer.h postag_lexer.h
+dwdst_fstgen.o: dwdst_fstgen_cmdparser.h dwdst_lexer.h postag_lexer.h
+dwdst_pargen.o: dwdst_pargen_cmdparser.h dwdst_lexer.h postag_lexer.h
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -142,8 +155,11 @@ AM_CXXFLAGS = $(FSM_WFLAGS) $(FSM_OFLAGS)
 dwdst_LDFLAGS = @FSM_LFLAGS@
 dwdst_LDADD = @FSM_LIBS@
 
-dwdstt_LDFLAGS = @FSM_LFLAGS@
-dwdstt_LDADD = @FSM_LIBS@
+dwdst_fstgen_LDFLAGS = @FSM_LFLAGS@
+dwdst_fstgen_LDADD = @FSM_LIBS@
+
+dwdst_pargen_LDFLAGS = @FSM_LFLAGS@
+dwdst_pargen_LDADD = @FSM_LIBS@
 
 # dwdspp_LDFLAGS = @FSM_LFLAGS@
 # dwdspp_LDADD = @FSM_LIBS@
@@ -171,7 +187,8 @@ MAINTAINERCLEANFILES = \
 	dwdspp_lexer.cc dwdspp_lexer.h \
 	postag_lexer.cc postag_lexer.h \
 	dwdst_cmdparser.cc dwdst_cmdparser.h \
-	dwdstt_cmdparser.cc dwdstt_cmdparser.h \
+	dwdst_fstgen_cmdparser.cc dwdst_fstgen_cmdparser.h \
+	dwdst_pargen_cmdparser.cc dwdst_pargen_cmdparser.h \
 	dwdspp_cmdparser.cc dwdspp_cmdparser.h
 
 ##-----------------------------------------------------------------------
@@ -185,7 +202,8 @@ EXTRA_DIST = \
 	dwdspp_lexer.cc dwdspp_lexer.h \
 	postag_lexer.cc postag_lexer.h \
 	dwdst_cmdparser.cc dwdst_cmdparser.h \
-	dwdstt_cmdparser.cc dwdstt_cmdparser.h \
+	dwdst_fstgen_cmdparser.cc dwdst_fstgen_cmdparser.h \
+	dwdst_pargen_cmdparser.cc dwdst_pargen_cmdparser.h \
 	dwdspp_cmdparser.cc dwdspp_cmdparser.h
 
 ## --- recursion subdirectories for 'make dist'

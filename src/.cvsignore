@@ -1,7 +1,10 @@
 dwdspp
 dwdst
 dwdstt
+dwdst-pargen
+dwdst-fstgen
 UnitMABBAW.cpp
+*.par
 *.tt
 *.pp
 *.out

@@ -1,0 +1,32 @@
+# -*- Mode: Text -*-
+# gengetopt specification for 'dwdst-fstgen'
+package "dwdst-fstgen"
+purpose	"Generate FSTs for use with the KDWDS Part-of-Speech tagger.
++ You must specify one of the options '--unknown' or '--disambig'
++ Default output filename is mode-dependent"
+
+# ------- Options
+
+# ---- Flags:
+option	"verbose"	    v	"Specify verbosity level"		    int default="1"		no
+option	"tags-only"	    t	"Analyze only PoS tags, not morpho-syntactic features"			no
+#option	"eos-string"	    e	"Use STRING as the EOS marker"		    string default="EOS"	no
+
+# ---- Operation Mode:
+# -- unknown-FSA generation (FSA used as analysis for unknown tokens)
+option	 "unknown"	    u	"Generate a binary unknown-FSA"						no
+option  "disambig"	    d	"Generate a binary disambiguation-FSA (NOT YET IMPLEMENTED)"		no
+
+# ---- Standard Files:
+option	"symbols"	    s	"Specify symbols file"			string default="dwdst.sym"	no
+
+#option	"morph"		    m	"Specify morphological transducer"	string default="dwdst.fst"	no
+#option	"morph"		    m	"Specify morphological transducer"	string default="dwdst-debug.fst"	no
+
+# ---- Input Files:
+option	"open-class-list"   P	"Specify PoS-tag listfile for open classes"	string				no
+option	"pos-tag-list"	    p	"Specify PoS-tag listfile for all classes"	string				no
+
+# ---- Output Files:
+#option	"output-file"	    F	"Specify output FST file"		string default="-"		no
+option	"output-file"	    F	"Specify output FST file"		string				no
