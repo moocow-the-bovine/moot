@@ -26,7 +26,7 @@ which tokenizes an input stream, and eliminates most SGML
 markup.
 
 \see mootPPLexer
-\see <A HREF="../../programs/moopp.html">dwspp(1)</A>
+\see <A HREF="../../programs/mootpp.html">dwspp(1)</A>
 
 
 \section HMM HMM Tagging
@@ -37,7 +37,7 @@ tagging and disambiguation.
 \todo Write a faster HMM trainer -- for now, use moot::mootHMMTrainer.
 
 \see \link moot::mootHMM mootHMM\endlink
-\see <A HREF="../../programs/moohmm.html">moohmm(1)
+\see <A HREF="../../programs/moothmm.html">moothmm(1)
 
 
 
@@ -52,7 +52,7 @@ you may specify a tag-extraction transducer (yet another FSM) which
 maps morphological output paths to PoS tags.
 
 \see \link moot::mootMorph mootMorph\endlink
-\see <A HREF="../../programs/moom.html">moom(1)</A>
+\see <A HREF="../../programs/mootm.html">mootm(1)</A>
 
 
 
@@ -88,10 +88,10 @@ libFSM finite state machine C++ library by Thomas Hanneforth.
 \section SeeAlso More Information
 
 \see FSM
-\see <A HREF="../../programs/moopp.html">moopp(1)</A>
+\see <A HREF="../../programs/mootpp.html">mootpp(1)</A>
 \see <A HREF="../../programs/mootrain.html">mootrain(1)</A>
-\see <A HREF="../../programs/moohmm.html">moohmm(1)</A>
-\see <A HREF="../../programs/moom.html">moom(1)</A>
+\see <A HREF="../../programs/moothmm.html">moothmm(1)</A>
+\see <A HREF="../../programs/mootm.html">mootm(1)</A>
 \see <A HREF="../../programs/moot.html">moot(1)</A>
 
 \todo Write Perl interface.
