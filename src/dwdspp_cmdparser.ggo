@@ -1,0 +1,8 @@
+# -*- Mode: Text -*-
+# gengetopt specification for 'dwdspp'
+package "dwdspp"
+purpose	"Tokenizer for the KDWDS project."
+
+# Options
+option	"output"	o	"Specify output file"		string default="-"		no
+option	"verbose"	v	"Verbose output to stderr"	no

@@ -14,6 +14,8 @@ dwdst
 *.lab
 *_cmdparser.cc
 *_cmdparser.h
+dwdspp_lexer.cc
+dwdspp_lexer.h
 stamp-h*
 config.h
 config.h.in

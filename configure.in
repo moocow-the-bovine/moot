@@ -38,8 +38,11 @@ dnl
 AC_PROG_CC
 AC_PROG_CXX
 AC_LANG(C++)
-dnl v--- needid if Makefile.am uses _LTLIBRARIES targets
+dnl v--- needed if Makefile.am uses _LTLIBRARIES targets
 dnl AC_PROG_LIBTOOL
+
+dnl v--- needed if Makefile.am uses lex sources
+AM_PROG_LEX
 
 dnl
 dnl for static-only libraries (non-libtool)
@@ -230,7 +233,6 @@ else
   AC_MSG_RESULT(no)
   FSM_WFLAGS=""
 fi
-
 
 dnl
 dnl Restore user's *FLAGS

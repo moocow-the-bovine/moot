@@ -17,7 +17,7 @@
 
 ## --- executable programs
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
-bin_PROGRAMS = dwdst
+bin_PROGRAMS = dwdst dwdspp
 
 ## --- libtool libraries
 #lib_LTLIBRARIES = ${lib_1}.la ... ${lib_N}.la
@@ -43,12 +43,20 @@ dwdst_SOURCES = \
 	dwdst_main.cc \
 	dwdst_cmdparser.ggo
 
+dwdspp_SOURCES = \
+	dwdspp_lexer.ll \
+	dwdspp.cc \
+	dwdspp.h \
+	dwdspp_main.cc \
+	dwdspp_cmdparser.ggo
+
 ## --- Extra (possible) sources
 #EXTRA_${prog_i}_SOURCES = 
 #EXTRA_${lib_i}_la_SOURCES = 
 
 ## --- Additional dependencies
 dwdst.o: dwdst_cmdparser.h
+dwdspp.o: dwdspp_cmdparser.h dwdspp_lexer.h
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -61,7 +69,7 @@ dwdst.o: dwdst_cmdparser.h
 noinst_HEADERS = nopackage.h
 
 ##-----------------------------------------------------------------------
-## pre-compile rules: gengetopt
+## pre-compile rules: gengetopt ; flex++
 ##-----------------------------------------------------------------------
 
 .ggo.h:
@@ -72,6 +80,11 @@ noinst_HEADERS = nopackage.h
 	gengetopt -u -F$* < $^
 	mv $*.c $*.cc
 
+.ll.h:
+	flex++ -8 -h$*.h -o$*.cc $<
+
+.ll.cc:
+	flex++ -8 -h$*.h -o$*.cc $<
 
 ##-----------------------------------------------------------------------
 ## compile flags
@@ -113,6 +126,9 @@ AM_CXXFLAGS = $(FSM_WFLAGS) $(FSM_OFLAGS)
 dwdst_LDFLAGS = @FSM_LFLAGS@
 dwdst_LDADD = @FSM_LIBS@
 
+dwdspp_LDFLAGS = @FSM_LFLAGS@
+dwdspp_LDADD = @FSM_LIBS@
+
 #${lib_i}_la_LDFLAGS = -L. -version-info ${lib_i_current}:${lib_i_rev}:${lib_i_age}
 #${lib_i}_LIBADD     = -lotherlib
 
@@ -132,7 +148,8 @@ dwdst_LDADD = @FSM_LIBS@
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = \
 	*~ .*~ Makefile Makefile.in \
-	dwdst_cmdparser.cc dwdst_cmdparser.h
+	dwdst_cmdparser.cc dwdst_cmdparser.h \
+	dwdspp_cmdparser.cc dwdspp_cmdparser.h
 
 ##-----------------------------------------------------------------------
 ## Variables: distribution
@@ -140,7 +157,8 @@ MAINTAINERCLEANFILES = \
 
 ## --- extra distribution files
 EXTRA_DIST = \
-	dwdst_cmdparser.cc dwdst_cmdparser.h
+	dwdst_cmdparser.cc dwdst_cmdparser.h \
+	dwdspp_cmdparser.cc dwdspp_cmdparser.h
 
 ## --- recursion subdirectories for 'make dist'
 #DIST_SUBDIRS = $(SUBDIRS)
