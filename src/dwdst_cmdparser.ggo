@@ -15,5 +15,3 @@ option	"output"	o	"Specify output file"			string default="-"		no
 option	"symbols"	s	"Specify symbols file"			string default="dwdst.sym"	no
 option	"morph"		m	"Specify morphological transducer"	string default="dwdst.fst"		no
 #option	"morph"		m	"Specify morphological transducer"	string default="dwdst-debug.fst"	no
-
-
