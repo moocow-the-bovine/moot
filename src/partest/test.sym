@@ -1,9 +1,0 @@
-Letter		a b c
-
-FValue		val1 val2
-
-Category:	ACAT FValue
-Category:	BCAT
-Category:	CCAT
-
-WordBoundary	+++
