@@ -959,7 +959,9 @@ bool mootHMM::estimate_lambdas(const mootNgrams &ngrams)
 	  //-- current unigram count : f(t2)
 	  f_t2 = ngrams.lookup(ngi2->first);
 
-	  
+	  //-- ignore eos
+	  if (ngi2->first == tagids.id2name(start_tagid)) continue;
+	 
 	  //-- compute adjusted probabilities
 	  ngp12  =  f_t12 == 1  ?  0  : (f_t12  - 1.0) / (f_t1  - 1.0);
 	  ngp2   =  f_N   == 1  ?  0  : (f_t2   - 1.0) / (f_N   - 1.0);
