@@ -1,20 +1,20 @@
 /*-*- Mode: Bison++ -*-*/
 /*----------------------------------------------------------------------
- * Name: dwdstNgramsParser.yy
+ * Name: dwdstLexfreqsParser.yy
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + specification for ngram-parameter-file parser for (K)DWDS PoS-tagger
+ *   + specification for lexical frequency parameter-file parser for (K)DWDS PoS-tagger
  *   + process with Alain Coetmeur's 'bison++' to produce a C++ parser
  *----------------------------------------------------------------------*/
 
-%name dwdstNgramsParser
+%name dwdstLexfreqsParser
 
 /* -- bison++ flags --- */
 /* -- force use of location stack : defines global 'yyltype' by default */
 %define LSP_NEEDED
 
 // -- ... so we define yyltype ourselves ... (see %header section)
-%define LTYPE dwdstNgramsParserLType
+%define LTYPE dwdstLexfreqsParserLType
 
 // -- debugging (see below)
 %define DEBUG 1
@@ -24,7 +24,7 @@
 /* %define ERROR_BODY =0 */
 
 // -- use inline error-reporting
-%define ERROR_BODY { yycarp("dwdstNgramsParser: Error: %s", msg); }
+%define ERROR_BODY { yycarp("dwdstLexfreqsParser: Error: %s", msg); }
 
 // -- use pure-function lexer body
 //%define LEX_BODY =0
@@ -42,7 +42,7 @@
 #include <string.h>
 
 #include "dwdstTypes.h"
-#include "dwdstNgrams.h"
+#include "dwdstLexfreqs.h"
 
 // -- get rid of bumble's macros
 #undef YYACCEPT
@@ -60,11 +60,12 @@ typedef struct {
   int last_line;
   int last_column;
   char *text;
-} dwdstNgramsParserLType;
+} dwdstLexfreqsParserLType;
+
 
 /**
- * \class dwdstNgramsParser
- * \brief Bison++ parser for dwdst ngram-parameter files.
+ * \class dwdstLexfreqsParser
+ * \brief Bison++ parser for dwdst lexfreq-parameter files.
  */
 %}
 
@@ -74,12 +75,12 @@ typedef struct {
 #endif
 %}
 
-%define CLASS dwdstNgramsParser
+%define CLASS dwdstLexfreqsParser
 %define MEMBERS \
   public: \
    /* -- public instance members go here */ \
-   /** a pointer to the ngram-parameter object to hold the data we're parsing */ \
-   dwdstNgrams          *ngrams; \
+   /** a pointer to the lexfreq-parameter object to hold the data we're parsing */ \
+   dwdstLexfreqs        *lexfreqs; \
    /* to keep track of all possible tags we've parsed (optional). */ \
    set<dwdstTagString>  *alltags; \
   private: \
@@ -88,13 +89,13 @@ typedef struct {
    /* public methods */ \
    /* report warnings */\
    virtual void yywarn(const char *msg) { \
-      yycarp("dwdstNgramsParser: Warning: %s", msg);\
+      yycarp("dwdstLexfreqsParser: Warning: %s", msg);\
    }; \
    /** report anything */\
    virtual void yycarp(char *fmt, ...);
    
 
-%define CONSTRUCTOR_INIT : ngrams(NULL), alltags(NULL)
+%define CONSTRUCTOR_INIT : lexfreqs(NULL), alltags(NULL)
 
 
 
@@ -103,85 +104,79 @@ typedef struct {
  *------------------------------------------------------------*/
 
 %union {
-  dwdstNgrams::NgramString   *ngram;            ///< for tag-lists
-  dwdstTagString            *tagstr;            ///< for single tags (strings)
-  dwdstNgrams::NgramCount     count;            ///< for tag-list counts
+  dwdstTokString                   *tokstr;         ///< for single tokens or tags (strings)
+  dwdstLexfreqs::LexfreqCount        count;         ///< for tag-list counts
 }
 
 %header{
 /**
- * \typedef yy_dwdstNgramsParser_stype
- * \brief Bison++ semantic value typedef for dwdst N-Gram parameter file parser.
+ * \typedef yy_dwdstLexfreqsParser_stype
+ * \brief Bison++ semantic value typedef for dwdst-pargen parameter-file parser.
  */
 %}
 
 // -- Type declarations
-%token <tagstr>  TAG
-%token <count>   COUNT
-%type  <tagstr>  tag
-%type  <count>   count    tab newline param params
-%type  <ngram>   ngram
+%token <tokstr>   TOKEN
+%token <count>    COUNT
+%type  <tokstr>   token tag entryBody
+%type  <count>    count total          tab newline entry entries
 
 // -- Operator precedence and associativity
-//%left TAB       // -- ngram-construction operator
+//%left TAB       // -- lexfreq-construction operator
 
-%start params
+%start entries
 
 /* -------------- rules section -------------- */
 %%
 
-params:		/* empty */ { $$ = 0; }
-	|	params param { $$ = 0; }
-	|	newline params { $$ = 0; }
+entries:	/* empty */ { $$ = 0; }
+	|	entries entry { $$ = 0; }
+	|	newline entries { $$ = 0; }
 	;
 
-param:		ngram tab count newline
+entry:		entryBody newline
 		{
-		  // -- single-parameter: add the parsed parameter to our table
-		  ngrams->add_count(*$1, $3);
-		  // -- and delete any components
-		  $1->clear();
-                  delete $1;
-		  $$ = 0;
+		  delete $1;
+                  $$ = 0;
 		}
 	;
 
-ngram:		tag
+entryBody:	token { $$ = $1; }
+	|	entryBody   tab   total { $$ = $1; /* total is, like, totally optional, bro! */ }
+	|	entryBody   tab   tag   tab   count
 		{
-		    // -- single tag: make a new vector
-		    $$ = new dwdstNgrams::NgramString();
-                    $$->clear();
-                    $$->push_back(*$1);
-                    delete $1;
-		}
-	|	ngram tab tag
-		{
-		    // -- tab-separated tags: add to the 'current' ngram
-                    $1->push_back(*$3);
-                    delete $3;
-		    $$ = $1;
+		  lexfreqs->add_count(*$1, *$3, $5);
+                  delete $3;
+                  $$ = $1;
 		}
 	;
 
-tag:		TAG
+token:		TOKEN
 		{
-		    if (alltags) alltags->insert(*$1);
-		    $$ = $1;
+		  $$ = $1;
 		}
-/*	|	// empty
+	|	COUNT
 		{
-		    yyerror("expected a tag");
-                    YYABORT;
+		  $$ = new dwdstTokString((const char *)yylloc.text);
 		}
-*/
+	;
+
+tag:		token
+		{
+		  if (alltags) alltags->insert(*$1);
+		  $$ = $1;
+		}
 	;
 
 count:		COUNT { $$ = $1; }
 	|	/* empty */
 		{
-		    yyerror("expected a count.");
+		    yyerror("expected a COUNT.");
                     YYABORT;
 		}
+	;
+
+total:		count { $$ = $1; }
 	;
 
 tab:		'\t' { $$=0; }
@@ -208,7 +203,7 @@ newline:	'\n' { $$=0; }
  * Error Methods
  *----------------------------------------------------------------*/
 
-void dwdstNgramsParser::yycarp(char *fmt, ...)
+void dwdstLexfreqsParser::yycarp(char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);

@@ -28,6 +28,11 @@ dwdstNgramsLexer.h
 dwdstNgramsParser.cc
 dwdstNgramsParser.h
 
+dwdstLexfreqsLexer.cc
+dwdstLexfreqsLexer.h
+dwdstLexfreqsParser.cc
+dwdstLexfreqsParser.h
+
 dwdstAlphabetLexer.cc
 dwdstAlphabetLexer.h
 dwdstAlphabetParser.cc
@@ -42,3 +47,4 @@ Makefile.in
 README.txt
 configure
 graveyard
+

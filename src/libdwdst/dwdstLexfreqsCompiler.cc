@@ -1,7 +1,7 @@
 /* -*- Mode: C++ -*- */
 
 /*============================================================================
- * File: dwdstNgramsCompiler.cc
+ * File: dwdstLexfreqsCompiler.cc
  * Author:  Bryan Jurish <moocow@ling.uni-potsdam.de>
  *
  * Description:
@@ -10,12 +10,12 @@
 
 #include <stdio.h>
 
-#include <FSM.h>
+//#include <FSM.h>
 
-#include "dwdstNgrams.h"
-#include "dwdstNgramsLexer.h"
-#include "dwdstNgramsParser.h"
-#include "dwdstNgramsCompiler.h"
+#include "dwdstLexfreqs.h"
+#include "dwdstLexfreqsLexer.h"
+#include "dwdstLexfreqsParser.h"
+#include "dwdstLexfreqsCompiler.h"
 
 /*----------------------------------------------------------------
  * Constructor / Destructors
@@ -28,7 +28,7 @@
 /*----------------------------------------------------------------
  * Public Methods: PARSING
  *----------------------------------------------------------------*/
-int dwdstNgramsCompiler::yylex()
+int dwdstLexfreqsCompiler::yylex()
 {
   yylloc.first_line=theLexer.theLine;
   yylloc.first_column=theLexer.theColumn;
@@ -40,16 +40,16 @@ int dwdstNgramsCompiler::yylex()
 }
 
 
-dwdstNgrams *dwdstNgramsCompiler::parse_ngrams()
+dwdstLexfreqs *dwdstLexfreqsCompiler::parse_lexfreqs()
 {
   // sanity check
-  if (!ngrams) {
-    yyerror("Cannot compile to a NULL ngrams object!");
+  if (!lexfreqs) {
+    yyerror("Cannot compile to a NULL lexfreqs object!");
     return NULL;
   }
   // actual parsing
   if (yyparse() != 0) return NULL;
-  return ngrams;
+  return lexfreqs;
 }
 
 
@@ -57,16 +57,16 @@ dwdstNgrams *dwdstNgramsCompiler::parse_ngrams()
  * Public Methods: Errors & Warnings
  *----------------------------------------------------------------*/
 
-void dwdstNgramsCompiler::yyerror(const char *msg) {
+void dwdstLexfreqsCompiler::yyerror(const char *msg) {
     fprintf(stderr,"%s: error:%s%s at line %d, column %d, near token '%s': %s\n",
-	    (objname ? objname : "dwdstNgramsCompiler"),
+	    (objname ? objname : "dwdstLexfreqsCompiler"),
 	    (srcname ? " in file " : ""),
 	    (srcname ? srcname : ""),
 	    yylloc.first_line, yylloc.first_column, yylloc.text, msg);
 }
-void dwdstNgramsCompiler::yywarn(const char *msg) {
+void dwdstLexfreqsCompiler::yywarn(const char *msg) {
     fprintf(stderr,"%s: warning:%s%s at line %d, column %d, near token '%s': %s\n",
-	  (objname ? objname : "dwdstNgramsCompiler"),
+	  (objname ? objname : "dwdstLexfreqsCompiler"),
 	  (srcname ? " in file " : ""),
 	  (srcname ? srcname : ""),
 	  yylloc.first_line, yylloc.first_column, yylloc.text, msg);

@@ -1,40 +1,35 @@
 /*-*- Mode: Flex++ -*-*/
 /*----------------------------------------------------------------------
- * Name: dwdstNgramsLexer.ll
+ * Name: dwdstLexfreqsLexer.ll
  * Author: Bryan Jurish
  * Description:
- *   + Lexer for TnT-style n-gram frequency parameter files
+ *   + Lexer for TnT-style lexical-frequency parameter files
  *   + process with Alain Coetmeur's 'flex++' to produce a C++ lexer
  *----------------------------------------------------------------------*/
 
 /* --- Lexer name --- */
-%name dwdstNgramsLexer
+%name dwdstLexfreqsLexer
 
 %header{
 
-/*#include <string.h>
-#include <string>
-#include <FSMSymSpec.h>
-*/
-
 #include "dwdstTypes.h"
-#include "dwdstNgramsParser.h"
+#include "dwdstLexfreqsParser.h"
 
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
 /*!
- * \class dwdstNgramsLexer
- * \brief Flex++ lexer for (TnT-style) dwdst n-gram parameter files. 
+ * \class dwdstLexfreqsLexer
+ * \brief Flex++ lexer for (TnT-style) dwdst lexical frequency parameter files. 
  * Supports comments introduced with '%%'.
  */
 %}
 
 %define LEX_PARAM \
-  YY_dwdstNgramsParser_STYPE *yylval, YY_dwdstNgramsParser_LTYPE *yylloc
+  YY_dwdstLexfreqsParser_STYPE *yylval, YY_dwdstLexfreqsParser_LTYPE *yylloc
 
 
-%define CLASS dwdstNgramsLexer
+%define CLASS dwdstLexfreqsLexer
 %define MEMBERS \
   public: \
     /* -- public typedefs */\
@@ -54,7 +49,7 @@
     char *stringbuf; \
   public: \
     /** virtual destructor to shut up gcc */\
-    virtual ~dwdstNgramsLexer(void) {};\
+    virtual ~dwdstLexfreqsLexer(void) {};\
     /** use stream input */\
     void select_streams(FILE *in=stdin, FILE *out=stdout); \
     /** use string input */\
@@ -77,7 +72,7 @@
     return result = len;\
   }\
   /* black magic */\
-  return result= fread(buffer, 1, max_size, YY_dwdstNgramsLexer_IN);
+  return result= fread(buffer, 1, max_size, YY_dwdstLexfreqsLexer_IN);
 
 
 
@@ -117,14 +112,14 @@ textorsp   [^\n\r\t]
   //theLine++; theColumn = 0;
   theColumn += yyleng;
   yylval->count = atof((const char *)yytext);
-  return dwdstNgramsParser::COUNT;
+  return dwdstLexfreqsParser::COUNT;
 }
 
 {textchar}({textorsp}*{textchar})? {
   // -- any other text: append to the token-buffer
   theColumn += yyleng;
-  yylval->tagstr = new dwdstTagString((const char *)yytext);
-  return dwdstNgramsParser::TAG;
+  yylval->tokstr = new dwdstTokString((const char *)yytext);
+  return dwdstLexfreqsParser::TOKEN;
 }
 
 {newline} {
@@ -140,7 +135,7 @@ textorsp   [^\n\r\t]
 . {
   // -- huh? -- just ignore it!
   theColumn += yyleng;
-  fprintf(stderr,"dwdstNgramsLexer warning: unknown character '%c': ignored.\n", yytext[YY_MORE_ADJ]);
+  fprintf(stderr,"dwdstLexfreqsLexer warning: unknown character '%c': ignored.\n", yytext[YY_MORE_ADJ]);
 }
 
 %%
@@ -153,13 +148,13 @@ textorsp   [^\n\r\t]
 
 
 /*----------------------------------------------------------------------
- * Local Methods for dwdstNgramsLexer
+ * Local Methods for dwdstLexfreqsLexer
  *----------------------------------------------------------------------*/
 
 /*
- * void dwdstNgramsLexer::select_streams(FILE *in, FILE *out)
+ * void dwdstLexfreqsLexer::select_streams(FILE *in, FILE *out)
  */
-void dwdstNgramsLexer::select_streams(FILE *in, FILE *out) {
+void dwdstLexfreqsLexer::select_streams(FILE *in, FILE *out) {
   yyin = in;
   yyout = out;
   use_string = false;
@@ -171,9 +166,9 @@ void dwdstNgramsLexer::select_streams(FILE *in, FILE *out) {
 }
 
 /*
- * void dwdstNgramsLexer::select_string(const char *in, FILE *out=stdout)
+ * void dwdstLexfreqsLexer::select_string(const char *in, FILE *out=stdout)
  */
-void dwdstNgramsLexer::select_string(const char *in, FILE *out=stdout) {
+void dwdstLexfreqsLexer::select_string(const char *in, FILE *out=stdout) {
   select_streams(stdin,out);  // flex __really__ wants a real input stream
 
   // -- string-buffer stuff
@@ -185,7 +180,7 @@ void dwdstNgramsLexer::select_string(const char *in, FILE *out=stdout) {
 /*
  * tokbuf_append(text,leng)
  */
-inline void dwdstNgramsLexer::tokbuf_append(char *text, int leng) {
+inline void dwdstLexfreqsLexer::tokbuf_append(char *text, int leng) {
   if (tokbuf_clear) {
     tokbuf = (char *)text;
     tokbuf_clear = false;

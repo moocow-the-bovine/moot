@@ -62,20 +62,19 @@ dwdstTagger::dwdstTagger(FSMSymSpec *mysyms, FSM *mymorph)
  */
 FSMSymSpec *dwdstTagger::load_morph_symbols(char *filename)
 {
-  list<string> msglist;
-
   // -- cleanup old symbols first
   if (syms && i_made_syms) delete syms;
 
-  syms = new FSMSymSpec(filename, &msglist, DWDST_SYM_ATT_COMPAT);
-  if (!msglist.empty()) {
+  syms = new FSMSymSpec(filename, &syms_msgs, DWDST_SYM_ATT_COMPAT);
+  if (!syms_msgs.empty()) {
     fprintf(stderr,
 	    "\ndwdstTagger::load_symbols() Error: could not load symbols from file '%s'\n",
 	    filename);
-    for (list<string>::iterator e = msglist.begin(); e != msglist.end(); e++) {
+    for (list<string>::iterator e = syms_msgs.begin(); e != syms_msgs.end(); e++) {
       fprintf(stderr,"%s\n",e->c_str());
     }
-    syms = NULL; // -- invalidate the object
+    syms_msgs.clear(); // -- clear messages
+    syms = NULL;       // -- invalidate the tagger object
   }
 
   i_made_syms = true;
@@ -115,58 +114,10 @@ dwdstTagger::~dwdstTagger() {
 }
 
 /*--------------------------------------------------------------------------
- * Low-Level Tagging Methods
+ * mid-Level Tagging Methods
  *--------------------------------------------------------------------------*/
 
-/*
- * tag_eos()
- *  + NON-DISAMBIGUATING MODE:
- *    - just writes eos string to this->outfile
- *  + DISAMBIGUATING MODE: [gone]
- *    - performs disambiguation via this->dis
- *    - writes sentence output to this->outfile
- *      based on this->sentence_words
- */
-inline void dwdstTagger::tag_eos(void) {
-  // -- just output end-of-sentence marker
-  if (verbose > 0) {
-    if (want_mabbaw_format) {
-      fputs(eos.c_str(), outfile);
-      fputs("\n\n", outfile);
-    }
-    else {
-	fputc('\n', outfile);
-    }
-  }
-}
-
-
-/*
- * tag_token(char *token = NULL)
- *  + tags the input-token in this->token
- *  + NON-DISAMBIGUATING MODE:
- *    - ouputs to this->outfile
- *    - formats according to this->want_* data members
- *  + DISAMBIGUATING MODE: [gone]
- *    - pushes word onto the literal sentence-buffer
- *    - feeds analyses to this->dis
- */
-inline const dwdstTagger::MorphAnalysisSet& dwdstTagger::tag_token(char *token)
-{
-  //-- analyse
-  tmp->fsm_clear();
-  curtok_s = (char *)(token ? token : curtok);
-  result = morph->fsm_lookup(curtok_s, tmp, true);
-
-  //-- serialize
-  analyses.clear();
-  tmp->fsm_symbol_vectors(analyses, false);
-
-  //-- track statistics
-  if (track_statistics && analyses.empty()) nunknown++;
-
-  return analyses;
-}
+//(inlined)
 
 
 /*--------------------------------------------------------------------------
@@ -322,41 +273,7 @@ dwdstTagger::get_fsm_tag_strings(FSM *fsa, set<FSMSymbolString> *tag_strings=NUL
  * Low-level tagging utilities: output
  *--------------------------------------------------------------------------*/
 
-void dwdstTagger::print_token_analyses(const char *token,
-				       dwdstTagger::MorphAnalysisSet *an,
-				       FILE *out)
-{
-  if (!an) an = &analyses;
-  if (!out) out = outfile ? outfile : stdout;
-
-  fputs(token ? token : curtok, out);
-  if (want_mabbaw_format) {
-    /*-- ambiguous, strings, all features, mabbaw-style */
-    fprintf(out, ": %d Analyse(n)\n", an->size());
-    for (analyses_i = an->begin(); analyses_i != an->end(); analyses_i++) {
-      //-- stringify this analysis
-      analysis_str.clear();
-      syms->symbol_vector_to_string(analyses_i->istr, analysis_str, want_avm);
-      //-- ... and print it
-      fputc('\t', out);
-      fputs(analysis_str.c_str(), out);
-      fprintf(out, (analyses_i->weight ? "\t<%f>\n" : "\n"), analyses_i->weight);
-    }
-    fputc('\n',outfile);
-  } else { /*-- want_mabbaw_format */
-    /*-- ambiguous, strings, all features, one tok/line */
-    for (analyses_i = an->begin(); analyses_i != an->end(); analyses_i++) {
-      //-- stringify this analysis
-      analysis_str.clear();
-      syms->symbol_vector_to_string(analyses_i->istr, analysis_str, want_avm);
-      //-- ... and print it
-      fputc('\t', out);
-      fputs(analysis_str.c_str(), out);
-      if (analyses_i->weight) fprintf(out, "<%f>", analyses_i->weight);
-    }
-    fputc('\n',out);
-  }
-}
+//(inlined)
 
 
 /*--------------------------------------------------------------------------
@@ -464,6 +381,18 @@ dwdstTagger::analyses_to_string(const set<FSMSymbolString> &analyses)
 /*--------------------------------------------------------------------------
  * Error reporting
  *--------------------------------------------------------------------------*/
+
+void dwdstTagger::check_symspec_messages(void) {
+  if (syms->messages && !syms->messages->empty()) {
+    if (verbose > 0) {
+      for (list<string>::iterator e = syms_msgs.begin(); e != syms_msgs.end(); e++) {
+	fprintf(stderr,"%s\n",e->c_str());
+      }
+    }
+    syms->messages->clear();
+  }
+}
+
 void dwdstTagger::carp(char *fmt, ...)
 {
   va_list ap;

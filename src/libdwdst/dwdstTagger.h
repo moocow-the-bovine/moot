@@ -35,6 +35,9 @@ public:
   /** Single POS tag, without features */
   typedef FSMSymbol Tag;
 
+  /** Single POS tag string, with or without features */
+  typedef FSMSymbolString TagString;
+
   /** Single morphological analysis, including features */
   typedef FSM::FSMWeightedSymbolVector MorphAnalysis;
 
@@ -43,6 +46,9 @@ public:
 
   /** Set of morphological analyses, including features */
   typedef set<MorphAnalysis> MorphAnalysisSet;
+
+  /** Set of POS tag strings, with or without features */
+  typedef set<FSMSymbolString> TagStringSet;
 
 public:
   // ------ public data
@@ -74,9 +80,11 @@ public:
   bool track_statistics;
   
   /**
-   * output verbosity level (0..2)
-   * 0: silent (no output but warnings/errors)
-   * 1: output tagged text
+   * output verbosity level (0..3)
+   *  0: silent (no output but warnings/errors)
+   *  1: output tagged text
+   *  2: (reserved for dwdst)
+   *  3: output runtime FSMSymSpec errors
    * default = 1
    */
   int verbose;
@@ -121,6 +129,12 @@ public:
   /** pre-allocated temporary: for print_analyses() */
   FSMSymbolString analysis_str;
 
+  /** hack: for FSMSymbolSpec: error messages */
+  list<string> syms_msgs;
+
+  /** pre-allocated temporary: for analysisStrings() */
+  TagStringSet analysis_strings;
+
 public:
   // -- public methods: constructor/destructor
   /** constructor */
@@ -158,13 +172,43 @@ public:
    *
    * No printing initiated by this method.
    */
-  inline const MorphAnalysisSet &tag_token(char *token = NULL);
+  inline const MorphAnalysisSet &tag_token(char *token = NULL)
+  {
+    //-- analyse
+    tmp->fsm_clear();
+    curtok_s = (char *)(token ? token : curtok);
+    result = morph->fsm_lookup(curtok_s, tmp, true);
+
+    //-- serialize
+    analyses.clear();
+    tmp->fsm_symbol_vectors(analyses, false);
+
+    //-- track statistics
+    if (track_statistics && analyses.empty()) nunknown++;
+
+    //-- check for errors (hack)
+    check_symspec_messages();
+
+    return analyses;
+  };
 
   /**
    * mid-level tagging utility: tag end-of-sentence i/o
    * Outputs EOS marker if flags permit.
    */
-  inline void tag_eos(void);
+  inline void tag_eos(void)
+  {
+    // -- just output end-of-sentence marker
+    if (verbose > 0) {
+      if (want_mabbaw_format) {
+	fputs(eos.c_str(), outfile);
+	fputs("\n\n", outfile);
+      }
+      else {
+	fputc('\n', outfile);
+      }
+    }
+  };
 
   // -- public methods: sanity checks
   /** tagging utility: sanity check */
@@ -179,6 +223,23 @@ public:
   // low-level tagging utilities : output
 
   /**
+   * mid-level tagging utility: stringify a single token
+   * analysis-set.
+   */
+  inline TagStringSet &analyses_to_strings(MorphAnalysisSet *ans = NULL)
+  {
+    if (!ans) ans = &analyses;
+    analysis_strings.clear();
+    for (analyses_i = ans->begin(); analyses_i != ans->end(); analyses_i++) {
+      //-- stringify this analysis
+      analysis_str.clear();
+      syms->symbol_vector_to_string(analyses_i->istr, analysis_str, want_avm, verbose > 2);
+      analysis_strings.insert(analysis_str);
+    }
+    return analysis_strings;
+  };
+
+  /**
    * Prints analyses to the currently selected output stream.
    * 'token' defaults to 'curtok',
    * 'an' defaults to 'analyses' member, 'out' defaults to 'outfile'
@@ -188,11 +249,47 @@ public:
    * elsewhere.
    */
   inline void print_token_analyses(const char *token = NULL,
-				   MorphAnalysisSet *an = NULL,
-				   FILE *out = NULL);
+				   MorphAnalysisSet *ans = NULL,
+				   FILE *out = NULL)
+  {
+    if (!ans) ans = &analyses;
+    if (!out) out = outfile ? outfile : stdout;
+    
+    fputs(token ? token : curtok, out);
+    if (want_mabbaw_format) {
+      /*-- ambiguous, strings, all features, mabbaw-style */
+      fprintf(out, ": %d Analyse(n)\n", ans->size());
+      for (analyses_i = ans->begin(); analyses_i != ans->end(); analyses_i++) {
+	//-- stringify this analysis
+	analysis_str.clear();
+	syms->symbol_vector_to_string(analyses_i->istr, analysis_str, want_avm, verbose > 2);
+	//-- ... and print it
+	fputc('\t', out);
+	fputs(analysis_str.c_str(), out);
+	fprintf(out, (analyses_i->weight ? "\t<%f>\n" : "\n"), analyses_i->weight);
+      }
+      fputc('\n',outfile);
+    } else { /*-- want_mabbaw_format */
+      /*-- ambiguous, strings, all features, one tok/line */
+      for (analyses_i = ans->begin(); analyses_i != ans->end(); analyses_i++) {
+	//-- stringify this analysis
+	analysis_str.clear();
+	syms->symbol_vector_to_string(analyses_i->istr, analysis_str, want_avm, verbose > 2);
+	//-- ... and print it
+	fputc('\t', out);
+	fputs(analysis_str.c_str(), out);
+	if (analyses_i->weight) fprintf(out, "<%f>", analyses_i->weight);
+      }
+      fputc('\n',out);
+    }
+  };
+
 
   //-------------------------------------
   // debugging & error reporting etc.
+
+  /** Hack: check, print, & clear messages associated with our FSMSymSpec */
+  inline void check_symspec_messages(void);
 
   /** Convert a symbol-vector to a numeric string */
   string symbol_vector_to_ascii(const FSM::FSMSymbolVector v);

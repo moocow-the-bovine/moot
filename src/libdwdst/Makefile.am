@@ -39,15 +39,17 @@ lib_LTLIBRARIES = libdwdst.la
 libdwdst_la_SOURCES = \
 	dwdstTaggerLexer.cc \
 	dwdstPPLexer.cc \
+	dwdstNgrams.cc \
 	dwdstNgramsLexer.cc \
 	dwdstNgramsParser.cc \
 	dwdstNgramsCompiler.cc \
-	dwdstTagger.cc
-
-libdwdst_later = \
+	dwdstLexfreqs.cc \
 	dwdstLexfreqsLexer.cc \
 	dwdstLexfreqsParser.cc \
 	dwdstLexfreqsCompiler.cc \
+	dwdstTagger.cc
+
+libdwdst_later = \
 	dwdstHMM.cc
 
 libdwdst_old = \
@@ -66,6 +68,8 @@ libdwdst_old = \
 ## --- Additional dependencies
 #dwdstTrainer.o: dwdstParamCompiler.h
 #dwdstTrainer.lo: dwdstParamCompiler.h
+dwdstNgrams.lo: dwdstNgramsLexer.h dwdstNgramsParser.h 
+dwdstNgrams.o: dwdstNgramsLexer.h dwdstNgramsParser.h
 dwdstNgramsCompiler.lo: dwdstNgramsLexer.h dwdstNgramsParser.h 
 dwdstNgramsCompiler.o: dwdstNgramsLexer.h dwdstNgramsParser.h
 dwdstNgramsLexer.lo: dwdstNgramsLexer.h dwdstNgramsParser.h
@@ -74,6 +78,18 @@ dwdstNgramsLexer.h: $(FLEXXX_DEPS)
 dwdstNgramsLexer.cc: $(FLEXXX_DEPS)
 dwdstNgramsParser.h: $(BISONXX_DEPS)
 dwdstNgramsParser.cc: $(BISONXX_DEPS)
+
+dwdstLexfreqs.lo: dwdstLexfreqsLexer.h dwdstLexfreqsParser.h 
+dwdstLexfreqs.o: dwdstLexfreqsLexer.h dwdstLexfreqsParser.h
+dwdstLexfreqsCompiler.lo: dwdstLexfreqsLexer.h dwdstLexfreqsParser.h 
+dwdstLexfreqsCompiler.o: dwdstLexfreqsLexer.h dwdstLexfreqsParser.h
+dwdstLexfreqsLexer.lo: dwdstLexfreqsLexer.h dwdstLexfreqsParser.h
+dwdstLexfreqsLexer.o: dwdstLexfreqsLexer.h dwdstLexfreqsParser.h
+dwdstLexfreqsLexer.h: $(FLEXXX_DEPS)
+dwdstLexfreqsLexer.cc: $(FLEXXX_DEPS)
+dwdstLexfreqsParser.h: $(BISONXX_DEPS)
+dwdstLexfreqsParser.cc: $(BISONXX_DEPS)
+
 
 #dwdstDisambiguator.o: dwdstAlphabetCompiler.h
 #dwdstDisambiguator.lo: dwdstAlphabetCompiler.h
@@ -93,13 +109,19 @@ dwdstNgramsParser.cc: $(BISONXX_DEPS)
 ## --- installable headers: @includedir@/@pkgname@
 #pkginclude_HEADERS = ${hfile_1} ... ${hfile_N}
 pkginclude_HEADERS = \
+	dwdstEnum.h \
 	dwdstTypes.h \
 	dwdstTagger.h \
 	dwdstTaggerLexer.h \
 	dwdstPPLexer.h \
 	dwdstNgramsLexer.h \
 	dwdstNgramsParser.h \
-	dwdstNgramsCompiler.h
+	dwdstNgramsCompiler.h \
+	dwdstNgrams.h \
+	dwdstLexfreqsLexer.h \
+	dwdstLexfreqsParser.h \
+	dwdstLexfreqsCompiler.h \
+	dwdstLexfreqs.h
 
 pkgheaders_old = \
 	dwdstTrainer.h \
@@ -157,7 +179,7 @@ BISONXX_FLAGS = $(BISONXX_DFLAGS) -d -v -S$(BISONXX_SKEL) -H$(BISONXX_HSKEL)
 AM_CPPFLAGS = $(FSM_IFLAGS)
 
 ## --- compiler flags (c++)
-AM_CXXFLAGS = $(FSM_WFLAGS) $(FSM_OFLAGS)
+AM_CXXFLAGS = $(DWDST_WFLAGS) $(DWDST_OFLAGS)
 
 ##-----------------------------------------------------------------------
 ## Additional variable: library versioning
@@ -217,7 +239,11 @@ MAINTAINERCLEANFILES = \
 	dwdstPPLexer.cc dwdstPPLexer.h \
 	dwdstTaglistLexer.cc dwdstTaglistLexer.h \
 	dwdstAlphabetLexer.cc dwdstAlphabetLexer.h \
-	dwdstAlphabetParser.cc dwdstAlphabetParser.h
+	dwdstAlphabetParser.cc dwdstAlphabetParser.h \
+	dwdstNgramsLexer.cc dwdstNgramsLexer.h \
+	dwdstNgramsParser.cc dwdstNgramsParser.h \
+	dwdstLexfreqsLexer.cc dwdstLexfreqsLexer.h \
+	dwdstLexfreqsParser.cc dwdstLexfreqsParser.h \
 
 ##-----------------------------------------------------------------------
 ## Variables: distribution
@@ -232,6 +258,8 @@ EXTRA_DIST = \
 	dwdstTaglistLexer.ll \
 	dwdstNgramsLexer.ll \
 	dwdstNgramsParser.yy \
+	dwdstLexfreqsLexer.ll \
+	dwdstLexfreqsParser.yy \
 	dwdstAlphabetLexer.ll \
 	dwdstAlphabetParser.yy \
 	flexskel.cc flexskel.h \
