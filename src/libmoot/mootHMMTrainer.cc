@@ -36,6 +36,7 @@
 #include <stdarg.h>
 
 #include "mootHMMTrainer.h"
+#include "mootToken.h"
 #include "mootTokenIO.h"
 
 //#define mootHMMTrainerDEBUG 1
@@ -85,19 +86,22 @@ bool mootHMMTrainer::train_from_stream(FILE *in, const char *filename)
   treader.select_stream(in,myfile);
 
   //-- prepare variables
-  mootTokenLexer::TokenType typ;
+  mootTokFlavor typ;
 
   //-- do training
   train_init();
-  while ((typ = treader.get_token()) != mootTokenLexer::TLEOF) {
+  while ((typ = treader.get_token()) != TF_EOF) {
     DEBUG( carp("DEBUG: Got token type %d\n", typ) );
     switch (typ) {
 
-    case mootTokenLexer::TLTOKEN:
+    case TF_COMMENT:
+      break;
+
+    case TF_TOKEN:
       train_token(treader.token());
       break;
 
-    case mootTokenLexer::TLEOS:
+    case TF_EOS:
       train_eos();
       train_bos();
       break;
@@ -153,6 +157,8 @@ void mootHMMTrainer::train_bos(void)
 /*-- new (hack) */
 void mootHMMTrainer::train_token(const mootToken &curtok)
 {
+  if (curtok.flavor() != TF_TOKEN) return; //-- ignore comments, etc.
+
   if (curtok.besttag().empty()) {
     carp("mootHMMTrainer::train_token(): no best tag for token `%s'",
 	 curtok.text().c_str());

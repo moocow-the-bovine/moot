@@ -52,6 +52,15 @@
 using namespace std;
 using namespace moot;
 
+typedef enum {
+  vlSilent = 0,
+  vlErrors = 1,
+  vlWarnings = 2,
+  vlSummary = 3,
+  vlProgress = 4,
+  vlEverything = 5
+} verbosityLevel;
+
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
@@ -84,7 +93,7 @@ void GetMyOptions(int argc, char **argv)
   cmdline_parser_envdefaults(&args);
 
   //-- show banner
-  if (args.verbose_arg > 1)
+  if (args.verbose_arg > vlSilent)
     fprintf(stderr,
 	    "\n%s version %s by Bryan Jurish <moocow@ling.uni-potsdam.de>\n\n",
 	    PROGNAME, VERSION);
@@ -105,7 +114,7 @@ void GetMyOptions(int argc, char **argv)
   churner.use_list = args.list_given;
 
   //-- get initialization start-time
-  if (args.verbose_arg > 1) gettimeofday(&istarted, NULL);
+  if (args.verbose_arg >= vlSummary) gettimeofday(&istarted, NULL);
 
   //-- i/o format flags
   hmm.input_ignore_first_analysis = args.ignore_first_given;
@@ -119,10 +128,12 @@ void GetMyOptions(int argc, char **argv)
   hmm.unknown_class_threshhold = args.class_threshhold_arg;
 
   // -- assign "verbose" flag
-  if (args.verbose_arg <= 0) hmm.verbose = mootHMM::vlSilent;
-  else if (args.verbose_arg <= 1) hmm.verbose = mootHMM::vlErrors;
-  else if (args.verbose_arg <= 2) hmm.verbose = mootHMM::vlWarnings;
-  else if (args.verbose_arg <= 3) hmm.verbose = mootHMM::vlProgress;
+  hmm.ndots = args.dots_arg;
+  if (args.verbose_arg <= vlSilent) hmm.verbose = mootHMM::vlSilent;
+  else if (args.verbose_arg <= vlErrors) hmm.verbose = mootHMM::vlErrors;
+  else if (args.verbose_arg <= vlWarnings) hmm.verbose = mootHMM::vlWarnings;
+  else if (args.verbose_arg <= vlSummary) hmm.verbose = mootHMM::vlWarnings;
+  else if (args.verbose_arg <= vlProgress) hmm.verbose = mootHMM::vlProgress;
   else hmm.verbose = mootHMM::vlEverything;
 
   //-- load model spec
@@ -158,7 +169,7 @@ void GetMyOptions(int argc, char **argv)
   }
 
   // -- report
-  if (args.verbose_arg > 1) {
+  if (args.verbose_arg >= vlProgress) {
     fprintf(stderr, "%s: Initialization complete\n", PROGNAME);
   }
 
@@ -200,7 +211,7 @@ void print_summary(FILE *file)
   // -- print summary
   fprintf(file,
 	  "\n%%%%---------------------------------------------------------------------\n");
-  fprintf(file, "%%%%%s Summary:\n", PROGNAME);
+  fprintf(file, "%%%% %s Summary:\n", PROGNAME);
   fprintf(file, "%%%%  + General\n");
   fprintf(file, "%%%%    - Files Processed     : %9u file(s)\n", nfiles);
   fprintf(file, "%%%%    - Sentences Processed : %9u sent\n", hmm.nsents);
@@ -246,31 +257,30 @@ int main (int argc, char **argv)
   GetMyOptions(argc,argv);
 
   // -- get init-stop time = analysis-start time
-  if (args.verbose_arg > 1) gettimeofday(&astarted, NULL);
+  if (args.verbose_arg >= vlSummary) gettimeofday(&astarted, NULL);
 
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
-    if (args.verbose_arg > 1) {
-      nfiles++;
-      if (args.verbose_arg > 2) {
-	fprintf(stderr,"%s: analyzing file '%s'... ", PROGNAME, churner.in.name);
-	fflush(stderr);
-      }
-    }
-    if (args.verbose_arg > 1) {
+    if (args.verbose_arg >= vlSummary) nfiles++;
+    if (args.verbose_arg >= vlProgress) {
       fprintf(out.file, "\n%%%% File: %s\n\n", churner.in.name);
+      fprintf(stderr,"%s: analyzing file '%s'...", PROGNAME, churner.in.name);
+      fflush(stderr);
     }
 
     hmm.tag_stream(churner.in.file, out.file, churner.in.name);
     
-    if (args.verbose_arg > 2) {
+    if (args.verbose_arg >= vlProgress) {
       fprintf(stderr," done.\n");
       fflush(stderr);
+    }
+    else if (hmm.ndots) {
+      fputc('\n', stderr);
     }
   }
 
   // -- summary
-  if (args.verbose_arg > 1) {
+  if (args.verbose_arg >= vlSummary) {
       // -- timing
       gettimeofday(&astopped, NULL);
 

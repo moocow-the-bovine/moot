@@ -52,7 +52,10 @@ DOXY_INPUTS = \
 	mootNgramsLexer.h	mootNgramsParser.h	mootNgramsCompiler.h	\
 	mootNgrams.h \
 	mootPPLexer.h \
-	mootHMM.h
+	mootHMM.h \
+	mootHMMTrainer.h \
+	mootEval.h \
+	mootUtils.h
 
 #	mootCHMM.h
 #	mootMorph.h

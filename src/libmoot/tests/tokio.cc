@@ -9,7 +9,7 @@ void churntest(int argc, char **argv) {
   TokenReader tr;
   FILE *infile = stdin;
 
-  tr.lexer.first_analysis_is_best = true;
+  tr.lexer.first_analysis_is_best = false;
   tr.lexer.ignore_first_analysis = false;
 
   if (argc > 1) {
@@ -25,12 +25,14 @@ void churntest(int argc, char **argv) {
   mootSentence sent;
   do {
     sent = tr.get_sentence();
+
     printf("SENTENCE:\n");
     for (mootSentence::const_iterator si = sent.begin();
 	 si != sent.end();
 	 si++)
       {
-	printf("\t+ TOKEN: toktext=`%s'\t ; besttag=`%s'\n",
+	printf("\t+ TOKEN: flavor=`%s' ; toktext=`%s'\t ; besttag=`%s'\n",
+	       mootTokFlavorNames[si->flavor()],
 	       si->text().c_str(), si->besttag().c_str());
 	for (mootToken::AnalysisSet::const_iterator ai = si->analyses().begin();
 	     ai != si->analyses().end();
@@ -40,7 +42,7 @@ void churntest(int argc, char **argv) {
 		   ai->cost, ai->tag.c_str(), ai->details.c_str());
 	  }
       }
-  } while (tr.lexer.lasttyp != mootTokenLexer::TLEOF);
+  } while (tr.lexer.lasttyp != TF_EOF);
   printf("EOF\n");
 }
 

@@ -58,7 +58,8 @@ gengetopt_args_info args;
 TokenReader treader1(true,true);
 TokenReader treader2(true,true);
 TokenWriter twriter(false);
-mootSentence s1, s2;
+//mootSentence s1, s2;
+mootTokFlavor tf1, tf2, tf1prev, tf2prev;
 
 //-- comparison
 mootEval eval;
@@ -122,7 +123,7 @@ void GetMyOptions(int argc, char **argv)
   else if (args.verbose_arg <= 1) vlevel = evlBasic;
   else if (args.verbose_arg <= 2) vlevel = evlExtended;
   else if (args.verbose_arg <= 3) vlevel = evlMistakes;
-  else if (args.verbose_arg <= 4) vlevel = evlEverything;
+  else /*if (args.verbose_arg > 3)*/ vlevel = evlEverything;
 
   //-- options: file selection
   if (args.eval_first_given || args.eval_second_given) {
@@ -150,7 +151,8 @@ void GetMyOptions(int argc, char **argv)
   }
 
   //-- open: file1
-  file1.name = args.inputs[0];
+  if (strcmp(args.inputs[0], "-")==0) file1.name = "<stdin>";
+  else file1.name = args.inputs[0];
   if (!file1.open("r")) {
     fprintf(stderr, "%s: open failed for file '%s': %s",
 	    PROGNAME, file1.name, strerror(errno));
@@ -159,7 +161,8 @@ void GetMyOptions(int argc, char **argv)
   treader1.select_stream(file1.file, file1.name);
 
   //-- open: file2
-  file2.name = args.inputs[1];
+  if (strcmp(args.inputs[1], "-")==0) file2.name = "<stdin>";
+  else file2.name = args.inputs[1];
   if (!file2.open()) {
     fprintf(stderr, "%s: open failed for file '%s': %s",
 	    PROGNAME, file2.name, strerror(errno));
@@ -170,6 +173,11 @@ void GetMyOptions(int argc, char **argv)
   //-- process options
   //(none)
 }
+
+/*--------------------------------------------------------------------------
+ * token output
+ *--------------------------------------------------------------------------*/
+void put_tok_results(FILE *file, const mootToken &tok1, const mootToken &tok2);
 
 /*--------------------------------------------------------------------------
  * summary (new)
@@ -189,94 +197,166 @@ int main (int argc, char **argv)
 {
   GetMyOptions(argc,argv);
 
+  //-- Dummy token
+  mootToken tokDummy("%% (EMPTY)");
+  tokDummy.flavor(TF_TOKEN); //-- really a comment
+
+  mootToken tokEOS("%% (EOS)");
+  tokDummy.flavor(TF_TOKEN); //-- really a comment
+
+  mootToken tokEOF("%% (EOF)");
+  tokDummy.flavor(TF_TOKEN); //-- really a comment
+
+  //-- input configuration : ignore comments completely
+  //treader1.lexer.ignore_comments = true;
+  //treader2.lexer.ignore_comments = true;
+
   //-- compare files
-  do {
-    s1 = treader1.get_sentence();
-    s2 = treader2.get_sentence();
+  tf1prev = TF_EOS;
+  tf2prev = TF_EOS;
+  for (tf1=treader1.get_token()  , tf2=treader2.get_token();
+       tf1 != TF_EOF            || tf2 != TF_EOF;
+       /*treader1.get_token(), treader2.get_token()*/ )
+    {
+      //-- assign token aliases
+      const mootToken &tok1 = (tf1 == TF_EOS
+			       ? tokEOS
+			       : (tf1 == TF_EOF
+				  ? tokEOF
+				  : treader1.token()));
+      const mootToken &tok2 = (tf2 == TF_EOS
+			       ? tokEOS
+			       : (tf2 == TF_EOF
+				  ? tokEOF
+				  : treader2.token()));
 
-    //-- check for eof
-    if (treader1.lexer.lasttyp == mootTokenLexer::TLEOF
-	|| treader1.lexer.lasttyp == mootTokenLexer::TLEOF)
-      {
-	if ((treader1.lexer.lasttyp == mootTokenLexer::TLEOF
-	     && treader2.lexer.lasttyp != mootTokenLexer::TLEOF)
-	    ||
-	    (treader1.lexer.lasttyp != mootTokenLexer::TLEOF
-	     && treader2.lexer.lasttyp == mootTokenLexer::TLEOF))
-	  {
-	    fprintf(stderr, "%s: file lengths differ at lines %u/%u!\n",
-		    PROGNAME, treader1.lexer.theLine, treader2.lexer.theLine);
-	  }
-	break;
+      //-- check for comments
+      if (tf1 == TF_COMMENT || tf2 == TF_COMMENT) {
+	eval.clear();
+	if (tf1==tf2) {
+	  //-- comments in both files
+	  put_tok_results(out.file, tok1, tok2);
+	  //tf1prev = tf1;
+	  //tf2prev = tf2;
+	  tf1 = treader1.get_token();
+	  tf2 = treader2.get_token();
+	}
+	else if (tf1==TF_COMMENT) {
+	  //-- comment in file1 only
+	  put_tok_results(out.file, tok1, tok2);
+	  //tf1prev = tf1;
+	  tf1 = treader1.get_token();
+	}
+	else if (tf2==TF_COMMENT) {
+	  put_tok_results(out.file, tok1, tok2);
+	  //tf2prev = tf2;
+	  tf2 = treader2.get_token();
+	}
+	continue;
       }
 
-    //-- iterate over all tokens
-    nsents++;
-    mootSentence::const_iterator s1i, s2i;
-    for (s1i=s1.begin()  ,  s2i=s2.begin();
-	 s1i != s1.end() && s2i != s2.end();
-	 s1i++           ,  s2i++)
-      {
-	ntokens++;
-	nans1 += s1i->analyses().size();
-	nans2 += s2i->analyses().size();
-
-	eval.compareTokens(*s1i,*s2i);
-	if (eval.isTokenMismatch()) ntokmisses++;
-	if (eval.isBestMismatch()) nbestmisses++;
-
-	if (eval.isEmptyClass1()) {
-	  nempties1++;
-	  if (!eval.isBestMismatch()) nsaves1++;
+      //-- check for EOS
+      else if (tf1 == TF_EOS || tf2 == TF_EOS) {
+	if (tf1==tf2) {
+	  //-- eos: match
+	  nsents++;
+	  if (vlevel >= evlEverything) fputc('\n', out.file);
+	  tf1prev = tf1;
+	  tf1 = treader1.get_token();
+	  tf2prev = tf2;
+	  tf2 = treader2.get_token();
+	  continue;
 	}
-	else if (eval.isBestMismatch()) {
-	    nfumbles1++;
-	}
-
-	if (eval.isEmptyClass2()) {
-	  nempties2++;
-	  if (!eval.isBestMismatch()) nsaves2++;
-	}
-	else if (eval.isBestMismatch()) {
-	  nfumbles2++;
-	}
-
-	if (eval.isImpClass1()) nimps1++;
-	if (eval.isImpClass2()) nimps2++;
-
-	if (eval.isXImpClass1()) nximps1++;
-	if (eval.isXImpClass2()) nximps2++;
-
-	//-- output evaluation results
-	if (vlevel >= evlEverything
-	    || (vlevel >= evlMistakes
-		&& (eval.isTokenMismatch()
-		    || eval.isBestMismatch()
-		    || (eval_file1
-			&& (eval.isEmptyClass1()
-			    || eval.isImpClass1()
-			    || eval.isXImpClass1()))
-		    || (eval_file2
-			&& (eval.isEmptyClass2()
-			    || eval.isImpClass2()
-			    || eval.isXImpClass2())) ) ) )
-	  {
-	    fputs(eval.status_string().c_str(), out.file);
-	    fputc('\t', out.file);
-	    fputs(twriter.token_string(*s1i).c_str(), out.file);
-	    fputs("\t/\t", out.file);
-	    twriter.token_put(out.file, *s2i);
+	else if (tf1prev==TF_EOS || tf2prev==TF_EOS) {
+	  //-- ignore consecutive EOS tokens
+	  if (tf1 == TF_EOS) {
+	    tf1prev = tf1;
+	    tf1 = treader1.get_token();
 	  }
+	  if (tf2 == TF_EOS) {
+	    tf2prev = tf2;
+	    tf2 = treader2.get_token();
+	  }
+	  continue;
+	}
+	//-- report real eos mismatch
+	fprintf(stderr, "%s: sentence lengths differ at lines %u/%u!\n",
+		PROGNAME, treader1.lexer.theLine, treader2.lexer.theLine);
+	if (tf1 == TF_EOS) {
+	  tf1prev = tf1;
+	  tf1 = treader1.get_token();
+	}
+	if (tf2 == TF_EOS) {
+	  tf2prev = tf2;
+	  tf2 = treader2.get_token();
+	}
+	continue;
       }
-    if (vlevel >= evlEverything) fputc('\n', out.file);
 
-    //-- check sentence lengths
-    if (s1i != s1.end() || s2i != s2.end()) {
-      fprintf(stderr, "%s: sentence lengths differ at lines %u/%u!\n",
-	      PROGNAME, treader1.lexer.theLine, treader2.lexer.theLine);
-      continue;
+      //-- check for EOF
+      else if (tf1 == TF_EOF || tf2 == TF_EOF) {
+	if (tf1==tf2) break; //-- eof: match
+
+	else if (tf1 != TF_EOF) {
+	  put_tok_results(out.file, tok1, tok2);
+	  tf1prev = tf1;
+	  tf1 = treader1.get_token();
+	  if (tf1prev == TF_EOS) continue; //-- skip eof/eos mismatch
+	}
+	else if (tf2 != TF_EOF) {
+	  put_tok_results(out.file, tok1, tok2);
+	  tf2prev = tf2;
+	  tf2 = treader2.get_token();
+	  if (tf2prev == TF_EOS) continue; //-- skip eof/eos mismatch
+	}
+
+	//-- report real eof mismatch
+	fprintf(stderr, "%s: file lengths differ at lines %u/%u!\n",
+		PROGNAME, treader1.lexer.theLine, treader2.lexer.theLine);
+	continue;
+      }
+
+      //--------------------------------------------------------
+      //-- "plain" tokens: compare
+      ntokens++;
+      nans1 += tok1.analyses().size();
+      nans2 += tok2.analyses().size();
+
+      eval.compareTokens(tok1,tok2);
+      if (eval.isTokenMismatch()) ntokmisses++;
+      if (eval.isBestMismatch()) nbestmisses++;
+
+      if (eval.isEmptyClass1()) {
+	nempties1++;
+	if (!eval.isBestMismatch()) nsaves1++;
+      }
+      else if (eval.isBestMismatch()) {
+	nfumbles1++;
+      }
+      
+      if (eval.isEmptyClass2()) {
+	nempties2++;
+	if (!eval.isBestMismatch()) nsaves2++;
+      }
+      else if (eval.isBestMismatch()) {
+	nfumbles2++;
+      }
+      
+      if (eval.isImpClass1()) nimps1++;
+      if (eval.isImpClass2()) nimps2++;
+      
+      if (eval.isXImpClass1()) nximps1++;
+      if (eval.isXImpClass2()) nximps2++;
+      
+      //-- output evaluation results
+      put_tok_results(out.file, tok1, tok2);
+      
+      //-- get next token in each file
+      tf1prev = tf1;
+      tf2prev = tf2;
+      tf1 = treader1.get_token();
+      tf2 = treader2.get_token();
     }
-  } while (1);
 
   //-- summary
   print_summary(out.file);
@@ -378,4 +458,31 @@ void print_summary_file(FILE *outfile,
 	  (ntokens-nximps-nfumbles),100.0*(double)(ntokens-nximps-nfumbles)/(double)(ntokens-nximps),
 	  nfumbles, 100.0*(double)(nfumbles)/(double)(ntokens-nximps)
 	  );
+}
+
+
+/*--------------------------------------------------------------------------
+ * token output
+ *--------------------------------------------------------------------------*/
+void put_tok_results(FILE *file, const mootToken &tok1, const mootToken &tok2)
+{
+  if (vlevel >= evlEverything
+      || (vlevel >= evlMistakes
+	  && (eval.isTokenMismatch()
+	      || eval.isBestMismatch()
+	      || (eval_file1
+		  && (eval.isEmptyClass1()
+		      || eval.isImpClass1()
+		      || eval.isXImpClass1()))
+	      || (eval_file2
+		  && (eval.isEmptyClass2()
+		      || eval.isImpClass2()
+		      || eval.isXImpClass2())) ) ) )
+    {
+      fputs(eval.status_string().c_str(), file);
+      fputc('\t', file);
+      fputs(twriter.token_string(tok1).c_str(), file);
+      fputs("\t/\t", file);
+      twriter.token_put(file, tok2);
+    }
 }

@@ -57,7 +57,6 @@
 
 #include <stdarg.h>
 #include "mootToken.h"
-/*#include "mootTypes.h"*/
 
 
 /*============================================================================
@@ -86,44 +85,14 @@
  *
  */
 
-/** Useful for debugging token-types */\
-const char mootTokenLexerTypeNames[12][16] = {
-      "TLUNKNOWN",
-      "TLEOF",
-      "TLEOS", 
-      "TLTOKEN", 
-      "TLTEXT", 
-      "TLTAB", 
-      "TLTAG", 
-      "TLDETAILS", 
-      "TLCOST", 
-      "TLNEWLINE", 
-      "TLIGNORE" 
-  };
-#line 99 "mootTokenLexer.ll"
+#line 84 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CLASS  mootTokenLexer
-#line 100 "mootTokenLexer.ll"
+#line 85 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_MEMBERS  \
   public: \
-    /* -- public typedefs */\
-    /** typedef for token-types */\
-    typedef enum {\
-      /* Output token-types */\
-      TLUNKNOWN,   /**< unknown token */\
-      TLEOF,       /**< end-of-file */\
-      TLEOS,       /**< end-of-sentence */\
-      TLTOKEN,     /**< token (+ analyses) */\
-      /*-- internal use only */\
-      TLTEXT,      /**< token text (internal use only) */\
-      TLTAB,       /**< tabs (internal use only) */\
-      TLTAG,       /**< analysis tags (internal use only) */\
-      TLDETAILS,   /**< analysis details (internal use only) */\
-      TLCOST,      /**< analysis costs (internal use only) */\
-      TLNEWLINE,   /**< newlines (internal use only) */\
-      TLIGNORE,    /**< ignored (internal use only) */\
-      TLNTYPES \
-    } TokenType;\
-    \
+  /* -- public typedefs */\
+  typedef moot::mootTokFlavor TokenType; \
+  \
   public: \
    /* -- positional parameters */ \
    /** current line*/\
@@ -138,6 +107,8 @@ const char mootTokenLexerTypeNames[12][16] = {
    moot::mootToken::Analysis manalysis;\
    /** last token type */ \
    TokenType lasttyp; \
+   /** whether to ignore comments (default=false) */ \
+   bool ignore_comments; \
    /** whether first analysis parsed should be considered 'best' (default=true) */ \
    bool first_analysis_is_best; \
    /** whether we're parsing a 'best' analysis */\
@@ -174,11 +145,12 @@ const char mootTokenLexerTypeNames[12][16] = {
     inline void itokbuf_append(char *text, int leng); \
     /** for error reporting */ \
     virtual void yycarp(char *fmt, ...);
-#line 172 "mootTokenLexer.ll"
+#line 143 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CONSTRUCTOR_INIT  :\
   theLine(1), \
   theColumn(0), \
-  lasttyp(TLEOS), \
+  lasttyp(moot::TF_EOS), \
+  ignore_comments(false), \
   first_analysis_is_best(true), \
   current_analysis_is_best(false), \
   ignore_first_analysis(false), \
@@ -187,7 +159,7 @@ const char mootTokenLexerTypeNames[12][16] = {
   srcname("(unknown)"),\
   use_string(false), \
   stringbuf(NULL)
-#line 185 "mootTokenLexer.ll"
+#line 157 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_INPUT_CODE  \
   /* yy_input(char *buf, int &result, int max_size) */\
   if (use_string) {\
@@ -200,7 +172,7 @@ const char mootTokenLexerTypeNames[12][16] = {
   }\
   /* black magic */\
   return result= fread(buffer, 1, max_size, YY_mootTokenLexer_IN);
-#line 222 "mootTokenLexer.ll"
+#line 194 "mootTokenLexer.ll"
 #line 52 "/usr/local/share/flex++bison++/flexskel.h"
 
 
@@ -452,7 +424,7 @@ class YY_mootTokenLexer_CLASS YY_mootTokenLexer_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 446 "mootTokenLexer.ll"
+#line 430 "mootTokenLexer.ll"
 #endif
 #line 302 "/usr/local/share/flex++bison++/flexskel.h"
 

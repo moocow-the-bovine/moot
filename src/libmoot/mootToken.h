@@ -59,7 +59,7 @@
 
 /**
  * \def MOOT_TNT_COMPAT
- * Whether to typify tokens the "right" way, or as TnT does it
+ * Whether to typify token text as TnT does it, or the "right" way
  */
 #define MOOT_TNT_COMPAT 1
 //#undef MOOT_TNT_COMPAT
@@ -80,6 +80,46 @@ typedef string mootTokString;
 /** Tagset (read "lexical class") type */
 typedef set<mootTagString> mootTagSet;
 
+
+/*----------------------------------------------------------------------
+ * Token Flavors
+ *----------------------------------------------------------------------*/
+typedef enum {
+  /* Output token-types */
+  TF_UNKNOWN,   /**< we dunno what it is -- could be anything  */
+  TF_TOKEN,     /**< plain token (+/-besttag,+/-analyses) */
+  TF_COMMENT,   /**< a line-comment */
+  TF_EOS,       /**< end-of-sentence */
+  TF_EOF,       /**< end-of-file */
+  /*-- internal lexer use only */ 
+  TF_TEXT,      /**< token text (internal use only) */ 
+  TF_TAB,       /**< tabs (internal use only) */ 
+  TF_TAG,       /**< analysis tags (internal use only) */ 
+  TF_DETAILS,   /**< analysis details (internal use only) */ 
+  TF_COST,      /**< analysis costs (internal use only) */ 
+  TF_NEWLINE,   /**< newlines (internal use only) */ 
+  TF_IGNORE,    /**< ignored (internal use only) */ 
+  TF_NFLAVORS   /**< number of flavors (not a flavor itself) */
+} mootTokFlavor;
+
+/** Useful for debugging token flavors */\
+const char mootTokFlavorNames[TF_NFLAVORS][16] =
+{
+  "TF_UNKNOWN",
+  "TF_TOKEN",
+  "TF_COMMENT",
+  "TF_EOS",
+  "TF_EOF",
+  /*-- internal lexer use only */
+  "TF_TEXT",
+  "TF_TAB",
+  "TF_TAG",
+  "TF_DETAILS",
+  "TF_COST",
+  "TF_NEWLINE",
+  "TF_IGNORE"
+};
+
 /*--------------------------------------------------------------------------
  * mootToken
  *--------------------------------------------------------------------------*/
@@ -94,7 +134,7 @@ public:
 
   /** Type for analysis weights */
   typedef float Cost;
- 
+
   /** Type for a single morphological analysis */
   class Analysis {
   public:
@@ -129,8 +169,8 @@ public:
 
     /** Clear this object */
     inline void clear(void) {
-      tag = "";
-      details = "";
+      tag.clear();
+      details.clear();
       cost = 0.0;
     };
 
@@ -163,6 +203,13 @@ public:
    */
 
   /**
+   * Token content type.
+   * This should usually be \c TF_TOKEN , but it might
+   * also be \c TF_COMMENT .
+   */
+  mootTokFlavor   tok_flavor;
+
+  /**
    * Literal token text.
    * \warning Use the text() method(s) instead of accessing this directly!
    */
@@ -180,31 +227,41 @@ public:
    */
   mootTagString   tok_besttag;
 
+  /** Comments associated with (read "preceeding") this token */
+  string          tok_comment;
+
+  /** Aribtrary user data associated with this token */
+  void           *user_data;
+
 public:
   /*------------------------------------------------------------
    * Constructors / Destructors
    */
   /** Default constructor: empty text, no analyses */
   mootToken(void)
-    : tok_text(""), tok_besttag("")
+    : tok_flavor(TF_TOKEN), tok_text(""), tok_besttag(""), user_data(NULL)
   {};
 
   /** Constructor given only token text: no analyses */
   mootToken(const mootTokString &text)
-    : tok_text(text), tok_besttag("")
+    : tok_flavor(TF_TOKEN), tok_text(text), tok_besttag(""), user_data(NULL)
   {};
 
   /** Constructor given text & analyses */
   mootToken(const mootTokString &text,
 	    const AnalysisSet &analyses)
-    : tok_text(text), tok_analyses(analyses), tok_besttag("")
+    : tok_flavor(TF_TOKEN),
+      tok_text(text), tok_analyses(analyses), tok_besttag(""),
+      user_data(NULL)
   {};
 
   /** Constructor given text & analyses & best tag */
   mootToken(const mootTokString &text,
 	    const AnalysisSet &analyses,
 	    const mootTagString &besttag)
-    : tok_text(text), tok_analyses(analyses), tok_besttag(besttag)
+    : tok_flavor(TF_TOKEN),
+      tok_text(text), tok_analyses(analyses), tok_besttag(besttag),
+      user_data(NULL)
   {};
 
   /*------------------------------------------------------------
@@ -214,7 +271,8 @@ public:
   friend bool operator==(const mootToken &x, const mootToken &y)
   {
     return
-      x.tok_text == y.tok_text
+      x.tok_flavor == y.tok_flavor
+      && x.tok_text == y.tok_text
       && x.tok_besttag == y.tok_besttag
       && x.tok_analyses == y.tok_analyses;
   };
@@ -232,11 +290,13 @@ public:
   /*------------------------------------------------------------
    * Manipulators: General
    */
-  /** Clear this object */
+  /** Clear this object (except for user_data) */
   inline void clear(void) {
+    tok_flavor = TF_TOKEN;
     tok_text.clear();
     tok_analyses.clear();
     tok_besttag.clear();
+    //user_data = NULL;
   };
 
   /*------------------------------------------------------------
@@ -260,6 +320,14 @@ public:
   inline mootTagString &besttag(const mootTagString &besttag) {
     tok_besttag = besttag;
     return tok_besttag;
+  };
+
+  /** Get token flavor */
+  inline mootTokFlavor flavor(void) const { return tok_flavor; }
+  /** Set token flavor */
+  inline mootTokFlavor flavor(const mootTokFlavor flavr) {
+    tok_flavor = flavr;
+    return tok_flavor;
   };
 
   /** Get token analyses */
@@ -303,6 +371,8 @@ public:
   {
     return tok_analyses.upper_bound(Analysis(tag,MOOT_COST_UB));
   };
+
+ 
 
   /*------------------------------------------------------------
    * Compatibility
@@ -368,7 +438,6 @@ public:
  */
 typedef list<mootToken> mootSentence;
 
-
 /*----------------------------------------------------------------------
  * Pattern-based Typification
  *----------------------------------------------------------------------*/
@@ -377,7 +446,7 @@ typedef list<mootToken> mootSentence;
 typedef enum {
   TokTypeAlpha,      /**< (Mostly) alphabetic token: "foo", "bar", "foo2bar" */
   TokTypeCard,       /**< @CARD: Digits-only: "42" */
-  TokTypeCardPunct,  /**< @CARDPUNCT: Digits with single-char punctuation suffix: "42." */
+  TokTypeCardPunct,  /**< @CARDPUNCT: Digits single-char punctuation suffix: "42." */
   TokTypeCardSuffix, /**< @CARDSUFFIX: Digits with (almost any) suffix: "42nd" */
   TokTypeCardSeps,   /**< @CARDEPS: Digits with interpunctuation: "420.24/7" */
   TokTypeUnknown,    /**< @UNKNOWN: Special "Unknown" token-type */
@@ -458,7 +527,7 @@ inline TokenType token2type(const mootTokString &token)
   }
 
 #if defined(MOOT_TNT_COMPAT)
-  //-- allow at most 3-character suffixes
+  //-- allow only suffixes of length <= 3 characters
   for (int i=0 ; ti != token.end() && i < 3 ; ti++, i++) {;}
   //-- ^([:digit:]+)([[:digit:][:CardPunct]]*)([^[:digit:][:CardPunct:]])(.{0,3})
 

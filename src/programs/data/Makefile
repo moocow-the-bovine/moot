@@ -32,6 +32,7 @@ MORPHHACK ?= ./morphhack.perl
 ##-- Globals: programs: moot
 MOOTRAIN = ../mootrain
 MOOTHMM = ../moot
+#MOOTHMM_FLAGS = -d1024
 MOOTHMM_FLAGS =
 MOOTEVAL = ../mooteval
 MOOTCOMPILE = ../mootcompile
@@ -51,7 +52,7 @@ t: $(TEST).t
 %.t: %.ttt
 	cut -f 1 $< > $@
 
-%.t: $.tt
+%.t: %.tt
 	cut -f 1 $< > $@
 
 %.t: %.mtt
@@ -135,7 +136,7 @@ cerrors: $(EVAL).cerrors
 
 %.cerrors: %.eval classify-eval.perl
 	./classify-eval.perl $< \
-	| grep '^.b:' $< | grep -v '^..:...:---' | sort | uniq -c | sort -r -n > $@
+	| grep '^.b:' | grep -v '^..:...:---' | sort | uniq -c | sort -r -n > $@
 
 %.ierrors: %.eval
 	grep '^.' $< | grep -v '^..:...:---' $< | sort | uniq -c | sort -r -n > $@
@@ -151,15 +152,22 @@ unsave:
 	rm -rf save/$(label).stamp
 
 save/%.stamp: $(TEST).ttt $(TEST).mtt $(TRAIN).model
-	$(MAKE) $(TEST).tt.eval  $(TEST).tt.errors
-	$(MAKE) $(TEST).dmtt.eval $(TEST).dmtt.errors $(TEST).dmtt.cerrors
-	$(MAKE) $(TEST).cmtt.eval $(TEST).cmtt.errors $(TEST).cmtt.cerrors
+	$(MAKE) $(TEST).tt.eval $(TEST).dmtt.eval $(TEST).cmtt.eval
+#--
+#	$(MAKE) $(TEST).tt.errors
+#	$(MAKE) $(TEST).dmtt.errors $(TEST).dmtt.cerrors
+#	$(MAKE) $(TEST).cmtt.errors $(TEST).cmtt.cerrors
+#--
+#	$(MAKE) $(TRAIN).tt.errors
+#	$(MAKE) $(TRAIN).dmtt.errors $(TRAIN).dmtt.cerrors
+#	$(MAKE) $(TRAIN).cmtt.errors $(TRAIN).cmtt.cerrors
+#--
 	mkdir -p save/$*
 	mv \
 	   $(TRAIN).lex $(TRAIN).123 $(TRAIN).clx \
-	   $(TEST).tt $(TEST).tt.eval $(TEST).tt.errors \
-	   $(TEST).dmtt $(TEST).dmtt.eval $(TEST).dmtt.errors $(TEST).dmtt.cerrors \
-	   $(TEST).cmtt $(TEST).cmtt.eval $(TEST).cmtt.errors $(TEST).cmtt.cerrors \
+	   $(TEST).tt $(TEST).tt.eval \
+	   $(TEST).dmtt $(TEST).dmtt.eval \
+	   $(TEST).cmtt $(TEST).cmtt.eval \
 	  save/$*
 	rm -f $(TRAIN).model
 	touch $@

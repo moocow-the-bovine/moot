@@ -50,8 +50,43 @@ For details on moot file formats, see L<mootfiles>.
 #group "Basic Options"
 int "verbose" v "Verbosity level." \
     arg="LEVEL" \
-    default="2" \
-    details="Be more or less verbose.  Recognized values are in the range 0..3."
+    default="3" \
+    details="
+Be more or less verbose.  Recognized values are in the range 0..5:
+
+=over 4
+
+=item 0
+
+Be silent.
+
+=item 1
+
+Print error messages to stderr.
+
+=item 2
+
+Print warnings to stderr.
+
+=item 3
+
+Print summary information to stderr.
+
+=item 4
+
+Print progress information to stderr.
+
+=item 5
+
+Print everything.
+
+=back
+"
+
+int   "dots"   d  "Print a dot for every NTOKS tokens processed." \
+    arg="NTOKS" \
+    default="0" \
+    details="Zero (the default) means that no dots will be printed."
 
 #flag  "words"  w  "INPUTs are input tokens, not filenames." \
 #    details="Useful for testing."
@@ -157,7 +192,7 @@ Lexical probabilities for unknown tokens in the input are estimated
 from tokens which occur at most FLOAT times in the model.
 "
 
-double "class-threshhold" X "Freq. threshhold for 'unknown' class probabilities" \
+double "class-threshhold" C "Freq. threshhold for 'unknown' class probabilities" \
   arg="FLOAT" \
   default="1.0" \
   details="

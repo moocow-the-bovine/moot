@@ -60,13 +60,25 @@ void TokenReader::select_string(const char *instr, char *source_name)
 mootSentence &TokenReader::get_sentence(void)
 {
   int lxtok;
+
   sentence.clear();
-  while ((lxtok = lexer.yylex()) != mootTokenLexer::TLEOF) {
-    if (lxtok == mootTokenLexer::TLEOS) {
+  while ((lxtok = lexer.yylex()) != TF_EOF) {
+    switch (lxtok) {
+
+    case TF_COMMENT:
+    case TF_TOKEN:
+      sentence.push_back(lexer.mtoken);
+      break;
+
+    case TF_EOS:
       if (!sentence.empty()) return sentence;
-      continue;
+      break;
+
+    default:
+      //-- whoa
+      fprintf(stderr, "mootTokenIO::get_sentence(): unknown token type '%d' ignored!\n", lxtok);
+      break;
     }
-    sentence.push_back(lexer.mtoken);
   }
   return sentence;
 }
@@ -78,6 +90,7 @@ mootSentence &TokenReader::get_sentence(void)
 string TokenWriter::token_string(const mootToken &token)
 {
   string s = token.text();
+  if (token.flavor() == TF_COMMENT) return s;
 
   //-- best tag is always standalone first 'analysis'
   s.push_back('\t');
@@ -125,6 +138,10 @@ void TokenWriter::token_put(FILE *out, const mootToken &token)
   fputc('\n', out);
   */
   fputs(token.text().c_str(), out);
+  if (token.flavor() == TF_COMMENT) {
+    fputc('\n', out);
+    return;
+  }
 
   //-- best tag is always standalone first 'analysis'
   fputc('\t',out);

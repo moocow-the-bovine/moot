@@ -4,21 +4,7 @@
 
 using namespace moot;
 
-char typnames[mootTokenLexer::TLNTYPES][64] =
-    {
-      "TLUNKNOWN",
-      "TLEOF",
-      "TLEOS",
-      "TLTOKEN",
-      "TLTEXT",
-      "TLTAB",
-      "TLTAG",
-      "TLDETAILS",
-      "TLCOST",
-      "TLNEWLINE",
-      "TLIGNORE"
-    };
-
+char **typnames = mootTokFlavorNames;
 
 void churntest(int argc, char **argv) {
   mootTokenLexer lex;

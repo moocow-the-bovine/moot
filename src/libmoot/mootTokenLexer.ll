@@ -47,7 +47,6 @@
 
 #include <stdarg.h>
 #include "mootToken.h"
-/*#include "mootTypes.h"*/
 
 
 /*============================================================================
@@ -76,20 +75,6 @@
  *
  */
 
-/** Useful for debugging token-types */\
-const char mootTokenLexerTypeNames[12][16] = {
-      "TLUNKNOWN",
-      "TLEOF",
-      "TLEOS", 
-      "TLTOKEN", 
-      "TLTEXT", 
-      "TLTAB", 
-      "TLTAG", 
-      "TLDETAILS", 
-      "TLCOST", 
-      "TLNEWLINE", 
-      "TLIGNORE" 
-  };
 %}
 
 /*%define LEX_PARAM \
@@ -99,25 +84,9 @@ const char mootTokenLexerTypeNames[12][16] = {
 %define CLASS mootTokenLexer
 %define MEMBERS \
   public: \
-    /* -- public typedefs */\
-    /** typedef for token-types */\
-    typedef enum {\
-      /* Output token-types */\
-      TLUNKNOWN,   /**< unknown token */\
-      TLEOF,       /**< end-of-file */\
-      TLEOS,       /**< end-of-sentence */\
-      TLTOKEN,     /**< token (+ analyses) */\
-      /*-- internal use only */\
-      TLTEXT,      /**< token text (internal use only) */\
-      TLTAB,       /**< tabs (internal use only) */\
-      TLTAG,       /**< analysis tags (internal use only) */\
-      TLDETAILS,   /**< analysis details (internal use only) */\
-      TLCOST,      /**< analysis costs (internal use only) */\
-      TLNEWLINE,   /**< newlines (internal use only) */\
-      TLIGNORE,    /**< ignored (internal use only) */\
-      TLNTYPES \
-    } TokenType;\
-    \
+  /* -- public typedefs */\
+  typedef moot::mootTokFlavor TokenType; \
+  \
   public: \
    /* -- positional parameters */ \
    /** current line*/\
@@ -132,6 +101,8 @@ const char mootTokenLexerTypeNames[12][16] = {
    moot::mootToken::Analysis manalysis;\
    /** last token type */ \
    TokenType lasttyp; \
+   /** whether to ignore comments (default=false) */ \
+   bool ignore_comments; \
    /** whether first analysis parsed should be considered 'best' (default=true) */ \
    bool first_analysis_is_best; \
    /** whether we're parsing a 'best' analysis */\
@@ -172,7 +143,8 @@ const char mootTokenLexerTypeNames[12][16] = {
 %define CONSTRUCTOR_INIT :\
   theLine(1), \
   theColumn(0), \
-  lasttyp(TLEOS), \
+  lasttyp(moot::TF_EOS), \
+  ignore_comments(false), \
   first_analysis_is_best(true), \
   current_analysis_is_best(false), \
   ignore_first_analysis(false), \
@@ -222,22 +194,30 @@ tagchar    [^ \t\n\r\]]
 %%
 %{
   BEGIN(TOKEN);
+  using namespace std;
+  using namespace moot;
 %}
 
 ^([ \t]*){newline} {
   /** blank line: maybe return eos (ignore empty sentences) */
   theLine++; theColumn=0;
-  if (lasttyp != TLEOS) {
-    lasttyp=TLEOS;
-    return TLEOS;
+  if (lasttyp != TF_EOS) {
+    lasttyp=TF_EOS;
+    return TF_EOS;
   }
 }
 
 ^([ \t]*)"%%"([^\r\n]*){newline} {
-  /* mostly ignore comments */
+  //-- return comments as special tokens
   theLine++;
   theColumn = 0;
-  lasttyp = TLIGNORE;
+  lasttyp = TF_COMMENT;
+  if (!ignore_comments) {
+    mtoken.clear();
+    mtoken.flavor(TF_COMMENT);
+    mtoken.tok_text = mootTokString((const char *)yytext, yyleng-1);
+    return TF_COMMENT;
+  }
 }
 
 
@@ -245,15 +225,16 @@ tagchar    [^ \t\n\r\]]
   /* TOKEN: non-empty token text */
   theColumn += yyleng;
   mtoken.clear();
+  mtoken.flavor(TF_TOKEN);
   mtoken.tok_text.append((const char *)yytext);
-  lasttyp = TLTEXT;
+  lasttyp = TF_TEXT;
 }
 
 <TOKEN>{space}+/{wordchar} {
   /* TOKEN: token-internal whitespace: keep it */
   theColumn += yyleng;
   mtoken.tok_text.append((const char *)yytext);
-  lasttyp = TLTEXT;
+  lasttyp = TF_TEXT;
 }
 
 <TOKEN>{space}*/{eotchar} {
@@ -261,7 +242,7 @@ tagchar    [^ \t\n\r\]]
   theColumn += yyleng;
   if (first_analysis_is_best) current_analysis_is_best = true;
   if (ignore_first_analysis)  ignore_current_analysis = true;
-  lasttyp = TLTEXT;
+  lasttyp = TF_TEXT;
   BEGIN(SEPARATORS);
 }
 
@@ -270,7 +251,7 @@ tagchar    [^ \t\n\r\]]
 <SEPARATORS>{tab}({space}*) {
   //-- SEPARATORS: Separator character(s): increment column nicely
   theColumn = (((int)theColumn/8)+1)*8 + (yyleng ? yyleng-1 : 0);
-  lasttyp = TLTAB;
+  lasttyp = TF_TAB;
 }
 <SEPARATORS>""/{wordchar} {
   //-- SEPARATORS: end of separators
@@ -279,28 +260,31 @@ tagchar    [^ \t\n\r\]]
 }
 <SEPARATORS>{newline} {
   //-- SEPARATORS/EOT: reset to initial state : see also <SEPARATORS><<EOF>>
+  theLine++;
+  theColumn = 0;
   BEGIN(TOKEN);
   //-- return token flag (actual data is in 'mtoken' member)
-  lasttyp = TLTOKEN;
-  return TLTOKEN;
+  lasttyp = TF_TOKEN;
+  return TF_TOKEN;
 }
 
 <SEPARATORS><<EOF>> {
   //fprintf(stderr, "<SEPARATORS>EOF: lasttyp=%s\n", mootTokenLexerTypeNames[lasttyp]);
   switch (lasttyp) {
-   case TLTEXT:
-     lasttyp = TLTOKEN;
+   case TF_TEXT:
+     lasttyp = TF_TOKEN;
      break;
-   case TLNEWLINE:
-   case TLTOKEN:
-     lasttyp = TLEOS;
+   case TF_TOKEN:
+   case TF_COMMENT:
+   case TF_NEWLINE:
+     lasttyp = TF_EOS;
      break;
-   case TLEOS:
-   case TLEOF:
-     lasttyp = TLEOF;
+   case TF_EOS:
+   case TF_EOF:
+     lasttyp = TF_EOF;
      break;
    default:
-     lasttyp = TLEOS;
+     lasttyp = TF_EOS;
   }
   //fprintf(stderr, "<SEPARATORS>EOF: returning=%s\n", mootTokenLexerTypeNames[lasttyp]);
   return lasttyp;
@@ -311,7 +295,7 @@ tagchar    [^ \t\n\r\]]
   //-- DETAILS: looks like a tag
   theColumn += yyleng;
   manalysis.details.append((const char *)yytext);
-  lasttyp = TLDETAILS;
+  lasttyp = TF_DETAILS;
   BEGIN(TAG);
 }
 
@@ -319,14 +303,14 @@ tagchar    [^ \t\n\r\]]
   //-- DETAILS: detail text
   theColumn += yyleng;
   manalysis.details.append((const char *)yytext);
-  lasttyp = TLDETAILS;
+  lasttyp = TF_DETAILS;
 }
 
 <DETAILS>{space}+/{wordchar} {
   //-- DETAILS: internal whitespace: keep it
   theColumn += yyleng;
   manalysis.details.append((const char *)yytext);
-  lasttyp = TLDETAILS;
+  lasttyp = TF_DETAILS;
 }
 
 <DETAILS>"<"([+-]?)[0-9]*(\.?)([0-9]+)">" {
@@ -335,13 +319,13 @@ tagchar    [^ \t\n\r\]]
   moot::mootToken::Cost cost;
   sscanf((const char *)yytext+1, "%f", &cost);
   manalysis.cost += cost;
-  lasttyp = TLCOST;
+  lasttyp = TF_COST;
 }
 
 <DETAILS>""/{eotchar} {
   //-- DETAILS/EOD: add & clear current analysis, if any : see also <DETAILS><<EOF>>
   //-- add & clear current analysis, if any
-  if (lasttyp != TLTAB) {
+  if (lasttyp != TF_TAB) {
     //-- set default tag
     if (manalysis.tag.empty()) {
       manalysis.tag.swap(manalysis.details);
@@ -368,7 +352,7 @@ tagchar    [^ \t\n\r\]]
 <DETAILS><<EOF>> {
   //fprintf(stderr, "<DETAILS>EOF : lasttyp=%s\n", mootTokenLexerTypeNames[lasttyp]);
   //-- add & clear current analysis, if any : see also <DETAILS>""/{eotchar}
-  if (lasttyp != TLTAB) {
+  if (lasttyp != TF_TAB) {
     //-- set default tag
     if (manalysis.tag.empty()) {
       manalysis.tag.swap(manalysis.details);
@@ -389,8 +373,8 @@ tagchar    [^ \t\n\r\]]
   }
   //-- return the token NOW
   BEGIN(TOKEN);
-  lasttyp = TLTOKEN;
-  return TLTOKEN;
+  lasttyp = TF_TOKEN;
+  return TF_TOKEN;
 }
 
 <TAG>{tagchar}+ {
@@ -398,7 +382,7 @@ tagchar    [^ \t\n\r\]]
   theColumn += yyleng;
   manalysis.details.append((const char *)yytext);
   if (manalysis.tag.empty()) manalysis.tag = (const char *)yytext;
-  lasttyp = TLTAG;
+  lasttyp = TF_TAG;
   BEGIN(DETAILS);
 }
 
@@ -408,7 +392,7 @@ tagchar    [^ \t\n\r\]]
 {space}+ {
   /* mostly ignore spaces */
   theColumn += yyleng;
-  lasttyp = TLIGNORE;
+  lasttyp = TF_IGNORE;
 }
 
 . {
@@ -430,15 +414,15 @@ tagchar    [^ \t\n\r\]]
 <<EOF>> {
   //fprintf(stderr, "<>EOF: lasttyp=%d\n", lasttyp);
   switch (lasttyp) {
-   case TLEOS:
-   case TLEOF:
-     lasttyp = TLEOF;
+   case TF_EOS:
+   case TF_EOF:
+     lasttyp = TF_EOF;
      break;
-   case TLNEWLINE:
-     lasttyp = TLEOS;
+   case TF_NEWLINE:
+     lasttyp = TF_EOS;
      break;
    default:
-     lasttyp = TLEOS;
+     lasttyp = TF_EOS;
   }
   return lasttyp;
 }
@@ -467,7 +451,7 @@ void mootTokenLexer::select_streams(FILE *in, FILE *out)
   yyout = out;
   use_string = false;
 
-  // -- black magic from flex(1) manpage
+  //-- black magic from flex(1) manpage
   if (yy_current_buffer != NULL) { yy_delete_buffer(yy_current_buffer); }
   yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
   reset();

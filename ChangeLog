@@ -1,10 +1,44 @@
 ChangeLog for package moot
 
 Todo:
-	+ add XML I/O (subclass of mootToken(Reader|Writer) ?)
-	  - test effect of virtuals here
+	+ add XML I/O (subclass of moot::Token(Reader|Writer) ?)
+	  - test performance impact of virtuals here
 	+ write perl-XS interface & utilities
-	+ optimize class-based tagging: pre-prune classfreqs
+	+ find out where all the process time is going in
+	  class-based disambig (it ain't in the find(), as I had
+	  thought: classification maybe?)
+
+v2.0.0pre6 Thu, 10 Jun 2004 01:37:09 +0200
+	+ got comment pass-through working: added type
+	  'mootTokFlavor' in 'mootToken.h' and instance datum
+	  'tok_flavor' to 'mootToken' -- may be 'TF_COMMENT'
+	  for comment-tokens: these must be caught and
+	  handled by the application when using the
+	  mootSentence interface (mootHMM and mootHMMTrainer
+	  appear to work properly).
+	  - comments also passed through by 'mooteval': this
+	    is a serious Pain In The Wazoo, but it might
+	    be particularly helpful here.
+	+ added '--dots' option to 'moot' : slows things down
+	  considerably, but it's a nice bell and/or whistle
+	  (nifty tty stuff is prettier in xterm, but emacs
+	  don't like it, so i ain't coding it in...)
+	
+v2.0.0pre5 Sun,  6 Jun 2004 12:07:11 +0200
+	+ re-added & tested binary model I/O
+	+ added new 'mootcompile' and 'mootdump' programs
+	  to clean up 'moot' itself a bit
+	+ moved old 'programs/cmdutil.*' and 'programs/hmmutil.*'
+	  structs and functions into library: 'mootUtils.h';
+	  redefined in terms of 'string'
+	+ added high-level mootHMM::load_model() method for
+	  single-model load, compilation, and smoothing estimation.
+	+ fixed bug causing all fallbacks without 'use_lex_classes'
+	+ reworked mootHMM::viterbi_step(tokid,classid,lclass)
+	  to use only a single iterator -- tiny bit faster,
+	  but relies on 'typedef LexProbSubtable LexClassProbSubtable';
+	  not a problem now or in the foreseeable future.
+	+ (former todo): optimize class-based tagging: pre-prune classfreqs
 	  and merge viterbi_step()s into one iterator-based
 	  method ?
 	  - nope, we lose either efficiency or strictness
@@ -20,21 +54,6 @@ Todo:
 	    (read "consistency"), so #ifdef'd it out.
 	    * leads to the question where the REAL speed-brake
 	      is coming from... class lookup / conversion?
-
-v2.0.0pre5 Sun,  6 Jun 2004 12:07:11 +0200
-	+ re-added & tested binary model I/O
-	+ added new 'mootcompile' and 'mootdump' programs
-	  to clean up 'moot' itself a bit
-	+ moved old 'programs/cmdutil.*' and 'programs/hmmutil.*'
-	  structs and functions into library: 'mootUtils.h';
-	  redefined in terms of 'string'
-	+ added high-level mootHMM::load_model() method for
-	  single-model load, compilation, and smoothing estimation.
-	+ fixed bug causing all fallbacks without 'use_lex_classes'
-	+ reworked mootHMM::viterbi_step(tokid,classid,lclass)
-	  to use only a single iterator -- tiny bit faster,
-	  but relies on 'typedef LexProbSubtable LexClassProbSubtable';
-	  not a problem now or in the foreseeable future.
 	
 v2.0.0pre4 Sun,  6 Jun 2004 02:52:24 +0200
 	+ gaspode bughunt

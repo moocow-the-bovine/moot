@@ -256,7 +256,7 @@ int read();
  * Rules
  *----------------------------------------------------------------------*/
 #include "mootTokenLexer.h"
-#line 222 "mootTokenLexer.ll"
+#line 194 "mootTokenLexer.ll"
 #line 196 "/usr/local/share/flex++bison++/flexskel.cc"
 
 #define yy___text YY_mootTokenLexer_TEXT
@@ -561,9 +561,9 @@ static YY_CHAR *yy_last_accepting_cpos;
 #if YY_mootTokenLexer_DEBUG != 0
 static const short int yy_rule_linenum[24] =
     {   0,
-      227,  236,  244,  252,  259,  259,  270,  275,  280,  280,
-      310,  318,  325,  332,  341,  341,  396,  396,  408,  414,
-      419,  424,  424
+      201,  210,  224,  233,  240,  240,  251,  256,  261,  261,
+      294,  302,  309,  316,  325,  325,  380,  380,  392,  398,
+      403,  408,  408
     } ;
 
 #endif
@@ -708,80 +708,89 @@ do_action:      /* this label is used only to access EOF actions */
 
 
   BEGIN(TOKEN);
+  using namespace std;
+  using namespace moot;
 
 case 1:
-#line 227 "mootTokenLexer.ll"
+#line 201 "mootTokenLexer.ll"
 {
   /** blank line: maybe return eos (ignore empty sentences) */
   theLine++; theColumn=0;
-  if (lasttyp != TLEOS) {
-    lasttyp=TLEOS;
-    return TLEOS;
+  if (lasttyp != TF_EOS) {
+    lasttyp=TF_EOS;
+    return TF_EOS;
   }
 }
 	YY_BREAK
 case 2:
-#line 236 "mootTokenLexer.ll"
+#line 210 "mootTokenLexer.ll"
 {
-  /* mostly ignore comments */
+  //-- return comments as special tokens
   theLine++;
   theColumn = 0;
-  lasttyp = TLIGNORE;
+  lasttyp = TF_COMMENT;
+  if (!ignore_comments) {
+    mtoken.clear();
+    mtoken.flavor(TF_COMMENT);
+    mtoken.tok_text = mootTokString((const char *)yytext, yyleng-1);
+    return TF_COMMENT;
+  }
 }
 	YY_BREAK
 case 3:
-#line 244 "mootTokenLexer.ll"
+#line 224 "mootTokenLexer.ll"
 {
   /* TOKEN: non-empty token text */
   theColumn += yyleng;
   mtoken.clear();
+  mtoken.flavor(TF_TOKEN);
   mtoken.tok_text.append((const char *)yytext);
-  lasttyp = TLTEXT;
+  lasttyp = TF_TEXT;
 }
 	YY_BREAK
 case 4:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 252 "mootTokenLexer.ll"
+#line 233 "mootTokenLexer.ll"
 {
   /* TOKEN: token-internal whitespace: keep it */
   theColumn += yyleng;
   mtoken.tok_text.append((const char *)yytext);
-  lasttyp = TLTEXT;
+  lasttyp = TF_TEXT;
 }
 	YY_BREAK
 case 5:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 259 "mootTokenLexer.ll"
+#line 240 "mootTokenLexer.ll"
 {
   /* TOKEN: end-of-token (with trailing whitespace: ignored) */
   theColumn += yyleng;
   if (first_analysis_is_best) current_analysis_is_best = true;
   if (ignore_first_analysis)  ignore_current_analysis = true;
-  lasttyp = TLTEXT;
+  lasttyp = TF_TEXT;
   BEGIN(SEPARATORS);
 }
 	YY_BREAK
 case YY_STATE_EOF(TOKEN):
-#line 268 "mootTokenLexer.ll"
+#line 249 "mootTokenLexer.ll"
 { BEGIN(SEPARATORS); }
 	YY_BREAK
 case 7:
-#line 270 "mootTokenLexer.ll"
+#line 251 "mootTokenLexer.ll"
 {
   //-- SEPARATORS: Separator character(s): increment column nicely
   theColumn = (((int)theColumn/8)+1)*8 + (yyleng ? yyleng-1 : 0);
-  lasttyp = TLTAB;
+  lasttyp = TF_TAB;
 }
 	YY_BREAK
 case 8:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 275 "mootTokenLexer.ll"
+#line 256 "mootTokenLexer.ll"
 {
   //-- SEPARATORS: end of separators
   theColumn += yyleng;
@@ -789,33 +798,36 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
 }
 	YY_BREAK
 case 9:
-#line 280 "mootTokenLexer.ll"
+#line 261 "mootTokenLexer.ll"
 {
   //-- SEPARATORS/EOT: reset to initial state : see also <SEPARATORS><<EOF>>
+  theLine++;
+  theColumn = 0;
   BEGIN(TOKEN);
   //-- return token flag (actual data is in 'mtoken' member)
-  lasttyp = TLTOKEN;
-  return TLTOKEN;
+  lasttyp = TF_TOKEN;
+  return TF_TOKEN;
 }
 	YY_BREAK
 case YY_STATE_EOF(SEPARATORS):
-#line 288 "mootTokenLexer.ll"
+#line 271 "mootTokenLexer.ll"
 {
   //fprintf(stderr, "<SEPARATORS>EOF: lasttyp=%s\n", mootTokenLexerTypeNames[lasttyp]);
   switch (lasttyp) {
-   case TLTEXT:
-     lasttyp = TLTOKEN;
+   case TF_TEXT:
+     lasttyp = TF_TOKEN;
      break;
-   case TLNEWLINE:
-   case TLTOKEN:
-     lasttyp = TLEOS;
+   case TF_TOKEN:
+   case TF_COMMENT:
+   case TF_NEWLINE:
+     lasttyp = TF_EOS;
      break;
-   case TLEOS:
-   case TLEOF:
-     lasttyp = TLEOF;
+   case TF_EOS:
+   case TF_EOF:
+     lasttyp = TF_EOF;
      break;
    default:
-     lasttyp = TLEOS;
+     lasttyp = TF_EOS;
   }
   //fprintf(stderr, "<SEPARATORS>EOF: returning=%s\n", mootTokenLexerTypeNames[lasttyp]);
   return lasttyp;
@@ -825,56 +837,56 @@ case 11:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 310 "mootTokenLexer.ll"
+#line 294 "mootTokenLexer.ll"
 {
   //-- DETAILS: looks like a tag
   theColumn += yyleng;
   manalysis.details.append((const char *)yytext);
-  lasttyp = TLDETAILS;
+  lasttyp = TF_DETAILS;
   BEGIN(TAG);
 }
 	YY_BREAK
 case 12:
-#line 318 "mootTokenLexer.ll"
+#line 302 "mootTokenLexer.ll"
 {
   //-- DETAILS: detail text
   theColumn += yyleng;
   manalysis.details.append((const char *)yytext);
-  lasttyp = TLDETAILS;
+  lasttyp = TF_DETAILS;
 }
 	YY_BREAK
 case 13:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 325 "mootTokenLexer.ll"
+#line 309 "mootTokenLexer.ll"
 {
   //-- DETAILS: internal whitespace: keep it
   theColumn += yyleng;
   manalysis.details.append((const char *)yytext);
-  lasttyp = TLDETAILS;
+  lasttyp = TF_DETAILS;
 }
 	YY_BREAK
 case 14:
-#line 332 "mootTokenLexer.ll"
+#line 316 "mootTokenLexer.ll"
 {
   //-- DETAILS/COST: add cost to current analysis
   theColumn += yyleng;
   moot::mootToken::Cost cost;
   sscanf((const char *)yytext+1, "%f", &cost);
   manalysis.cost += cost;
-  lasttyp = TLCOST;
+  lasttyp = TF_COST;
 }
 	YY_BREAK
 case 15:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 341 "mootTokenLexer.ll"
+#line 325 "mootTokenLexer.ll"
 {
   //-- DETAILS/EOD: add & clear current analysis, if any : see also <DETAILS><<EOF>>
   //-- add & clear current analysis, if any
-  if (lasttyp != TLTAB) {
+  if (lasttyp != TF_TAB) {
     //-- set default tag
     if (manalysis.tag.empty()) {
       manalysis.tag.swap(manalysis.details);
@@ -900,11 +912,11 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
 }
 	YY_BREAK
 case YY_STATE_EOF(DETAILS):
-#line 368 "mootTokenLexer.ll"
+#line 352 "mootTokenLexer.ll"
 {
   //fprintf(stderr, "<DETAILS>EOF : lasttyp=%s\n", mootTokenLexerTypeNames[lasttyp]);
   //-- add & clear current analysis, if any : see also <DETAILS>""/{eotchar}
-  if (lasttyp != TLTAB) {
+  if (lasttyp != TF_TAB) {
     //-- set default tag
     if (manalysis.tag.empty()) {
       manalysis.tag.swap(manalysis.details);
@@ -925,74 +937,74 @@ case YY_STATE_EOF(DETAILS):
   }
   //-- return the token NOW
   BEGIN(TOKEN);
-  lasttyp = TLTOKEN;
-  return TLTOKEN;
+  lasttyp = TF_TOKEN;
+  return TF_TOKEN;
 }
 	YY_BREAK
 case 17:
-#line 396 "mootTokenLexer.ll"
+#line 380 "mootTokenLexer.ll"
 {
   //-- TAG: tag text
   theColumn += yyleng;
   manalysis.details.append((const char *)yytext);
   if (manalysis.tag.empty()) manalysis.tag = (const char *)yytext;
-  lasttyp = TLTAG;
+  lasttyp = TF_TAG;
   BEGIN(DETAILS);
 }
 	YY_BREAK
 case YY_STATE_EOF(TAG):
-#line 405 "mootTokenLexer.ll"
+#line 389 "mootTokenLexer.ll"
 { BEGIN(DETAILS); }
 	YY_BREAK
 case 19:
-#line 408 "mootTokenLexer.ll"
+#line 392 "mootTokenLexer.ll"
 {
   /* mostly ignore spaces */
   theColumn += yyleng;
-  lasttyp = TLIGNORE;
+  lasttyp = TF_IGNORE;
 }
 	YY_BREAK
 case 20:
-#line 414 "mootTokenLexer.ll"
+#line 398 "mootTokenLexer.ll"
 {
   theColumn += yyleng;
   yycarp("Unrecognized TOKEN character '%c'", *yytext);
 }
 	YY_BREAK
 case 21:
-#line 419 "mootTokenLexer.ll"
+#line 403 "mootTokenLexer.ll"
 {
   theColumn += yyleng;
   yycarp("Unrecognized DETAIL character '%c'", *yytext);
 }
 	YY_BREAK
 case 22:
-#line 424 "mootTokenLexer.ll"
+#line 408 "mootTokenLexer.ll"
 {
   theColumn += yyleng;
   yycarp("Unrecognized TAG character '%c'", *yytext);
 }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 430 "mootTokenLexer.ll"
+#line 414 "mootTokenLexer.ll"
 {
   //fprintf(stderr, "<>EOF: lasttyp=%d\n", lasttyp);
   switch (lasttyp) {
-   case TLEOS:
-   case TLEOF:
-     lasttyp = TLEOF;
+   case TF_EOS:
+   case TF_EOF:
+     lasttyp = TF_EOF;
      break;
-   case TLNEWLINE:
-     lasttyp = TLEOS;
+   case TF_NEWLINE:
+     lasttyp = TF_EOS;
      break;
    default:
-     lasttyp = TLEOS;
+     lasttyp = TF_EOS;
   }
   return lasttyp;
 }
 	YY_BREAK
 case 24:
-#line 446 "mootTokenLexer.ll"
+#line 430 "mootTokenLexer.ll"
 ECHO;
 	YY_BREAK
 #line 463 "/usr/local/share/flex++bison++/flexskel.cc"
@@ -1587,7 +1599,7 @@ void YY_mootTokenLexer_CLASS::YY_mootTokenLexer_INIT_BUFFER( YY_BUFFER_STATE b, 
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 446 "mootTokenLexer.ll"
+#line 430 "mootTokenLexer.ll"
 
 
 
@@ -1612,7 +1624,7 @@ void mootTokenLexer::select_streams(FILE *in, FILE *out)
   yyout = out;
   use_string = false;
 
-  // -- black magic from flex(1) manpage
+  //-- black magic from flex(1) manpage
   if (yy_current_buffer != NULL) { yy_delete_buffer(yy_current_buffer); }
   yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
   reset();

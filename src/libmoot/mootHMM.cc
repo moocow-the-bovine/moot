@@ -1122,15 +1122,16 @@ void mootHMM::tag_stream(FILE *in, FILE *out, char *srcname)
   treader.select_stream(in,srcname);
   do {
     mootSentence &sent = treader.get_sentence();
+
     //if (sent.empty()) break;
-    if (treader.lexer.lasttyp == mootTokenLexer::TLEOF) break;
+    if (treader.lexer.lasttyp == TF_EOF) break;
 
     tag_sentence(sent);
 
     twriter.sentence_put(out,sent);
   } while (1);
 
-  if (ndots && verbose >= vlProgress) fputc('\n', stderr);
+  //if (ndots) fputc('\n', stderr);
 }
 
 
@@ -1147,7 +1148,7 @@ void mootHMM::tag_strings(int argc, char **argv, FILE *out, char *infilename)
   tag_sentence(sent);
   nsents++;
 
-  if (ndots && verbose >= vlProgress) fputc('\n', stderr);
+  //if (ndots) fputc('\n', stderr);
 }
 
 /*--------------------------------------------------------------------------
@@ -1162,6 +1163,7 @@ void mootHMM::tag_mark_best(mootSentence &sentence)
   if (pnod) pnod = pnod->path_next;  //-- skip boundary tag
 
   for (senti = sentence.begin(); senti != sentence.end(); senti++) {
+    if (senti->flavor() == TF_COMMENT) continue; //-- ignore comments
     if (pnod && pnod->node) {
       senti->besttag(tagids.id2name(pnod->node->tagid));
       pnod = pnod->path_next;

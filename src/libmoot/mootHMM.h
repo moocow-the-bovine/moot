@@ -690,7 +690,7 @@ public:
     viterbi_clear();
     for (mootSentence::const_iterator si = sentence.begin(); si != sentence.end(); si++) {
       viterbi_step(*si);
-      if (ndots && verbose >= vlProgress && (ntokens % ndots)==0) fputc('.', stderr);
+      if (ndots && (ntokens % ndots)==0) fputc('.', stderr);
     }
     viterbi_finish();
     tag_mark_best(sentence);
@@ -716,6 +716,7 @@ public:
    * Really just a wrapper for \c viterbi_step(TokID,set<TagID>).
    */
   inline void viterbi_step(const mootToken &token) {
+    if (token.flavor() == TF_COMMENT) return; //-- ignore comments
     ntokens++;
     LexClass tok_class;
     for (mootToken::AnalysisSet::const_iterator ani = token.analyses().begin();
