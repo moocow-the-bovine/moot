@@ -159,17 +159,17 @@ alphalines:	/* empty */ { $$ = NULL; }
 	;
 
 alphaline:	newline { $$=NULL; }
-	|	typeID tab shortName tab longName tab regexList
+	|	typeID tab shortName tab longName regexList
 		{
 		    // -- index the parsed alphabet-line
 		    if (*($1) == "Class") {
-		      compile_alphabet_class($3,$5,$7);
+		      compile_alphabet_class($3,$5,$6);
 		    }
                     // -- cleanup
                     $1->clear(); delete $1;
                     $3->clear(); delete $3;
                     $5->clear(); delete $5;
-                    $7->clear(); delete $7;
+                    $6->clear(); delete $6;
 		    $$ = NULL;
                 }
 		;
@@ -184,12 +184,12 @@ longName:	SYMBOL { $$=$1; }
 		;
 
 regexList:	/* empty */ { $$ = new FSMSymbolString(""); }
-	|	regexList SYMBOL {
-                  if ($1->empty()) $1->push_back('|');
+	|	regexList tab regex {
+                  if (!$1->empty()) $1->push_back('|');
                   $1->push_back('(');
-                  $1->append((const FSMSymbolString)*$2);
+                  $1->append((const FSMSymbolString)*$3);
                   $1->push_back(')');
-                  delete $2;
+                  delete $3;
                   $$ = $1;
 		}
 	;
