@@ -272,7 +272,7 @@ void GetMyOptions(int argc, char **argv)
   writer->printf_raw("   Border Tag        : %s\n", hmm.tagids.id2name(hmm.start_tagid).c_str());
 #ifdef MOOT_USE_TRIGRAMS
   writer->printf_raw("   N-Gram lambdas    : lambda1=%g, lambda2=%g, lambda3=%g\n",
-	    exp(hmm.nglambda1), exp(hmm.nglambda2), exp(hmm.nglamda3));
+	    exp(hmm.nglambda1), exp(hmm.nglambda2), exp(hmm.nglambda3));
 #else
   writer->printf_raw("   N-Gram lambdas    : lambda1=%g, lambda2=%g\n",
 	    exp(hmm.nglambda1), exp(hmm.nglambda2));
