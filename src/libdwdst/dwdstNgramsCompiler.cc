@@ -1,7 +1,7 @@
 /* -*- Mode: C++ -*- */
 
 /*============================================================================
- * File: dwdstParamCompiler.cc
+ * File: dwdstNgramsCompiler.cc
  * Author:  Bryan Jurish <moocow@ling.uni-potsdam.de>
  *
  * Description:
@@ -12,9 +12,9 @@
 
 #include <FSM.h>
 
-#include "dwdstParamLexer.h"
-#include "dwdstParamParser.h"
-#include "dwdstParamCompiler.h"
+#include "dwdstNgramsLexer.h"
+#include "dwdstNgramsParser.h"
+#include "dwdstNgramsCompiler.h"
 
 /*----------------------------------------------------------------
  * Constructor / Destructors
@@ -27,7 +27,7 @@
 /*----------------------------------------------------------------
  * Public Methods: PARSING
  *----------------------------------------------------------------*/
-int dwdstParamCompiler::yylex()
+int dwdstNgramsCompiler::yylex()
 {
   yylloc.first_line=theLexer.theLine;
   yylloc.first_column=theLexer.theColumn;
@@ -39,7 +39,7 @@ int dwdstParamCompiler::yylex()
 }
 
 
-NGramTable *dwdstParamCompiler::parse_ngrams()
+NGramTable *dwdstNgramsCompiler::parse_ngrams()
 {
   // sanity check
   if (!ngtable) {
@@ -56,16 +56,16 @@ NGramTable *dwdstParamCompiler::parse_ngrams()
  * Public Methods: Errors & Warnings
  *----------------------------------------------------------------*/
 
-void dwdstParamCompiler::yyerror(const char *msg) {
+void dwdstNgramsCompiler::yyerror(const char *msg) {
     fprintf(stderr,"%s: error:%s%s at line %d, column %d, near token '%s': %s\n",
-	    (objname ? objname : "dwdstParamCompiler"),
+	    (objname ? objname : "dwdstNgramsCompiler"),
 	    (srcname ? " in file " : ""),
 	    (srcname ? srcname : ""),
 	    yylloc.first_line, yylloc.first_column, yylloc.text, msg);
 }
-void dwdstParamCompiler::yywarn(const char *msg) {
+void dwdstNgramsCompiler::yywarn(const char *msg) {
     fprintf(stderr,"%s: warning:%s%s at line %d, column %d, near token '%s': %s\n",
-	  (objname ? objname : "dwdstParamCompiler"),
+	  (objname ? objname : "dwdstNgramsCompiler"),
 	  (srcname ? " in file " : ""),
 	  (srcname ? srcname : ""),
 	  yylloc.first_line, yylloc.first_column, yylloc.text, msg);

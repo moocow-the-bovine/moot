@@ -39,43 +39,52 @@ lib_LTLIBRARIES = libdwdst.la
 libdwdst_la_SOURCES = \
 	dwdstTaggerLexer.cc \
 	dwdstPPLexer.cc \
-	dwdstParamLexer.cc \
-	dwdstParamParser.cc \
-	dwdstParamCompiler.cc \
+	dwdstNgramsLexer.cc \
+	dwdstNgramsParser.cc \
+	dwdstNgramsCompiler.cc \
+	dwdstTagger.cc
+
+libdwdst_later = \
+	dwdstLexfreqsLexer.cc \
+	dwdstLexfreqsParser.cc \
+	dwdstLexfreqsCompiler.cc \
+	dwdstHMM.cc
+
+libdwdst_old = \
 	dwdstTaglistLexer.cc \
-	dwdstTagger.cc \
 	dwdstTrainer.cc \
 	dwdstAlphabetLexer.cc \
 	dwdstAlphabetParser.cc \
 	dwdstAlphabetCompiler.cc \
 	dwdstDisambiguator.cc
 
+
 ## --- Extra (possible) sources
 #EXTRA_${prog_i}_SOURCES = 
 #EXTRA_${lib_i}_la_SOURCES = 
 
 ## --- Additional dependencies
-dwdstTrainer.o: dwdstParamCompiler.h
-dwdstTrainer.lo: dwdstParamCompiler.h
-dwdstParamCompiler.lo: dwdstParamLexer.h dwdstParamParser.h 
-dwdstParamCompiler.o: dwdstParamLexer.h dwdstParamParser.h
-dwdstParamLexer.lo: dwdstParamLexer.h dwdstParamParser.h
-dwdstParamLexer.o: dwdstParamLexer.h dwdstParamParser.h
-dwdstParamLexer.h: $(FLEXXX_DEPS)
-dwdstParamLexer.cc: $(FLEXXX_DEPS)
-dwdstParamParser.h: $(BISONXX_DEPS)
-dwdstParamParser.cc: $(BISONXX_DEPS)
+#dwdstTrainer.o: dwdstParamCompiler.h
+#dwdstTrainer.lo: dwdstParamCompiler.h
+dwdstNgramsCompiler.lo: dwdstNgramsLexer.h dwdstNgramsParser.h 
+dwdstNgramsCompiler.o: dwdstNgramsLexer.h dwdstNgramsParser.h
+dwdstNgramsLexer.lo: dwdstNgramsLexer.h dwdstNgramsParser.h
+dwdstNgramsLexer.o: dwdstNgramsLexer.h dwdstNgramsParser.h
+dwdstNgramsLexer.h: $(FLEXXX_DEPS)
+dwdstNgramsLexer.cc: $(FLEXXX_DEPS)
+dwdstNgramsParser.h: $(BISONXX_DEPS)
+dwdstNgramsParser.cc: $(BISONXX_DEPS)
 
-dwdstDisambiguator.o: dwdstAlphabetCompiler.h
-dwdstDisambiguator.lo: dwdstAlphabetCompiler.h
-dwdstAlphabetCompiler.lo: dwdstAlphabetLexer.h dwdstAlphabetParser.h 
-dwdstAlphabetCompiler.o: dwdstAlphabetLexer.h dwdstAlphabetParser.h
-dwdstAlphabetLexer.lo: dwdstAlphabetLexer.h dwdstAlphabetParser.h
-dwdstAlphabetLexer.o: dwdstAlphabetLexer.h dwdstAlphabetParser.h
-dwdstAlphabetLexer.h: $(FLEXXX_DEPS)
-dwdstAlphabetLexer.cc: $(FLEXXX_DEPS)
-dwdstAlphabetParser.h: $(BISONXX_DEPS)
-dwdstAlphabetParser.cc: $(BISONXX_DEPS)
+#dwdstDisambiguator.o: dwdstAlphabetCompiler.h
+#dwdstDisambiguator.lo: dwdstAlphabetCompiler.h
+#dwdstAlphabetCompiler.lo: dwdstAlphabetLexer.h dwdstAlphabetParser.h 
+#dwdstAlphabetCompiler.o: dwdstAlphabetLexer.h dwdstAlphabetParser.h
+#dwdstAlphabetLexer.lo: dwdstAlphabetLexer.h dwdstAlphabetParser.h
+#dwdstAlphabetLexer.o: dwdstAlphabetLexer.h dwdstAlphabetParser.h
+#dwdstAlphabetLexer.h: $(FLEXXX_DEPS)
+#dwdstAlphabetLexer.cc: $(FLEXXX_DEPS)
+#dwdstAlphabetParser.h: $(BISONXX_DEPS)
+#dwdstAlphabetParser.cc: $(BISONXX_DEPS)
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -88,9 +97,11 @@ pkginclude_HEADERS = \
 	dwdstTagger.h \
 	dwdstTaggerLexer.h \
 	dwdstPPLexer.h \
-	dwdstParamLexer.h \
-	dwdstParamParser.h \
-	dwdstParamCompiler.h \
+	dwdstNgramsLexer.h \
+	dwdstNgramsParser.h \
+	dwdstNgramsCompiler.h
+
+pkgheaders_old = \
 	dwdstTrainer.h \
 	dwdstTaglistLexer.h \
 	dwdstAlphabetLexer.h \
@@ -155,10 +166,10 @@ AM_CXXFLAGS = $(FSM_WFLAGS) $(FSM_OFLAGS)
 ##-----------------------------------------------------------------------
 
 ## --- The most recent interface number that this library implements.
-LIBCUR = 0
+LIBCUR = 1
 
 ## --- The implementation number of the CURRENT interface.
-LIBREV = 6
+LIBREV = 0
 
 ## --- The difference between the newest and oldest interfaces that this
 ##     library implements.  In other words, the library implements all the
@@ -219,8 +230,8 @@ EXTRA_DIST = \
 	dwdstTaggerLexer.ll \
 	dwdstPPLexer.ll \
 	dwdstTaglistLexer.ll \
-	dwdstParamLexer.ll \
-	dwdstParamParser.yy \
+	dwdstNgramsLexer.ll \
+	dwdstNgramsParser.yy \
 	dwdstAlphabetLexer.ll \
 	dwdstAlphabetParser.yy \
 	flexskel.cc flexskel.h \

@@ -58,7 +58,7 @@
  * Definitions
  *----------------------------------------------------------------------*/
 space      [ \t]
-newline    [\n\r]
+newline    (\r?\n)
 wchar      [^ \t\n\r]
 
 /*----------------------------------------------------------------------
@@ -66,7 +66,7 @@ wchar      [^ \t\n\r]
  *----------------------------------------------------------------------*/
 %%
 
-{newline}+                     { theLine += yyleng; theColumn = 0; return EOS; }
+{newline}{newline}+            { theLine += yyleng; theColumn = 0; return EOS; }
 {space}+                       { theColumn += yyleng; /* ignore spaces */ }
 
 ^{space}*\#([^\r\n]*){newline} { theLine++; theColumn = 0; /* ignore comments */ }

@@ -1,6 +1,6 @@
 /*-*- Mode: Flex++ -*-*/
 /*----------------------------------------------------------------------
- * Name: dwdstParamLexer.ll
+ * Name: dwdstNgramsLexer.ll
  * Author: Bryan Jurish
  * Description:
  *   + Lexer for TnT-style parameter files
@@ -8,31 +8,33 @@
  *----------------------------------------------------------------------*/
 
 /* --- Lexer name --- */
-%name dwdstParamLexer
+%name dwdstNgramsLexer
 
 %header{
 
-#include <string.h>
+/*#include <string.h>
 #include <string>
-
 #include <FSMSymSpec.h>
-#include "dwdstParamParser.h"
+*/
+
+#include "dwdstTypes.h"
+#include "dwdstNgramsParser.h"
 
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
 /*!
- * \class dwdstParamLexer
- * \brief Flex++ lexer for dwdst-pargen (TnT-style) parameter files. 
+ * \class dwdstNgramsLexer
+ * \brief Flex++ lexer for (TnT-style) dwdst n-gram parameter files. 
  * Supports comments introduced with '%%'.
  */
 %}
 
 %define LEX_PARAM \
-  YY_dwdstParamParser_STYPE *yylval, YY_dwdstParamParser_LTYPE *yylloc
+  YY_dwdstNgramsParser_STYPE *yylval, YY_dwdstNgramsParser_LTYPE *yylloc
 
 
-%define CLASS dwdstParamLexer
+%define CLASS dwdstNgramsLexer
 %define MEMBERS \
   public: \
     /* -- public typedefs */\
@@ -43,7 +45,7 @@
     /** current column*/\
     int theColumn;\
     /** token-buffering */\
-    FSMSymbolString tokbuf;\
+    dwdstTagString tokbuf;\
     /** whether to clear the token-buffer on 'tokbuf_append()' */\
     bool tokbuf_clear;\
   private: \
@@ -52,7 +54,7 @@
     char *stringbuf; \
   public: \
     /** virtual destructor to shut up gcc */\
-    virtual ~dwdstParamLexer(void) {};\
+    virtual ~dwdstNgramsLexer(void) {};\
     /** use stream input */\
     void select_streams(FILE *in=stdin, FILE *out=stdout); \
     /** use string input */\
@@ -75,7 +77,7 @@
     return result = len;\
   }\
   /* black magic */\
-  return result= fread(buffer, 1, max_size, YY_dwdstParamLexer_IN);
+  return result= fread(buffer, 1, max_size, YY_dwdstNgramsLexer_IN);
 
 
 
@@ -115,14 +117,14 @@ textorsp   [^\n\r\t]
   //theLine++; theColumn = 0;
   theColumn += yyleng;
   yylval->count = atof((const char *)yytext);
-  return dwdstParamParser::COUNT;
+  return dwdstNgramsParser::COUNT;
 }
 
 {textchar}({textorsp}*{textchar})? {
   // -- any other text: append to the token-buffer
   theColumn += yyleng;
-  yylval->symstr = new FSMSymbolString((const char *)yytext);
-  return dwdstParamParser::REGEX;
+  yylval->tagstr = new dwdstTagString((const char *)yytext);
+  return dwdstNgramsParser::TAG;
 }
 
 {newline} {
@@ -138,7 +140,7 @@ textorsp   [^\n\r\t]
 . {
   // -- huh? -- just ignore it!
   theColumn += yyleng;
-  fprintf(stderr,"dwdstParamLexer warning: unknown character '%c': ignored.\n", yytext[YY_MORE_ADJ]);
+  fprintf(stderr,"dwdstNgramsLexer warning: unknown character '%c': ignored.\n", yytext[YY_MORE_ADJ]);
 }
 
 %%
@@ -151,13 +153,13 @@ textorsp   [^\n\r\t]
 
 
 /*----------------------------------------------------------------------
- * Local Methods for dwdstParamLexer
+ * Local Methods for dwdstNgramsLexer
  *----------------------------------------------------------------------*/
 
 /*
- * void dwdstParamLexer::select_streams(FILE *in, FILE *out)
+ * void dwdstNgramsLexer::select_streams(FILE *in, FILE *out)
  */
-void dwdstParamLexer::select_streams(FILE *in, FILE *out) {
+void dwdstNgramsLexer::select_streams(FILE *in, FILE *out) {
   yyin = in;
   yyout = out;
   use_string = false;
@@ -169,9 +171,9 @@ void dwdstParamLexer::select_streams(FILE *in, FILE *out) {
 }
 
 /*
- * void dwdstParamLexer::select_string(const char *in, FILE *out=stdout)
+ * void dwdstNgramsLexer::select_string(const char *in, FILE *out=stdout)
  */
-void dwdstParamLexer::select_string(const char *in, FILE *out=stdout) {
+void dwdstNgramsLexer::select_string(const char *in, FILE *out=stdout) {
   select_streams(stdin,out);  // flex __really__ wants a real input stream
 
   // -- string-buffer stuff
@@ -183,7 +185,7 @@ void dwdstParamLexer::select_string(const char *in, FILE *out=stdout) {
 /*
  * tokbuf_append(text,leng)
  */
-inline void dwdstParamLexer::tokbuf_append(char *text, int leng) {
+inline void dwdstNgramsLexer::tokbuf_append(char *text, int leng) {
   if (tokbuf_clear) {
     tokbuf = (char *)text;
     tokbuf_clear = false;

@@ -22,6 +22,13 @@
  * and filters out XML markup.
  */
 
+//#include <string>
+#include <dwdstTypes.h>
+%}
+
+%{
+//#include <string>
+#include <dwdstTypes.h>
 %}
 
 %define CLASS dwdstPPLexer
@@ -50,15 +57,23 @@
     bool verbose; \
     /** number of tokens processed (for verbose mode) */\
     unsigned int ntokens; \
+    /** output sentence separator */ \
+    dwdstTagString output_sentence_separator; \
+    /** output token separator */ \
+    dwdstTagString output_token_separator; \
     \
     /* -- local methods */ \
     /** preprocess a C-stream */\
     bool tokenize_stream(FILE *in=stdin, FILE *out=stdout); \
     /** hack for non-global yywrap() */\
-    void step_streams(FILE *in, FILE *out);
+    void step_streams(FILE *in, FILE *out);\
+    /** make g++ happy */\
+    virtual ~dwdstPPLexer(void) {};
 
 %define CONSTRUCTOR_CODE \
-  ntokens = 0;
+  ntokens = 0; \
+  output_sentence_separator = "\n\n"; \
+  output_token_separator = "\n";
 
 
 /*----------------------------------------------------------------------
@@ -194,13 +209,13 @@ bool dwdstPPLexer::tokenize_stream(FILE *in=stdin, FILE *out=stdout)
     if (verbose) ntokens++;
     switch (tok) {
       case EOS:
-          if (yytext[0] != '<') {
+          if (yytext[0] != '<') {  /* !? */
             yy_echo();
-	    fputc(' ',out);
           }
-          fputc('\n', out);
+          fputs(output_sentence_separator.c_str(), out);
+          break;
 
-      case  START_XML_TAG:
+      case START_XML_TAG:
       case END_XML_TAG:
 	  /* ignore XML tags */
 	  break;
@@ -208,10 +223,10 @@ bool dwdstPPLexer::tokenize_stream(FILE *in=stdin, FILE *out=stdout)
       default:
 	  /* write it as its own token */
           yy_echo();
-          fputc(' ', out);
+          fputs(output_token_separator.c_str(), out);
       }
   }
-  fputc('\n', out);
+  fputc('\n', out);   /* always add terminating newline */
   yyterminate();
   return true;
 }

@@ -1,20 +1,20 @@
 /*-*- Mode: Bison++ -*-*/
 /*----------------------------------------------------------------------
- * Name: dwdstParamParser.yy
+ * Name: dwdstNgramsParser.yy
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + specification for parameter-file parser for (K)DWDS PoS-tagger
+ *   + specification for ngram-parameter-file parser for (K)DWDS PoS-tagger
  *   + process with Alain Coetmeur's 'bison++' to produce a C++ parser
  *----------------------------------------------------------------------*/
 
-%name dwdstParamParser
+%name dwdstNgramsParser
 
 /* -- bison++ flags --- */
 /* -- force use of location stack : defines global 'yyltype' by default */
 %define LSP_NEEDED
 
 // -- ... so we define yyltype ourselves ... (see %header section)
-%define LTYPE dwdstParamParserLType
+%define LTYPE dwdstNgramsParserLType
 
 // -- debugging (see below)
 %define DEBUG 1
@@ -24,7 +24,7 @@
 /* %define ERROR_BODY =0 */
 
 // -- use inline error-reporting
-%define ERROR_BODY { yycarp("dwdstParamParser: Error: %s", msg); }
+%define ERROR_BODY { yycarp("dwdstNgramsParser: Error: %s", msg); }
 
 // -- use pure-function lexer body
 //%define LEX_BODY =0
@@ -41,8 +41,8 @@
 #include <string>
 #include <string.h>
 
-#include <FSMSymSpec.h>
-#include <FSMTypes.h>
+//#include <FSMSymSpec.h>
+//#include <FSMTypes.h>
 
 #include "dwdstTypes.h"
 
@@ -62,11 +62,11 @@ typedef struct {
   int last_line;
   int last_column;
   char *text;
-} dwdstParamParserLType;
+} dwdstNgramsParserLType;
 
 /**
- * \class dwdstParamParser
- * \brief Bison++ parser for dwdst-pargen parameter files.
+ * \class dwdstNgramsParser
+ * \brief Bison++ parser for dwdst ngram-parameter files.
  */
 %}
 
@@ -76,21 +76,21 @@ typedef struct {
 #endif
 %}
 
-%define CLASS dwdstParamParser
+%define CLASS dwdstNgramsParser
 %define MEMBERS \
   public: \
    /* -- public instance members go here */ \
-   /** a pointer to the parameter map we are constructing. */ \
+   /** a pointer to the ngram-parameter map we are constructing. */ \
    NGramTable *ngtable; \
    /** to keep track of all possible tags we've parsed. */ \
-   set<FSMSymbolString> *alltags; \
+   set<string> *alltags; \
   private: \
    /* private instance members go here */ \
   public: \
    /* public methods */ \
    /* report warnings */\
    virtual void yywarn(const char *msg) { \
-      yycarp("dwdstParamParser: Warning: %s", msg);\
+      yycarp("dwdstNgramsParser: Warning: %s", msg);\
    }; \
    /** report anything */\
    virtual void yycarp(char *fmt, ...);
@@ -106,21 +106,21 @@ typedef struct {
 
 %union {
   NGramVector      *ngram;            ///< for tag-lists
-  FSMSymbolString *symstr;            ///< for single-tag regex-strings
+  string          *tagstr;            ///< for single tags (strings)
   float             count;            ///< for tag-list counts
 }
 
 %header{
 /**
- * \typedef yy_dwdstParamParser_stype
+ * \typedef yy_dwdstNgramsParser_stype
  * \brief Bison++ semantic value typedef for dwdst-pargen parameter-file parser.
  */
 %}
 
 // -- Type declarations
-%token <symstr>  REGEX
+%token <tagstr>  TAG
 %token <count>   COUNT
-%type  <symstr>  regex
+%type  <tagstr>  tag
 %type  <count>   count    tab newline param params
 %type  <ngram>   ngram
 
@@ -152,31 +152,31 @@ param:		ngram tab count newline
 		}
 	;
 
-ngram:		regex
+ngram:		tag
 		{
-		    // -- single regex: make a new vector
+		    // -- single tag: make a new vector
 		    $$ = new NGramVector();
                     $$->clear();
                     $$->push_back(*$1);
                     delete $1;
 		}
-	|	ngram tab regex
+	|	ngram tab tag
 		{
-		    // -- tab-separated regexes: add to the 'current' ngram
+		    // -- tab-separated tags: add to the 'current' ngram
                     $1->push_back(*$3);
                     delete $3;
 		    $$ = $1;
 		}
 	;
 
-regex:		REGEX
+tag:		TAG
 		{
 		    alltags->insert(*$1);
 		    $$ = $1;
 		}
 /*	|	// empty
 		{
-		    yyerror("expected a regex");
+		    yyerror("expected a tag");
                     YYABORT;
 		}
 */
@@ -214,7 +214,7 @@ newline:	'\n' { $$=0; }
  * Error Methods
  *----------------------------------------------------------------*/
 
-void dwdstParamParser::yycarp(char *fmt, ...)
+void dwdstNgramsParser::yycarp(char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);

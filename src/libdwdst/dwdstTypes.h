@@ -26,6 +26,9 @@
 
 using namespace std;
 
+/** Tag-string type */
+typedef string dwdstTagString;
+
 /** STL utilities for symbol-vectors */
 class dwdstSymbolVectorUtils {
 public:
@@ -134,5 +137,6 @@ public:
 // Used by dwdstTrainer::add_pos_arc() [not too kosher]
 // --this is defined by FSMTypes.h !!!
 //typedef hash_set<FSMState> FSMStateSet;
+
 
 #endif /* _DWDST_TYPES_H */
