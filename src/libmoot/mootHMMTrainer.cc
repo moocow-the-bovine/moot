@@ -200,7 +200,7 @@ void mootHMMTrainer::train_token(const mootToken &curtok)
 {
   TagSet tagset;
   curtok.tokExport(NULL,&tagset);
-  train_token(curtok.toktext, tagset);
+  train_token(curtok.text(), tagset);
 }
 
 /*-- DEPRECATED */

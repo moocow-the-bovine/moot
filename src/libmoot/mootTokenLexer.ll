@@ -206,7 +206,7 @@ detchar    [^\t\n\r]
   /* TOKEN: token text at beginning of string */
   theColumn += yyleng;
   mtoken.clear();
-  mtoken.toktext = (const char *)yytext;
+  mtoken.text((const char *)yytext);
   lasttyp = TLTEXT;
   BEGIN(TAG);
 }
@@ -215,7 +215,7 @@ detchar    [^\t\n\r]
   //-- TAB: add & clear current analysis, if any
   theColumn = (((int)theColumn/8)+1)*8;
   if (lasttyp != TLTEXT) {
-    mtoken.analyses.insert(manalysis);
+    mtoken.insert(manalysis);
     manalysis.clear();
   }
   lasttyp = TLTAB;
@@ -225,7 +225,7 @@ detchar    [^\t\n\r]
   //-- TAB: add & clear current analysis, if any
   theColumn = (((int)theColumn/8)+1)*8;
   if (lasttyp != TLTEXT) {
-    mtoken.analyses.insert(manalysis);
+    mtoken.insert(manalysis);
     manalysis.clear();
   }
   lasttyp = TLTAB;
@@ -236,7 +236,7 @@ detchar    [^\t\n\r]
    //-- TAG: best tag
    theColumn += yyleng;
    manalysis.tag.append((const char *)yytext+1);
-   mtoken.besttag.append((const char *)yytext+1);
+   mtoken.tok_besttag.append((const char *)yytext+1);
    lasttyp = TLTAG;
 }
 
@@ -261,7 +261,7 @@ detchar    [^\t\n\r]
   theLine++; theColumn = 0;
   //-- add & clear current analysis, if any
   if (lasttyp != TLTEXT) {
-    mtoken.analyses.insert(manalysis);
+    mtoken.insert(manalysis);
     manalysis.clear();
   }
   //-- reset to initial state

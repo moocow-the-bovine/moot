@@ -33,7 +33,14 @@
 #include <set>
 #include <string>
 
-/*#include "mootTypes.h"*/
+#if defined(__GNUC__)
+# include <float.h>
+# define MOOT_COST_LB FLT_MIN
+# define MOOT_COST_UB FLT_MAX
+#else /* defined(__GNUC__) */
+# define MOOT_COST_LB 1.1e-38F
+# define MOOT_COST_UB 3.4e+38F
+#endif /* defined(__GNUC__) */
 
 namespace moot {
   using namespace std;
@@ -125,42 +132,119 @@ public:
    * Data Members
    */
 
-  /** Literal token text */
-  mootTokString toktext;
+  /**
+   * Literal token text.
+   * \warning Use the text() method(s) instead of accessing this directly!
+   */
+  mootTokString   tok_text;
 
-  /** Set of possible analyses as a mootToken::AnalysisSet */
-  AnalysisSet   analyses;
+  /**
+   * Set of possible analyses as a mootToken::AnalysisSet
+   * \warning Use the analyses() method(s) instead of accessing this directly!
+   */
+  AnalysisSet     tok_analyses;
 
-  /** Best tag for this token */
-  mootTagString         besttag;
+  /**
+   * Best tag for this token.
+   * \warning Use the besttag() method(s) instead of accessing this directly!
+   */
+  mootTagString   tok_besttag;
 
-  /*---------------------------------------------------------------------*
+public:
+  /*------------------------------------------------------------
    * Constructors / Destructors
    */
   /** Default constructor: empty text, no analyses */
   mootToken(void)
-    : toktext(""), besttag("")
+    : tok_text(""), tok_besttag("")
   {};
 
   /** Constructor given only token text: no analyses */
-  mootToken(const mootTokString &my_text)
-    : toktext(my_text), besttag("")
+  mootToken(const mootTokString &text)
+    : tok_text(text), tok_besttag("")
   {};
 
   /** Constructor given text & analyses */
-  mootToken(const mootTokString &my_text,
-	    const mootToken::AnalysisSet &my_analyses)
-    : toktext(my_text), analyses(my_analyses), besttag("")
+  mootToken(const mootTokString &text,
+	    const AnalysisSet &analyses)
+    : tok_text(text), tok_analyses(analyses), tok_besttag("")
   {};
 
+  /** Constructor given text & analyses & best tag */
+  mootToken(const mootTokString &text,
+	    const AnalysisSet &analyses,
+	    const mootTagString &besttag)
+    : tok_text(text), tok_analyses(analyses), tok_besttag(besttag)
+  {};
+
+  /*------------------------------------------------------------
+   * Manipulators: General
+   */
   /** Clear this object */
-  void clear(void) {
-    toktext = "";
-    analyses.clear();
-    besttag = "";
+  inline void clear(void) {
+    tok_text.clear();
+    tok_analyses.clear();
+    tok_besttag.clear();
+  };
+
+  /*------------------------------------------------------------
+   * Manipulators: specific
+   */
+  /** Get token text */
+  inline const mootTokString &text(void) const {
+    return tok_text;
+  };
+  /** Set token text */
+  inline mootTokString &text(const mootTokString &text) {
+    tok_text = text;
+    return tok_text;
+  };
+
+  /** Get best tag */
+  inline const mootTagString &besttag(void) const {
+    return tok_besttag;
+  };
+  /** Set best tag */
+  inline mootTagString &besttag(const mootTagString &besttag) {
+    tok_besttag = besttag;
+    return tok_besttag;
+  };
+
+  /** Get token analyses */
+  inline const AnalysisSet &analyses(void) const {
+    return tok_analyses;
+  };
+  /** Set token analyses */
+  inline const AnalysisSet &analyses(const AnalysisSet &analyses)
+  {
+    tok_analyses = analyses;
+    return tok_analyses;
+  };
+  /** Insert an analysis */
+  inline void insert(const Analysis &analysis)
+  {
+    tok_analyses.insert(analysis);
+  };
+  /** Remove an analysis */
+  inline void erase(const Analysis &analysis)
+  {
+    tok_analyses.erase(analysis);
+  };
+  /** Prune analyses, retaining only those for 'besttag' */
+  inline void prune(void)
+  {
+    Analysis bound(tok_besttag,MOOT_COST_LB);
+    tok_analyses.erase(--tok_analyses.begin(),
+		       tok_analyses.lower_bound(bound));
+    bound.cost = MOOT_COST_UB;
+    tok_analyses.erase(tok_analyses.upper_bound(bound),
+		       tok_analyses.end());
   };
 
 
+  /*------------------------------------------------------------
+   * Compatibility
+   */
   /**
    * For backwards-compatibility: convert old-style 'text,tags' pair
    * to a mootToken.
@@ -170,13 +254,13 @@ public:
   inline void tokImport(const mootTokString *src_toktext=NULL,
 			const set<mootTagString> *src_tagset=NULL)
   {
-    if (src_toktext) toktext = *src_toktext;
+    if (src_toktext) tok_text = *src_toktext;
     if (src_tagset) {
       for (set<mootTagString>::const_iterator tsi = src_tagset->begin();
 	   tsi != src_tagset->end();
 	   tsi++)
 	{
-	  analyses.insert(Analysis(*tsi));
+	  tok_analyses.insert(Analysis(*tsi));
 	}
     }
   };
@@ -190,22 +274,27 @@ public:
   inline void tokExport(mootTokString *dst_toktext=NULL,
 			set<mootTagString> *dst_tagset=NULL) const
   {
-    if (dst_toktext) *dst_toktext = toktext;
+    if (dst_toktext) *dst_toktext = tok_text;
     if (dst_tagset) {
-      for (AnalysisSet::const_iterator asi = analyses.begin();
-	   asi != analyses.end();
+      for (AnalysisSet::const_iterator asi = tok_analyses.begin();
+	   asi != tok_analyses.end();
 	   asi++)
 	{
 	  dst_tagset->insert(asi->tag);
 	}
     }
   };
-
   
 }; //-- /mootToken
 
 
-/** Sentences are just lists of mootToken objects */
+/*--------------------------------------------------------------------------
+ * mootSentence
+ *--------------------------------------------------------------------------*/
+
+/**
+ * Sentences are just lists of mootToken objects
+ */
 typedef list<mootToken> mootSentence;
 
 }; /* namespace moot */

@@ -77,13 +77,13 @@ mootSentence &TokenReader::get_sentence(void)
  *------------------------------------------------------------*/
 string TokenWriter::token_string(const mootToken &token)
 {
-  string s = token.toktext;
-  if (!token.besttag.empty()) {
+  string s = token.text();
+  if (!token.besttag().empty()) {
     s.append("\t/");
-    s.append(token.besttag);
+    s.append(token.besttag());
   }
-  for (mootToken::AnalysisSet::const_iterator ai = token.analyses.begin();
-       ai != token.analyses.end();
+  for (mootToken::AnalysisSet::const_iterator ai = token.analyses().begin();
+       ai != token.analyses().end();
        ai++)
     {
       s.push_back('\t');
@@ -104,13 +104,13 @@ string TokenWriter::token_string(const mootToken &token)
 
 void TokenWriter::token_put(FILE *out, const mootToken &token)
 {
-  fputs(token.toktext.c_str(), out);
-  if (!token.besttag.empty()) {
+  fputs(token.text().c_str(), out);
+  if (!token.besttag().empty()) {
     fputs("\t/",out);
-    fputs(token.besttag.c_str(), out);
+    fputs(token.besttag().c_str(), out);
   }
-  for (mootToken::AnalysisSet::const_iterator ai = token.analyses.begin();
-       ai != token.analyses.end();
+  for (mootToken::AnalysisSet::const_iterator ai = token.analyses().begin();
+       ai != token.analyses().end();
        ai++)
     {
       fputc('\t', out);

@@ -603,18 +603,18 @@ public:
    * Really just a wrapper for viterbi_step(TokID tokid,set<TagID>).
    */
   inline void viterbi_step(const mootToken &token) {
-    if (token.analyses.empty()) {
-      viterbi_step(token.toktext);
+    if (token.analyses().empty()) {
+      viterbi_step(token.text());
     }
     else {
       set<TagID> tok_tagids;
-      for (mootToken::AnalysisSet::const_iterator ani = token.analyses.begin();
-	   ani != token.analyses.end();
+      for (mootToken::AnalysisSet::const_iterator ani = token.analyses().begin();
+	   ani != token.analyses().end();
 	   ani++)
 	{
 	  tok_tagids.insert(tagids.name2id(ani->tag));
 	}
-      viterbi_step(token2id(token.toktext), tok_tagids);
+      viterbi_step(token2id(token.text()), tok_tagids);
     }
   };
 

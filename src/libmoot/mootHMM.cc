@@ -558,14 +558,14 @@ void mootHMM::tag_mark_best(mootSentence &sentence)
 
   for (senti = sentence.begin(); senti != sentence.end(); senti++) {
     if (pnod && pnod->node) {
-      senti->besttag = tagids.id2name(pnod->node->tagid);
+      senti->besttag(tagids.id2name(pnod->node->tagid));
       pnod = pnod->path_next;
     }
     else {
       //-- this should never actually happen, but it has...
       carp("%s: Error: no best tag for token '%s'!\n",
-	   "mootHMM::tag_mark_best()", senti->toktext.c_str());
-      senti->besttag = tagids.id2name(0); //-- use 'unknown' tag
+	   "mootHMM::tag_mark_best()", senti->text().c_str());
+      senti->besttag(tagids.id2name(0)); //-- use 'unknown' tag
     }
   }
 };
