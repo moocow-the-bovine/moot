@@ -2,3 +2,4 @@ foo	3	ATAG	1	BTAG	1	CTAG	1
 bar	3	ATAG	1	BTAG	1	CTAG	1
 baz	3	ATAG	1	BTAG	1	CTAG	1
 unknown	1	UNKNOWN	1
+eos	1	EOS	1

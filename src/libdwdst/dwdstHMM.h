@@ -9,12 +9,18 @@
 #ifndef _DWDST_HMM_H
 #define _DWDST_HMM_H
 
+#include <float.h>
 #include <hash_map>
 
 #include "dwdstTypes.h"
 #include "dwdstLexfreqs.h"
 #include "dwdstNgrams.h"
 #include "dwdstEnum.h"
+
+/**
+ * Constant representing a minimal probability.
+ */
+#define dwdstProbEpsilon FLT_EPSILON
 
 /*--------------------------------------------------------------------------
  * dwdstHMM : HMM class
@@ -133,8 +139,10 @@ public:
   TagID             start_tagid;  /**< Initial tag, used for bootstrapping */
 
   //------ public data: smoothing constants
-  ProbT             lambda1;    /**< Smoothing constant for unigrams */
-  ProbT             lambda2;    /**< Smoothing constant for bigrams */
+  ProbT             nglambda1;    /**< Smoothing constant for unigrams */
+  ProbT             nglambda2;    /**< Smoothing constant for bigrams */
+  ProbT             wlambda1;     /**< Smoothing constant lexical probabilities */
+  ProbT             wlambda2;     /**< Smoothing constant lexical probabilities */
 
   //------ low-level data: for Viterbi algorithm
   ViterbiStateTable vtable;     /**< Low-level state table for Viterbi algorithm */
@@ -156,7 +164,11 @@ public:
 
   /** Default constructor */
   dwdstHMM(void)
-    : start_tagid(0), lambda1(1e-10), lambda2(1.0 - 1e-10)
+    : start_tagid(0),
+      nglambda1(dwdstProbEpsilon),
+      nglambda2(1.0 - dwdstProbEpsilon),
+      wlambda1(1.0 - dwdstProbEpsilon),
+      wlambda2(dwdstProbEpsilon)
   {};
 
   /** Construct & compile in one swell foop. */
@@ -164,7 +176,11 @@ public:
 	   const dwdstNgrams &ngrams,
 	   const dwdstTagString &start_tag_str=dwdstTagString(),
 	   const dwdstLexfreqs::LexfreqCount unknownLexThreshhold=1)
-    : start_tagid(0), lambda1(1e-10), lambda2(1.0 - 1e-10)
+    : start_tagid(0),
+      nglambda1(dwdstProbEpsilon),
+      nglambda2(1.0 - dwdstProbEpsilon),
+      wlambda1(1.0 - dwdstProbEpsilon),
+      wlambda2(dwdstProbEpsilon)
     {
 	compile(lexfreqs, ngrams, start_tag_str, unknownLexThreshhold);
     };
@@ -420,15 +436,18 @@ public:
    */
   inline const ProbT arcp(const TagID prevtagid, const TokID tokid, const TagID tagid) const
   {
-    //-- DEBUG
+    //--DEBUG
     fprintf(stderr, "arcp(ptag=%u, tok=%u, tag=%u) : ", prevtagid, tokid, tagid);
     fprintf(stderr, "wordp(tok,tag)=%g ; tagp(tag)=%g ; tagp(ptag,tag)=%g\n",
 	    wordp(tokid,tagid), tagp(tagid), tagp(prevtagid, tagid));
+    //--/DEBUG
+
     return
-      wordp(tokid, tagid)
-      * ( (lambda1 * tagp(tagid))
-	  + //(prevtagid == start_tagid ? 0.0 : (lambda2 * tagp(tagid, prevtagid))) )
-	  (lambda2 * tagp(prevtagid, tagid)) );
+      ( (wlambda1 * wordp(tokid, tagid)) + wlambda2 )
+      * 
+      ( (nglambda1 * tagp(tagid))
+	+ //(prevtagid == start_tagid ? 0.0 : (nglambda2 * tagp(tagid, prevtagid))) )
+	(nglambda2 * tagp(prevtagid, tagid)) );
   };
 
   /**

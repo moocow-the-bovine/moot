@@ -75,8 +75,8 @@ int main (int argc, char **argv) {
   fprintf(stderr, "compiled.\n");
 
   //-- set lambdas
-  hmm.lambda1 = 0.5;
-  hmm.lambda2 = 0.5;
+  //hmm.nglambda1 = 0.5;
+  //hmm.nglambda2 = 0.5;
 
   //--report
   fprintf(stderr, "%s: start_tag=%u(\"%s\")\n",

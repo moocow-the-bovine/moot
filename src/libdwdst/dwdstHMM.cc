@@ -59,6 +59,7 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
       const dwdstTokString &tokstr = lfti->first.first;
       const dwdstTagString &tagstr = lfti->first.second;
       const dwdstLexfreqs::LexfreqCount toktotal = lexfreqs.lookup(tokstr);
+      const dwdstNgrams::NgramCount     tagtotal = ngrams.lookup(tagstr);
 
       //-- always get or assign a tag-id
       tagid = tagids.nameExists(tagstr)
@@ -66,7 +67,7 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
 	: tagids.insert(tagstr);
 
       //-- sanity check
-      if (toktotal == 0) continue;
+      if (toktotal == 0 || tagtotal == 0) continue;
 
       //-- unknown threshhold check
       if (toktotal > unknownLexThreshhold) {
@@ -75,8 +76,10 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
 	  ? tokids.name2id(tokstr)
 	  : tokids.insert(tokstr);
 
-	//-- ... and compute lexical probability
-	lexprobs[IDPair(tokid,tagid)] = lfti->second / toktotal;
+	//-- ... and compute lexical probability: p(tok|tag)
+	lexprobs[IDPair(tokid,tagid)] = lfti->second / tagtotal;
+	//-- ... and compute lexical probability: p(tag|tok) [IMPURE]
+	//lexprobs[IDPair(tokid,tagid)] = lfti->second / toktotal;
       }
       else {
 	//-- otherwise, it's below the unknown threshhold, so we assign it the constant "unknown" ID

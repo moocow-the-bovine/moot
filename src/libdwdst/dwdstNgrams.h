@@ -109,8 +109,39 @@ public:
   {
     NgramStringTable::const_iterator ngti = ngtable.find(ngram);
     return ngti == ngtable.end() ? 0 : ngti->second;
-  }
+  };
 
+  /** Returns current count for unigram, returns 0 if unknown */
+  inline const NgramCount lookup(const dwdstTagString &tagstr)
+    const
+  {
+    NgramString ngs;
+    ngs.push_back(tagstr);
+    return lookup(ngs);
+  };
+
+  /** Returns current count for bigram, returns 0 if unknown */
+  inline const NgramCount lookup(const dwdstTagString &prevtagstr, const dwdstTagString &tagstr)
+    const
+  {
+    NgramString ngs;
+    ngs.push_back(prevtagstr);
+    ngs.push_back(tagstr);
+    return lookup(ngs);
+  };
+
+  /** Returns current count for trigram, returns 0 if unknown */
+  inline const NgramCount lookup(const dwdstTagString &prevprevtagstr,
+				 const dwdstTagString &prevtagstr,
+				 const dwdstTagString &tagstr)
+    const
+  {
+    NgramString ngs;
+    ngs.push_back(prevprevtagstr);
+    ngs.push_back(prevtagstr);
+    ngs.push_back(tagstr);
+    return lookup(ngs);
+  };
 
   //------ public methods: i/o
 
