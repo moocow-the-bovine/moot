@@ -32,13 +32,12 @@
 #ifndef _moot_TYPES_H
 #define _moot_TYPES_H
 
+#include <ctype.h>
+
 #include <string>
 #include <deque>
 #include <map>
 #include <set>
-//#include <pair>
-//#include <hash_map>
-//#include <hash_set>
 
 #if defined(__GNUC__)
 #  if __GNUC__ >= 3
@@ -60,8 +59,7 @@
 #  define moot_STL_NAMESPACE std
 #endif /* defiend(__GNUC__) */
 
-#include <FSM.h>
-#include <FSMSymSpec.h>
+#include <mootFSM.h>
 
 /** Whether to load symspecs in AT&T-compatibility mode */
 #define moot_SYM_ATT_COMPAT true

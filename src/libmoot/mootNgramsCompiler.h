@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <FSM.h>
+#include <mootFSM.h>
 
 #include "mootNgramsLexer.h"
 #include "mootNgramsParser.h"

@@ -38,8 +38,6 @@
 #include <set>
 #include <list>
 
-#include <FSMTypes.h>
-
 #include "mootMorph.h"
 #include "mootTaggerLexer.h"
 

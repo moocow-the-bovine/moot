@@ -31,11 +31,6 @@
 
 %header{
 
-/*#include <string.h>
-#include <string>
-#include <FSMSymSpec.h>
-*/
-
 #include "mootTypes.h"
 #include "mootNgramsParser.h"
 

@@ -38,11 +38,7 @@
 
 
 #include <stdio.h>
-
-#include <FSMTypes.h>
-#include <FSMSymSpec.h>
-#include <FSM.h>
-
+#include <mootFSM.h>
 #include "mootTypes.h"
 
 moot_BEGIN_NAMESPACE
