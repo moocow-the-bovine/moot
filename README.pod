@@ -36,6 +36,7 @@ or from the official distribution site of
 this package.
 Tested with flex++-v2.3.8-4 and bison++-v1.21-5.
 
+=begin comment text
 
 =item libbumble E<gt>= 1.13.5
 
@@ -49,6 +50,7 @@ package -- you can make one yourself, or you can
 get one from the official distribution site of
 this package.
 
+=end comment text
 
 =item libFSM E<gt>= v0.1.0.6
 
@@ -59,15 +61,20 @@ You will need a pkg-config metafile (libFSM.pc)
 for this requirement
 in your PKG_CONFIG_PATH in order to compile this
 package -- you can make one yourself, or you can
-get one from
+get one from the author of this package.
+
+=begin comment text
+
 the official distribution site of this package.
+
+=end comment text
 
 
 =item libFSMext E<gt>= v0.0.1
 
 Should be available wherever you got this package.
 
-You will need a pkg-config metafile (libFSM.pc)
+You will need a pkg-config metafile (libFSMext.pc)
 for this requirement
 in your PKG_CONFIG_PATH in order to compile this
 package -- you can make one yourself, or you can
@@ -108,25 +115,39 @@ these sources.
 
 =head1 KNOWN BUGS
 
-Morphology is still quite slow.
-
-No distribution site.
+If you find one, let me know!
 
 
 =head1 ACKNOWLEDGEMENTS
 
-This package was developed in part in the context of the KDWDS project
-("Kollokationen im Digitalen Wörterbuch der deutschen Sprache"
-= "collocations in the digital dictionary of the German language")
-at the Berlin-Brandenburgische Akademie der Wissenschaften.
-For details on the DWDS project, visit: http://www.dwds.de.
+This package was developed in the context of the
+project 'Kollokationen im Wörterbuch'
+("collocations in the dictionary", http://www.bbaw.de/forschung/kollokationen)
+in association with the project
+'Digitales Wörterbuch deutscher Sprache (DWDS)'
+("digital dictionary of the German language", http://www.dwds.de)
+at the Berlin-Brandenburgische Akademie der Wissenschaften (http://www.bbaw.de)
+with funding from
+the Alexander von Humboldt Stiftung (http://www.avh.org)
+and from the Zukunftsinvestitionsprogramm of the
+German federal government.
 
+I am grateful to Christiane Fellbaum, Alexander Geyken,
+Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
+for offering useful insights in the course of development
+of this package.
 
-=head1 AUTHORS
+Thomas Hanneforth wrote and maintains the libFSM C++ library
+for finite-state device operations used by the
+class-based HMM tagger / disambiguator.
 
-Thomas Hanneforth wrote the underlying FSM library.
+Alexander Geyken and Thomas Hanneforth developed the
+rule-based morphological analysis system for German
+which was used in the development and testing of the
+class-based HMM tagger / disambiguator.
+
+=head1 AUTHOR
 
 Bryan Jurish E<lt>moocow@ling.uni-potsdam.deE<gt>
-wrote and maintains the 'moot' package itself.
 
 =cut

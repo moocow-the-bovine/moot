@@ -124,3 +124,5 @@ foreach $file (@ARGV) {
 }
 
 close(LOG) if ($DEBUG>0);
+
+# useless comment

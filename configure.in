@@ -70,9 +70,9 @@ AC_CACHE_CHECK([for installation prefix], [ac_cv_install_prefix],
            ac_cv_install_prefix="$prefix"
 	 fi
 	])
-#  ... and add it to our flags
-CPPFLAGS="$CPPFLAGS -I${ac_cv_install_prefix}/include"
-LDFLAGS="$LDFLAGS -L${ac_cv_install_prefix}/lib"
+dnl #  ... and add it to our flags
+dnl CPPFLAGS="$CPPFLAGS -I${ac_cv_install_prefix}/include"
+dnl LDFLAGS="$LDFLAGS -L${ac_cv_install_prefix}/lib"
 
 
 dnl check for strdup
@@ -117,11 +117,11 @@ dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 dnl ------------------------------------------------------------
 dnl libFSM (via pkg-config)
 dnl
-PKG_CHECK_MODULES(FSMLIB, libFSM >= 0.1.0.6)
-CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I libFSM`"
-LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L libFSM`"
-FSM_LIBS="`$PKG_CONFIG --libs-only-l libFSM`"
-AC_SUBST(FSM_LIBS)
+dnl PKG_CHECK_MODULES(FSMLIB, libFSM >= 0.1.0.6)
+dnl CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I libFSM`"
+dnl LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L libFSM`"
+dnl FSM_LIBS="`$PKG_CONFIG --libs-only-l libFSM`"
+dnl AC_SUBST(FSM_LIBS)
 dnl libFSM
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -150,7 +150,8 @@ PKG_CHECK_MODULES(FBXX, flex++bison++ >= 0.0.5,
 if test "$ac_cv_have_pkg_fbxx" = "yes"; then
   PATH="$PATH:`$PKG_CONFIG --variable=prefix flex++bison++`/bin"
   export PATH
-  CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I flex++bison++`"
+  ###--- libFSMext should already get us this ---
+  #CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I flex++bison++`"
 fi
 
 
@@ -294,7 +295,7 @@ if test "$moot_doc_formats" != "none" ; then
     AC_CONFIG_LINKS(doc/programs/${g}:src/programs/${g})  
   done
   AC_SUBST(moot_program_gogs)
-
+  AC_CONFIG_LINKS(doc/programs/acknowledge.pod:src/programs/acknowledge.pod)
 
   ### -- initialize defaults
   DOC_SUBDIRS=""

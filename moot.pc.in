@@ -16,7 +16,7 @@ docdir=@docdir@
 pkgdocdir=@pkgdocdir@
 
 cppflags=-I@spkgincludedir@ @CPPFLAGS@
-ldadd=-lmoot
+ldadd=-lmoot @LIBS@
 
 
 Name: @PACKAGE@

@@ -26,7 +26,7 @@ which tokenizes an input stream, and eliminates most SGML
 markup.
 
 \see mootPPLexer
-\see <A HREF="../../programs/mootpp.html">dwspp(1)</A>
+\see <A HREF="../../programs/mootpp.html">mootpp(1)</A>
 
 
 \section HMM HMM Tagging
@@ -75,14 +75,33 @@ improvement (3x) with respect to mootMorph on its own.
 
 \section Ack Acknowledgements
 
-Development of this package began in the context
-of the DWDS/Collocations project
-('Kollokationen im digitalen W&ouml;rterbuch der deutschen Sprache'
-= 'collocations in the digital dictionary of the German language') at the
-Berlin-Brandenburgische Akademie der Wissenschaften.
-For details on the DWDS project, visit: http://www.dwds.de.
+This package was developed in the context of the
+project
+<A HREF=http://www.bbaw.de/forschung/kollokationen>Kollokationen im Wörterbuch</A>
+("collocations in the dictionary")
+in association with the project
+<A HREF=http://www.dwds.de>Digitales Wörterbuch deutscher Sprache (DWDS)</A>
+("digital dictionary of the German language")
+at the
+<A HREF="http://www.bbaw.de">Berlin-Brandenburgische Akademie der Wissenschaften</A>
+with funding from the
+<A HREF="http://www.avh.org">Alexander von Humboldt Stiftung</A>
+and from the
+Zukunftsinvestitionsprogramm of the German federal government.
 
-libFSM finite state machine C++ library by Thomas Hanneforth.
+I am grateful to Christiane Fellbaum, Alexander Geyken,
+Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
+for offering useful insights in the course of development
+of this package.
+
+Thomas Hanneforth wrote and maintains the libFSM C++ library
+for finite-state device operations used by the
+class-based HMM tagger / disambiguator.
+
+Alexander Geyken and Thomas Hanneforth developed the
+rule-based morphological analysis system for German
+which was used in the development and testing of the
+class-based HMM tagger / disambiguator.
 
 
 \section SeeAlso More Information
