@@ -199,7 +199,7 @@ bool mootHMM::load_model(const string &modelname,
     }
 
     // -- load model: class frequencies
-    if (!lcfile.empty() && file_exists(lcfile.c_str())) {
+    if (use_lex_classes && !lcfile.empty() && file_exists(lcfile.c_str())) {
       if (verbose >= vlProgress)
 	carp("%s: loading class frequency file '%s'...", myname, lcfile.c_str());
 
@@ -220,6 +220,9 @@ bool mootHMM::load_model(const string &modelname,
       return false;
     }
     else if (verbose >= vlProgress) carp(" compiled.\n");
+
+    //-- check whether to use classes
+    if (lcprobs.size() <= 2) use_lex_classes = false;
 
     //-- estimate smoothing constants: lexical probabiltiies (wlambdas)
     if (verbose >= vlProgress)
@@ -895,12 +898,6 @@ void mootHMM::viterbi_step(TokID tokid)
  */
 void mootHMM::viterbi_step(TokID tokid, ClassID classid, const LexClass &lclass)
 {
-  //-- Get next column
-  ViterbiColumn *col = viterbi_get_column();
-  ViterbiNode   *nod;
-  col->col_prev = vtable;
-  col->nodes = NULL;
-
   //-- sanity check(s)
   if (tokid >= n_toks) tokid = 0;
   if (classid >= n_classes) classid = 0;
@@ -914,39 +911,47 @@ void mootHMM::viterbi_step(TokID tokid, ClassID classid, const LexClass &lclass)
     if (classid == 0) nunknown++;
   }
 
-  //-- Get map of possible destination tags
-  const LexProbSubTable      &lps  = lexprobs[tokid];
-  const LexClassProbSubTable &lcps = lcprobs[classid];
+  //-- set constants
+  LexProbSubTable *lps;
+  ProbT wclambda1, wclambda2;
+  if (tokid != 0 || !use_lex_classes) {
+    lps = &lexprobs[tokid];
+    wclambda1 = wlambda1;
+    wclambda2 = wlambda2;
+  } else {
+    lps = &lcprobs[classid];
+    wclambda1 = clambda1;
+    wclambda2 = clambda2;
+  }
 
-  //-- Iterators
-  LexProbSubTable::const_iterator      lpsi;
-  LexClassProbSubTable::const_iterator lcpsi;
+  //-- Get next column
+  ViterbiColumn *col = viterbi_get_column();
+  ViterbiNode   *nod;
+  col->col_prev = vtable;
+  col->nodes = NULL;
 
   //-- for each possible destination tag 'vtagid'
-  for (LexClass::const_iterator lci = lclass.begin(); lci != lclass.end(); lci++)
+#if 0
+  /*
+   * Iterate over actual probability-table entries:
+   *
+   * This is about 3% (2K tok/sec) faster, and gives 3.9% fewer errors
+   * (96.66% vs. 96.52% correct), but it loses us almost-mandatory
+   * internal coverage ("strictness" of specified class: only 99.61%
+   * vs. 100%), so we don't do it this way.
+   */
+  for (LexProbSubTable::const_iterator lpsi = lps->begin(); lpsi != lps->end(); lpsi++)
     {
-      vtagid  = *lci;
+      vtagid  = lpsi->first;
 
       //-- ignore "unknown" tag(s)
       if (vtagid >= n_tags || vtagid == 0) continue;
 
-      //-- get lexical probability:
-      if (tokid != 0 || !use_lex_classes) {
-	//-- Known "Plain" token
-	//   : use "real" lexical probabilities
-	//   : P(tok|tag) := lambda_{w1}*p(tok|tag) + lambda_{w2}
-	lpsi = lps.find(vtagid);
-	vwordpr = (wlambda2 + (lpsi  == lps.end()  ? 0 : (wlambda1 * lpsi->second)) );
-      }
-      else { // (tokid==0 && use_lex_classes)
-	//-- Unknown token, known or unknown class
-	//   : use class probabilities
-	//   : P(tok|tag) := lambda_{c}*p(class|tag) + lambda_{w2}
-	lcpsi = lcps.find(vtagid);
-	vwordpr = (clambda2 + (lcpsi  == lcps.end()  ? 0 : (clambda1 * lcpsi->second)) );
-      }
+      //-- get lexical probability
+      vwordpr = (wclambda2 + (wclambda1 * lpsi->second));
 
-      //-- find best previous tag by n-gram probabilites: store information in vbestpr,vbestpn
+      //-- find best previous tag by n-gram probabilites
+      //   : store information in vbestpr,vbestpn
       viterbi_find_best_prevnode(vtagid, tagp(vtagid));
 
       //-- skip zero-probabilities
@@ -960,6 +965,45 @@ void mootHMM::viterbi_step(TokID tokid, ClassID classid, const LexClass &lclass)
       nod->row_next = col->nodes;
       col->nodes    = nod;
     }
+
+#else
+
+  /*
+   * Iterate over actual actual class specified:
+   *
+   * This is about 2K tok/sec faster, and gives 3.9% fewer errors
+   * (from 96.66% vs. 96.52% correct), but it loses us almost-mandatory
+   * internal coverage ("strictness" of specified class, so we
+   * don't do it this way.
+   */
+  LexProbSubTable::const_iterator lpsi;
+  for (LexClass::const_iterator lci = lclass.begin(); lci != lclass.end(); lci++)
+    {
+      vtagid  = *lci;
+
+      //-- ignore "unknown" tag(s)
+      if (vtagid >= n_tags || vtagid == 0) continue;
+
+      //-- get lexical probability
+      lpsi = lps->find(vtagid);
+      vwordpr = (wclambda2 + (lpsi  == lps->end()  ? 0 : (wclambda1 * lpsi->second)) );
+
+      //-- find best previous tag by n-gram probabilites
+      //   : store information in vbestpr,vbestpn
+      viterbi_find_best_prevnode(vtagid, tagp(vtagid));
+
+      //-- skip zero-probabilities
+      //if (vbestpr <= 0) continue;
+
+      //-- update state table column for current destination tag
+      nod           = viterbi_get_node();
+      nod->tagid    = vtagid;
+      nod->prob     = (vbestpr * vwordpr);
+      nod->pth_prev = vbestpn;
+      nod->row_next = col->nodes;
+      col->nodes    = nod;
+    }
+#endif /* disambiguation method */
 
   if (col->nodes == NULL) {
     //-- oops: we haven't found anything...

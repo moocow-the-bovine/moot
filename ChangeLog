@@ -3,6 +3,7 @@ ChangeLog for package moot
 Todo:
 	+ add XML I/O (subclass of mootToken(Reader|Writer) ?)
 	  - test effect of virtuals here
+	+ write perl-XS interface & utilities
 	+ optimize class-based tagging: pre-prune classfreqs
 	  and merge viterbi_step()s into one iterator-based
 	  method ?
@@ -13,6 +14,12 @@ Todo:
 	    after that, we lose the relation between
 	    tokens and their classes (in principle, this
 	    relation can be dynamic, which is a Feature...)
+	  - experimented with this technique in mootHMM:
+	    gains us a smidgeon of speed (2K tok/s) and
+	    some accuracy, at the cost of internal coverage
+	    (read "consistency"), so #ifdef'd it out.
+	    * leads to the question where the REAL speed-brake
+	      is coming from... class lookup / conversion?
 
 v2.0.0pre5 Sun,  6 Jun 2004 12:07:11 +0200
 	+ re-added & tested binary model I/O
@@ -21,6 +28,13 @@ v2.0.0pre5 Sun,  6 Jun 2004 12:07:11 +0200
 	+ moved old 'programs/cmdutil.*' and 'programs/hmmutil.*'
 	  structs and functions into library: 'mootUtils.h';
 	  redefined in terms of 'string'
+	+ added high-level mootHMM::load_model() method for
+	  single-model load, compilation, and smoothing estimation.
+	+ fixed bug causing all fallbacks without 'use_lex_classes'
+	+ reworked mootHMM::viterbi_step(tokid,classid,lclass)
+	  to use only a single iterator -- tiny bit faster,
+	  but relies on 'typedef LexProbSubtable LexClassProbSubtable';
+	  not a problem now or in the foreseeable future.
 	
 v2.0.0pre4 Sun,  6 Jun 2004 02:52:24 +0200
 	+ gaspode bughunt
@@ -157,7 +171,6 @@ v1.0.0 Thu, 21 Aug 2003 13:37:21 +0200
 	- enable pre-computed tagsets in input files in mootCHMM
 	  as for mootHMM (parse dwdsm "TAG:ANALYSIS" format?!)
 	  * looks like a job for POSIX regexes...
-	- write perl-XS interface
 	
 v1.0.0_pre4 Thu, 14 Aug 2003 17:55:48 +0200
   + corrected '-q' syntax for moot, optimized 

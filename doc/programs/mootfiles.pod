@@ -286,7 +286,7 @@ An example "well done" file is:
 =cut
 
 ##--------------------------------------------------------------
-## Input: Cooked: Well Done (+tagged,+analyzed)
+## Input: Cooked: Refried (+eval,(+tagged,+/-analyzed)^2)
 =pod
 
 =item Refried
@@ -341,7 +341,7 @@ tokens matched (or at least were compatible).
 
 =item IMPOSSIBLE_FLAG
 
-'-' if token ANALYSES included token BESTTAG (for the given file), otherwise 'i'.
+'-' if token ANALYSES included token BESTTAG (for the corresponding file), otherwise 'i'.
 
 =item XIMPOSSIBLE_FLAG
 
