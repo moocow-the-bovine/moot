@@ -13,8 +13,14 @@ on_reparse "warn"
 # Details
 #-----------------------------------------------------------------------------
 details "
-'mootrain' gathers training data for the HMM tagger
-used by 'moot' from a tagged training corpus.
+'mootrain' gathers training data for the HMM part-of-speech tagger
+used by the 'moot' program  from a tagged training corpus.
+The training
+corpus should be in 'medium' (+tagged,-analyzed) or 'well done'
+(+tagged,+analyzed) format.  The output file(s) are text-format
+raw frequency models.
+
+See L<mootfiles> for details on moot file formats.
 "
 
 #-----------------------------------------------------------------------------
@@ -29,14 +35,10 @@ rcfile "~/.mootrainrc"
 #-----------------------------------------------------------------------------
 argument "INPUT(s)" "Tagged input corpus file(s)." \
     details="
-Input files should be in much the same format as that accepted
-by Thorsten Brants' tnt-para(1) program: one token per line,
-tags and tokens separated by a single TAB character.  A blank
-line indicates a sentence boundary.  The initial analysis for
-each token is considered the 'best' analysis.  Subsequent
-analyses are used to construct lexical class frequencies.
+Input files should be 'medium' (+tagged,-analyzed)
+or 'well done' (+tagged,-analyzed).
 
-See L<mootfiles> for details.
+See L<mootfiles> for details on moot file formats.
 "
 
 #-----------------------------------------------------------------------------
@@ -89,33 +91,15 @@ flag "verbose-ngrams" N "Generate long-form ngrams (default=no)"
 #-----------------------------------------------------------------------------
 # Addenda
 #-----------------------------------------------------------------------------
-addenda "
-
-=head2 Model Files
-
-The mootrain program produces text-format model files for use with
-moothmm(1) and/or moot(1).
-See L<mootfiles> for details on the format of these files.
-
-When specifiying a text model with the '--output' option, you may
-specifiy:
-
-  --output=TMODEL
-
-in order to use the files 'TMODEL.lex', 'TMODEL.123', and 'TMODEL.clx'
-or you may specify the component model files individually, by:
-
-  --output=TMODEL.lex,TMODEL.123,TMODEL.clx
-
-Existing files will be overwritten.
-"
+#addenda ""
 
 #-----------------------------------------------------------------------------
 # Bugs
 #-----------------------------------------------------------------------------
 bugs "
 
-Only ca. 99.998% compatible with tnt-para(1).
+Only ca. 99.998% compatible with tnt-para(1), due to token-typification
+strangeness.
 
 "
 
@@ -124,4 +108,4 @@ Only ca. 99.998% compatible with tnt-para(1).
 #-----------------------------------------------------------------------------
 acknowledge `cat acknowledge.pod`
 
-seealso "L<mootpp>, L<mootm>, L<moot>, L<mooteval>, L<mootfiles>"
+seealso "L<mootpp>, mootm(1), L<moot>, L<mooteval>, L<mootfiles>"

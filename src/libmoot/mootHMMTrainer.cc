@@ -167,7 +167,7 @@ void mootHMMTrainer::train_token(const mootToken &curtok)
   //-- count class frequencies
   if (want_classfreqs) {
     mootTagSet lclass;
-    curtok.tokExport(NULL,&lclass);
+    curtok.tokExport(NULL,&lclass,false);
     lcfreqs.add_count(lclass, curtok.besttag(), 1.0);
   }
 

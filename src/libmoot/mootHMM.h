@@ -44,52 +44,55 @@
 #include <zlib.h>
 
 /**
- * \def moot_DEBUG_ARCP
- * Define this for verbose debugging information to stderr.
- * Actually, arcp() should never be called anymore, so this
- * probably won't produce any output at all...
- */
-//#define moot_DEBUG_ARCP 1
-#undef moot_DEBUG_ARCP
-
-/**
  * \def moot_ADD_ONE_HACK
  * Define this to include the 'add one' hack to avoid float underflows.
  *
  * \warning this causes major problems with sparse data, and using
  * 'double' as our probability type seems to work just dandy without
- * this hack...
+ * this hack.  In other words, you should \b NEVER define this.
  */
-//#define moot_ADD_ONE_HACK 1
 #undef moot_ADD_ONE_HACK
 
 /**
  * \def mootProbEpsilon
  * Constant representing a minimal probability.
- * Used for default constructor.
+ * Used for default constructor.  The standard value
+ * should be appropriate for an IEEE 754-1985 float,
+ * but we want our probabilities bigger, so we use
+ * DBL_EPSILON if we can.
  */
 //#define mootProbEpsilon FLT_EPSILON
 //#define mootProbEpsilon 1e-32
-#define mootProbEpsilon DBL_EPSILON
+#ifdef DBL_EPSILON
+# define mootProbEpsilon DBL_EPSILON
+#else
+# define mootProbEpsilon 1.19209290E-07
+#endif
 
 /**
  * \def moot_LEX_UNKNOWN_TOKENS
  * Define this to include real lexical entries for tokens with counts
- * <= UnknownLexThreshhold.
+ * <= UnknownLexThreshhold.  Not entirely correct, but it actually
+ * seems to help.
  */
 #define moot_LEX_UNKNOWN_TOKENS
+//#undef moot_LEX_UNKNOWN_TOKENS
 
 /**
  * \def moot_USE_TRIGRAMS
- * Define this to use trigrams (not yet implemented!)
+ * Define this to use trigrams (not yet implemented everywhere!)
  */
 #undef moot_USE_TRIGRAMS
 
 /**
- * \def moot_VITERBI_VERBOSE
- * Define this to store verbose information during viterbi_step().
+ * \def moot_LEX_UNKNOWN_CLASSES
+ * Define this to include real lexical-class entries for classes with counts
+ * <= UnknownClassThreshhold.  Not entirely kosher, but it works well, so
+ * what the hey...
  */
-#define moot_VITERBI_VERBOSE
+#define moot_LEX_UNKNOWN_CLASSES
+//#undef moot_LEX_UNKNOWN_CLASSES
+
 
 moot_BEGIN_NAMESPACE
 
@@ -106,7 +109,11 @@ public:
   /** \name Atomic Types */
   //@{
 
-  /** Type for a single probability value */
+  /**
+   * Type for a single probability value.
+   * We use \c double here, since our probabilties can get wee tiny small
+   * for longish sentences.
+   */
   typedef double ProbT;
   //typedef float ProbT;
 
@@ -117,9 +124,8 @@ public:
   typedef mootEnumID TokID;
 
   /**
-   * Typedef for a lexical ClassID. Zero indicates a previously
-   * unknown class.  If you want the ClassID associated with
-   * empty lexical classes, use \c class2id(LexClass()).
+   * Typedef for a lexical ClassID. Zero indicates
+   * either a previously unknown class or the empty class.
    */
   typedef mootEnumID ClassID;
   //@}
@@ -132,7 +138,7 @@ public:
   /**
    * Type for a lexical-class aka "ambiguity class".  Intuitively, the
    * lexical class associated with a given token is just the set of all
-   * possible PoS tags for that that token.
+   * a priori possible PoS tags for that that token.
    */
   typedef set<TagID> LexClass;
 
@@ -178,23 +184,33 @@ public:
 		   LexClassEqual>
           ClassIDTable;
 
-  /** Type for lexical probability lookup subtable: tagid->p(tagid) */
+  /** Type for lexical probability lookup subtable: \c tagid=>p(tagid) */
   typedef map<TagID,ProbT> LexProbSubTable;
 
   /**
    * Type for lexical-class probability lookup subtable:
-   * \c tagid->prob
+   * \c tagid=>p(...tagid...)
    */
   typedef LexProbSubTable LexClassProbSubTable;
 
   /**
-   * Type for lexical probability lookup table: \c tokid->(tagid->p(tokid|tagid))
+   * Type for lexical probability lookup table: \c tokid=>(tagid=>p(tokid|tagid))
    */
   typedef vector<LexProbSubTable> LexProbTable;
 
   /**
    * Type for lexical-class probability lookup table:
-   * \c classid->(tagid->p(classid|tagid))
+   * \c classid=>(tagid=>p(classid|tagid))
+   * Really just an alias for \c LexProbSubtable: at
+   * some point, we should capitalize on this and
+   * make things spiffy boffo stomach-lurching fast,
+   * but that requires more information than is
+   * currently stored in our models (specifically,
+   * foreknowledge of the token->class mapping for known
+   * tokens), and an assumption that this mapping is
+   * static, which it very well might not be at
+   * some vaguely imagined unspecified future point
+   * in time.
    */
   typedef LexProbTable LexClassProbTable;
 
@@ -268,13 +284,13 @@ public:
   /** \name Viterbi State-Table Types  */
   //@{
 
-  /** Type for a Viterbi state-table entry (linked-list columns) */
+  /** Type for a Viterbi state-table entry (linked-list columns of linked-list rows) */
   class ViterbiNode {
   public:
     TagID tagid;                   /**< Tag-ID for this node */
     ProbT prob;                    /**< Probability of best path to this node */
-    struct ViterbiNode *pth_prev;  /**< Previous node in best path */
-    struct ViterbiNode *row_next;  /**< Next node in current column */
+    struct ViterbiNode *pth_prev;  /**< Previous node in best path to this node */
+    struct ViterbiNode *row_next;  /**< Next tag-node in current column */
   };
 
   /**
@@ -297,9 +313,11 @@ public:
    * All relevant allocation (and de-allocation) is handled
    * internally:
    * All ViterbiPathNode pointers returned by any mootHMM method
-   * call are de-allocated on clear(). 
+   * call are de-allocated on clear().  On viterbi_clear(),
+   * they're wiped and tossed onto an internal trash-stack:
+   * this is marginally faster than re-allocation.
    *
-   * Don't rely on the data in your (ViterbiPathNode*)s
+   * \warning Don't rely on the data in your (ViterbiPathNode*)s
    * remaining the same over multiple mootHMM method calls:
    * get what you need, and then lose the nodes.
    */
@@ -308,17 +326,8 @@ public:
     ViterbiNode      *node;      /** Corresponding state-table node */
     ViterbiPathNode  *path_next; /** Next node in this path */
   };
-  //typedef deque<ViterbiNode*> ViterbiPath;
   //@}
 
-
-#ifdef moot_VITERBI_VERBOSE
-  /*---------------------------------------------------------------------*/
-  /** \name Viterbi Debug Types  */
-  //@{
-  typedef map<string,size_t> viterbiStepInfo;
-  //@}
-#endif // moot_VITERBI_VERBOSE
 
 public:
   /*---------------------------------------------------------------------*/
@@ -345,7 +354,20 @@ public:
   /** \name Useful Constants */
   //@{
 
-  /** Boundary tag, used during compilation, viterbi_start(), and viterbi_finish() */
+  /**
+   * Whether to use class probabilities (Default=true)
+   * \warning Don't set this to true unless your input
+   * files actually contain a priori analyses generated
+   * by the same method on which you trained your model;
+   * otherwise, expect abominable accuracy.
+   */
+  bool      use_lex_classes;
+
+  /**
+   * Boundary tag, used during compilation, viterbi_start(), and viterbi_finish()
+   * This gets set by the \c start_tag_str argument to compile().
+   * Whatever it is, it should be consistend with what you trained on.
+   */
   TagID     start_tagid;
 
   /**
@@ -354,23 +376,26 @@ public:
    * or as probabilities for the "unknown" token.  This is just a raw
    * count: the minimum number of times a token must have occurred in
    * the training data in order for us to record statistics about it
-   * as "pure" lexical probabilities.
+   * as "pure" lexical probabilities.  Default=1.
    */
   ProbT     unknown_lex_threshhold;
 
   /**
-   * Lexical class for unknown tokens. 
-   * An empty class (the default) means to treat them as 
-   * "plain" (possibly @UNKNOWN) tokens.
-   * Used by compile() to set \c uclassid datum.
+   * "Unknown" lexical-class threshhold: used during compilation to determine
+   * whether a classes's statistics are recorded as "pure" class probabilities
+   * or as probabilities for the "unknown" class.  This is just a raw
+   * count: the minimum number of times a class must have occurred in
+   * the training data in order for us to record statistics about it
+   * as "pure" lexical-class probabilities.  Default=1
    */
-  mootTagSet unknown_tagset;
+  ProbT     unknown_class_threshhold;
 
   /**
-   * Class-ID to use for unknown tokens with no analyses (the "empty class").
-   * Zero (the default) corresponds to an empty 'uclass_tags'.
+   * LexClass to use for unknown tokens with no analyses.
+   * This gets set at compile-time.  You can re-assign it
+   * after that if you are so inclined.
    */
-  ClassID   uclassid;
+  LexClass   uclass;
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -381,8 +406,10 @@ public:
 #ifdef moot_USE_TRIGRAMS
   ProbT             nglambda3;    /**< Smoothing constant for trigrams */
 #endif
-  ProbT             wlambda1;     /**< Smoothing constant lexical probabilities */
-  ProbT             wlambda2;     /**< Smoothing constant lexical probabilities */
+  ProbT             wlambda1;     /**< Smoothing constant for lexical probabilities */
+  ProbT             wlambda2;     /**< Smoothing constant for lexical probabilities */
+  ProbT             clambda1;     /**< Smoothing constant for class probabilities */
+  ProbT             clambda2;     /**< Smoothing constant for class probabilities */
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -393,7 +420,6 @@ public:
   ClassIDTable      classids;   /**< Class-ID lookup table */
 
   TokID             typids[NTokTypes]; /**< TokenType to TokenID lookup table for non-alphabetics */
-  mootTokString   typnames[NTokTypes]; /**< Names of special (non-alphabetic) tokens */
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -430,10 +456,6 @@ public:
   size_t             nfallbacks;  /**< Number of fallbacks in viterbi_step() */
   //@}
 
-#ifdef moot_VITERBI_VERBOSE
-  viterbiStepInfo    viterbiInfo;  /**< viterbi_step() information */
-#endif // moot_VITERBI_VERBOSE
-
 protected:
   /*---------------------------------------------------------------------*/
   /** \name Low-level data: trash stacks */
@@ -453,8 +475,6 @@ protected:
   ViterbiNode      *vbestpn;    /**< Best previous node for viterbi_step() */
 
   ViterbiPathNode  *vbestpath;  /**< For node->path conversion */
-
-  //LexClass       lexclass_tmp;  /* Temporary lexical class for conversions / lookup */
   //@}
 
 public:
@@ -465,13 +485,16 @@ public:
   mootHMM(void)
     : input_ignore_first_analysis(false),
       output_best_only(false),
+      use_lex_classes(true),
       start_tagid(0),
       unknown_lex_threshhold(1.0),
-      uclassid(0),
+      unknown_class_threshhold(1.0),
       nglambda1(mootProbEpsilon),
       nglambda2(1.0 - mootProbEpsilon),
       wlambda1(1.0 - mootProbEpsilon),
       wlambda2(mootProbEpsilon),
+      clambda1(1.0 - mootProbEpsilon),
+      clambda2(mootProbEpsilon),
       n_tags(0),
       n_toks(0),
       n_classes(0),
@@ -537,29 +560,25 @@ public:
   /*------------------------------------------------------------*/
   /** \name Accessors */
   //@{
-  /** Set the unknown token name */
+  /** Set the unknown token name : UNSAFE! */
   inline void unknown_token_name(const mootTokString &name)
   {
     tokids.unknown_name(name);
-    for (int i = 0; i < NTokTypes; i++) {
-      typnames[i] = TokenTypeNames[i];
-    }
-    typnames[TokTypeUnknown] = name;
   };
 
-  /** Set the unknown tag */
+  /** Set the unknown tag : this tag should never appear anyways */
   inline void unknown_tag_name(const mootTokString &name)
   {
     tagids.unknown_name(name);
   };
 
-  /**
+  /*
    * Set lexical class to use for tokens without user-specified analyses.
-   * \see uclassid
+   * Really just an alias for 'uclass' datum.
    */
   inline void unknown_class_name(const mootTagSet &tagset)
   {
-    unknown_tagset = tagset;
+    tagset2lexclass(tagset,&uclass,false);
   };
   //@}
 
@@ -579,17 +598,23 @@ public:
   /** Assign IDs for tokens and tags from lexfreqs: called by compile() */
   void assign_ids_lf(const mootLexfreqs &lexfreqs);
 
+  /** Assign IDs for tags from ngrams: called by compile() */
+  void assign_ids_ng(const mootNgrams   &ngrams);
+
   /** Assign IDs for classes and tags from classfreqs: called by compile() */
   void assign_ids_cf(const mootClassfreqs &classfreqs);
 
-  /** Assign IDs for tags from ngrams: called by compile() */
-  void assign_ids_ng(const mootNgrams   &ngrams);
+  /** Compile "unknown" lexical class : called by compile() */
+  void compile_unknown_lexclass(const mootClassfreqs &classfreqs);
 
   /** Estimate ngram-smoothing constants: NOT called by compile(). */
   bool estimate_lambdas(const mootNgrams &ngrams);
 
   /** Estimate lexical smoothing constants: NOT called by compile(). */
   bool estimate_wlambdas(const mootLexfreqs &lf);
+
+  /** Estimate class smoothing constants: NOT called by compile(). */
+  bool estimate_clambdas(const mootClassfreqs &cf);
   //@}
 
   //------------------------------------------------------------
@@ -638,20 +663,14 @@ public:
    */
   inline void viterbi_step(const mootToken &token) {
     ntokens++;
-    if (token.analyses().empty()) {
-      nunclassed++;
-      viterbi_step(token2id(token.text()));
-    }
-    else {
-      LexClass tok_class;
-      for (mootToken::AnalysisSet::const_iterator ani = token.analyses().begin();
-	   ani != token.analyses().end();
-	   ani = token.upper_bound(ani->tag))
-	{
-	  tok_class.insert(tagids.name2id(ani->tag));
-	}
-      viterbi_step(token2id(token.text()), tok_class);
-    }
+    LexClass tok_class;
+    for (mootToken::AnalysisSet::const_iterator ani = token.analyses().begin();
+	 ani != token.analyses().end();
+	 ani = token.upper_bound(ani->tag))
+      {
+	tok_class.insert(tagids.name2id(ani->tag));
+      }
+    viterbi_step(token2id(token.text()), tok_class);
   };
 
   //------------------------------------------------------------
@@ -663,20 +682,23 @@ public:
    */
   inline void viterbi_step(TokID tokid, const LexClass &lexclass)
   {
-    if (lexclass.empty()) {
-      nunclassed++;
-      viterbi_step(tokid);
-    } else {
-      //-- non-empty class : get ID
-      ClassID classid =
-	//class2id(lexclass,1,1) //-- : creates new class if unknown (uniform dist) : RESULTS=GOOD
-	class2id(lexclass,0,1) //-- : creates new class if unknown (empty dist) : RESULTS=GOOD
-	//class2id(lexclass,0,0) //-- : assigns ID '0' if unknown                 : RESULTS=BAD
-	;
-      if (classid==0) {
-	viterbi_step(tokid);   //-- this should never happen! (?)
+    if (use_lex_classes) {
+      if (lexclass.empty()) {
+	nunclassed++;
+	viterbi_step(tokid, 0, uclass);
+      } else {
+	//-- non-empty class : get ID (assign empty distribution if unknown)
+	ClassID classid = class2id(lexclass,0,1);
+	viterbi_step(tokid,classid,lexclass);
       }
-      viterbi_step(tokid,classid,lexclass);
+    } else {
+      //-- !use_lex_classes
+      if (lexclass.empty()) {
+	nunclassed++;
+	viterbi_step(tokid);
+      } else {
+	viterbi_step(tokid,0,lexclass);
+      }
     }
   };
 
@@ -684,7 +706,7 @@ public:
   // Viterbi: single iteration: (TokID,ClassID,LexClass)
   /**
    * Step a single Viterbi iteration, considering only the tags
-   * for class \c classid.
+   * in \c lclass
    */
   void viterbi_step(TokID tokid, ClassID classid, const LexClass &lclass);
 
@@ -719,14 +741,9 @@ public:
    */
   inline void viterbi_step(const mootTokString &token_text, const set<mootTagString> &tags)
   {
-    set<TagID> tags_ids;
-    for (set<mootTagString>::const_iterator tagi = tags.begin();
-	 tagi != tags.end();
-	 tagi++)
-      {
-	tags_ids.insert(tagids.name2id(*tagi));
-      }
-    return viterbi_step(token2id(token_text), tags_ids);
+    LexClass lclass;
+    tagset2lexclass(tags,&lclass);
+    viterbi_step(token2id(token_text), lclass);
   };
 
   //------------------------------------------------------------
@@ -1020,7 +1037,7 @@ public:
 
   /**
    * Lookup the ClassID for the lexical-class \c lclass.
-   * @param autopopulate if true, new classes will be autopopulated with uniform distributions.
+   * @param autopopulate if true, new classes will be autopopulated with uniform distributions (implies \c autocreate).
    * @param autocreate if true, new classes will be created and assigned class-ids.
    */
   inline ClassID class2id(const LexClass &lclass,
@@ -1233,7 +1250,6 @@ public:
 
   /** Debugging method: dump current Viterbi state-table column to a text file */
   void viterbi_txtdump(FILE *file);
-
   //@}
 };
 

@@ -90,48 +90,24 @@ errors: $(EVAL).errors
 cerrors: $(EVAL).cerrors
 
 %.tt.errors: %.tt.eval
-	grep '^.b' $< \
-	| sort \
-	| uniq -c \
-	| sort -r -n \
-	> $@
+	grep '^.b' $< | sort | uniq -c | sort -r -n > $@
 
 %.tt.cerrors:
 	echo "WHOLE FILE" > $@
 
 %.errors: %.eval
-	grep '^.b:' $< \
-	| grep -v '^..:...:---' \
-	| sort \
-	| uniq -c \
-	| sort -r -n \
-	> $@
+	grep '^.b:' $< | grep -v '^..:...:---' | sort | uniq -c | sort -r -n > $@
 
 %.cerrors: %.eval classify-eval.perl
 	./classify-eval.perl $< \
-	| grep '^.b:' $< \
-	| grep -v '^..:...:---' \
-	| sort \
-	| uniq -c \
-	| sort -r -n \
-	> $@
+	| grep '^.b:' $< | grep -v '^..:...:---' | sort | uniq -c | sort -r -n > $@
 
 %.ierrors: %.eval
-	grep '^.' $< \
-	| grep -v '^..:...:---' $< \
-	| sort \
-	| uniq -c \
-	| sort -r -n \
-	> $@
+	grep '^.' $< | grep -v '^..:...:---' $< | sort | uniq -c | sort -r -n > $@
 
 %.icerrors: %.eval classify-eval.perl
 	./classify-eval.perl $< \
-	| grep '^.' \
-	| grep -v '^..:...:---' \
-	| sort \
-	| uniq -c \
-	| sort -r -n \
-	> $@
+	| grep '^.' | grep -v '^..:...:---' | sort | uniq -c | sort -r -n > $@
 
 ##-- save
 save: save/$(label).stamp

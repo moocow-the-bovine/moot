@@ -12,16 +12,18 @@ on_reparse "warn"
 # Details
 #-----------------------------------------------------------------------------
 details "
-mootpp is a pre-processor for raw text intended to be
-used to prepare documents for PoS tagging by 'mootm' (see L<mootm>),
-'moothmm' (see L<moothmm>), or 'moot' (see L<moot>).
+mootpp is a rudimentary pre-processor for raw text intended
+for use with the 'moot' part-of-speech tagging tools.  It takes
+as its input one or more 'raw' files, and produces a 'rare'
+output file.  Most SGML markup should be eliminated by mootpp.
+See L<mootfiles> for details on moot file formats.
 "
 
 #-----------------------------------------------------------------------------
 # Arguments
 #-----------------------------------------------------------------------------
 argument "FILE(s)" "Input files" \
-    details="See the L<--list> option."
+    details="See also the --list option."
 
 #-----------------------------------------------------------------------------
 # Options
@@ -36,7 +38,7 @@ string	"output" o "Write output to FILE." \
     arg="FILE" \
     default="-" \
     details="
-Output files are in TnT format: one token per line, a blank line
+Output files are in 'rare' format: one token per line, a blank line
 indicates a sentence boundary.
 "
 
@@ -59,4 +61,4 @@ as filenames of the input files themselves.
 #-----------------------------------------------------------------------------
 acknowledge `cat acknowledge.pod`
 
-seealso "L<mootm>, L<moothmm>, L<moot>."
+seealso "mootm(1), L<moot>."

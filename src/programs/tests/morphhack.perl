@@ -65,16 +65,16 @@ while (($tok,$vals) = each(%xlate_tok)) {
 ##-- single-tag translation table (additive)
 %xlate_tag =
   (
-   ADJC => ['[ADJD hack=1]'],
+   'ADJC' => ['[ADJD hack=1]'],
    #XY   => ['[$. hack=1]'],
    ##--
    #NE => ['[NN hack=1]'],
    #NN => ['[NE hack=1]']
    ##--
-   NE => ['[NN hack=1]', '[ADJA hack=1]' ],
-   NN => ['[NE hack=1]', '[ADJA hack=1]' ],
+   'NE' => ['[NN hack=1]', '[ADJA hack=1]' ],
+   'NN' => ['[NE hack=1]', '[ADJA hack=1]' ],
    ##--
-   PIDAT => ['[PIAT hack=1]'],
+   'PIDAT' => ['[PIAT hack=1]'],
   );
 
 

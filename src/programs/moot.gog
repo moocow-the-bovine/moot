@@ -15,6 +15,12 @@ on_reparse "warn"
 details "
 'moot' is a Hidden Markov Model (HMM) Part-of-Spech (PoS)
 tagger / disambiguator program based on the 'libmoot' library.
+
+It takes as its input one or more 'rare' (-tagged,-analyzed)
+or 'medium rare' (-tagged,+analyzed) files and produces a
+'medium' (+tagged,-analyzed) or 'well done' (+tagged,+analyzed)
+file, respectively.  See L<mootfiles> for details on moot file
+formats.
 "
 
 #-----------------------------------------------------------------------------
@@ -116,6 +122,15 @@ See 'HMM MODEL FILE FORMATS' in L<mootfiles> for details
 on model file formats.
 "
 
+int "use-lex-classes" L "Whether to use lexical class-probabilities." \
+    arg="BOOL" \
+    default="1" \
+    details="
+Only useful if your file contains a priori analyses.
+Default behavior is to try and use classes if you specify
+a non-empty class-frequency file.
+"
+
 string "nlambdas" N "N-Gram smoothing constants (default=estimate)" \
   arg="LAMBDAS" \
   details="
@@ -150,6 +165,15 @@ Lexical probabilities for unknown tokens in the input are estimated
 from tokens which occur at most FLOAT times in the model.
 "
 
+double "unknown-class-threshhold" X "Frequency threshhold for 'unknown' class probabilities" \
+  arg="FLOAT" \
+  default="1.0" \
+  details="
+Class probabilities for unrecognized tokens  in the input are estimated
+from classes which occur at most FLOAT times in the model
+and/or from the empty class.
+"
+
 string "unknown-token" u "Symbolic name of the 'unknown' token" \
   arg="NAME" \
   default="@UNKNOWN" \
@@ -176,7 +200,7 @@ be a valid analysis for any token.
 #-----------------------------------------------------------------------------
 # Addenda
 #-----------------------------------------------------------------------------
-addenda ""
+#addenda ""
 
 #-----------------------------------------------------------------------------
 # Bugs
@@ -192,4 +216,4 @@ None known.
 #-----------------------------------------------------------------------------
 acknowledge `cat acknowledge.pod`
 
-seealso "L<mootpp>, L<mootm>, L<mootrain>, L<mooteval>, L<mootfiles>"
+seealso "L<mootpp>, mootm(1), L<mootrain>, L<mooteval>, L<mootfiles>"

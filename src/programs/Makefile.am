@@ -52,12 +52,6 @@ moot_SOURCES = \
 	moot_main.cc \
 	moot_cmdparser.cc moot_cmdparser.h
 
-moot_SOURCES = \
-	cmdutil.cc cmdutil.h \
-	hmmutil.cc hmmutil.h \
-	moot_main.cc \
-	moot_cmdparser.cc moot_cmdparser.h
-
 mootrain_SOURCES = \
 	cmdutil.cc cmdutil.h \
 	hmmutil.cc hmmutil.h \

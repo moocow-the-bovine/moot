@@ -311,7 +311,7 @@ public:
    * For backwards-compatibility: convert old-style 'text,tags' pair
    * to a mootToken.
    *
-   * NOTE: current analysis-set is NOT cleared by this method.
+   * \warning current analysis-set is NOT cleared by this method.
    */
   inline void tokImport(const mootTokString *src_toktext=NULL,
 			const mootTagSet    *src_tagset=NULL)
@@ -331,10 +331,15 @@ public:
    * For lazy backwards-compatibility:
    * convert mootToken back to old-style 'text,tagset' pair.
    *
-   * NOTE: argument tagset is NOT cleared by this method.
+   * @param dst_toktext pointer to destination token-text. NULL (default) means don't export text.
+   * @param dst_tagset pointer to destination tagset. NULL (default) means don't export tagset.
+   * @param want_besttag_in_tagset whether to include besttag in exported tagset.  Default=true.
+
+   * \warning argument tagset is NOT cleared by this method.
    */
   inline void tokExport(mootTokString *dst_toktext=NULL,
-			mootTagSet *dst_tagset=NULL) const
+			mootTagSet *dst_tagset=NULL,
+			bool want_besttag_in_tagset = true) const
   {
     if (dst_toktext) *dst_toktext = tok_text;
     if (dst_tagset) {
@@ -346,7 +351,8 @@ public:
 	{
 	  dst_tagset->insert(asi->tag);
 	}
-      if (!tok_besttag.empty()) dst_tagset->insert(tok_besttag);
+      if (want_besttag_in_tagset && !tok_besttag.empty())
+	dst_tagset->insert(tok_besttag);
     }
   };
   

@@ -116,9 +116,11 @@ void GetMyOptions(int argc, char **argv)
   hmm.output_best_only = args.best_given;
 
   // -- assign "unknown" ids & other flags
+  hmm.use_lex_classes = args.use_lex_classes_arg;
   hmm.unknown_token_name(args.unknown_token_arg);
   hmm.unknown_tag_name(args.unknown_tag_arg);
   hmm.unknown_lex_threshhold = args.unknown_threshhold_arg;
+  hmm.unknown_class_threshhold = args.unknown_class_threshhold_arg;
 
   // -- parse model spec
   char *binfile=NULL;
@@ -185,10 +187,16 @@ void GetMyOptions(int argc, char **argv)
       }
     }
     else {
+      hmm.use_lex_classes = false;
       if (args.verbose_arg > 1)
 	fprintf(stderr, "%s: no class frequency file '%s' -- skipping.\n",
 		PROGNAME, classfile);
     }
+  } else {
+    hmm.use_lex_classes = false;
+    if (args.verbose_arg > 1)
+      fprintf(stderr, "%s: no class frequency file '%s' -- not using lexical classes.\n",
+	      PROGNAME, classfile);
   }
 
   // -- compile HMM
@@ -246,6 +254,16 @@ void GetMyOptions(int argc, char **argv)
       } else if (args.verbose_arg > 1) {
 	fprintf(stderr," done.\n");
       }
+    }
+
+    //-- estimate class lambdas
+    if (args.verbose_arg > 1)
+      fprintf(stderr, "%s: estimating class lambdas...", PROGNAME);
+    if (!hmm.estimate_clambdas(classfreqs)) {
+      fprintf(stderr,"\n%s: class lambda estimation FAILED.\n", PROGNAME);
+      exit(1);
+    } else if (args.verbose_arg > 1) {
+      fprintf(stderr," done.\n");
     }
 
     if (args.compile_given) {
@@ -319,22 +337,22 @@ void print_summary(FILE *file)
   fprintf(file, "%%%%    - Sentences Processed : %9u sent\n", hmm.nsents);
   fprintf(file, "%%%%    - Tokens Processed    : %9u tok\n", hmm.ntokens);
   fprintf(file, "%%%%  + Analysis\n");
-  fprintf(file, "%%%%    - Token Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
+  fprintf(file, "%%%%    - Token Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  hmm.ntokens-hmm.nnewtokens,
 	  100.0*((double)hmm.ntokens-(double)hmm.nnewtokens)/(double)hmm.ntokens,
 	  hmm.nnewtokens,
 	  100.0*(double)hmm.nnewtokens/(double)hmm.ntokens);
-  fprintf(file, "%%%%    - Class Given (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
+  fprintf(file, "%%%%    - Class Given (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  hmm.ntokens-hmm.nunclassed,
 	  100.0*((double)hmm.ntokens-(double)hmm.nunclassed)/(double)hmm.ntokens,
 	  hmm.nunclassed,
 	  100.0*(double)hmm.nunclassed/(double)hmm.ntokens);
-  fprintf(file, "%%%%    - Class Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
+  fprintf(file, "%%%%    - Class Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  hmm.ntokens-hmm.nnewclasses,
 	  100.0*((double)hmm.ntokens-(double)hmm.nnewclasses)/(double)hmm.ntokens,
 	  hmm.nnewclasses,
 	  100.0*(double)hmm.nnewclasses/(double)hmm.ntokens);
-  fprintf(file, "%%%%    - Total Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
+  fprintf(file, "%%%%    - Total Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  hmm.ntokens-hmm.nunknown,
 	  100.0*((double)hmm.ntokens-(double)hmm.nunknown)/(double)hmm.ntokens,
 	  hmm.nunknown,

@@ -12,9 +12,10 @@ on_reparse "warn"
 # Details
 #-----------------------------------------------------------------------------
 details "
-mooteval compares two  'medium' for 'well done'
-input files, and summarizes the differences between them.  See
-L<mootfiles> for details on file formats.
+mooteval compares two  'medium' (+tagged,-analyzed) and/or
+'well done' (+tagged,+analyzed) input files, and summarizes
+the differences between them.
+See L<mootfiles> for details on moot file formats.
 "
 
 #-----------------------------------------------------------------------------
@@ -34,13 +35,17 @@ int "verbose" v "Verbosity level." \
 
 flag "eval-first" 1 "Evaluate FILE1 vs. baseline FILE2" \
     details="
-Only useful if --verbose >= 2.  If neither --eval-first nor --eval-second
+Only useful if --verbose >= 2.
+
+If neither --eval-first nor --eval-second
 is given, both input files are evaluated against one another.
 "
 
 flag "eval-second" 2 "Evaluate FILE2 vs. baseline FILE1" \
     details="
-Only useful if --verbose >= 2.  If neither --eval-first nor --eval-second
+Only useful if --verbose >= 2.
+
+If neither --eval-first nor --eval-second
 is given, both input files are evaluated against one another.
 "
 
@@ -60,4 +65,4 @@ If --verbose >= 1, a summary will always be printed to stderr.
 #-----------------------------------------------------------------------------
 acknowledge `cat acknowledge.pod`
 
-seealso "L<mootm>, L<moothmm>, L<moot>, L<mootfiles>."
+seealso "L<mootpp>, mootm(1), L<moot>, L<mootfiles>."
