@@ -1,6 +1,6 @@
 /*
-   moot-utils version 1.0.4 : moocow's part-of-speech tagger
-   Copyright (C) 2002-2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   moot-utils : moocow's part-of-speech tagger
+   Copyright (C) 2002-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  * File: moot_main.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + CHMM PoS tagger/disambiguator for DWDS project : main()
+ *   + HMM PoS tagger/disambiguator for DWDS project : main()
  *--------------------------------------------------------------------------*/
 
 #ifdef HAVE_CONFIG_H
@@ -41,9 +41,9 @@
 
 #include <string>
 
-#include <mootMorph.h>
-#include <mootCHMM.h>
+#include <mootHMM.h>
 #include <mootLexfreqs.h>
+#include <mootClassfreqs.h>
 #include <mootNgrams.h>
 
 #include "cmdutil.h"
@@ -64,25 +64,17 @@ cmdutil_file_churner churner;
 
 // -- files
 cmdutil_file_info out;
+size_t nfiles = 0;
 
 // -- global classes/structs
-mootCHMM     hmm;
-mootMorph   &morph = hmm.morph;
-mootNgrams   ngrams;
-mootLexfreqs lexfreqs;
+mootHMM        hmm;
+mootNgrams     ngrams;
+mootLexfreqs   lexfreqs(32768);
+mootClassfreqs classfreqs(512);
 
 // -- for verbose timing info
-timeval t1, t2, t3;
-double  elapsed_i, elapsed_t;
-
-typedef enum {
-  vlSilent=0,
-  vlErrors=1,
-  vlProgress=2,
-  vlTiming=3,
-  vlWarnings=4,
-  vlEverything=5
-} VerbosityLevel;
+timeval istarted, astarted, astopped;
+double  ielapsed, aelapsed;
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -96,9 +88,9 @@ void GetMyOptions(int argc, char **argv)
   cmdline_parser_envdefaults(&args);
 
   // -- show banner
-  if (args.verbose_arg >= vlProgress)
+  if (args.verbose_arg > 1)
     fprintf(stderr,
-	    "%s version %s by Bryan Jurish <moocow@ling.uni-potsdam.de>\n\n",
+	    "\n%s version %s by Bryan Jurish <moocow@ling.uni-potsdam.de>\n\n",
 	    PROGNAME, VERSION);
 
   // -- output file
@@ -117,20 +109,23 @@ void GetMyOptions(int argc, char **argv)
   churner.use_list = args.list_given;
 
   // -- get initialization start-time
-  if (args.verbose_arg >= vlTiming) gettimeofday(&t1, NULL);
+  if (args.verbose_arg > 1) gettimeofday(&istarted, NULL);
+
+  // -- i/o format flags
+  hmm.input_ignore_first_analysis = args.ignore_first_given;
+  hmm.output_best_only = args.best_given;
 
   // -- assign "unknown" ids & other flags
   hmm.unknown_token_name(args.unknown_token_arg);
   hmm.unknown_tag_name(args.unknown_tag_arg);
   hmm.unknown_lex_threshhold = args.unknown_threshhold_arg;
-  hmm.morph_cache_threshhold = args.morph_cache_threshhold_arg;
-  hmm.want_pos_only = args.pos_only_given;
 
   // -- parse model spec
   char *binfile=NULL;
   char *lexfile=NULL;
+  char *classfile=NULL;
   char *ngfile=NULL;
-  if (!hmm_parse_model(args.model_arg, &binfile, &lexfile, &ngfile)) {
+  if (!hmm_parse_model(args.model_arg, &binfile, &lexfile, &ngfile, &classfile)) {
     fprintf(stderr, "%s: could not parse model specification '%s'\n",
 	    PROGNAME, args.model_arg);
     exit(1);
@@ -138,111 +133,75 @@ void GetMyOptions(int argc, char **argv)
 
   // -- load model: binary
   if (binfile) {
-    if (args.verbose_arg >= vlProgress)
+    if (args.verbose_arg > 1)
       fprintf(stderr, "%s: loading binary HMM model file '%s'...", PROGNAME, binfile);
     if (!hmm.load(binfile)) {
       fprintf(stderr,"\n%s: load FAILED for binary HMM model file '%s'\n",
 	      PROGNAME, binfile);
       exit(1);
-    } else if (args.verbose_arg >= vlProgress) {
+    } else if (args.verbose_arg > 1) {
       fprintf(stderr," loaded.\n");
     }
   }
 
   // -- load model: lexical frequencies
   if (lexfile) {
-    if (args.verbose_arg >= vlProgress)
+    if (args.verbose_arg > 1)
       fprintf(stderr, "%s: loading lexical frequency file '%s'...", PROGNAME, lexfile);
     if (!lexfreqs.load(lexfile)) {
       fprintf(stderr,"\n%s: load FAILED for lexical frequency file '%s'\n",
 	      PROGNAME, lexfile);
       exit(1);
-    } else if (args.verbose_arg >= vlProgress) {
+    } else if (args.verbose_arg > 1) {
       fprintf(stderr," loaded.\n");
     }
   }
 
   // -- load model: n-gram frequencies
   if (ngfile) {
-    if (args.verbose_arg >= vlProgress)
+    if (args.verbose_arg > 1)
       fprintf(stderr, "%s: loading n-gram frequency file '%s'...", PROGNAME, ngfile);
     if (!ngrams.load(ngfile)) {
       fprintf(stderr,"\n%s: load FAILED for n-gram frequency file '%s'\n",
 	      PROGNAME, ngfile);
       exit(1);
-    } else if (args.verbose_arg >= vlProgress) {
+    } else if (args.verbose_arg > 1) {
       fprintf(stderr," loaded.\n");
     }
   }
 
-  // -- morphology setup: compile-only flags
-  if (!binfile) {
-    morph.want_avm           = args.avm_given;
-    morph.do_dequote         = args.dequote_given;
-  }
+  // -- load model: class frequencies
+  if (classfile && *classfile) {
+    if (file_exists(classfile)) {
+      if (args.verbose_arg > 1)
+	fprintf(stderr, "%s: loading class frequency file '%s'...", PROGNAME, classfile);
 
-  // -- morphology setup: common flags
-  morph.want_mabbaw_format = args.mabbaw_given;
-
-  if      (args.verbose_arg <= vlSilent)   morph.verbose = mootMorph::vlSilent;
-  else if (args.verbose_arg <= vlErrors)   morph.verbose = mootMorph::vlErrors;
-  else if (args.verbose_arg <= vlProgress) morph.verbose = mootMorph::vlErrors;
-  else if (args.verbose_arg <= vlTiming)   morph.verbose = mootMorph::vlErrors;
-  else if (args.verbose_arg <= vlWarnings) morph.verbose = mootMorph::vlWarnings;
-  else                                     morph.verbose = mootMorph::vlEverything;
-
-
-  //-- morphology object setup : symbols
-  if (args.symbols_given || !binfile) {
-    if (args.verbose_arg >= vlProgress)
-      fprintf(stderr, "%s: loading morphological symbols-file '%s'...", PROGNAME, args.symbols_arg);
-    if (!morph.load_morph_symbols(args.symbols_arg)) {
-      fprintf(stderr,"\n%s: load FAILED for morphological symbols-file '%s'\n",
-	      PROGNAME, args.symbols_arg);
-      exit(1);
-    } else if (args.verbose_arg >= vlProgress) {
-      fprintf(stderr," loaded.\n");
+      if (!classfreqs.load(classfile)) {
+	fprintf(stderr,"\n%s: load FAILED for class frequency file '%s'\n",
+		PROGNAME, classfile);
+	exit(1);
+      } else if (args.verbose_arg > 1) {
+	fprintf(stderr," loaded.\n");
+      }
+    }
+    else {
+      if (args.verbose_arg > 1)
+	fprintf(stderr, "%s: no class frequency file '%s' -- skipping.\n",
+		PROGNAME, classfile);
     }
   }
-
-  //-- morphology object setup : morphology FST
-  if (args.morph_given || !binfile) {
-    if (args.verbose_arg >= vlProgress)
-      fprintf(stderr, "%s: loading morphological FST '%s'...", PROGNAME, args.morph_arg);
-    if (!morph.load_morph_fst(args.morph_arg)) {
-      fprintf(stderr,"\n%s: load FAILED for morphological FST '%s'\n", PROGNAME, args.morph_arg);
-      exit(1);
-    } else if (args.verbose_arg >= vlProgress) {
-      fprintf(stderr," loaded.\n");
-    }
-  }
-
-  //-- morphology object setup : tag-extraction FST
-  if (args.tagx_given) {
-    if (args.verbose_arg >= vlProgress)
-      fprintf(stderr, "%s: loading tag-extracion FST '%s'...", PROGNAME, args.tagx_arg);
-    if (!morph.load_tagx_fst(args.tagx_arg)) {
-      fprintf(stderr,"\n%s: load FAILED for morphological FST '%s'\n", PROGNAME, args.tagx_arg);
-      exit(1);
-    } else if (args.verbose_arg >= vlProgress) {
-      fprintf(stderr," loaded.\n");
-    }
-  }
-
 
   // -- compile HMM
   if (!binfile) {
-    if (args.verbose_arg >= vlProgress)
+    if (args.verbose_arg > 1)
       fprintf(stderr, "%s: compiling HMM...", PROGNAME);
-    if (!hmm.compile(lexfreqs, ngrams, args.eos_tag_arg))
-      {
-	fprintf(stderr,"\n%s: HMM compilation FAILED\n", PROGNAME);
-	exit(1);
-      }
-    else if (args.verbose_arg >= vlProgress)
-      {
-	fprintf(stderr," compiled.\n");
-      }
+    lexfreqs.compute_specials();
+    if (!hmm.compile(lexfreqs, ngrams, classfreqs, args.eos_tag_arg)) {
+      fprintf(stderr,"\n%s: HMM compilation FAILED\n", PROGNAME);
+      exit(1);
+    } else if (args.verbose_arg > 1) {
+      fprintf(stderr," compiled.\n");
+    }
 
     // -- parse n-gram smoothing constants (nlambdas)
     if (args.nlambdas_arg) {
@@ -258,12 +217,12 @@ void GetMyOptions(int argc, char **argv)
       hmm.nglambda3 = nlambdas[2];
 #endif
     } else {
-      if (args.verbose_arg >= vlProgress)
+      if (args.verbose_arg > 1)
 	fprintf(stderr, "%s: estimating n-gram lambdas...", PROGNAME);
       if (!hmm.estimate_lambdas(ngrams)) {
 	fprintf(stderr,"\n%s: n-gram lambda estimation FAILED.\n", PROGNAME);
 	exit(1);
-      } else if (args.verbose_arg >= vlProgress) {
+      } else if (args.verbose_arg > 1) {
 	fprintf(stderr," done.\n");
       }
     }
@@ -279,52 +238,49 @@ void GetMyOptions(int argc, char **argv)
       hmm.wlambda1 = wlambdas[0];
       hmm.wlambda2 = wlambdas[1];
     } else {
-      if (args.verbose_arg >= vlProgress)
+      if (args.verbose_arg > 1)
 	fprintf(stderr, "%s: estimating lexical lambdas...", PROGNAME);
       if (!hmm.estimate_wlambdas(lexfreqs)) {
 	fprintf(stderr,"\n%s: lexical lambda estimation FAILED.\n", PROGNAME);
 	exit(1);
-      } else if (args.verbose_arg >= vlProgress) {
+      } else if (args.verbose_arg > 1) {
 	fprintf(stderr," done.\n");
       }
     }
 
     if (args.compile_given) {
-      if (args.verbose_arg >= vlProgress)
+      if (args.verbose_arg > 1)
 	fprintf(stderr, "%s: saving binary HMM model '%s' ...", PROGNAME, args.compile_arg);
       if (!hmm.save(args.compile_arg, args.compress_arg)) {
 	fprintf(stderr,"\n%s: binary HMM dump FAILED\n", PROGNAME);
 	exit(1);
-      } else if (args.verbose_arg >= vlProgress) {
+      } else if (args.verbose_arg > 1) {
 	fprintf(stderr," saved.\n");
       }
       exit(0);
     }
   }
-    
+
   // -- report
-  if (args.verbose_arg >= vlProgress) {
+  if (args.verbose_arg > 1) {
     fprintf(stderr, "%s: Initialization complete\n", PROGNAME);
   }
 
   //-- dump if requested
   if (args.dump_given) {
-    if (args.verbose_arg >= vlProgress)
+    if (args.verbose_arg > 1)
       fprintf(stderr, "%s: dumping HMM debugging output to '%s' ...", PROGNAME, out.name);
 
     hmm.txtdump(out.file);
 
-    if (args.verbose_arg >= vlProgress)
+    if (args.verbose_arg > 1)
       fprintf(stderr," dumped.\n");
 
     exit(0);
   }
 
-
   //-- get comment-string
-  char cmts[3] = "% ";
-  if (args.mabbaw_given) cmts[0] = '#';
-  cmts[1] = cmts[0];
+  char cmts[3] = "%%";
 
   //-- get time
   time_t now_time = time(NULL);
@@ -334,16 +290,10 @@ void GetMyOptions(int argc, char **argv)
   //-- report to output-file
   fprintf(out.file, "%s %s output file generated on %s", cmts, PROGNAME, asctime(&now_tm));
   fprintf(out.file, "%s Configuration:\n", cmts);
-  fprintf(out.file, "%s   Symbols           : %s\n", cmts, morph.syms_filename.c_str());
-  fprintf(out.file, "%s   Morphology FST    : %s\n", cmts, morph.mfst_filename.c_str());
-  fprintf(out.file, "%s   Tag-Extractor     : %s\n", cmts,
-	  morph.xfst ? morph.xfst_filename.c_str() : "(none)");
-  fprintf(out.file, "%s   ULex Threshhold   : %g\n", cmts, hmm.unknown_lex_threshhold);
-  fprintf(out.file, "%s   MCache Threshhold : %g\n", cmts, hmm.morph_cache_threshhold);
-  fprintf(out.file, "%s   MCache Size       : %u\n", cmts, hmm.morphcache.size());
+  fprintf(out.file, "%s   Lex. Threshhold   : %g\n", cmts, hmm.unknown_lex_threshhold);
   fprintf(out.file, "%s   Unknown Token     : %s\n", cmts, hmm.tokids.id2name(0).c_str());
   fprintf(out.file, "%s   Unknown Tag       : %s\n", cmts, hmm.tagids.id2name(0).c_str());
-  fprintf(out.file, "%s   Boundary Tag      : %s\n", cmts, hmm.tagids.id2name(hmm.start_tagid).c_str());
+  fprintf(out.file, "%s   Border Tag        : %s\n", cmts, hmm.tagids.id2name(hmm.start_tagid).c_str());
   fprintf(out.file, "%s   N-Gram lambdas    : lambda1=%g, lambda2=%g",
 	  cmts, hmm.nglambda1, hmm.nglambda2);
 #ifdef moot_USE_TRIGRAMS
@@ -353,7 +303,52 @@ void GetMyOptions(int argc, char **argv)
   fprintf(out.file, "%s   Lexical lambdas  : lambdaw1=%g, lambdaw2=%g\n",
 	  cmts, hmm.wlambda1, hmm.wlambda2);
 }
-  
+
+
+/*--------------------------------------------------------------------------
+ * Summary
+ *--------------------------------------------------------------------------*/
+void print_summary(FILE *file)
+{
+  // -- print summary
+  fprintf(file,
+	  "\n%%%%---------------------------------------------------------------------\n");
+  fprintf(file, "%%%%%s Summary:\n", PROGNAME);
+  fprintf(file, "%%%%  + General\n");
+  fprintf(file, "%%%%    - Files Processed     : %9u file(s)\n", nfiles);
+  fprintf(file, "%%%%    - Sentences Processed : %9u sent\n", hmm.nsents);
+  fprintf(file, "%%%%    - Tokens Processed    : %9u tok\n", hmm.ntokens);
+  fprintf(file, "%%%%  + Analysis\n");
+  fprintf(file, "%%%%    - Token Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
+	  hmm.ntokens-hmm.nnewtokens,
+	  100.0*((double)hmm.ntokens-(double)hmm.nnewtokens)/(double)hmm.ntokens,
+	  hmm.nnewtokens,
+	  100.0*(double)hmm.nnewtokens/(double)hmm.ntokens);
+  fprintf(file, "%%%%    - Class Given (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
+	  hmm.ntokens-hmm.nunclassed,
+	  100.0*((double)hmm.ntokens-(double)hmm.nunclassed)/(double)hmm.ntokens,
+	  hmm.nunclassed,
+	  100.0*(double)hmm.nunclassed/(double)hmm.ntokens);
+  fprintf(file, "%%%%    - Class Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
+	  hmm.ntokens-hmm.nnewclasses,
+	  100.0*((double)hmm.ntokens-(double)hmm.nnewclasses)/(double)hmm.ntokens,
+	  hmm.nnewclasses,
+	  100.0*(double)hmm.nnewclasses/(double)hmm.ntokens);
+  fprintf(file, "%%%%    - Total Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f)\n",
+	  hmm.ntokens-hmm.nunknown,
+	  100.0*((double)hmm.ntokens-(double)hmm.nunknown)/(double)hmm.ntokens,
+	  hmm.nunknown,
+	  100.0*(double)hmm.nunknown/(double)hmm.ntokens);
+  fprintf(file, "%%%%    - Fallbacks           : %9u (%6.2f%%)\n",
+	  hmm.nfallbacks,
+	  100.0*(double)hmm.nfallbacks/(double)hmm.ntokens);
+  fprintf(file, "%%%%  + Performance\n");
+  fprintf(file, "%%%%    - Initialize Time     : %12.2f sec\n", ielapsed);
+  fprintf(file, "%%%%    - Analysis Time       : %12.2f sec\n", aelapsed);
+  fprintf(file, "%%%%    - Throughput Rate     : %12.2f tok/sec\n", (double)hmm.ntokens/aelapsed);
+  fprintf(file,
+	  "%%%%---------------------------------------------------------------------\n");
+}
 
 
 /*--------------------------------------------------------------------------
@@ -361,25 +356,27 @@ void GetMyOptions(int argc, char **argv)
  *--------------------------------------------------------------------------*/
 int main (int argc, char **argv)
 {
-  size_t nfiles = 0;
-
   GetMyOptions(argc,argv);
 
   // -- get init-stop time = analysis-start time
-  if (args.verbose_arg >= vlTiming) gettimeofday(&t2, NULL);
+  if (args.verbose_arg > 1) gettimeofday(&astarted, NULL);
 
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
-    nfiles++;
-    if (args.verbose_arg >= vlProgress) {
-      fprintf(stderr,"%s: analyzing file '%s'...", PROGNAME, churner.in.name);
-      fflush(stderr);
+    if (args.verbose_arg > 1) {
+      nfiles++;
+      if (args.verbose_arg > 2) {
+	fprintf(stderr,"%s: analyzing file '%s'... ", PROGNAME, churner.in.name);
+	fflush(stderr);
+      }
     }
-    fprintf(out.file, "\n%%%% File: %s\n\n", churner.in.name);
+    if (args.verbose_arg > 1) {
+      fprintf(out.file, "\n%%%% File: %s\n\n", churner.in.name);
+    }
 
     hmm.tag_stream(churner.in.file, out.file, churner.in.name);
     
-    if (args.verbose_arg >= vlProgress) {
+    if (args.verbose_arg > 2) {
       fprintf(stderr," done.\n");
       fflush(stderr);
     }
@@ -387,40 +384,14 @@ int main (int argc, char **argv)
   out.close();
 
   // -- summary
-  if (args.verbose_arg >= vlTiming) {
+  if (args.verbose_arg > 1) {
       // -- timing
-      gettimeofday(&t3, NULL);
+      gettimeofday(&astopped, NULL);
 
-      elapsed_i = (t2.tv_sec-t1.tv_sec) + (double)(t2.tv_usec-t1.tv_usec)/1000000.0;
-      elapsed_t = (t3.tv_sec-t2.tv_sec) + (double)(t3.tv_usec-t2.tv_usec)/1000000.0;
+      aelapsed = astopped.tv_sec-astarted.tv_sec + (double)(astopped.tv_usec-astarted.tv_usec)/1000000.0;
+      ielapsed = astarted.tv_sec-istarted.tv_sec + (double)(astarted.tv_usec-istarted.tv_usec)/1000000.0;
 
-      // -- print summary
-      fprintf(stderr, "\n-----------------------------------------------------\n");
-      fprintf(stderr, "%s Summary:\n", PROGNAME);
-      fprintf(stderr, "  + Morphology\n");
-      fprintf(stderr, "    - Tokens analyzed     : %u tok\n", morph.ntokens);
-      fprintf(stderr, "    - Unknown tokens      : %u tok\n", morph.nunknown);
-      if (morph.ntokens != 0) {
-	// -- avoid div-by-zero errors
-	fprintf(stderr, "    - Recognition Rate    : %.2f %%\n",
-		100.0*(double)(hmm.ntokens-morph.nunknown)/(double)hmm.ntokens);
-      } else {
-	fprintf(stderr, "    - Recognition Rate    : -NaN-\n");
-      }
-      fprintf(stderr, "    - MorphCache Lookups  : %u tok\n", hmm.ntokens-hmm.morph.ntokens);
-      if (hmm.ntokens != 0) {
-	fprintf(stderr, "    - MorphCache Rate     : %.2f %%\n",
-		100.0*(hmm.ntokens-morph.ntokens)/(float)hmm.ntokens);
-      } else {
-	fprintf(stderr, "    - MorphCache Rate     : -NaN-\n");
-      }
-      fprintf(stderr, "  + General\n");
-      fprintf(stderr, "    - Files Processed     : %u files\n", nfiles);
-      fprintf(stderr, "    - Tokens Processed    : %u tok\n", hmm.ntokens);
-      fprintf(stderr, "    - Initialize Time     : %.3f sec\n", elapsed_i);
-      fprintf(stderr, "    - Analysis Time       : %.3f sec\n", elapsed_t);
-      fprintf(stderr, "    - Throughput Rate     : %.2f tok/sec\n", (double)hmm.ntokens/elapsed_t);
-      fprintf(stderr, "-----------------------------------------------------\n");
+      print_summary(stderr);
   }
 
   return 0;

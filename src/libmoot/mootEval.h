@@ -124,7 +124,7 @@ public:
 
 
   /*----------------------------------------------------
-   * Strinification
+   * Stringification
    */
   /**
    * Returns canonical string-form of a mootEvalFlag: this

@@ -88,13 +88,14 @@ text files.  An example "raw" text file is:
 A "cooked" text file is a text file which encodes information
 such as token boundaries, sentence boundaries, part-of-speech tag,
 and/or potential analyses.  The moot utilities distinguish between
-four different types of cooked text file: in order of ascending
+several different types of cooked text file: in order of ascending
 informational content, these are:
 "rare" (-tagged, -analyzed),
 "medium rare" (-tagged, +analyzed),
 "medium" (+tagged, -analyzed),
+"well done" (+tagged, +analyzed),
 and
-"well done" (+tagged, +analyzed).
+"refried" (+tagged, +analyzed, +evaluated).
 Differnent moot utilities require their input files to be
 more or less "cooked" -- see the documentation of the individual
 utilities for details.
@@ -117,10 +118,10 @@ By convention, "rare"
 filenames carry the extension ".t".  The syntax is:
 
  RARE_FILE  ::= {RARE_LINE}*
- RARE_LINE  ::= {COMMENT} | {EOS} | {RARE_TOKEN}
- COMMENT    ::= {SPACE}* "%%" ([^{NEWLINE}])*  {NEWLINE}
+ RARE_LINE  ::= ({COMMENT} | {EOS} | {RARE_TOKEN}) {NEWLINE}
+ COMMENT    ::= {SPACE}* "%%" ([^{NEWLINE}])*
  EOS        ::= ( {SPACE}* {NEWLINE} )+
- RARE_TOKEN ::= {TOKEN_TEXT} {NEWLINE}
+ RARE_TOKEN ::= {TOKEN_TEXT}
  TOKEN_TEXT ::= ( {WORDCHAR} | {SPACE} )+
  SPACE      ::= " "
  NEWLINE    ::= "\n" | "\r"
@@ -166,7 +167,7 @@ every token is associated with an empty set of possible analyses.
 By convention, "medium rare" filenames carry the extension ".mt"
 
  MED_RARE_FILE  ::= {MED_RARE_LINE}*
- MED_RARE_LINE  ::= {COMMENT} | {EOS} | {MED_RARE_TOKEN}
+ MED_RARE_LINE  ::= ({COMMENT} | {EOS} | {MED_RARE_TOKEN}) {NEWLINE}
  MED_RARE_TOKEN ::= {TOKEN_TEXT} ( {TAB} {ANALYSIS} )*
  ANALYSIS       ::= {DETAIL_PREFIX}? {TAG} {DETAIL_SUFFIX}?
  DETAIL_PREFIX  ::= ( {WORDCHAR} | {SPACE} | {COST} )* ("[" ("_"?))?
@@ -221,7 +222,7 @@ By convention, "medium" filenames carry the extension ".tt"
 (tagger output) or ".ttt" (gold standard).
 
  MEDIUM_FILE    ::= {MEDIUM_LINE}*
- MEDIUM_LINE    ::= {COMMENT} | {EOS} | {MEDIUM_TOKEN}
+ MEDIUM_LINE    ::= ({COMMENT} | {EOS} | {MEDIUM_TOKEN}) {NEWLINE}
  MEDIUM_TOKEN   ::= {TOKEN_TEXT} {TAB} {BEST_ANALYSIS}
  BEST_ANALYSIS  ::= {ANALYSIS}
 
@@ -261,7 +262,7 @@ By convention, "well done" filenames carry the extension ".dtt"
 (tagger output) or ".dttt" (gold standard).
 
  WELL_DONE_FILE  ::= {WELL_DONE_LINE}*
- WELL_DONE_LINE  ::= {COMMENT} | {EOS} | {WELL_DONE_TOKEN}
+ WELL_DONE_LINE  ::= ({COMMENT} | {EOS} | {WELL_DONE_TOKEN}) {NEWLINE}
  WELL_DONE_TOKEN ::= {TOKEN_TEXT} {TAB} {BEST_ANALYSIS} ( {TAB} {ANALYSIS} )*
 
 As before, leading and trailing spaces are stripped from
@@ -270,6 +271,87 @@ I<ANALYSIS> is "greedy".
 An example "well done" file is:
 
  %% Example well-done cooked file for moot
+ %% Sentence 1 : analysis-set tags bracketed for clarity
+ This   PDAT    [NE]    [PDAT]    [PDIS]
+ is     VVFIN   [VAFIN] [VVFIN]
+ a      ART     [ART]   [CARD]
+ test   NN      [NN]    [VVFIN]
+ .      $.      [$.]
+
+ %% Sentence 2 : analysis-tags embedded in complete analyses
+ This   PDAT    [NE type="last"] This <420>  [PDAT num="sg"] this <24.7>
+ too    ADV     [ADV] too <0.0>
+ .      $.      [$.] . <-42>
+
+=cut
+
+##--------------------------------------------------------------
+## Input: Cooked: Well Done (+tagged,+analyzed)
+=pod
+
+=item Refried
+
+=item (+tagged, +analyzed, +evaluated)
+
+A "refried" file is basically the synthesis of a pair of
+"medium" or "well done" files.  "Refried" files can be
+created by the F<mooteval> program from a pair of
+parallel cooked files.  Each line of a "refried" file
+contains an status code, and a pair of "well-done" style token
+analyses separated by tabs and a single slash '/'.
+
+ REFRIED_FILE     ::= {REFRIED_LINE}*
+ REFRIED_LINE     ::= ( {COMMENT} | {EOS} | {REFRIED_TOKEN} ) {NEWLINE}
+ REFRIED_TOKEN    ::= {STATUS_CODE} {TAB} {REFRIED_SOURCES}
+ REFRIED_SOURCES  ::= {WELL_DONE_TOKEN} {TAB} "/" {TAB} {WELL_DONE_TOKEN}
+ STATUS_CODE      ::= {BASIC_FLAGS} ":" {FILE1_FLAGS} ":" {FILE2_FLAGS}
+ BASIC_FLAGS      ::= {TOKMATCH_FLAG} {BESTMATCH_FLAG}
+ TOKMATCH_FLAG    ::= "-" | "t"
+ BESTMATCH_FLAG   ::= "-" | "b"
+ FILE1_FLAGS      ::= {FILE_FLAGS}
+ FILE2_FLAGS      ::= {FILE_FLAGS}
+ FILE_FLAGS       ::= {EMPTY_FLAG} {IMPOSSIBLE_FLAG} {XIMPOSSIBLE_FLAG}
+ EMPTY_FLAG       ::= "-" | "e"
+ IMPOSSIBLE_FLAG  ::= "-" | "i"
+ XIMPOSSIBLE_FLAG ::= "-" | "x"
+
+As before, leading and trailing spaces are stripped from
+token text and analyses, and the I<TAG> component of each
+I<ANALYSIS> is "greedy".
+
+The STATUS_CODE component of each REFRIED_TOKEN encodes a
+number of flags concerning which part (if any) of the
+tokens compared did not match.  The general convention
+is use of a '-' character to indicate that the compared
+tokens matched (or at least were compatible).
+
+=over 4
+
+=item TOKMATCH_FLAG
+
+'-' if token text components matched, otherwise 't'.
+
+=item BESTMATCH_FLAG
+
+'-' if best-tag components matched, otherwise 'b'.
+
+=item EMPTY_FLAG
+
+'-' if token ANALYSES were non-empty (for the given file), otherwise 'e'.
+
+=item IMPOSSIBLE_FLAG
+
+'-' if token ANALYSES included token BESTTAG (for the given file), otherwise 'i'.
+
+=item XIMPOSSIBLE_FLAG
+
+'-' if token ANALYSES included token BESTTAG for the B<other> file, otherwise 'x'.
+
+=back
+
+An example "refried" file is:
+
+ %% Example refried file for moot
  %% Sentence 1 : analysis-set tags bracketed for clarity
  This   PDAT    [NE]    [PDAT]    [PDIS]
  is     VVFIN   [VAFIN] [VVFIN]

@@ -19,9 +19,7 @@
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
 #bin_PROGRAMS = mootpp mootm moothmm moot mootrain
 #bin_PROGRAMS = mootpp moothmm moot mootrain
-bin_PROGRAMS = mootpp moothmm mootrain mooteval
-
-old_programs = moot-fstgen moot-pargen
+bin_PROGRAMS = mootpp moot mootrain mooteval
 
 ## --- libtool libraries
 #lib_LTLIBRARIES = ${lib_1}.la ... ${lib_N}.la
@@ -48,11 +46,11 @@ mootpp_SOURCES = \
 	mootpp_main.cc \
 	mootpp_cmdparser.cc mootpp_cmdparser.h
 
-moothmm_SOURCES = \
+moot_SOURCES = \
 	cmdutil.cc cmdutil.h \
 	hmmutil.cc hmmutil.h \
-	moothmm_main.cc \
-	moothmm_cmdparser.cc moothmm_cmdparser.h
+	moot_main.cc \
+	moot_cmdparser.cc moot_cmdparser.h
 
 moot_SOURCES = \
 	cmdutil.cc cmdutil.h \
@@ -78,7 +76,6 @@ mooteval_SOURCES = \
 
 ## --- Additional dependencies
 mootpp_main.o: mootpp_cmdparser.h
-moothmm_main.o: moothmm_cmdparser.h hmmutil.h
 moot_main.o: moot_cmdparser.h hmmutil.h
 mootrain_main.o: mootrain_cmdparser.h hmmutil.h
 mooteval_main.o: mooteval_cmdparser.h
@@ -171,11 +168,11 @@ LDADD_COMMON   = ../libmoot/libmoot.la
 mootpp_LDFLAGS = $(LDFLAGS_COMMON)
 mootpp_LDADD = $(LDADD_COMMON)
 
-moothmm_LDFLAGS = $(LDFLAGS_COMMON)
-moothmm_LDADD = $(LDADD_COMMON)
-
 moot_LDFLAGS = $(LDFLAGS_COMMON)
 moot_LDADD = $(LDADD_COMMON)
+
+#moot_LDFLAGS = $(LDFLAGS_COMMON)
+#moot_LDADD = $(LDADD_COMMON)
 
 mootrain_LDFLAGS = $(LDFLAGS_COMMON)
 mootrain_LDADD = $(LDADD_COMMON)
@@ -214,11 +211,11 @@ MAINTAINERCLEANFILES = \
 EXTRA_DIST = \
 	moot.gog \
 	mootpp.gog \
-	moothmm.gog \
 	mootrain.gog \
 	mooteval.gog \
 	acknowledge.pod
 
+#	moothmm.gog 
 #	moot.sym
 
 ## --- recursion subdirectories for 'make dist'

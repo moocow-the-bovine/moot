@@ -48,6 +48,7 @@ char *PROGNAME = "mooteval";
 // files
 cmdutil_file_info file1;
 cmdutil_file_info file2;
+cmdutil_file_info out;
 
 // options & file-churning
 gengetopt_args_info args;
@@ -67,6 +68,8 @@ size_t ntokens = 0;     //-- total number of tokens
 size_t nsents = 0;      //-- total number of sentences
 size_t ntokmisses = 0;  //-- number of token-text mismatches
 size_t nbestmisses = 0; //-- number of best-tag mismatches
+
+//-- information: file specific
 size_t nempties1 = 0;   //-- number of empty analyses in file1
 size_t nempties2 = 0;   //-- number of empty analyses in file2
 size_t nimps1 = 0;      //-- number of impossible analyses in file1
@@ -77,8 +80,27 @@ size_t nximps2 = 0;     //-- number of x-impossible analyses in file2
 unsigned long nans1 = 0; //-- total number of analyses in file1
 unsigned long nans2 = 0; //-- total number of analyses in file2
 
+size_t nsaves1 = 0;   //-- saves (empty class & x-best match) in file 1 vs. 2
 size_t nsaves2 = 0;   //-- saves (empty class & x-best match) in file 2 vs. 1
+
+size_t nfumbles1 = 0; //-- fumbles (+x-class-cover, -best-match) in file 1 vs. 2
 size_t nfumbles2 = 0; //-- fumbles (+x-class-cover, -best-match) in file 2 vs. 1
+
+//-- output flags
+bool eval_file1 = false;
+bool eval_file2 = false;
+
+
+//-- verbosity levels
+typedef enum {
+  evlSilent = 0,       //-- be silent (only print summary info)
+  evlBasic = 10,       //-- print information + basic summary info
+  evlExtended = 20,    //-- print information + extended summary info
+  evlMistakes = 30,    //-- print tokens with errors
+  evlEverything = 40   //-- print everything
+} verbosityLevel;
+
+int vlevel = 10; //-- our verbosity level
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -93,6 +115,31 @@ void GetMyOptions(int argc, char **argv)
     fprintf(stderr,
 	    "\n%s version %s by Bryan Jurish <jurish@ling.uni-potsdam.de>\n\n",
 	    PROGNAME, VERSION);
+
+  //-- options: verbosity
+  if (args.verbose_arg <= 0)      vlevel = evlSilent;
+  else if (args.verbose_arg <= 1) vlevel = evlBasic;
+  else if (args.verbose_arg <= 2) vlevel = evlExtended;
+  else if (args.verbose_arg <= 3) vlevel = evlMistakes;
+  else if (args.verbose_arg <= 4) vlevel = evlEverything;
+
+  //-- options: file selection
+  if (args.eval_first_given || args.eval_second_given) {
+    if (args.eval_first_given) eval_file1 = true;
+    if (args.eval_second_given) eval_file2 = true;
+  } else {
+    eval_file1 = true;
+    eval_file2 = true;
+  }
+
+  //-- options: output file
+  out.name = args.output_arg;
+  if (strcmp(out.name,"-") == 0) out.name = "<stdout>";
+  if (!out.open("w")) {
+    fprintf(stderr,"%s: open failed for output-file '%s': %s\n",
+	    PROGNAME, out.name, strerror(errno));
+    exit(1);
+  }
 
   //-- process arguments: files
   if (args.inputs_num < 2) {
@@ -128,7 +175,10 @@ void GetMyOptions(int argc, char **argv)
  *--------------------------------------------------------------------------*/
 void print_summary(FILE *file);
 
-void print_summary_file(int fileNumber, const char *filename, ...);
+void print_summary_file(FILE *outfile,
+			size_t ntokens, size_t nanls,
+			size_t nempties, size_t nimps, size_t nximps,
+			size_t nsaves, size_t nfumbles);
 
 
 /*--------------------------------------------------------------------------
@@ -170,7 +220,7 @@ int main (int argc, char **argv)
 	nans1 += s1i->analyses().size();
 	nans2 += s2i->analyses().size();
 
-	.compareTokens(*s1i,*s2i);
+	eval.compareTokens(*s1i,*s2i);
 	if (eval.isTokenMismatch()) ntokmisses++;
 	if (eval.isBestMismatch()) nbestmisses++;
 
@@ -182,7 +232,7 @@ int main (int argc, char **argv)
 	    nfumbles1++;
 	}
 
-	if (eval.isEmptyClass2) {
+	if (eval.isEmptyClass2()) {
 	  nempties2++;
 	  if (!eval.isBestMismatch()) nsaves2++;
 	}
@@ -195,7 +245,29 @@ int main (int argc, char **argv)
 
 	if (eval.isXImpClass1()) nximps1++;
 	if (eval.isXImpClass2()) nximps2++;
+
+	//-- output evaluation results
+	if (vlevel >= evlEverything
+	    || (vlevel >= evlMistakes
+		&& (eval.isTokenMismatch()
+		    || eval.isBestMismatch()
+		    || (eval_file1
+			&& (eval.isEmptyClass1()
+			    || eval.isImpClass1()
+			    || eval.isXImpClass1()))
+		    || (eval_file2
+			&& (eval.isEmptyClass2()
+			    || eval.isImpClass2()
+			    || eval.isXImpClass2())) ) ) )
+	  {
+	    fputs(eval.status_string().c_str(), out.file);
+	    fputc('\t', out.file);
+	    fputs(twriter.token_string(*s1i).c_str(), out.file);
+	    fputs("\t/\t", out.file);
+	    twriter.token_put(out.file, *s2i);
+	  }
       }
+    if (vlevel >= evlEverything) fputc('\n', out.file);
 
     //-- check sentence lengths
     if (s1i != s1.end() || s2i != s2.end()) {
@@ -206,11 +278,16 @@ int main (int argc, char **argv)
   } while (1);
 
   //-- summary
-  print_summary(stdout);
+  print_summary(out.file);
+
+  if (vlevel >= evlBasic && out.file != stdout) {
+    print_summary(stderr);
+  }
 
   //-- cleanup
   file1.close();
   file2.close();
+  out.close();
 
   return 0;
 }
@@ -220,61 +297,84 @@ int main (int argc, char **argv)
 /*--------------------------------------------------------------------------
  * summary (new)
  *--------------------------------------------------------------------------*/
-void print_summary(FILE *file);
+void print_summary(FILE *outfile)
 {
   if (ntokens==0) ntokens = 1;
-  fprintf(stdout,
-	  "\n%%%%-------------------------------------------------------------------\n");
-  fprintf(stdout, "%%%% %s Summary:\n", PROGNAME);
+  fprintf(outfile,
+	  "%%%%-------------------------------------------------------------------\n");
+  fprintf(outfile, "%%%% %s Summary:\n", PROGNAME);
 
   //----------------------------------------------------
   // General
-  fprintf(stdout, "%%%%  + NTokens             : %9u\n", ntokens);
-  fprintf(stdout, "%%%%  + NSentences          : %9u\n", nsents);
+  fprintf(outfile, "%%%%  + NTokens             : %9u\n", ntokens);
+  fprintf(outfile, "%%%%  + NSentences          : %9u\n", nsents);
 
   //----------------------------------------------------
   // File-1
-  fprintf(stdout, "%%%%  + File-1              : %s\n", file1.name);
-  fprintf(stdout, "%%%%    - Avg. Class Size   : %12.2f\n",
-	  (double)nans2/(double)ntokens);
-
-  fprintf(stdout, "%%%%    - Class Empty / Non : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  nempties1, 100.0*(double)nempties1/(double)ntokens,
-	  ntokens-nempties1, 100.0*(double)(ntokens-nempties1)/(double)ntokens);
-
-  fprintf(stdout, "%%%%    - Class Sane / Non  : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  ntokens-nimps1, 100.0*(double)(ntokens-nimps1)/(double)ntokens,
-	  nimps1, 100.0*(double)nimps1/(double)ntokens);
-
-  fprintf(stdout, "%%%%    - Class XSane / Non : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  ntokens-nximps1, 100.0*(double)(ntokens-nximps1)/(double)ntokens,
-	  nximps1, 100.0*(double)nximps1/(double)ntokens,
-
-  fprintf(stdout, "%%%%    - XSaves / Non      : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  nsaves1, 100.0*(double)(nsaves1)/(double)nempties1,
-	  nempties1-nsaves1, 100.0*(double)(nempties1-nsaves1)/(double)nempties1);
-
-  fprintf(stdout, "%%%%    - Catches / Fumbles : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  (ntokens-nximps1-nfumbles1),100.0*(double)(ntokens-nximps1-nfumbles1)/(double)(ntokens-nximps1),
-	  nfumbles1, 100.0*(double)(nfumbles1)/(double)(ntokens-nximps1),
+  fprintf(outfile, "%%%%  + File-1              : %s\n", file1.name);
+  if (vlevel >= evlExtended && eval_file1)
+    print_summary_file(outfile, ntokens, nans1, nempties1,
+		       nimps1, nximps1, nsaves1, nfumbles1);
 
   //----------------------------------------------------
   // File-2
-  fprintf(stdout, "%%%%  + File-2              : %s\n", file2.name);
-  fprintf(stdout, "%%%%    - Avg. Class Size   : %12.2f\n",
-	  (double)nans2/(double)ntokens);
-
+  fprintf(outfile, "%%%%  + File-2              : %s\n", file2.name);
+  if (vlevel >= evlExtended && eval_file2)
+    print_summary_file(outfile, ntokens, nans2, nempties2,
+		       nimps2, nximps2, nsaves2, nfumbles2);
 
   //----------------------------------------------------
   // Accuracy
-  fprintf(stdout, "%%%%  + Tokens Equal / Non  : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+  fprintf(outfile, "%%%%  + Tokens Equal / Diff : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  ntokens-ntokmisses, 100.0*(double)(ntokens-ntokmisses)/(double)ntokens,
 	  ntokmisses, 100.0*(double)(ntokmisses)/(double)ntokens);
 
-  fprintf(stdout, "%%%%  + Tags Equal / Non    : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+  fprintf(outfile, "%%%%  + Tags Equal / Diff   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  ntokens-nbestmisses, 100.0*(double)(ntokens-nbestmisses)/(double)ntokens,
 	  nbestmisses, 100.0*(double)(nbestmisses)/(double)ntokens);
 
-  fprintf(stdout,
+  fprintf(outfile,
 	  "%%%%-------------------------------------------------------------------\n");
+}
+
+
+
+
+/*--------------------------------------------------------------------------
+ * summary (file)
+ *--------------------------------------------------------------------------*/
+void print_summary_file(FILE *outfile,
+			size_t ntokens,
+			size_t nanls,
+			size_t nempties,
+			size_t nimps,
+			size_t nximps,
+			size_t nsaves,
+			size_t nfumbles)
+{
+  //----------------------------------------------------
+  // File-N
+  fprintf(outfile, "%%%%    - Avg. Class Size   : %12.2f\n",
+	  (double)nanls/(double)(ntokens-nempties)
+	  );
+  fprintf(outfile, "%%%%    - Class Given / Not : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  ntokens-nempties, 100.0*(double)(ntokens-nempties)/(double)ntokens,
+	  nempties, 100.0*(double)nempties/(double)ntokens
+	  );
+  fprintf(outfile, "%%%%    - Class Sane / Not  : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  ntokens-nimps, 100.0*(double)(ntokens-nimps)/(double)ntokens,
+	  nimps, 100.0*(double)nimps/(double)ntokens
+	  );
+  fprintf(outfile, "%%%%    - Class XSane / Not : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  ntokens-nximps, 100.0*(double)(ntokens-nximps)/(double)ntokens,
+	  nximps, 100.0*(double)nximps/(double)ntokens
+	  );
+  fprintf(outfile, "%%%%    - XSaves / Failures : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  nsaves, 100.0*(double)nsaves/(double)nempties,
+	  nempties-nsaves, 100.0*(double)(nempties-nsaves)/(double)nempties
+	  );
+  fprintf(outfile, "%%%%    - Catches / Fumbles : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  (ntokens-nximps-nfumbles),100.0*(double)(ntokens-nximps-nfumbles)/(double)(ntokens-nximps),
+	  nfumbles, 100.0*(double)(nfumbles)/(double)(ntokens-nximps)
+	  );
 }
