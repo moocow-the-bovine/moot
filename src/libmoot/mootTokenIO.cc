@@ -78,14 +78,13 @@ mootSentence &TokenReader::get_sentence(void)
 string TokenWriter::token_string(const mootToken &token)
 {
   string s = token.text();
-  if (want_tags_only || token.analyses().empty()) {
-    if (want_best_only || token.analyses().empty()) {
-      //-- best-only, tags-only: exactly 1 tag/tok
-      s.push_back('\t');
-      s.append(token.besttag());
-    } //-- /+tags,+best
-    else {
-      //-- tags-only, all possibilities
+
+  //-- best tag is always first 'analysis'
+  s.push_back('\t');
+  s.append(token.besttag());
+
+  if (want_tags_only) {
+      //-- +tags,-best: tags-only, all possibilities
       set<mootTagString> tagset;
       token.tokExport(NULL,&tagset);
       for (set<mootTagString>::const_iterator tsi = tagset.begin();
