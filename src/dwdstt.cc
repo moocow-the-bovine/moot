@@ -126,7 +126,18 @@ FSM *dwds_tagger_trainer::generate_unknown_fsa()
  */
 bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
 {
-  int tok;
+  int tok, eosi;
+  bool is_eos;
+  set<FSMSymbolString> *curtags;
+  set<FSMSymbolString>::iterator t;
+
+  set<FSMSymbolString> *curngrams = new set<FSMSymbolString>;
+  set<FSMSymbolString> *nextngrams = new set<FSMSymbolString>;
+
+  set<FSMSymbolString>::iterator g_old;
+  set<FSMSymbolString>::iterator g_new;
+
+  FSMSymbolStringQueue::iterator qi;
 
   // -- sanity check
   if (!can_tag()) {
@@ -134,35 +145,94 @@ bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
     return false;
   }
 
-  // -- NOT YET IMPLEMENTED -- just die!
-  fprintf(stderr, "dwds_tagger_trainer::train_from_stream(): not yet implemented.\n");
-  abort();
+  // -- ensure that all-tags contains the tagset-tags
+  alltags.insert(tagset.begin(),tagset.end());
 
+  // -- initialize string-sets
+  for (eosi = 0; eosi < kmax; eosi++) {
+    curtags = new set<FSMSymbolString>();
+    curtags->insert(eos);
+    stringq.push_back(curtags);
+  }
+
+  // -- ye olde guttes
   lexer.step_streams(in,out);
   while ((tok = lexer.yylex()) != DTEOF) {
-    switch (tok) {
-    case EOS:
-      /* do something spiffy */
-      fputs(eos.c_str(), out);
-      fputs("\n\n", out);
-      break;
+    // -- check for eos
+    if (tok == EOS || tok == DTEOF) {
+      eosi = kmax;
+      is_eos = true;
+    }
+    else {
+      eosi = 0;
+      is_eos = false;
+    }
 
-    case TOKEN:
-    default:
-      tmp->fsm_clear();
-      results.clear();
-      s = (char *)lexer.yytext;
-      
-      result = morph->fsm_lookup(s,tmp,true);  // v0.0.2 -- getting leaks here!
-      tmp->fsm_strings(syms, &results, false, want_avm);
-      
-      fprintf(out, "%s: %d Analyse(n)\n", lexer.yytext, results.size());
-      for (ri = results.begin(); ri != results.end(); ri++) {
-	fputs("\t", out);
-	fputs(ri->istr.c_str(), out);
-	fprintf(out, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
+    // -- eos run-up / -down
+    for ( ; eosi >= 0; eosi--) {
+      // -- tag it first
+      if (!is_eos) {
+	s = (char *)lexer.yytext;
+	tmp->fsm_clear();
+	result = morph->fsm_lookup(s,tmp,true);
       }
-      fputc('\n',out);
+
+      // -- pop 'current' tag-string set (last in queue == oldest)
+      curtags = stringq.back();
+      stringq.pop_back();
+
+      // -- get the 'next' tag-string set to the 'current' one
+      curtags->clear();
+      if (!is_eos) {
+	if (want_features) {
+	  results.clear();
+	  tmp->fsm_strings(syms, &results, false, want_avm);
+	  // -- set curtags to full string results
+	  for (ri = results.begin(); ri != results.end(); ri++) {
+	    curtags->insert(ri->istr);
+	  }
+	} else {
+	  // -- all features
+	  get_fsm_tag_strings(tmp,curtags);
+	}
+	// -- unknown token?
+	if (curtags->empty()) get_fsm_tag_strings(ufsa,curtags);
+      } else {
+	// -- terminal EOS
+	curtags->insert(eos);
+      }
+
+      // -- push 'current' tags onto the queue (front of queue == newest)
+      stringq.push_front(curtags);
+      
+      // -- note all 'current' tags in "alltags"
+      alltags.insert(curtags->begin(),curtags->end());
+
+      // -- counting: i <= kmax -grams
+      curngrams->clear();
+      for (qi = stringq.begin(); qi != stringq.end(); qi++) {
+	// -- grab next ngrams
+	if (curngrams->empty()) *curngrams = **qi;
+	else {
+	  // -- get iterator-current tags
+	  curtags = *qi;
+	  nextngrams->clear();
+	  for (g_old = curngrams->begin(); g_old != curngrams->end(); g_old++) {
+	    for (g_new = curtags->begin(); g_new != curtags->end(); g_new++) {
+	      nextngrams->insert(*g_new + wdsep + *g_old);
+	    }
+	  }
+	  *curngrams = *nextngrams;
+	}
+	// -- ... and count them
+	for (t = curngrams->begin(); t != curngrams->end(); t++) {
+	  if ((sci = strings2counts.find(*t)) != strings2counts.end()) {
+	    strings2counts[*t] += curngrams->size() >= 0 ? 1.0/(float)curngrams->size() : 0;
+	  } else {
+	    strings2counts[*t] = curngrams->size() >= 0 ? 1.0/(float)curngrams->size() : 0;
+	  }
+	}
+      }
       
       // -- verbosity
       if (verbose) {
@@ -171,6 +241,16 @@ bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
       }
     }
   }
+  // -- cleanup string-sets
+  for (eosi = 0; eosi < kmax; eosi++) {
+    curtags = stringq.front();
+    stringq.pop_front();
+    curtags->clear();
+    delete curtags;
+  }
+  delete curngrams;
+  delete nextngrams;
+
   return true;
 }
 
@@ -197,6 +277,9 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
     return false;
   }
 
+  // -- ensure that all-tags contains the tagset-tags
+  alltags.insert(tagset.begin(),tagset.end());
+
   // -- initialize string-sets
   for (i = 0; i < kmax; i++) {
     curtags = new set<FSMSymbolString>();
@@ -205,44 +288,44 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
   }
 
   // -- ye olde guttes
-  for ( ; --argc >= 0; argv++) {
+  for ( ; --argc >= -1*kmax; argv++) {
 
     // -- tag it first
-    s = *argv;
-    tmp->fsm_clear();
-    result = morph->fsm_lookup(s,tmp,true);
-
-    // -- pop 'current' string set
+    if (argc >= 0) {
+      s = *argv;
+      tmp->fsm_clear();
+      result = morph->fsm_lookup(s,tmp,true);
+    }
+    // -- pop 'current' tag-string set (last in queue == oldest)
     curtags = stringq.back();
     stringq.pop_back();
 
-    // -- get the 'current' tag-set
+    // -- get the 'next' tag-string set to the 'current' one
     curtags->clear();
-    if (want_features) {
-      results.clear();
-      tmp->fsm_strings(syms, &results, false, want_avm);
-      // -- set curtags to full string results
-      for (ri = results.begin(); ri != results.end(); ri++) {
-	curtags->insert(ri->istr);
+    if (argc >= 0) {
+      if (want_features) {
+	results.clear();
+	tmp->fsm_strings(syms, &results, false, want_avm);
+	// -- set curtags to full string results
+	for (ri = results.begin(); ri != results.end(); ri++) {
+	  curtags->insert(ri->istr);
+	}
+      } else {
+	// -- all features
+	get_fsm_tag_strings(tmp,curtags);
       }
+      // -- unknown token?
+      if (curtags->empty()) get_fsm_tag_strings(ufsa,curtags);
     } else {
-      // -- all features
-      get_fsm_tag_strings(tmp,curtags);
+      // -- terminal EOS
+      curtags->insert(eos);
     }
-    // -- unknown token?
-    if (curtags->empty()) get_fsm_tag_strings(ufsa,curtags);
 
-    // -- push 'current' tags onto the back of the queue
+    // -- push 'current' tags onto the queue (front of queue == newest)
     stringq.push_front(curtags);
 
-    /* // -- counting: unigrams
-       for (t = curtags->begin(); t != curtags->end(); t++) {
-       if ((sci = strings2counts.find(*t)) != strings2counts.end()) {
-       strings2counts[*t] += curtags->size() >= 0 ? 1.0/(float)curtags->size() : 0;
-       } else {
-       strings2counts[*t] = curtags->size() >= 0 ? 1.0/(float)curtags->size() : 0;
-       }
-      }*/
+    // -- note all 'current' tags in "alltags"
+    alltags.insert(curtags->begin(),curtags->end());
 
 #  ifdef DWDSTT_DEBUG
     // -- output (debug)
@@ -254,7 +337,6 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
     }
     fputc('\n',out);
 #  endif // DWDSTT_DEBUG
-
 
     // -- counting: i <= kmax -grams
     curngrams->clear();
@@ -272,7 +354,7 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
 	}
 	*curngrams = *nextngrams;
       }
-      // -- ... and count them (??? CONTINUE HERE ???)
+      // -- ... and count them
       for (t = curngrams->begin(); t != curngrams->end(); t++) {
 	if ((sci = strings2counts.find(*t)) != strings2counts.end()) {
 	  strings2counts[*t] += curngrams->size() >= 0 ? 1.0/(float)curngrams->size() : 0;
@@ -311,10 +393,15 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
  */
 bool dwds_tagger_trainer::write_param_file(FILE *out=stdout)
 {
-  // -- Unigrams
-  fputs("%% Unigrams\n", out);
+  // -- sorted string-list
+  set<FSMSymbolString> allstrings;
   for (sci = strings2counts.begin(); sci != strings2counts.end(); sci++) {
-    fprintf(out, "%s\t%f\n", sci->first.c_str(), sci->second);
+    allstrings.insert(sci->first);
+  }
+
+  fputs("%% Parameter File\n", out);
+  for (set<FSMSymbolString>::iterator asi = allstrings.begin(); asi != allstrings.end(); asi++) {
+    fprintf(out, "%s\t%f\n", asi->c_str(), strings2counts[*asi]);
   }
   return true;
 }

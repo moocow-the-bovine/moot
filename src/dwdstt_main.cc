@@ -142,7 +142,7 @@ void GetMyOptions(int argc, char **argv)
   // -- tagger-trainer object setup : kmax
   dwdstt.kmax = args.kgram_max_arg;
 
-  // link morph-FST to symbols file
+  // -- tagger-trainer object setup : link morph-FST to symbols file
   if (!dwdstt.morph->fsm_use_symbol_spec(dwdstt.syms)) {
     fprintf(stderr,"%s ERROR: could not use symbols from '%s' in FST from '%s'\n",
 	    PROGNAME, args.symbols_arg, args.morph_arg);
@@ -176,6 +176,10 @@ int main (int argc, char **argv)
     }
     dwdstt.train_from_strings(args.inputs_num, args.inputs, out.file);
   } else {
+    if (args.verbose_arg > 0) {
+      fprintf(stderr, "%s: Analyzing input files... %s",
+	      PROGNAME, args.verbose_arg > 1 ? "\n" : "");
+    }
     // -- big loop
     for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
       if (args.verbose_arg > 0) {
@@ -196,6 +200,10 @@ int main (int argc, char **argv)
 	fflush(stderr);
       }
     }
+    if (args.verbose_arg == 1) {
+      fprintf(stderr, " done.\n");
+      fflush(stderr);
+    }
   }
 
 #ifdef DWDSTT_DEBUG
@@ -203,19 +211,20 @@ int main (int argc, char **argv)
 #endif
 
   // -- paramater file
+  if (args.verbose_arg > 0 && out.file != stdout) {
+    fprintf(stderr, "%s: Generating parameter file '%s'... ",
+	    PROGNAME, out.name);
+  }
   dwdstt.write_param_file(out.file);
-  out.close();
+  if (args.verbose_arg > 0 && out.file != stdout) {
+    out.close();
+    fprintf(stderr, "done.\n");
+  } else {
+    out.close();
+  }
 
   // -- summary
   if (args.verbose_arg > 0) {
-      // -- timing
-      //gettimeofday(&astopped, NULL);
-
-      /*
-	aelapsed = astopped.tv_sec - astarted.tv_sec + (double)(astopped.tv_usec - astarted.tv_usec) / 1000000.0;
-	ielapsed = astarted.tv_sec - istarted.tv_sec + (double)(astarted.tv_usec - istarted.tv_usec) / 1000000.0;
-      */
-
       // -- print summary
       fprintf(stderr, "\n-----------------------------------------------------\n");
       fprintf(stderr, "%s Summary:\n", PROGNAME);

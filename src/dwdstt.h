@@ -9,7 +9,7 @@
 #ifndef _DWDSTT_H_
 #define _DWDSTT_H_
 
-#define DWDSTT_DEBUG
+//#define DWDSTT_DEBUG
 //#undef DWDSTT_DEBUG
 
 #ifdef HAVE_CONFIG_H
@@ -43,6 +43,8 @@ public:
   FSMSymbolStringQueue  stringq;
   FSM                   *ufsa;
   set<FSMSymbolString>  tagset;
+  set<FSMSymbolString>  alltags;
+
 private:
   StringToCountTable::iterator sci;
 
