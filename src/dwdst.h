@@ -40,6 +40,7 @@ public:
 
   // -- flags
   bool want_avm;
+  bool want_numeric;
   bool want_features;
   bool want_tnt_format;
   bool verbose;
@@ -58,10 +59,24 @@ protected:
   // -- temporary variables
   FSM *result, *tmp;
   FSMSymbolString s;
+
+  // -- all features, string-mode
   set<FSMStringWeight> results;
   set<FSMStringWeight>::iterator ri;
+
+  // -- tags only, strings
   set<FSMSymbolString> tagresults;
   set<FSMSymbolString>::iterator tri;
+
+
+  // -- all features, numeric
+  set<FSMSymbolVectorWeight> nresults;
+  set<FSMSymbolVectorWeight>::iterator nri;
+  // -- tags only, numeric
+  set<FSMSymbol> ntagresults;
+  set<FSMSymbol>::iterator ntri;
+  // -- numeric vector-iterator
+  FSMSymbolVector::const_iterator vi;
 
 public:
   // -- public methods: constructor/destructor

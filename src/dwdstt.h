@@ -33,16 +33,16 @@ class dwds_tagger_trainer : public dwds_tagger {
   // -- typedefs
 public:
   typedef hash_map<string,float> StringToCountTable;
-  typedef deque<set<FSMSymbolString> *> StringQueue;
+  typedef deque<set<FSMSymbolString> *> FSMSymbolStringQueue;
 private:
 
   // -- data members
 public:
   int kmax;
-  StringToCountTable   strings2counts;
-  StringQueue          stringq;
-  FSM                  *ufsa;
-  set<FSMSymbolString> tagset;
+  StringToCountTable    strings2counts;
+  FSMSymbolStringQueue  stringq;
+  FSM                   *ufsa;
+  set<FSMSymbolString>  tagset;
 private:
   StringToCountTable::iterator sci;
 

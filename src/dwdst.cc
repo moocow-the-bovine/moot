@@ -35,6 +35,7 @@ dwds_tagger::dwds_tagger(FSM *mymorph, FSMSymSpec *mysyms)
 
   // -- public flags
   want_avm = false;
+  want_numeric = false;
   want_features = true;
   want_tnt_format = false;
   verbose = false;
@@ -150,7 +151,6 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
       if (verbose) ntokens++;
 
       tmp->fsm_clear();
-      results.clear();
       s = (char *)lexer.yytext;
       result = morph->fsm_lookup(s,tmp,true);  // v0.0.2 -- getting leaks here!
 
@@ -158,47 +158,103 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
 
       if (want_features) {
 	// -- all features
-	tmp->fsm_strings(syms, &results, false, want_avm);
-	if (verbose && tagresults.empty()) nunknown++;
-	if (want_tnt_format) {
-	  // -- all features, one tok/line
-	  for (ri = results.begin(); ri != results.end(); ri++) {
-	    fputs("\t", out);
-	    fputs(ri->istr.c_str(), out);
-	    if (ri->weight) fprintf(out, "<%f>", ri->weight);
+	if (want_numeric) {
+	  nresults.clear();
+	  // -- all features, numeric
+	  tmp->fsm_bstrings(&nresults, false);
+	  if (verbose && nresults.empty()) nunknown++;
+
+	  if (want_tnt_format) {
+	    // -- all features, numeric, one tok/line
+	    for (nri = nresults.begin(); nri != nresults.end(); nri++) {
+	      fputs("\t", out);
+	      for (vi = nri->ivec.begin(); vi != nri->ivec.end(); vi++) {
+		fprintf(out, " %d", *vi);
+	      }
+	      if (nri->weight) fprintf(out, "<%f>", nri->weight);
+	    }
+	    fputc('\n',out);
+	  } else { // want_tnt_format
+	    // -- all features, numeric, madwds-style
+	    fprintf(out, ": %d Analyse(n)\n", nresults.size());
+	    for (nri = nresults.begin(); nri != nresults.end(); nri++) {
+	      fputs("\t", out);
+	      //fputs(nri->istr.c_str(), out);
+	      for (vi = nri->ivec.begin(); vi != nri->ivec.end(); vi++) {
+		fprintf(out, " %d", *vi);
+	      }
+	      fprintf(out, (nri->weight ? "\t<%f>\n" : "\n"), nri->weight);
+	    }
+	    fputc('\n',out);
+	  } 
+	} else { // want_numeric
+	  results.clear();
+	  // -- all features, strings
+	  tmp->fsm_strings(syms, &results, false, want_avm);
+	  if (verbose && results.empty()) nunknown++;
+	  if (want_tnt_format) {
+	    // -- all features, one tok/line
+	    for (ri = results.begin(); ri != results.end(); ri++) {
+	      fputs("\t", out);
+	      fputs(ri->istr.c_str(), out);
+	      if (ri->weight) fprintf(out, "<%f>", ri->weight);
+	    }
+	    fputc('\n',out);
+	  } else { // want_tnt_format
+	    // -- all features, madwds-style
+	    fprintf(out, ": %d Analyse(n)\n", results.size());
+	    for (ri = results.begin(); ri != results.end(); ri++) {
+	      fputs("\t", out);
+	      fputs(ri->istr.c_str(), out);
+	      fprintf(out, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
+	    }
+	    fputc('\n',out);
+	  } 
+	}
+      } else { // want_features
+	if (want_numeric) {
+	  // -- tags only, numeric
+	  ntagresults.clear();
+	  get_fsm_tags(tmp, &ntagresults);
+	  if (verbose && ntagresults.empty()) nunknown++;
+	  
+	  if (want_tnt_format) {
+	    // -- tags-only, numeric, one tok/line
+	    for (ntri = ntagresults.begin(); ntri != ntagresults.end(); ntri++) {
+	      fprintf(out, "\t%d", *ntri);
+	    }
+	    fputc('\n', out);
+	  } else { // want_tnt_format
+	    // -- tags-only, numeric madwds-style
+	    fprintf(out, ": %d Analyse(n)\n", ntagresults.size());
+	    for (ntri = ntagresults.begin(); ntri != ntagresults.end(); ntri++) {
+	      fprintf(out, "\t%d\n", *ntri);
+	    }
+	    fputc('\n',out);
 	  }
-	  fputc('\n',out);
-	} else {
-	  // -- all features, madwds native format
-	  fprintf(out, ": %d Analyse(n)\n", results.size());
-	  for (ri = results.begin(); ri != results.end(); ri++) {
-	    fputs("\t", out);
-	    fputs(ri->istr.c_str(), out);
-	    fprintf(out, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
+	} else { // want_numeric
+	  // -- tags only, strings
+	  tagresults.clear();
+	  get_fsm_tag_strings(tmp, &tagresults);
+	  if (verbose && tagresults.empty()) nunknown++;
+	  
+	  if (want_tnt_format) {
+	    // -- tags-only, one tok/line
+	    for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
+	      fputc('\t', out);
+	      fputs(*(tri->c_str()) == '_' ? tri->c_str()+1 : tri->c_str(), out);
+	    }
+	    fputc('\n', out);
+	  } else { // want_tnt_format
+	    // -- tags-only, madwds native format
+	    fprintf(out, ": %d Analyse(n)\n", tagresults.size());
+	    for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
+	      fputs("\t[", out);
+	      fputs(tri->c_str(), out);
+	      fputs("]\n", out);
+	    }
+	    fputc('\n',out);
 	  }
-	  fputc('\n',out);
-	} 
-      } else {
-	// -- tags only
-	get_fsm_tag_strings(tmp, &tagresults);
-	if (verbose && tagresults.empty()) nunknown++;
-	
-	if (want_tnt_format) {
-	  // -- tags-only, one tok/line
-	  for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
-	    fputc('\t', out);
-	    fputs(*(tri->c_str()) == '_' ? tri->c_str()+1 : tri->c_str(), out);
-	  }
-	  fputc('\n', out);
-	} else {
-	  // -- tags-only, madwds native format
-	  fprintf(out, ": %d Analyse(n)\n", tagresults.size());
-	  for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
-	    fputs("\t[", out);
-	    fputs(tri->c_str(), out);
-	    fputs("]\n", out);
-	  }
-	  fputc('\n',out);
 	}
       }
     }
@@ -231,51 +287,106 @@ bool dwds_tagger::tag_strings(int argc, char **argv, FILE *out=stdout)
     fputs(*argv, out);
     if (want_features) {
       // -- all features
-      tmp->fsm_strings(syms, &results, false, want_avm);
-      if (verbose && tagresults.empty()) nunknown++;
-      if (want_tnt_format) {
-	// -- all features, one tok/line
-	for (ri = results.begin(); ri != results.end(); ri++) {
-	  fputs("\t", out);
-	  fputs(ri->istr.c_str(), out);
-	  if (ri->weight) fprintf(out, "<%f>", ri->weight);
+      if (want_numeric) {
+	nresults.clear();
+	// -- all features, numeric
+	tmp->fsm_bstrings(&nresults, false);
+	if (verbose && nresults.empty()) nunknown++;
+	
+	if (want_tnt_format) {
+	  // -- all features, numeric, one tok/line
+	  for (nri = nresults.begin(); nri != nresults.end(); nri++) {
+	    fputs("\t", out);
+	    for (vi = nri->ivec.begin(); vi != nri->ivec.end(); vi++) {
+	      fprintf(out, " %d", *vi);
+	    }
+	    if (nri->weight) fprintf(out, "<%f>", nri->weight);
+	  }
+	  fputc('\n',out);
+	} else { // want_tnt_format
+	  // -- all features, numeric, madwds-style
+	  fprintf(out, ": %d Analyse(n)\n", nresults.size());
+	  for (nri = nresults.begin(); nri != nresults.end(); nri++) {
+	    fputs("\t", out);
+	    //fputs(nri->istr.c_str(), out);
+	    for (vi = nri->ivec.begin(); vi != nri->ivec.end(); vi++) {
+	      fprintf(out, " %d", *vi);
+	    }
+	    fprintf(out, (nri->weight ? "\t<%f>\n" : "\n"), nri->weight);
+	  }
+	  fputc('\n',out);
+	} 
+      } else { // want_numeric
+	results.clear();
+	// -- all features, strings
+	tmp->fsm_strings(syms, &results, false, want_avm);
+	if (verbose && results.empty()) nunknown++;
+	if (want_tnt_format) {
+	  // -- all features, one tok/line
+	  for (ri = results.begin(); ri != results.end(); ri++) {
+	    fputs("\t", out);
+	    fputs(ri->istr.c_str(), out);
+	    if (ri->weight) fprintf(out, "<%f>", ri->weight);
+	  }
+	  fputc('\n',out);
+	} else { // want_tnt_format
+	  // -- all features, madwds-style
+	  fprintf(out, ": %d Analyse(n)\n", results.size());
+	  for (ri = results.begin(); ri != results.end(); ri++) {
+	    fputs("\t", out);
+	    fputs(ri->istr.c_str(), out);
+	    fprintf(out, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
+	  }
+	  fputc('\n',out);
+	} 
+      }
+    } else { // want_features
+      if (want_numeric) {
+	// -- tags only, numeric
+	ntagresults.clear();
+	get_fsm_tags(tmp, &ntagresults);
+	if (verbose && ntagresults.empty()) nunknown++;
+	
+	if (want_tnt_format) {
+	  // -- tags-only, numeric, one tok/line
+	  for (ntri = ntagresults.begin(); ntri != ntagresults.end(); ntri++) {
+	    fprintf(out, "\t%d", *ntri);
+	  }
+	  fputc('\n', out);
+	} else { // want_tnt_format
+	  // -- tags-only, numeric madwds-style
+	  fprintf(out, ": %d Analyse(n)\n", ntagresults.size());
+	  for (ntri = ntagresults.begin(); ntri != ntagresults.end(); ntri++) {
+	    fprintf(out, "\t%d\n", *ntri);
+	  }
+	  fputc('\n',out);
 	}
-	fputc('\n',out);
-      } else {
-	// -- all features, madwds native format
-	fprintf(out, ": %d Analyse(n)\n", results.size());
-	for (ri = results.begin(); ri != results.end(); ri++) {
-	  fputs("\t", out);
-	  fputs(ri->istr.c_str(), out);
-	  fprintf(out, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
+      } else { // want_numeric
+	// -- tags only, strings
+	tagresults.clear();
+	get_fsm_tag_strings(tmp, &tagresults);
+	if (verbose && tagresults.empty()) nunknown++;
+	
+	if (want_tnt_format) {
+	  // -- tags-only, one tok/line
+	  for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
+	    fputc('\t', out);
+	    fputs(*(tri->c_str()) == '_' ? tri->c_str()+1 : tri->c_str(), out);
+	  }
+	  fputc('\n', out);
+	} else { // want_tnt_format
+	  // -- tags-only, madwds native format
+	  fprintf(out, ": %d Analyse(n)\n", tagresults.size());
+	  for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
+	    fputs("\t[", out);
+	    fputs(tri->c_str(), out);
+	    fputs("]\n", out);
+	  }
+	  fputc('\n',out);
 	}
-	fputc('\n',out);
-      } 
-    } else {
-      // -- tags only
-      get_fsm_tag_strings(tmp, &tagresults);
-      if (verbose && tagresults.empty()) nunknown++;
-
-      if (want_tnt_format) {
-	// -- tags-only, one tok/line
-	for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
-	  fputc('\t', out);
-	  fputs(*(tri->c_str()) == '_' ? tri->c_str()+1 : tri->c_str(), out);
-	}
-	fputc('\n', out);
-      } else {
-	// -- tags-only, madwds native format
-	fprintf(out, ": %d Analyse(n)\n", tagresults.size());
-	for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
-	  fputs("\t[", out);
-	  fputs(tri->c_str(), out);
-	  fputs("]\n", out);
-	}
-	fputc('\n',out);
       }
     }
   }
-
   return true;
 }
 
