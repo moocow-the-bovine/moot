@@ -22,21 +22,6 @@ void churntest(int argc, char **argv) {
   mootSentence sent;
   do {
     sent = tr.get_sentence();
-    printf("SENTENCE:\n");
-    for (mootSentence::const_iterator si = sent.begin();
-	 si != sent.end();
-	 si++)
-      {
-	printf("\t+ TOKEN: toktext=`%s'\t ; besttag=`%s'\n",
-	       si->text().c_str(), si->besttag().c_str());
-	for (mootToken::AnalysisSet::const_iterator ai = si->analyses().begin();
-	     ai != si->analyses().end();
-	     ai++)
-	  {
-	    printf("\t  - ANALYSIS: cost=%g\t ; tag=`%s'\t ; details=`%s'\t\n",
-		   ai->cost, ai->tag.c_str(), ai->details.c_str());
-	  }
-      }
   } while (!sent.empty() || !feof(infile));
   printf("EOF\n");
 }

@@ -29,17 +29,30 @@
 #ifndef _moot_TOKEN_H
 #define _moot_TOKEN_H
 
+#define MOOT_TOKEN_VERSION 1
+#define MOOT_TOKEN_REVISION 0
+
 #include <list>
 #include <set>
 #include <string>
 
 #if defined(__GNUC__)
 # include <float.h>
-# define MOOT_COST_LB FLT_MIN
-# define MOOT_COST_UB FLT_MAX
+
+/** Cost value to use when finding lower bounds in mootToken methods */
+# define MOOT_COST_LB -FLT_MAX
+
+/** Cost value to use when finding upper bounds in mootToken methods */
+# define MOOT_COST_UB +FLT_MAX
+
 #else /* defined(__GNUC__) */
-# define MOOT_COST_LB 1.1e-38F
-# define MOOT_COST_UB 3.4e+38F
+
+/** Cost value to use when finding lower bounds in mootToken methods */
+# define MOOT_COST_LB -1E+37F
+
+/** Cost value to use when finding upper bounds in mootToken methods */
+# define MOOT_COST_UB +1E+37F
+
 #endif /* defined(__GNUC__) */
 
 namespace moot {
@@ -112,13 +125,18 @@ public:
     /** Comparsion operator */
     friend bool operator <(const Analysis &x, const Analysis &y)
     {
-      return x.cost < y.cost || x.tag < y.tag || x.details < y.details;
+      int tcomp = x.tag.compare(y.tag);
+      if (tcomp < 0) return true;
+      else if (tcomp > 0) return false;
+      return (x.cost == y.cost
+	      ? x.details < y.details
+	      : x.cost < y.cost);
     };
 
     /** Equality operator */
     friend bool operator ==(const Analysis &x, const Analysis &y)
     {
-      return x.cost == y.cost && x.tag == y.tag && x.details == y.details;
+      return x.tag == y.tag && x.cost == y.cost && x.details == y.details;
     }
     
   }; //-- /mootToken::Analysis
@@ -234,11 +252,22 @@ public:
   inline void prune(void)
   {
     Analysis bound(tok_besttag,MOOT_COST_LB);
-    tok_analyses.erase(--tok_analyses.begin(),
+    tok_analyses.erase(tok_analyses.begin(),
 		       tok_analyses.lower_bound(bound));
     bound.cost = MOOT_COST_UB;
     tok_analyses.erase(tok_analyses.upper_bound(bound),
 		       tok_analyses.end());
+  };
+
+  /** Find first analysis (if any) whose tag is <= tag */
+  inline AnalysisSet::const_iterator lower_bound(const mootTagString &tag) const
+  {
+    return tok_analyses.lower_bound(Analysis(tag,MOOT_COST_LB));
+  };
+  /** Find first analysis (if any) whose tag is > tag */
+  inline AnalysisSet::const_iterator upper_bound(const mootTagString &tag) const
+  {
+    return tok_analyses.upper_bound(Analysis(tag,MOOT_COST_UB));
   };
 
 
@@ -282,6 +311,7 @@ public:
 	{
 	  dst_tagset->insert(asi->tag);
 	}
+      if (!tok_besttag.empty()) dst_tagset->insert(tok_besttag);
     }
   };
   

@@ -1,5 +1,10 @@
 ChangeLog for package moot
 
+v2.0.0
+	+ parse new MorphConsole output (with TAB separators, at least)
+	+ (re-)added various output options to moothmm: tags-only, best-only 
+	+ added best-tag marking with prefix '/'
+	
 v1.0.5 Fri, 21 May 2004 14:14:31 +0200
   + extracting FSM dependencies to 'mootm' package
 	

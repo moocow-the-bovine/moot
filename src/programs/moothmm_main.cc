@@ -1,5 +1,5 @@
 /*
-   moot-utils version 1.0.4 : moocow's part-of-speech tagger
+   moot-utils : moocow's part-of-speech tagger
    Copyright (C) 2002-2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
@@ -107,6 +107,10 @@ void GetMyOptions(int argc, char **argv)
 
   // -- get initialization start-time
   if (args.verbose_arg > 1) gettimeofday(&istarted, NULL);
+
+  // -- output format flags
+  hmm.want_best_only = args.best_given;
+  hmm.want_tags_only = args.tags_given;
 
   // -- assign "unknown" ids & other flags
   hmm.unknown_token_name(args.unknown_token_arg);

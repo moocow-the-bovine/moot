@@ -32,8 +32,11 @@
  *     - raw text (no markup!)
  *     - token-line format (TAB-separated)
  *        TOKEN_TEXT  ANALYSIS_1 ... ANALYSIS_N
- *     - analysis format:
- *        TAG[<COST>][:DETAILS[<COST>]]
+ *     - analysis format(s):
+ *        ...(COST?)... "[" ("_"?) TAG ["]"|" "] ...(COST?)...
+ *     - COST format(s):
+ *       "<" COST_FLOAT ">"
+ *
  *   + process with Coetmeur's flex++ to produce 'mootTokenLexer.cc'
  *----------------------------------------------------------------------*/
 
@@ -59,13 +62,18 @@
  * Format: 1 tok/line, comments introduced with '%%'.  Supports
  * multiple tags/tok.
  *
- * token-line format (TAB-separated)
+ * token-line format (TAB-separated):
  *
- * TOKEN_TEXT "\t" ANALYSIS_1 "\t" ... "\t" ANALYSIS_N "\n"
+ * TOKEN_TEXT  ANALYSIS_1 ... ANALYSIS_N
  *
- * analysis format:
+ * Analysis format(s):
  *
- *  TAG ":" ANALYSIS_DETAILS
+ * ...(COST?)... "[" ("_"?) TAG ["]"|" "] ...(COST?)...
+ *
+ * COST format(s):
+ *
+ * "<" COST_FLOAT ">"
+ *
  */
 
 %}
@@ -110,6 +118,8 @@
    moot::mootToken::Analysis manalysis;\
    /** last token type */ \
    TokenType lasttyp; \
+   /** whether we're parsing a 'best' tag */\
+   bool is_best; \
    \
    /* -- token-buffering */\
    /** token-buffer */\
@@ -143,6 +153,7 @@
   theLine(1), \
   theColumn(0), \
   lasttyp(TLEOS), \
+  is_best(false), \
   itokbuf_clear(true), \
   srcname("(unknown)"),\
   use_string(false), \
@@ -166,17 +177,21 @@
  *----------------------------------------------------------------------*/
 %x TAG
 %x DETAILS
+%x SEPARATORS
 %s TOKEN
 
 /*----------------------------------------------------------------------
  * Definitions
  *----------------------------------------------------------------------*/
 space      [ ]
+wordchar   [^ \t\n\r]
 tab        [\t]
+eotchar    [\t\n\r]
 newline    [\n\r]
-tagchar    [^\t\n\r\<\>\:\=]
 tokchar    [^\t\n\r]
-detchar    [^\t\n\r]
+detchar    [^ \t\n\r\<\>\[]
+tagchar    [^ \t\n\r\]]
+bestchar   [\/]
 
 /*----------------------------------------------------------------------
  * Rules
@@ -202,77 +217,77 @@ detchar    [^\t\n\r]
   lasttyp = TLIGNORE;
 }
 
-^{tokchar}* {
-  /* TOKEN: token text at beginning of string */
+
+<TOKEN>^{wordchar}+ {
+  /* TOKEN: non-empty token text */
   theColumn += yyleng;
   mtoken.clear();
-  mtoken.text((const char *)yytext);
+  mtoken.tok_text.append((const char *)yytext);
   lasttyp = TLTEXT;
-  BEGIN(TAG);
 }
 
-<TAG>{tab}+ {
-  //-- TAB: add & clear current analysis, if any
-  theColumn = (((int)theColumn/8)+1)*8;
-  if (lasttyp != TLTEXT) {
-    mtoken.insert(manalysis);
-    manalysis.clear();
-  }
+<TOKEN>{space}+/{wordchar} {
+  /* TOKEN: token-internal whitespace: keep it */
+  theColumn += yyleng;
+  mtoken.tok_text.append((const char *)yytext);
+  lasttyp = TLTEXT;
+}
+
+<TOKEN>{space}*/{eotchar} {
+  /* TOKEN: trailing whitespace: ignore it */
+  theColumn += yyleng;
+  lasttyp = TLTEXT;
+  BEGIN(SEPARATORS);
+}
+
+
+<SEPARATORS>{tab}({space}*) {
+  //-- SEPARATORS: Separator character(s): increment column nicely
+  theColumn = (((int)theColumn/8)+1)*8 + (yyleng ? yyleng-1 : 0);
   lasttyp = TLTAB;
 }
-
-<DETAILS>{tab}+ {
-  //-- TAB: add & clear current analysis, if any
-  theColumn = (((int)theColumn/8)+1)*8;
-  if (lasttyp != TLTEXT) {
-    mtoken.insert(manalysis);
-    manalysis.clear();
-  }
-  lasttyp = TLTAB;
-  BEGIN(TAG);
-}
-
-<TAG>"/"({tagchar}*) {
-   //-- TAG: best tag
-   theColumn += yyleng;
-   manalysis.tag.append((const char *)yytext+1);
-   mtoken.tok_besttag.append((const char *)yytext+1);
-   lasttyp = TLTAG;
-}
-
-<TAG>{tagchar}* {
-  //--  TAG: set in analysis
+<SEPARATORS>{bestchar}+({space}*) {
   theColumn += yyleng;
-  manalysis.tag.append((const char *)yytext);
-  lasttyp = TLTAG;
+  is_best = true;
 }
-
-<TAG>(" "*)":"(" "*) {
-  //-- COLON: switch to detail-mode
+<SEPARATORS>""/{wordchar} {
+  //-- SEPARATORS: end of separators
   theColumn += yyleng;
-  lasttyp = TLDETAILS;
   BEGIN(DETAILS);
 }
-
-<TAG>(" "*)/{newline} { BEGIN(DETAILS); }
-
-<DETAILS>(" "*){newline} {
-  //-- NEWLINE: add & clear current analysis, if any */
-  theLine++; theColumn = 0;
-  //-- add & clear current analysis, if any
-  if (lasttyp != TLTEXT) {
-    mtoken.insert(manalysis);
-    manalysis.clear();
-  }
-  //-- reset to initial state
+<SEPARATORS>{newline} {
+  //-- SEPARATORS/EOT: reset to initial state
   BEGIN(TOKEN);
   //-- return token flag (actual data is in 'mtoken' member)
   lasttyp = TLTOKEN;
   return TLTOKEN;
 }
 
-<TAG>"<"[0-9]*(\.?)([0-9]+)">"(" "*) {
-  //-- COST: add cost to current analysis
+
+<DETAILS>"["(_?)/{tagchar} {
+  //-- DETAILS: looks like a tag
+  theColumn += yyleng;
+  manalysis.details.append((const char *)yytext);
+  lasttyp = TLDETAILS;
+  BEGIN(TAG);
+}
+
+<DETAILS>{detchar}+ {
+  //-- DETAILS: detail text
+  theColumn += yyleng;
+  manalysis.details.append((const char *)yytext);
+  lasttyp = TLDETAILS;
+}
+
+<DETAILS>{space}+/{wordchar} {
+  //-- DETAILS: internal whitespace: keep it
+  theColumn += yyleng;
+  manalysis.details.append((const char *)yytext);
+  lasttyp = TLDETAILS;
+}
+
+<DETAILS>"<"([+-]?)[0-9]*(\.?)([0-9]+)">" {
+  //-- DETAILS/COST: add cost to current analysis
   theColumn += yyleng;
   moot::mootToken::Cost cost;
   sscanf((const char *)yytext+1, "%f", &cost);
@@ -280,12 +295,38 @@ detchar    [^\t\n\r]
   lasttyp = TLCOST;
 }
 
-<DETAILS>{detchar}+ {
-  /* analysis strings */
+<DETAILS>""/{eotchar} {
+  //-- DETAILS/EOD: add & clear current analysis, if any */
+  //-- add & clear current analysis, if any
+  if (lasttyp != TLTAB) {
+    //-- set default tag
+    if (manalysis.tag.empty()) {
+      manalysis.tag.swap(manalysis.details);
+      //manalysis.details.clear();
+    } 
+    mtoken.insert(manalysis);
+
+    //-- set best tag if applicable
+    if (is_best) {
+      mtoken.besttag(manalysis.tag);
+      is_best = false;
+    }
+
+    //-- clear
+    manalysis.clear();
+  }
+  BEGIN(SEPARATORS);
+}
+
+<TAG>{tagchar}+ {
+  //-- TAG: tag text
   theColumn += yyleng;
   manalysis.details.append((const char *)yytext);
-  lasttyp = TLDETAILS;
+  if (manalysis.tag.empty()) manalysis.tag = (const char *)yytext;
+  lasttyp = TLTAG;
+  BEGIN(DETAILS);
 }
+
 
 {space}+ {
   /* mostly ignore spaces */
@@ -295,18 +336,19 @@ detchar    [^\t\n\r]
 
 . {
   theColumn += yyleng;
-  yycarp("Unrecognized character '%c'", *yytext);
-}
-
-<TAG>. {
-  theColumn += yyleng;
-  yycarp("Unrecognized character '%c'", *yytext);
+  yycarp("Unrecognized TOKEN character '%c'", *yytext);
 }
 
 <DETAILS>. {
   theColumn += yyleng;
-  yycarp("Unrecognized character '%c'", *yytext);
+  yycarp("Unrecognized DETAIL character '%c'", *yytext);
 }
+
+<TAG>. {
+  theColumn += yyleng;
+  yycarp("Unrecognized TAG character '%c'", *yytext);
+}
+
 
 <<EOF>> {
   switch (lasttyp) {
@@ -330,7 +372,11 @@ detchar    [^\t\n\r]
  * Local Methods for mootTokenLexer
  *----------------------------------------------------------------------*/
 
-void mootTokenLexer::reset(void) { BEGIN(TOKEN); }
+void mootTokenLexer::reset(void)
+{
+  is_best = false;
+  BEGIN(TOKEN);
+}
 
 
 /*-----------------------------------------------------------------------
@@ -346,7 +392,7 @@ void mootTokenLexer::select_streams(FILE *in, FILE *out)
   // -- black magic from flex(1) manpage
   if (yy_current_buffer != NULL) { yy_delete_buffer(yy_current_buffer); }
   yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
-  BEGIN(TOKEN);
+  reset();
 }
 
 /*
@@ -358,6 +404,8 @@ void mootTokenLexer::select_string(const char *in, FILE *out) {
   // -- string-buffer stuff
   use_string = true;
   stringbuf = (char *)in;
+
+  reset();
 }
 
 /*

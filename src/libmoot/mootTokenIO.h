@@ -99,15 +99,24 @@ public:
 class TokenWriter {
 public:
   /*----------------------------------------
-   * Types: Writing: Data
+   * Wrting: Data
    */
+  /** Whether to output all PoS tags or just the 'best' tag (the default). */
+  bool want_best_only;
+  /** Whether to output all analyses (default) for each tag we output, or just the tag. */
+  bool want_tags_only;
+      
+  /** Temporary buffer for stringification of costs */
   char costbuf[32];
 
+public:
   /*----------------------------------------
-   * Types: Writing: Methods
+   * Writing: Methods
    */
   /** Default constructor */
-  TokenWriter(void) {};
+  TokenWriter(bool i_want_best_only=false, bool i_want_tags_only=false)
+    : want_best_only(i_want_best_only), want_tags_only(i_want_tags_only)
+  {};
 	
   /** Generate canonical string-form of a mootToken (without trailing newline) */
   string token_string(const mootToken &token);

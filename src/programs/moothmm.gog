@@ -50,12 +50,18 @@ string "output"	o "Specify output file (default=stdout)." \
     default="-"
 
 #---------------------------------------------------
-# Output format options
+# Output options
 #---------------------------------------------------
-#group "Output Format Options"
+group "Output Format Options"
 
 #flag "avm"       a "Produce AVM ('vector') output." \
 #    details="Ambiguous-mode only"
+
+flag  "best"  b "Prune non-optimal tags (analyses) from the output." \
+     details="Only meaningful if your input file contains analysis restrictions."
+
+flag  "tags"  t "Output only PoS tags, not detailed analyses." \
+     details="Useful for compatibility with older programs."
 
 #-----------------------------------------------------------------------------
 # Compilation Options
