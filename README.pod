@@ -1,12 +1,12 @@
 =pod
 
-README for package 'moot'
+README for package 'moot' (formerly 'dwdst')
 
-Last updated for moot version 1.0.1
+Last updated for moot version 1.0.4
 
 =head1 DESCRIPTION
 
-moot - Part-of-Speech tagger using Thomas Hanneforth's libFSM.
+moot - moocow's part-of-speech tagger.
 
 =head1 REQUIREMENTS
 
@@ -16,15 +16,14 @@ moot - Part-of-Speech tagger using Thomas Hanneforth's libFSM.
 
 Available from http://www.stlport.org
 
-Since libFSM now compiles with gcc >= v3.0, the STLport
-dependency's days may be numbered.  At the moment, STLport
-is still required.
+Only required for building with gcc-2.x.
 
 
 =item pkg-config
 
 Available from:
 http://www.freedesktop.org/software/pkgconfig/
+
 
 
 =item flex++ , bison++
@@ -35,6 +34,7 @@ ftp://iecc.com/pub/file/bison++flex++
 
 or from the official distribution site of
 this package.
+Tested with flex++-v2.3.8-4 and bison++-v1.21-5.
 
 
 =item libbumble E<gt>= 1.13.5
@@ -105,18 +105,17 @@ You will also need the Getopt::Gen perl module,
 which should be available from wherever you acquired
 these sources.
 
+
 =head1 KNOWN BUGS
 
 Morphology is still quite slow.
 
 No distribution site.
 
-No HMM trainer (use tnt-para(1)).
-
 
 =head1 ACKNOWLEDGEMENTS
 
-This package was developed as part of the KDWDS project
+This package was developed in part in the context of the KDWDS project
 ("Kollokationen im Digitalen Wörterbuch der deutschen Sprache"
 = "collocations in the digital dictionary of the German language")
 at the Berlin-Brandenburgische Akademie der Wissenschaften.
