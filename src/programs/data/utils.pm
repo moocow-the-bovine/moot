@@ -10,7 +10,7 @@ use IO::File;
 ##                 "$tag1\t$tag2\t$tag3"=>$count
 ##                 __HAPAX__=>{$hapax_tag=>...}, }
 
-our $ignore_eos_ugtotal = 0;
+our $ignore_eos_ugtotal = 1;
 our $EOS = "__\$";
 our $TOTAL = '';
 
@@ -49,6 +49,25 @@ sub load_123 {
 
   $ngfh->close();
   return $ngs;
+}
+
+##--------------------------------------------------------------
+## \%ugs = ngs2ugs(\%ngrams,\%options)
+##   + %options:
+##     ignore_eos=>$bool=0
+##     ignore_total=>$bool=0
+sub ngs2ugs {
+  my ($ngrams,$options) = @_;
+  $options = {} if (!defined($options));
+  my $ugs = {};
+  my ($k,$v);
+  while (($k,$v) = each(%$ngs)) {
+    next if ($k eq $TOTAL && $options->{ignore_total});
+    next if ($k eq $EOS   && $options->{ignore_eos});
+    next if ($k =~ /\t/);
+    $ugs->{$k} = $v;
+  }
+  return $ugs;
 }
 
 ##--------------------------------------------------------------
@@ -101,5 +120,54 @@ sub lex2unigrams {
 
   return $ngs;
 }
+
+##--------------------------------------------------------------
+## MLE
+
+## \%probs = mle(\%counts)
+##  + do general ML estimation
+sub mle {
+  my $counts = shift;
+  my $total = sum([values(%$counts)]);
+  my $probs = { %$counts };
+  foreach (values(%$probs)) {
+    $_ /= $total;
+  }
+  return $probs;
+}
+
+
+
+##--------------------------------------------------------------
+## Samuelsson smoothing
+
+## $M = cs_M(\@probs)
+## $M = cs_M(\@probs,$logbase)
+## $M = cs_M(\%probs)
+## $M = cs_M(\%probs,$logbase)
+##  + defined s.t. entropy(uniform($M)) = entropy(\@probs)
+sub cs_M {
+  my ($probs,$logbase) = @_;
+  $logbase = (defined($logbase) ? exp(1) : 2) if (!$logbase);
+  my $H = entropyN($probs,$logbase);
+  my $M = $logbase ** $H;
+  return $M;
+}
+
+## $sigma0 = cs_sigma0(\@probs)
+## $sigma0 = cs_sigma0(\%dist)
+##  + get std dev of uniform dist w/ entropy of \%dist
+sub cs_sigma0 {
+  my $M = cs_M(@_);
+  return sqrt(($M**2 - 1)/12);
+}
+
+## $sigma = cs_sigma(\@probs_C_k_minus_1, $sizeof_C_k)
+sub cs_sigma {
+  my $pCk1 = shift;
+  my $sizeofCk = shift || distsize($pCk1);
+  return cs_sigma0($pCk1) / sqrt($sizeofCk);
+}
+
 
 1;

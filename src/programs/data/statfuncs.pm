@@ -13,9 +13,15 @@ our $PI = 3.14195;
 ##--------------------------------------------------------------
 ## Logarithms
 
-## $log = log2($n)
+## $log = log2($x)
 ##  + compute base-2 logarithms
 sub log2 ($) { return $_[0] ? log(shift)/log(2) : 0; }
+
+## $logN = logN($x,$base)
+##  + computes base ${base} logarithm of $x
+sub logN {
+  return $_[0] ? ($_[1] ? log($_[0])/log($_[1]) : log($_[0])) : 0;
+}
 
 ##--------------------------------------------------------------
 ## Factorial
@@ -133,28 +139,71 @@ sub uniform {
 ## Information Theory : Entropy
 
 ## $nbits = msglen($prob)
+## $nbits = msglen($prob,$logbase)
 ##   + get (unweighted) message-length (in bits) for event of probability $prob
-sub msglen ($) {
-  return $_[0] ? log2(1/shift) : 0;
+sub msglen {
+  my ($prob,$logbase) = @_;
+  $logbase = 2 if (!defined($logbase));
+  return $prob ? logN(1/$prob,$logbase) : 0;
 }
 
-## $entropy = entroy(@probs)
+## $entropy = entropy(@probs)
+## $entropy = entropy(\@probs)
+## $entropy = entropy(\%dist)
 ##   + get entropy for a discrete random variable,
 ##     given probabilities for all possible outcomes
 sub entropy {
+  my @probs;
+  if ($#_ == 0 && ref($_[0])) {
+    if (ref($_[0]) =~ /^ARRAY/) {
+      @probs = @{$_[0]};
+    }
+    elsif (ref($_[0]) =~ /^HASH/) {
+      @probs = values(%{$_[0]});
+    }
+    else {
+      warn("can't handle ", ref($_[0]), " reference!\n");
+    }
+  } else {
+    @probs = @_;
+  }
   my $H = 0;
-  foreach (@_) {
+  foreach (@probs) {
     $H += ($_ * msglen($_));
+  }
+  return $H;
+}
+
+## $H = entropyN(\@probs,$logbase)
+## $H = entropyN(\%dist,$logbase)
+##   + get entropy for a discrete random variable,
+##     given probabilities for all possible outcomes
+##     and optional log base.
+sub entropyN {
+  my ($probs,$logbase) = @_;
+  my $H = 0;
+  if (ref($probs) =~ /^HASH/) {
+    ##-- handle hash-distributions
+    $probs = [values(%$probs)];
+  }
+  foreach (@$probs) {
+    $H += ($_ * msglen($_,$logbase));
   }
   return $H;
 }
 
 ## $H = entropy2(@values)
 ##   + just like entropy(), phrased differently
-sub entropy2 { sum([@_], sub { $_[0]*msglen($_[0]) }); }
+sub entropy2 {
+  return sum([@_], sub { $_[0]*msglen($_[0]) });
+}
 
 ## $H = entropy_dist(\%dist)
-sub entropy_dist { return entropy(values(%{$_[0]})); }
+## $H = entropy_dist(\%dist,$logbase)
+sub entropy_dist {
+  my ($dist,$logbase) = @_;
+  return entropyN([values(%$dist)], $logbase);
+}
 
 
 ## $max_H = max_entropy($nprobs)
@@ -309,5 +358,20 @@ sub dist2latex {
   }
   return $s;
 }
+
+##--------------------------------------------------------------
+## General: discrete distribution size
+
+## $n = distsize(@_)
+## $n = distsize(\@probs)
+## $n = distsize(\%dist)
+sub distsize {
+  if ($#_ == 0 && ref($_[0])) {
+    return scalar(@{$_[0]}) if (ref($_[0]) =~ /^ARRAY/);
+    return scalar(values(%{$_[0]})) if (ref($_[0]) =~ /^HASH/);
+  }
+  return scalar(@_);
+}
+
 
 1;
