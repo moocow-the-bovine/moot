@@ -128,8 +128,8 @@ fi
 dnl zlib: headers
 for h in zlib.h ; do
   AC_CHECK_HEADER($h,
-	[fsm_have_header="yes"], [fsm_have_header="no"], [ ])
-  if test "$fsm_have_header" = "no" ; then
+	[moot_have_header="yes"], [moot_have_header="no"], [ ])
+  if test "$moot_have_header" = "no" ; then
     AC_MSG_WARN([Required zlib header '$h' not found!])
     AC_MSG_WARN([Are the zlib headers in your 'CPPFLAGS' environment variable?])
     AC_MSG_ERROR([Required package not found -- aborting.])

@@ -9,6 +9,7 @@ moot-pargen.pod
 moot-fstgen.pod
 dwdshmm.pod
 moothmm.pod
+*.tmp
 *.gog
 *.html
 *.txt

@@ -2,7 +2,7 @@
 Name: @PACKAGE@
 Version: @VERSION@
 Release: @BINDIST_RELEASE@
-Copyright: Copyright (c) 2002-2003 by Bryan Jurish.  All Rights Reserved.
+Copyright: Copyright (c) 2002-2004 by Bryan Jurish.  All Rights Reserved.
 Summary: moocow's part-of-speech tagger.
 Group: dev
 Source: @PACKAGE@-@VERSION@.tar.gz
