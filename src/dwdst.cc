@@ -83,24 +83,14 @@ FSMSymSpec *dwds_tagger::load_symbols(char *filename)
  */
 FSM *dwds_tagger::load_fsm_file(char *filename, FSM **fsm, bool *i_made_fsm=NULL)
 {
-  int fsmtype;
-
   // -- cleanup old FSM first
-  if (*fsm && i_made_fsm && *i_made_fsm) (*fsm)->fsm_free();
+  if (*fsm && i_made_fsm && *i_made_fsm) { delete *fsm; }
 
   *fsm = new FSM(filename);
-  fsmtype = (*fsm)->fsm_type();
-  if (!*fsm || !(*fsm)->representation()
-      // HACK!
-      || (fsmtype != FSMTypeTransducer &&
-	  fsmtype != FSMTypeWeightedTransducer &&
-	  fsmtype != FSMTypeSubsequentialTransducer &&
-	  fsmtype != FSMTypeAcceptor &&
-	  fsmtype != FSMTypeWeightedAcceptor))
-    {   
-      fprintf(stderr,"\ndwds_tagger::load_fsm_file() Error: load failed for FST file '%s'.\n", filename);
-      *fsm = NULL; // -- invalidate the object
-    }
+  if (!**fsm) {
+    fprintf(stderr,"\ndwds_tagger::load_fsm_file() Error: load failed for FST file '%s'.\n", filename);
+    *fsm = NULL; // -- invalidate the object
+  }
   if (i_made_fsm) { *i_made_fsm = true; }
   return *fsm;
 }
@@ -110,11 +100,11 @@ FSM *dwds_tagger::load_fsm_file(char *filename, FSM **fsm, bool *i_made_fsm=NULL
  * dwds_tagger::~dwds_tagger()
  */
 dwds_tagger::~dwds_tagger() {
-  if (tmp) tmp->fsm_free();
+  if (tmp) delete tmp;
   if (syms && i_made_syms) delete syms;
-  if (morph && i_made_morph) morph->fsm_free();
-  if (ufsa && i_made_ufsa) ufsa->fsm_free();
-  if (dfsa && i_made_dfsa) dfsa->fsm_free();
+  if (morph && i_made_morph) delete morph;
+  if (ufsa && i_made_ufsa) delete ufsa;
+  if (dfsa && i_made_dfsa) delete dfsa;
 
   syms = NULL;
   morph = NULL;
@@ -146,7 +136,7 @@ inline void dwds_tagger::tag_token(void)
     results.clear();
     
     /*--all features, strings */
-    tmp->fsm_strings(syms, &results, false, want_avm);
+    tmp->fsm_strings(*syms, results, false, want_avm);
     if (verbose && results.empty()) nunknown++;
     if (want_tnt_format) {
       /*-- all features, one tok/line */
@@ -176,7 +166,10 @@ inline void dwds_tagger::tag_token(void)
       /*-- tags-only, one tok/line */
       for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
 	fputc('\t', outfile);
-	fputs(*(tri->c_str()) == '_' ? tri->c_str()+1 : tri->c_str(), outfile);
+	fputs(want_avm && *(tri->c_str()) == '_'
+	      ? tri->c_str()+1
+	      : tri->c_str(),
+	      outfile);
       }
       fputc('\n', outfile);
     } else { /*-- want_tnt_format */
@@ -184,7 +177,10 @@ inline void dwds_tagger::tag_token(void)
       fprintf(outfile, ": %d Analyse(n)\n", tagresults.size());
       for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
 	fputs("\t[", outfile);
-	fputs(tri->c_str(), outfile);
+	fputs(want_avm && *(tri->c_str()) == '_'
+	      ? tri->c_str()+1
+	      : tri->c_str(),
+	      outfile);
 	fputs("]\n", outfile);
       }
       fputc('\n',outfile);
@@ -288,7 +284,7 @@ set<FSMSymbol> *dwds_tagger::get_fsm_tags(FSM *fsa, set<FSMSymbol> *tags=NULL)
   FSMState q0;
   FSMTransitions *arcs;
   FSMTransition  *arc;
-  FSMBaseRepresentation *rep = fsa->representation();
+  FSMRepresentation *rep = fsa->fsm_representation();
 
   // -- ensure 'tags' is defined
   if (!tags) tags = new set<FSMSymbol>();

@@ -21,10 +21,8 @@ using namespace std;
  */
 dwds_tagger_trainer::~dwds_tagger_trainer()
 {
-    if (ufsa) ufsa->fsm_free();
-    ufsa = NULL;
-    if (dfsa) dfsa->fsm_free();
-    dfsa = NULL;
+  // -- do nothing
+  ;
 }
 
 /*--------------------------------------------------------------------------
@@ -94,7 +92,7 @@ set<FSMSymbolString> dwds_tagger_trainer::read_taglist_file(set<FSMSymbolString>
  */
 FSM *dwds_tagger_trainer::generate_unknown_fsa()
 {
-  FSMBaseRepresentation *base;
+  FSMRepresentation *base;
   FSMState q0;
   set<FSMState> pstates;
   set<FSMState>::iterator ps;
@@ -107,7 +105,7 @@ FSM *dwds_tagger_trainer::generate_unknown_fsa()
   }
 
   // -- add start state
-  base = ufsa->representation();
+  base = ufsa->fsm_representation();
   q0 = base->set_start_state(base->add_state(base->new_state()));
 
   // -- return an FSA ambiguous between all tags in 'tagset'
@@ -151,7 +149,7 @@ set<FSMState>
 dwds_tagger_trainer::fsm_add_pos_arc(FSM *fsm, const FSMState qfrom, const FSMSymbolString &pos,
 				     const FSMWeight cost = FSM_default_cost_structure.freecost())
 {
-  FSMBaseRepresentation *base = fsm->representation();
+  FSMRepresentation *base = fsm->fsm_representation();
   FSMState qi;
   set<FSMState> pstates;
 
@@ -334,7 +332,7 @@ inline void dwds_tagger_trainer::train_next_token(void)
       if (want_features) {
 	// -- all features
 	results.clear();
-	tmp->fsm_strings(syms, &results, false, want_avm);
+	tmp->fsm_strings(*syms, results, false, want_avm);
 
 	// -- set curtags to full string results
 	for (ri = results.begin(); ri != results.end(); ri++) {

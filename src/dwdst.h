@@ -76,22 +76,22 @@ protected:
   char *token;
 
   // -- all features, string-mode
-  set<FSMStringWeight> results;
-  set<FSMStringWeight>::iterator ri;
+  set<FSM::FSMStringWeight> results;
+  set<FSM::FSMStringWeight>::iterator ri;
 
   // -- tags only, strings
   set<FSMSymbolString> tagresults;
   set<FSMSymbolString>::iterator tri;
 
 
-  // -- all features, numeric
-  set<FSMSymbolVectorWeight> nresults;
-  set<FSMSymbolVectorWeight>::iterator nri;
-  // -- tags only, numeric
+  //// -- all features, numeric
+  //set<FSMSymbolVectorWeight> nresults;
+  //set<FSMSymbolVectorWeight>::iterator nri;
+  //// -- tags only, numeric
   set<FSMSymbol> ntagresults;
   set<FSMSymbol>::iterator ntri;
-  // -- numeric vector-iterator
-  FSMSymbolVector::const_iterator vi;
+  //// -- numeric vector-iterator
+  //FSMSymbolVector::const_iterator vi;
 
 public:
   // -- public methods: constructor/destructor

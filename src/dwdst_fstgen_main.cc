@@ -138,7 +138,9 @@ int main (int argc, char **argv)
       fprintf(stderr, "%s: saving analysis FSA for unknown tokens to file '%s'...",
 	      PROGNAME, args.output_file_arg);
     }
-    FSM *ufsa_t = dwdstt.ufsa->fsm_convert(FSM::FSMCTTable);
+    //FSM *ufsa_t =
+    dwdstt.ufsa->fsm_convert(FSM::FSMCTTable);
+    FSM *ufsa_t = dwdstt.ufsa;
     if (!ufsa_t->fsm_save_to_binary_file(args.output_file_arg)) {
       fprintf(stderr, "\n%s Error: could not save analysis FSA for unknown tokens to file '%s'.\n",
 	      PROGNAME, args.output_file_arg);
@@ -146,7 +148,7 @@ int main (int argc, char **argv)
     } else if (args.verbose_arg > 0) {
       fprintf(stderr, " saved.\n");
     }
-    ufsa_t->fsm_free();
+    //ufsa_t->fsm_free();
   }
   else if (args.disambig_given) {
     //-------------------------------------------
