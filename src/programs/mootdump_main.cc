@@ -40,10 +40,13 @@
 #include <mootNgrams.h>
 
 #include <mootUtils.h>
+#include <mootCIO.h>
+
 #include "mootdump_cmdparser.h"
 
 using namespace std;
 using namespace moot;
+using namespace mootio;
 
 /*--------------------------------------------------------------------------
  * Globals
@@ -54,7 +57,7 @@ char *PROGNAME = "mootdump";
 gengetopt_args_info  args;
 
 // -- files
-cmdutil_file_info out;
+mofstream out;
 
 // -- global classes/structs
 mootHMM        hmm;
@@ -87,11 +90,9 @@ void GetMyOptions(int argc, char **argv)
 	    PROGNAME, VERSION);
 
   //-- output file
-  out.name = args.output_arg;
-  if (strcmp(out.name,"-") == 0) out.name = "<stdout>";
-  if (!out.open("w")) {
+  if (!out.open(args.output_arg,"w")) {
     fprintf(stderr,"%s: open failed for output-file '%s': %s\n",
-	    PROGNAME, out.name, strerror(errno));
+	    PROGNAME, out.name.c_str(), strerror(errno));
     exit(1);
   }
 
@@ -119,7 +120,8 @@ int main (int argc, char **argv)
 
   //-- produce text dump
   if (args.verbose_arg > 1)
-    fprintf(stderr, "%s: writing HMM text dump to '%s' ...", PROGNAME, out.name);
+    fprintf(stderr, "%s: writing HMM text dump to '%s' ...",
+	    PROGNAME, out.name.c_str());
 
   hmm.txtdump(out.file);
 

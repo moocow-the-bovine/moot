@@ -103,14 +103,50 @@ string "output"	o "Specify output file (default=stdout)." \
 #---------------------------------------------------
 group "Format Options"
 
-flag  "ignore-first" 2 "Ignore the first analysis for each input token." \
-    details="Useful for re-analysis."
+string "input-format" I "Specify input file(s) format(s)." \
+    arg="FORMAT" \
+    details="
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
 
-flag  "best"  b "Prune non-optimal tags (analyses) from the output." \
-     details="Only meaningful if your input file contains analysis restrictions."
+Default='MediumRare'
 
-#flag  "tags"  t "Output only PoS tags, not detailed analyses." \
-#     details="Useful for compatibility with older programs."
+See 'I/O Format Flags' in L<mootfiles> for details.
+"
+
+string "output-format" O "Specify output file format." \
+  arg="FORMAT" \
+  details="
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+
+Default='WellDone'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+"
+
+string "input-encoding" - "Override XML document input encoding." \
+    arg="ENCODING" \
+    details="
+Potentially useful for XML documents without encoding declarations.
+"
+
+string "output-encoding" - "Set default XML output encoding." \
+    arg="ENCODING" \
+    details="
+Slower, but potentially useful for human-readable XML output.
+"
+
+#flag  "ignore-first" 2 "Ignore the first analysis for each input token." \
+#    details="Useful for re-analysis."
+#
+#flag  "best"  b "Prune non-optimal tags (analyses) from the output." \
+#     details="Only meaningful if your input file contains analysis restrictions."
+#
+##flag  "tags"  t "Output only PoS tags, not detailed analyses." \
+##     details="Useful for compatibility with older programs."
 
 #-----------------------------------------------------------------------------
 # Compilation Options

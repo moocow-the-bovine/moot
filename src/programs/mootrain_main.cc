@@ -45,12 +45,16 @@
 #include <mootLexfreqs.h>
 #include <mootClassfreqs.h>
 #include <mootHMMTrainer.h>
-
+#include <mootTokenIO.h>
+#include <mootTokenExpatIO.h>
+#include <mootCIO.h>
 #include <mootUtils.h>
+
 #include "mootrain_cmdparser.h"
 
 using namespace std;
 using namespace moot;
+using namespace mootio;
 
 /*--------------------------------------------------------------------------
  * Globals
@@ -62,9 +66,9 @@ gengetopt_args_info  args;
 cmdutil_file_churner churner;
 
 // -- files
-cmdutil_file_info lfout;
-cmdutil_file_info ngout;
-cmdutil_file_info lcout;
+mofstream lfout;
+mofstream ngout;
+mofstream lcout;
 
 // -- global classes/structs
 mootHMMTrainer  hmmt;
@@ -72,6 +76,14 @@ mootLexfreqs   &lexfreqs = hmmt.lexfreqs;
 mootNgrams     &ngrams   = hmmt.ngrams;
 mootClassfreqs &lcfreqs  = hmmt.lcfreqs;
 
+//-- token i/o
+int ifmt         = tiofNone;
+int ifmt_implied = tiofTagged;
+int ifmt_default = tiofWellDone;
+
+TokenReader *reader = NULL;
+
+//-- verbosity level
 typedef enum {
   vlSilent=0,
   vlErrors=1,
@@ -115,7 +127,7 @@ void GetMyOptions(int argc, char **argv)
       exit(1);
     }
   } else if (args.inputs_num > 0) {
-    string mymodel = unextend(args.inputs[0]);
+    string mymodel = moot_unextend(args.inputs[0]);
 
     if (!hmm_parse_model_name_text(mymodel, lexfile, ngfile, lcfile)) {
       fprintf(stderr, "%s: could not get output model from corpus-name '%s'\n",
@@ -145,40 +157,57 @@ void GetMyOptions(int argc, char **argv)
 
   // -- open output files
   if (hmmt.want_lexfreqs) {
-    lfout.name = strdup(lexfile.c_str());
-    if (!lfout.open("w")) {
+    if (!lfout.open(lexfile, "w")) {
       fprintf(stderr, "%s: open failed for lexical frequency file '%s': %s\n",
-	      PROGNAME, lfout.name, strerror(errno));
+	      PROGNAME, lfout.name.c_str(), strerror(errno));
       exit(1);
     }
   }
   if (hmmt.want_ngrams) {
-    ngout.name = strdup(ngfile.c_str());
-    if (!ngout.open("w")) {
+    if (!ngout.open(ngfile,"w")) {
       fprintf(stderr, "%s: open failed for ngram frequency file '%s': %s\n",
-	      PROGNAME, ngout.name, strerror(errno));
+	      PROGNAME, ngout.name.c_str(), strerror(errno));
       exit(1);
     }
   }
   if (hmmt.want_classfreqs) {
-    lcout.name = strdup(lcfile.c_str());
-    if (!lcout.open("w")) {
+    if (!lcout.open(lcfile,"w")) {
       fprintf(stderr, "%s: open failed for class frequency file '%s': %s\n",
-	      PROGNAME, lcout.name, strerror(errno));
+	      PROGNAME, lcout.name.c_str(), strerror(errno));
       exit(1);
     }
   }
+
+  //-- i/o format : input
+  ifmt = TokenIO::parse_format_request(args.input_format_arg,
+				       (args.inputs_num>0 ? args.inputs[0] : NULL),
+				       ifmt_implied,
+				       ifmt_default);
+
+  //-- io: new_reader
+  reader = TokenIO::new_reader(ifmt);
+  if (!reader) {
+    fprintf(stderr, "%s: Error: could not set up TokenReader!\n");
+    exit(1);
+  }
+
+#ifdef MOOT_EXPAT_ENABLED
+  //-- io: encoding: reader
+  if (ifmt&tiofXML && args.input_encoding_given) {
+    ((TokenReaderExpat *)reader)->setEncoding(string(args.input_encoding_arg));
+  }
+#endif
 
   //-- report
   if (args.verbose_arg >= vlProgress) {
     //fprintf(stderr, "%s: kmax               : %d\n", PROGNAME, hmmt.kmax);
     fprintf(stderr, "%s: EOS tag            : %s\n", PROGNAME, hmmt.eos_tag.c_str());
     fprintf(stderr, "%s: Lexical frequenies : %s\n", PROGNAME,
-	    lfout.name ? lfout.name : "(null)");
+	    !lfout.name.empty() ? lfout.name.c_str() : "(null)");
     fprintf(stderr, "%s: Ngram frequencies  : %s\n", PROGNAME,
-	    ngout.name ? ngout.name : "(null)");
+	    !ngout.name.empty() ? ngout.name.c_str() : "(null)");
     fprintf(stderr, "%s: Class frequencies  : %s\n", PROGNAME,
-	    lcout.name ? lcout.name : "(null)");
+	    !lcout.name.empty() ? lcout.name.c_str() : "(null)");
   }
 }
   
@@ -202,33 +231,37 @@ int main (int argc, char **argv)
 
   //-- initialize summary info
   if (hmmt.want_lexfreqs) {
-    fprintf(lfout.file, "%s %s lexical frequency file generated on %s",
-	    cmts, PROGNAME, asctime(&now_tm));
+    lfout.printf("%s %s lexical frequency file generated on %s",
+		 cmts, PROGNAME, asctime(&now_tm));
   }
   if (hmmt.want_ngrams) {
-    fprintf(ngout.file, "%s %s ngram frequency file generated on %s",
-	    cmts, PROGNAME, asctime(&now_tm));
+    ngout.printf("%s %s ngram frequency file generated on %s",
+		 cmts, PROGNAME, asctime(&now_tm));
   }
   if (hmmt.want_classfreqs) {
-    fprintf(lcout.file, "%s %s class frequency file generated on %s",
-	    cmts, PROGNAME, asctime(&now_tm));
+    lcout.printf("%s %s class frequency file generated on %s",
+		 cmts, PROGNAME, asctime(&now_tm));
   }
 
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
     nfiles++;
     if (args.verbose_arg >= vlProgress) {
-      fprintf(stderr,"%s: training from file '%s'...", PROGNAME, churner.in.name);
+      fprintf(stderr,"%s: training from file '%s'...",
+	      PROGNAME, churner.in.name.c_str());
       fflush(stderr);
     }
-    if (lfout.file)
-      fprintf(lfout.file, "%s  Corpus     : %s\n", cmts, churner.in.name);
-    if (ngout.file)
-      fprintf(ngout.file, "%s  Corpus      : %s\n", cmts, churner.in.name);
-    if (lcout.file)
-      fprintf(lcout.file, "%s  Corpus        : %s\n", cmts, churner.in.name);
+    if (lfout.valid())
+      lfout.printf("%s  Corpus     : %s\n", cmts, churner.in.name.c_str());
+    if (ngout.valid())
+      ngout.printf("%s  Corpus      : %s\n", cmts, churner.in.name.c_str());
+    if (lcout.valid())
+      lcout.printf("%s  Corpus        : %s\n", cmts, churner.in.name.c_str());
 
-    hmmt.train_from_stream(churner.in.file, churner.in.name);
+    reader->from_mstream(&churner.in);
+    reader->reader_name(churner.in.name);
+    hmmt.train_from_reader(reader);
+    reader->close();
     
     if (args.verbose_arg >= vlProgress) {
       fprintf(stderr," done.\n");
@@ -248,18 +281,21 @@ int main (int argc, char **argv)
       fprintf(stderr, "done.\n");
 
     if (args.verbose_arg >= vlProgress)
-      fprintf(stderr, "%s: saving lexical frequency file '%s'...", PROGNAME, lfout.name);
+      fprintf(stderr, "%s: saving lexical frequency file '%s'...",
+	      PROGNAME, lfout.name.c_str());
 
     //-- print summary to file
-    fprintf(lfout.file, "%s  Num/Tokens : %g\n", cmts, hmmt.lexfreqs.n_tokens);
-    fprintf(lfout.file, "%s  Num/Types  : %u\n", cmts, hmmt.lexfreqs.lftable.size());
-    fprintf(lfout.file, "%s  Num/Tags   : %u\n", cmts, hmmt.lexfreqs.tagtable.size());
-    fprintf(lfout.file, "%s  Num/Pairs  : %u tok*tag\n", cmts, hmmt.lexfreqs.n_pairs());
+    if (lfout.valid()) {
+      lfout.printf("%s  Num/Tokens : %g\n", cmts, hmmt.lexfreqs.n_tokens);
+      lfout.printf("%s  Num/Types  : %u\n", cmts, hmmt.lexfreqs.lftable.size());
+      lfout.printf("%s  Num/Tags   : %u\n", cmts, hmmt.lexfreqs.tagtable.size());
+      lfout.printf("%s  Num/Pairs  : %u tok*tag\n", cmts, hmmt.lexfreqs.n_pairs());
+    }
 
     //-- lexfreqs: save: guts
-    if (!hmmt.lexfreqs.save(lfout.file, lfout.name)) {
+    if (!hmmt.lexfreqs.save(lfout.file, lfout.name.c_str())) {
       fprintf(stderr, "\n%s: save FAILED for lexical frequency file '%s'\n",
-	      PROGNAME, lfout.name);
+	      PROGNAME, lfout.name.c_str());
       exit(2);
     } else if (args.verbose_arg >= vlProgress) {
       fprintf(stderr, " saved.\n");
@@ -267,25 +303,23 @@ int main (int argc, char **argv)
     lfout.close();
   }
 
-
   // -- save: n-grams
   if (hmmt.want_ngrams) {
     if (args.verbose_arg >= vlProgress)
       fprintf(stderr, "%s: saving ngram frequency file '%s'...",
-	      PROGNAME, ngout.name);
+	      PROGNAME, ngout.name.c_str());
 
     //-- finish summary
-    fprintf(ngout.file, "%s  EOS Tag     : %s\n", cmts, hmmt.eos_tag.c_str());
-    //fprintf(ngout.file, "%s  kmax        : %u\n", cmts, hmmt.kmax);
-    fprintf(ngout.file, "%s  Num/Tokens  : %g\n", cmts, hmmt.lexfreqs.n_tokens);
-    fprintf(ngout.file, "%s  Num/1-grams : %u\n", cmts, hmmt.ngrams.ngtable.size());
-    fprintf(ngout.file, "%s  Num/2-grams : %u\n", cmts, hmmt.ngrams.n_bigrams());
-    fprintf(ngout.file, "%s  Num/3-grams : %u\n", cmts, hmmt.ngrams.n_trigrams());
+    ngout.printf("%s  EOS Tag     : %s\n", cmts, hmmt.eos_tag.c_str());
+    ngout.printf("%s  Num/Tokens  : %g\n", cmts, hmmt.lexfreqs.n_tokens);
+    ngout.printf("%s  Num/1-grams : %u\n", cmts, hmmt.ngrams.ngtable.size());
+    ngout.printf("%s  Num/2-grams : %u\n", cmts, hmmt.ngrams.n_bigrams());
+    ngout.printf("%s  Num/3-grams : %u\n", cmts, hmmt.ngrams.n_trigrams());
 
     //-- guts
-    if (!hmmt.ngrams.save(ngout.file, ngout.name, !args.verbose_ngrams_given)) {
+    if (!hmmt.ngrams.save(ngout.file, ngout.name.c_str(), !args.verbose_ngrams_given)) {
       fprintf(stderr, "\n%s: save FAILED for n-gram frequency file '%s'\n",
-	      PROGNAME, ngout.name);
+	      PROGNAME, ngout.name.c_str());
       exit(2);
     } else if (args.verbose_arg >= vlProgress) {
       fprintf(stderr, " saved.\n");
@@ -297,19 +331,20 @@ int main (int argc, char **argv)
   //-- save: classfreqs
   if (hmmt.want_classfreqs) {
     if (args.verbose_arg >= vlProgress)
-      fprintf(stderr, "%s: saving class frequency file '%s'...", PROGNAME, lcout.name);
+      fprintf(stderr, "%s: saving class frequency file '%s'...",
+	      PROGNAME, lcout.name.c_str());
 
     //-- print summary to file
-    fprintf(lcout.file, "%s  Num/Tokens    : %g\n", cmts, hmmt.lcfreqs.totalcount);
-    fprintf(lcout.file, "%s  Num/Classes   : %u\n", cmts, hmmt.lcfreqs.lctable.size());
-    fprintf(lcout.file, "%s  Num/Tags      : %u\n", cmts, hmmt.lcfreqs.tagtable.size());
-    fprintf(lcout.file, "%s  Num/Pairs     : %u class*tag\n", cmts, hmmt.lcfreqs.n_pairs());
-    fprintf(lcout.file, "%s  - Impossibles : %u class*tag\n", cmts, hmmt.lcfreqs.n_impossible());
+    lcout.printf("%s  Num/Tokens    : %g\n", cmts, hmmt.lcfreqs.totalcount);
+    lcout.printf("%s  Num/Classes   : %u\n", cmts, hmmt.lcfreqs.lctable.size());
+    lcout.printf("%s  Num/Tags      : %u\n", cmts, hmmt.lcfreqs.tagtable.size());
+    lcout.printf("%s  Num/Pairs     : %u class*tag\n", cmts, hmmt.lcfreqs.n_pairs());
+    lcout.printf("%s  - Impossibles : %u class*tag\n", cmts, hmmt.lcfreqs.n_impossible());
 
     //-- classfreqs: save: guts
-    if (!hmmt.lcfreqs.save(lcout.file, lcout.name)) {
+    if (!hmmt.lcfreqs.save(lcout.file, lcout.name.c_str())) {
       fprintf(stderr, "\n%s: save FAILED for class frequency file '%s'\n",
-	      PROGNAME, lcout.name);
+	      PROGNAME, lcout.name.c_str());
       exit(2);
     } else if (args.verbose_arg >= vlProgress) {
       fprintf(stderr, " saved.\n");

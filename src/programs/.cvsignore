@@ -1,5 +1,6 @@
 save
 negra
+mootchurn
 mooteval
 mootrain
 mootcompile
@@ -15,6 +16,9 @@ moot-pargen
 moot-fstgen
 typtag
 tokio
+speednotes.txt
+speednotes.txt.new
+test.*
 [^a]*.pod
 *.typt*
 *.1

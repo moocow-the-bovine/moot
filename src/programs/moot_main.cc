@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <stdarg.h>
 
 #ifdef HAVE_TIME_H
 #include <time.h>
@@ -45,7 +46,10 @@
 #include <mootLexfreqs.h>
 #include <mootClassfreqs.h>
 #include <mootNgrams.h>
+#include <mootTokenIO.h>
+#include <mootTokenExpatIO.h>
 
+#include <mootCIO.h>
 #include <mootUtils.h>
 #include "moot_cmdparser.h"
 
@@ -71,15 +75,33 @@ gengetopt_args_info  args;
 cmdutil_file_churner churner;
 
 // -- files
-cmdutil_file_info out;
+mofstream out;
 size_t nfiles = 0;
 
 // -- global classes/structs
 mootHMM        hmm;
 
+
+// -- token i/o
+int ifmt         = tiofNone;
+int ifmt_implied = tiofNone;
+int ifmt_default = tiofMediumRare;
+
+int  ofmt         = tiofNone;
+int  ofmt_implied = tiofTagged;
+int &ofmt_default = ifmt;
+
+TokenReader *reader = NULL;
+TokenWriter *writer = NULL;
+
 // -- for verbose timing info
 timeval istarted, astarted, astopped;
 double  ielapsed, aelapsed;
+
+/*--------------------------------------------------------------------------
+ * Protos
+ *--------------------------------------------------------------------------*/
+void print_summary(TokenWriter *tw);
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -99,11 +121,9 @@ void GetMyOptions(int argc, char **argv)
 	    PROGNAME, VERSION);
 
   //-- output file
-  out.name = args.output_arg;
-  if (strcmp(out.name,"-") == 0) out.name = "<stdout>";
-  if (!out.open("w")) {
+  if (!out.open(args.output_arg,"w")) {
     fprintf(stderr,"%s: open failed for output-file '%s': %s\n",
-	    PROGNAME, out.name, strerror(errno));
+	    PROGNAME, out.name.c_str(), strerror(errno));
     exit(1);
   }
 
@@ -116,9 +136,36 @@ void GetMyOptions(int argc, char **argv)
   //-- get initialization start-time
   if (args.verbose_arg >= vlSummary) gettimeofday(&istarted, NULL);
 
-  //-- i/o format flags
-  hmm.input_ignore_first_analysis = args.ignore_first_given;
-  hmm.output_best_only = args.best_given;
+
+  //-- i/o format : input
+  ifmt = TokenIO::parse_format_request(args.input_format_arg,
+				       (args.inputs_num>0 ? args.inputs[0] : NULL),
+				       ifmt_implied,
+				       ifmt_default);
+
+  //-- i/o format : output
+  ofmt = TokenIO::parse_format_request(args.output_format_arg,
+				       args.output_arg,
+				       ofmt_implied,
+				       ofmt_default);
+
+  //-- io: new_reader, new_writer
+  reader = TokenIO::new_reader(ifmt);
+  writer = TokenIO::new_writer(ofmt);
+
+#ifdef MOOT_EXPAT_ENABLED
+  //-- io: encoding: reader
+  if (ifmt&tiofXML && args.input_encoding_given) {
+    ((TokenReaderExpat *)reader)->setEncoding(string(args.input_encoding_arg));
+  }
+  //-- io: encoding: writer
+  if (ofmt&tiofXML && args.output_encoding_given) {
+    ((TokenWriterExpat *)writer)->setEncoding(string(args.output_encoding_arg));
+  }
+#endif
+
+  //-- io: writer: sink
+  writer->to_mstream(&out);
 
   //-- assign "unknown" ids & other flags
   hmm.use_lex_classes = args.use_classes_arg;
@@ -173,79 +220,93 @@ void GetMyOptions(int argc, char **argv)
     fprintf(stderr, "%s: Initialization complete\n", PROGNAME);
   }
 
-  //-- get comment-string
-  char cmts[3] = "%%";
-
   //-- get time
   time_t now_time = time(NULL);
   tm     now_tm;
   localtime_r(&now_time, &now_tm);
 
   //-- report to output-file
-  fprintf(out.file, "%s %s output file generated on %s", cmts, PROGNAME, asctime(&now_tm));
-  fprintf(out.file, "%s Configuration:\n", cmts);
-  fprintf(out.file, "%s   Unknown Token     : %s\n", cmts, hmm.tokids.id2name(0).c_str());
-  fprintf(out.file, "%s   Unknown Tag       : %s\n", cmts, hmm.tagids.id2name(0).c_str());
-  fprintf(out.file, "%s   Border Tag        : %s\n", cmts, hmm.tagids.id2name(hmm.start_tagid).c_str());
-  fprintf(out.file, "%s   N-Gram lambdas    : lambda1=%g, lambda2=%g",
-	  cmts, hmm.nglambda1, hmm.nglambda2);
+  writer->put_comment_block_begin();
+  writer->printf_raw("\n %s output file generated on %s", PROGNAME, asctime(&now_tm));
+  writer->printf_raw(" Configuration:\n");
+  writer->printf_raw("   Unknown Token     : %s\n", hmm.tokids.id2name(0).c_str());
+  writer->printf_raw("   Unknown Tag       : %s\n", hmm.tagids.id2name(0).c_str());
+  writer->printf_raw("   Border Tag        : %s\n", hmm.tagids.id2name(hmm.start_tagid).c_str());
 #ifdef moot_USE_TRIGRAMS
-  fprintf(out.file, " lambda3=%g", hmm.nglambda3);
+  writer->printf_raw("   N-Gram lambdas    : lambda1=%g, lambda2=%g, lambda3=%g\n",
+	    hmm.nglambda1, hmm.nglambda2, hmm.nglamda3);
+#else
+  writer->printf_raw("   N-Gram lambdas    : lambda1=%g, lambda2=%g\n",
+	    hmm.nglambda1, hmm.nglambda2);
 #endif
-  fprintf(out.file, "\n");
-  fprintf(out.file, "%s   Lex. Threshhold   : %g\n", cmts, hmm.unknown_lex_threshhold);
-  fprintf(out.file, "%s   Lexical lambdas   : lambdaw1=%g, lambdaw2=%g\n",
-	  cmts, hmm.wlambda1, hmm.wlambda2);
-  fprintf(out.file, "%s   Use classes?      : %s\n",
-	  cmts, hmm.use_lex_classes ? "yes" : "no");
-  fprintf(out.file, "%s   Class Threshhold  : %g\n", cmts, hmm.unknown_class_threshhold);
-  fprintf(out.file, "%s   Class lambdas     : lambdac1=%g, lambdac2=%g\n",
-	  cmts, hmm.clambda1, hmm.clambda2);
+  writer->printf_raw("\n");
+  writer->printf_raw("   Lex. Threshhold   : %g\n", hmm.unknown_lex_threshhold);
+  writer->printf_raw("   Lexical lambdas   : lambdaw1=%g, lambdaw2=%g\n",
+	  hmm.wlambda1, hmm.wlambda2);
+  writer->printf_raw("   Use classes?      : %s\n",
+	  hmm.use_lex_classes ? "yes" : "no");
+  writer->printf_raw("   Class Threshhold  : %g\n", hmm.unknown_class_threshhold);
+  writer->printf_raw("   Class lambdas     : lambdac1=%g, lambdac2=%g\n",
+	  hmm.clambda1, hmm.clambda2);
+  writer->printf_raw("\n");
+  writer->put_comment_block_end();
 }
 
 /*--------------------------------------------------------------------------
  * Summary
  *--------------------------------------------------------------------------*/
-void print_summary(FILE *file)
+void print_summary(TokenWriter *tw)
 {
   // -- print summary
-  fprintf(file,
-	  "\n%%%%---------------------------------------------------------------------\n");
-  fprintf(file, "%%%% %s Summary:\n", PROGNAME);
-  fprintf(file, "%%%%  + General\n");
-  fprintf(file, "%%%%    - Files Processed     : %9u file(s)\n", nfiles);
-  fprintf(file, "%%%%    - Sentences Processed : %9u sent\n", hmm.nsents);
-  fprintf(file, "%%%%    - Tokens Processed    : %9u tok\n", hmm.ntokens);
-  fprintf(file, "%%%%  + Analysis\n");
-  fprintf(file, "%%%%    - Token Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+  tw->put_comment_block_begin();
+  tw->printf_raw("=====================================================================\n");
+  tw->printf_raw(" %s Summary:\n", PROGNAME);
+  tw->printf_raw("  + General\n");
+  tw->printf_raw("    - Input format        : \"%s\"\n",
+		 TokenIO::format_canonical_string(ifmt).c_str());
+  tw->printf_raw("    - Output format       : \"%s\"\n",
+		 TokenIO::format_canonical_string(ofmt).c_str());
+  tw->printf_raw("    - Files Processed     : %9u file(s)\n", nfiles);
+  tw->printf_raw("    - Sentences Processed : %9u sent\n", hmm.nsents);
+  tw->printf_raw("    - Tokens Processed    : %9u tok\n", hmm.ntokens);
+  tw->printf_raw("  + Analysis\n");
+  tw->printf_raw("    - Token Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  hmm.ntokens-hmm.nnewtokens,
 	  100.0*((double)hmm.ntokens-(double)hmm.nnewtokens)/(double)hmm.ntokens,
 	  hmm.nnewtokens,
 	  100.0*(double)hmm.nnewtokens/(double)hmm.ntokens);
-  fprintf(file, "%%%%    - Class Given (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+  tw->printf_raw("    - Class Given (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  hmm.ntokens-hmm.nunclassed,
 	  100.0*((double)hmm.ntokens-(double)hmm.nunclassed)/(double)hmm.ntokens,
 	  hmm.nunclassed,
 	  100.0*(double)hmm.nunclassed/(double)hmm.ntokens);
-  fprintf(file, "%%%%    - Class Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+  tw->printf_raw("    - Class Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  hmm.ntokens-hmm.nnewclasses,
 	  100.0*((double)hmm.ntokens-(double)hmm.nnewclasses)/(double)hmm.ntokens,
 	  hmm.nnewclasses,
 	  100.0*(double)hmm.nnewclasses/(double)hmm.ntokens);
-  fprintf(file, "%%%%    - Total Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+  tw->printf_raw("    - Total Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  hmm.ntokens-hmm.nunknown,
 	  100.0*((double)hmm.ntokens-(double)hmm.nunknown)/(double)hmm.ntokens,
 	  hmm.nunknown,
 	  100.0*(double)hmm.nunknown/(double)hmm.ntokens);
-  fprintf(file, "%%%%    - Fallbacks           : %9u (%6.2f%%)\n",
+  tw->printf_raw("    - Fallbacks           : %9u (%6.2f%%)\n",
 	  hmm.nfallbacks,
 	  100.0*(double)hmm.nfallbacks/(double)hmm.ntokens);
-  fprintf(file, "%%%%  + Performance\n");
-  fprintf(file, "%%%%    - Initialize Time     : %12.2f sec\n", ielapsed);
-  fprintf(file, "%%%%    - Analysis Time       : %12.2f sec\n", aelapsed);
-  fprintf(file, "%%%%    - Throughput Rate     : %12.2f tok/sec\n", (double)hmm.ntokens/aelapsed);
-  fprintf(file,
-	  "%%%%---------------------------------------------------------------------\n");
+  tw->printf_raw("  + Performance\n");
+  tw->printf_raw("    - Initialize Time     : %12.2f sec\n", ielapsed);
+  tw->printf_raw("    - Analysis Time       : %12.2f sec\n", aelapsed);
+  tw->printf_raw("    - Throughput Rate     : %12.2f tok/sec\n", (double)hmm.ntokens/aelapsed);
+  tw->printf_raw("=====================================================================\n");
+  tw->put_comment_block_end();
+}
+
+void print_summary_to_file(FILE *file)
+{
+  TokenWriterNative twn(tiofWellDone);
+  twn.to_file(file);
+  print_summary(&twn);
+  twn.close();
 }
 
 
@@ -263,12 +324,15 @@ int main (int argc, char **argv)
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
     if (args.verbose_arg >= vlSummary) nfiles++;
     if (args.verbose_arg >= vlProgress) {
-      fprintf(out.file, "\n%%%% File: %s\n\n", churner.in.name);
-      fprintf(stderr,"%s: analyzing file '%s'...", PROGNAME, churner.in.name);
+      writer->printf_comment("\n     File: %s\n", churner.in.name.c_str());
+      fprintf(stderr,"%s: analyzing file '%s'...", PROGNAME, churner.in.name.c_str());
       fflush(stderr);
     }
 
-    hmm.tag_stream(churner.in.file, out.file, churner.in.name);
+    //hmm.tag_file(churner.in.file, out.file, churner.in.name);
+
+    reader->from_mstream(&churner.in);
+    hmm.tag_io(reader, writer);
     
     if (args.verbose_arg >= vlProgress) {
       fprintf(stderr," done.\n");
@@ -292,9 +356,10 @@ int main (int argc, char **argv)
 	astarted.tv_sec-istarted.tv_sec
 	+ (double)(astarted.tv_usec-istarted.tv_usec)/1000000.0;
 
-      print_summary(stderr);
-      if (out.file != stdout) print_summary(out.file);
+      if (out.file != stdout) print_summary(writer);
+      print_summary_to_file(stderr);
   }
+  writer->close();
   out.close();
 
   return 0;

@@ -1,0 +1,184 @@
+# -*- Mode: Shell-Script -*-
+#
+# Getopt::Gen specification for mootchurn
+#-----------------------------------------------------------------------------
+program "mootchurn"
+#program_version "0.01"
+
+purpose	"File format converter for moocow's PoS tagger."
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details "
+'mootchurn' is a file-format converter for use with the
+'moot' part-of-speech tagging tools.  See L<mootfiles>
+for details on moot file formats.
+"
+
+#-----------------------------------------------------------------------------
+# Files
+#-----------------------------------------------------------------------------
+rcfile "/etc/mootchurnrc"
+rcfile "~/.mootchurnrc"
+
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+argument "INPUT(s)" "Input files / file-lists." \
+    details="
+Input files should be 'cooked' in some format
+known to moot.
+
+See also the '--list' option.
+
+For details on moot file formats, see L<mootfiles>.
+"
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+#group "Basic Options"
+int "verbose" v "Verbosity level." \
+    arg="LEVEL" \
+    default="5" \
+    details="
+Be more or less verbose.  Recognized values are in the range 0..5:
+
+=over 4
+
+=item 0
+
+Be silent.
+
+=item 1
+
+Print error messages to stderr.
+
+=item 2
+
+Print warnings to stderr.
+
+=item 3
+
+Print summary information to stderr.
+
+=item 4
+
+Print progress information to stderr.
+
+=item 5
+
+Print everything.
+
+=back
+"
+
+int   "dots"   d  "Print a dot for every NTOKS tokens processed." \
+    arg="NTOKS" \
+    default="0" \
+    details="Zero (the default) means that no dots will be printed."
+
+flag  "list"   l  "INPUTs are file-lists, not filenames." \
+    details="Useful for large batch-processing jobs."
+
+string "output"	o "Specify output file (default=stdout)." \
+    arg="FILE" \
+    default="-"
+
+#---------------------------------------------------
+# Format options
+#---------------------------------------------------
+group "Format Options"
+
+flag "tokens" t "Read input token-wise." \
+   details="
+Default behavior is to read sentence-wise.
+"
+
+string "input-format" I "Specify input file(s) format(s)." \
+    arg="FORMAT" \
+    details="
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+
+Default='WellDone'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+"
+
+string "output-format" O "Specify output file format." \
+  arg="FORMAT" \
+  details="
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+
+Default='WellDone'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+"
+
+#---------------------------------------------------
+# XML options
+#---------------------------------------------------
+group "XML Options"
+
+string "input-encoding" - "Override XML document input encoding" \
+    arg="ENCODING" \
+    details="
+Potentially useful for XML documents without encoding declarations
+"
+
+string "output-encoding" - "Set default XML output encoding" \
+    arg="ENCODING" \
+    details="
+Potentially useful for human-readable XML documents,
+but also dangerous.
+"
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+addenda "
+
+=head2 Caveats
+
+When converting to XML, you should first ensure that your data
+is properly encoded, using either character entities or UTF-8
+to encode non-ASCII characters.
+
+When convering from XML, all data will be written in the
+encoding declared in the document, or in UTF-8 if no encoding
+was declared.
+
+"
+
+#-----------------------------------------------------------------------------
+# Bugs
+#-----------------------------------------------------------------------------
+bugs "
+
+None known.
+
+"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+#acknowledge `cat acknowledge.pod`
+
+seealso "
+L<mootfiles>
+L<mootpp>,
+mootm(1),
+L<mootrain>,
+L<mootcompile>,
+L<mootdump>,
+L<moot>,
+L<mooteval>
+"

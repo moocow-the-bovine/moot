@@ -31,7 +31,35 @@ argument "FILE1 FILE2" "Files to compare."
 int "verbose" v "Verbosity level." \
     arg="LEVEL" \
     default="2" \
-    details="Range: 0..4"
+    details="
+Valid values are in the the range [0..4].
+
+=over 4
+
+=item 0
+
+Silent operation.
+
+=item 1
+
+Report basic summary information.
+
+=item 2
+
+Report extended summary information.
+
+=item 3
+
+Print a verbose listing of all tokens associated with
+any mismatch condition.
+
+=item 4
+
+Print a verbose listing of all tokens in the input files.
+
+=back
+
+"
 
 flag "eval-first" 1 "Evaluate FILE1 vs. baseline FILE2" \
     details="
@@ -56,9 +84,37 @@ string	"output" o "Write output to FILE." \
 If --verbose >= 1, a summary will always be printed to stderr.
 "
 
+string "input-format" I "Specify input file formats." \
+    arg="FORMAT" \
+    details="
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.  Both input files should have the same format.
+
+Default='WellDone'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+"
+
+string "input-encoding" - "Override XML document input encoding." \
+    arg="ENCODING" \
+    details="
+Potentially useful for XML documents without encoding declarations.
+"
+
 #-----------------------------------------------------------------------------
 # Addenda
 #-----------------------------------------------------------------------------
+addenda "
+
+=head2 Caveats
+
+Both input files should be in compatible formats (either
+native text or XML).
+
+Output is always in native text 'refried' format.
+
+"
 
 #-----------------------------------------------------------------------------
 # Footer

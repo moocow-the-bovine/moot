@@ -38,12 +38,13 @@
 #include <mootLexfreqs.h>
 #include <mootClassfreqs.h>
 #include <mootNgrams.h>
-
+#include <mootCIO.h>
 #include <mootUtils.h>
 #include "mootcompile_cmdparser.h"
 
 using namespace std;
 using namespace moot;
+using namespace mootio;
 
 /*--------------------------------------------------------------------------
  * Globals
@@ -54,7 +55,7 @@ char *PROGNAME = "mootcompile";
 gengetopt_args_info  args;
 
 // -- files
-cmdutil_file_info out;
+mofstream out;
 
 // -- global classes/structs
 mootHMM        hmm;
@@ -86,13 +87,12 @@ void GetMyOptions(int argc, char **argv)
 	    PROGNAME, VERSION);
 
   //-- output file
-  out.name = args.output_arg;
-  if (strcmp(out.name,"-") == 0) out.name = "<stdout>";
-  if (!out.open("w")) {
+  if (!out.open(args.output_arg,"wb")) {
     fprintf(stderr,"%s: open failed for output-file '%s': %s\n",
-	    PROGNAME, out.name, strerror(errno));
+	    PROGNAME, out.name.c_str(), strerror(errno));
     exit(1);
   }
+  out.close(); //-- close again: HMM will write it itself
 
   // -- assign "unknown" ids & other flags
   hmm.use_lex_classes = args.use_classes_arg;
@@ -118,9 +118,11 @@ bool load_model(char *modelname)
   }
 
   // -- load model: lexical frequencies
-  if (!lexfile.empty() && file_exists(lexfile.c_str())) {
-    if (args.verbose_arg > 1)
-      fprintf(stderr, "%s: loading lexical frequency file '%s'...", PROGNAME, lexfile.c_str());
+  if (!lexfile.empty() && moot_file_exists(lexfile.c_str())) {
+    if (args.verbose_arg > 1) {
+      fprintf(stderr, "%s: loading lexical frequency file '%s'...",
+	      PROGNAME, lexfile.c_str());
+    }
     if (!lexfreqs.load(lexfile.c_str())) {
       fprintf(stderr,"\n%s: load FAILED for lexical frequency file '%s'\n",
 	      PROGNAME, lexfile.c_str());
@@ -131,9 +133,11 @@ bool load_model(char *modelname)
   }
 
   // -- load model: n-gram frequencies
-  if (!ngfile.empty() && file_exists(ngfile.c_str())) {
-    if (args.verbose_arg > 1)
-      fprintf(stderr, "%s: loading n-gram frequency file '%s'...", PROGNAME, ngfile.c_str());
+  if (!ngfile.empty() && moot_file_exists(ngfile.c_str())) {
+    if (args.verbose_arg > 1) {
+      fprintf(stderr, "%s: loading n-gram frequency file '%s'...",
+	      PROGNAME, ngfile.c_str());
+    }
     if (!ngrams.load(ngfile.c_str())) {
       fprintf(stderr,"\n%s: load FAILED for n-gram frequency file '%s'\n",
 	      PROGNAME, ngfile.c_str());
@@ -144,10 +148,11 @@ bool load_model(char *modelname)
   }
 
   // -- load model: class frequencies
-  if (!classfile.empty() && file_exists(classfile.c_str())) {
-    if (args.verbose_arg > 1)
-      fprintf(stderr, "%s: loading class frequency file '%s'...", PROGNAME, classfile.c_str());
-      
+  if (!classfile.empty() && moot_file_exists(classfile.c_str())) {
+    if (args.verbose_arg > 1) {
+      fprintf(stderr, "%s: loading class frequency file '%s'...",
+	      PROGNAME, classfile.c_str());
+    }
     if (!classfreqs.load(classfile.c_str())) {
       fprintf(stderr,"\n%s: load FAILED for class frequency file '%s'\n",
 	      PROGNAME, classfile.c_str());
@@ -187,7 +192,8 @@ int main (int argc, char **argv)
   if (classfreqs.lctable.size() <= 1 && hmm.use_lex_classes) {
     hmm.use_lex_classes = false;
     if (args.verbose_arg > 1)
-      fprintf(stderr, "%s: no class frequencies available: model won't use lexical classes!\n",
+      fprintf(stderr,
+	      "%s: no class frequencies available: model won't use lexical classes!\n",
 	      PROGNAME);
   }
 
@@ -263,16 +269,14 @@ int main (int argc, char **argv)
 
   //-- dump binary model
   if (args.verbose_arg > 1)
-    fprintf(stderr, "%s: saving binary HMM model `%s' ...", PROGNAME, out.name);
-  if (!hmm.save(out.name, args.compress_arg)) {
+    fprintf(stderr, "%s: saving binary HMM model `%s' ...",
+	    PROGNAME, out.name.c_str());
+  if (!hmm.save(out.name.c_str(), args.compress_arg)) {
     fprintf(stderr,"\n%s: binary HMM dump FAILED \n", PROGNAME);
     exit(1);
   } else if (args.verbose_arg > 1) {
     fprintf(stderr," saved.\n");
   }
-
-  //-- cleanup
-  out.close();
 
   //-- summary
   char cmts[3] = "%%";

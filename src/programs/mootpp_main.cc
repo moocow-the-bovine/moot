@@ -41,20 +41,31 @@
 
 #include <mootPPLexer.h>
 #include <mootUtils.h>
+#include <mootCIO.h>
+#include <mootToken.h>
+#include <mootTokenIO.h>
+
 #include "mootpp_cmdparser.h"
 
 using namespace std;
 using namespace moot;
+using namespace mootio;
 
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
 char *PROGNAME = "mootpp";
 
-// files
-cmdutil_file_info out;
+//-- files
+mofstream out;
 
-// options & file-churning
+//-- Token I/O
+int ofmt = tiofNone;
+int ofmt_implied = tiofNone;
+int ofmt_default = tiofRare;
+TokenWriter *writer = NULL;
+
+//-- options & file-churning
 gengetopt_args_info args;
 cmdutil_file_churner churner;
 
@@ -73,11 +84,9 @@ void GetMyOptions(int argc, char **argv)
 	    PROGNAME, VERSION);
 
   // -- output file
-  out.name = args.output_arg;
-  if (strcmp(out.name,"-") == 0) out.name = "<stdout>";
-  if (!out.open("w")) {
-    fprintf(stderr,"%s: open failed for output-file '%s': %s\n",
-	    PROGNAME, out.name, strerror(errno));
+  if (!out.open(args.output_arg,"w")) {
+    fprintf(stderr,"%s: open failed for output-file \"%s\": %s\n",
+	    PROGNAME, out.name.c_str(), strerror(errno));
     exit(1);
   }
 
@@ -86,6 +95,16 @@ void GetMyOptions(int argc, char **argv)
   churner.inputs = args.inputs;
   churner.ninputs = args.inputs_num;
   churner.use_list = args.list_given;
+
+  //-- i/o format : output
+  ofmt = TokenIO::parse_format_request(args.output_format_arg,
+				       args.output_arg,
+				       ofmt_implied,
+				       ofmt_default);
+
+  //-- setup token-writer
+  writer = TokenIO::new_writer(ofmt);
+  writer->to_mstream(&out);
 }
 
 /*--------------------------------------------------------------------------
@@ -93,13 +112,13 @@ void GetMyOptions(int argc, char **argv)
  *--------------------------------------------------------------------------*/
 int main (int argc, char **argv)
 {
-  mootPPLexer lexer;
+  mootPPLexer *lexer = new mootPPLexer();
   int nfiles = 0;
   timeval started,stopped;
   double elapsed;
 
   GetMyOptions(argc,argv);
-  lexer.verbose = args.verbose_arg;
+  lexer->verbose = args.verbose_arg;
 
   // -- get start time
   if (args.verbose_arg > 0) {
@@ -108,40 +127,69 @@ int main (int argc, char **argv)
 
   // -- big loop
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
-      if (args.verbose_arg > 0) {
-	nfiles++;
-	if (args.verbose_arg > 1) {
-	  fprintf(stderr,"%s: processing file '%s'... ", PROGNAME, churner.in.name);
-	  fflush(stderr);
-	}
-      }
-      fprintf(out.file, "\n%%%% %s: File: %s\n\n", PROGNAME, churner.in.name);
-
-      lexer.tokenize_stream(churner.in.file, out.file);
-
+    if (args.verbose_arg > 0) {
+      nfiles++;
       if (args.verbose_arg > 1) {
-	fprintf(stderr," done.\n");
+	fprintf(stderr,"%s: processing file '%s'... ",
+		PROGNAME, churner.in.name.c_str());
 	fflush(stderr);
       }
+    }
+    writer->printf_comment("\n    File: %s\n", churner.in.name.c_str());
+
+    lexer->from_mstream(&churner.in);
+    lexer->to_mstream(&out);
+
+    int lxtok;
+    mootSentence sent;
+    while ((lxtok = lexer->yylex()) != mootPPLexer::PPEOF) {
+      if (args.verbose_arg > 0) lexer->ntokens++;
+      switch (lxtok) { 
+      case mootPPLexer::EOS:
+	if (lexer->yytext[0] != '<') {  //-- hack: check for xml markup
+	  sent.push_back(mootToken((const char *)lexer->yytext));
+	  writer->put_sentence(sent);
+	  sent.clear();
+	}
+	break;
+
+      case mootPPLexer::XML_START_TAG:
+      case mootPPLexer::XML_END_TAG:
+	//-- ignore XML tags
+	break;
+
+      default:
+	//-- write it as its own token
+	sent.push_back(mootToken((const char *)lexer->yytext));
+	break;
+      }
+    }
+    if (!sent.empty()) writer->put_sentence(sent); //-- put final sentence
+
+    if (args.verbose_arg > 1) {
+      fprintf(stderr," done.\n");
+      fflush(stderr);
+    }
   }
+  writer->close();
   out.close();
 
   // -- summary
   if (args.verbose_arg > 0) {
-      // -- timing
-      gettimeofday(&stopped, NULL);
-      elapsed = stopped.tv_sec-started.tv_sec + (stopped.tv_usec-started.tv_usec)/1000000.0;
-
-      // -- print summary
-      fprintf(stderr, "\n-----------------------------------------------------\n");
-      fprintf(stderr, "%s Summary:\n", PROGNAME);
-      fprintf(stderr, "  + Files processed : %d\n", nfiles);
-      fprintf(stderr, "  + Tokens found    : %d\n", lexer.ntokens);
-      fprintf(stderr, "  + Time Elsapsed   : %.2f sec\n", elapsed);
-      fprintf(stderr, "  + Throughput      : %.2f toks/sec\n", (float)lexer.ntokens/elapsed);
-      fprintf(stderr, "-----------------------------------------------------\n");
+    // -- timing
+    gettimeofday(&stopped, NULL);
+    elapsed = stopped.tv_sec-started.tv_sec + (stopped.tv_usec-started.tv_usec)/1000000.0;
+    
+    // -- print summary
+    fprintf(stderr, "\n-----------------------------------------------------\n");
+    fprintf(stderr, "%s Summary:\n", PROGNAME);
+    fprintf(stderr, "  + Files processed : %d\n", nfiles);
+    fprintf(stderr, "  + Tokens found    : %d\n", lexer->ntokens);
+    fprintf(stderr, "  + Time Elsapsed   : %.2f sec\n", elapsed);
+    fprintf(stderr, "  + Throughput      : %.2f toks/sec\n", (float)lexer->ntokens/elapsed);
+    fprintf(stderr, "-----------------------------------------------------\n");
   }
-
+  
   return 0;
 }
 

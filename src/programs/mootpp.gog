@@ -51,10 +51,29 @@ processed.  Otherwise, the FILE(s) arguments are interpreted
 as filenames of the input files themselves.
 "
 
+string "output-format" O "Specify output file format." \
+  arg="FORMAT" \
+  details="
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+
+Default='Rare'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+"
 
 #-----------------------------------------------------------------------------
 # Addenda
 #-----------------------------------------------------------------------------
+addenda "
+
+=head2 Caveats
+
+When writing in XML format, you should first ensure that your input data
+is properly encoded in UTF-8.
+
+"
 
 #-----------------------------------------------------------------------------
 # Footer
@@ -64,5 +83,6 @@ acknowledge `cat acknowledge.pod`
 seealso "
 L<mootfiles>,
 mootm(1),
-L<moot>
+L<moot>,
+L<mootchurn>
 "

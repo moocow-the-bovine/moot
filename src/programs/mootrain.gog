@@ -44,13 +44,39 @@ See L<mootfiles> for details on moot file formats.
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
-#group "Basic Options"
+group "Basic Options"
 int "verbose" v "Verbosity level." \
     arg="LEVEL" \
     default="2" \
     details="Be more or less verbose.  Recognized values are in the range 0..3."
 
 string "output" o "Specify basename for output files (default=INPUT)"
+
+string "input-format" I "Specify input file(s) format(s)." \
+    arg="FORMAT" \
+    details="
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+
+Default='WellDone'
+
+Implied='Tagged'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+"
+
+string "input-encoding" - "Override document encoding for XML input." \
+    arg="ENCODING" \
+    details="
+Potentially useful for XML documents without encoding declarations.
+"
+
+#-----------------------------------------------------------------------------
+# Model Format Options
+#-----------------------------------------------------------------------------
+
+group "Model Format Options"
 
 flag "lex" l "Generate only lexical frequency file." \
     default="0"
@@ -60,13 +86,6 @@ flag "ngrams"	n "Generate only n-gram frequency file." \
 
 flag "classes"	C "Generate only lexical-class frequency file." \
     default="0"
-
-
-#-----------------------------------------------------------------------------
-# Format Options
-#-----------------------------------------------------------------------------
-
-group "Format Options"
 
 string "eos-tag" e "Specify boundary tag (default=__$)" \
   arg="TAG" \
@@ -87,6 +106,12 @@ be a valid analysis for any token.
 #"
 
 flag "verbose-ngrams" N "Generate long-form ngrams (default=no)"
+
+#---------------------------------------------------
+# XML options
+#---------------------------------------------------
+#group "XML Options"
+
 
 #-----------------------------------------------------------------------------
 # Addenda
