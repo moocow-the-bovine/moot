@@ -283,7 +283,8 @@ if test "$dwdst_doc_formats" != "none" ; then
   AC_SUBST(POD2LATEX)
 
   ### -- docs: .gog file linkup
-  dwdst_program_gogs="dwdst.gog dwdspp.gog dwdst-fstgen.gog dwdst-pargen.gog"
+  #dwdst_program_gogs="dwdst.gog dwdspp.gog dwdst-fstgen.gog dwdst-pargen.gog"
+  dwdst_program_gogs="dwdst.gog dwdspp.gog"
   for g in $dwdst_program_gogs ; do
     AC_CONFIG_LINKS(doc/programs/${g}:src/programs/${g})  
   done

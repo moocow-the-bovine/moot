@@ -260,10 +260,13 @@ EXTRA_DIST = \
 	dwdstNgramsParser.yy \
 	dwdstLexfreqsLexer.ll \
 	dwdstLexfreqsParser.yy \
-	dwdstAlphabetLexer.ll \
-	dwdstAlphabetParser.yy \
 	flexskel.cc flexskel.h \
 	bison.cc bison.h
+
+dist_old =
+	dwdstAlphabetLexer.ll \
+	dwdstAlphabetParser.yy
+
 
 #	dwdst.sym 
 
