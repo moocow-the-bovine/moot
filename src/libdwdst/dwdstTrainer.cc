@@ -126,12 +126,12 @@ FSM *dwdstTrainer::generate_unknown_fsa()
 
 /*--------------------------------------------------------------------------
  * Public Methods: FSA Generation: Diambiguation-FSA
- *  --> BAUSTELLE!
+ *  --> WORK IN PROGESS <--
  *--------------------------------------------------------------------------*/
 
 /**
  * Generate a statistical PoS-disambiguation FSA based on internal
- * N-Gram tables. \b Warning: work in progress!
+ * N-Gram tables.
  */
 FSM *dwdstTrainer::generate_disambig_fsa()
 {
@@ -141,17 +141,51 @@ FSM *dwdstTrainer::generate_disambig_fsa()
     abort();
     return NULL;
   */
+
+  // -- sanity check(s)
+  if (kmax <= 0) {
+    for (NGramTable::iterator ngti = ngtable.begin(); ngti != ngtable.end(); ngti++) {
+      if ((int)ngti->first.size() > kmax)
+	kmax = ngti->first.size();
+    }
+    fprintf(stderr,"dwdstTrainer::generate_disambig_fsa(): using implicit value %d for kmax.\n",kmax);
+  }
+
   if (dfsa) { delete dfsa; }
   dfsa = new FSM();
+  dfsa->set_fsm_type(false,true);
   FSMRepresentation *rep = dfsa->fsm_representation();
   FSMWeight freecost = rep->cost_structure()->freecost();
 
+  // -- HACK: temporarily remove EOS from the tagset
+#ifdef DWDST_DFSA_DEBUG
+  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): before erase(eos=%s), alltags.size()=%d\n",
+	  eos.c_str(), alltags.size());
+#endif
+  alltags.erase(eos);
+#ifdef DWDST_DFSA_DEBUG
+  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): after erase(eos=%s), alltags.size()=%d\n",
+	  eos.c_str(), alltags.size());
+#endif
+
   // -- build a symbol-map for all tags we know
   FSMSymbol symMax = 0;
+  float uniGramCount = 0;
   dwdstStringToSymbolMap tags2symbols;
   for (set<FSMSymbolString>::iterator si = alltags.begin(); si != alltags.end(); si++) {
     tags2symbols[*si] = ++symMax;
+    // -- count unigrams
+    theNgram.clear();
+    theNgram.push_back(*si);
+    NGramTable::iterator ngfi;
+    if ((ngfi = ngtable.find(theNgram)) != ngtable.end()) {
+      uniGramCount += ngfi->second;
+    }
   }
+
+#ifdef DWDST_DFSA_DEBUG
+  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): generated %d skeleton tag-symbols.\n", symMax);
+#endif
 
   // -- generate a skeleton-FSA using a single-symbol for each pseudo-tag
   //    initialization: BOS
@@ -172,10 +206,17 @@ FSM *dwdstTrainer::generate_disambig_fsa()
   int len;
   FSMState prevState;
   NGramVector prevNgram;
+
   for (len = 1; len < kmax; len++) {
     // -- len: n-gram length for this pass
     //    we ignore len=0, because that's BOS/EOS,
     //    and also  len=kmax, because we don't need states for those.
+
+# ifdef DWDST_DFSA_DEBUG_VERBOSE
+    fprintf(stderr,
+	    "dwdstTrainer::generate_disambig_fsa(): BOS-bootstrap len=%d.\n", len);
+# endif
+
     for (tagIters_begin(tagIters,alltags,len);
 	 !tagIters_done(tagIters,alltags);
 	 tagIters_next(tagIters,alltags))
@@ -186,6 +227,14 @@ FSM *dwdstTrainer::generate_disambig_fsa()
 	for (tagSetIterVector::iterator tsi = tagIters.begin(); tsi != tagIters.end(); tsi++) {
 	  theNgram.push_back(*(*tsi));
 	}
+	
+# ifdef DWDST_DFSA_DEBUG_VERBOSE
+	fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): BOS-bootstrap nGram=<");
+	for (NGramVector::iterator dbg_ngvi = theNgram.begin(); dbg_ngvi != theNgram.end(); dbg_ngvi++) {
+	  fprintf(stderr,"%s,",dbg_ngvi->c_str());
+	}
+	fprintf(stderr, ">\n");
+# endif
 
 	// -- add a (final) state for the current nGram
 	FSMState theState = rep->new_state();
@@ -203,7 +252,7 @@ FSM *dwdstTrainer::generate_disambig_fsa()
 	  prevState = pngi->second;
 	  FSMSymbolString  theTag     = theNgram[theNgram.size()-1];
 	  FSMSymbol        tagSymbol  = tags2symbols[theTag];
-	  FSMWeight        arcCost    = disambigArcCost(prevNgram, theTag);
+	  FSMWeight        arcCost    = disambigArcCost(prevNgram, theTag, uniGramCount);
 	  rep->add_transition(prevState, theState, tagSymbol, tagSymbol, arcCost);
 	} else {
 	  // -- this should never happen!
@@ -216,6 +265,12 @@ FSM *dwdstTrainer::generate_disambig_fsa()
   // -- now, add transitions for the various kmax-Grams,
   //    between the states for the (kmax-1)-Grams
   NGramVector nextNgram;
+
+# ifdef DWDST_DFSA_DEBUG_VERBOSE
+    fprintf(stderr,
+	    "dwdstTrainer::generate_disambig_fsa(): (kmax=%d)-linkup.\n", kmax);
+# endif
+
   for (tagIters_begin(tagIters,alltags,kmax-1);
        !tagIters_done(tagIters,alltags);
        tagIters_next(tagIters,alltags))
@@ -228,6 +283,14 @@ FSM *dwdstTrainer::generate_disambig_fsa()
       for (tagSetIterVector::iterator tsi = tagIters.begin(); tsi != tagIters.end(); tsi++) {
 	prevNgram.push_back(*(*tsi));
       }
+
+# ifdef DWDST_DFSA_DEBUG_VERBOSE
+      fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): kmax-linkup prevNgram=<");
+      for (NGramVector::iterator dbg_ngvi = prevNgram.begin(); dbg_ngvi != prevNgram.end(); dbg_ngvi++) {
+	fprintf(stderr,"%s,",dbg_ngvi->c_str());
+      }
+      fprintf(stderr, ">\n");
+# endif
 
       // -- source-state lookup
       map<NGramVector,FSMState>::const_iterator pngi = nGram2State.find(prevNgram);
@@ -243,14 +306,22 @@ FSM *dwdstTrainer::generate_disambig_fsa()
       nextNgram = prevNgram;
       nextNgram.pop_front();
       for (set<FSMSymbolString>::iterator tsi = alltags.begin(); tsi != alltags.end(); tsi++) {
+
+# ifdef DWDST_DFSA_DEBUG_VERBOSE
+	fprintf(stderr, "dwdstTrainer::generate_disambig_fsa():   + theTag='%s'\n", tsi->c_str());
+# endif
+
 	FSMSymbolString theTag = *tsi;
 	nextNgram.push_back(theTag);
 	map<NGramVector,FSMState>::const_iterator nngi = nGram2State.find(nextNgram);
 	if (nngi != nGram2State.end()) {
 	  FSMState   theState   = nngi->second;
 	  FSMSymbol  tagSymbol  = tags2symbols[theTag];
-	  FSMWeight  arcCost    = disambigArcCost(prevNgram, theTag);
+	  FSMWeight  arcCost    = disambigArcCost(prevNgram, theTag, uniGramCount);
 	  rep->add_transition(prevState, theState, tagSymbol, tagSymbol, arcCost);
+# ifdef DWDST_DFSA_DEBUG_VERBOSE
+	  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa():     > cost='%f'\n", arcCost);
+# endif
 	} else {
 	  // -- this should never happen!
 	  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): missing sink-state in kmax-linkup!\n");
@@ -258,6 +329,31 @@ FSM *dwdstTrainer::generate_disambig_fsa()
 	nextNgram.pop_back();
       }
     }
+#ifdef DWDST_DFSA_DEBUG
+  // debug: save skeleton tag-labels
+  FILE *labfile = fopen("dskeleton.lab","w");
+  if (labfile) {
+    for (dwdstStringToSymbolMap::iterator t2si =  tags2symbols.begin();
+	 t2si != tags2symbols.end();
+	 t2si++)
+      {
+	fprintf(labfile,"%s\t%d\n", t2si->first.c_str(), t2si->second);
+      }
+    fclose(labfile);
+  } else {
+    fprintf(stderr,
+	    "dwdstTrainer::generate_disambig_fsa(): could not open 'dskeleton.lab': %s\n",
+	    strerror(errno));
+  }
+  // debug: save skeleton FSM
+  //if (!dfsa->fsm_save_to_binary_file("dskeleton.fsa", false)) {
+  //  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): save failed for 'dskeleton.fsa'\n");
+  //}
+#endif
+
+  // -- HACK: re-insert removed EOS back into the tagset
+  alltags.insert(eos);
+
   return dfsa;
 }
 
@@ -269,26 +365,46 @@ FSM *dwdstTrainer::generate_disambig_fsa()
  * Returns the expected cost of transition from
  * state nGram to state <nGram,tagTo>.
  */
-FSMWeight dwdstTrainer::disambigArcCost(NGramVector &nGram, FSMSymbolString &tagTo)
+FSMWeight dwdstTrainer::disambigArcCost(NGramVector &nGram, FSMSymbolString &tagTo, float uniGramCount=0)
 {
-  NGramVector nGramFrom = nGram;
-  nGramFrom.pop_back();
+  NGramVector nGramTo = nGram;
+  nGramTo.push_back(tagTo);
 
-  // -- get raw count and number of fallbacks for nGramFrom
-  NGramCountFallbacksPair fromCF = nGramCountFallbacks(nGramFrom);
-
-  // -- now we set up the destination-nGram, because
-  //    nGramFrom might have been shortened.
-  NGramVector nGramTo = nGramFrom;
-  nGramTo.push_back(nGram[nGram.size()-1]);
+  // -- get raw count and number of fallbacks for nGramTo
   NGramCountFallbacksPair toCF = nGramCountFallbacks(nGramTo);
+
+  NGramCountFallbacksPair fromCF;
+  if (nGramTo.size() <= 1) {
+    // -- fallback to unigram: special case
+    fromCF.fallbacks() = 0;
+    fromCF.count() = uniGramCount;
+  } else {
+    // -- normal case:
+    //    now we set up the source-nGram, because
+    //    nGramTo might have been shortened.
+    NGramVector nGramFrom = nGramTo;
+    nGramFrom.pop_back();
+    fromCF = nGramCountFallbacks(nGramFrom);
+
+    // -- sanity check
+    if (nGramFrom.size() != nGramTo.size()-1) {
+      fprintf(stderr,
+	      "dwdstTrainer::disambigArcCost(): got %d-gram without prefix %d-gram.\n",
+	      nGramTo.size(), nGramTo.size()-1);
+    }
+  }
 
   // -- now we can just do the math
   //    ArcCost(fromCF,toCF) := / fromFallbacks + toFallbacks + (toCount / fromCount) : if fromCount != 0
   //                            \ fromFallbacks + toFallbacks + 1.0                   : otherwise
+  /*
+    float FBsum = fromCF.fallbacks() + toCF.fallbacks();
+    float Cquot = fromCF.count() ? (toCF.count() / fromCF.count()) : 1.0;
+    return FBsum + (1.0 - Cquot);
+  */
   return
-    (fromCF.fallbacks() + toCF.fallbacks() +
-     (fromCF.count() ? (toCF.count() / fromCF.count()) : 1.0));
+    fromCF.fallbacks() + toCF.fallbacks() +
+    1 - (fromCF.count() ? (toCF.count() / fromCF.count()) : 1.0);
 }
 
 /**
@@ -346,15 +462,17 @@ tagSetIterVector &dwdstTrainer::tagIters_next(tagSetIterVector &tagIters,
 					       set<FSMSymbolString> &tagSet)
 {
   for (int j = tagIters.size()-1; j >= 0; j--) {
-    ++tagIters[j];
-    // -- HACK: ignore EOS
-    if (tagIters[j] != tagSet.end() && *(tagIters[j]) == eos) {
+    /*
       ++tagIters[j];
-    }
+      // -- HACK: ignore EOS
+      if (tagIters[j] != tagSet.end() && *(tagIters[j]) == eos) ++tagIters[j];
+      // -- Try to just step this position
+      if (tagIters[j] != tagSet.end() || j == 0) break;
+    */
+
     // -- Try to just step this position
-    if (tagIters[j] != tagSet.end() || j == 0) {
-      break;
-    }
+    if (++tagIters[j] != tagSet.end() || j == 0) break;
+
     // -- Reset this position and increment the next highest
     tagIters[j] = tagSet.begin();
   }
@@ -364,7 +482,7 @@ tagSetIterVector &dwdstTrainer::tagIters_next(tagSetIterVector &tagIters,
 /**
  * Are we done iterating yet?
  */
-bool dwdstTrainer::tagIters_done(tagSetIterVector &tagIters, set<FSMSymbolString> tagSet)
+bool dwdstTrainer::tagIters_done(tagSetIterVector &tagIters, set<FSMSymbolString> &tagSet)
 {
   return tagIters[0] == tagSet.end();
 }

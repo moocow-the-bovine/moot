@@ -17,7 +17,12 @@ dnl
 dnl use autoheader
 dnl
 AM_CONFIG_HEADER([src/libdwdst/dwdstConfig.h])
-dnl AH_BOTTOM([
+AH_TOP([/*
+ * Avoid conflicts with other autotools packages (i.e. FSMlib)
+ */
+#include <cleanConfig.h>
+])
+dnl AH_BOTTOM([/*
 dnl /* PACKAGE does not jive well with multiple-program pacakges
 dnl    using 'gengetopt'.  'autoheader' doesn't like to undefine
 dnl    it, so we include an extra little header file to do that

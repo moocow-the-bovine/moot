@@ -19,7 +19,7 @@ int kmax = 3;
 /*-----------------------------------------------------------------
  * Iteration Utilities
  */
-tagSetIterVector &tagIters_init(int len) {
+tagSetIterVector &tagIters_begin(int len) {
   // -- initialize
   tagIters.clear();
   //tagIters.reserve(len);
@@ -41,7 +41,7 @@ tagSetIterVector &tagIters_next(void) {
   return tagIters;
 }
 
-bool tagIters_end() { return tagIters[0] == alltags.end(); }
+bool tagIters_done() { return tagIters[0] == alltags.end(); }
 
 
 /*-----------------------------------------------------------------
@@ -50,7 +50,7 @@ bool tagIters_end() { return tagIters[0] == alltags.end(); }
 void iter_test() {
   int len;
   for (len = 1; len <= kmax; len++) {
-    for (tagIters_init(len); !tagIters_end(); tagIters_next()) {
+    for (tagIters_begin(len); !tagIters_done(); tagIters_next()) {
       // -- report
       printf("Iteration [len=%d, tagIters.size()=%d]: ", len, tagIters.size());
       for (tagSetIterVector::iterator tsi = tagIters.begin(); tsi != tagIters.end(); tsi++)

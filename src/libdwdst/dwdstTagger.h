@@ -14,11 +14,6 @@
 //#undef DWDST_DEBUG
 
 
-#ifdef HAVE_CONFIG_H
-/*# include "nopackage.h"*/
-# include <dwdstConfig.h>
-#endif
-
 #include <stdio.h>
 
 #include <FSMTypes.h>
@@ -26,6 +21,11 @@
 #include <FSM.h>
 
 #include "dwdstTaggerLexer.h"
+
+#ifdef HAVE_CONFIG_H
+/*# include "nopackage.h"*/
+# include <dwdstConfig.h>
+#endif
 
 /// Whether to load symspecs in AT&T-compatibility mode
 #define DWDST_SYM_ATT_COMPAT true

@@ -20,8 +20,15 @@ dwdst-fstgen
 *.a
 *.so
 .deps
+*.ps
+*.lfsa
 *.fst
 *.tfst
+*.fsa
+*.tfsa
+*.afst
+*.afsa
+*.dot
 *.lab
 *_cmdparser.cc
 *_cmdparser.h

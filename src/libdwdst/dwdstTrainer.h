@@ -15,14 +15,22 @@
 //#undef DWDST_FSTGEN_DEBUG
 //#define DWDST_PARGEN_DEBUG
 //#undef DWDST_PARGEN_DEBUG
+#define DWDST_DFSA_DEBUG
+//#undef DWDST_DFSA_DEBUG
+//#define DWDST_DFSA_DEBUG_VERBOSE
+//#undef DWDST_DFSA_DEBUG_VERBOSE
+
+#if defined(DWDST_DFSA_DEBUG_VERBOSE) && !defined(DWDST_DFSA_DEBUG)
+# define DWDST_DFSA_DEBUG
+#endif
+
+#include "dwdstTagger.h"
+#include "dwdstTypes.h"
 
 #ifdef HAVE_CONFIG_H
 //# include "nopackage.h"
 # include <dwdstConfig.h>
 #endif
-
-#include "dwdstTagger.h"
-#include "dwdstTypes.h"
 
 using namespace std;
 
@@ -89,20 +97,29 @@ public:
   /// destructor
   ~dwdstTrainer();
 
+
   // ----- public methods: FSM generation
 
-  /// generate an analysis-FSA for unknown tokens
+  /// Generate an analysis-FSA for unknown tokens.
   FSM *generate_unknown_fsa();
 
-  /// generate a disambiguation-FSA based on internal n-gram tables
-  /// (not yet implemented!)
+  /// Generate a disambiguation-FSA based on internal n-gram tables.
+  /// <b>WARNING: WORK IN PROGRESS!</b>
   FSM *generate_disambig_fsa();
+
 
   // ----- mid-/low-level methods: FSM generation
 
   /// low-level: add an PoS-"arc" to an FSA: this needs an overhaul!
   set<FSMState> fsm_add_pos_arc(FSM *fsm, const FSMState qfrom, const FSMSymbolString &pos,
 				const FSMWeight cost = FSM_default_cost_structure.freecost());
+
+  // -- public methods: low-level: disambig-fsa utilities
+  /// Low-level: get the cost of final transition for nGram.
+  FSMWeight disambigArcCost(NGramVector &nGram, FSMSymbolString &tagTo, float uniGramCost=0);
+  /// Low-level: get the count for a single nGram, using fallback strategy.
+  NGramCountFallbacksPair nGramCountFallbacks(NGramVector &nGram);
+
 
   // ----- public methods: param-generation: (output-file = DEBUG)
 
@@ -111,6 +128,7 @@ public:
 
   /// high-level: train from a raw-text stream
   bool train_from_stream(FILE *in=stdin, FILE *out=stdout);
+
 
   // ----- mid/low-level
 
@@ -164,19 +182,17 @@ public:
   /// You shouldn't need to call this yourself.
   inline bool cleanup_training_temps();
 
-  // -- public methods: low-level: tagset-iteration utilities
-  /// Low-level possible tagset-ngram iteration initializer.
-  tagSetIterVector &tagIters_begin(tagSetIterVector &tagIters,set<FSMSymbolString> &tagSet,int len);
-  /// Low-level possible tagset-ngram iteration incrementer.
-  tagSetIterVector &tagIters_next(tagSetIterVector &tagIters,set<FSMSymbolString> &tagSet);
-  /// Low-level possible tagset-ngram iteration termination-test predicate.
-  bool tagIters_done(tagSetIterVector &tagIters,set<FSMSymbolString> tagSet);
 
-  // -- public methods: low-level: disambig-fsa utilities
-  /// Low-level: get the cost of final transition for nGram.
-  FSMWeight disambigArcCost(NGramVector &nGram, FSMSymbolString &tagTo);
-  /// Low-level: get the count for a single nGram, using fallback strategy.
-  NGramCountFallbacksPair nGramCountFallbacks(NGramVector &nGram);
+  // -- public methods: low-level: tagset-iteration utilities
+
+  /// Low-level possible tagset-ngram iteration initializer.
+  tagSetIterVector &tagIters_begin(tagSetIterVector &tagIters, set<FSMSymbolString> &tagSet, int len);
+
+  /// Low-level possible tagset-ngram iteration incrementer.
+  tagSetIterVector &tagIters_next(tagSetIterVector &tagIters, set<FSMSymbolString> &tagSet);
+
+  /// Low-level possible tagset-ngram iteration termination-test predicate.
+  bool tagIters_done(tagSetIterVector &tagIters, set<FSMSymbolString> &tagSet);
 };
 
 #endif // _DWDST_TRAINER_H_

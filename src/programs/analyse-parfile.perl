@@ -75,20 +75,20 @@ if ($verbose > 0) { print "Examining n-gram tables...\n"; }
 %ambigs = ();
 while (($weight,$ngset) = each(%weights)) {
   # examine
-  next if (scalar(keys(%$ngset)) <= 1);  # ignore singletons
+  @ngrams = keys(%$ngset);
+  next if (scalar(@ngrams) <= 1);  # ignore singletons
  NG1:
-  foreach $ng1 (keys(%$ngset)) {
+  for ($i = 0; $i <= $#ngrams; $i++) {
+    $ng1 = $ngrams[$i];
     @tags1 = split($wdsep,$ng1);
+    pop(@tags1);
+    $prefix1 = join($wdsep,@tags1);
   NG2:
-    foreach $ng2 (keys(%$ngset)) {
-      next if ($ng1 eq $ng2);
-      @tags2 = split($wdsep,$ng2);
-      next if ($#tags1 != $#tags2);
+    for ($j = $i+1; $j <= $#ngrams; $j++) {
+      $ng2 = $ngrams[$j];
+      next if ($ng2 !~ /^$prefix1$wdsep(?:[^$wdsep]+)$/);
 
-      for ($i = 0; $i < $#tags1; ++$i) {
-	next NG2 if ($tags1[$i] ne $tags2[$i]);
-      }
-      ## -- it's a real ambiguity
+      ## -- it's a real ambiguity: $ng1 and $ng2 share a real prefix $prefix1
       $ambigs{"$weight"}{$ng2}
 	= $ambigs{"$weight"}{$ng1} = undef;
 
