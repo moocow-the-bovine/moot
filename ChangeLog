@@ -3,6 +3,19 @@ ChangeLog for package moot
 Todo:
 	+ write perl-XS interface & utilities
 
+v2.0.4-pre1 Sat, 31 Jul 2004 13:56:22 +0200
+	+ added mootTrieVector
+	  - template class for longest-match string tries
+	+ added mootAssocVector
+	  - template class for short LISP-style associative arrays
+	    (i.e. map<> alternative)
+	  - small memory footprint
+	  - fast iteration
+	  - linear time search, but faster than map<> for small arrays
+	+ added mootSuffixTrie
+	  - TnT-style suffix trie using mootTrieVector and mootAssocVector
+	  - compiles ok, not yet used
+
 v2.0.3 Tue, 20 Jul 2004 19:49:58 +0200
 	+ added shell-script 'mootconfig' to report compile-time
 	  options for installed systems (pkg-config variable
