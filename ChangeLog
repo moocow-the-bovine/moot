@@ -1,8 +1,13 @@
 ChangeLog for package moot
 
-v2.0.0 Tue, 25 May 2004 17:14:08 +0200
-	+ parse new MorphConsole output (with TAB separators, at least)
-	+ (re-)added various output options to moothmm: tags-only, best-only 
+v2.0.0 Thu, 27 May 2004 00:48:43 +0200
+	+ added mootToken.h: mootToken, mootSentence interface classes
+  	  - old string-based methods now deprecated
+	+ added mootTokenLexer - replaces old 'mootTaggerLexer'
+	  - parses new MorphConsole output (with TAB separators, at least)
+	+ added mootTokenIO.h : classes mootToken(Reader|Writer)
+	  - for file and/or string I/O in native format(s)
+	+ (re-)added 'best-only' output as option to moothmm
 	+ added best-tag marking with prefix '/'
 	
 v1.0.5 Fri, 21 May 2004 14:14:31 +0200
