@@ -10,7 +10,9 @@ EVAL = $(TEST).dmtt
 TRUTH = $(TEST).ttt
 
 ##-- Globals: programs
-MOOTM = /usr/local/bin/mootm
+MOOTM = $(shell \
+	test -x /usr/local/bin/mootm && @echo "/usr/local/bin/mootm" \
+	|| echo "/home/moocow/public/bin/mootm")
 MORPHHACK = ./morphhack.perl
 MOOTM_FLAGS = -m /usr/local/share/moot/dwdst-stts-nofeatures.fst -d1024
 MOOTRAIN = ../mootrain
