@@ -504,8 +504,8 @@ bool mootHMM::estimate_wlambdas(const mootLexfreqs &lf)
  *--------------------------------------------------------------------------*/
 void mootHMM::tag_stream(FILE *in, FILE *out, char *srcname)
 {
-  TokenReader treader;
-  TokenWriter twriter(want_best_only, want_tags_only);
+  TokenReader treader(input_first_analysis_is_best, input_ignore_first_analysis);
+  TokenWriter twriter(output_best_only, output_tags_only);
 
   treader.select_stream(in,srcname);
   do {

@@ -9,6 +9,9 @@ void churntest(int argc, char **argv) {
   TokenReader tr;
   FILE *infile = stdin;
 
+  tr.lexer.first_analysis_is_best = true;
+  tr.lexer.ignore_first_analysis = true;
+
   if (argc > 1) {
     infile = fopen(argv[1], "r");
   }

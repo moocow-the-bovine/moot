@@ -118,8 +118,14 @@
    moot::mootToken::Analysis manalysis;\
    /** last token type */ \
    TokenType lasttyp; \
-   /** whether we're parsing a 'best' tag */\
-   bool is_best; \
+   /** whether first analysis parsed should be considered 'best' */ \
+   bool first_analysis_is_best; \
+   /** whether we're parsing a 'best' analysis */\
+   bool current_analysis_is_best; \
+   /** whether first analysis parsed should be ignored */ \
+   bool ignore_first_analysis; \
+   /** whether we're parsing an analysis to be ignored */\
+   bool ignore_current_analysis; \
    \
    /* -- token-buffering */\
    /** token-buffer */\
@@ -153,7 +159,10 @@
   theLine(1), \
   theColumn(0), \
   lasttyp(TLEOS), \
-  is_best(false), \
+  first_analysis_is_best(false), \
+  current_analysis_is_best(false), \
+  ignore_first_analysis(false), \
+  ignore_current_analysis(false), \
   itokbuf_clear(true), \
   srcname("(unknown)"),\
   use_string(false), \
@@ -191,7 +200,7 @@ newline    [\n\r]
 tokchar    [^\t\n\r]
 detchar    [^ \t\n\r\<\>\[]
 tagchar    [^ \t\n\r\]]
-bestchar   [\/]
+/*bestchar   [\/]*/
 
 /*----------------------------------------------------------------------
  * Rules
@@ -234,8 +243,10 @@ bestchar   [\/]
 }
 
 <TOKEN>{space}*/{eotchar} {
-  /* TOKEN: trailing whitespace: ignore it */
+  /* TOKEN: end-of-token (with trailing whitespace: ignored) */
   theColumn += yyleng;
+  if (first_analysis_is_best) current_analysis_is_best = true;
+  if (ignore_first_analysis)  ignore_current_analysis = true;
   lasttyp = TLTEXT;
   BEGIN(SEPARATORS);
 }
@@ -245,10 +256,6 @@ bestchar   [\/]
   //-- SEPARATORS: Separator character(s): increment column nicely
   theColumn = (((int)theColumn/8)+1)*8 + (yyleng ? yyleng-1 : 0);
   lasttyp = TLTAB;
-}
-<SEPARATORS>{bestchar}+({space}*) {
-  theColumn += yyleng;
-  is_best = true;
 }
 <SEPARATORS>""/{wordchar} {
   //-- SEPARATORS: end of separators
@@ -304,12 +311,14 @@ bestchar   [\/]
       manalysis.tag.swap(manalysis.details);
       //manalysis.details.clear();
     } 
-    mtoken.insert(manalysis);
+
+    if (ignore_current_analysis) ignore_current_analysis=false;
+    else mtoken.insert(manalysis);
 
     //-- set best tag if applicable
-    if (is_best) {
+    if (current_analysis_is_best) {
       mtoken.besttag(manalysis.tag);
-      is_best = false;
+      current_analysis_is_best = false;
     }
 
     //-- clear
@@ -374,7 +383,7 @@ bestchar   [\/]
 
 void mootTokenLexer::reset(void)
 {
-  is_best = false;
+  current_analysis_is_best = false;
   BEGIN(TOKEN);
 }
 

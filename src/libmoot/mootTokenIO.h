@@ -58,8 +58,16 @@ public:
   /*----------------------------------------
    * Types: Reading: Methods
    */
-  /** Default constructor */
-  TokenReader(void) {};
+
+  /** Default constructor
+   * @param first_analysis_is_best Whether first analysis should be used to instantiate 'besttag'
+   * @param ignore_first_analysis  Whether first analysis should be (otherwise) ignored
+   */
+  TokenReader(bool first_analysis_is_best=false, bool ignore_first_analysis=false)
+  {
+    lexer.first_analysis_is_best = first_analysis_is_best;
+    lexer.ignore_first_analysis = ignore_first_analysis;
+  };
 
   /** Get underlying token buffer */
   mootToken &token(void) { return lexer.mtoken; }

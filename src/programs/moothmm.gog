@@ -50,12 +50,18 @@ string "output"	o "Specify output file (default=stdout)." \
     default="-"
 
 #---------------------------------------------------
-# Output options
+# Format options
 #---------------------------------------------------
-group "Output Format Options"
+group "Format Options"
 
 #flag "avm"       a "Produce AVM ('vector') output." \
 #    details="Ambiguous-mode only"
+
+flag  "first_is_best" 1 "Assume 1st analysis is 'best' for each input token." \
+    details="Useful for re-analysis."
+
+flag  "ignore_first" 2 "Ignore the first analysis for each input token." \
+    details="Useful for re-analysis."
 
 flag  "best"  b "Prune non-optimal tags (analyses) from the output." \
      details="Only meaningful if your input file contains analysis restrictions."

@@ -252,12 +252,28 @@ public:
 
 public:
   /*---------------------------------------------------------------------*/
-  /** \name Behavioral flags : used by moot::TokenWriter */
-  /** Whether to output all given PoS tags (default) or just the 'best' tag. */
-  bool want_best_only;
-  /** Whether to output all analysis details (default), or just the analysis-tag. */
-  bool want_tags_only;
+  /** \name Input format flags : used by moot::TokenReader */
   //@{
+  /** Whether to output all given PoS tags (default) or just the 'best' tag. */
+  bool input_first_analysis_is_best;
+  /** Whether to output all analysis details (default), or just the analysis-tag. */
+  bool input_ignore_first_analysis;
+  //@}
+
+  /*---------------------------------------------------------------------*/
+  /** \name Output format flags : used by moot::TokenWriter */
+  //@{
+  /**
+   * Whether to output only analyses 
+   * corresponding to the 'best' PoS tag (true),
+   * or for all given PoS tags (false=default)
+   */
+  bool output_best_only;
+  /**
+   * Whether to output only PoS tags (true)
+   * or all analysis details (false=default).
+   */
+  bool output_tags_only;
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -349,8 +365,10 @@ public:
   //@{
   /** Default constructor */
   mootHMM(void)
-    : want_best_only(false),
-      want_tags_only(false),
+    : input_first_analysis_is_best(false),
+      input_ignore_first_analysis(false),
+      output_best_only(false),
+      output_tags_only(false),
       start_tagid(0),
       unknown_lex_threshhold(1.0),
       nglambda1(mootProbEpsilon),
