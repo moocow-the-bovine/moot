@@ -1,0 +1,69 @@
+# -*- Mode: Shell-Script -*-
+
+#-----------------------------------------------------------------------
+# File: dwds-unknown.lxi
+# Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+# Description:
+#   + kdwds tagger source file: analysis of unknown tokens
+#-----------------------------------------------------------------------
+#
+# Process this file with 'lexcomplex' to produce an FSA
+#
+# + Comments (lines starting with '#') and blank lines are
+#   ignored.
+
+#-----------------------------------------------------------------------
+# Nonword categories
+#-----------------------------------------------------------------------
+#_QUOTE
+#_PUNCT
+#_NUMBER
+_ABBREV
+
+#-----------------------------------------------------------------------
+# Open Classes
+#-----------------------------------------------------------------------
+_NOUN
+_VERB
+_ADJ
+_ADVERB
+_ADPOS
+_NAME
+_GEONAME
+
+#-----------------------------------------------------------------------
+# Closed Classes
+#-----------------------------------------------------------------------
+#_ARTDEF
+#_ARTINDEF
+#_CONJ
+#_CARD
+#_ACR
+#_PAV
+#_PDAT
+#_PIS
+#_PISNEG
+#_PIAT
+#_PIDAT
+#_PIDATNEG
+#_PPER
+#_PRF
+#_PPOS
+#_PPOSAT
+#_PRELS
+#_PRELAT
+#_PWS
+#_PWAT
+#_PWAV
+#_PTKA
+#_PTKABT
+#_PTKANT
+#_PTKFOC
+#_PTKNEG
+#_PTKVZ
+#_PTKZU
+
+#-----------------------------------------------------------------------
+# Particles
+#-----------------------------------------------------------------------
+#_VPART
