@@ -1,0 +1,343 @@
+####==============================================================
+## Header
+=pod
+
+=head1 moot TUTORIAL
+
+This document provides a rudimentary introduction to the
+moot PoS tagging utilities.  It should under no circumstances
+be considered a substitute for the individual program
+documentation.
+
+=cut
+
+##==============================================================
+## The Big Idea
+=pod
+
+=head1 The Big Idea
+
+The moot utilities are designed for Part-of-Speech Tagging:
+assigning a single univocal "tag" to each input token.
+The runtime tagger (moot) determines which tags to assign
+by (sequence) maximization of uni-, bi-, and trigram probabilities,
+as well as lexical probabilties and optionally lexical-class
+probabilities.  Probability data is passed to the runtime tagger
+in a "model".  Runtime data to the tagger must be tokenized
+("cooked"), and may optionally for each input token a set
+of possible analyses (a "lexical class") for that token.
+
+=cut
+
+##==============================================================
+## Training
+=pod
+
+=head1 Training
+
+Before an input file can be tagged, statistical data in the
+form of a "model" must first be provided.
+The easiest way to produce such a model is by using the
+"mootrain" (L<mootrain>) utility to derive frequency
+data from a pre-tagged corpus.
+
+=cut
+
+##==============================================================
+## Training: Tagged
+=pod
+
+=head2 Training from a Tagged Corpus
+
+If you have a text-format corpus in the file
+"corpus.ttt" which is pre-tagged with the "best"
+part-of-speech tags, then the incantation:
+
+  mootrain --lex --ngrams corpus.ttt
+
+will produce the model files "corpus.lex" and "corpus.123"
+required for runtime tagging of tokens cooked "rare".
+
+=cut
+
+##==============================================================
+## Training: Tagged,Analyzed
+=pod
+
+=head2 Training from a Tagged and Analyzed Corpus
+
+If you have a text-format corpus in the file
+"corpus.ttt" which is pre-tagged with the "best"
+part-of-speech tags as well as lexical classes,
+then the incantation:
+
+  mootrain --lex --ngrams --classes corpus.mttt
+
+will produce the model files "corpus.lex", "corpus.123",
+and "corpus.clx" required for runtime tagging of
+tokens cooked "medium rare".
+
+If you are using mootm(1) to analyze incoming tokens,
+but your training corpus "corpus.ttt" contains only
+tags (and not analyses), you may generate an appropriate
+"well done" corpus file "corpus.mttt" from "corpus.ttt"
+by calling:
+
+ mootm -12 -m morph.fst -s morph.sym -a -o corpus.mttt corpus.mttt
+
+before calling "mootrain".
+
+=cut
+
+##==============================================================
+## Tokenization
+=pod
+
+=head1 Tokenization
+
+Assume you have some raw (unformatted) text to be tagged in the file
+"test.txt".  Before the text can be tagged, it must first be
+split into indivdual tokens.  The moot utilities contain a
+rudimentary preprocessor, "mootpp" (L<mootpp>), to perform
+this task.  The incantation:
+
+ mootpp -o test.t test.txt
+
+will produce a "rare" cooked file "test.t" suitable for passing
+to the tagger or to an external analysis program.
+
+=cut
+
+##==============================================================
+## Analysis
+=pod
+
+=head1 Analysis (Optional)
+
+If you have an external analysis program such as mootm(1)
+which assigns (possibly empty) lexical classes to input tokens,
+and if your model contains lexical class information (i.e. if
+you trained from a "well done" corpus, and the file "corpus.clx"
+contains entries for more than one lexical class), then you
+may wish at this point to filter "test.t" through your analysis
+program, yielding "test.mt".
+
+For "mootm" with an analysis
+transducer "morph.fst" and analysis symbols "morph.sym",
+the incantation is:
+
+ mootm --morph=morph.fst --symbols=morph.sym --avm -o test.mt test.t
+
+=cut
+
+
+##==============================================================
+## Tagging
+=pod
+
+=head1 Tagging
+
+Having trained a model, as well as tokenized (and optionally analyzed)
+your input file, you are now ready to call the runtime tagger,
+moot (L<moot>).
+
+=cut
+
+##==============================================================
+## Tagging: Rare
+=pod
+
+=head2 Tagging: Rare Cooked Input
+
+If you are not using an external analysis program,
+and if you have a trained model in the files "corpus.lex"
+and "corpus.123", as well as a rare cooked file "test.t"
+to be tagged, then:
+
+ moot --model=corpus --use-classes=0 -o test.tt test.t
+
+will produce a "medium cooked" (tagged) output file
+"test.tt".
+
+=cut
+
+##==============================================================
+## Tagging: Medium Rare
+=pod
+
+=head2 Tagging: Medium Rare Cooked Input
+
+If you are using an external analysis program such as mootm(1),
+and if you have a trained model in the files "corpus.lex",
+"corpus.123", and "corpus.clx", as well as a medium rare cooked file "test.mt"
+to be tagged, then:
+
+ moot --model=corpus --use-classes=1 -o test.cmt test.t
+
+will produce a "well done" (+tagged,+analyzed) output file
+"test.cmt".
+
+=cut
+
+##==============================================================
+## Evaluation
+=pod
+
+=head1 Evaluation
+
+In the course of model development, it is customary to
+reserve a small portion of the hand-tagged training
+corpus for testing.  If you have such a medium cooked
+file "test.ttt" tagged with the "truth", as well as
+a moot output file "test.tt" for the same tokens, you
+can check the accuracy of the tagger
+with the program "mooteval" (L<mooteval>):
+
+ mooteval -2 test.ttt test.tt
+
+=cut
+
+##==============================================================
+## Expample files
+=pod
+
+=head1 Example Files
+
+=cut
+
+##==============================================================
+## Expample: corpus.ttt: +tagged,-analyzed
+=pod
+
+=head2 corpus.ttt : medium cooked file
+
+ %% File       : corpus.ttt
+ %% Description: demonstration corpus for moot tutorial: +tagged,-analyzed
+ 
+ %% Sentence 1
+ This		DD
+ is		VBZ
+ a		AT
+ sentence	NN
+ .		$.
+ 
+ %% Sentence 2
+ This		DD
+ is		VBZ
+ another	DD
+ sentence	NN
+ .		$.
+ 
+ %% Sentence 3
+ Here		RL
+ is		VBZ
+ a		AT
+ 3rd		MD
+ sentence	NN
+ also		RR
+ .		$.
+
+=cut
+
+##==============================================================
+## Expample: corpus.mttt: +tagged,+analyzed
+=pod
+
+=head2 corpus.mttt : well done cooked file
+
+ %% File       : corpus.mttt
+ %% Description: demonstration corpus for moot tutorial: +tagged,+analyzed
+ 
+ %% Sentence 1
+ This		DD	[AT]	[DD]
+ is		VBZ	[VBZ]
+ a		AT	[AT]
+ sentence	NN	[NN]	[VBZ]
+ .		$.	[$.]
+ 
+ %% Sentence 2
+ This		DD	[DD]	[AT]
+ is		VBZ	[VBZ]
+ another	DD	[PP]	[NN]
+ sentence	NN	[NN]	[VBZ]
+ .		$.	[$.]
+ 
+ %% Sentence 3
+ Here		RL	[RL]	[ADV]
+ is		VBZ	[VBZ]
+ a		AT	[AT]
+ 3rd		MD
+ sentence	NN	[NN]	[VBZ]
+ also		RR	[RR]
+ .		$.	[$.]
+
+=cut
+
+##==============================================================
+## Expample: test.txt: raw text file
+=pod
+
+=head2 test.txt : raw text file
+
+ This is a test.  This is ONLY a test.
+
+=cut
+
+##==============================================================
+## Expample: test.t: rare cooked file
+=pod
+
+=head2 test.t : rare cooked file
+
+ This
+ is
+ a
+ test
+ .
+ 
+ This
+ is
+ ONLY
+ a
+ test
+ .
+
+=cut
+
+
+##==============================================================
+## Expample: test.mt: medium-rare cooked file
+=pod
+
+=head2 test.mt : medium-rare cooked file
+
+ This	[AT]	[DD]
+ is	[VBZ]
+ a	[AT]
+ test	[NN]	[VBZ]
+ .	[$.]
+ 
+ This	[AT]	[DD]
+ is	[VBZ]
+ ONLY
+ a	[AT]
+ test	[NN]	[VBZ]
+ .	[$.]
+
+=cut
+
+
+##--------------------------------------------------------------
+## Footer
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@ling.uni-potsdam.deE<gt>
+
+=head1 SEE ALSO
+
+mootutils(1)
+
+=cut
+

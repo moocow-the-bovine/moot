@@ -1,0 +1,25 @@
+%% File       : corpus.ttt
+%% Description: demonstration corpus for moot tutorial: +tagged,-analyzed
+
+%% Sentence 1
+This		DD
+is		VBZ
+a		AT
+sentence	NN
+.		$.
+
+%% Sentence 2
+This		DD
+is		VBZ
+another		DD
+sentence	NN
+.		$.
+
+%% Sentence 3
+Here		RL
+is		VBZ
+a		AT
+3rd		MD
+sentence	NN
+also		RR
+.		$.
