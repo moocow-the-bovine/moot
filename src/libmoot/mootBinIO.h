@@ -39,7 +39,7 @@
 #include <mootTypes.h>
 #include <mootEnum.h>
 #include <mootIO.h>
-
+#include <mootHMM.h>
 
 /** \brief Namespace for structured binary stream I/O */
 namespace mootBinIO {
@@ -342,12 +342,13 @@ namespace mootBinIO {
    * STL: hash_map<>
    */
   /** \brief Binary I/O template instantiation for STL hash_map<> */
-  template<class KeyT, class ValT> class Item<hash_map<KeyT,ValT> > {
+  template<class KeyT, class ValT, class HashFuncT, class EqualFuncT>
+  class Item<hash_map<KeyT,ValT,HashFuncT,EqualFuncT> > {
   public:
     Item<KeyT> key_item;
     Item<ValT> val_item;
   public:
-    inline bool load(mootio::mistream *is, hash_map<KeyT,ValT> &x) const
+    inline bool load(mootio::mistream *is, hash_map<KeyT,ValT,HashFuncT,EqualFuncT> &x) const
     {
       //-- load size
       Item<size_t> size_item;
@@ -369,20 +370,48 @@ namespace mootBinIO {
       return len==0;
     };
 
-    inline bool save(mootio::mostream *os, const hash_map<KeyT,ValT> &x) const
+    inline bool save(mootio::mostream *os, const hash_map<KeyT,ValT,HashFuncT,EqualFuncT> &x) const
     {
       //-- save size
       Item<size_t> size_item;
       if (!size_item.save(os, x.size())) return false;
 
       //-- save items
-      for (typename hash_map<KeyT,ValT>::const_iterator xi = x.begin(); xi != x.end(); xi++) {
-	if (!key_item.save(os,xi->first) || !val_item.save(os,xi->second))
-	  return false;
-      }
+      for (typename hash_map<KeyT,ValT,HashFuncT,EqualFuncT>::const_iterator xi = x.begin();
+	   xi != x.end();
+	   xi++)
+	{
+	  if (!key_item.save(os,xi->first) || !val_item.save(os,xi->second))
+	    return false;
+	}
       return true;
     };
   };
+
+  /*------------------------------------------------------------
+   * moot types: Trigram
+   */
+#ifdef MOOT_USE_TRIGRAMS
+  template <>
+  class Item<mootHMM::Trigram> {
+  public:
+    Item<mootHMM::TagID> tagid_item;
+  public:
+    inline bool load(mootio::mistream *is, mootHMM::Trigram &x) const
+    {
+      return (tagid_item.load(is, x.tag1)
+	      && tagid_item.load(is, x.tag2)
+	      && tagid_item.load(is, x.tag3));
+    };
+
+    inline bool save(mootio::mostream *os, const mootHMM::Trigram &x) const
+    {
+      return (tagid_item.save(os, x.tag1)
+	      && tagid_item.save(os, x.tag2)
+	      && tagid_item.save(os, x.tag3));
+    };
+  };
+#endif // MOOT_USE_TRIGRAMS
 
   /*------------------------------------------------------------
    * moot types: mootEnum

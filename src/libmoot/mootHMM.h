@@ -26,8 +26,8 @@
  *   + moot PoS tagger : Hidden Markov Model (Disambiguator): headers
  *--------------------------------------------------------------------------*/
 
-#ifndef _moot_HMM_H
-#define _moot_HMM_H
+#ifndef _MOOT_HMM_H
+#define _MOOT_HMM_H
 
 #ifdef __GNUC__
 # include <float.h>
@@ -79,28 +79,33 @@
 #endif //-- /DBL_MAX
 
 /**
- * \def moot_LEX_UNKNOWN_TOKENS
+ * \def MOOT_LEX_UNKNOWN_TOKENS
  * Define this to include real lexical entries for tokens with counts
  * <= UnknownLexThreshhold.  Not entirely correct, but it actually
  * seems to help.
  */
-#define moot_LEX_UNKNOWN_TOKENS
-//#undef moot_LEX_UNKNOWN_TOKENS
+#define MOOT_LEX_UNKNOWN_TOKENS
+//#undef MOOT_LEX_UNKNOWN_TOKENS
 
 /**
- * \def moot_USE_TRIGRAMS
- * Define this to use trigrams (not yet implemented everywhere!)
+ * \def MOOT_USE_TRIGRAMS
+ * If defined, trigrams will be used in addition to uni- and bi-grams.
  */
-#undef moot_USE_TRIGRAMS
 
 /**
- * \def moot_LEX_UNKNOWN_CLASSES
+ * \def MOOT_RELAX
+ * If defined, pre-analyses will be used only as "hints" ; otherwise,
+ * they are considered hard restrictions.
+ */
+
+/**
+ * \def MOOT_LEX_UNKNOWN_CLASSES
  * Define this to include real lexical-class entries for classes with counts
  * <= UnknownClassThreshhold.  Not entirely kosher, but it works well, so
  * what the hey...
  */
-#define moot_LEX_UNKNOWN_CLASSES
-//#undef moot_LEX_UNKNOWN_CLASSES
+#define MOOT_LEX_UNKNOWN_CLASSES
+//#undef MOOT_LEX_UNKNOWN_CLASSES
 
 
 moot_BEGIN_NAMESPACE
@@ -248,10 +253,9 @@ public:
    * and lookup is Just Plain Quick.
    */
   typedef ProbT *BigramProbTable;
-  //typedef vector<TagProbTable> BigramProbTable;
 
-#ifdef moot_USE_TRIGRAMS
-  /// Key type for a trigram
+#ifdef MOOT_USE_TRIGRAMS
+  /// \brief Key type for a uni-, bi-, or trigram
   class Trigram {
   public:
 
@@ -277,9 +281,9 @@ public:
     };
 
   public:
-    TagID tag1;
-    TagID tag2;
-    TagID tag3;
+    TagID tag1;  ///< previous-previous tag_{i-2} or 0
+    TagID tag2;  ///< previous tag: tag_{i-1} or 0
+    TagID tag3;  ///< current tag: tag_i
 
   public:
     /// Trigram constructor
@@ -292,40 +296,65 @@ public:
   };
 
   /// Type for a trigram probability lookup table
-  /// : trigram(t1,t2,t3)->p(t3|<t1,t2>)
+  /// : trigram(t1,t2,t3)->log(p(t3|<t1,t2>))
   typedef
-    hash_map<Trigram,ProbT,Trigram::HashFcn,Trigram::EqualFcn>
+    hash_map<Trigram,ProbT,
+	     Trigram::HashFcn,
+	     Trigram::EqualFcn>
     TrigramProbTable;
 #endif
   //@}
 
   /*---------------------------------------------------------------------*/
-  /** \name Viterbi State-Table Types  */
+  /** \name Viterbi Trellis Types  */
   //@{
 
-  /** \brief Type for a Viterbi state-table entry
+  /** \brief Type for a Viterbi trellis entry ("pillar") node
    *
-   * Viterbi state-table is a reverse-linked-list of columns
-   * of linked-list rows.
+   * Viterbi trellis is a
+   * (reverse-linked-list of columns [words]
+   *   (of linked-list rows [current-tags]
+   *    (of linked-list "pillars" [previous-tags])))
    */
   class ViterbiNode {
   public:
-    TagID tagid;                   ///< Tag-ID for this node
-    ProbT lprob;                   ///< log-Probability of best path to this node
-    struct ViterbiNode *pth_prev;  ///< Previous node in best path to this node
-    struct ViterbiNode *row_next;  ///< Next tag-node in current column
+    TagID tagid;                  ///< Current Tag-ID for this node
+#ifdef MOOT_USE_TRIGRAMS
+    TagID ptagid;                 ///< Previous Tag-ID for this node
+#endif
+    ProbT lprob;                  ///< log-Probability of best path to this node
+
+    class ViterbiNode *pth_prev;  ///< Previous node in best path to this node
+    class ViterbiNode *nod_next;  ///< Next previous-tag-node in current pillar
   };
 
-  /**
-   * \brief Type for a Viterbi state-table column.
+#ifdef MOOT_USE_TRIGRAMS
+  /** \brief Type for a Viterbi trellis row ("current tag") node
    *
-   * A Viterbi state-table is completely represented by its (current)
+   * A Viterbi trellis row is completely specified by its Tag-ID
+   * and corresponding "pillar" of previous Tag-IDs.
+   */
+  class ViterbiRow {
+  public:
+    TagID  tagid;                 ///< Current Tag-ID for this node (redundant)
+    class ViterbiNode *nodes;     ///< Trellis "pillar" node(s) for this row
+    class ViterbiRow  *row_next;  ///< Next row
+  };
+#else
+  typedef ViterbiNode ViterbiRow; ///< Alias for a Viterbi trellis row ("current tag") node
+#endif
+
+
+  /**
+   * \brief Type for a Viterbi trellis column.
+   *
+   * A Viterbi trellis is completely represented by its (current)
    * final column (top of the stack).
    */
   class ViterbiColumn {
   public:
-    ViterbiNode   *nodes;    /**< Column nodes */
-    ViterbiColumn *col_prev; /**< Previous column */
+    ViterbiRow    *rows;     ///< Column rows
+    ViterbiColumn *col_prev; ///< Previous column
   };
 
   /**
@@ -346,7 +375,7 @@ public:
    */
   struct ViterbiPathNode {
   public:
-    ViterbiNode      *node;      /** Corresponding state-table node */
+    ViterbiNode      *node;      /** Corresponding pillar-level trellis node */
     ViterbiPathNode  *path_next; /** Next node in this path */
   };
   //@}
@@ -423,7 +452,7 @@ public:
   //@{
   ProbT             nglambda1;    /**< (log) Smoothing constant for unigrams */
   ProbT             nglambda2;    /**< (log) Smoothing constant for bigrams */
-#ifdef moot_USE_TRIGRAMS
+#ifdef MOOT_USE_TRIGRAMS
   ProbT             nglambda3;    /**< (log) Smoothing constant for trigrams */
 #endif
   ProbT             wlambda0;     /**< (log) Smoothing constant for lexical probabilities */
@@ -453,7 +482,7 @@ public:
 
   LexProbTable      lexprobs;   /**< Lexical probability lookup table */
   LexClassProbTable lcprobs;    /**< Lexical-class probability lookup table */
-#ifdef moot_USE_TRIGRAMS
+#ifdef MOOT_USE_TRIGRAMS
   TrigramProbTable  ngprobs3;   /**< N-gram (log-)probability lookup table: trigrams */
 #else
   BigramProbTable   ngprobs2;   /**< N-gram (log-)probability lookup table: bigrams */
@@ -461,9 +490,9 @@ public:
   //@}
 
   /*---------------------------------------------------------------------*/
-  /** \name Viterbi State Data */
+  /** \name Viterbi Trellis Data */
   //@{
-  ViterbiColumn     *vtable;    /**< Low-level state table for Viterbi algorithm */
+  ViterbiColumn     *vtable;    /**< Low-level trellis structure for Viterbi algorithm */
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -482,8 +511,11 @@ protected:
   /*---------------------------------------------------------------------*/
   /** \name Low-level data: trash stacks */
   //@{
-  ViterbiNode     *trash_nodes;     /**< Recycling bin for Viterbi state-table nodes */
-  ViterbiColumn   *trash_columns;   /**< Recycling bin for Viterbi state-table columns */
+  ViterbiNode     *trash_nodes;     /**< Recycling bin for Viterbi trellis nodes */
+#ifdef MOOT_USE_TRIGRAMS
+  ViterbiRow      *trash_rows;      /**< Recycling bin for Viterbi trellis rows */
+#endif
+  ViterbiColumn   *trash_columns;   /**< Recycling bin for Viterbi trellis columns */
   ViterbiPathNode *trash_pathnodes; /**< Recycling bin for Viterbi path-nodes */
   //@}
 
@@ -685,9 +717,6 @@ public:
     if (token.toktype() != TokTypeVanilla) return; //-- ignore non-vanilla tokens
     ntokens++;
     LexClass tok_class;
-    /*for (mootToken::AnalysisSet::const_iterator ani = token.analyses().begin();
-	 ani != token.analyses().end();
-	 ani = token.upper_bound(ani->tag))*/
     for (mootToken::Analyses::const_iterator ani = token.analyses().begin();
 	 ani != token.analyses().end();
 	 ani++)
@@ -856,14 +885,25 @@ public:
     ViterbiNode *pnod;
     vbestpr = MOOT_PROB_NEG;
     vbestpn = NULL;
-    for (pnod = vtable->nodes; pnod != NULL; pnod = pnod->row_next) {
-      //if (pnod->prob > vbestpr) {
-      //vbestpr = pnod->prob;
+
+#ifdef MOOT_USE_TRIGRAMS
+    ViterbiRow  *prow;
+    for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
+      for (pnod = prow->nodes; pnod != NULL; pnod = pnod->nod_next) {
+	if (pnod->lprob > vbestpr) {
+	  vbestpr = pnod->lprob;
+	  vbestpn = pnod;
+	}
+      }
+    }
+#else // !MOOT_USE_TRIGRAMS
+    for (pnod = vtable->rows; pnod != NULL; pnod = pnod->nod_next) {
       if (pnod->lprob > vbestpr) {
 	vbestpr = pnod->lprob;
 	vbestpn = pnod;
       }
     }
+#endif // MOOT_USE_TRIGRAMS
     return vbestpn;
   };
 
@@ -877,9 +917,25 @@ public:
   {
     ViterbiNode *pnod;
     vbestpr = MOOT_PROB_NEG;
-    for (pnod = vtable->nodes; pnod != NULL; pnod = pnod->row_next) {
+#ifdef MOOT_USE_TRIGRAMS
+    ViterbiRow  *prow;
+    vbestpn = NULL;
+    for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
+      if (prow->tagid == tagid) {
+	for (pnod = prow->nodes; pnod != NULL; pnod = pnod->nod_next) {
+	  if (pnod->lprob > vbestpr) {
+	    vbestpr = pnod->lprob;
+	    vbestpn = pnod;
+	  }
+	}
+	return vbestpn;
+      }
+    }
+#else // !MOOT_USE_TRIGRAMS
+    for (pnod = vtable->rows; pnod != NULL; pnod = pnod->nod_next) {
       if (pnod->tagid == tagid) return pnod;
     }
+#endif // MOOT_USE_TRIGRAMS
     return NULL;
   };
  
@@ -911,32 +967,104 @@ public:
 
   /** \name Low-level Viterbi iteration utilities */
   //{@
+
+  /** Returns true iff @col is a valid (non-empty) Viterbi trellis column */
+  inline bool viterbi_column_ok(const ViterbiColumn *col) const {
+    return (col
+	    && col->rows 
+#ifdef MOOT_USE_TRIGRAMS
+	    && col->rows->nodes
+#endif
+	    );
+  };
+
   /**
-   * Find the best previous node from top column of 'vtable' for destination tag 'curtagid',
-   * stores a pointer to the best previous node in 'vbestpn', and the
-   * (adjusted) n-gram transition probability in 'vbestpr'.
-   *
-   * \note lexical probabilites are ignored for this computation, since they're
-   * constant for the current (token,tag) pair under consideration.
+   * Get and populate a new Viterbi-trellis row in column @col for destination Tag-ID
+   * @curtagid with lexical (log-)probability @wordpr.
+   * If @col is NULL (the default), a new column will be allocated.
+   * Returns a pointer to the trellis column, or NULL on failure.
    */
-  inline void viterbi_find_best_prevnode(TagID curtagid, ProbT curtagp=MOOT_PROB_NEG)
+  inline ViterbiColumn *viterbi_populate_row(TagID curtagid,
+					     ProbT wordpr=MOOT_PROB_ONE,
+					     ViterbiColumn *col=NULL)
   {
-    ViterbiNode *pnod;
-    if (curtagp <= MOOT_PROB_ZERO) curtagp = tagp(curtagid);
+#ifdef MOOT_USE_TRIGRAMS
+    ViterbiRow  *prow, *row = viterbi_get_row();
+    ViterbiNode *pnod, *nod = NULL;
+
+    if (!col) {
+      col           = viterbi_get_column();
+      col->rows     = NULL;
+    }
+    col->col_prev = vtable;
+    row->nodes = NULL;
+
+    for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
+      vbestpr = MOOT_PROB_NEG;
+      vbestpn = NULL;
+
+      for (pnod = prow->nodes; pnod != NULL; pnod = pnod->nod_next) {
+	vtagpr = pnod->lprob + tagp(pnod->ptagid, prow->tagid, curtagid);
+	if (vtagpr > vbestpr) {
+	  vbestpr = vtagpr;
+	  vbestpn = pnod;
+	}
+      }
+
+      //-- set node information
+      nod = viterbi_get_node();
+      nod->tagid    = curtagid;
+      nod->ptagid   = prow->tagid;
+      nod->lprob    = vbestpr + wordpr;
+      //nod->row      = row;
+      nod->pth_prev = vbestpn;
+      nod->nod_next = row->nodes;
+
+      row->nodes    = nod;
+    }
+
+    //-- set row information
+    row->tagid    = curtagid;
+    row->row_next = col->rows;
+    col->rows     = row;
+
+#else //! MOOT_USE_TRIGRAMS
+
+    ViterbiNode *pnod, *nod = NULL;
+
+    if (!col) {
+      col           = viterbi_get_column();
+      col->rows     = NULL;
+    }
+    col->col_prev = vtable;
 
     vbestpr = MOOT_PROB_NEG;
     vbestpn = NULL;
-    for (pnod = vtable->nodes; pnod != NULL; pnod = pnod->row_next) {
-      vtagpr = 
-	//pnod->lprob + log( (nglambda1 * curtagp) + (nglambda2 * tagp(pnod->tagid, curtagid)) );
-	pnod->lprob + tagp(pnod->tagid, curtagid);
 
+    for (pnod = vtable->rows; pnod != NULL; pnod = pnod->nod_next) {
+      vtagpr = pnod->lprob + tagp(pnod->tagid, curtagid);
       if (vtagpr > vbestpr) {
 	vbestpr = vtagpr;
 	vbestpn = pnod;
       }
     }
+
+    //-- set node/row information
+    nod           = viterbi_get_node();
+    nod->tagid    = curtagid;
+    nod->lprob    = vbestpr + wordpr;
+    nod->pth_prev = vbestpn;
+    nod->nod_next = col->rows;
+
+    //-- set row/col information
+    nod->nod_next = col->rows;
+    col->rows     = nod;
+
+#endif // MOOT_USE_TRIGRAMS
+
+    return col;
   };
+
 
   //------------------------------------------------------------
   // Viterbi: Low-level: clear best-path
@@ -972,8 +1100,8 @@ public:
   inline ViterbiNode *viterbi_get_node(void) {
     ViterbiNode *nod;
     if (trash_nodes != NULL) {
-      nod = trash_nodes;
-      trash_nodes = nod->row_next;
+      nod         = trash_nodes;
+      trash_nodes = nod->nod_next;
     } else {
       nod = new ViterbiNode();
     }
@@ -981,12 +1109,28 @@ public:
   };
 
   //------------------------------------------------------------
+  // Viterbi: trash utilities: Rows
+#ifdef MOOT_USE_TRIGRAMS
+  /** Returns a pointer to an unused ViterbiRow, possibly allocating a new one. */
+  inline ViterbiRow *viterbi_get_row(void) {
+    ViterbiRow *row;
+    if (trash_rows != NULL) {
+      row        = trash_rows;
+      trash_rows = row->row_next;
+    } else {
+      row = new ViterbiRow();
+    }
+    return row;
+  };
+#endif //MOOT_USE_TRIGRAMS
+
+  //------------------------------------------------------------
   // Viterbi: trash utilities: columns
   /** Returns a pointer to an unused ViterbiColumn, possibly allocating a new one. */
   inline ViterbiColumn *viterbi_get_column(void) {
     ViterbiColumn *col;
     if (trash_columns != NULL) {
-      col = trash_columns;
+      col           = trash_columns;
       trash_columns = col->col_prev;
     } else {
       col = new ViterbiColumn();
@@ -1165,15 +1309,13 @@ public:
   inline const ProbT tagp(const TagID tagid) const
   {
     return
-#ifdef moot_USE_TRIGRAMS
-      ngprobs3 && tagid < n_tags
-      ? ngprobs3[tagid]
-      : MOOT_PROB_ZERO;
+#ifdef MOOT_USE_TRIGRAMS
+      tagp(0,0,tagid);
 #else
       ngprobs2 && tagid < n_tags
       ? ngprobs2[tagid]
       : MOOT_PROB_ZERO;
-#endif // moot_USE_TRIGRAMS
+#endif // MOOT_USE_TRIGRAMS
   };
 
   /**
@@ -1196,10 +1338,8 @@ public:
   inline const ProbT tagp(const TagID prevtagid, const TagID tagid) const
   {
     return
-#ifdef moot_USE_TRIGRAMS
-      ngprobs3 && prevtagid < n_tags && tagid < n_tags
-      ? ngprobs3[(n_tags*prevtagid)+tagid]
-      : MOOT_PROB_ZERO;
+#ifdef MOOT_USE_TRIGRAMS
+      tagp(0,prevtagid,tagid);
 #else
       ngprobs2 && prevtagid < n_tags && tagid < n_tags
       ? ngprobs2[(n_tags*prevtagid)+tagid]
@@ -1220,24 +1360,25 @@ public:
   /*------------------------------------------------------------
    * Trigram probability lookup
    */
-#ifdef moot_USE_TRIGRAMS
+#ifdef MOOT_USE_TRIGRAMS
   /**
    * Looks up and returns trigram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
    * given Trigram(prevtagid2,prevtagid1,tagid)
    *
-   * \bold NOT REALLY IMPLEMENTED.
+   * \bold WORK IN PROGRESS
    */
-  inline const ProbT tagp(const Trigram &trigram) const
+  inline const ProbT tagp(const Trigram &trigram, ProbT ProbZero=MOOT_PROB_ZERO) const
   {
     TrigramProbTable::const_iterator tgti = ngprobs3.find(trigram);
-    return tgti == ngprobs3.end() ? MOOT_PROB_ZERO : tgti->second;
+    return tgti != ngprobs3.end() ? tgti->second : ProbZero;
   };
+
 
   /**
    * Looks up and returns trigram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
    * given prevtagid2, prevtagid1, tagid.
    *
-   * \bold NOT REALLY IMPLEMENTED.
+   * \bold WORK IN PROGRESS
    */
   inline const ProbT tagp(const TagID prevtagid2, const TagID prevtagid1, const TagID tagid) const
   {
@@ -1249,7 +1390,7 @@ public:
    *
    * Looks up and returns trigram (log-)probability: log(p(tag|prevtag1,prevtag2)), string-version.
    *
-   * \bold NOT REALLY IMPLEMENTED.
+   * \bold WORK IN PROGRESS
    */
   inline const ProbT tagp(const mootTagString &prevtag2,
 			  const mootTagString &prevtag1,
@@ -1258,7 +1399,7 @@ public:
   {
     return tagp(tagids.name2id(prevtag2), tagids.name2id(prevtag1), tagids.name2id(tag));
   };
-#endif /* moot_USE_TRIGRAMS */
+#endif // MOOT_USE_TRIGRAMS
   //@}
 
 
@@ -1287,4 +1428,4 @@ public:
 
 moot_END_NAMESPACE
 
-#endif /* _moot_HMM_H */
+#endif /* _MOOT_HMM_H */

@@ -3,7 +3,25 @@ ChangeLog for package moot
 Todo:
 	+ write perl-XS interface & utilities
 
-v2.0.2 Sun, 18 Jul 2004 13:59:28 +0200
+v2.0.2 Mon, 19 Jul 2004 15:51:53 +0200
+	+ added build option '--enable-trigrams'
+	  - use trigram probabilities in addition to uni- and bigram probabilities
+	  - helps with rare (*.tt) and -classfreq medium-rare (*.dmt) tagging
+	  - hurts +classfreq medium-rare (*.cmt) tagging
+	  - hurts tagging speed in a major way:
+	    * rare                   :  7165.76 vs. 120071.95 tok/sec (ca. 17x slower) [-relax]
+	    * -classfreq medium-rare : 25648.62 vs.  48529.92 tok/sec (ca.  2x slower) [-relax]
+	    * +classfreq medium-rare : 14237.84 vs.  40900.69 tok/sec (ca.  3x slower) [-relax]
+	  --> maybe beam-search would help here?
+	+ added build option '--enable-relax'
+	  - 'relaxed' interpretation of pre-analyses:
+	     * raises accuracy and speed at the cost of internal coverage
+	       (lose "strict" interpretation of pre-analyses)
+	     * makes no difference to rare (*.tt) tagging
+	     * reduces -classfreq medium-rare (*.dmt) tagging to 'rare' case (hurts)
+	     * helps with +classfreq medium-rare (*.cmt) tagging
+	+ added pkg-config variable 'build_options'
+	  - for easy access to compile-time options for an installed distribution
 	+ pre-compute log-probabilities
 	  - avoid underflow, and a snippet faster at runtime
 	+ reduce storage requirements by storing unigrams as [0][tagid]
