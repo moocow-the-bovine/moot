@@ -280,62 +280,69 @@ dwdstTagger::get_fsm_tag_strings(FSM *fsa, set<FSMSymbolString> *tag_strings=NUL
 
 //(inlined)
 
-
 void dwdstTagger::symbol_vector_to_string_dq(const vector<FSMSymbol> &vec, FSMSymbolString &str)
 {
+  bool last_was_char = true;
   str.clear();
-  for (vector<FSMSymbol>::const_iterator vi = vec.begin(); vi != vec.end(); ) {
-    if (*vi == EPSILON || *vi == FSMNOLABEL) {
-      vi++;
-      continue;
-    }
+
+  //-- Special case for first symbol --
+  vector<FSMSymbol>::const_iterator vi;
+  for (vi = vec.begin(); vi != vec.end(); vi++) {
     register const FSMSymbolString *isym = syms->symbol_to_symbolname(*vi);
     if (isym == NULL) {
       if (verbose > 2) {
-	carp("dwdstTagger::symbol_vector_to_string_sq(): Error: undefined symbol '%d' -- ignored", *vi);
+	carp("dwdstTagger::symbol_vector_to_string_dq(): Error: undefined symbol '%d' -- ignored", *vi);
       }
-      vi++;
+      continue;
+    }
+    else { //-- isym==NULL
+      if (isym->size() > 1) {
+	if ((*isym)[0] == '_') {
+	  //str.append(*isym, 1, isym->size());
+	  str.append(isym->begin()+1, isym->end());
+	} else {
+	  str.append(*isym);
+	}
+	//str.push_back('.');
+	last_was_char = false;
+      } else {
+	str.push_back((*isym)[0]);
+	last_was_char = true;
+      }
+    }
+    break;
+  }
+
+
+  //-- Normal case --
+  for (vi++; vi != vec.end(); vi++) {
+    if (*vi == EPSILON || *vi == FSMNOLABEL) continue;
+    register const FSMSymbolString *isym = syms->symbol_to_symbolname(*vi);
+    if (isym == NULL) {
+      if (verbose > 2) {
+	carp("dwdstTagger::symbol_vector_to_string_dq(): Error: undefined symbol '%d' -- ignored", *vi);
+      }
       continue;
     }
     else { //-- isym==NULL
       // -- it's a kosher symbol
-      if ((*isym)[0] == '_') {
-	// -- it's a category (hack!)
-	str.append(*isym, 1, isym->length());
-	const vector<FSMSymbolString>* feat = syms->features_of_category(*isym);
-	vi++;
-	for (vector<FSMSymbolString>::const_iterator fi = feat->begin();
-	     fi != feat->end() && vi != vec.end();
-	     vi++, fi++)
-	  {
-	    const set<FSMSymbol> *fsubtypes = syms->subtypes_of(*fi);
-	    if (fsubtypes->find(*vi) == fsubtypes->end()) {
-	      // -- not a valid value for this feature -- assume the category is done
-	      break;
-	    }
-	    isym = syms->symbol_to_symbolname(*vi);
-	    str.push_back('.');
-	    str.append(*isym);
-	  }
-	// -- done with this category
-	str.push_back('.');  //-- just in case
-	continue; // -- we've already incremented vi enough
-      }
-      else { //-- isym[0]=='_' : non-category
-	if (isym->length() > 1) {
-	  str.append(*isym);
-	  str.push_back('.');
+      if (isym->size() > 1) {
+	str.push_back('.');
+	if ((*isym)[0] == '_') {
+	  //str.append(*isym, 1, isym->size());
+	  str.append(isym->begin()+1, isym->end());
 	} else {
-	  str.push_back((*isym)[0]);
+	  str.append(*isym);
 	}
+	last_was_char = false;
+      } else {
+	if (!last_was_char) str.push_back('.');
+	str.push_back((*isym)[0]);
+	last_was_char = true;
       }
     }
-    vi++;
   }
-  //-- delete trailing '.'
-  if (str[str.size()-1] == '.') str.pop_back();
 };
-
 
 
 

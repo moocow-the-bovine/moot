@@ -291,9 +291,9 @@ public:
   inline void symbol_vector_to_string(const vector<FSMSymbol> &vec, FSMSymbolString &str)
   {
     if (do_dequote) {
-      syms->symbol_vector_to_string(vec, str, want_avm, verbose > 2);
-    } else {
       symbol_vector_to_string_dq(vec, str);
+    } else {
+      syms->symbol_vector_to_string(vec, str, want_avm, verbose > 2);
     }
   };
 

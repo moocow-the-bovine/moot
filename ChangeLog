@@ -1,4 +1,8 @@
 ChangeLog for package dwdst
 
+v1.0.0_pre4 Thu, 14 Aug 2003 17:55:48 +0200
+  + corrected '-q' syntax for dwdst, optimized 
+    dwdstTagger::symbol_vector_to_string_dq() method.
+	
 Wed Nov 13 16:02:33 CET 2002
   + updated for FSMlib v0.1.0
