@@ -81,7 +81,8 @@ size_t mootClassfreqs::n_impossible(void)
 	   lcsi++)
 	{
 	  if (lcti->first.find(lcsi->first) == lcti->first.end())
-	    n += lcti->second.freqs.size();
+	    n++;
+	    //n += lcti->second.freqs.size();
 	}
     }
   return n;

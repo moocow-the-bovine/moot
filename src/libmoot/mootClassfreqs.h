@@ -119,11 +119,11 @@ public:
     //-- adjust token-table
     ClassfreqTable::iterator lci = lctable.find(lclass);
     if (lci == lctable.end()) {
-      //-- new token
+      //-- new class
       lci = lctable.insert(ClassfreqTable::value_type(lclass,ClassfreqEntry(count))).first;
       lci->second.freqs[tag] = count;
     } else {
-      //-- known token
+      //-- known class
       lci->second.count += count;
 
       ClassfreqSubtable::iterator lsi = lci->second.freqs.find(tag);
