@@ -149,6 +149,24 @@ void test_symbols() {
 
 
 /*
+ * sigma() =>  ... // ??? lines
+ */
+void test_sigma() {
+  //FSMSymbolString s = cat;
+  const set<FSMSymbolString> *results = syms->symbols();
+
+  cout << "sigma() = "
+       << (results->empty() ? " --empty--\n" : "\n");
+  for (set<FSMSymbolString>::const_iterator r = results->begin(); r != results->end(); r++) {
+      FSMSymbol s = syms->symbolname_to_symbol(*r);
+      if (s != EPSILON && s != FSMNOLABEL) {
+	  cout << "\t" << r->c_str() << " (" << s << ")\n";
+      }
+  }
+}
+
+
+/*
  * categories1() => ABBREV ... NOUN ...  VZUINFIX  // 69 lines
  *  + gets all categories (HACK!)
  */
@@ -222,7 +240,7 @@ int main (int argc, char **argv) {
     ++argv;
 
     //test_type_inference(*argv);
-    test_subtypes_of(*argv);
+    //test_subtypes_of(*argv);
     //test_supertypes_of(*argv);
     //test_features_of_cat(*argv);
     //test_name2sym(*argv);
@@ -233,4 +251,5 @@ int main (int argc, char **argv) {
   //test_categories2();
   //test_terminal_signs();
   //test_terminal_symbols();
+  test_sigma();
 }
