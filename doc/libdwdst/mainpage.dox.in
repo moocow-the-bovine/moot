@@ -93,4 +93,7 @@ libFSM finite state machine C++ library by Thomas Hanneforth.
 \see <A HREF="../../programs/dwdsm.html">dwdsm(1)</A>
 \see <A HREF="../../programs/dwdst.html">dwdst(1)</A>
 
+\todo Ensure gcc-3.x compatibility.
+\todo Write Perl interface.
+
 */
