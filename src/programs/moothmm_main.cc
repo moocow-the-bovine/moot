@@ -348,7 +348,8 @@ int main (int argc, char **argv)
       ielapsed = astarted.tv_sec-istarted.tv_sec + (double)(astarted.tv_usec-istarted.tv_usec)/1000000.0;
 
       // -- print summary
-      fprintf(stderr,"\n---------------------------------------------------------------------\n");
+      fprintf(stderr,
+	      "\n---------------------------------------------------------------------\n");
       fprintf(stderr, "%s Summary:\n", PROGNAME);
       fprintf(stderr, "  + General\n");
       fprintf(stderr, "    - Files Processed     : %9u file(s)\n", nfiles);
@@ -382,7 +383,8 @@ int main (int argc, char **argv)
       fprintf(stderr, "    - Initialize Time     : %12.2f sec\n", ielapsed);
       fprintf(stderr, "    - Analysis Time       : %12.2f sec\n", aelapsed);
       fprintf(stderr, "    - Throughput Rate     : %12.2f tok/sec\n", (double)hmm.ntokens/aelapsed);
-      fprintf(stderr, "---------------------------------------------------------------------\n");
+      fprintf(stderr,
+	      "---------------------------------------------------------------------\n");
   }
 
   return 0;
