@@ -1,8 +1,8 @@
 /* -*- Mode: C++ -*- */
 
 /*
-   libmoot version 1.0.4 : moocow's part-of-speech tagging library
-   Copyright (C) 2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   libmoot : moocow's part-of-speech tagging library
+   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -46,6 +46,33 @@ moot_BEGIN_NAMESPACE
 
 // (inlined)
 
+/*----------------------------------------------------------------------
+ * Information
+ *----------------------------------------------------------------------*/
+size_t mootNgrams::n_bigrams(void)
+{
+  size_t n = 0;
+  for (NgramTable::const_iterator ngi1 = ngtable.begin(); ngi1 != ngtable.end(); ngi1++)
+    {
+      n += ngi1->second.freqs.size();
+    }
+  return n;
+}
+
+size_t mootNgrams::n_trigrams(void)
+{
+  size_t n = 0;
+  for (NgramTable::const_iterator ngi1 = ngtable.begin(); ngi1 != ngtable.end(); ngi1++)
+    {
+      for (BigramTable::const_iterator ngi2 = ngi1->second.freqs.begin();
+	   ngi2 != ngi1->second.freqs.end();
+	   ngi2++)
+	{
+	  n += ngi2->second.freqs.size();
+	}
+    }
+  return n;
+}
 
 /*----------------------------------------------------------------------
  * I/O
@@ -88,41 +115,38 @@ bool mootNgrams::save(char *filename, bool compact)
 
 bool mootNgrams::save(FILE *file, char *filename, bool compact)
 {
-  set<NgramString> ngrams;
+  NgramTable::const_iterator ngi1;
+  BigramTable::const_iterator ngi2;
+  TrigramTable::const_iterator ngi3;
 
-  //-- prepare sorted key-list
-  for (NgramStringTable::const_iterator ngti = ngtable.begin(); ngti != ngtable.end(); ngti++) {
-    ngrams.insert(ngti->first);
-  }
+  for (ngi1 = ngtable.begin(); ngi1 != ngtable.end(); ngi1++) {
+    const mootTagString &tag1   = ngi1->first;
+    const CountT        &count1 = ngi1->second.count;
+    fprintf(file, "%s\t%g\n", tag1.c_str(), count1);
 
-  //-- and output
-  NgramString::const_iterator ngii;
-  NgramString                 prevngram;
-  NgramString::const_iterator pngi;
-  for (set<NgramString>::iterator ngi = ngrams.begin(); ngi != ngrams.end(); ngi++) {
-    if (ngi->empty()) continue;
-    if (compact) {
-      for (pngi  = prevngram.begin() ,  ngii  = ngi->begin();
-	   pngi != prevngram.end()   && ngii != ngi->end()    && *pngi == *ngii;
-	   pngi ++                   ,  ngii ++)
-	{
-	  fputc('\t', file);
-	}
-      for (; ngii != ngi->end(); ngii++)
-	{
-	  fputs(ngii->c_str(), file);
-	  fputc('\t', file);
-	}
-      prevngram = *ngi;
-    }
-    else {
-      //-- verbose mode: print all tags
-      for (ngii = ngi->begin(); ngii != ngi->end(); ngii++) {
-	fputs(ngii->c_str(), file);
+    for (ngi2 = ngi1->second.freqs.begin(); ngi2 != ngi1->second.freqs.end(); ngi2++) {
+      const mootTagString &tag2   = ngi2->first;
+      const CountT        &count2 = ngi2->second.count;
+
+      if (compact) {
 	fputc('\t', file);
+      } else {
+	fprintf(file, "%s\t", tag1.c_str());
+      }
+      fprintf(file, "%s\t%g\n", tag2.c_str(), count2);
+
+      for (ngi3 = ngi2->second.freqs.begin(); ngi3 != ngi2->second.freqs.end(); ngi3++) {
+	const mootTagString &tag3   = ngi3->first;
+	const CountT        &count3 = ngi3->second;
+
+	if (compact) {
+	  fputs("\t\t", file);
+	} else {
+	  fprintf(file, "%s\t%s\t", tag1.c_str(), tag2.c_str());
+	}
+	fprintf(file, "%s\t%g\n", tag3.c_str(), count3);
       }
     }
-    fprintf(file, "%g\n", ngtable[*ngi]);
   }
 
   return 1;

@@ -1,6 +1,6 @@
 /*
-   moot-utils version 1.0.4 : moocow's part-of-speech tagger
-   Copyright (C) 2002-2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   moot-utils : moocow's part-of-speech tagger
+   Copyright (C) 2002-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 */
 
 /*--------------------------------------------------------------------------
- * File: hmmdutil.cc
+ * File: hmmutil.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
  *   + HMM command-line parsing utilities
@@ -66,7 +66,12 @@ bool hmm_parse_textmodel(char *model, char **lexfile, char **ngfile)
 
 bool hmm_parse_corpusmodel(char *corpus, char **lexfile, char **ngfile)
 {
+  char olddot = '.';
   char *dot   = strrchr(corpus, '.');
+  if (!dot) {
+    dot = corpus + strlen(corpus);
+    olddot = '\0';
+  }
   *dot = '\0';
   if (!*lexfile) *lexfile = (char *)malloc(strlen(corpus)+4);
   if (!*ngfile)  *ngfile = (char *)malloc(strlen(corpus)+4);
@@ -74,7 +79,7 @@ bool hmm_parse_corpusmodel(char *corpus, char **lexfile, char **ngfile)
   strcpy(*ngfile, corpus);
   strcat(*lexfile, ".lex");
   strcat(*ngfile, ".123");
-  *dot = '.';
+  *dot = olddot;
   return true;
 }
 

@@ -1,8 +1,8 @@
 /* -*- Mode: C++ -*- */
 
 /*
-   libmoot version 1.0.4 : moocow's part-of-speech tagging library
-   Copyright (C) 2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   libmoot : moocow's part-of-speech tagging library
+   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -40,58 +40,104 @@ class mootNgrams {
 
 public:
   //------ public typedefs
-  
-  /** Type for a single N-Gram, string form */
-  typedef  deque<mootTagString> NgramString;
 
   /** Type for an N-Gram count */
   typedef CountT NgramCount;
-  
-  /** Utilities for mootNgrams::NgramString */
-  class NgramStringUtils {
-  public:
-    // -- STL utilities
-    struct HashFcn {
-    public:
-      inline size_t operator()(const NgramString &x) const {
-	size_t hv = 0;
-	for (NgramString::const_iterator xi = x.begin();
-	     xi != x.end();
-	     xi++)
-	  {
-	    for (mootTagString::const_iterator xii = xi->begin();
-		 // (*xii) != '\0' &&
-		 xii != xi->end();
-		 xii++)
-	      {
-		hv += (hv<<5)-hv + *xii;
-	      }
-	    //hv += 5*hv + __stl_hash_string(xi->c_str());
-	  }
-	return hv;
-      };
-    };
-    struct EqualFcn {
-    public:
-      inline size_t operator()(const NgramString &x, const NgramString &y) const {
-	return x==y;
-      };
-    };
-  }; //-- end mootNgrams::NgramStringUtils
 
-  /** Actual N-Gram->Count lookup table typedef */
-  typedef
-    //map<mootNGramString,float> //--slower
-    hash_map<NgramString,
-	     float,
-	     NgramStringUtils::HashFcn,
-	     NgramStringUtils::EqualFcn>
-    NgramStringTable;
+  /** Type for tertiary (tag->trigramCount) lookup-table entry */
+  typedef map<mootTagString,NgramCount> TrigramTable;
+
+  /** Type for secondary lookup-table entry */
+  class BigramEntry {
+  public:
+    CountT       count;   /**< bigram count */
+    TrigramTable  freqs;   /**< map from tags to trigram counts beginning with this bigram */
+  public:
+    BigramEntry(const CountT bg_count=0) : count(bg_count) {};
+  };
+
+  /** Type for secondary lookup table */
+  typedef map<mootTagString,BigramEntry> BigramTable;
+  
+  /** Type for primary lookup-table entry */
+  class UnigramEntry {
+  public:
+    CountT       count;   /**< bigram count */
+    BigramTable  freqs;   /**< map from tags to bigram entries beginning with this tag */
+  public:
+    UnigramEntry(const CountT ug_count=0) : count(ug_count) {};
+  };
+
+  /** Type for primary lookup-table */
+  typedef map<mootTagString,UnigramEntry> NgramTable;
+
+  /** Class for full trigram data: used by interface methods */
+  class Ngram : public deque<mootTagString> {
+  public:
+    /** Default constructor */
+    Ngram(void) {};
+    /** Unigram constructor */
+    Ngram(const mootTagString &tag1) {
+      push_back(tag1);
+    };
+    /** Bigram constructor */
+    Ngram(const mootTagString &tag1, const mootTagString &tag2) {
+      push_back(tag1);
+      push_back(tag2);
+    };
+    /** Trigram constructor */
+    Ngram(const mootTagString &tag1,
+	  const mootTagString &tag2,
+	  const mootTagString &tag3) {
+      push_back(tag1);
+      push_back(tag2);
+      push_back(tag3);
+    };
+
+    /** Default destructor */
+    ~Ngram(void) {
+      clear();
+    };
+
+    /*----------------
+     * Accessors
+     */
+    /** Return the 1st tag of the trigram */
+    const mootTagString &tag1(void) const { return (*this)[0]; } ;
+    /** Return the 2nd tag of the trigram */
+    const mootTagString &tag2(void) const { return (*this)[1]; };
+    /** Return the 3rd tag of the trigram */
+    const mootTagString &tag3(void) const { return (*this)[2]; };
+
+    /*----------------
+     * Manipulators
+     */
+    /** Push \c tag3 onto the end of the n-gram, shifting old \c tag1 off the front */
+    void push(const mootTagString &tag_new=mootTagString("")) {
+      if (size() >= 3) pop_front();
+      push_back(tag_new);
+    };
+
+    /** Debug: string-form */
+    string as_string(void) const {
+      string s = "<";
+      for (const_iterator i = begin(); i != end(); i++) {
+	s.append(*i);
+	s.push_back(',');
+      }
+      if (s.size() > 1) {
+	s[s.size()-1] = '>';
+      } else {
+	s.push_back('>');
+      }
+      return s;
+    };
+  };
 
 public:
   //------ public data
-  NgramStringTable ngtable;  /**< N-Gram to count lookup table */
-  NgramCount       ugtotal;  /**< total number of unigrams */
+  NgramTable  ngtable;  /**< N-Gram to count lookup table */
+  NgramCount  ugtotal;  /**< total number of unigrams */
 
 public:
   //------ public methods
@@ -111,60 +157,135 @@ public:
     ugtotal = 0;
   };
 
-  /** Add 'count' to the current count for 'ngram', returns new count */
-  inline NgramCount add_count(const NgramString &ngram, const NgramCount count)
+  //------ public methods: information
+  /** Return the number of distinct stored bigrams */
+  size_t n_bigrams(void);
+
+  /** Return the number of distinct stored trigrams */
+  size_t n_trigrams(void);
+
+  /**
+   * Add \c count to the current count for unigram <tag>.
+   */
+  inline void add_count(const mootTagString &tag, const NgramCount count)
   {
-    /*
-    if (ngtable.find(ngram) != ngtable.end()) {
-      ngtable[ngram] = count;
-    } else {
-      ngtable[ngram] += count;
-    }
-    */
-    if (ngram.size() == 1) ugtotal += count;
-    return ngtable[ngram] += count;
+    ngtable[tag].count += count;
+    ugtotal += count;
   };
 
+  /**
+   * Add \c count to the current count for bigram <tag1,tag2>
+   * Does NOT add any unigram counts.
+   */
+  inline void add_count(const mootTagString &tag1,
+			const mootTagString &tag2,
+			const NgramCount count)
+  {
+    ngtable[tag1].freqs[tag2].count += count;
+  };
+
+  /**
+   * Add \c count to the current count for trigram <tag1,tag2,tag3>
+   * Does NOT add any bigram or unigram counts.
+   */
+  inline void add_count(const mootTagString &tag1,
+			const mootTagString &tag2,
+			const mootTagString &tag3,
+			const NgramCount count)
+  {
+    ngtable[tag1].freqs[tag2].freqs[tag3] += count;
+  };
+
+  /**
+   * Add \c count to the current count for
+   * \c ngram -- length-dependent.
+   */
+  inline void add_count(const Ngram &ngram, const NgramCount count)
+  {
+    switch (ngram.size()) {
+    case 0:
+      break;
+    case 1:
+      add_count(ngram[0],count);
+      break;
+    case 2:
+      add_count(ngram[0],ngram[1],count);
+      break;
+    case 3:
+      add_count(ngram[0],ngram[1],ngram[2],count);
+      break;
+    default:
+      break;
+    }
+  };
+
+
+  /**
+   * Add \c count to the current count for
+   * <tag1>, <tag1,tag2>, and <tag1,tag2,tag3>
+   * in \c ngram.... \c ngram may be shorter than
+   * 3 tags, in which case counts are only
+   * added for the elements present.
+   */
+  inline void add_counts(const Ngram &ngram, const NgramCount count)
+  {
+    size_t ngsize = ngram.size();
+    if (ngsize < 1) return;
+
+    NgramTable::iterator ngi1 = ngtable.find(ngram.tag1());
+    if (ngi1 == ngtable.end()) {
+      ngi1 = ngtable.insert(pair<mootTagString,UnigramEntry>(ngram.tag1(),UnigramEntry())).first;
+    }
+    ngi1->second.count += count;
+    ugtotal += count;
+
+    if (ngsize < 2) return;
+    BigramTable::iterator ngi2 = ngi1->second.freqs.find(ngram.tag2());
+    if (ngi2 == ngi1->second.freqs.end()) {
+      ngi2 = ngi1->second.freqs.insert(pair<mootTagString,
+				            BigramEntry>  (ngram.tag2(),BigramEntry())).first;
+    }
+    ngi2->second.count += count;
+
+    if (ngsize < 3) return;
+    TrigramTable::iterator ngi3 = ngi2->second.freqs.find(ngram.tag3());
+    if (ngi3 == ngi2->second.freqs.end()) {
+      ngi2->second.freqs[ngram.tag3()] = count;
+    } else {
+      ngi3->second += count;
+    }
+  };
 
   //------ public methods: lookup
 
-  /** Returns current count for ngram, returns 0 if unknown */
-  inline const NgramCount lookup(const NgramString &ngram) const
-  {
-    NgramStringTable::const_iterator ngti = ngtable.find(ngram);
-    return ngti == ngtable.end() ? 0 : ngti->second;
-  };
-
   /** Returns current count for unigram, returns 0 if unknown */
-  inline const NgramCount lookup(const mootTagString &tagstr)
-    const
+  inline const NgramCount lookup(const mootTagString &tag) const
   {
-    NgramString ngs;
-    ngs.push_back(tagstr);
-    return lookup(ngs);
+    NgramTable::const_iterator ugi = ngtable.find(tag);
+    return ugi == ngtable.end() ? 0 : ugi->second.count;
   };
 
-  /** Returns current count for bigram, returns 0 if unknown */
-  inline const NgramCount lookup(const mootTagString &prevtagstr, const mootTagString &tagstr)
-    const
+  /** Returns current count for bigram <tag1,tag2>, returns 0 if unknown */
+  inline const NgramCount lookup(const mootTagString &tag1, const mootTagString &tag2) const
   {
-    NgramString ngs;
-    ngs.push_back(prevtagstr);
-    ngs.push_back(tagstr);
-    return lookup(ngs);
+    NgramTable::const_iterator ugi = ngtable.find(tag1);
+    if (ugi == ngtable.end()) return 0;
+    BigramTable::const_iterator bgi = ugi->second.freqs.find(tag2);
+    return bgi == ugi->second.freqs.end() ? 0 : bgi->second.count;
   };
 
-  /** Returns current count for trigram, returns 0 if unknown */
-  inline const NgramCount lookup(const mootTagString &prevprevtagstr,
-				 const mootTagString &prevtagstr,
-				 const mootTagString &tagstr)
+  /** Returns current count for trigram <tag1,tag2,tag3>, returns 0 if unknown */
+  inline const NgramCount lookup(const mootTagString &tag1,
+				 const mootTagString &tag2,
+				 const mootTagString &tag3)
     const
   {
-    NgramString ngs;
-    ngs.push_back(prevprevtagstr);
-    ngs.push_back(prevtagstr);
-    ngs.push_back(tagstr);
-    return lookup(ngs);
+    NgramTable::const_iterator ugi = ngtable.find(tag1);
+    if (ugi == ngtable.end()) return 0;
+    BigramTable::const_iterator bgi = ugi->second.freqs.find(tag2);
+    if (bgi == ugi->second.freqs.end()) return 0;
+    TrigramTable::const_iterator tgi = bgi->second.freqs.find(tag3);
+    return tgi == bgi->second.freqs.end() ? 0 : tgi->second;
   };
 
   //------ public methods: i/o

@@ -35,7 +35,6 @@
 
 #include "mootTypes.h"
 #include "mootToken.h"
-#include "mootTokenIO.h"
 #include "mootLexfreqs.h"
 #include "mootNgrams.h"
 #include "mootEnum.h"
@@ -109,37 +108,93 @@ public:
 
   /** Type for a token-identider. Zero indicates an unknown token. */
   typedef mootEnumID TokID;
+
+  /**
+   * Typedef for a lexical ClassID. Zero indicates a previously
+   * unknown class.  If you want the ClassID associated with
+   * unknown tokens, use tokids2classids[0], which ought to
+   * give you a "real" (read "non-empty") ClassID.
+   */
+  typedef mootEnumID ClassID;
   //@}
 
+  /*------------------------------------------------------------
+   * public typedefs : lexical classes
+   */
+  /// \name Lexical class types
+  //@{
+  /**
+   * Type for a lexical-class aka "ambiguity class".  Intuitively, the
+   * lexical class associated with a given token is just the set of all
+   * possible PoS tags for that that token.
+   */
+  typedef set<TagID> LexClass;
+
+  /** Hash method: utility struct for hash_map<LexClass,...>. */
+  struct LexClassHash {
+  public:
+    inline size_t operator()(const LexClass &x) const {
+      size_t hv = 0;
+      for (LexClass::const_iterator xi = x.begin(); xi != x.end(); xi++) {
+	hv = 5*hv + *xi;
+      }
+      return hv;
+    };
+  };
+  /** Equality predicate: utility struct for hash_map<LexClass,...>. */
+  struct LexClassEqual {
+  public:
+    inline size_t operator()(const LexClass &x, const LexClass &y) const {
+      return x==y;
+    };
+  };
+  //@}
 
   /*---------------------------------------------------------------------*/
   /** \name Lookup-Table Types */
   //@{
   
-  /** Typedef for token-id lookup table */
-  typedef mootEnum<mootTokString,
-		    hash<mootTokString>,
-		    equal_to<mootTokString> >
-          TokIDTable;
-
   /** Typedef for tag-id lookup table */
   typedef mootEnum<mootTagString,
 		    hash<mootTagString>,
 		    equal_to<mootTagString> >
           TagIDTable;
 
-  /** Type for lexical probability lookup subtable: tagid->prob */
+  /** Typedef for token-id lookup table */
+  typedef mootEnum<mootTokString,
+		    hash<mootTokString>,
+		    equal_to<mootTokString> >
+          TokIDTable;
+
+  /** Typedef for class-id lookup table */
+  typedef mootEnum<LexClass,
+		   LexClassHash,
+		   LexClassEqual>
+          ClassIDTable;
+
+  /** Type for lexical probability lookup subtable: tagid->p(tagid) */
   typedef map<TagID,ProbT> LexProbSubTable;
 
   /**
-   * Type for lexical probability lookup table: tokid->(tagid->prob),
-   * where prob==p(tokid|tagid).
+   * Type for lexical-class probability lookup subtable:
+   * \c tagid->prob
+   */
+  typedef LexProbSubTable LexClassProbSubTable;
+
+  /**
+   * Type for lexical probability lookup table: \c tokid->(tagid->p(tokid|tagid))
    */
   typedef vector<LexProbSubTable> LexProbTable;
 
   /**
+   * Type for lexical-class probability lookup table:
+   * \c classid->(tagid->p(classid|tagid))
+   */
+  typedef LexProbTable LexClassProbTable;
+
+  /**
    * Type for unigram probability table: c-style array:
-   * probabilities indexed by numeric tag-id.
+   * probabilities indexed by numeric tag-id: \c tagid->p(tagid)
    */
   typedef ProbT *TagProbTable;
   //typedef vector<ProbT> TagProbTable;
@@ -147,8 +202,8 @@ public:
 
   /**
    * Type for bigram probability lookup table:
-   * c-style 2d array: probabilites p(tag|ptag)
-   * indexed by ((ntags*ptag)+tag).
+   * c-style 2d array: probabilites \c p(tagid|ptagid)
+   * indexed by \c ((ntags*ptagid)+tagid).
    *
    * This winds up being a rather sparse table,
    * but it should fit well in memory even for large
@@ -190,14 +245,13 @@ public:
     TagID tag3;
 
   public:
-    /** Constructor */
+    /** Trigram constructor */
     Trigram(TagID t1=0, TagID t2=0, TagID t3=0) : tag1(t1), tag2(t2), tag3(t3) {};
-
-    /** Destructor */
+    /** Trigram destructor */
     ~Trigram(void) {};
   };
 
-  /** Type for a trigram probability lookup table */
+  /** Type for a trigram probability lookup table : trigram(t1,t2,t3)->p(t3|<t1,t2>)*/
   typedef
     hash_map<Trigram,ProbT,Trigram::HashFcn,Trigram::EqualFcn>
     TrigramProbTable;
@@ -273,10 +327,26 @@ public:
   //@}
 
   /*---------------------------------------------------------------------*/
-  /** \name Pragmatic Constants */
+  /** \name Useful Constants */
   //@{
-  TagID             start_tagid;  /**< Initial/final tag, used for bootstrapping */
-  ProbT             unknown_lex_threshhold;  /**< Unknown lexical threshhold */
+
+  /** Boundary tag, used during compilation, viterbi_start(), and viterbi_finish() */
+  TagID     start_tagid;
+
+  /**
+   * "Unknown" lexical threshhold: used during compilation to determine
+   * whether a token's statistics are recorded as "pure" lexical probabilities
+   * or as probabilities for the "unknown" token.  This is just a raw
+   * count: the minimum number of times a token must have occurred in
+   * the training data in order for us to record statistics about it
+   * as "pure" lexical probabilities.
+   */
+  ProbT     unknown_lex_threshhold;
+
+  /**
+   * Class-ID to use for tokens for which no analyses were specified.
+   */
+  ClassID   uclassid;
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -296,9 +366,10 @@ public:
   //@{
   TokIDTable        tokids;     /**< Token-ID lookup table */
   TagIDTable        tagids;     /**< Tag-ID lookup table */
+  ClassIDTable      classids;   /**< Class-ID lookup table */
 
-  TokID             typids[NTokTypes]; /**< Token-type to Token-ID lookup table for non-alphas */
-  mootTokString    typnames[NTokTypes]; /**< Names of special tokens */
+  TokID             typids[NTokTypes]; /**< TokenType to TokenID lookup table for non-alphabetics */
+  mootTokString   typnames[NTokTypes]; /**< Names of special (non-alphabetic) tokens */
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -306,7 +377,10 @@ public:
   //@{
   size_t            n_tags;     /**< Number of known tags: used to compute lookup indices */
   size_t            n_toks;     /**< Number of known tokens: used for sanity checks */
+  size_t            n_classes;  /**< Number of known lexical classes */
+
   LexProbTable      lexprobs;   /**< Lexical probability lookup table */
+  LexClassProbTable lcprobs;    /**< Lexical-class probability lookup table */
   TagProbTable      ngprobs1;   /**< N-gram probability lookup table: unigrams */
   BigramProbTable   ngprobs2;   /**< N-gram probability lookup table: bigrams */
 #ifdef moot_USE_TRIGRAMS
@@ -329,7 +403,7 @@ public:
 
 protected:
   /*---------------------------------------------------------------------*/
-  /** \name Low-level: trash stacks */
+  /** \name Low-level data: trash stacks */
   //@{
   ViterbiNode     *trash_nodes;     /**< Recycling bin for Viterbi state-table nodes */
   ViterbiColumn   *trash_columns;   /**< Recycling bin for Viterbi state-table columns */
@@ -337,7 +411,7 @@ protected:
   //@}
 
   /*---------------------------------------------------------------------*/
-  /** \name Low-level Viterbi data */
+  /** \name Low-level data: temporaries */
   //@{
   TagID             vtagid;     /**< Current tag-id under consideration for viterbi_step() */
   ProbT             vbestpr;    /**< Best probability for viterbi_step() */
@@ -346,13 +420,8 @@ protected:
   ViterbiNode      *vbestpn;    /**< Best previous node for viterbi_step() */
 
   ViterbiPathNode  *vbestpath;  /**< For node->path conversion */
-  //@}
 
-  /*---------------------------------------------------------------------*/
-  /** \name Low-level tagging data */
-  //@{
-  //vector<mootTokString> tokens;  /**< Temporarily stores input tokens for tag_stream() */
-  //set<TagID>             curtags; /**< Temporarily stores input token-tags for tag_stream() */
+  //LexClass       lexclass_tmp;  /* Temporary lexical class for conversions / lookup */
   //@}
 
 public:
@@ -365,12 +434,14 @@ public:
       output_best_only(false),
       start_tagid(0),
       unknown_lex_threshhold(1.0),
+      uclassid(0),
       nglambda1(mootProbEpsilon),
       nglambda2(1.0 - mootProbEpsilon),
       wlambda1(1.0 - mootProbEpsilon),
       wlambda2(mootProbEpsilon),
       n_tags(0),
       n_toks(0),
+      n_classes(0),
       ngprobs1(NULL),
       ngprobs2(NULL),
       vtable(NULL),
@@ -398,9 +469,19 @@ public:
   //@}
 
   /*------------------------------------------------------------*/
+  /** \name Reset / clear */
+  //@{
+  /**
+   * Reset/clear the object, freeing all dynamic data structures.
+   * If 'wipe_everything' is false, ID-tables and constants will
+   * spared.
+   */
+  void clear(bool wipe_everything=true);
+  //@}
+
+  /*------------------------------------------------------------*/
   /**\name Binary load / save */
   //@{
-
   /** Save to a binary file */
   bool save(const char *filename, int compression_level=Z_DEFAULT_COMPRESSION);
 
@@ -437,22 +518,10 @@ public:
   };
   //@}
 
-  /*------------------------------------------------------------*/
-  /** \name Reset and clear */
-  //@{
-  /**
-   * Reset/clear the object, freeing all dynamic data structures.
-   * If 'wipe_everything' is false, ID-tables and constants will
-   * spared.
-   */
-  void clear(bool wipe_everything=true);
-  //@}
-
 
   //------------------------------------------------------------
-  /** \name Compilation */
+  /** \name Compilation / Initialization */
   //@{
-
   /**
    * Compile probabilites from raw frequency counts in 'lexfreqs' and 'ngrams'.
    * Returns false on failure.
@@ -464,144 +533,132 @@ public:
   /** Assign IDs for tokens and tags from lexfreqs: called by compile() */
   void assign_ids_lf(const mootLexfreqs &lexfreqs);
 
-  /** Assign IDs for tokens and tags from ngrams: called by compile() */
+  /** Assign IDs for tags (and tokens?) from ngrams: called by compile() */
   void assign_ids_ng(const mootNgrams   &ngrams);
 
-  /**
-   * Estimate ngram-smoothing constants: NOT called by compile().
-   */
+  /** Estimate ngram-smoothing constants: NOT called by compile(). */
   bool estimate_lambdas(const mootNgrams &ngrams);
 
-  /**
-   * Estimate lexical smoothing constants: NOT called by compile().
-   */
+  /** Estimate lexical smoothing constants: NOT called by compile(). */
   bool estimate_wlambdas(const mootLexfreqs &lf);
   //@}
 
   //------------------------------------------------------------
-  /** \name Trash-stack Utilities */
-
+  // Tagging: Top-level
+  /** \name Top-level Tagging Interface */
   //@{
-  /** Returns a pointer to an unused ViterbiNode, possibly allocating a new one. */
-  inline ViterbiNode *viterbi_get_node(void) {
-    ViterbiNode *nod;
-    if (trash_nodes != NULL) {
-      nod = trash_nodes;
-      trash_nodes = nod->row_next;
-    } else {
-      nod = new ViterbiNode();
+
+  /** Top-level tagging interface: file input & output */
+  void tag_stream(FILE *in=stdin, FILE *out=stdout, char *srcname=NULL);
+
+  /** Top-level tagging interface: string input, file output */
+  void tag_strings(int argc, char **argv, FILE *out=stdout, char *infilename=NULL);
+
+  /**
+   * Top-level tagging interface: mootSentence input & output (destructive).
+   * Calling this method will (re-)populate the \c besttag
+   * datum in the \c sentence argument.
+   */
+  inline void tag_sentence(mootSentence &sentence) {
+    viterbi_clear();
+    for (mootSentence::const_iterator si = sentence.begin(); si != sentence.end(); si++) {
+      viterbi_step(*si);
+      ntokens++;
     }
-    return nod;
-  };
-
-  //------------------------------------------------------------
-  // Viterbi utilities: columns
-
-  /** Returns a pointer to an unused ViterbiColumn, possibly allocating a new one. */
-  inline ViterbiColumn *viterbi_get_column(void) {
-    ViterbiColumn *col;
-    if (trash_columns != NULL) {
-      col = trash_columns;
-      trash_columns = col->col_prev;
-    } else {
-      col = new ViterbiColumn();
-    }
-    return col;
-  };
-
-  //------------------------------------------------------------
-  // Viterbi utilities: path-nodes
-
-  /** Returns a pointer to an unused ViterbiPathNode, possibly allocating a new one. */
-  inline ViterbiPathNode *viterbi_get_pathnode(void) {
-    ViterbiPathNode *pnod;
-    if (trash_pathnodes != NULL) {
-      pnod            = trash_pathnodes;
-      trash_pathnodes = pnod->path_next;
-    } else {
-      pnod = new ViterbiPathNode();
-    }
-    return pnod;
+    viterbi_finish();
+    tag_mark_best(sentence);
+    nsents++;
   };
   //@}
 
-  //------------------------------------------------------------
-  // Viterbi: clear
-
-  /** \name High-level Viterbi algorithm API */
+  /*====================================================================
+   * VITERBI: Mid-level
+   *====================================================================*/
+  /** \name Mid-level Viterbi algorithm API */
   //@{
 
+  //------------------------------------------------------------
+  // Viterbi: Mid-level: clear
   /** Clear Viterbi state table(s) */
   void viterbi_clear(void);
 
   //------------------------------------------------------------
   // Viterbi: single iteration: (mootToken)
-
   /**
-   * Step a single Viterbi iteration, mootToken version.
-   * Really just a wrapper for viterbi_step(TokID,set<TagID>).
+   * Step a single Viterbi iteration, \c mootToken version.
+   * Really just a wrapper for \c viterbi_step(TokID,set<TagID>).
    */
   inline void viterbi_step(const mootToken &token) {
     if (token.analyses().empty()) {
-      viterbi_step(token.text());
+      viterbi_step(token2id(token.text()));
     }
     else {
-      set<TagID> tok_tagids;
+      LexClass tok_class;
       for (mootToken::AnalysisSet::const_iterator ani = token.analyses().begin();
 	   ani != token.analyses().end();
 	   ani = token.upper_bound(ani->tag))
 	{
-	  tok_tagids.insert(tagids.name2id(ani->tag));
+	  tok_class.insert(tagids.name2id(ani->tag));
 	}
-      viterbi_step(token2id(token.text()), tok_tagids);
+      viterbi_step(token2id(token.text()), tok_class);
     }
   };
 
+  //------------------------------------------------------------
+  // Viterbi: single iteration: (TokID,LexClass=set<ClassID>)
+  /**
+   * Step a single Viterbi iteration, considering only the tags
+   * in \c lexclass -- useful if you have some a priori information
+   * on the token.
+   */
+  inline void viterbi_step(TokID tokid, const LexClass &lexclass)
+  {
+    if (lexclass.empty()) viterbi_step(tokid);
+    else {
+      ClassID classid = class2id(lexclass);  //-- instantiates new class if unknown
+      if (classid==0) viterbi_step(tokid);   //-- this should never happen!
+      viterbi_step(tokid,classid,lexclass);
+    }
+  };
+
+  //------------------------------------------------------------
+  // Viterbi: single iteration: (TokID,ClassID,LexClass)
+  /**
+   * Step a single Viterbi iteration, considering only the tags
+   * for class \c classid.
+   */
+  void viterbi_step(TokID tokid, ClassID classid, const LexClass &lclass);
 
   //------------------------------------------------------------
   // Viterbi: single iteration: (TokID)
-
   /**
    * Step a single Viterbi iteration, considering all known tags
-   * for 'tokid' as possible analyses.  Faster in the case
+   * for \c tokid as possible analyses.  May be faster in cases
    * where no futher information (i.e. set of possible tags) is
    * available.
    */
-  inline void viterbi_step(TokID tokid);
-
-  //------------------------------------------------------------
-  // Viterbi: single iteration: (TokID,set<TagID>)
-
-  /**
-   * Step a single Viterbi iteration, considering only the tags
-   * in 'tagids' -- useful if you have some a priori information
-   * on the token.
-   */
-  inline void viterbi_step(TokID tokid, const set<TagID> &tag_ids);
-
+  void viterbi_step(TokID tokid);
 
   //------------------------------------------------------------
   // Viterbi: single iteration: (TokString)
-
   /**
-   * \bold DEPRECATED in favor of viterbi_step(moot_token)
+   * \bold DEPRECATED in favor of \c viterbi_step(mootToken)
    *
    * Step a single Viterbi iteration, string version.
-   * Really just a wrapper for viterbi_step(TokID tokid).
+   * Really just a wrapper for \c viterbi_step(TokID tokid).
    */
-  inline void viterbi_step(const mootTokString &token) {
-    return viterbi_step(token2id(token));
+  inline void viterbi_step(const mootTokString &token_text) {
+    return viterbi_step(token2id(token_text));
   };
 
   //------------------------------------------------------------
   // Viterbi: single iteration: (TokString,set<TagString>)
-
   /**
    * \bold DEPRECATED
    *
-   * Step a single Viterbi iteration, considering only the tags in 'tags'.
+   * Step a single Viterbi iteration, considering only the tags in \c tags.
    */
-  inline void viterbi_step(const mootTokString &token, const set<mootTagString> &tags)
+  inline void viterbi_step(const mootTokString &token_text, const set<mootTagString> &tags)
   {
     set<TagID> tags_ids;
     for (set<mootTagString>::const_iterator tagi = tags.begin();
@@ -610,25 +667,22 @@ public:
       {
 	tags_ids.insert(tagids.name2id(*tagi));
       }
-    return viterbi_step(token2id(token), tags_ids);
+    return viterbi_step(token2id(token_text), tags_ids);
   };
-
 
   //------------------------------------------------------------
   // Viterbi: single iteration: (TokID,TagID,col=NULL)
-
   /**
-   * Step a single Viterbi iteration, considering only the tag 'tagid'.
+   * Step a single Viterbi iteration, considering only the tag \c tagid.
    */
-  inline void viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col=NULL);
+  void viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col=NULL);
 
   //------------------------------------------------------------
   // Viterbi: single iteration: (TokString,TagString)
-
   /**
    * \bold DEPRECATED
    *
-   * Step a single Viterbi iteration, considering only the tag 'tag': string version.
+   * Step a single Viterbi iteration, considering only the tag \c tag : string version.
    */
   inline void viterbi_step(const mootTokString &token, const mootTagString &tag)
   {
@@ -638,9 +692,8 @@ public:
 
   //------------------------------------------------------------
   // Viterbi: finish
-
   /**
-   * Run final Viterbi iteration, using 'final_tagid' as the boundary tag
+   * Run final Viterbi iteration, using \c final_tagid as the boundary tag
    */
   inline void viterbi_finish(const TagID final_tagid)
   {
@@ -648,26 +701,55 @@ public:
   };
 
   /**
-   * Run final Viterbi iteration, using instance datum 'start_tagid' as the final tag.
+   * Run final Viterbi iteration, using instance datum \c start_tagid as the final tag.
    */
   inline void viterbi_finish(void)
   {
     viterbi_step(0, start_tagid);
   };
+
+  /**
+   * Mid-level tagging interface: mark 'best' tags in sentence
+   * structure: fills \c besttag datum of each \c mootToken element
+   * of \c sentence.  Before calling this method, you should
+   * have done following:
+   *
+   * \li called \c viterbi_clear() to initialize the Viterbi trellis.
+   * \li called \c viterbi_step(mootToken) once for each element of \c sentence.
+   * \li called \c viterbi_finish() to push the boundary tag onto the Viterbi trellis.
+   */
+  void tag_mark_best(mootSentence &sentence);
   //@}
 
 
   //------------------------------------------------------------
-  // public methods: mid-level: Viterbi: best node
-
-  /** \name Mid-Level Viterbi State Utilties  */
+  // Viterbi: Low/Mid-level: path utilities
+  /** \name Low/Mid-Level Viterbi Path Utilties  */
   //@{
+
+  /** Get current best path (in input order), considering all current tags */
+  inline ViterbiPathNode *viterbi_best_path(void)
+  {
+    return viterbi_node_path(viterbi_best_node());
+  };
+
+  /** Get current best path (in input order), considering only tag 'tagid' */
+  inline ViterbiPathNode *viterbi_best_path(TagID tagid)
+  {
+    return viterbi_node_path(viterbi_best_node(tagid));
+  };
+
+  /** Get current best path (in input order), considering only tag 'tag' */
+  inline ViterbiPathNode *viterbi_best_path(const mootTagString &tagstr)
+  {
+    return viterbi_best_path(tagids.name2id(tagstr));
+  };
 
   /**
    * Get best current node from Viterbi state tables, considering all
-   * possible current tags.  The best full path to this node can be
-   * reconstructed (in reverse order) by traversing the 'pth_prev'
-   * pointers until (pth_prev==NULL).
+   * possible current tags (all rows in current column).  The best full
+   * path to this node can be reconstructed (in reverse order) by
+   * traversing the \c pth_prev pointers until \c (pth_prev==NULL) .
    */
   inline ViterbiNode *viterbi_best_node(void)
   {
@@ -698,10 +780,9 @@ public:
     }
     return NULL;
   };
-
+ 
   //------------------------------------------------------------
-  // public methods: mid-level: node-to-path conversion
-
+  // Viterbi: Low/Mid: node-to-path conversion
   /**
    * Useful utility: build a path (in input order) from a ViterbiNode.
    * See caveats for 'struct ViterbiPathNode' -- return value is non-const
@@ -723,44 +804,17 @@ public:
   };
   //@}
 
-
-  //------------------------------------------------------------
-  // public methods: high-level: best path
-
-  /** \name High-level Viterbi Path utilities */
-  //@{
-
-  /** Get current best path (in input order), considering all current tags */
-  inline ViterbiPathNode *viterbi_best_path(void)
-  {
-    return viterbi_node_path(viterbi_best_node());
-  };
-
-  /** Get current best path (in input order), considering only tag 'tagid' */
-  inline ViterbiPathNode *viterbi_best_path(TagID tagid)
-  {
-    return viterbi_node_path(viterbi_best_node(tagid));
-  };
-
-  /** Get current best path (in input order), considering only tag 'tag' */
-  inline ViterbiPathNode *viterbi_best_path(const mootTagString &tagstr)
-  {
-    return viterbi_best_path(tagids.name2id(tagstr));
-  };
-  //@}
-
-
   //------------------------------------------------------------
   // public methods: low-level: Viterbi
 
-  /** \name Low-level Viterbi utilities */
+  /** \name Low-level Viterbi iteration utilities */
   //{@
   /**
    * Find the best previous node from top column of 'vtable' for destination tag 'curtagid',
    * stores a pointer to the best previous node in 'vbestpn', and the
    * (adjusted) n-gram transition probability in 'vbestpr'.
    *
-   * NOTE: lexical probabilites are ignored for this computation, since they're
+   * \note lexical probabilites are ignored for this computation, since they're
    * constant for the current (token,tag) pair under consideration.
    */
   inline void viterbi_find_best_prevnode(TagID curtagid, ProbT curtagp=-1.0)
@@ -791,9 +845,8 @@ public:
   };
 
   //------------------------------------------------------------
-  // public methods: low-level: Viterbi: clear best-path
-
-  /** Clear Viterbi state table(s) */
+  // Viterbi: Low-level: clear best-path
+  /** Clear internal \c vbestpath temporary */
   inline void viterbi_clear_bestpath(void)
   {
     //-- move to trash: path-nodes
@@ -808,33 +861,122 @@ public:
 
   //------------------------------------------------------------
   // Viterbi: fallback
-
   /**
    * Step a single Viterbi iteration, last-ditch effort: consider
-   * all tags.  Implicitly called by other viterbi_step() methods.
+   * all tags in tagset.  Implicitly called by other viterbi_step()
+   * methods.
    */
-  inline void _viterbi_step_fallback(TokID tokid, ViterbiColumn *col);
+  void _viterbi_step_fallback(TokID tokid, ViterbiColumn *col);
   //@}
 
-  //------------------------------------------------------------
-  // public methods: low-level: token-type identification
 
-  /** \name TnT compatibility hacks */
+  //------------------------------------------------------------
+  /** \name Low-level Trash-stack Utilities */
+
   //@{
-  /** Get the TokID for a given token, uses type-based lookup */
+  /** Returns a pointer to an unused ViterbiNode, possibly allocating a new one. */
+  inline ViterbiNode *viterbi_get_node(void) {
+    ViterbiNode *nod;
+    if (trash_nodes != NULL) {
+      nod = trash_nodes;
+      trash_nodes = nod->row_next;
+    } else {
+      nod = new ViterbiNode();
+    }
+    return nod;
+  };
+
+  //------------------------------------------------------------
+  // Viterbi: trash utilities: columns
+  /** Returns a pointer to an unused ViterbiColumn, possibly allocating a new one. */
+  inline ViterbiColumn *viterbi_get_column(void) {
+    ViterbiColumn *col;
+    if (trash_columns != NULL) {
+      col = trash_columns;
+      trash_columns = col->col_prev;
+    } else {
+      col = new ViterbiColumn();
+    }
+    return col;
+  };
+
+  //------------------------------------------------------------
+  // Viterbi: trash utilities: path-nodes
+  /** Returns a pointer to an unused ViterbiPathNode, possibly allocating a new one. */
+  inline ViterbiPathNode *viterbi_get_pathnode(void) {
+    ViterbiPathNode *pnod;
+    if (trash_pathnodes != NULL) {
+      pnod            = trash_pathnodes;
+      trash_pathnodes = pnod->path_next;
+    } else {
+      pnod = new ViterbiPathNode();
+    }
+    return pnod;
+  };
+  //@}
+
+
+
+  //------------------------------------------------------------
+  // Low-level: ID Lookup
+  /** \name ID Lookup */
+  //@{
+  /** Get the TokID for a given token, using type-based lookup */
   inline TokID token2id(const mootTokString &token) const
   {
     TokenType typ = token2type(token);
     return typids[typ]==0 ? tokids.name2id(token) : typids[typ];
   };
+
+  /**
+   * Lookup the ClassID for the lexical-class \c lclass.
+   * A new class-ID will be generated if \c lclass is not currently defined.
+   * Additionally, if \c autopopulate is true (the default), the new class
+   * will be populated with a uniform distribution.
+   */
+  inline ClassID class2id(const LexClass &lclass, bool autopopulate=true)
+  {
+    ClassID cid = classids.name2id(lclass);
+    if (cid == 0) {
+      //-- previously unknown class: fill 'er up with default values
+      cid = classids.insert(lclass);
+      if (cid >= lcprobs.size()) {
+	n_classes = cid+1;
+
+	//-- resize() should really happen 2 lines down,
+	//   but that might break something : test this at some point!
+	lcprobs.resize(n_classes);
+      }
+      if (autopopulate) {
+	LexClassProbSubTable &lcps = lcprobs[cid];
+	if (!lclass.empty()) {
+	  //-- non-empty class: restrict population to class-members
+	  ProbT lcprob = 1.0/((ProbT)lclass.size());
+	  for (LexClass::const_iterator lci = lclass.begin(); lci != lclass.end(); lci++) {
+	    lcps[*lci] = lcprob;
+	  }
+	} else {
+	  //-- empty class: use class for "unknown" token instead [HACK!]
+	  const LexProbSubTable &lps = lexprobs[0];
+	  ProbT lpprob = 1.0/((ProbT)lps.size());
+	  for (LexProbSubTable::const_iterator lpsi = lps.begin(); lpsi != lps.end(); lpsi++) {
+	    lcps[lpsi->first] = lpprob;
+	  }
+	}
+      }
+    }
+    return cid;
+  };
   //@}
 
 
-  /** \name Probability lookup */
-  //@{
   //------------------------------------------------------------
-  // public methods: low-level: lexical probability lookup
+  /** \name Probability Lookup */
+  //@{
 
+  /*------------------------------------------------------------
+   * Lexical Probability Lookup
+   */
   /**
    * Looks up and returns lexical probability: p(tokid|tagid)
    * given tokid, tagid.
@@ -858,10 +1000,34 @@ public:
     return wordp(token2id(token), tagids.name2id(tag));
   };
 
+  /*------------------------------------------------------------
+   * Lexical-Class Probability Lookup
+   */
+  /**
+   * Looks up and returns lexical-class probability: p(classid|tagid)
+   */
+  inline const ProbT classp(const ClassID classid, const TagID tagid) const
+  {
+    if (classid >= lcprobs.size()) return 0;
+    const LexClassProbSubTable &lps = lcprobs[classid];
+    LexClassProbSubTable::const_iterator lpsi = lps.find(tagid);
+    return lpsi != lps.end() ? lpsi->second : 0;
+  };
 
-  //------------------------------------------------------------
-  // public methods: low-level: unigram probability lookup
+  /**
+   * \bold DEPRECATED
+   *
+   * Looks up and returns lexical-class probability: p(class|tag)
+   * given class, tag -- no id auto-generation is performed!
+   */
+  inline const ProbT classp(const LexClass &lclass, const mootTagString tag) const
+  {
+    return classp(classids.name2id(lclass), tagids.name2id(tag));
+  };
 
+  /*------------------------------------------------------------
+   * Unigram Probability Lookup
+   */
   /**
    * Looks up and returns unigram probability: p(tagid).
    */
@@ -883,8 +1049,9 @@ public:
     return tagp(tagids.name2id(tag));
   };
 
-  //------------------------------------------------------------
-  // public methods: low-level: bigram probability lookup
+  /*------------------------------------------------------------
+   * Bigram Probability Lookup
+   */
   /**
    * Looks up and returns bigram probability: p(tagid|prevtagid),
    * given tagid, prevtagid.
@@ -907,8 +1074,9 @@ public:
     return tagp(tagids.name2id(prevtag), tagids.name2id(tag));
   };
 
-  //------------------------------------------------------------
-  // public methods: low-level: trigram probability lookup
+  /*------------------------------------------------------------
+   * Trigram probability lookup
+   */
 #ifdef moot_USE_TRIGRAMS
   /**
    * Looks up and returns trigram probability: p(tagid|prevtagid2,prevtagid1),
@@ -952,35 +1120,12 @@ public:
 
 
   //------------------------------------------------------------
-  // public methods: top-level: tagging
+  // Error Reporting
 
-  /** \name Top-level tagging interface */
+  /** \name Error reporting */
   //@{
-
-  /** Top-level tagging interface: file input */
-  void tag_stream(FILE *in=stdin, FILE *out=stdout, char *srcname=NULL);
-
-  /** Top-level tagging interface: string input */
-  void tag_strings(int argc, char **argv, FILE *out=stdout, char *infilename=NULL);
-
-  /**
-   * Mid-level tagging interface: mark 'best' tags in sentence
-   * structure: fills 'besttag' datum of each 'mootToken' element
-   * of 'sentence'.
-   */
-  void tag_mark_best(mootSentence &sentence);
-  //@}
-
-
-  //------------------------------------------------------------
-  // public methods: low-level: errors
-
-  /** \name Warnings / Errors */
-  //@{
-
   /** Error reporting */
   void carp(char *fmt, ...);
-
   //@}
 
   //------------------------------------------------------------

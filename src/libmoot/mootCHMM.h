@@ -29,12 +29,12 @@
 #ifndef _moot_CHMM_H
 #define _moot_CHMM_H
 
-//#include "mootMorph.h"
+#include <zlib.h>
+
 #include "mootHMM.h"
 #include "mootTypes.h"
+#include "mootToken.h"
 #include "mootBinStream.h"
-
-#include <zlib.h>
 
 moot_BEGIN_NAMESPACE
 
@@ -57,7 +57,7 @@ public:
   /** Type for a lexical-class. */
   typedef set<TagID> LexClass;
 
-  /** Utility struct for hash_map<>. */
+  /** Hash method: utility struct for hash_map<LexClass,...>. */
   struct LexClassHash {
   public:
     inline size_t operator()(const LexClass &x) const {
@@ -68,7 +68,7 @@ public:
       return hv;
     };
   };
-  /** Utility struct for hash_map<>. */
+  /** Equality predicate: utility struct for hash_map<LexClass,...>. */
   struct LexClassEqual {
   public:
     inline size_t operator()(const LexClass &x, const LexClass &y) const {
@@ -92,151 +92,28 @@ public:
     ClassIDTable;
 
 
-  /** Type for lexical-class probability lookup subtable: tagid->prob */
+  /**
+   * Type for lexical-class probability lookup subtable:
+   * tagid->prob
+   *
+   * This is really identical to mootHMM::LexProbSubTable
+   */
   typedef map<TagID,ProbT> LexClassProbSubTable;
 
-  /** Type for lexical-class probability lookup table: classid->(tagid->p(classid|tagid)) */
-  typedef vector<LexClassProbSubTable> LexClassProbTable;
-  //@}
-
-
-  /*------------------------------------------------------------
-   * public typedefs : morphology
-   */
-  /// \name Morphology types
-  //@{
-
-  /** Single morphological analysis, including features */
-  typedef mootMorph::MorphAnalysis MorphAnalysis;
-
-  /** Set of morphological analyses, including features */
-  typedef mootMorph::MorphAnalysisSet MorphAnalysisSet;
-
-  /** Single morphological analysis, with tag and weight extracted */
-  typedef FSMSymbolString TagMorphAnalysis;
-
   /**
-   * Set of morphological analyses, with tag and weight extracted,
-   * This class is here in order to:
-   * (1) minimize copying by paying attention to analysis-weights, and
-   * (2) convert morphological analyses to strings
+   * Type for lexical-class probability lookup table:
+   * classid->(tagid->p(classid|tagid))
+   *
+   * This is identical to mootHMM::LexProbTable
    */
-  //typedef set<TagMorphAnalysis> TagMorphAnalysisSet;
-  class TagMorphAnalysisSet {
-  public:
-    set<TagMorphAnalysis> analyses;  /**< Morphological analyses */
-    FSMWeight               weight;  /**< Weight of these analyses */
-  public:
-    /** Default constructor */
-    TagMorphAnalysisSet(FSMWeight w=MAXFLOAT)
-      : weight(w)
-    {};
-
-    /** Destructor */
-    ~TagMorphAnalysisSet(void) {};
-
-    /** Insertion: strings: weight-watcher */
-    inline void insert(const TagMorphAnalysis &a, const FSMWeight w)
-    {
-      if (w > weight) return; //-- too costly: ignore
-      if (w < weight) {
-	//-- cheaper: clear and insert
-	analyses.clear();
-	weight = w;
-      }
-      //-- equal: just insert
-      analyses.insert(a);
-    };
-
-    /** Insertion: weighted strings */
-    inline void insert(const FSM::FSMStringWeight &sw)
-    {
-      insert(sw.istr, sw.weight);
-    };
-
-    /** Insertion: vectors: weight-watcher */
-    inline void insert(const FSM::FSMSymbolVector &av, const FSMWeight w, const mootMorph &morph)
-    {
-      if (w > weight) return; //-- too costly: ignore
-
-      //-- stringify
-      TagMorphAnalysis as;
-      morph.symbol_vector_to_string(av, as);
-
-      if (w < weight) {
-	//-- cheaper: clear and insert
-	analyses.clear();
-	weight = w;
-      }
-      //-- equal: just insert
-      analyses.insert(as);
-    };
-
-    /** Insertion: weighted vectors */
-    inline void insert(const FSM::FSMWeightedSymbolVector &wv, const mootMorph &morph)
-    {
-      insert(wv.istr, wv.weight, morph);
-    };
-  };
-  //@}
-
-  /*------------------------------------------------------------
-   * public typedefs : runtime data
-   */
-  /// \name Runtime & API types
-  //@{
-
-  /** Type for intermediate token-information: map tags to morphological analysis-sets */
-  typedef map<TagID,TagMorphAnalysisSet> TagMorphMap;
-
-  /** Type for temporary per-token morphological information */
-  struct TmpTagMorphMap {
-    TagMorphMap     tmmap;
-    TmpTagMorphMap *next;
-  };
-  //@}
-
-
-  /*------------------------------------------------------------
-   * public typedefs : caching
-   */
-  /// \name Cache Types
-  //@{
-
-  /** Type for morphological-map cache: tokid->TagMorphMap */
-  typedef hash_map<TokID,TagMorphMap> TokMorphCache;
-  //@}
-
-  /*------------------------------------------------------------
-   * public typedefs : Viterbi
-   */
-  /// \name Viterbi State-Table types
-  //@{
-
-  /** Type for a Viterbi state-table entry (linked-list columns) */
-  class ViterbiNode : public mootHMM::ViterbiNode
-  {
-  public:
-    TagMorphAnalysisSet   *mas;     /**< New: Morphological analyses for this node only */
-  };
+  typedef vector<LexClassProbSubTable> LexClassProbTable;
   //@}
 
 public:
   /*------------------------------------------------------------
    * public data : flags
    */
-  /// \name flags
-  //@{
-  bool want_pos_only;  /* Whether to output only PoS-tags (no big speed benefits at the moment) */
-  //@}
-
-  /*------------------------------------------------------------
-   * public data : morphology
-   */
-  /// \name Morphology
-  //@{
-  mootMorph        morph;          /**< Morphological analyzer */
-  //@}
+  // (none)
 
   /*------------------------------------------------------------
    * public data : lookup table(s)
@@ -258,18 +135,6 @@ public:
   //@}
 
   /*------------------------------------------------------------
-   * public data : cache(s)
-   *   + For 'morphcache', index 0 corresponds to
-   *     the "unknown" lexical class: a failed morphological analysis:
-   *     this data gets generated at compile-time.
-   */
-  /// \name Caches
-  //@{
-  TokMorphCache    morphcache;       /**< Morphology cache */
-  TagMorphMap    tmm_fallback;       /**< Fallback morphological map */
-  //@}
-
-  /*------------------------------------------------------------
    * public data : per-token saved information
    */
   //(none)
@@ -281,14 +146,7 @@ protected:
    */
   /// \name Pre-allocated temporaries
   //@{
-  FSMSymbolString   symstr_tmp;   /**< Temporary string for conversions */
   LexClass          lexclass_tmp; /**< Temporary lexical class for conversions / lookup */
-
-  /*------------------------------------------------------------
-   * protected data : temporary (TagMorphMap)s
-   */
-  TmpTagMorphMap *ttmms_used;  /**< (TmpTagMorphMap)s currently in use */
-  TmpTagMorphMap *ttmms_free;  /**< (TmpTagMorphMap)s currently not in use */
   //@}
 
 public:
@@ -300,10 +158,7 @@ public:
   //@{
   /** Default constructor */
   mootCHMM(void) : 
-    want_pos_only(false),
-    uclassid(0),
-    ttmms_used(NULL),
-    ttmms_free(NULL)
+    uclassid(0)
   {};
 
   /** Destructor */
@@ -316,16 +171,18 @@ public:
   /*------------------------------------------------------------
    * public methods: reset/clear
    */
-
+  /// \name reset / clear
+  //@{
   /**
    * Reset/clear the object, freeing all dynamic data structures.
    * If 'wipe_everything' is false, ID-tables and constants will
    * spared.
    */
   void clear(bool wipe_everything=true);
+  //@}
 
   /*------------------------------------------------------------
-   * public methods: high-level: binary load/save
+   * Binary Load/save
    */
   /// \name Binary load/save
   //@{
@@ -349,18 +206,10 @@ public:
   //@}
 
   /*------------------------------------------------------------
-   * public methods: load morphology
+   * public methods: compilation
    */
   /// \name Initialization / Compilation
   //@{
-  inline bool load_morphology(const char *symbolfile, const char *fstfile)
-  {
-    return (morph.load_morph_symbols(symbolfile) && morph.load_morph_fst(fstfile));
-  };
-
-  /*------------------------------------------------------------
-   * public methods: compilation
-   */
 
   /**
    * Compile probabilites from raw frequency counts in 'lexfreqs' and 'ngrams'.
@@ -376,119 +225,82 @@ public:
   //@}
 
   /*------------------------------------------------------------
-   * public methods: high-level: Viterbi: clear state tables
+   * public methods: top-level
    */
-
-  /** \name High-level Viterbi algorithm API */
+  /// \name Top-level tagging interface 
   //@{
 
-  /** Clear Viterbi state table(s) */
-  inline void viterbi_clear(void)
-  {
-    //-- superclass clear
-    mootHMM::viterbi_clear();
+  /** Tag tokens from a C-stream using mootTokenReader */
+  bool tag_stream(FILE *in=stdin, FILE *out=stdout, char *srcname=NULL);
 
-    //-- unmark used (TagMorphMap)s
-    TmpTagMorphMap *ttmm, *ttmm_next;
-    for (ttmm = ttmms_used; ttmm != NULL; ttmm = ttmm_next) {
-      ttmm_next   = ttmm->next;
-      ttmm->next  = ttmms_free;
-      ttmms_free  = ttmm;
-    }
-    ttmms_used = NULL;
-  };
-
+  /** Tag a C-array of token-strings as a sentence */
+  void tag_strings(int argc, char **argv, FILE *out=stdout, char *infilename=NULL);
+  //@}
 
   /*------------------------------------------------------------
-   * public methods: high-level: Viterbi: single iteration: (tokstr)
+   * Viterbi
    */
+  /** \name Mid-level Viterbi algorithm API */
+  //@{
+
+  //------------------------------------------------------------
+  // Viterbi: single iteration: (mootToken)
 
   /**
-   * Step a single Viterbi iteration.
+   * Step a single Viterbi iteration, mootToken version.
+   * Really just a wrapper for viterbi_step(TokID,set<TagID>).
+   *
+   * \note this should be virtual.
    */
-  inline void viterbi_step(const mootTokString &tokstr)
-  {
-    //-- Get Token-ID
-    TokID tokid = token2id(tokstr);
-
-    //-- Get morphological map
-    TagMorphMap  *tmm = token2morphmap(tokstr, tokid);
-    ClassID classid   = 0;
-    if (tmm->empty()) {
-      //-- unknown to morphology?
-      tmm     = &(morphcache[0]);
-      classid = uclassid;
-    } else if (tokid==0) {
-      //-- Get class-ID and class probability table (HMM-unknown tokens only!)
-      classid = morphmap2classid(tmm);
+  inline void viterbi_step(const mootToken &token) {
+    if (token.analyses().empty()) {
+      viterbi_step(token.text());
     }
-
-    //-- ye olde guttes
-    _viterbi_step_sub(tokid, classid, tmm);
-  };
-
-
-  /**
-   * Step a single Viterbi iteration, given a TokID and a MorphAnalysisSet
-   */
-  inline void viterbi_step(const TokID tokid, const MorphAnalysisSet &ma)
-  {
-    //-- Get a temporary morphological map
-    TagMorphMap *tmm = get_tmp_morphmap();
-    ClassID  classid = 0;
-    if (ma.empty()) {
-      //-- unknown to morphology
-      tmm     = &(morphcache[0]);
-      classid = uclassid;
-    } else {
-      //-- known to morphology: get morphmap
-      analyses2morphmap(ma, tmm);
-      if (tokid == 0) {
-	//-- lookup classid (HMM-unknown tokens only!)
-	classid = morphmap2classid(tmm);
-      }
+    else {
+      set<TagID> tok_tagids;
+      for (mootToken::AnalysisSet::const_iterator ani = token.analyses().begin();
+	   ani != token.analyses().end();
+	   ani = token.upper_bound(ani->tag))
+	{
+	  tok_tagids.insert(tagids.name2id(ani->tag));
+	}
+      viterbi_step(token2id(token.text()), tok_tagids);
     }
-
-    //-- ye olde guttes
-    _viterbi_step_sub(tokid, classid, tmm);
   };
 
   //------------------------------------------------------------
-  // public methods: high-level: Viterbi: finish
+  // Viterbi: single iteration: (TokString)
+  /**
+   * \bold DEPRECATED in favor of viterbi_step(moot_token)
+   *
+   * Step a single Viterbi iteration, given only token-text string
+   */
+  inline void viterbi_step(const mootTokString &tokstr) {
+    return viterbi_step(token2id(tokstr));
+  };
 
+  //------------------------------------------------------------
+  // Viterbi: finish
   /**
    * Run final Viterbi iteration, using 'final_tagid' as the final tag
    */
-  inline void viterbi_finish(const TagID final_tagid)
-  {
+  inline void viterbi_finish(const TagID final_tagid) {
     _viterbi_push(final_tagid);
   };
 
   /**
    * Run final Viterbi iteration, using instance datum 'start_tagid' as the final tag.
    */
-  inline void viterbi_finish(void)
-  {
+  inline void viterbi_finish(void) {
     _viterbi_push(start_tagid);
   };
-  //@}
 
-  /*------------------------------------------------------------
-   * public methods: top-level
-   */
-  /// \name Top-level tagging interface 
-  //@{
-
-  /** Tag tokens from a C-stream using mootTaggerLexer */
-  bool tag_stream(FILE *in=stdin, FILE *out=stdout, char *srcname=NULL);
-
-  /** Tag a C-array of token-strings (as a sentence) */
-  void tag_strings(int argc, char **argv, FILE *out=stdout, char *infilename=NULL);
+  /**
+   * Mark 
   //@}
 
   /// \name Tagging interface output
   //@{
-
   /** Dump best path for current sentence buffer. */
   inline void tag_print_best_path(FILE *out=stdout)
   {

@@ -1,8 +1,8 @@
 /* -*- Mode: C++ -*- */
 
 /*
-   libmoot version 1.0.4 : moocow's part-of-speech tagging library
-   Copyright (C) 2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   libmoot : moocow's part-of-speech tagging library
+   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -43,53 +43,37 @@ public:
   typedef CountT LexfreqCount;
 
   /**
-   * Type for the lexical total-frequency lookup table.
+   * Type for frequency lookup subtables.
    */
-  typedef hash_map<mootTokString,LexfreqCount> LexfreqTotalTable;
+  typedef map<mootTagString,LexfreqCount> LexfreqSubtable;
 
-  /** Type for keys of the lexeme+tag frequency lookup table */
-  typedef pair<mootTokString,mootTagString> LexfreqKey;
-
-  /** Helper struct (argh) */
-  struct LexfreqKeyHashFcn {
+  /**
+   * Type for frequency lookup table entries.
+   */
+  class LexfreqEntry {
   public:
-    inline size_t operator()(const LexfreqKey &x) const
-    {
-      //size_t hv = hash<const mootTokString&>(x.first);
-      //return hv + (hv<<5)-hv + hash<const mootTagStr&>(x.second);
-      return
-	hash<mootTokString>()(x.first) * hash<mootTagString>()(x.second);
-    };
-  };
-  /** Another helper struct */
-  struct LexfreqKeyEqualFcn {
+    LexfreqCount     total;     /**< Total occurrences of this lexeme */
+    LexfreqSubtable  freqs;     /**< Maps tags to occurrences of this lexeme with key tag */
   public:
-    inline size_t operator()(const LexfreqKey &x, const LexfreqKey &y) const
-    {
-      return x.first == y.first && x.second == y.second;
-    };
+    LexfreqEntry(const LexfreqCount tok_total=0) : total(tok_total) {};
+    LexfreqEntry(const LexfreqCount tok_total, const LexfreqSubtable &tok_tagfreqs)
+      : total(tok_total), freqs(tok_tagfreqs)
+    {};
   };
 
+  /**
+   * Type for the lexical frequency lookup table.
+   */
+  typedef hash_map<mootTokString,LexfreqEntry> LexfreqTokTable;
 
-  /** Lookup table:  Lexeme->(Tag->Count) */
-  typedef
-    hash_map<LexfreqKey,
-	     LexfreqCount,
-	     LexfreqKeyHashFcn,
-	     LexfreqKeyEqualFcn>
-    LexfreqStringTable;
-
-  /** Lookup table: Tag->Count */
-  typedef
-  hash_map<mootTagString,LexfreqCount> LexfreqTagTable;
+  /** Lookup table: tag->Count(tag) */
+  typedef hash_map<mootTagString,LexfreqCount> LexfreqTagTable;
 
 public:
   //------ public data
-  /** lexeme->(tag->count) lookup table */
-  LexfreqStringTable lftable;
-  LexfreqTotalTable  lftotals;
-  LexfreqTagTable    lftags;
-  LexfreqCount       n_tokens;
+  LexfreqTokTable    lftable;    /**< lexeme->(tag->count) lookup table */
+  LexfreqTagTable    tagtable;   /**< tag->count lookup table */
+  LexfreqCount       n_tokens;   /**< total number of tokens counted */
 
 public:
   //------ public methods
@@ -111,74 +95,49 @@ public:
   /** Clear internal table(s) */
   void clear(void);
 
-  /** Add 'count' to the current count for pair(token,tag), returns new count */
-  inline LexfreqCount add_count(const LexfreqKey &key, const LexfreqCount count)
+  /** Add 'count' to the current count for (token,tag) */
+  inline void add_count(const mootTokString &text,
+			const mootTagString &tag,
+			const LexfreqCount count)
   {
-    //-- adjust count
-    LexfreqStringTable::iterator ti = lftable.find(key);
-    if (ti == lftable.end()) {
-      ti = lftable.insert(pair<LexfreqKey,LexfreqCount>(key,count)).first;
+    //-- adjust token-table
+    LexfreqTokTable::iterator lfi = lftable.find(text);
+    if (lfi == lftable.end()) {
+      //-- new token
+      lfi = lftable.insert(LexfreqTokTable::value_type(text,LexfreqEntry(count))).first;
+      lfi->second.freqs[tag] = count;
     } else {
-      ti->second += count;
+      //-- known token
+      lfi->second.total += count;
+
+      LexfreqSubtable::iterator lsi = lfi->second.freqs.find(tag);
+      if (lsi == lfi->second.freqs.end()) {
+	//-- unknown (tok,tag) pair
+	lfi->second.freqs[tag] = count;
+      } else {
+	//-- known (tok,tag) pair: just add
+	lsi->second += count;
+      }
     }
-    //-- adjust total
-    LexfreqTotalTable::iterator toti = lftotals.find(key.first);
-    if (toti == lftotals.end()) {
-      lftotals[key.first] = count;
+
+    //-- adjust total tag-count
+    LexfreqTagTable::iterator lftagi = tagtable.find(tag);
+    if (lftagi != tagtable.end()) {
+      lftagi->second += count;
     } else {
-      toti->second += count;
+      tagtable[tag] = count;
     }
-    //-- adjust tag-count
-    LexfreqTagTable::iterator tagi = lftags.find(key.second);
-    if (tagi == lftags.end()) {
-      lftags[key.second] = count;
-    } else {
-      tagi->second += count;
-    }
+
     //-- adjust total token-count
     n_tokens += count;
-    //-- return
-    return ti->second;
   };
 
-  /** Add 'count' to the current count for (token,tag), returns new count */
-  inline LexfreqCount add_count(const mootTokString &token,
-				const mootTagString &tag,
-				const LexfreqCount count)
-  {
-    return add_count(LexfreqKey(token,tag), count);
-  }; //-- add_count()
-
-
   //------ public methods: lookup
-
-  /** Returns current count for pair(token,tag), returns 0 if unknown */
-  inline const LexfreqCount lookup(const LexfreqKey &key) const
+  const LexfreqCount taglookup(const mootTagString &tag) const
   {
-    LexfreqStringTable::const_iterator ti = lftable.find(key);
-    return ti == lftable.end() ? 0 : ti->second;
-  }; //-- lookup(key)
-
-  /** Returns current count for (token,tag), returns 0 if unknown */
-  inline const LexfreqCount lookup(const mootTokString &token, const mootTagString &tag) const
-  {
-    return lookup(LexfreqKey(token,tag));
-  }; //-- lookup(token,tag)
-
-  /** Returns current total count for token, returns 0 if unknown */
-  inline const LexfreqCount lookup(const mootTokString &token) const
-  {
-    LexfreqTotalTable::const_iterator toti = lftotals.find(token);
-    return toti == lftotals.end() ? 0 : toti->second;
-  }; //-- lookup(token)
-
-
-  /** Returns current total count for tag, returns 0 if unknown */
-  inline const LexfreqCount taglookup(const mootTagString &tag) const
-  {
-    LexfreqTagTable::const_iterator tagi = lftags.find(tag);
-    return tagi == lftags.end() ? 0 : tagi->second;
-  }; //-- taglookup(tag)
+    LexfreqTagTable::const_iterator tagi = tagtable.find(tag);
+    return tagi == tagtable.end() ? 0 : tagi->second;
+  };
 
   //------ public methods: i/o
 

@@ -55,120 +55,13 @@ public:
   /// \name Training types
   //@{
   /** Type for an N-gram */
-  typedef mootNgrams::NgramString Ngram;
+  typedef mootNgrams::Ngram      Ngram;
 
   /** Type for counts */
   typedef mootNgrams::NgramCount CountT;
 
   /** Type for current tag-sets */
   typedef set<mootTagString> TagSet;
-
-  /** Class for on-the-fly computation of n-gram sets */
-  class NgramSet {
-  public:
-    //-- iteration
-    struct ngIteratorItem {
-      size_t pos;
-      TagSet::iterator cur;
-      TagSet::iterator begin;
-      TagSet::iterator end;
-    };
-
-    typedef deque<ngIteratorItem>         ngIterator;
-    typedef ngIterator::iterator          ngIterator2;
-    typedef ngIterator::reverse_iterator  ngIterator2r;
-
-  public:
-    typedef deque<TagSet> ngsType;
-  public:
-    ngsType ngs;
-  public:
-    //-- construct / destroy
-    NgramSet(size_t size=0) { ngs.resize(size); };
-    ~NgramSet(void) {};
-
-    //-- clear , size, resize
-    inline void clear(void) { ngs.clear(); };
-    inline const size_t size(void) { return ngs.size(); };
-    inline void resize(size_t size) { ngs.resize(size); };
-
-    //-- push, pop, step
-    inline void push_front(const TagSet &ts) { ngs.push_front(ts); };
-    inline void push_back(const TagSet &ts) { ngs.push_back(ts); };
-    inline void pop_front(void) { ngs.pop_front(); };
-    inline void pop_back(void) { ngs.pop_back(); };
-    inline void step(const TagSet &ts)
-    {
-      ngs.pop_front();
-      ngs.push_back(ts);
-    };
-
-    //-- iteration
-    inline ngIterator iter_begin(size_t len=0)
-    {
-      ngIterator it(len <= ngs.size() ? len : ngs.size());
-      return iter_begin(it,len);
-    };
-
-    inline ngIterator &iter_begin(ngIterator &it, size_t len=0)
-    {
-      it.resize(len <= ngs.size() ? len : ngs.size());
-      ngIterator2 iti;
-      ngsType::iterator ngsi;
-      size_t pos;
-      for (iti    = it.begin() ,  ngsi  = ngs.begin() , pos = 0;
-	   iti   != it.end()  &&  ngsi != ngs.end();
-	   iti++               ,  ngsi++              , pos++)
-	{
-	  iti->pos   = pos;
-	  iti->begin = iti->cur = ngsi->begin();
-	  iti->end   = ngsi->end();
-	}
-      return it;
-    };
-
-    inline bool iter_valid(ngIterator &it)
-    {
-      return !it.empty() && it.front().cur != it.front().end;
-    };
-
-    inline ngIterator &iter_next(ngIterator &it)
-    {
-      if (!iter_valid(it)) return it;
-
-      ngIterator2r                 itr;
-      for (itr = it.rbegin(); itr != it.rend(); itr++) {
-	//-- easy increment
-	itr->cur++;
-
-	//-- check overflow
-	if (itr->cur == itr->end &&  itr->pos != 0) {
-	  itr->cur = itr->begin;
-	  continue;
-	}
-
-	//-- done
-	break;
-      }
-      return it;
-    };
-
-    inline Ngram &iter2ngram(ngIterator &it, Ngram &ng)
-    {
-      ng.resize(it.size());
-      Ngram::iterator ngi;
-      ngIterator2 iti;
-      for (iti    = it.begin() ,  ngi  = ng.begin();
-	   iti   != it.end()  &&  ngi != ng.end();
-	   iti++               ,  ngi++)
-	{
-	  *ngi = *(iti->cur);
-	}
-      return ng;
-    };
-
-  };
-  //@}
 
 public:
   /*-------------------------------------------------------------*/
@@ -179,7 +72,7 @@ public:
   mootLexfreqs lexfreqs;
 
   /** N-gram data */
-  mootNgrams ngrams;
+  mootNgrams   ngrams;
   //@}
 
   /*-------------------------------------------------------------*/
@@ -195,18 +88,15 @@ public:
   /** String indicating end-of-sentence */
   mootTagString eos_tag;
 
-  /** Maximum length of n-grams for which to gather data (n<=kmax) */
-  unsigned short int kmax;
+  /* Maximum length of n-grams for which to gather data (n<=kmax) */
+  //unsigned short int kmax;
   //@}
 
 protected:
   /*------------------------------------------------------------*/
   /// \name Runtime training state
   //@{
-  /** Current n-grams */
-  NgramSet ngset;
-
-  /** Temporary ngram for counting */
+  /** Current n-gram window */
   Ngram ng;
 
   /** Stupid hack */
@@ -222,7 +112,6 @@ public:
     : want_lexfreqs(true),
       want_ngrams(true),
       eos_tag("__$"),
-      kmax(3),
       last_was_eos(false)
   {};
 
@@ -263,21 +152,6 @@ public:
 
   /** Gather training information for a single token, using mootToken */
   void train_token(const mootToken &curtok);
-
-  /** Gather training information for a single token
-   *
-   * DEPRECATED in favor of 'mootToken' interface.
-   */
-  void train_token(const mootTokString &curtok, const TagSet &curtags);
-
-  /** Gather ngram-training information for a single token. */
-  void _train_token_ng(const mootToken &curtok);
-
-  /** Gather ngram-training information for a single token.
-   *
-   * DEPRECATED in favor of 'mootToken' interface.
-   */
-  void _train_token_ng(const TagSet &curtags);
 
   /** Gather training information for a sentence boundary. */
   void train_eos(void);

@@ -52,22 +52,6 @@ libmoot_la_SOURCES = \
 	mootHMMTrainer.cc
 
 #	mootCHMM.cc
-#	mootTokenParser.cc 
-
-libmoot_la_SOURCES_old = \
-	mootTokenLexer.cc \
-	mootPPLexer.cc \
-	mootNgrams.cc \
-	mootNgramsLexer.cc \
-	mootNgramsParser.cc \
-	mootNgramsCompiler.cc \
-	mootLexfreqs.cc \
-	mootLexfreqsLexer.cc \
-	mootLexfreqsParser.cc \
-	mootLexfreqsCompiler.cc \
-	mootHMM.cc \
-	mootCHMM.cc \
-	mootHMMTrainer.cc
 
 
 ## --- Extra (possible) sources
@@ -143,9 +127,9 @@ pkginclude_HEADERS = \
 	mootLexfreqsCompiler.h \
 	mootLexfreqs.h \
 	mootHMM.h \
-	mootCHMM.h \
 	mootHMMTrainer.h
 
+#	mootCHMM.h 
 #	mootTokenParser.h
 
 ## --- no-install headers

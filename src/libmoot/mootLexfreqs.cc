@@ -42,8 +42,7 @@ void mootLexfreqs::clear(void)
 {
   n_tokens = 0;
   lftable.clear();
-  lftotals.clear();
-  lftags.clear();
+  tagtable.clear();
 }
 
 /*----------------------------------------------------------------------
@@ -94,31 +93,23 @@ bool mootLexfreqs::save(char *filename)
 
 bool mootLexfreqs::save(FILE *file, char *filename)
 {
-  set<LexfreqKey> keys;
+  set<mootTokString> toks;
 
   //-- prepare sorted key-list
-  for (LexfreqStringTable::const_iterator lfti = lftable.begin(); lfti != lftable.end(); lfti++) {
-    keys.insert(lfti->first);
+  for (LexfreqTokTable::const_iterator lfi = lftable.begin(); lfi != lftable.end(); lfi++) {
+    toks.insert(lfi->first);
   }
 
   //-- iterate through sorted keys
-  mootTokString lasttok;
-  for (set<LexfreqKey>::const_iterator keyi = keys.begin(); keyi != keys.end(); keyi++) {
-    const mootTokString &curtok = keyi->first;
-    const mootTagString &curtag = keyi->second;
+  for (set<mootTokString>::const_iterator toki = toks.begin(); toki != toks.end(); toki++) {
+    const LexfreqEntry  &entry  = lftable[*toki];
+    fprintf(file, "%s\t%g", toki->c_str(), entry.total);
 
-    //-- do we have a new token?
-    if (keyi == keys.begin() || curtok != lasttok) {
-      if (keyi != keys.begin()) fputc('\n', file);
-      fprintf(file, "%s\t%g", curtok.c_str(), lookup(curtok));
-      lasttok = curtok;
+    for (LexfreqSubtable::const_iterator ei = entry.freqs.begin(); ei != entry.freqs.end(); ei++) {
+      fprintf(file, "\t%s\t%g", ei->first.c_str(), ei->second);
     }
-
-    //-- output tags
-    fprintf(file, "\t%s\t%g", curtag.c_str(), lookup(*keyi));
+    fputc('\n', file);
   }
-  fputc('\n', file);
-
   return 1;
 }
 

@@ -33,7 +33,7 @@
  *     - token-line format (TAB-separated)
  *        TOKEN_TEXT  ANALYSIS_1 ... ANALYSIS_N
  *     - analysis format(s):
- *        ...(COST?)... "[" ("_"?) TAG ["]"|" "] ...(COST?)...
+ *        ...(COST?)... "[" TAG ["]"|" "] ...(COST?)...
  *     - COST format(s):
  *       "<" COST_FLOAT ">"
  *
@@ -68,7 +68,7 @@
  *
  * Analysis format(s):
  *
- * ...(COST?)... "[" ("_"?) TAG ["]"|" "] ...(COST?)...
+ * ...(COST?)... "[" TAG ["]"|" "] ...(COST?)...
  *
  * COST format(s):
  *
@@ -269,7 +269,7 @@ tagchar    [^ \t\n\r\]]
 }
 
 
-<DETAILS>"["(_?)/{tagchar} {
+<DETAILS>"["/{tagchar} {
   //-- DETAILS: looks like a tag
   theColumn += yyleng;
   manalysis.details.append((const char *)yytext);

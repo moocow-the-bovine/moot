@@ -39,6 +39,14 @@
 #include "mootToken.h"
 #include "mootTokenIO.h"
 
+//#define mootHMMTrainerDEBUG 1
+#undef mootHMMTrainerDEBUG
+
+#ifdef mootHMMTrainerDEBUG
+# define DEBUG(code) code
+#else
+# define DEBUG(code) 
+#endif
 
 moot_BEGIN_NAMESPACE
 
@@ -74,7 +82,7 @@ bool mootHMMTrainer::train_from_stream(FILE *in, const char *filename)
   char *myfile = strdup(filename);
 
   //-- prepare lexer
-  TokenReader treader;
+  TokenReader treader(true,false);
   treader.select_stream(in,myfile);
 
   //-- prepare variables
@@ -83,6 +91,7 @@ bool mootHMMTrainer::train_from_stream(FILE *in, const char *filename)
   //-- do training
   train_init();
   while ((typ = treader.get_token()) != mootTokenLexer::TLEOF) {
+    DEBUG( carp("DEBUG: Got token type %d\n", typ) );
     switch (typ) {
 
     case mootTokenLexer::TLTOKEN:
@@ -111,67 +120,15 @@ bool mootHMMTrainer::train_from_stream(FILE *in, const char *filename)
 }
 
 
-/*
-bool mootHMMTrainer::train_from_stream(FILE *in, const char *filename)
-{
-  //-- prepare lexer
-  mootTokenReader treader;
-  treader.select_stream(in,filename);
-
-  //-- prepare variables
-  mootTokenLexer::TokenType typ;
-
-  //-- do training
-  train_init();
-  while ((typ = lexer.yylex()) != mootTaggerLexer::DTEOF) {
-    switch (typ) {
-      
-    case mootTaggerLexer::TOKEN:
-      curtok = (const char *)lexer.yytext;
-      break;
-      
-    case mootTaggerLexer::TAG:
-      curtags.insert(mootTagString((const char *)lexer.yytext));
-      break;
-
-    case mootTaggerLexer::EOT:
-      train_token(curtok,curtags);
-      curtags.clear();
-      break;
-
-    case mootTaggerLexer::EOS:
-      train_eos();
-      train_bos();
-      break;
-
-    default:
-      carp("%s: Error: unknown token '%s' in file '%s' at line %d, column %d\n",
-	   "mootHMMTrainer::train_from_stream()",
-	   filename,
-	   lexer.yytext,
-	   lexer.theLine,
-	   lexer.theColumn);
-      break;
-    }
-  }
-  return true;
-}
-*/
-
 /*------------------------------------------------------------
  * Mid-level training methods : init
  */
 void mootHMMTrainer::train_init(void)
 {
-  ngset.resize((size_t)kmax);
-  ng.resize((size_t)kmax);
+  ng.resize(3);
   train_bos();
   //-- count one EOS marker (TnT compatibility hack)
-  if (want_ngrams) {
-    ng.clear();
-    ng.push_back(eos_tag);
-    ngrams.add_count(ng,1);
-  }
+  if (want_ngrams) ngrams.add_count(eos_tag,1.0);
 }
 
 /*------------------------------------------------------------
@@ -179,15 +136,14 @@ void mootHMMTrainer::train_init(void)
  */
 void mootHMMTrainer::train_bos(void)
 {
+  DEBUG( carp("\nDEBUG: train_bos() : called\n") );
   if (want_ngrams) {
-    for (NgramSet::ngsType::iterator ngsi = ngset.ngs.begin();
-	 ngsi != ngset.ngs.end();
-	 ngsi++)
-      {
-	ngsi->clear();
-	ngsi->insert(eos_tag);
-      }
+    DEBUG( carp("DEBUG: train_bos() : pre: ng=%s\n", ng.as_string().c_str()) );
+    ng.clear();
+    ng.push_back(eos_tag);
+    DEBUG( carp("DEBUG: train_bos() : post: ng=%s\n", ng.as_string().c_str()) );
   }
+  DEBUG( carp("DEBUG: train_bos() : completed.\n") );
 }
 
 
@@ -198,81 +154,30 @@ void mootHMMTrainer::train_bos(void)
 /*-- new (hack) */
 void mootHMMTrainer::train_token(const mootToken &curtok)
 {
-  TagSet tagset;
-  curtok.tokExport(NULL,&tagset);
-  train_token(curtok.text(), tagset);
-}
+  if (curtok.besttag().empty()) {
+    carp("mootHMMTrainer::train_token(): no best tag for token `%s'",
+	 curtok.text().c_str());
+  }
 
-/*-- DEPRECATED */
-void mootHMMTrainer::train_token(const mootTokString &curtok, const TagSet &curtags)
-{
-  CountT count = ((CountT)curtags.size());
-  TagSet::const_iterator cti;
-
+  //-- count lexical frequencies
   if (want_lexfreqs) {
-    //-- count lexical frequencies
-    for (cti = curtags.begin();
-	 cti != curtags.end();
-	 cti++) {
-      lexfreqs.add_count(curtok, *cti, (count ? (1.0/count) : 0.0));
-    }
+    DEBUG( carp("DEBUG: train_token(`%s') : training lexfreqs\n", curtok.text().c_str()) );
+    lexfreqs.add_count(curtok.text(), curtok.besttag(), 1.0);
   }
 
-  if (want_ngrams) _train_token_ng(curtags);
-}
+  //-- count n-gram frequencies
+  if (want_ngrams) {
+    DEBUG( carp("DEBUG: train_token(`%s') : training ngrams\n", curtok.text().c_str()) );
 
+    ng.push(curtok.besttag());
+    if (ng.size()>=3) ngrams.add_counts(ng, 1.0); //.. add counts if we can
 
-/*------------------------------------------------------------
- * Mid-level training methods : token : ngrams
- */
+    DEBUG( carp("DEBUG: train_token(`%s') : ngram=%s\n", \
+	       curtok.text().c_str(), ng.as_string().c_str()) );
 
-/*-- deprecated, but the real thing */
-void mootHMMTrainer::_train_token_ng(const TagSet &curtags)
-{
-  if (!want_ngrams) return;
-
-  //-- count kmax-grams: add in next tagset
-  ngset.step(curtags);
-
-  //-- count all current ngrams
-  NgramSet::ngIterator ngsi;
-  size_t len;
-  CountT ngcount;
-  for (len = 1; len <= kmax; len++) {
-    //-- get count
-    ngcount = 0;
-    for (ngsi = ngset.iter_begin(len);
-	 ngset.iter_valid(ngsi);
-	 ngset.iter_next(ngsi))
-      {
-	ngcount++;
-      }
-    ngcount = 1.0/ngcount; //-- normalize
-    
-    //-- count ngrams
-    for (ngsi = ngset.iter_begin(len);
-	 ngset.iter_valid(ngsi);
-	 ngset.iter_next(ngsi))
-      {
-	ngset.iter2ngram(ngsi,ng);
-	//-- ignore redundant n-grams for the boundary tag
-	if (len > 1 && ((ng[0] == eos_tag && ng[1] == eos_tag)
-			|| (ng.back() == eos_tag && ng[len-2] == eos_tag)))
-	  continue;
-	ngrams.add_count(ng,ngcount);
-      }
+    //-- hack
+    last_was_eos = false;
   }
-
-  //-- hack
-  last_was_eos = false;
-}
-
-/*-- new (hack) */
-void mootHMMTrainer::_train_token_ng(const mootToken &curtok)
-{
-  TagSet curtags;
-  curtok.tokExport(NULL,&curtags);
-  _train_token_ng(curtags);
 }
 
 
@@ -281,16 +186,26 @@ void mootHMMTrainer::_train_token_ng(const mootToken &curtok)
  */
 void mootHMMTrainer::train_eos(void)
 {
+  DEBUG( carp("DEBUG: train_eos() : called\n") );
+  //-- on entry, we have <t1,t2,t3> or <__$,t1>
+  //   and have trained for it and all proper prefixes
   if (want_ngrams && !last_was_eos) {
-    TagSet eostags;
-    eostags.insert(eos_tag);
-    for (int i = 1; i < kmax; i++) {
-      _train_token_ng(eostags);
-    }
+    //-- train for <t2,t3,__$>
+    ng.push(eos_tag);
+    ngrams.add_counts(ng, 1.0);
+    DEBUG( carp("DEBUG: train_eos() : trained ng=%s\n", ng.as_string().c_str()) );
+
+    //-- train for <t3,__$>
+    ng.push(eos_tag);
+    ng.pop_back();
+    ngrams.add_counts(ng, 1.0);
+    DEBUG( carp("DEBUG: train_eos() : trained ng=%s\n", ng.as_string().c_str()) );
+
+    //-- train (again) for <__$>
+    ngrams.add_count(eos_tag, 1.0);
   }
   last_was_eos = true;
 }
-
 
 
 /*------------------------------------------------------------
@@ -305,3 +220,5 @@ void mootHMMTrainer::carp(char *fmt, ...)
 }
 
 moot_END_NAMESPACE
+
+#undef DEBUG //-- this name is WAY too common to let it float out of this file...

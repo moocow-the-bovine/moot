@@ -100,11 +100,11 @@ typedef struct {
    /** a pointer to the ngram-parameter object to hold the data we're parsing */ \
    moot::mootNgrams              *ngrams; \
    /** to keep track of all possible tags we've parsed (optional). */ \
-   std::set<moot::mootTagString>      *alltags; \
+   std::set<moot::mootTagString> *alltags; \
    /** previous  ngram parsed (for brief file format */ \
-   moot::mootNgrams::NgramString  prevngram; \
+   moot::mootNgrams::Ngram  prevngram; \
    /** current ngram being parsed */ \
-   moot::mootNgrams::NgramString  curngram; \
+   moot::mootNgrams::Ngram  curngram; \
   private: \
    /* private instance members go here */ \
   public: \
@@ -127,7 +127,7 @@ typedef struct {
  *------------------------------------------------------------*/
 
 %union {
-  moot::mootNgrams::NgramString   *ngram;            ///< for tag-lists
+  moot::mootNgrams::Ngram         *ngram;            ///< for tag-lists
   moot::mootTagString            *tagstr;            ///< for single tags (strings)
   moot::mootNgrams::NgramCount     count;            ///< for tag-list counts
 }

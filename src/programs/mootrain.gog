@@ -73,13 +73,13 @@ not be an element of the actual tag-set -- that is, it should not
 be a valid analysis for any token.
 "
 
-int "kmax" k "Specify maximum n-gram length (default=3)" \
-  argh="LENGTH" \
-  default="3" \
-  details="
-Specifying any value less than 3 may cause lambda estimation
-to fail miserably in mootHMM and/or mootCHMM -- don't do it.
-"
+#int "kmax" k "Specify maximum n-gram length (default=3)" \
+#  argh="LENGTH" \
+#  default="3" \
+#  details="
+#Specifying any value less than 3 may cause lambda estimation
+#to fail miserably in mootHMM and/or mootCHMM -- don't do it.
+#"
 
 flag "verbose-ngrams" N "Generate long-form ngrams (default=no)"
 
