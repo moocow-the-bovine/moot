@@ -46,17 +46,19 @@ int mootEval::compareTokens(const mootToken &tok1, const mootToken &tok2)
   if (tok1.besttag() != tok2.besttag()) status |= MEF_BestMismatch;
 
   if (tok1.analyses().empty()) {
-    //status |= (MEF_EmptyClass1|MEF_ImpClass1);
+    //status |= (MEF_EmptyClass1|MEF_ImpClass1|MEF_XImpClass1);
     status |= MEF_EmptyClass1;
-  } else if (tok1.lower_bound(tok1.besttag()) == tok1.tok_analyses.end()) {
-    status |= MEF_ImpClass1;
+  } else {
+    if (tok1.lower_bound(tok1.besttag()) == tok1.analyses().end()) status |= MEF_ImpClass1;
+    if (tok1.lower_bound(tok2.besttag()) == tok1.analyses().end()) status |= MEF_XImpClass1;
   }
 
   if (tok2.analyses().empty()) {
-    //status |= (MEF_EmptyClass1|MEF_ImpClass2);
+    //status |= (MEF_EmptyClass1|MEF_ImpClass2|MEF_XImpClass2);
     status |= MEF_EmptyClass2;
-  } else if (tok2.lower_bound(tok2.besttag()) == tok2.tok_analyses.end()) {
-    status |= MEF_ImpClass2;
+  } else {
+    if (tok2.lower_bound(tok2.besttag()) == tok2.analyses().end()) status |= MEF_ImpClass2;
+    if (tok2.lower_bound(tok1.besttag()) == tok2.analyses().end()) status |= MEF_XImpClass2;
   }
 
   return status;
@@ -73,15 +75,18 @@ int mootEval::compareTokens(const mootToken &tok1, const mootToken &tok2)
  */
 string mootEval::status_string(void)
 {
-  string str(8,'-');
-  str[0] = status&MEF_TokMismatch  ? 't' : '-';
-  str[1] = status&MEF_BestMismatch ? 'b' : '-';
-  str[2] = ':';
-  str[3] = status&MEF_EmptyClass1  ? 'e' : '-';
-  str[4] = status&MEF_ImpClass1    ? 'i' : '-';
-  str[5] = ':';
-  str[6] = status&MEF_EmptyClass2  ? 'e' : '-';
-  str[7] = status&MEF_ImpClass2    ? 'i' : '-';
+  string str;
+  str.reserve(10);
+  str.push_back(status&MEF_TokMismatch  ? 't' : '-');
+  str.push_back(status&MEF_BestMismatch ? 'b' : '-');
+  str.push_back(':');
+  str.push_back(status&MEF_EmptyClass1  ? 'e' : '-');
+  str.push_back(status&MEF_ImpClass1    ? 'i' : '-');
+  str.push_back(status&MEF_XImpClass1   ? 'x' : '-');
+  str.push_back(':');
+  str.push_back(status&MEF_EmptyClass2  ? 'e' : '-');
+  str.push_back(status&MEF_ImpClass2    ? 'i' : '-');
+  str.push_back(status&MEF_XImpClass2   ? 'x' : '-');
   return str;
 }
 

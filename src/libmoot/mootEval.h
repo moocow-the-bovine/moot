@@ -51,9 +51,11 @@ public:
     MEF_TokMismatch    = 0x0002, /**< token-text mismatch */
     MEF_BestMismatch   = 0x0004, /**< best-tag mismatch */
     MEF_EmptyClass1    = 0x0008, /**< empty class in 1st token */
-    MEF_ImpClass1      = 0x0010, /**< Impossible class in 1st token (besttag1 \not\in class1) */
-    MEF_EmptyClass2    = 0x0020, /**< empty class in 2nd token */
-    MEF_ImpClass2      = 0x0040  /**< Impossible class in 2nd token (besttag2 \not\in class2) */
+    MEF_EmptyClass2    = 0x0010, /**< empty class in 2nd token */
+    MEF_ImpClass1      = 0x0020, /**< Impossible class in 1st token (besttag1 \not\in class1) */
+    MEF_ImpClass2      = 0x0040, /**< Impossible class in 2nd token (besttag2 \not\in class2) */
+    MEF_XImpClass1     = 0x0080, /**< X-Impossible class in 2nd token (besttag1 \not\in class2) */
+    MEF_XImpClass2     = 0x0100  /**< X-Impossible class in 2nd token (besttag2 \not\in class1) */
   } evalStatus;
 
 public:
@@ -65,26 +67,79 @@ public:
   /** Clear the object */
   inline void clear(void) { status = MEF_None; };
 
-  /** Compare content of two mootToken objects : returns binary OR'd evalStatus flags */
+  /**
+   * Compare content of two mootToken objects : returns binary OR'd evalStatus flags
+   * \note You must call this before any of the \c is*() methods will return
+   * meaningful values.
+   */
   int compareTokens(const mootToken &tok1, const mootToken &tok2);
 
   /** Compare content of two mootSentence objects */
   //list<mootEvalFlag> compareSentences(const mootSentence &sent1, const mootSentence &sent2);
 
+  /*----------------------------------------------------
+   * Accessors
+   */
+  /** True after compareTokens(tok1,tok2) iff tokens mismatchedw */
+  inline bool isTokenMismatch(void) { return status&MEF_TokMismatch; };
+
+  /** True after compareTokens(tok1,tok2) iff best-tags mismatched */
+  inline bool isBestMismatch(void) { return status&MEF_BestMismatch; };
+
+  /**
+   * True after compareTokens(tok1,tok2) iff tok1 had empty analyses:
+   * iff \f$ tok1.analyses() = \emptyset \f$
+   */
+  inline bool isEmptyClass1(void) { return status&MEF_EmptyClass1; };
+
+  /**
+   * True after compareTokens(tok1,tok2) iff tok2 had empty analyses:
+   * iff \f$ tok2.analyses() = \emptyset \f$
+   */
+  inline bool isEmptyClass2(void) { return status&MEF_EmptyClass2; };
+
+  /**
+   * True after \c compareTokens(tok1,tok2) iff tok1 had impossible non-empty analysis-set:
+   * iff \f$ (tok1.besttag() \not\in tok1.analyses()) \f$
+   */
+  inline bool isImpClass1(void) { return status&MEF_ImpClass1; };
+
+  /**
+   * True after \c compareTokens(tok1,tok2) iff tok2 had impossible non-empty analysis-set:
+   * iff \f$ (tok2.besttag() \not\in tok2.analyses()) \$
+   */
+  inline bool isImpClass2(void) { return status&MEF_ImpClass2; };
+
+  /**
+   * True after \c compareTokens(tok1,tok2) iff tok1 had cross-impossible non-empty analysis-set:
+   * iff \f$ (tok2.besttag() \not\in tok1.analyses()) \f$
+   */
+  inline bool isXImpClass1(void) { return status&MEF_XImpClass1; };
+
+  /**
+   * True after \c compareTokens(tok1,tok2) iff tok2 had cross-impossible non-empty analysis-set:
+   * iff \f$ (tok1.besttag() \not\in tok2.analyses()) \$
+   */
+  inline bool isXImpClass2(void) { return status&MEF_XImpClass2; };
+
+
+  /*----------------------------------------------------
+   * Strinification
+   */
   /**
    * Returns canonical string-form of a mootEvalFlag: this
    * string 3 fields of 2 ASCII characters each, each
    * character corresponding to one of the bits in
    * \c flags.  The output looks like:
    *
-   * \c {:Tok:}{:Best:}":"{:Empty1:}{:Imp1:}":"{:Empty2:}{:Imp2:}
+   * \c {:Tok:}{:Best:}":"{:Empty1:}{:Imp1:}{:XImp1:}":"{:Empty2:}{:Imp2:}{:XImp2:}
    *
    * where a literal '-' indicates an unset flag, and
    * any other character indicates that the flag is set.
    * The actual characters used are mnemonics for the
    * corresponding flags:
    *
-   * \c (t|-)(b|-):(e|-)(i|-):(e|-)(i|-)
+   * \c (t|-)(b|-):(e|-)(i|-)(x|-):(e|-)(i|-)(x|-)
    */
   string status_string(void);
 };
