@@ -49,6 +49,12 @@ if test "$CXXFLAGS" != "$USER_CXXFLAGS" ; then
   CXXFLAGS="$USER_CXXFLAGS"
 fi
 
+#---------------------------------------------------------------
+# short package includes
+spkgincludedir="\${includedir}/AC_PACKAGE_NAME"
+AC_SUBST(spkgincludedir)
+# short package includes
+#---------------------------------------------------------------
 
 #---------------------------------------------------------------
 # get real prefix
@@ -229,12 +235,12 @@ AC_ARG_WITH(doc-formats,
 	AC_HELP_STRING([--with-doc-formats=LIST],
 		       [Build documentation formats in LIST. \
                         Available formats: txt, man, html, dvi, ps, pdf, none.
-	                Default='man html pdf']),
+	                Default='man html']),
 	[ac_cv_doc_formats="$withval"])
 
 ## -- set default doc formats if unspecified
 if test -z "$ac_cv_doc_formats" ; then
-  ac_cv_doc_formats="man html pdf"
+  ac_cv_doc_formats="man html"
 fi
 
 ## -- un-comma-tize the doc-formats
@@ -471,5 +477,6 @@ AC_CONFIG_FILES(doc/programs/Makefile)
 AC_CONFIG_FILES(doc/Makefile)
 AC_CONFIG_FILES(config/Makefile)
 AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES(dwdst.pc)
 AC_CONFIG_FILES(dwdst.spec)
 AC_OUTPUT

@@ -1,3 +1,5 @@
+dwdst.pc
+dwdst.spec
 *~
 .*~
 *.o
@@ -11,7 +13,6 @@
 *.changes
 *.dsc
 *.rpm
-*.spec
 rpm
 .libs
 .deps

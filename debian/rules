@@ -76,6 +76,14 @@ install: build
 	#$(MAKE) install prefix=$(CURDIR)/debian/tmp
 	$(MAKE) install \
 	  prefix=$(CURDIR)/debian/tmp/usr
+	# argh!
+	install -d -m 755 $(CURDIR)/debian/tmp/usr/share/doc/dwdst-doc
+	for d in programs libdwdst ; do \
+	  mv $(CURDIR)/debian/tmp/usr/share/doc/dwdst/$$d \
+	     $(CURDIR)/debian/tmp/usr/share/doc/dwdst-doc/$$d ;\
+	  ln -s ../dwdst-doc/$$d \
+	        $(CURDIR)/debian/tmp/usr/share/doc/dwdst/$$d ;\
+	done
 
 
 # Build architecture-independent files here.
@@ -105,7 +113,7 @@ binary-arch: build install
 	dh_installchangelogs
 	dh_link
 	dh_strip
-	dh_compress
+	dh_compress -X.tag
 	dh_fixperms
 	dh_makeshlibs
 	dh_installdeb

@@ -10,3 +10,8 @@ Architecture: any
 Depends: ${shlibs:Depends}
 Description: (K)DWDS Part-of-Speech tagger using libFSM.
 
+Package: dwdst-doc
+Section: doc
+Architecture: all
+Depends: ${shlibs:Depends}
+Description: (K)DWDS Part-of-Speech tagger API documentation.

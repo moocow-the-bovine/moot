@@ -108,7 +108,7 @@ install-doc-sub:
 	    $(INSTALL_DATA) $(TAGFILE) $(DESTDIR)$(pkgdocdir)/$(DOXYBASE)/$(DOXYBASE).tag ;\
 	  fi
 	  for d in $(DOC_SUBDIRS) ; do \
-	    if test -d "$d" ; then \
+	    if test -d "$$d" ; then \
 	      $(mkinstalldirs) $(DESTDIR)$(pkgdocdir)/$(DOXYBASE)/$$d ;\
 	      (cd $$d ;\
 	       for f in * ; do \

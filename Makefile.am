@@ -33,8 +33,15 @@ PODS = README.pod
 #-----------------------------------------------------------------------
 pkgdoc_DATA = \
 	$(PODS:.pod=.txt) \
+	AUTHORS \
+	COPYING \
 	INSTALL \
-	COPYING
+	ChangeLog
+
+#-----------------------------------------------------------------------
+# Variables: installation (pkg-config)
+#-----------------------------------------------------------------------
+pkgconfig_DATA = @PACKAGE@.pc
 
 #-----------------------------------------------------------------------
 # file-list (for .rpm building) [OBSOLETE (argh!)]
@@ -58,10 +65,13 @@ DEBIAN_FILES = \
 	debian/README.Debian \
 	debian/$(BINDIST_PKGNAME).dirs \
 	debian/$(BINDIST_PKGNAME).files \
+	debian/$(BINDIST_PKGNAME)-doc.dirs \
+	debian/$(BINDIST_PKGNAME)-doc.files \
 	debian/changelog \
 	debian/control \
 	debian/copyright \
 	debian/docs \
+	debian/shlibs \
 	debian/rules
 
 DEBIAN_CLEANFILES = \
@@ -136,7 +146,11 @@ RPM ?= rpm
 
 # .rpm derived from .deb
 drpm: $(BINDIST_DEB)
-	fakeroot alien --keep-version --to-rpm $<
+	for deb in \
+	   $(BINDIST_PKGNAME)*_$(VERSION)-$(BINDIST_RELEASE)_$(BINDIST_CPU).deb \
+	   $(BINDIST_PKGNAME)*_$(VERSION)-$(BINDIST_RELEASE)_all.deb ; do \
+	 fakeroot alien --keep-version --to-rpm "$$deb" ;\
+	done
 
 # .rpm built from its own .spec
 rpm: $(BINDIST_RPM)
@@ -152,14 +166,13 @@ $(BINDIST_RPM): $(DISTFILES) $(RPMSPEC)
 	rm -f $(RPMROOT)/SOURCES/$(PACKAGE)-$(VERSION).tar.gz
 	ln -s $(PWD)/$(PACKAGE)-$(VERSION).tar.gz $(RPMROOT)/SOURCES
 	$(RPM) $(RPMFLAGS) $(RPMSPEC)
-	mv $(RPMROOT)/RPMS/$(BINDIST_CPU)/$(BINDIST_RPM) $@
+	mv $(RPMROOT)/RPMS/$(BINDIST_CPU)/$(PACKAGE)*-$(VERSION)-$(BINDIST_RELEASE).*.rpm .
 #	## -- cleanup
 	rm -f $(RPMROOT)/SOURCES/$(PACKAGE)-$(VERSION).tar.gz
 	rm -rf $(RPMROOT)/BUILD/$(PACKAGE)-$(VERSION)
-	rm -rf $(RPMROOT)/*/*/$(PACKAGE)[-.]*
 
 norpm:
-	rm -f $(BINDIST_RPM)
+	rm -f *.rpm
 
 
 #-----------------------------------------------------------------------

@@ -13,6 +13,14 @@ BuildRoot: /var/tmp/%{name}-buildroot
 Part-of-Speech tagger using libFSM.
 
 
+%package doc
+Group: doc
+Summary: HTML documentation for dwdst PoS tagging package.
+
+%description doc
+HTML documentation for dwdst PoS tagging package.
+
+
 %prep
 %setup -n @PACKAGE@-@VERSION@
 # %patch -p1 .buildroot
@@ -40,9 +48,18 @@ test -n "$RPM_BUILD_ROOT" \
 %post
 ldconfig
 
-# %files -f @PACKAGE@.ifiles
 %files
 %defattr(-,root,root)
 /usr/bin/dwds*
-/usr/share/doc/dwdst
+/usr/lib/libdwdst.*
+/usr/lib/pkgconfig/dwdst.*
 /usr/man/man1/dwds*
+%doc /usr/share/doc/dwdst/AUTHORS
+%doc /usr/share/doc/dwdst/ChangeLog
+%doc /usr/share/doc/dwdst/COPYING
+%doc /usr/share/doc/dwdst/INSTALL
+%doc /usr/share/doc/dwdst/README.txt
+
+%files doc
+/usr/share/doc/dwdst/libdwdst
+/usr/share/doc/dwdst/programs

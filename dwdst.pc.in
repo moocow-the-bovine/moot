@@ -1,0 +1,28 @@
+# -*- Mode: Shell-Script -*-
+
+# File: dwdst.pc
+# Description:
+#   + pkg-config data for (K)DWDS PoS tagger
+#   + auto-generated from dwdst.pc.in
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+includedir=@includedir@
+libdir=@libdir@
+
+PACKAGE=@PACKAGE@
+datadir=@datadir@
+docdir=@docdir@
+pkgdocdir=@pkgdocdir@
+
+cppflags=-I@spkgincludedir@ @CPPFLAGS@
+ldadd=-ldwdst
+
+
+Name: @PACKAGE@
+Description: (K)DWDS Part-of-Speech tagging library.
+Version: @VERSION@
+#Requires: libbumble >= 1.13.5, flex++bison++ >= 0.0.5
+Requires: libFSM >= 0.1.0.3, libFSMext >= 0.0.0
+Libs: -L${libdir} ${ldadd}
+Cflags: ${cppflags}
