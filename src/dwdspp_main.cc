@@ -14,38 +14,23 @@
 # include <config.h>
 #endif
 
-#include "dwdspp_cmdparser.h"
-//#include "dwdspp.h"
 #include "dwdspp_lexer.h"
+#include "dwdspp_cmdparser.h"
+#include "cmdutil.h"
 
 using namespace std;
-
-extern "C" int getline(char **, size_t *, FILE *);
 
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
 char *PROGNAME = "dwdspp";
 
-// options
-gengetopt_args_info args;
-
-// filenames
-char *infile = "-";
-char *outfile = "-";
-char *inlistfile = "-";
-
 // files
-FILE *in = NULL;
-FILE *out = NULL;
-FILE *inlist = NULL;
+cmdutil_file_info out;
 
-// for file-lists
-char *linebuf = NULL;
-size_t lbsize = 0;
-
-// for argument-stepping
-unsigned int input_num = 0;
+// options & file-churning
+gengetopt_args_info args;
+cmdutil_file_churner churner;
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -62,144 +47,20 @@ void GetMyOptions(int argc, char **argv)
 	    PROGNAME, VERSION);
 
   // -- output file
-  if (strcmp(args.output_arg,"-") != 0) {
-    out = fopen(args.output_arg, "w");
-  } else {
-    out = stdout;
-  }
-  if (!out) {
-    fprintf(stderr,"%s: open failed for output-file '%s': %s\n", PROGNAME, args.output_arg, strerror(errno));
+  out.name = args.output_arg;
+  if (strcmp(out.name,"-") == 0) out.name = "<stdout>";
+  if (!out.open("w")) {
+    fprintf(stderr,"%s: open failed for output-file '%s': %s\n",
+	    PROGNAME, out.name, strerror(errno));
     exit(1);
   }
+
+  // -- set up file-churner
+  churner.progname = PROGNAME;
+  churner.inputs = args.inputs;
+  churner.ninputs = args.inputs_num;
+  churner.use_list = args.list_given;
 }
-
-/*--------------------------------------------------------------------------
- * file-stepping
- *--------------------------------------------------------------------------*/
-
-/*
- * inlist = step_inlist_file();
- *  - sets globals "FILE *inlist" and "char *inlistfile" as side effect
- *  - returns global "FILE *inlist"
- *  - returns NULL if no more inlistfiles are available
- */
-FILE *next_inlist_file() {
-    if (inlist && inlist != stdin) fclose(inlist);
-    if (!args.list_given) return NULL;
-    if (++input_num >= args.inputs_num) return NULL;
-
-    inlistfile = args.inputs[input_num];
-    inlist = fopen(args.inputs[input_num], "r");
-    if (!inlist) {
-	fprintf(stderr,"%s: open failed for input list-file '%s': %s\n",
-		PROGNAME, inlistfile, strerror(errno));
-	exit(1);
-    }
-    return inlist;
-}
-
-/*
- * in = first_file();
- *  - sets globals "FILE *in" and "char *infile" as side effect
- *  - returns global "FILE *in"
- */
-FILE *first_file() {
-    if (args.list_given) {
-	// -- args/inputs are file-LISTS
-	if (args.inputs_num == 0) {
-	    // -- file-list on stdin
-	    inlistfile = "<stdin>";
-	    inlist = stdin;
-	} else {
-	    // -- file-list(s) given
-	    inlistfile = args.inputs[0];
-	    inlist = fopen(args.inputs[0], "r");
-	}
-	// -- sanity check
-	if (!inlist) {
-	    fprintf(stderr,"%s: open failed for input list-file '%s': %s\n",
-		    PROGNAME, inlistfile, strerror(errno));
-	    exit(1);
-	}
-	// -- read next file
-	while (getline(&linebuf, &lbsize, inlist) == -1) {
-	    if (feof(inlist)) {
-		if (!(inlist = next_inlist_file())) return NULL;
-	    } else {
-		fprintf(stderr, "%s: Error reading input-list-file '%s': %s\n",
-			PROGNAME, inlistfile, strerror(errno));
-		exit(1);
-	    }
-	}
-	infile = linebuf;
-	infile[strlen(infile)-1] = '\0';  // eliminate trailing newline
-	if (!(in = fopen(infile, "r"))) {
-	    fprintf(stderr, "%s: open failed for input-file '%s': %s\n",
-		    PROGNAME, infile, strerror(errno));
-	    exit(1);
-	}
-	return in;
-    }
-
-    // -- args/inputs are file-NAMES
-    if (args.inputs_num == 0) {
-	// -- read from stdin
-	infile = "<stdin>";
-	in = stdin;
-    } else {
-	// -- read from files
-	infile = args.inputs[0];
-	if (!(in = fopen(infile, "r"))) {
-	    fprintf(stderr, "%s: open failed for input-file '%s': %s",
-		    PROGNAME, infile, strerror(errno));
-	    exit(1);
-	}
-    }
-    return in;
-}
-
-
-/*
- * in = next_file();
- *  - sets globals "FILE *in" and "char *infile" as side effect
- *  - returns global "FILE *in"
- */
-FILE *next_file() {
-    if (in && in != stdin) fclose(in);
-
-    if (args.list_given) {
-	// -- read next file
-	while (getline(&linebuf, &lbsize, inlist) == -1) {
-	    if (feof(inlist)) {
-		if (!(inlist = next_inlist_file())) return NULL;
-	    } else {
-		fprintf(stderr, "%s: Error reading input-list-file '%s': %s\n",
-			PROGNAME, inlistfile, strerror(errno));
-		exit(1);
-	    }
-	}
-	infile = linebuf;
-	infile[strlen(infile)-1] = '\0';  // eliminate trailing newline
-	if (!(in = fopen(infile, "r"))) {
-	    fprintf(stderr, "%s: open failed for input-file '%s': %s\n",
-		    PROGNAME, infile, strerror(errno));
-	    exit(1);
-	}
-	return in;
-    }
-
-    // -- args/inputs are file-NAMES
-    if (++input_num >= args.inputs_num) return NULL;
-
-    infile = args.inputs[input_num];
-    if (!(in = fopen(infile, "r"))) {
-	fprintf(stderr, "%s: open failed for input-file '%s': %s",
-		PROGNAME, infile, strerror(errno));
-	exit(1);
-    }
-    return in;
-}
-
 
 /*--------------------------------------------------------------------------
  * main
@@ -220,23 +81,24 @@ int main (int argc, char **argv)
   }
 
   // -- big loop
-  for (in = first_file(); in; in = next_file()) {
+  for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
       if (args.verbose_arg > 0) {
 	numfiles++;
 	if (args.verbose_arg > 1) {
-	    fprintf(stderr,"%s: processing file '%s'... ", PROGNAME, infile);
-	    fflush(stderr);
+	  fprintf(stderr,"%s: processing file '%s'... ", PROGNAME, churner.in.name);
+	  fflush(stderr);
 	}
       }
-      fprintf(out, "\n# %s: File: %s\n\n", PROGNAME, infile);
+      fprintf(out.file, "\n# %s: File: %s\n\n", PROGNAME, churner.in.name);
 
-      lexer.tokenize_stream(in,out);
+      lexer.tokenize_stream(churner.in.file, out.file);
 
       if (args.verbose_arg > 1) {
 	fprintf(stderr," done.\n");
 	fflush(stderr);
       }
   }
+  out.close();
 
   // -- summary
   if (args.verbose_arg > 0) {

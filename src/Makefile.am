@@ -44,6 +44,8 @@ dwdst_SOURCES = \
 	dwdst_cmdparser.ggo
 
 dwdspp_SOURCES = \
+	cmdutil.cc \
+	cmdutil.h \
 	dwdspp_lexer.ll \
 	dwdspp_main.cc \
 	dwdspp_cmdparser.ggo
