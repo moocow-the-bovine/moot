@@ -432,7 +432,7 @@ std::string moot_program_banner(const std::string &prog_name,
   if (is_free) {
     s.append("This program comes with ABSOLUTELY NO WARRANTY. It is free software. You are\n"
 	     "welcome redistribute it under certain conditions. See the file COPYING which\n"
-	     "cam with the distribution for details.\n\n");
+	     "came with the distribution for details.\n\n");
   }
 
   return s;
