@@ -9,12 +9,12 @@
 #ifndef _DWDST_TRAINER_H_
 #define _DWDST_TRAINER_H_
 
-//#define DWSTT_DEBUG
-//#undef DWSTT_DEBUG
-//#define DWST_FSTGEN_DEBUG
-//#undef DWSTT_FSTGEN_DEBUG
-//#define DWST_PARGEN_DEBUG
-//#undef DWSTT_PARGEN_DEBUG
+//#define DWDST_DEBUG
+//#undef DWDST_DEBUG
+//#define DWDST_FSTGEN_DEBUG
+//#undef DWDST_FSTGEN_DEBUG
+//#define DWDST_PARGEN_DEBUG
+//#undef DWDST_PARGEN_DEBUG
 
 #ifdef HAVE_CONFIG_H
 # include "nopackage.h"
@@ -36,8 +36,8 @@ class dwds_tagger_trainer : public dwds_tagger {
   // -- typedefs
 public:
   //typedef hash_map<string,float> StringToCountTable;
-  //typedef vector<set<FSMSymbolString> > NGramSetVector;
-  typedef vector<FSMSymbolString>       NGramVector;
+  //typedef vector<FSMSymbolString>       NGramVector;
+  typedef deque<FSMSymbolString>        NGramVector;
   typedef map<NGramVector,float>        NGramTable;
   typedef deque<set<FSMSymbolString> *> FSMSymbolStringQueue;
 private:
@@ -61,19 +61,15 @@ private:
   set<FSMSymbolString> *curtags;
   set<FSMSymbolString>::iterator cti;
 
-  //set<FSMSymbolString> *curngrams;
-  //set<FSMSymbolString> *nextngrams;
   NGramVector      theNgram;
   set<NGramVector> *curngrams;
   set<NGramVector> *nextngrams;
   set<NGramVector> *tmpngrams;
 
-  //set<FSMSymbolString>::iterator g_old;
-  //set<FSMSymbolString>::iterator g_new;
   set<NGramVector>::iterator ngi;
-  //set<FSMSymbolString>::iterator g_new;
 
-  FSMSymbolStringQueue::reverse_iterator qi;
+  //FSMSymbolStringQueue::reverse_iterator qri;
+  FSMSymbolStringQueue::iterator qi;
   set<FSMSymbolString>::iterator qii;
 
 
@@ -96,10 +92,11 @@ public:
   bool train_from_stream(FILE *in=stdin, FILE *out=stdout);
   // -- mid-level
   inline void train_next_token(void);
+  inline void train_eos(void);
 
   // -- public methods: param-generation: parameter-file read/write
-  bool read_param_file(FILE *in=stdin,const char *filename=NULL);  // NYI
-  bool write_param_file(FILE *out=stdout);
+  bool load_param_file(FILE *in=stdin,const char *filename=NULL);  // NYI
+  bool save_param_file(FILE *out=stdout);
 
   // -- public methods: mid-level: listfile-reading
   set<FSMSymbolString> get_all_pos_tags(const char *filename=NULL)

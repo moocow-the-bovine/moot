@@ -18,6 +18,9 @@
  * \class dwdst_param_lexer
  * \brief Flex++ lexer for TnT parameter files.  Supports comments introduced with '#'.
  */
+
+/*#define DWDST_PARLEX_BUFSIZE 1024*/
+
 %}
 
 %define CLASS dwdst_param_lexer
@@ -29,6 +32,7 @@
       PF_EOF, \
       PF_REGEX, \
       PF_COUNT, \
+      PF_TAB, \
       PF_NEWLINE, \
       PF_UNKNOWN \
     } TokenType; \
@@ -42,6 +46,9 @@
     /* private local data */ \
     bool use_string; \
     char *stringbuf; \
+    /* argh: regex-buffereing */ \
+    /*char rebuf[DWDST_PARLEX_BUFSIZE];*/ \
+    /*int  rebufleng;*/ \
   public: \
     /** \brief use stream input */\
     void select_streams(FILE *in=stdin, FILE *out=stdout); \
@@ -53,7 +60,6 @@
   theColumn(1), \
   use_string(false), \
   stringbuf(NULL)
-
 
 %define INPUT_CODE \
   /* yy_input(char *buf, int &result, int max_size) */\
@@ -74,60 +80,46 @@
 newline    [\n\r]
 nonnewline [^\n\r]
 whitespace [ \t]
-textchar   [^\n\r\t\#\\]
+textchar   [^ \n\r\t]
+textorsp   [^\n\r\t]
 
 /*----------------------------------------------------------------------
  * Rules
  *----------------------------------------------------------------------*/
 %%
 
-^{whitespace}*{newline} {
-  // -- ignore blank lines
-  theLine++; theColumn = 0;
-}
-
-"\\"{newline} {
-  // -- escaped newlines : ignore
-  theLine++; theColumn = 0;
-  yymore();
-}
-
-"\\". {
-   // -- other escapes
-   theColumn += yyleng;
-   yymore();
+^(" "+) {
+  // -- ignore leading whitespace
+  theColumn += yyleng;
 }
 
 "%%"({nonnewline}*) {
-   /* ignore comments */
+   // -- comments : throw away
    theColumn += yyleng;
-   yytext[YY_MORE_ADJ] = '\0';  // -- return to the nether regions which spawned you, foul beast!
-   yymore();
 }
 
-"\t" {
+({whitespace}*)"\t"({whitespace}*) {
   // -- tab: return the current text-segment
   theColumn += yyleng;
-  yytext[YY_MORE_ADJ] = '\0';
+  return PF_TAB;
+}
+
+{textchar}({textorsp}*{textchar})? {
+  // -- append all other text to the current text-segment
+  theColumn += yyleng;
   return PF_REGEX;
 }
 
-{textchar}+ {
-  // -- append all other text to the current text-segment
-  theColumn += yyleng;
-  yymore();
-}
-
-([\-\+]?)([0-9]*)(\.?)([0-9]+)/{newline} {
-  // -- counts
+([\-\+]?)([0-9]*)(\.?)([0-9]+)([ \t]*)("%%".*)?/{newline} {
+  // -- counts : return it
   theLine++; theColumn = 0;
   return PF_COUNT;
 }
 
 {newline} {
-  // -- dangling newline
+  // -- newlines : ignore (and chuck any current text!)
   theLine++; theColumn = 0;
-  return PF_NEWLINE;
+  //return PF_NEWLINE;
 }
 
 <<EOF>> {
@@ -137,11 +129,9 @@ textchar   [^\n\r\t\#\\]
 }
 
 . {
-  // -- huh?
+  // -- huh? -- just ignore it!
   theColumn += yyleng;
-  fprintf(stderr,"dwds_param_lexer: unknown character '%c': ignored.\n", *yytext);
-  yytext[YY_MORE_ADJ] = '\0';
-  yymore();
+  fprintf(stderr,"dwds_param_lexer warning: unknown character '%c': ignored.\n", yytext[YY_MORE_ADJ]);
 }
 
 %%

@@ -61,7 +61,8 @@ dwdst_fstgen_SOURCES = \
 	dwdst_trainer.h \
 	dwdst_fstgen_main.cc \
 	dwdst_fstgen_cmdparser.ggo \
-	postag_lexer.ll
+	postag_lexer.ll \
+	dwdst_param_lexer.ll
 
 dwdst_pargen_SOURCES = \
 	cmdutil.cc \
@@ -73,7 +74,8 @@ dwdst_pargen_SOURCES = \
 	dwdst_fstgen.h \
 	dwdst_pargen_main.cc \
 	dwdst_pargen_cmdparser.ggo \
-	postag_lexer.ll
+	postag_lexer.ll \
+	dwdst_param_lexer.ll
 
 ## --- Extra (possible) sources
 #EXTRA_${prog_i}_SOURCES = 
@@ -84,6 +86,7 @@ dwdspp_main.o: dwdspp_cmdparser.h dwdspp_lexer.h
 dwdst_main.o: dwdst_cmdparser.h dwdst_lexer.h
 dwdst_fstgen_main.o: dwdst_fstgen_cmdparser.h dwdst_lexer.h postag_lexer.h
 dwdst_pargen_main.o: dwdst_pargen_cmdparser.h dwdst_lexer.h postag_lexer.h
+dwdst_trainer.o: dwdst_param_lexer.h dwdst_param_lexer.cc
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -154,10 +157,10 @@ dwdst_LDFLAGS = @FSM_LFLAGS@
 dwdst_LDADD = @FSM_LIBS@
 
 dwdst_fstgen_LDFLAGS = @FSM_LFLAGS@
-dwdst_fstgen_LDADD = @FSM_LIBS@
+dwdst_fstgen_LDADD = -lFSMExt @FSM_LIBS@
 
 dwdst_pargen_LDFLAGS = @FSM_LFLAGS@
-dwdst_pargen_LDADD = @FSM_LIBS@
+dwdst_pargen_LDADD = -lFSMExt @FSM_LIBS@
 
 # dwdspp_LDFLAGS = @FSM_LFLAGS@
 # dwdspp_LDADD = @FSM_LIBS@

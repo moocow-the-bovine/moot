@@ -155,7 +155,7 @@ int main (int argc, char **argv)
 	}
       }
 #    ifdef DWDST_PARGEN_DEBUG
-      fprintf(out.file, "\n# %s (DEBUG): File: %s\n\n", PROGNAME, churner.in.name);
+      fprintf(out.file, "\n%%%% %s (DEBUG): File: %s\n\n", PROGNAME, churner.in.name);
 #    endif
       
       dwdstt.train_from_stream(churner.in.file, out.file);
@@ -191,7 +191,7 @@ int main (int argc, char **argv)
   fprintf(out.file, "%%%%    want_avm      : %s\n", dwdstt.want_avm ? "yes" : "no");
   fprintf(out.file, "%%%%    eos_string    : %s\n", args.eos_string_arg);
 
-  dwdstt.write_param_file(out.file);
+  dwdstt.save_param_file(out.file);
   if (args.verbose_arg > 0 && out.file != stdout) {
     out.close();
     fprintf(stderr, "done.\n");
