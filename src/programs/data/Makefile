@@ -44,11 +44,17 @@ SUFFIX_TRIE_LEN ?= $(a)
 SUFFIX_TRIE_THRESH ?= $(A)
 SUFFIX_THETA  ?= $(theta)
 
+##-- moot: beam stuff
+Z ?= 1000
+BEAM_CUTOFF ?= $(Z)
+
 ##-- Globals: programs: moot
 MOOT_BINDIR   ?= $(shell cd .. ; pwd -P)
 MOOTRAIN      ?= $(MOOT_BINDIR)/mootrain
 MOOTHMM       ?= $(MOOT_BINDIR)/moot
-MOOTHMM_FLAGS ?= -a$(SUFFIX_TRIE_LEN) -A$(SUFFIX_TRIE_THRESH) --trie-theta=$(SUFFIX_THETA)
+MOOTHMM_FLAGS ?= \
+	-a$(SUFFIX_TRIE_LEN) -A$(SUFFIX_TRIE_THRESH) --trie-theta=$(SUFFIX_THETA) \
+	-Z$(BEAM_CUTOFF)
 #-d1024
 
 MOOTEVAL      ?= $(MOOT_BINDIR)/mooteval
@@ -128,6 +134,9 @@ lc-dmt: $(TEST).lc.dmt
 
 %.lc.vtt: %.lc.t $(LCMODEL).lex $(LCMODEL).123 $(MOOTHMM)
 	$(MOOTHMM) -M$(LCMODEL).lex,$(LCMODEL).123 $(MOOTHMM_FLAGS) -S $< -o $@
+
+%.lc.mt: %.mt
+	tr A-ZÄÖÜ a-zäöü < $< > $@
 
 %.lc.dmt: %.lc.mt $(LCMODEL).lex $(LCMODEL).123 $(MOOTHMM)
 	$(MOOTHMM) -M$(LCMODEL).lex,$(LCMODEL).123 $(MOOTHMM_FLAGS) $< -o $@
@@ -410,7 +419,7 @@ nolc-tt:
 %.lc.ttt: %.ttt
 	tr A-ZÄÖÜ a-zäöü < $< > $@
 
-lc_model: $(LCMODEL)
+lc_model: $(LCMODEL).model
 
 %.lc.model: %.lc.ttt $(MOOTRAIN)
 	$(MOOTRAIN) -Imedium -lnC $< -o $*.lc
@@ -422,7 +431,8 @@ TNT_AFLAGS ?= -a$(SUFFIX_TRIE_LEN)
 TNT_DFLAGS ?= -d4
 TNT_UFLAGS ?= -u3
 TNT_NFLAGS ?= -n3
-TNT_FLAGS ?= $(TNT_AFLAGS) $(TNT_DFLAGS) $(TNT_UFLAGS) $(TNT_NFLAGS)
+TNT_ZFLAGS ?= -Z$(BEAM_CUTOFF)
+TNT_FLAGS ?= $(TNT_AFLAGS) $(TNT_DFLAGS) $(TNT_UFLAGS) $(TNT_NFLAGS) $(TNT_ZFLAGS)
 
 notnt:
 	rm -f *.tnt-tt *.tnt-tt.*
