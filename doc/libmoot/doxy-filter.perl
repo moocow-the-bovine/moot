@@ -15,15 +15,18 @@ use vars qw($filepath $filesuff $pppath);
 $PP_ONLY = 0;
 $DO_CPP = 1;
 $logfile = undef;
+#$logfile = 'doxy-filter.log';
+@includes = qw();
 $cmdline = join(' ', $0, @ARGV);
 GetOptions(
 	   "only-preprocess|o!"=>\$PP_ONLY,
-	   "preprocess|do-cpp|p!"=>\$DO_CPP,
-	   "no-preprocess|no-cpp|P"=>sub { $DO_CPP = 0; },
+	   "preprocess|do-cpp|p"=>\$DO_CPP,
+	   "no-preprocess|no-cpp|np|n"=>sub { $DO_CPP = 0; },
 	   "logfile|l=s"=>\$logfile,
+	   "I=s"=>\@includes,
 	  );
 
-$config_cppflags = "";
+$config_cppflags = join(' ', map { "-I$_" } @includes);
 do "doxy-filter.cfg";
 
 #-----------------------------------------------------------------------

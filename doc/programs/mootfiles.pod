@@ -59,12 +59,12 @@ defaults from a program configuration file.
 ## Text File Formats
 =pod
 
-=head1 TEXT FILE FORMATS
+=head1 TEXT FILE FORMATS (NATIVE)
 
 =cut
 
 ##--------------------------------------------------------------
-## Input: Raw Text files
+## Input: Text: Raw Text files
 =pod
 
 =head2 Raw Text Files
@@ -100,6 +100,9 @@ Differnent moot utilities require their input files to be
 more or less "cooked" -- see the documentation of the individual
 utilities for details.
 
+Native "cooked" text files are conventionally
+identified by the filename infix ".moot".
+
 =over 4
 
 =cut
@@ -111,6 +114,8 @@ utilities for details.
 =item Rare
 
 =item (-tagged, -analyzed)
+
+=item *.t
 
 The most basic level of "cookedness", a "rare" text file encodes
 only token- and sentence-boundaries.
@@ -154,6 +159,8 @@ thus impossible to declare an "empty" token.  An example
 
 =item (-tagged, +analyzed)
 
+=item *.mr
+
 A "medium rare" file is at least as informative as a "rare"
 file -- that is, it encodes everything that a "rare" file
 encodes, and in exactly the same fashion.  Additionally,
@@ -164,7 +171,7 @@ also a numeric cost and arbitrary analysis details.
 Somewhat counter-intuitively,
 every "rare" file is also a "medium rare" file for which
 every token is associated with an empty set of possible analyses.
-By convention, "medium rare" filenames carry the extension ".mt"
+By convention, "medium rare" filenames carry the extension ".mrt"
 
  MED_RARE_FILE  ::= {MED_RARE_LINE}*
  MED_RARE_LINE  ::= ({COMMENT} | {EOS} | {MED_RARE_TOKEN}) {NEWLINE}
@@ -215,6 +222,8 @@ are called "unrecognized" tokens.
 
 =item (+tagged, -analyzed)
 
+=item *.tt , *.ttt
+
 A "medium" file can be understood as a "medium rare" file which
 associates exactly one analysis with each token.  The tag for this
 analysis is considered the "best" tag for the associated token.
@@ -254,12 +263,14 @@ An example "medium" file is:
 
 =item (+tagged, +analyzed)
 
+=item *.wd, *.wdt
+
 A "well done" file can be understood as the synthesis of
 a "medium rare" and a "medium" file: it contains a "best"
 analysis for each token (the first one), as well as a set of
 I<a priori> potential analyses analyses for that token.
-By convention, "well done" filenames carry the extension ".dtt"
-(tagger output) or ".dttt" (gold standard).
+By convention, "well done" filenames carry the extension ".wd"
+(tagger output) or ".wdt" (gold standard).
 
  WELL_DONE_FILE  ::= {WELL_DONE_LINE}*
  WELL_DONE_LINE  ::= ({COMMENT} | {EOS} | {WELL_DONE_TOKEN}) {NEWLINE}
@@ -367,10 +378,284 @@ An example "refried" file is:
 =back
 
 =cut
-
-## /Input File Formats
+## /Text File Formats
 ##==============================================================
 
+
+##==============================================================
+## XML File Formats
+=pod
+
+=head1 XML FILE FORMATS
+
+moot currently uses the (extremely cool and amazingly fast)
+Expat XML parser library by James Clark for incremental
+processing of XML documents, (a previous implementation
+used libxml2 (also extremely cool but not quite as amazingly fast as expat),
+but the moot libxml2 support is no longer maintained, and is disabled
+by default), as well as output recoding
+using librecode by François Pinard.  Both expat and
+librecode support are compile-time options -- check
+the contents of 'mootConfig.h' to see whether they
+are enabled on your system.
+
+When working with "cooked" XML (see below), it is
+critical to remember that the moot internal processing
+routines B<always> receive token and PoS-tag text encoded
+in UTF-8, I<regardless> of the document encoding.
+This is of particular importance when converting
+from native to XML format i.e. with 'mootchurn'
+-- it is highly reccommended that you use the 'recode'
+command-line utility (distributed with 'librecode')
+to ensure that your native text data is true
+UTF-8 before passing it to 'mootchurn' for XML
+output.  Future implementations might use locale
+information to automate this process.
+If all of your data (training corpus, test corpus,
+and runtime corpora) are parsed in XML mode,
+none of the above should present a problem.
+
+XML files are identified by the filename infix '.xml'.
+
+=cut
+
+##--------------------------------------------------------------
+## Input : XML : Raw
+=pod
+
+=head2 Raw XML Files
+
+A "raw" XML file is just like a "raw" text file.  The
+'mootpp' program supports rudimentary recognition and
+removal of (SG|HT|X)ML markup.
+
+=cut
+
+
+##--------------------------------------------------------------
+## Input : XML : Cooked
+=pod
+
+=head2 Cooked XML Files
+
+As of version 2.0.0, the moot utilities
+support "cooked" XML files, in addition to the native
+text format(s).  See "Cooked Text Files" above for
+more details on the native formats and the
+information content corresponding to the various
+subtypes.
+
+All "cooked" XML formats share the same structure (much
+as the "cooked" text formats are defined in terms of
+one another).  The preliminary syntax (subject to change
+without notice) is:
+
+ COOKED_XML_FILE    ::= {XML_DECL}? {XML_CONTENT}*
+ XML_DECL           ::= "<?xml " ... "?>"
+ XML_CONTENT        ::= {XML_EOS} | {XML_RAW} | {XML_TOKEN}
+ XML_EOS            ::= "<eos/>"
+ XML_RAW            ::= ...
+ XML_TOKEN          ::= "<token>" {XML_TOKEN_CONTENT} "</token>"
+ XML_TOKEN_CONTENT  ::= ({XML_TOKEN_TEXT}
+                         | {XML_TOKEN_ANALYSIS}
+                         | {XML_TOKEN_BESTTAG}
+                         | {XML_RAW})*
+ XML_TOKEN_TEXT     ::= "<text>" {TOKEN_TEXT} "</text>"
+ XML_TOKEN_BESTTAG  ::= "<moot.tag>" {TOKEN_BESTTAG} "</moot.tag>"
+ XML_TOKEN_ANALYSIS ::= '<analysis pos="' {ANALYSIS_TAG} '">' {ANALYSIS_DETAILS} "</analysis>"
+ ANALYSIS_DETAILS   ::= {XML_RAW}*
+
+The document structure is thus expected to be something like
+the following (in a bastard notation born of BNF and XPath):
+
+ SENTENCE_BOUNDARY  ::= //eos                            # really only end-elts
+ TOKEN_TEXT         ::= //token//text/text()             # should be accurate
+ ANALYIS_TAG        ::= //token//analysis/@pos           # uses attribute value (not full node)
+ ANALYSIS_DETAILS   ::= //token//analysis/text()         # buggy -- actually ignored!
+ TOKEN_BESTTAG      ::= //token//moot.tag[last()]/text() # should be accurate
+
+TODO: pull up literal element name parameters from TokenReaderExpat
+to user-level.
+
+TODO: add a DTD for the default XML format to the distribution.
+
+An example "cooked" XML document is the following:
+
+ <?xml version="1.0"?>
+ <doc>
+  <!-- Sentence-1 : Well Done, Medium, and Medium Rare -->
+  <token>
+    <!-- A 'well done' token with minimal structure -->
+    <text>This</text>
+    <moot.tag>PDAT</moot.tag>
+    <analysis pos="NE"/>
+    <analysis pos="NN"/>
+    <analysis pos="PDAT"/>
+    <analysis pos="PDS"/>
+  </token>
+  <token>
+    <!-- A 'well done' token with extra structure -->
+    <text>is</text>
+    <extraneous.element>
+      <analysis pos="VAFIN"/>
+      <moot.tag>VVFIN</moot.tag>
+      <analysis pos="VVFIN"/>
+    </extraneous.element>
+  </token>
+  <token>
+    <!-- Yet another 'well done' token  -->
+    <text>a</text>
+    <other_extraneous_element>
+      <analysis pos="ART"/>
+    </other_extraneous_element>
+    <moot.tag>ART</moot.tag>
+  </token>
+  <token>
+    <!-- A 'medium' token -->
+    <text>Test</text>
+    <moot.tag>NN</moot.tag>
+  </token>
+  <token>
+    <!-- A 'Medium Rare' token -->
+    <text>.</text>
+    <analysis pos="$."/>
+  </token>
+  <eos/>
+  <!-- Sentence-2 : Rare tokens only -->
+  <token><text>This</text></token>
+  <token><text>too</text></token>
+  <token><text>.</text></token>
+  <eos/>
+ </doc>
+
+=cut
+## /XML File Formats
+##==============================================================
+
+##==============================================================
+## Input : I/O Format Flags
+=pod
+
+=head2 I/O Format Flags
+
+Several moot utilities are capable of processing input
+in a number of different formats, typically specified
+by '-I' and '-O' command-line options.
+The following list briefly describes the (case-insensitive)
+format flags which may be passed to such format options.
+Note that at the current time, not all formats support
+all available flags.
+
+If no format flags are specified by the user, the
+moot utilities will attempt to guess an appropriate
+format based on the filename and on the requirements
+for the particular utility in question.
+
+=over 4
+
+=item Basic Flags
+
+=over 4
+
+=item None
+
+No flags at all.
+This should never really happen at runtime,
+and should cause a default format to be assumed.
+
+=item Null
+
+If you specify 'null' as an output format,
+no output will actually be written
+(useful for testing input layer).
+
+=item Unknown
+
+Unknown format.
+This should never ever happen,
+and should cause a reversion to some default format.
+
+=item Native
+
+Specifies native text format I/O.
+
+=item XML
+
+Specifies XML format I/O.
+
+=item Pretty
+
+Beautified XML format.
+Useful for human-readable XML output.
+Not all XML I/O modes support cosmetic surgery.
+
+=item Conserve
+
+Conservative XML format: attempt to preserve as
+much of the input document structure as possible.
+Only meaningful if both XML input and XML output
+are requested.
+
+=item Text
+
+Read/write token text (all formats).
+
+=item Analyzed
+
+Read/write token analyses ('medium rare' or 'well done' formats).
+
+=item Tagged
+
+Read/write 'best tags' ('medium' or 'well done' formats).
+
+=item Pruned
+
+For 'well done' formats, ignore analyses which do
+not correspond to the 'best' tag.
+
+=back
+
+=item Compound Flags
+
+=over 4
+
+=item Rare
+
+=item R
+
+Alias for 'Text'.
+
+
+=item MediumRare
+
+=item MR
+
+Alias for 'Text,Analyzed'.
+
+
+
+=item Medium
+
+=item M
+
+Alias for 'Text,Tagged'.
+
+
+
+=item 'WellDone'
+
+=item WD
+
+Alias for 'Text,Tagged,Analyzed'
+
+
+=back
+
+=back
+
+=cut
+## Input : I/O Format Flags
+##==============================================================
 
 ##==============================================================
 ## HMM Model File Formats

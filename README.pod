@@ -2,17 +2,19 @@
 
 README for package 'moot'
 
-Last updated for moot version 2.0.0pre3
+Last updated for moot version 2.0.0
 
 =head1 DESCRIPTION
 
-moot - moocow's part-of-speech tagger.
+moot - moocow's part-of-speech tagger and utilities.
+
 
 =head1 REQUIREMENTS
 
 =over 4
 
-=item pkg-config
+
+=item pkg-config (Required)
 
 Available from:
 http://www.freedesktop.org/software/pkgconfig/
@@ -22,7 +24,19 @@ autoconf macros which come with the source distribution
 of pkg-config.
 
 
-=item flex++ , bison++
+=item STL headers (Required)
+
+If your C++ compiler does not have the STL
+headers already installed, you will need
+to get them from somewhere.
+For gcc-2.x, I recommend STLport E<gt>= 4.5.3,
+available from http://www.stlport.org
+You will have to set the environment variables
+CPPFLAGS, LDFLAGS, and LIBS according to
+your installation before building.
+
+
+=item flex++ , bison++ (Optional)
 
 Alain Coetmeur's C++ ports of the famous lexer/parser
 generator pair, available from:
@@ -32,14 +46,55 @@ from the official distribution site of this package.
 
 Tested with flex++-v2.3.8-4 and bison++-v1.21-5.
 
-=item STLport E<gt>= 4.5.3
+Should only be required if you want/need to mess with
+the native I/O formats.
 
-Available from http://www.stlport.org
 
-Only required for building with gcc-2.x.
-You will have to set the environment variables
-CPPFLAGS, LDFLAGS, and LIBS according to
-your installation.
+=item expat (Optional)
+
+XML parser library by James Clark, required for XML input.
+
+Tested version 1.95.6.
+
+
+=item librecode (Optional)
+
+Character-set recoding library by François Pinard, useful for XML output.
+
+Tested version 3.6.
+
+
+=item zlib (Optional)
+
+Compression library by Jean-loup Gailly and Mark Adler,
+useful for compressed binary HMM files.
+
+Tested version 1.2.1.
+
+
+=item doxygen (Optional)
+
+Required for building library documentation.
+
+Tested version 1.2.15.
+
+
+=item Perl (Optional)
+
+Get it from http://www.cpan.org or http://www.perl.com
+Required for building command-line parsers, utility
+documentation, library documentation, etc.
+
+=item Getopt::Gen
+
+A Perl module used to generate command-line option parsers.
+Should be available from the author of this package.
+
+=item pod2man, pod2text, pod2html (Optional)
+
+The Perl documentation converstion utilities, required
+for building the correspdonding program documentation
+formats, should have come with your Perl.
 
 =back
 
@@ -75,7 +130,7 @@ these sources.
 
 =head1 KNOWN BUGS
 
-If you find one, let me know!
+If you find one, let me know...
 
 
 =head1 ACKNOWLEDGEMENTS

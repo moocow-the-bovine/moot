@@ -13,7 +13,7 @@ EXTRACT_STATIC         = NO
 EXTRACT_LOCAL_CLASSES  = YES
 HIDE_UNDOC_MEMBERS     = NO
 HIDE_UNDOC_CLASSES     = NO
-HIDE_FRIEND_COMPOUNDS  = NO
+#HIDE_FRIEND_COMPOUNDS  = NO  # ?
 BRIEF_MEMBER_DESC      = YES
 REPEAT_BRIEF           = NO
 ALWAYS_DETAILED_SEC    = NO
@@ -28,8 +28,8 @@ HIDE_SCOPE_NAMES       = NO
 VERBATIM_HEADERS       = YES
 SHOW_INCLUDE_FILES     = YES
 JAVADOC_AUTOBRIEF      = NO
-MULTILINE_CPP_IS_BRIEF = YES
-DETAILS_AT_TOP         = NO
+#MULTILINE_CPP_IS_BRIEF = YES # ?
+#DETAILS_AT_TOP         = NO #?
 INHERIT_DOCS           = YES
 INLINE_INFO            = YES
 SORT_MEMBER_DOCS       = YES
@@ -38,7 +38,7 @@ TAB_SIZE               = 8
 GENERATE_TODOLIST      = YES
 GENERATE_TESTLIST      = YES
 GENERATE_BUGLIST       = YES
-GENERATE_DEPRECATEDLIST= YES
+#GENERATE_DEPRECATEDLIST= YES #?
 ALIASES                = 
 ENABLED_SECTIONS       = 
 MAX_INITIALIZER_LINES  = 30
@@ -110,9 +110,9 @@ HTML_STYLESHEET        =
 HTML_ALIGN_MEMBERS     = NO
 #GENERATE_HTMLHELP      = @DOXY_WANT_HTMLHELP@
 GENERATE_HTMLHELP      = NO
-CHM_FILE               = FSM.chm
+#CHM_FILE               = FSM.chm #?
 #HHC_LOCATION           = "C:\Programme\HTML Help Workshop\hhc.exe"
-HHC_LOCATION           = @DOXY_HHC_PROGRAM@
+#HHC_LOCATION           = @DOXY_HHC_PROGRAM@ #?
 GENERATE_CHI           = NO
 BINARY_TOC             = NO
 TOC_EXPAND             = NO
@@ -154,8 +154,8 @@ MAN_LINKS              = NO
 # configuration options related to the XML output
 #---------------------------------------------------------------------------
 GENERATE_XML           = NO
-XML_SCHEMA             = 
-XML_DTD                = 
+#XML_SCHEMA             =  #?
+#XML_DTD                =  #?
 #---------------------------------------------------------------------------
 # configuration options for the AutoGen Definitions output
 #---------------------------------------------------------------------------
@@ -169,9 +169,9 @@ ENABLE_PREPROCESSING   = NO
 MACRO_EXPANSION        = NO
 EXPAND_ONLY_PREDEF     = NO
 SEARCH_INCLUDES        = YES
-#INCLUDE_PATH           = @top_srcdir@/src/libmoot @top_builddir@src/libmoot
+INCLUDE_PATH           = @top_srcdir@/src/libmoot @top_builddir@src/libmoot
 INCLUDE_FILE_PATTERNS  = 
-PREDEFINED             = __cplusplus
+PREDEFINED             = __cplusplus @DOXY_DEFINES@
 EXPAND_AS_DEFINED      = 
 SKIP_FUNCTION_MACROS   = YES
 
@@ -197,12 +197,13 @@ TEMPLATE_RELATIONS     = YES
 INCLUDE_GRAPH          = YES
 INCLUDED_BY_GRAPH      = YES
 GRAPHICAL_HIERARCHY    = YES
+CALL_GRAPH             = YES
 DOT_IMAGE_FORMAT       = png
 DOT_PATH               = 
 DOTFILE_DIRS           = 
 MAX_DOT_GRAPH_WIDTH    = 1024
 MAX_DOT_GRAPH_HEIGHT   = 1024
-GENERATE_LEGEND        = NO
+GENERATE_LEGEND        = YES
 DOT_CLEANUP            = YES
 #---------------------------------------------------------------------------
 # Configuration::addtions related to the search engine   

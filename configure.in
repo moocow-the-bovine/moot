@@ -3,10 +3,10 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.0pre7])
-define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
+define([THE_PACKAGE_VERSION], [2.0.0])
+define([THE_PACKAGE_MAINTAINER],  [moocow@ling.uni-potsdam.de])
 
-AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
+AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
 dnl AC_INIT(moot, 2.0.0, moocow@ling.uni-potsdam.de)
 
 dnl source && aux dir
@@ -17,7 +17,6 @@ AC_CANONICAL_TARGET
 
 dnl use automake
 AM_INIT_AUTOMAKE(THE_PACKAGE_NAME, THE_PACKAGE_VERSION)
-dnl AM_INIT_AUTOMAKE
 
 dnl use autoheader
 AM_CONFIG_HEADER([src/libmoot/mootConfig.h])
@@ -39,6 +38,26 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_LANG(C++)
 
+dnl ------------------------------------------------------------
+dnl debug ?
+dnl
+AC_MSG_CHECKING([whether to build debug version])
+AC_ARG_ENABLE(debug,
+	AC_HELP_STRING([--enable-debug], [build debug version (default=no)]))
+
+if test "$enable_debug" == "yes" ; then
+   AC_MSG_RESULT(yes)
+   AC_DISABLE_SHARED
+   moot_OFLAGS="-g"
+else
+  AC_MSG_RESULT(no)
+  #moot_OFLAGS="-O2"
+  #moot_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
+  moot_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops"
+fi
+AC_SUBST(moot_OFLAGS)
+dnl ^--- /debug
+
 dnl v--- needed if Makefile.am uses _LTLIBRARIES targets
 AC_PROG_LIBTOOL
 
@@ -51,7 +70,7 @@ dnl AM_PROG_LEX
 
 ### --- unmangle user's CXXFLAGS
 if test "$CXXFLAGS" != "$USER_CXXFLAGS" ; then
-  # autoconf likes to set this... who knows why...
+  # autoconf likes to set this (to '-g -O2')... who knows why...
   AC_MSG_NOTICE([Restoring user's original CXXFLAGS value])
   CXXFLAGS="$USER_CXXFLAGS"
 fi
@@ -119,44 +138,59 @@ dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 dnl check for zlib
 dnl
-AC_ARG_WITH(zlib-include,
-	AC_HELP_STRING([--with-zlib-include=DIR],
-		[specify location of zlib headers (default=none)]),
-	[ac_cv_zlib_iflags="-I$withval"])
-if test -n "$ac_cv_zlib_iflags" ; then
-  CPPFLAGS="$CPPFLAGS $ac_cv_zlib_iflags"
-fi
+dnl zlib: user-request
+AC_ARG_ENABLE(zlib,
+	AC_HELP_STRING([--disable-zlib],
+	               [Disable zlib compression support]),
+	[ac_cv_enable_zlib="$enableval"],[ac_cv_enable_zlib="yes"])
 
-dnl zlib: headers
-for h in zlib.h ; do
+if test "$ac_cv_enable_zlib" != "no" ; then
+ dnl zlib: headers
+ for h in zlib.h ; do
   AC_CHECK_HEADER($h,
 	[moot_have_header="yes"], [moot_have_header="no"], [ ])
   if test "$moot_have_header" = "no" ; then
-    AC_MSG_WARN([Required zlib header '$h' not found!])
-    AC_MSG_WARN([Are the zlib headers in your 'CPPFLAGS' environment variable?])
-    AC_MSG_ERROR([Required package not found -- aborting.])
+    AC_MSG_WARN([])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([                 zlib header '$h' not found!])
+    AC_MSG_WARN([])
+    AC_MSG_WARN([    Is the directory containing the zlib headers in your])
+    AC_MSG_WARN([             'CPPFLAGS' environment variable?])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([])
   fi
-done
-
-dnl zlib: library
-AC_ARG_WITH(zlib-libdir,
-	AC_HELP_STRING([--with-zlib-libdir=DIR],
-		       [specify location of zlib library (default=none)]),
-	[ac_cv_zlib_libdir="$withval"])
-
-if test -n "$ac_cv_zlib_libdir" -a "$ac_cv_zlib_libdir" != "no" ; then
-  LDFLAGS="$LDFLAGS -L$ac_cv_zlib_libdir"
+  ac_cv_enable_zlib="no"
+ done
 fi
 
-dnl zlib: library: compile
-AC_CHECK_LIB(z,deflate,[ac_cv_have_libz="yes"])
-if test "$ac_cv_have_libz" != "yes" ; then
-  AC_MSG_WARN([zlib library (-lz) not found!])
-  AC_MSG_WARN([Is the directory containing 'libz.a' in your LDFLAGS environment variable?])
-  AC_MSG_ERROR([Required package not found -- aborting.])
+if test "$ac_cv_enable_zlib" != "no" ; then
+ dnl zlib: library: compile
+ AC_CHECK_LIB(z,deflate,[ac_cv_have_libz="yes"])
+ if test "$ac_cv_have_libz" != "yes" ; then
+    AC_MSG_WARN([])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([                   zlib library not found!])
+    AC_MSG_WARN([])
+    AC_MSG_WARN([         Is the directory containing libz.a in your])
+    AC_MSG_WARN([                'LDFLAGS' environment variable?])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([])
+    ac_cv_enable_zlib="no"
+ else
+   LIBS="$LIBS -lz"
+ fi
+fi
+
+##-- zlib: config.h flag
+if test "$ac_cv_enable_zlib" = "no" ; then
+  AC_MSG_NOTICE([zlib compression support disabled.])
 else
-  LIBS="$LIBS -lz"
+ ##-- ac_cv_enable_zlib != no
+ AC_DEFINE(MOOT_ZLIB_ENABLED,1,
+	   [Define this to enable zlib compression support])
+ DOXY_DEFINES="$DOXY_DEFINES MOOT_ZLIB_ENABLED=1"
 fi
+dnl
 dnl zlib
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -191,11 +225,16 @@ if test -z "$FLEXXX" ; then
     AC_PATH_PROG(FLEXXX,[flex++],[])
   fi
   if test -z "$FLEXXX" ; then
-    AC_MSG_WARN()
-    AC_MSG_WARN([cannot find Alain Coetmeur's flex++!])
-    AC_MSG_WARN([Is your FLEXXX environment variable set correctly?])
-    AC_MSG_WARN()
-    AC_MSG_WARN([Your build might fail!])
+    AC_MSG_WARN([])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([                Coetmeur's flex++ not found!])
+    AC_MSG_WARN([])
+    AC_MSG_WARN([         Does your FLEXXX environment variable contain])
+    AC_MSG_WARN([              the full path to the flex++ program?])
+    AC_MSG_WARN([])
+    AC_MSG_WARN([                  Your build might fail!])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([])
   fi
 fi
 
@@ -212,11 +251,16 @@ if test -z "$BISONXX" ; then
     AC_PATH_PROG(BISONXX,[bison++],[])
   fi
   if test -z "$BISONXX" ; then
-    AC_MSG_WARN()
-    AC_MSG_WARN([cannot find Alain Coetmeur's bison++!])
-    AC_MSG_WARN([Is your BISONXX environment variable set correctly?])
-    AC_MSG_WARN()
-    AC_MSG_WARN([Your build might fail!])
+    AC_MSG_WARN([])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([                Coetmeur's bison++ not found!])
+    AC_MSG_WARN([])
+    AC_MSG_WARN([         Does your BISONXX environment variable contain])
+    AC_MSG_WARN([              the full path to the bison++ program?])
+    AC_MSG_WARN([])
+    AC_MSG_WARN([                  Your build might fail!])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([])
   fi
 fi
 YACC="$BISONXX"
@@ -224,55 +268,157 @@ AC_SUBST(YACC)
 AC_SUBST(BISONXX)
 
 dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+dnl check for recode
+dnl
+dnl recode: user-request
+AC_ARG_ENABLE(recode,
+	AC_HELP_STRING([--disable-recode],
+	               [Disable librecode support]),
+	[ac_cv_enable_recode="$enableval"],[ac_cv_enable_recode="yes"])
+
+dnl recode: headers
+if test "$ac_cv_enable_recode" != "no" ; then
+ for h in recodext.h ; do
+  AC_CHECK_HEADER($h,
+	[moot_have_header="yes"], [moot_have_header="no"], [])
+  if test "$moot_have_header" = "no" ; then
+    AC_MSG_WARN([])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([             librecode header '$h' not found!])
+    AC_MSG_WARN([])
+    AC_MSG_WARN([    Is the directory containing the librecode headers in your])
+    AC_MSG_WARN([             'CPPFLAGS' environment variable?])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([])
+    ac_cv_enable_recode="no"
+  fi
+ done
+fi ;##-- /ac_cv_enable_recode != no
+
+dnl recode: library: compile
+if test "$ac_cv_enable_recode" != "no" ; then
+
+ AC_CHECK_LIB(recode,recode_new_outer,[ac_cv_have_librecode="yes"])
+
+ if test "$ac_cv_have_librecode" != "yes" ; then
+   AC_MSG_WARN([])
+   AC_MSG_WARN([----------------------------------------------------------------])
+   AC_MSG_WARN([             librecode library not found!])
+   AC_MSG_WARN([])
+   AC_MSG_WARN([    Is the directory containing the librecode.a in your])
+   AC_MSG_WARN([             'LDFLAGS' environment variable?])
+   AC_MSG_WARN([----------------------------------------------------------------])
+   AC_MSG_WARN([])
+   ac_cv_enable_recode="no"
+ else
+  LIBS="$LIBS -lrecode"
+ fi
+fi ;##-- /ac_cv_enable_recode != no
+
+dnl recode: config.h flag
+if test "$ac_cv_enable_recode" = "no" ; then
+  AC_MSG_NOTICE([librecode support disabled.])
+else
+ ##-- ac_cv_enable_recode != no
+ AC_DEFINE(MOOT_RECODE_ENABLED,1,
+	   [Define this to enable librecode support (useful for XML)])
+ DOXY_DEFINES="$DOXY_DEFINES MOOT_RECODE_ENABLED=1"
+fi
+dnl recode
+dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 dnl check for expat
 dnl
 dnl expat: user-request
-AC_ARG_ENABLE(xml,
-	AC_HELP_STRING([--disable-xml],[Disable XML support (enabled by default)]),
-	[ac_cv_enable_xml="$enableval"],[ac_cv_enable_xml="yes"])
+AC_ARG_ENABLE(expat,
+	AC_HELP_STRING([--disable-expat],
+	               [Disable experimental expat XML support]),
+	[ac_cv_enable_expat="$enableval"],[ac_cv_enable_expat="yes"])
 
 dnl expat: headers
-if test "$ac_cv_enable_xml" != "no" ; then
+if test "$ac_cv_enable_expat" != "no" ; then
  for h in expat.h ; do
   AC_CHECK_HEADER($h,
 	[moot_have_header="yes"], [moot_have_header="no"], [ ])
   if test "$moot_have_header" = "no" ; then
     AC_MSG_WARN([])
-    AC_MSG_WARN([------------------------------------------------------------------------])
-    AC_MSG_WARN([expat header '$h' not found!])
-    AC_MSG_WARN([(Are the expat headers in your 'CPPFLAGS' environment variable?)])
-    AC_MSG_WARN([------------------------------------------------------------------------])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([             expat header '$h' not found!])
     AC_MSG_WARN([])
-    ac_cv_enable_xml="no"
+    AC_MSG_WARN([    Is the directory containing the expat headers in your])
+    AC_MSG_WARN([             'CPPFLAGS' environment variable?])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([])
+    ac_cv_enable_expat="no"
   fi
  done
-fi ;##-- /ac_cv_enable_xml != no
+fi ;##-- /ac_cv_enable_expat != no
 
 dnl expat: library: compile
-if test "$ac_cv_enable_xml" != "no" ; then
+if test "$ac_cv_enable_expat" != "no" ; then
 
  AC_CHECK_LIB(expat,XML_DefaultCurrent,[ac_cv_have_libexpat="yes"])
 
  if test "$ac_cv_have_libexpat" != "yes" ; then
-  AC_MSG_WARN([])
-  AC_MSG_WARN([------------------------------------------------------------------------])
-  AC_MSG_WARN([expat library (-lexpat) not found!])
-  AC_MSG_WARN([Is the directory containing 'libexpat.a' in your LDFLAGS environment variable?])
-  AC_MSG_WARN([------------------------------------------------------------------------])
-  AC_MSG_WARN([])
+    AC_MSG_WARN([])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([                expat library not found!])
+    AC_MSG_WARN([])
+    AC_MSG_WARN([      Is the directory containing libexpat.a in your])
+    AC_MSG_WARN([             'LDPFLAGS' environment variable?])
+    AC_MSG_WARN([----------------------------------------------------------------])
+    AC_MSG_WARN([])
+    ac_cv_enable_expat="no"
  else
   LIBS="$LIBS -lexpat"
  fi
 fi ;##-- /ac_cv_enable_xml != no
 
 dnl expat: config.h flag
-if test "$ac_cv_enable_xml" = "no" ; then
-  AC_MSG_NOTICE([XML support disabled.])
+if test "$ac_cv_enable_expat" = "no" ; then
+  AC_MSG_NOTICE([Expat XML support disabled.])
 else
  ##-- ac_cv_enable_xml != no
- AC_DEFINE(MOOT_XML_ENABLED,1,[Define this to enable XML support])
+ AC_DEFINE(MOOT_EXPAT_ENABLED,1,
+	   [Define this to enable experimental expat XML support])
+ DOXY_DEFINES="$DOXY_DEFINES MOOT_EXPAT_ENABLED=1"
 fi
 dnl expat
+dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+dnl check for libxml2
+dnl
+dnl libxml2: user-request
+AC_ARG_ENABLE(libxml,
+	AC_HELP_STRING([--enable-libxml],
+	               [Enable experimental libxml2 XML support (off by default)]),
+	[ac_cv_enable_libxml="$enableval"],[ac_cv_enable_libxml="no"])
+
+dnl libxml2: pkg-config
+if test "$ac_cv_enable_libxml" != "no" ; then
+  PKG_CHECK_MODULES(LIBXML2, libxml-2.0 >= 2.6.7,
+	[ac_cv_enable_libxml="yes"],
+	[ac_cv_enable_libxml="no"])
+fi
+
+dnl libxml: config.h flag
+if test "$ac_cv_enable_libxml" = "no" ; then
+  AC_MSG_NOTICE([libxml2 XML support disabled.])
+else
+ ##-- ac_cv_enable_xml != no
+ AC_DEFINE(MOOT_LIBXML_ENABLED,1,
+	   [Define this to enable experimental libxml2 XML support])
+ CXXFLAGS="$CXXFLAGS $LIBXML2_CFLAGS"
+ LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L libxml-2.0`"
+ LIBS="$LIBS `$PKG_CONFIG --libs-only-l libxml-2.0`"
+
+ DOXY_DEFINES="$DOXY_DEFINES MOOT_LIBXML_ENABLED=1"
+fi
+dnl libxml2
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
@@ -351,7 +497,7 @@ if test "$moot_doc_formats" != "none" ; then
 
   ### -- report doxygen-check results
   if test -z "$DOXYGEN" ; then
-    AC_MSG_WARN([doxygen not found: library documentation will not be built!]) 
+    AC_MSG_WARN([doxygen not found: library documentation will not be built!])
   fi
 
   ### docs: pod converters
@@ -472,9 +618,12 @@ if test "$moot_doc_formats" != "none" ; then
     esac; # case "$fmt" in ...
   done; # for fmt in $moot_doc_formats ...
 
+  AC_SUBST(DOXY_DEFINES)
+
   AC_SUBST(DOXY_WANT_HTML)
   AC_SUBST(DOXY_WANT_MAN)
   AC_SUBST(DOXY_WANT_LATEX)
+
   AC_SUBST(DOC_SUBDIRS)
   AC_SUBST(DOC_MANDIRS)
   AC_SUBST(DOC_MAN3_MANS)
@@ -490,19 +639,19 @@ if test "$moot_doc_formats" != "none" ; then
   AC_SUBST(DOC_PROG_PDF_TARGETS)
 
 
-  # -- check for tag-files (this needs an overhaul!)
-  for ext in mootm ; do
-    extdocdir="`$PKG_CONFIG --variable=pkgdocdir ${ext}`"
-    if test -n "$extdocdir" -a "$extdocdir" != "no" ; then
-      exttagfiles="`find $extdocdir -name '*.tag'`"
-      for exttag in $exttagfiles ; do
-        exttagdir="`dirname $exttag`/html"
-        if test -d "$exttagdir" ; then
-          DOXY_TAGFILES="$DOXY_TAGFILES $exttag=$exttagdir"
-        fi
-      done
-    fi
-  done 
+  ##-- check for tag-files (this needs an overhaul!)
+  #for ext in mootm ; do
+  #  extdocdir="`$PKG_CONFIG --variable=pkgdocdir ${ext}`"
+  #  if test -n "$extdocdir" -a "$extdocdir" != "no" ; then
+  #    exttagfiles="`find $extdocdir -name '*.tag'`"
+  #    for exttag in $exttagfiles ; do
+  #      exttagdir="`dirname $exttag`/html"
+  #      if test -d "$exttagdir" ; then
+  #        DOXY_TAGFILES="$DOXY_TAGFILES $exttag=$exttagdir"
+  #      fi
+  #    done
+  #  fi
+  #done 
   AC_SUBST(DOXY_TAGFILES)   
 fi; # if "$moot_doc_formats" != "none" ...
 
@@ -531,24 +680,6 @@ AC_SUBST(BINDIST_CPU)
 AC_SUBST(BINDIST_OS)
 # Binary distribution
 #---------------------------------------------------------------
-
-dnl ------------------------------------------------------------
-dnl debug ?
-dnl
-AC_MSG_CHECKING([whether to build debug version])
-AC_ARG_ENABLE(debug,
-	AC_HELP_STRING([--enable-debug],[build debug version (default=no)]))
-
-if test "$enable_debug" == "yes" ; then
-   AC_MSG_RESULT(yes)
-   moot_OFLAGS="-g"
-else
-  AC_MSG_RESULT(no)
-  #moot_OFLAGS="-O2"
-  #moot_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
-  moot_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops"
-fi
-AC_SUBST(moot_OFLAGS)
 
 
 dnl ---------------------------------------------------------------
@@ -582,6 +713,7 @@ dnl output
 dnl
 AC_CONFIG_FILES(src/libmoot/Makefile src/programs/Makefile src/Makefile)
 dnl AC_CONFIG_FILES(doc/libmoot/mainpage.dox)
+dnl AC_CONFIG_FILES(doc/libmoot/doxy-filter.cfg)
 AC_CONFIG_FILES(doc/libmoot/libmoot.doxy doc/libmoot/Makefile)
 AC_CONFIG_FILES(doc/programs/Makefile)
 AC_CONFIG_FILES(doc/Makefile)

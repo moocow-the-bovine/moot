@@ -1,14 +1,93 @@
 ChangeLog for package moot
 
 Todo:
-	+ add XML I/O (subclass of moot::Token(Reader|Writer) ?)
 	+ write perl-XS interface & utilities
-	+ find out where all the process time is going in
-	  class-based disambig (it ain't in the find(), as I had
-	  thought: classification maybe?)
 
+v2.0.0 Fri, 09 Jul 2004 00:18:26 +0200
+	+ Documentation and general cleanup
+
+v2.0.0pre11 Fri, 09 Jul 2004 00:18:21 +0200
+	+ Added abstract 'mootio' layer:
+	  - replaces old mootBinStream
+	  - abstract I/O source/sink wrapper supporting:
+	    * C FILE*         : mootCIO.h
+	    * C char*         : mootBufferIO.h
+	    * zlib gzFile     : mootZIO.h
+	    * C++ (i|o)stream : mootCxxIO.h
+	  - main justification for not just using C++ streams
+	    * we want to keep "real" printf() for C FILE*s and buffers
+	  - Upshot:
+	    * inheritable from_*() / to_*() methods in lexers, formatters, etc.
+	    * just need to wrap calls to mootio::m*stream objects
+	+ Added detail-saving for XML input: for best XML->native conversion,
+	  use '--output-format=Native,Pretty'
+	  - fixes bug:
+  	    * Analysis details get lost in default XML output
+	      ~ so that after the following:
+	          bash$ mootchurn -Inative,wd t.mtt     -Oxml,wd -o t.mtt.xml
+	          bash$ mootchurn -Ixml,wd    t.mtt.xml -Oxml,wd -o t.mtt.xml.2
+	        't.mtt.xml' is NOT equivalent to 't.mtt.xml.2'
+	        (details are missing from the latter)
+	+ Added 'tiofConserve' format flag for pseudo-lossless XML
+	  - it does NOT work well with 'pretty' mode, but I for one
+	    can live with that.
+        + Added auto-recognition of filetypes based on filename extensions
+	  - Totally overridable by user requests
+	+ Added format parsing + guessing to remaining command-line utilities
+	+ Added abstract 'moot::GenericLexer' base class for flex++ lexers
+	  - should fix a few buffer allocation leaks
+	  - see mootGenericLexer.h for details on usage
+	
+v2.0.0pre10 Mon, 28 Jun 2004 19:36:32 +0200
+	+ moved format flag documentation to 'mootfiles(5)'
+	  - inaccurate at the moment, since only
+	    'mootchurn' supports format flags, but see 
+	+ extended XML librecode recoding support
+	  - new class 'mootXMLRecoder' in 'mootRecode.h'
+	  - fixes bad encoding of XML specials
+	    ('&', '<', '>', etc.) by use of two chained
+	    mootRecode objects
+	    * librecode ought to handle this more elegantly,
+	      but since the 'diacritics_only' flag lives
+	      in 'RECODE_REQUEST', I just don't grok how
+	      to make this happen: maybe it ought to be
+	      a surface?
+	  - librecode functions are inexplicably
+	    always returning false -- return codes
+	    are currently passed through but basically
+	    ignored, pending further investigation.
+
+v2.0.0pre9 Sun, 27 Jun 2004 22:44:53 +0200
+	+ added basic support for xml recoding using librecode
+	  - new class 'mootRecoder' in 'mootRecode.h'
+	  - added corresponding '--enable-librecode' argument to
+	    'configure.in'
+	
+v2.0.0pre8 Sun, 27 Jun 2004 22:44:53 +0200
+	+ wrote and re-wrote XML implementations for libxml2 and expat / fprintf()
+	  - currently best-tested: expat
+	+ reworked entire I/O layer in the process (aribtrarily
+	  ordered events with a single C buffer are way fast,
+	  but prickly to handle)
+	+ wrote 'mootchurn' utility for format conversion
+	  & consistency checking
+	+ changed 'mootToken::AnalysisSet' to '...::Analyses' = 'list<Analysis>':
+	  much much much faster for pre-analyzed input, and
+	  not noticeably slower for text-only input.
+	  - fixes bug #n:
+	    * find out where all the process time is going in
+	      class-based disambig 
+  	      ~ it ain't in the find(), as I had thought
+	      ~ looks we're ca. 6 times slower just churning
+	        a pre-analyzed file with 'sentchurn'
+	        + maybe use lists/vectors instead of sets for analyses? --> helps enormously!
+	        + break out ID-mappers (i.e. virtual tokens)?
+	
 v2.0.0pre7 Thu, 17 Jun 2004 16:58:37 +0200
 	+ added mootXmlParser.(h|cc) : abstract expat wrapper class
+	+ renamed misleading 'mootTokFlavor' to 'mootTokenType',
+	+ renamed old 'TokenType' to 'mootTokenFlavor' -- this
+	  is more accurate, and The Way Things Should Be.
 	+ re-worked mootTokenIO
 	  - now with 10% MORE Object Orientation than Ever Before!
 	  - i.e. many virtual methods and a biggish hierarchy,

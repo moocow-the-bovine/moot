@@ -31,26 +31,28 @@ pkgdocprog_DATA = \
 ## sources
 ##-----------------------------------------------------------------------
 
-SUFFIXES = .gog .pod .txt .1 .5 .html .tex .dvi .ps .pdf
+INDEX_SKEL = mootutils.skel
+
+SUFFIXES = .skel .gog .pod .txt .1 .5 .html .tex .dvi .ps .pdf
 
 ##-----------------------------------------------------------------------
 ## local hooks
 ##-----------------------------------------------------------------------
 all-local: $(man_MANS)
 
-txt: $(moot_pods:.pod=.txt)
+txt: $(moot_pods:.pod=.txt) $(INDEX_SKEL:.skel=.txt)
 
 man: $(man1_MANS) $(MAN5_MANS)
 
-html: $(moot_pods:.pod=.html)
+html: $(moot_pods:.pod=.html) $(INDEX_SKEL:.skel=.html)
 
-latex: $(moot_pods:.pod=.tex)
+latex: $(moot_pods:.pod=.tex) $(INDEX_SKEL:.skel=.tex)
 
-dvi: $(moot_pods:.pod=.dvi)
+dvi: $(moot_pods:.pod=.dvi) $(INDEX_SKEL:.skel=.dvi)
 
-ps: $(moot_pods:.pod=.ps)
+ps: $(moot_pods:.pod=.ps) $(INDEX_SKEL:.skel=.ps)
 
-pdf: $(moot_pods:.pod=.pdf)
+pdf: $(moot_pods:.pod=.pdf) $(INDEX_SKEL:.skel=.pdf)
 
 
 ##-----------------------------------------------------------------------
@@ -63,6 +65,14 @@ OPTGENFLAGS = -l
 
 .gog.pod:
 	optgen.perl $(OPTGENFLAGS) --nocfile --nohfile -F $* $<
+
+##-----------------------------------------------------------------------
+## pod compilation rules: Getopt::Gen (from skel)
+##-----------------------------------------------------------------------
+OPTGEN_SKELFLAGS = --nocfile --nohfile --nopod
+
+.skel.pod:
+	echo | optgen.perl $(OPTGEN_SKELFLAGS) --template=$< - > $@ 2>/dev/null
 
 ##-----------------------------------------------------------------------
 ## pod conversion rules
@@ -112,6 +122,7 @@ POD2HTMLFLAGS = --podpath="$(srcdir):." --htmlroot="."
 ## --- clean:  built by 'make'
 CLEANFILES = \
 	$(moot_program_gogs:.gog=.pod) \
+	$(INDEX_SKEL:.skel=.pod) \
 	*.man *.1 *.5 *.html *.txt *.tex *.dvi *.ps *.pdf \
 	*.log *.aux *.toc *.idx *~~ *.tmp
 
@@ -130,11 +141,12 @@ MAINTAINERCLEANFILES = \
 
 ## --- extra distribution files
 EXTRA_DIST = \
+	mootfiles.pod \
+	mootutils.skel \
 	@DOC_PROG_TXT_TARGETS@ \
 	@DOC_PROG_MAN1_TARGETS@ \
 	@DOC_PROG_MAN5_TARGETS@ \
-	@DOC_PROG_HTML_TARGETS@ \
-	mootfiles.pod
+	@DOC_PROG_HTML_TARGETS@
 
 ## --- recursion subdirectories for 'make dist'
 #DIST_SUBDIRS = $(SUBDIRS)

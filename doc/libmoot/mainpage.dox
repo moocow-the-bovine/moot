@@ -13,9 +13,8 @@ libmoot is a C++ library for Part-of-Speech (PoS) tagging.
 In addition to traditional bigram tagging routines, libmoot
 allows the use of user-specified a priori sets of possible analyses
 for each input token ("lexical classes"), which has been shown
-to lead to a reduction in errors of up to 21% with respect
+to lead to a reduction in errors of up to 32% with respect
 to traditional Hidden-Markov-Model (HMM) methods.
-
 
 
 \section PP Preprocessing
@@ -51,27 +50,33 @@ optionally extended by prior analyses.
 \see <A HREF="../../programs/mooteval.html">mooteval(1)</A>
 
 
-\section IO Virtual I/O
+\section IO Extendible I/O
 
-The abstract
+The high-level
 \link mootTokenIO.h mootTokenIO\endlink
 layer
 comprises the \link TokenReader TokenReader\endlink 
 and \link TokenWriter TokenWriter\endlink
 classes, which provide an abstract API specification for
 definition of user-defined I/O protocols using
-the C++ virtual method convention.
-Builtin I/O layer specializations include classes
-for native text-format I/O to and from strings
-and C-style streams.
+the C++ virtual method convention.  Builtin
+Token specializations include classes for
+native text-format and XML I/O.
+
+The low-level \link mootio mootio\endlink abstraction
+layer provides wrappers for several common stream
+flavors, including C streams (FILE*s), C++ streams,
+C memory buffers (char*s), as well as zlib compressed
+file streams (gzFile).
 
 \see \link moot::TokenReader TokenReader\endlink
-\see \link moot::TokenReaderCookedString TokenReaderCookedString\endlink
-\see \link moot::TokenReaderCookedFile TokenReaderCookedFile\endlink
+\see \link moot::TokenReaderNative TokenReaderNative\endlink
+\see \link moot::TokenReaderExpat TokenReaderExpat\endlink
 
 \see \link moot::TokenWriter TokenWriter\endlink
-\see \link moot::TokenWriterCookedString TokenWriterCookedString\endlink
-\see \link moot::TokenWriterCookedFile TokenWriterCookedFile\endlink
+\see \link moot::TokenWriterNative TokenWriterNative\endlink
+\see \link moot::TokenWriterExpat TokenWriterExpat\endlink
+
 
 \section Ack Acknowledgements
 
@@ -113,7 +118,5 @@ class-based HMM tagger / disambiguator.
 \see <A HREF="../../programs/mootdump.html">moodump(1)</A>
 \see <A HREF="../../programs/moot.html">moot(1)</A>
 \see <A HREF="../../programs/mooteval.html">mooteval(1)</A>
-
-\todo Write Perl XS interface.
 
 */

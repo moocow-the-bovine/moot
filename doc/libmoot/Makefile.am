@@ -27,7 +27,7 @@ DOXYFILE = $(DOXYBASE).doxy
 STAMPFILE = $(DOXYFILE:.doxy=.stamp)
 TAGFILE = $(DOXYFILE:.doxy=.tag)
 
-all-local: $(STAMPFILE)
+all-local: $(STAMPFILE) doxy-filter.cfg
 
 #-----------------------------------------------------------------------
 # doxygen hack: sources
@@ -39,23 +39,7 @@ vpath %.h $(DOXY_INCLUDES)
 
 DOXY_INPUTS = \
 	mainpage.dox \
-	mootToken.h mootTokenIO.h mootTokenLexer.h \
-	mootBinStream.h \
-	mootBinIO.h \
-	mootConfig.h \
-	mootTypes.h \
-	mootEnum.h \
-	mootLexfreqsLexer.h	mootLexfreqsParser.h	mootLexfreqsCompiler.h	\
-	mootLexfreqs.h \
-	mootClassfreqsLexer.h	mootClassfreqsParser.h	mootClassfreqsCompiler.h	\
-	mootClassfreqs.h \
-	mootNgramsLexer.h	mootNgramsParser.h	mootNgramsCompiler.h	\
-	mootNgrams.h \
-	mootPPLexer.h \
-	mootHMM.h \
-	mootHMMTrainer.h \
-	mootEval.h \
-	mootUtils.h
+	$(foreach dir,$(DOXY_INCLUDES),$(wildcard $(dir)/*.h))
 
 #	mootCHMM.h
 #	mootMorph.h
@@ -67,11 +51,14 @@ DOXY_INPUTS = \
 ## --- doxygen hacks: dependencies
 $(man3_MANS): $(STAMPFILE)
 
-$(STAMPFILE): $(DOXY_INPUTS)
+$(STAMPFILE): $(DOXY_INPUTS) doxy-filter.cfg
 
 #-----------------------------------------------------------------------
 # doxygen hack: build rules (recurse in this directory)
 #-----------------------------------------------------------------------
+doxy-filter.cfg:
+	echo -e '$$config_cppflags .= "$(patsubst %,-I%,$(DOXY_INCLUDES))";\n1;' > doxy-filter.cfg
+
 .doxy.stamp: doxy-filter.cfg
 	@(if test -n "$(DOXYGEN)" ; then \
 	  echo "$(DOXYGEN) $<" ;\
@@ -86,9 +73,6 @@ $(STAMPFILE): $(DOXY_INPUTS)
 	  echo "-------------------------------------------------------------------" ;\
 	 fi)
 	 touch $@
-
-doxy-filter.cfg:
-	echo -e '$$config_cppflags = "$(patsubst %,-I%,$(DOXY_INCLUDES))";\n1;' > doxy-filter.cfg
 
 #-----------------------------------------------------------------------
 # Variables: cleanup
