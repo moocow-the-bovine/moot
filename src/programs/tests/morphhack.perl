@@ -82,14 +82,24 @@ while (<>) {
   if (/^\s*%%/ || /^\s*$/) { print;  next; }
 
   chomp;
+
+  ##-- remove 'MorphConsole' redundant "empty analysis" marker
+  s/\t+\s*\$Keine Analyse\$/\t/;
+
   %ans = ();
-  ($token,@class) = split(/\s*\t+\s*/, $_);
+  ($token,@astrs) = split(/\s*\t+\s*/, $_);
 
   ##-- extract best, if requested
-  $best = shift(@class) if ($have_best);
+  $best = shift(@astrs) if ($have_best);
+
+  ##-- beautify class
+  foreach (@astrs) {
+    s/([^\]])( <)/$1\]$2/; ## -- beautify
+    s/\s*<[\d\.]+>\s*//g;    ## -- eliminate costs
+  }
 
   ##-- apply class-based rules
-  $class = join("\t", sort(@class));
+  $class = join("\t", sort(@astrs));
   $class = $xlate_class{$class} if (exists($xlate_class{$class}));
 
   ##-- apply tag-based rules on translated class

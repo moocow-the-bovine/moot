@@ -1,5 +1,7 @@
 # Makefile for moot data
 
+include config.mak
+
 ##-- Globals: data
 TEST = utest
 TRAIN = utrain
@@ -9,12 +11,25 @@ label = label
 EVAL = $(TEST).dmtt
 TRUTH = $(TEST).ttt
 
-##-- Globals: programs
-MOOTM = $(shell \
-	test -x /usr/local/bin/mootm && @echo "/usr/local/bin/mootm" \
-	|| echo "/home/moocow/public/bin/mootm")
-MORPHHACK = ./morphhack.perl
-MOOTM_FLAGS = -m share-moot/dwdst-stts-nofeatures.fst -d1024
+##-- Morph: mootm
+SHARE_MOOT ?= $(shell cd share-moot ; pwd -P)
+
+MOOTM_BINDIR ?= $(shell cd $(SHARE_MOOT)/../../bin ; pwd -P)
+MOOTM ?= $(MOOTM_BINDIR)/mootm
+MOOTM_FLAGS ?= -m $(SHARE_MOOT)/dwdst-stts-nofeatures.fst -d1024
+
+##-- Morph: MorphConsole
+MORPHC_BINDIR ?= $(MOOTM_BINDIR)
+MORPHC ?= $(MORPHC_BINDIR)/MorphConsole
+MORPHC_FLAGS ?= \
+	-b share-moot/fsm.new/moot.sym \
+	-m share-moot/fsm.new/MIMorph.fst \
+	-p -f
+
+##-- Morph: Hack
+MORPHHACK ?= ./morphhack.perl
+
+##-- Globals: programs: moot
 MOOTRAIN = ../mootrain
 MOOTHMM = ../moot
 MOOTHMM_FLAGS =
@@ -42,12 +57,10 @@ t: $(TEST).t
 %.t: %.mtt
 	cut -f 1 $< > $@
 
-##-- analysis
+##-- morph analysis
 mtt: $(TEST).mtt
 
-%.mtt: %.mttt
-	cut -f 1,3- $< > $@
-
+##-- analysis: mootm
 %.m0ttt: %.ttt $(MOOTM)
 	$(MOOTM) -12 $(MOOTM_FLAGS) $< -o $@
 
@@ -59,6 +72,24 @@ mtt: $(TEST).mtt
 
 %.mtt: %.m0tt $(MORPHHACK)
 	$(MORPHHACK) --nobest $< > $@
+
+##-- analysis: MorphConsole
+#%.m0tt: %.t $(MORPHC)
+#	$(MORPHC) $(MORPHC_FLAGS) $< > $@
+#
+#%.m1tt: %.m0tt $(MORPHHACK)
+#	$(MORPHHACK) --nobest $< > $@
+#
+#%.mttt: %.ttt
+#	$(MAKE) $*.m1tt
+#	cut -f2- $*.m1tt | paste $< - > $@
+#
+#%.mtt: %.mttt
+#	cut -f 1,3- $< > $@
+#
+#%.mtt: %.m1tt
+#	ln $< $@
+
 
 ##-- tagging
 tt: $(TEST).tt
@@ -177,10 +208,11 @@ cdump: $(MODEL).cdump
 
 ##-- cleanup
 clean:
-	rm -f *~ *.t *.tt *.dmtt
+	rm -f *~ *.t *.tt *.dmtt tmp.res
 
 realclean: clean
 	rm -f \
 	  *.lex *.123 *.clx \
-	  *.mtt *.m0tt *.mttt *.amtt \
+	  *.mtt *.m0tt *.m1tt *.amtt \
+	  *.mttt *.m0ttt *.m1ttt \
 	  *.model *.hmm *.chmm *.dump *.cdump
