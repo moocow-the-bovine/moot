@@ -2,7 +2,7 @@
 
 README for package 'moot' (formerly 'dwdst')
 
-Last updated for moot version 1.0.5
+Last updated for moot version 2.0.0pre3
 
 =head1 DESCRIPTION
 
@@ -17,6 +17,9 @@ moot - moocow's part-of-speech tagger.
 Available from http://www.stlport.org
 
 Only required for building with gcc-2.x.
+You will have to set the environment variables
+CPPFLAGS, LDFLAGS, and LIBS according to
+your installation.
 
 
 =item pkg-config
@@ -24,6 +27,9 @@ Only required for building with gcc-2.x.
 Available from:
 http://www.freedesktop.org/software/pkgconfig/
 
+To build from cvs, you will also need the pkg-config
+autoconf macros which come with the source distribution
+of pkg-config.
 
 
 =item flex++ , bison++
@@ -93,8 +99,7 @@ of this package.
 
 Thomas Hanneforth wrote and maintains the libFSM C++ library
 for finite-state device operations
-without which the class-based HMM tagger / disambiguator
-package would not have been built.
+used in the development of the HMM tagger / disambiguator.
 
 Alexander Geyken and Thomas Hanneforth developed the
 rule-based morphological analysis system for German
