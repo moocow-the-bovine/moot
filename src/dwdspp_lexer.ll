@@ -86,8 +86,8 @@ year			([0-9]|([1-9][0-9][0-9]?[0-9]?))
 ({day})([ \t])*({month_name}|{month})([ \t])*({year})	{ return DATE;  }
 
 
-[0-9]+							{ return INTEGER; }
-[0-9]+,[0-9]+						{ return FLOAT; }
+[\+\-]?([0-9]+)						{ return INTEGER; }
+[\+\-]?[0-9]*[\.,]([0-9]+)				{ return FLOAT; }
 
 {german_word}-\n{german_word}				{ return HYPHWORD; }
 {german_word}-{german_word}-{german_word}		{ return WORD; }

@@ -94,8 +94,10 @@ set<FSMSymbolString> dwds_tagger_trainer::read_taglist_file(set<FSMSymbolString>
  */
 FSM *dwds_tagger_trainer::generate_unknown_fsa()
 {
-  FSMBaseRepresentation *urep;
-  FSMState q0, qi;
+  FSMBaseRepresentation *base;
+  FSMState q0;
+  set<FSMState> pstates;
+  set<FSMState>::iterator ps;
 
   // -- ensure that ufsa exists
   if (ufsa) ufsa->fsm_clear();
@@ -105,36 +107,14 @@ FSM *dwds_tagger_trainer::generate_unknown_fsa()
   }
 
   // -- add start state
-  urep = ufsa->representation();
-  q0 = urep->set_start_state(urep->add_state(urep->new_state()));
+  base = ufsa->representation();
+  q0 = base->set_start_state(base->add_state(base->new_state()));
 
-  // -- return an FSA ambiguous between all tags in 'tagset' -- no features!
+  // -- return an FSA ambiguous between all tags in 'tagset'
   for (set<FSMSymbolString>::iterator p = opentags.begin(); p != opentags.end(); p++) {
-    qi = urep->add_state(urep->new_state());
-    urep->add_transition(q0, qi,
-			 syms->symbolname_to_symbol(*p), 
-			 syms->symbolname_to_symbol(*p),
-			 FSM_default_cost_structure.freecost());
-    urep->mark_state_as_final(qi);
-    if (want_features) {
-      FSMSymbolString catstr = *p;
-      if (catstr[0] == '_') { catstr.erase(0,1); }
-      const vector<FSMSymbolString> *feats = syms->features_of_category(catstr);
-      FSMState qf;
-      set<FSMState> pstates;
-      pstates.insert(qi);
-
-      for (vector<FSMSymbolString>::const_iterator f = feats->begin(); f != feats->end(); f++) {
-	set<FSMSymbol> *values = syms->subtypes_of(*f);
-	qf = urep->add_state(urep->new_state());
-	for (set<FSMSymbol>::iterator v = values->begin(); v != values->end(); v++) {
-	  for (set<FSMState>::iterator ps = pstates.begin(); ps != pstates.end(); ps++) {
-	    urep->add_transition(*ps, qf, *v, *v, FSM_default_cost_structure.freecost());
-	  }
-	}
-	pstates.insert(qf);
-	urep->mark_state_as_final(qf);
-      }
+    pstates = fsm_add_pos_arc(ufsa, q0, *p, FSM_default_cost_structure.freecost());
+    for (ps = pstates.begin(); ps != pstates.end(); ps++) {
+      base->mark_state_as_final(*ps);
     }
   }
   return ufsa;
@@ -144,6 +124,64 @@ FSM *dwds_tagger_trainer::generate_unknown_fsa()
  * Public Methods: FSA Generation: Diambiguation-FSA
  *  --> NOT YET IMPLEMENTED!
  *--------------------------------------------------------------------------*/
+
+/*
+ * FSM *dwds_tagger_trainer::generate_disambig_fsa();
+ */
+FSM *dwds_tagger_trainer::generate_disambig_fsa()
+{
+  fprintf(stderr,"dwds_tagger_trainer::generate_disambig_fsa(): not yet implemented!");
+  abort();
+  return NULL;
+}
+
+
+/*--------------------------------------------------------------------------
+ * Public Methods: mid-/low-level FSA Generation: arc-addition
+ *--------------------------------------------------------------------------*/
+
+/*
+ * set<FSMState>
+ * dwds_tagger_trainer::fsm_add_pos_arc(FSM *fsm, FSMState qfrom, FSMSymbolString &pos,
+ *                                      FSMWeight cost = FSM_default_cost_structure.freecost())
+ *   + returns set of "final" states for the arc
+ *   + honors the 'want_features' data-member
+ */
+set<FSMState>
+dwds_tagger_trainer::fsm_add_pos_arc(FSM *fsm, const FSMState qfrom, const FSMSymbolString &pos,
+				     const FSMWeight cost = FSM_default_cost_structure.freecost())
+{
+  FSMBaseRepresentation *base = fsm->representation();
+  FSMState qi;
+  set<FSMState> pstates;
+
+  // -- return an FSA ambiguous between all tags in 'tagset' -- no features!
+  qi = base->add_state(base->new_state());
+  base->add_transition(qfrom, qi,
+		       syms->symbolname_to_symbol(pos), 
+		       syms->symbolname_to_symbol(pos),
+		       cost);
+  pstates.insert(qi);
+
+  if (want_features) {
+    FSMSymbolString catstr = pos;
+    if (catstr[0] == '_') { catstr.erase(0,1); }
+    const vector<FSMSymbolString> *feats = syms->features_of_category(catstr);
+    FSMState qf; // -- feature-state
+
+    for (vector<FSMSymbolString>::const_iterator f = feats->begin(); f != feats->end(); f++) {
+      set<FSMSymbol> *values = syms->subtypes_of(*f);
+      qf = base->add_state(base->new_state());
+      for (set<FSMSymbol>::iterator v = values->begin(); v != values->end(); v++) {
+	for (set<FSMState>::iterator ps = pstates.begin(); ps != pstates.end(); ps++) {
+	  base->add_transition(*ps, qf, *v, *v, FSM_default_cost_structure.freecost());
+	}
+      }
+      pstates.insert(qf);
+    }
+  }
+  return pstates;
+}
 
 
 /*--------------------------------------------------------------------------
@@ -349,7 +387,7 @@ inline void dwds_tagger_trainer::train_next_token(void)
 
 
 /*--------------------------------------------------------------------------
- * Public Methods: Parameter generation: Parameter-File Output
+ * Public Methods: Parameter generation: Parameter-File Read/Write
  *--------------------------------------------------------------------------*/
 
 /*
@@ -370,6 +408,15 @@ bool dwds_tagger_trainer::write_param_file(FILE *out=stdout)
   return true;
 }
 
+/*
+ *
+ */
+bool dwds_tagger_trainer::read_param_file(FILE *in=stdin)
+{
+  fprintf(stderr,"dwdst_tagger_trainer::read_param_file(): not yet implemented!\n");
+  abort();
+  return false;
+}
 
 /*--------------------------------------------------------------------------
  *--------------------------------------------------------------------------*/

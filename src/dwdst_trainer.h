@@ -70,11 +70,13 @@ public:
   dwds_tagger_trainer(FSMSymSpec *mysyms=NULL, FSM *mymorph=NULL) {};
   ~dwds_tagger_trainer();
 
-  // -- public methods: unknown FSM generation
+  // -- public methods: FSM generation
   FSM *generate_unknown_fsa();
+  FSM *generate_disambig_fsa(); // NYI
 
-  // -- public methods: disambiguation FSM generation
-  //FSM *generate_disambig_fsa();
+  // -- mid-/low-level methods: FSM generation
+  set<FSMState> fsm_add_pos_arc(FSM *fsm, const FSMState qfrom, const FSMSymbolString &pos,
+				const FSMWeight cost = FSM_default_cost_structure.freecost());
 
   // -- public methods: param-generation: (output-file = DEBUG)
   bool train_from_strings(int argc, char **argv, FILE *out=stdout);
@@ -82,7 +84,8 @@ public:
   // -- mid-level
   inline void train_next_token(void);
 
-  // -- public methods: param-generation: parameter-file output
+  // -- public methods: param-generation: parameter-file read/write
+  bool read_param_file(FILE *in=stdin);  // NYI
   bool write_param_file(FILE *out=stdout);
 
   // -- public methods: mid-level: listfile-reading
@@ -99,8 +102,6 @@ public:
 
   // --- public methods: low-level : taglist file reading
   set<FSMSymbolString> read_taglist_file(set<FSMSymbolString> &tagset, const char *filename=NULL);
-  // --- public methods: low-level : param-file manipulation
-  //StringToCountTable *read_param_file(const char *filename);  
 };
 
 #endif // _DWST_TRAINER_H_
