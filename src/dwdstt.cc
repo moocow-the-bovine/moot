@@ -134,7 +134,7 @@ bool dwds_tagger_trainer::train_from_stream(FILE *in, FILE *out)
     return false;
   }
 
-  // -- HACK
+  // -- NOT YET IMPLEMENTED -- just die!
   fprintf(stderr, "dwds_tagger_trainer::train_from_stream(): not yet implemented.\n");
   abort();
 
@@ -183,6 +183,14 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
   set<FSMSymbolString> *curtags;
   set<FSMSymbolString>::iterator t;
 
+  set<FSMSymbolString> *curngrams = new set<FSMSymbolString>;
+  set<FSMSymbolString> *nextngrams = new set<FSMSymbolString>;
+
+  set<FSMSymbolString>::iterator g_old;
+  set<FSMSymbolString>::iterator g_new;
+
+  FSMSymbolStringQueue::iterator qi;
+
   // -- sanity check
   if (!can_tag()) {
     fprintf(stderr, "dwds_tagger_trainer::train_from_strings(): cannot run uninitialized trainer!\n");
@@ -193,7 +201,7 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
   for (i = 0; i < kmax; i++) {
     curtags = new set<FSMSymbolString>();
     curtags->insert(eos);
-    stringq.push_front(curtags);
+    stringq.push_back(curtags);
   }
 
   // -- ye olde guttes
@@ -205,8 +213,8 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
     result = morph->fsm_lookup(s,tmp,true);
 
     // -- pop 'current' string set
-    curtags = stringq.front();
-    stringq.pop_front();
+    curtags = stringq.back();
+    stringq.pop_back();
 
     // -- get the 'current' tag-set
     curtags->clear();
@@ -225,16 +233,16 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
     if (curtags->empty()) get_fsm_tag_strings(ufsa,curtags);
 
     // -- push 'current' tags onto the back of the queue
-    stringq.push_back(curtags);
+    stringq.push_front(curtags);
 
-    // -- counting: unigrams
-    for (t = curtags->begin(); t != curtags->end(); t++) {
-      if ((sci = strings2counts.find(*t)) != strings2counts.end()) {
-	strings2counts[*t] += curtags->size() >= 0 ? 1.0/(float)curtags->size() : 0;
-      } else {
-	strings2counts[*t] = curtags->size() >= 0 ? 1.0/(float)curtags->size() : 0;
-      }
-    }
+    /* // -- counting: unigrams
+       for (t = curtags->begin(); t != curtags->end(); t++) {
+       if ((sci = strings2counts.find(*t)) != strings2counts.end()) {
+       strings2counts[*t] += curtags->size() >= 0 ? 1.0/(float)curtags->size() : 0;
+       } else {
+       strings2counts[*t] = curtags->size() >= 0 ? 1.0/(float)curtags->size() : 0;
+       }
+      }*/
 
 #  ifdef DWDSTT_DEBUG
     // -- output (debug)
@@ -246,6 +254,33 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
     }
     fputc('\n',out);
 #  endif // DWDSTT_DEBUG
+
+
+    // -- counting: i <= kmax -grams
+    curngrams->clear();
+    for (qi = stringq.begin(); qi != stringq.end(); qi++) {
+      // -- grab next ngrams
+      if (curngrams->empty()) *curngrams = **qi;
+      else {
+	// -- get iterator-current tags
+	curtags = *qi;
+	nextngrams->clear();
+	for (g_old = curngrams->begin(); g_old != curngrams->end(); g_old++) {
+	  for (g_new = curtags->begin(); g_new != curtags->end(); g_new++) {
+	    nextngrams->insert(*g_new + wdsep + *g_old);
+	  }
+	}
+	*curngrams = *nextngrams;
+      }
+      // -- ... and count them (??? CONTINUE HERE ???)
+      for (t = curngrams->begin(); t != curngrams->end(); t++) {
+	if ((sci = strings2counts.find(*t)) != strings2counts.end()) {
+	  strings2counts[*t] += curngrams->size() >= 0 ? 1.0/(float)curngrams->size() : 0;
+	} else {
+	  strings2counts[*t] = curngrams->size() >= 0 ? 1.0/(float)curngrams->size() : 0;
+	}
+      }
+    }
 
     // -- verbosity
     if (verbose) {
@@ -261,6 +296,8 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
     curtags->clear();
     delete curtags;
   }
+  delete curngrams;
+  delete nextngrams;
 
   return true;
 }

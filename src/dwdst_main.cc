@@ -77,7 +77,8 @@ void GetMyOptions(int argc, char **argv)
 
   // -- tagger object setup : flags
   dwdst.want_avm = args.avm_given;
-  dwdst.want_numeric = args.numeric_given;
+  //dwdst.want_numeric = args.numeric_given;
+  //dwdst.want_binary = args.binary_given;
   dwdst.want_features = !args.tags_only_given;
   dwdst.want_tnt_format = args.tnt_format_given;
   dwdst.verbose  = (args.verbose_arg > 0);

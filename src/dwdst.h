@@ -40,7 +40,8 @@ public:
 
   // -- flags
   bool want_avm;
-  bool want_numeric;
+  //bool want_numeric;
+  //bool want_binary;
   bool want_features;
   bool want_tnt_format;
   bool verbose;
@@ -54,6 +55,7 @@ private:
   // -- flags
   bool i_made_morph;
   bool i_made_syms;
+  set<FSMSymbol>        fsm_tags_tmp;
 
 protected:
   // -- temporary variables
