@@ -128,7 +128,7 @@ FSM *dwdstTrainer::generate_unknown_fsa()
 
 /*--------------------------------------------------------------------------
  * Public Methods: FSA Generation: Diambiguation-FSA
- *  --> NOT YET IMPLEMENTED!
+ *  --> BAUSTELLE!
  *--------------------------------------------------------------------------*/
 
 /*
@@ -136,9 +136,135 @@ FSM *dwdstTrainer::generate_unknown_fsa()
  */
 FSM *dwdstTrainer::generate_disambig_fsa()
 {
-  fprintf(stderr,"dwdstTrainer::generate_disambig_fsa(): not yet implemented!");
-  abort();
-  return NULL;
+  // Mecker!
+  /*
+    fprintf(stderr,"dwdstTrainer::generate_disambig_fsa(): not yet implemented!");
+    abort();
+    return NULL;
+  */
+  if (dfsa) { delete dfsa; }
+  dfsa = new FSM();
+  FSMRepresentation rep = dfsa->fsm_representation();
+
+  // -- build a symbol-map for all tags we know
+  FSMSymbol symMax = 0;
+  dwdstStringToSymbolMap str2sym;
+  for (set<FSMSymbolString>::iterator si = alltags.begin(); si != alltags.end(); si++) {
+    str2sym[*si] = ++symMax;
+  }
+
+  // -- generate a skeleton-FSA using a single-symbol for each pseudo-tag
+  FSMState q0 = rep->new_state();
+  rep->add_state(q0);
+  rep->set_start_state(q0);
+
+  map<NGramVector,FSMState> nGram2State;
+  theNgram.clear();
+  theNgram.push_back(eos);
+  nGram2State.clear();
+  nGram2State[theNgram] = q0;
+
+  tagSetIterVector tagIters;
+  tagIters.clear();
+
+  int len, j;
+  NGramVector prevNgram;
+  FSMState theState, prevState;
+  for (len = 1; len <= kmax; len++) {
+    // -- len: n-gram length for this pass
+    for (tagIters_begin(tagIters,alltags,len);
+	 !tagIters_done(tagIters,alltags);
+	 tagIters_next(tagIters))
+      {
+	// -- build current and previous nGrams from tagIters
+	theNgram.clear();
+	if (len < kmax) theNgram.push_back(eos);
+	for (tagSetIterVector::tsi = tagIters.begin(); tsi != tagIters.end(); tsi++) {
+	  theNgram.push_back(*(*tsi));
+	}
+	prevNgram = theNgram;
+	prevNgram.pop_back();
+
+	// -- add a state for the current nGram
+	theState = rep->new_state();
+	rep->add_State(theState);
+	nGram2State[theNgram] = theState;
+
+	// -- add a transition from the preceeding nGram's state, if it exists
+	//    (BOS-bootstrap)
+	if ((dwdstStringToSymbolMap::iterator pngi = nGram2State.find(prevNgram)) !=
+	    nGram2State.end())
+	  {
+	    prevState = *pngi;
+	    
+	  }
+      }
+  }
+
+  FSMSymbol sym;
+  FSMState q;
+  for (sym = 1; sym < symMax; sym++) {
+    ; // continue!
+  }
+
+  return dfsa;
+}
+
+/*--------------------------------------------------------------------------
+ * Public Methods: weight-calculation utilities
+ *--------------------------------------------------------------------------*/
+
+/**
+ * Returns the expected cost of 
+ */
+FSMWeight dwdstTrainer::transitionCost(NGramVector &nGram)
+{
+  // continue!
+  return 0;
+}
+
+/*--------------------------------------------------------------------------
+ * Public Methods: low-level tag iteration utilities
+ *--------------------------------------------------------------------------*/
+
+/**
+ * Initialize possible ${len}-gram generating tag-iterator vector
+ * for \b tagSet.
+ */
+tagSetIterVector &dwdstTrainer::tagIters_begin(tagSetIterVector &tagIters,
+					       set<FSMSymbolString> &tagSet,
+					       int len)
+{
+  // -- initialize
+  tagIters.clear();
+  tagIters.reserve(len);
+  for (int j = 0; j < len; j++) {
+    tagIters.push_back(tagSet.begin());
+  }
+  return tagIters;
+}
+
+/**
+ * Get next possible ${tagIters.size()}-gram iterator-vector for tagSet
+ */
+tagSetIterVector &dwdstTrainer::tagIters_next(tagSetIterVector &tagIters) {
+  for (int j = tagIters.size()-1; j >= 0; j--) {
+    if (++tagIters[j] != alltags.end() || j == 0) {
+      // -- just step this position
+      break;
+    }
+    // -- reset this position and increment the next highest
+    tagIters[j] = alltags.begin();
+  }
+  return tagIters;
+}
+
+/**
+ * Are we done iterating yet?
+ */
+bool dwdstTrainer::tagIters_done(tagSetIterVector &tagIters, set<FSMSymbolString> tagSet)
+{
+  return tagIters[0] == tagSet.end();
 }
 
 
@@ -276,8 +402,6 @@ inline bool dwdstTrainer::init_training_temps(FILE *in=NULL, FILE *out=NULL)
  */
 inline bool dwdstTrainer::cleanup_training_temps()
 {
-  int i;
-
   // -- cleanup ngram-temps
   theNgram.clear();
   if (curngrams) {
@@ -298,7 +422,7 @@ inline bool dwdstTrainer::cleanup_training_temps()
       delete tmptags;
       tmptags = NULL;
   }
-  for (i = 0; i < kmax; i++) {
+  while (!stringq.empty()) {
     curtags = stringq.front();
     stringq.pop_front();
     if (curtags) {

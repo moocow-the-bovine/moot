@@ -1,4 +1,11 @@
+ittest
 symtest
+gttest
+pptest
+*.par
+*.tpar
+*.apar
+*.atpar
 *.o
 *~
 *.lab

@@ -163,6 +163,14 @@ public:
   /// Low-level de-initialization for training methods.
   /// You shouldn't need to call this yourself.
   inline bool cleanup_training_temps();
+
+  // -- public methods: low-level: tagset-iteration utilities
+  /// Low-level possible tagset-ngram iteration initializer.
+  tagSetIterVector &tagIters_begin(tagSetIterVector &tagIters,set<FSMSymbolString> &tagSet,int len);
+  /// Low-level possible tagset-ngram iteration incrementer.
+  tagSetIterVector &tagIters_next(tagSetIterVector &tagIters);
+  /// Low-level possible tagset-ngram iteration termination-test predicate.
+  bool tagIters_done(tagSetIterVector &tagIters,set<FSMSymbolString> tagSet);
 };
 
 #endif // _DWDST_TRAINER_H_

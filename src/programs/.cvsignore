@@ -4,6 +4,9 @@ dwdstt
 dwdst-pargen
 dwdst-fstgen
 *.par
+*.apar
+*.tpar
+*.atpar
 *.tt
 *.pp
 *.out

@@ -26,4 +26,11 @@ typedef map<NGramVector,float> NGramTable, *NGramTablePtr;
 /// Used by training methods to construct n-grams
 typedef deque<set<FSMSymbolString> * > FSMSymbolStringQueue, FSMSymbolStringQueuePtr;
 
+/// Used for disambig-fsa generation
+typedef map<FSMSymbolString,FSMSymbol> dwdstStringToSymbolMap;
+
+/// Used for disambig-fsa generation
+typedef vector<set<FSMSymbolString>::iterator> tagSetIterVector;
+
+
 #endif /* _DWDST_TYPES_H */

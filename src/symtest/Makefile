@@ -5,12 +5,15 @@ WFLAGS = -Wall
 
 LFLAGS = -L/usr/local/lib -lm -lFSMSymSpec
 
-TARGETS = symtest
+TARGETS = symtest ittest
 
 all: $(TARGETS)
 
 .cc.o:
 	$(CXX) $(WFLAGS) $(IFLAGS) $(OFLAGS) -c -o $@ $<
+
+ittest: ittest.o
+	$(CXX) $(WFLAGS) $(IFLAGS) $(OFLAGS) -o $@ $< -lstlport_gcc -lpthread
 
 symtest: symtest.o
 	$(CXX) $(WFLAGS) $(OFLAGS) -o $@ $^ $(LFLAGS)
