@@ -101,6 +101,11 @@ void GetMyOptions(int argc, char **argv)
 	    PROGNAME, args.symbols_arg, args.morph_arg);
     exit(1);
   }
+
+  // -- report
+  if (args.verbose_arg > 0) {
+    fprintf(stderr, "%s: Initialization complete\n\n", PROGNAME);
+  }
 }
   
 
