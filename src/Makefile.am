@@ -38,6 +38,9 @@ SUFFIXES = .ggo
 #${prog_i}_SOURCES =
 #${lib_i}_la_SOURCES =
 dwdst_SOURCES = \
+	cmdutil.cc \
+	cmdutil.h \
+	dwdst_lexer.ll \
 	dwdst.cc \
 	dwdst.h \
 	dwdst_main.cc \
@@ -55,7 +58,7 @@ dwdspp_SOURCES = \
 #EXTRA_${lib_i}_la_SOURCES = 
 
 ## --- Additional dependencies
-dwdst.o: dwdst_cmdparser.h
+dwdst.o: dwdst_cmdparser.h dwdst_lexer.h
 dwdspp_main.o: dwdspp_cmdparser.h dwdspp_lexer.h
 
 ##-----------------------------------------------------------------------

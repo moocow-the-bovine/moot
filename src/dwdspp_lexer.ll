@@ -1,9 +1,11 @@
 /*-*- Mode: Flex++ -*-*/
 /*----------------------------------------------------------------------
- * Name: BBAW_Lexer.l
- * Author: Bryan Jurish
- * Description:  Lex-File for the BBAW name recognition system
+ * Name: dwdspp_lexer.ll
+ * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Description:
+ *   + preprocessor for the KDWDS tagger
  *   + based on 'Bbaw.l' by Thomas Hanneforth
+ *   + process with Coetmeur's flex++ to produce 'dwdst_lexer.cc'
  *----------------------------------------------------------------------*/
 
 /* --- Lexer name --- */
@@ -13,14 +15,15 @@
 %define MEMBERS \
   public: \
     /* local data */ \
-    unsigned int numwords; \
+    unsigned int ntokens; \
     bool verbose; \
     \
     /* local methods */ \
-    bool tokenize_stream(FILE *in=stdin, FILE *out=stdout);
+    bool tokenize_stream(FILE *in=stdin, FILE *out=stdout); \
+    void step_streams(FILE *in, FILE *out);
 
 %define CONSTRUCTOR_CODE \
-  numwords = 0;
+  ntokens = 0;
 
 %header{
 typedef enum {
@@ -77,8 +80,8 @@ year			([0-9]|([1-9][0-9][0-9]?[0-9]?))
 \<([\?\!]?){letter}+[^\>]*\>		                { return START_XML_TAG; }
 \<\/{letter}+([0-9\.\_\-]*)\>				{ return END_XML_TAG; }
 
-&#[0-9]+;						{  }
-"&dash;"						{  }
+&#[0-9]+;						{ /* ignore XML char-entities */ }
+"&dash;"						{ /* ditto */ }
 
 ({day})([ \t])*({month_name}|{month})([ \t])*({year})	{ return DATE;  }
 
@@ -150,22 +153,30 @@ year			([0-9]|([1-9][0-9][0-9]?[0-9]?))
 %%
 
 /*----------------------------------------------------------------------
- * process_stream(FILE *in=stdin, FILE *out=stdout);
+ * dwdspp_lexer::step_streams(FILE *in, FILE *out)
+ *   + hack for non-global yywrap()
+ *----------------------------------------------------------------------*/
+void dwdspp_lexer::step_streams(FILE *in, FILE *out)
+{
+  yyin = in;
+  yyout = out;
+  // -- black magic from flex(1) manpage
+  if (yy_current_buffer != NULL) { yy_delete_buffer(yy_current_buffer); }
+  yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
+  BEGIN(INITIAL);
+}
+
+/*----------------------------------------------------------------------
+ * tokenize_stream(FILE *in=stdin, FILE *out=stdout);
  *   + run preprocesser from *in to *out
  */
 bool dwdspp_lexer::tokenize_stream(FILE *in=stdin, FILE *out=stdout)
 {
   int tok;
-  yyin = in;
-  yyout = out;
-
-  // black magic from the flex manpage
-  if (yy_current_buffer != NULL) { yy_delete_buffer(yy_current_buffer); }
-  yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
-  BEGIN(INITIAL);
+  step_streams(in,out);
 
   while ((tok = yylex()) != PPEOF) {
-    if (verbose) numwords++;
+    if (verbose) ntokens++;
     switch (tok) {
       case EOS:
           if (yytext[0] != '<') {

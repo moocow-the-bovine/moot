@@ -68,7 +68,7 @@ void GetMyOptions(int argc, char **argv)
 int main (int argc, char **argv)
 {
   dwdspp_lexer lexer;
-  int numfiles = 0;
+  int nfiles = 0;
   timeval started,stopped;
   double elapsed;
 
@@ -83,7 +83,7 @@ int main (int argc, char **argv)
   // -- big loop
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
       if (args.verbose_arg > 0) {
-	numfiles++;
+	nfiles++;
 	if (args.verbose_arg > 1) {
 	  fprintf(stderr,"%s: processing file '%s'... ", PROGNAME, churner.in.name);
 	  fflush(stderr);
@@ -109,10 +109,10 @@ int main (int argc, char **argv)
       // -- print summary
       fprintf(stderr, "\n-----------------------------------------------------\n");
       fprintf(stderr, "%s Summary:\n", PROGNAME);
-      fprintf(stderr, "  + Files processed : %d\n", numfiles);
-      fprintf(stderr, "  + Tokens found    : %d\n", lexer.numwords);
+      fprintf(stderr, "  + Files processed : %d\n", nfiles);
+      fprintf(stderr, "  + Tokens found    : %d\n", lexer.ntokens);
       fprintf(stderr, "  + Time Elsapsed   : %.2f sec\n", elapsed);
-      fprintf(stderr, "  + Throughput      : %.2f toks/sec\n", (float)lexer.numwords/elapsed);
+      fprintf(stderr, "  + Throughput      : %.2f toks/sec\n", (float)lexer.ntokens/elapsed);
       fprintf(stderr, "-----------------------------------------------------\n");
   }
 

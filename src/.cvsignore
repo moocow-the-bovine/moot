@@ -11,12 +11,13 @@ dwdspp
 .deps
 *.fst
 *.tfst
-*.sym
 *.lab
 *_cmdparser.cc
 *_cmdparser.h
 dwdspp_lexer.cc
 dwdspp_lexer.h
+dwdst_lexer.cc
+dwdst_lexer.h
 stamp-h*
 config.h
 config.h.in

@@ -8,12 +8,14 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/time.h>
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
 #include "dwdst_cmdparser.h"
+#include "cmdutil.h"
 #include "dwdst.h"
 
 using namespace std;
@@ -23,134 +25,149 @@ using namespace std;
  *--------------------------------------------------------------------------*/
 char *PROGNAME = "dwdst";
 
-// options
+// options & file-churning
 gengetopt_args_info args;
+cmdutil_file_churner churner;
 
-// filenames
-char *infile = "-";
-char *outfile = "-";
+// -- filenames
 char *symfile = "dwdst.sym";
 char *fstfile = "dwdst.fst";
 
-// files
-FILE *in = NULL;
-FILE *out = NULL;
+// -- files
+cmdutil_file_info out;
 
-// global structs
-FSMSymSpec *syms = NULL;
-FSM *morph = NULL;
-
-#define DWDST_SYM_ATT_COMPAT true
-
+// -- global classes/structs
+dwds_tagger dwdst;
 
 /*--------------------------------------------------------------------------
  * Option Processing
  *--------------------------------------------------------------------------*/
 void GetMyOptions(int argc, char **argv)
 {
-  list<string> msglist;
-  int fsmtype;
-
   if (cmdline_parser(argc, argv, &args) != 0)
     exit(1);
 
   // -- show banner
-  if (args.verbose_given)
+  if (args.verbose_arg > 0)
     fprintf(stderr,
 	    "\n%s version %s by Bryan Jurish <moocow@ling.uni-potsdam.de>\n\n",
 	    PROGNAME, VERSION);
 
   // -- output file
-  if (strcmp(args.output_arg,"-") != 0) {
-    out = fopen(args.output_arg, "w");
-  } else {
-    out = stdout;
-  }
-  if (!out) {
-    fprintf(stderr,"%s: open failed for output-file '%s': %s\n", PROGNAME, args.output_arg, strerror(errno));
+  out.name = args.output_arg;
+  if (strcmp(out.name,"-") == 0) out.name = "<stdout>";
+  if (!out.open("w")) {
+    fprintf(stderr,"%s: open failed for output-file '%s': %s\n",
+	    PROGNAME, out.name, strerror(errno));
     exit(1);
   }
 
-  // -- symbol spec
-  if (args.verbose_given) {
-    fprintf(stderr,"%s: loading symbols-file '%s'...", PROGNAME, args.symbols_arg);
-  }
-  syms = new FSMSymSpec(args.symbols_arg, &msglist, DWDST_SYM_ATT_COMPAT);
-  if (!msglist.empty()) {
-    fprintf(stderr,"\n%s Error: could not parse symbols-file '%s'\n", PROGNAME, args.symbols_arg);
-    for (list<string>::iterator e = msglist.begin(); e != msglist.end(); e++) {
-      fprintf(stderr,"%s\n",e->c_str());
-    }
-    exit(1);
-  }
-  if (args.verbose_given) {
-    fprintf(stderr," symbols-file loaded.\n");
+  // -- set up file-churner
+  churner.progname = PROGNAME;
+  churner.inputs = args.inputs;
+  churner.ninputs = args.inputs_num;
+  churner.use_list = args.list_given;
+
+
+  // -- tagger object setup : flags
+  dwdst.want_avm = args.avm_given;
+  dwdst.verbose  = (args.verbose_arg > 0);
+
+  // -- tagger object setup : symbols
+  if (args.verbose_arg > 0) fprintf(stderr, "%s: loading symbols-file '%s'...", PROGNAME, args.symbols_arg);
+  if (!dwdst.load_symbols(args.symbols_arg)) {
+    fprintf(stderr,"\n%s: load FAILED for symbols-file '%s'\n", PROGNAME, args.symbols_arg);
+  } else if (args.verbose_arg > 0) {
+    fprintf(stderr," loaded.\n");
   }
 
-  // -- morphology transducer
-  if (args.verbose_given) {
-    fprintf(stderr,"%s: loading morphology FST '%s'...", PROGNAME, args.morph_arg);
+  // -- tagger object setup : morphology FST
+  if (args.verbose_arg > 0) fprintf(stderr, "%s: loading morphology FST '%s'...", PROGNAME, args.morph_arg);
+  if (!dwdst.load_morph(args.morph_arg)) {
+    fprintf(stderr,"\n%s: load FAILED for morphology FST '%s'\n", PROGNAME, args.morph_arg);
+  } else if (args.verbose_arg > 0) {
+    fprintf(stderr," loaded.\n");
   }
-  morph = new FSM(args.morph_arg);
-  fsmtype = morph->fsm_type();
-  if (!morph || !morph->representation()
-      // HACK!
-      || (fsmtype != FSMTypeTransducer &&
-	  fsmtype != FSMTypeWeightedTransducer &&
-	  fsmtype != FSMTypeSubsequentialTransducer &&
-	  fsmtype != FSMTypeAcceptor &&
-	  fsmtype != FSMTypeWeightedAcceptor))
-    {   
-      fprintf(stderr,"\n%s ERROR: load failed for morphology FST '%s'.\n", PROGNAME, args.morph_arg);
-      exit(1);
-    }
-  if (args.verbose_given) {
-    fprintf(stderr," morphology FST loaded.\n");
-  }
-  
+
   // link morph-FST to symbols file
-  if (!morph->fsm_use_symbol_spec(syms)) {
+  if (!dwdst.morph->fsm_use_symbol_spec(dwdst.syms)) {
     fprintf(stderr,"%s ERROR: could not use symbols from '%s' in FST from '%s'\n",
 	    PROGNAME, args.symbols_arg, args.morph_arg);
     exit(1);
   }
 }
+  
+
 
 /*--------------------------------------------------------------------------
  * main
  *--------------------------------------------------------------------------*/
 int main (int argc, char **argv)
 {
-  unsigned int i;
+  int nfiles = 0;
+  timeval istarted, astarted, astopped;
+  double ielapsed, aelapsed;
+
+  // -- get initialization start-time
+  if (args.verbose_arg > 0) gettimeofday(&istarted, NULL);
 
   GetMyOptions(argc,argv);
 
+  // -- get init-stop time = analysis-start time
+  if (args.verbose_arg > 0) gettimeofday(&astarted, NULL);
+
+
+  // -- the guts
   if (args.words_given) {
-    fprintf(out, "# %s: File: command-line\n\n", PROGNAME);
-    for (i = 0; i < args.inputs_num; i++) {
-      dwdst_tag_token(args.inputs[i], out, morph, syms, args.avm_given);
-    }
-  }
-  else if (args.inputs_num == 0) {
-    fprintf(out, "# %s: File: stdin\n\n", PROGNAME);
-    dwdst_tag_stream(stdin, out, morph, syms, args.avm_given);
-  }
-  else {
-    for (i = 0; i < args.inputs_num; i++) {
-      fprintf(out, "# %s: File: %s\n\n", PROGNAME, args.inputs[i]);
-      if (!(in = fopen(args.inputs[i], "r"))) {
-	fprintf(stderr, "%s: open failed for input-file '%s': %s", PROGNAME, args.inputs[i], strerror(errno));
-	exit(1);
+    fprintf(out.file, "# %s: Analyzing command-line tokens\n\n", PROGNAME);
+    dwdst.tag_strings(args.inputs_num, args.inputs, out.file);
+  } else {
+    // -- big loop
+    for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
+      if (args.verbose_arg > 0) {
+	nfiles++;
+	if (args.verbose_arg > 1) {
+	  fprintf(stderr,"%s: analyzing file '%s'... ", PROGNAME, churner.in.name);
+	  fflush(stderr);
+	}
       }
-      if (args.verbose_given) {
-	fprintf(stderr,"%s: parsing file '%s'... ", PROGNAME, args.inputs[i]);
-      }
-      dwdst_tag_stream(in, out, morph, syms, args.avm_given);
-      fclose(in);
-      if (args.verbose_given) {
+      fprintf(out.file, "\n# %s: File: %s\n\n", PROGNAME, churner.in.name);
+      
+      dwdst.tag_stream(churner.in.file, out.file);
+      
+      if (args.verbose_arg > 1) {
 	fprintf(stderr," done.\n");
+	fflush(stderr);
       }
     }
+    out.close();
+  }
+
+  // -- summary
+  if (args.verbose_arg > 0) {
+      // -- timing
+      gettimeofday(&astopped, NULL);
+
+      aelapsed = astopped.tv_sec-astarted.tv_sec + (astopped.tv_usec-astarted.tv_usec)/1000000.0;
+      ielapsed = astarted.tv_sec-istarted.tv_sec + (astarted.tv_usec-istarted.tv_usec)/1000000.0;
+
+      // -- print summary
+      fprintf(stderr, "\n-----------------------------------------------------\n");
+      fprintf(stderr, "%s Summary:\n", PROGNAME);
+      fprintf(stderr, "  + Files processed  : %d\n", nfiles);
+      fprintf(stderr, "  + Tokens processed : %d\n", dwdst.ntokens);
+      fprintf(stderr, "  + Unknown tokens   : %d\n", dwdst.nunknown);
+      fprintf(stderr, "  + Recognition Rate : ");
+      if (dwdst.ntokens > 0) {
+	// -- avoid div-by-zero errors
+	fprintf(stderr, "%.2f\n", (double)(dwdst.ntokens-dwdst.nunknown)/(double)dwdst.ntokens);
+      } else {
+	fprintf(stderr, "-NaN-\n");
+      }
+      fprintf(stderr, "  + Init Time        : %.2f sec\n", ielapsed);
+      fprintf(stderr, "  + Analysis Time    : %.2f sec\n", aelapsed);
+      fprintf(stderr, "  + Throughput       : %.2f toks/sec\n", (float)dwdst.ntokens/aelapsed);
+      fprintf(stderr, "-----------------------------------------------------\n");
   }
 
   return 0;
