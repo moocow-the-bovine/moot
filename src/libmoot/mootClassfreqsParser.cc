@@ -90,7 +90,7 @@ void *alloca ();
 #define YY_mootClassfreqsParser_DEBUG  1
 #define YY_mootClassfreqsParser_ERROR_VERBOSE 
 #define YY_mootClassfreqsParser_LEX_BODY  =0
-#line 54 "mootClassfreqsParser.yy"
+#line 55 "mootClassfreqsParser.yy"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -126,7 +126,7 @@ typedef struct {
  * \class mootClassfreqsParser
  * \brief Bison++ parser for (TnT-style) moot lexical frequency parameter files.
  */
-#line 91 "mootClassfreqsParser.yy"
+#line 92 "mootClassfreqsParser.yy"
 
 #ifdef HAVE_CONFIG_H
 # include <mootConfig.h>
@@ -153,13 +153,13 @@ typedef struct {
    virtual void yycarp(char *fmt, ...);
 #define YY_mootClassfreqsParser_CONSTRUCTOR_INIT  : cfreqs(NULL)
 
-#line 127 "mootClassfreqsParser.yy"
+#line 128 "mootClassfreqsParser.yy"
 typedef union {
   moot::mootTagString  *tagstr;         ///< for single tags (strings)
   moot::CountT           count;         ///< for tag-list counts
 } yy_mootClassfreqsParser_stype;
 #define YY_mootClassfreqsParser_STYPE yy_mootClassfreqsParser_stype
-#line 132 "mootClassfreqsParser.yy"
+#line 133 "mootClassfreqsParser.yy"
 
 /**
  * \typedef yy_mootClassfreqsParser_stype
@@ -483,8 +483,8 @@ static const short yyrhs[] = {    -1,
 
 #if YY_mootClassfreqsParser_DEBUG != 0
 static const short yyrline[] = { 0,
-   153,   154,   155,   158,   165,   166,   167,   175,   176,   182,
-   189,   195,   196,   203,   206,   207,   214,   215,   216
+   154,   155,   156,   159,   166,   167,   168,   176,   177,   183,
+   190,   196,   197,   204,   207,   208,   215,   216,   217
 };
 
 static const char * const yytname[] = {   "$","error","$illegal.","TAG","COUNT",
@@ -957,34 +957,34 @@ yyreduce:
   switch (yyn) {
 
 case 1:
-#line 153 "mootClassfreqsParser.yy"
-{ yyval.count = 0; ;
-    break;}
-case 2:
 #line 154 "mootClassfreqsParser.yy"
 { yyval.count = 0; ;
     break;}
-case 3:
+case 2:
 #line 155 "mootClassfreqsParser.yy"
 { yyval.count = 0; ;
     break;}
+case 3:
+#line 156 "mootClassfreqsParser.yy"
+{ yyval.count = 0; ;
+    break;}
 case 4:
-#line 159 "mootClassfreqsParser.yy"
+#line 160 "mootClassfreqsParser.yy"
 {
                   lclass.clear();
                   yyval.count = 0;
 		;
     break;}
 case 5:
-#line 165 "mootClassfreqsParser.yy"
+#line 166 "mootClassfreqsParser.yy"
 { yyval.count = yyvsp[0].count; ;
     break;}
 case 6:
-#line 166 "mootClassfreqsParser.yy"
+#line 167 "mootClassfreqsParser.yy"
 { yyval.count = yyvsp[-2].count; /* total is optional (not really) */ ;
     break;}
 case 7:
-#line 168 "mootClassfreqsParser.yy"
+#line 169 "mootClassfreqsParser.yy"
 {
 		  cfreqs->add_count(lclass, *yyvsp[-2].tagstr, yyvsp[0].count);
 		  delete yyvsp[-2].tagstr;
@@ -992,11 +992,11 @@ case 7:
 		;
     break;}
 case 8:
-#line 175 "mootClassfreqsParser.yy"
+#line 176 "mootClassfreqsParser.yy"
 { yyval.count = 0; ;
     break;}
 case 9:
-#line 177 "mootClassfreqsParser.yy"
+#line 178 "mootClassfreqsParser.yy"
 {
 		  lclass.insert(*yyvsp[0].tagstr);
                   delete yyvsp[0].tagstr;
@@ -1004,50 +1004,50 @@ case 9:
 		;
     break;}
 case 10:
-#line 183 "mootClassfreqsParser.yy"
+#line 184 "mootClassfreqsParser.yy"
 {
 		  lclass.insert((const char *)yylloc.text);
 		  yyval.count = 0;
 		;
     break;}
 case 11:
-#line 190 "mootClassfreqsParser.yy"
+#line 191 "mootClassfreqsParser.yy"
 {
 		  yyval.tagstr = yyvsp[0].tagstr;
 		;
     break;}
 case 12:
-#line 195 "mootClassfreqsParser.yy"
+#line 196 "mootClassfreqsParser.yy"
 { yyval.count = yyvsp[0].count; ;
     break;}
 case 13:
-#line 197 "mootClassfreqsParser.yy"
+#line 198 "mootClassfreqsParser.yy"
 {
 		    yyerror("expected a COUNT.");
                     YYABORT;
 		;
     break;}
 case 14:
-#line 203 "mootClassfreqsParser.yy"
+#line 204 "mootClassfreqsParser.yy"
 { yyval.count = yyvsp[0].count; ;
     break;}
 case 15:
-#line 206 "mootClassfreqsParser.yy"
+#line 207 "mootClassfreqsParser.yy"
 { yyval.count=0; ;
     break;}
 case 16:
-#line 208 "mootClassfreqsParser.yy"
+#line 209 "mootClassfreqsParser.yy"
 {
 		    yyerror("expected a TAB.");
                     YYABORT;
                 ;
     break;}
 case 17:
-#line 214 "mootClassfreqsParser.yy"
+#line 215 "mootClassfreqsParser.yy"
 { yyval.count=0; ;
     break;}
 case 19:
-#line 217 "mootClassfreqsParser.yy"
+#line 218 "mootClassfreqsParser.yy"
 {
 		    yyerror("expected a NEWLINE.");
                     YYABORT;
@@ -1255,7 +1255,7 @@ yyerrhandle:
 /* END */
 
 /* #line 909 "/usr/local/share/flex++bison++/bison.cc" */
-#line 223 "mootClassfreqsParser.yy"
+#line 224 "mootClassfreqsParser.yy"
 
 /* -------------- body section -------------- */
 

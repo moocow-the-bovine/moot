@@ -22,7 +22,7 @@
 #define YY_mootNgramsParser_DEBUG  1
 #define YY_mootNgramsParser_ERROR_VERBOSE 
 #define YY_mootNgramsParser_LEX_BODY  =0
-#line 54 "mootNgramsParser.yy"
+#line 55 "mootNgramsParser.yy"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,14 +85,14 @@ typedef struct {
    ngrams(NULL), \
    alltags(NULL)
 
-#line 129 "mootNgramsParser.yy"
+#line 130 "mootNgramsParser.yy"
 typedef union {
   moot::mootNgrams::Ngram         *ngram;            ///< for tag-lists
   moot::mootTagString            *tagstr;            ///< for single tags (strings)
   moot::mootNgrams::NgramCount     count;            ///< for tag-list counts
 } yy_mootNgramsParser_stype;
 #define YY_mootNgramsParser_STYPE yy_mootNgramsParser_stype
-#line 135 "mootNgramsParser.yy"
+#line 136 "mootNgramsParser.yy"
 
 /**
  * \typedef yy_mootNgramsParser_stype

@@ -90,7 +90,7 @@ void *alloca ();
 #define YY_mootNgramsParser_DEBUG  1
 #define YY_mootNgramsParser_ERROR_VERBOSE 
 #define YY_mootNgramsParser_LEX_BODY  =0
-#line 54 "mootNgramsParser.yy"
+#line 55 "mootNgramsParser.yy"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -125,7 +125,7 @@ typedef struct {
  * \class mootNgramsParser
  * \brief Bison++ parser for (TnT-style) moot ngram-parameter files.
  */
-#line 90 "mootNgramsParser.yy"
+#line 91 "mootNgramsParser.yy"
 
 #ifdef HAVE_CONFIG_H
 # include <mootConfig.h>
@@ -158,14 +158,14 @@ typedef struct {
    ngrams(NULL), \
    alltags(NULL)
 
-#line 129 "mootNgramsParser.yy"
+#line 130 "mootNgramsParser.yy"
 typedef union {
   moot::mootNgrams::Ngram         *ngram;            ///< for tag-lists
   moot::mootTagString            *tagstr;            ///< for single tags (strings)
   moot::mootNgrams::NgramCount     count;            ///< for tag-list counts
 } yy_mootNgramsParser_stype;
 #define YY_mootNgramsParser_STYPE yy_mootNgramsParser_stype
-#line 135 "mootNgramsParser.yy"
+#line 136 "mootNgramsParser.yy"
 
 /**
  * \typedef yy_mootNgramsParser_stype
@@ -495,8 +495,8 @@ static const short yyrhs[] = {    -1,
 
 #if YY_mootNgramsParser_DEBUG != 0
 static const short yyrline[] = { 0,
-   157,   158,   159,   162,   174,   178,   186,   197,   209,   222,
-   223,   230,   231,   238,   239,   240
+   158,   159,   160,   163,   175,   179,   187,   198,   210,   223,
+   224,   231,   232,   239,   240,   241
 };
 
 static const char * const yytname[] = {   "$","error","$illegal.","TAG","COUNT",
@@ -967,19 +967,19 @@ yyreduce:
   switch (yyn) {
 
 case 1:
-#line 157 "mootNgramsParser.yy"
-{ yyval.count = 0; ;
-    break;}
-case 2:
 #line 158 "mootNgramsParser.yy"
 { yyval.count = 0; ;
     break;}
-case 3:
+case 2:
 #line 159 "mootNgramsParser.yy"
 { yyval.count = 0; ;
     break;}
+case 3:
+#line 160 "mootNgramsParser.yy"
+{ yyval.count = 0; ;
+    break;}
 case 4:
-#line 163 "mootNgramsParser.yy"
+#line 164 "mootNgramsParser.yy"
 {
 		  // -- single-parameter: add the parsed parameter to our table
 		  ngrams->add_count(curngram, yyvsp[-1].count);
@@ -991,20 +991,20 @@ case 4:
 		;
     break;}
 case 5:
-#line 175 "mootNgramsParser.yy"
+#line 176 "mootNgramsParser.yy"
 {
 		    yyval.ngram = yyvsp[0].ngram;
 		;
     break;}
 case 6:
-#line 179 "mootNgramsParser.yy"
+#line 180 "mootNgramsParser.yy"
 {
 		    // -- tab-separated tags: add to the current ngram (implicit in ngtag rule)
 		    yyval.ngram = yyvsp[0].ngram;
 		;
     break;}
 case 7:
-#line 187 "mootNgramsParser.yy"
+#line 188 "mootNgramsParser.yy"
 {
 		    // -- empty: add corresponding tag from previous ngram to current ngram
 		    if (prevngram.empty()) {
@@ -1017,7 +1017,7 @@ case 7:
 		;
     break;}
 case 8:
-#line 198 "mootNgramsParser.yy"
+#line 199 "mootNgramsParser.yy"
 {
 		    // -- single tag: add it to the current ngram
 		    curngram.push_back(*yyvsp[0].tagstr);
@@ -1029,40 +1029,40 @@ case 8:
 		;
     break;}
 case 9:
-#line 210 "mootNgramsParser.yy"
+#line 211 "mootNgramsParser.yy"
 {
 		    if (alltags) alltags->insert(*yyvsp[0].tagstr);
 		    yyval.tagstr = yyvsp[0].tagstr;
 		;
     break;}
 case 10:
-#line 222 "mootNgramsParser.yy"
+#line 223 "mootNgramsParser.yy"
 { yyval.count = yyvsp[0].count; ;
     break;}
 case 11:
-#line 224 "mootNgramsParser.yy"
+#line 225 "mootNgramsParser.yy"
 {
 		    yyerror("expected a count.");
                     YYABORT;
 		;
     break;}
 case 12:
-#line 230 "mootNgramsParser.yy"
+#line 231 "mootNgramsParser.yy"
 { yyval.count=0; ;
     break;}
 case 13:
-#line 232 "mootNgramsParser.yy"
+#line 233 "mootNgramsParser.yy"
 {
 		    yyerror("expected a TAB.");
                     YYABORT;
                 ;
     break;}
 case 14:
-#line 238 "mootNgramsParser.yy"
+#line 239 "mootNgramsParser.yy"
 { yyval.count=0; ;
     break;}
 case 16:
-#line 241 "mootNgramsParser.yy"
+#line 242 "mootNgramsParser.yy"
 {
 		    yyerror("expected a NEWLINE.");
                     YYABORT;
@@ -1270,7 +1270,7 @@ yyerrhandle:
 /* END */
 
 /* #line 909 "/usr/local/share/flex++bison++/bison.cc" */
-#line 247 "mootNgramsParser.yy"
+#line 248 "mootNgramsParser.yy"
 
 /* -------------- body section -------------- */
 

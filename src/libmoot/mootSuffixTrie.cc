@@ -4,19 +4,19 @@
    libmoot : moocow's part-of-speech tagging library
    Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+   
+   This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+   
+   You should have received a copy of the GNU Lesser General Public
+   License along with this library; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
 /*--------------------------------------------------------------------------
@@ -26,6 +26,7 @@
  *   + moocow's PoS tagger : suffix trie
  *--------------------------------------------------------------------------*/
 
+#include <mootConfig.h>
 #include <mootSuffixTrie.h>
 #include <stdio.h>
 #include <math.h>
@@ -74,13 +75,13 @@ using namespace std;
 /*--------------------------------------------------------------------------
  * Smoothing Initialization methods
  */
-//-- Define this to use global P(t) for empty suffix
-//#define SMOOTH_EMPTY_AS_GLOBAL
+//-- Define this to use global P(t) for empty suffix (a la Brants 2000)
+#define SMOOTH_EMPTY_AS_GLOBAL
 
-//-- Define this to use local P_{low}(t) for empty suffix
-#define SMOOTH_EMPTY_AS_EMPTY
+//-- Define this to use local P_{low}(t) for empty suffix  (a la acopost)
+//#define SMOOTH_EMPTY_AS_EMPTY
 
-//-- Define this to use lexical entriy @UNKNOWN for empty suffix
+//-- Define this to use lexical entriy @UNKNOWN for empty suffix (also a la acopost, variant)
 //   (NYI)
 //#define SMOOTH_EMTPY_AS_UNKNOWN
 
@@ -129,14 +130,15 @@ using namespace std;
  * Suffix Item Selection
  */
 //-- define this to ignore non-alphabetic tokens in trie construction
-#define IGNORE_NON_ALPHAS
+//#define IGNORE_NON_ALPHAS
 
 /*--------------------------------------------------------------------------
  * Debug
  */
 //-- define this for verbose debugging
 #define SUFFIX_TRIE_DEBUG
-#ifdef SUFFIX_TRIE_DEBUG
+
+#if defined(MOOT_DEBUG_ENABLED) && defined(SUFFIX_TRIE_DEBUG)
 # define DEBUG(code) code
 #else
 # define DEBUG(code)
@@ -163,6 +165,8 @@ bool SuffixTrie::build(const mootLexfreqs &lf,
     fprintf(stderr, "\nSuffixTrie::build(): insertion FAILED.\n");
     return false;
   }
+  DEBUG(fprintf(stderr, "\n->DEBUG: post-insert: pending size=%u\n", trie_pending.size()));
+
 
   //-- compile: populate adjaceny table
   if (verbose) { fprintf(stderr, ", compile"); fflush(stderr); }
@@ -180,6 +184,7 @@ bool SuffixTrie::build(const mootLexfreqs &lf,
     fprintf(stderr, "\nSuffixTrie::build(): empty trie -- aborting build.\n");
     return false;
   }
+  DEBUG(fprintf(stderr, "\n->DEBUG: begin()->data.size()=%u\n", begin()->data.size()));
 
 
   //-- smooth: theta: compute smoothing constants
@@ -289,7 +294,6 @@ bool SuffixTrie::_build_compute_theta(const mootLexfreqs &lf,
 					  const TagIDTable   &tagids,
 					  TagID eos_tagid)
 {
-  ProbT lextotal = lf.n_tokens;
   ProbT ugtotal  = ng.ugtotal - ng.lookup(tagids.id2name(eos_tagid));
   theta          = 0;
 
@@ -312,7 +316,7 @@ bool SuffixTrie::_build_compute_theta(const mootLexfreqs &lf,
 
   DEBUG(fprintf(stderr, \
 		"\n-> DEBUG[Brants]: size=%u; lextotal=%g ; ugtotal=%g ; ntags=%g; pavg=%g; theta=%g\n",\
-		size(), lextotal, ugtotal, ntags, pavg, theta));
+		size(), lf.n_tokens, ugtotal, ntags, pavg, theta));
 
 #elif defined(SMOOTH_ALA_STDDEV)
 
@@ -346,7 +350,7 @@ bool SuffixTrie::_build_compute_theta(const mootLexfreqs &lf,
 
   DEBUG(fprintf(stderr, \
 		"\n-> DEBUG[stddev]: size=%u; lextotal=%g ; ugtotal=%g ; ntags=%g; pavg=%g; theta=%g\n",\
-		size(), lextotal, ugtotal, ntags, pavg, theta));
+		size(), lf.n_tokens, ugtotal, ntags, pavg, theta));
 
 #elif defined(SMOOTH_ALA_ACOPOST)
 
@@ -369,7 +373,7 @@ bool SuffixTrie::_build_compute_theta(const mootLexfreqs &lf,
 
   DEBUG(fprintf(stderr, \
 		"\n-> DEBUG[acopost]: size=%u; lextotal=%g ; ugtotal=%g ; ntags=%g; theta=%g\n",\
-		size(), lextotal, ugtotal, ntags, theta));
+		size(), lf.n_tokens, ugtotal, ntags, theta));
 
 #elif defined(SMOOTH_ALA_SAMUELSSON)
 
@@ -377,7 +381,7 @@ bool SuffixTrie::_build_compute_theta(const mootLexfreqs &lf,
   theta = sqrt(((ProbT)begin()->data[0])/((ProbT)size()));
   DEBUG(fprintf(stderr, \
 		"\n-> DEBUG[Samuelsson]: size=%u; lextotal=%g ; ugtotal=%g ; suftotal=%g; avg(theta)=%g\n",\
-		size(), lextotal, ugtotal, begin()->data[0], theta));
+		size(), lf.n_tokens, ugtotal, begin()->data[0], theta));
 
 #endif // SMOOTH_ALA_BRANTS / SMOOTH_ALA_STDDEV / SMOOTH_ALA_ACOPOST / SMOOTH_ALA_SAMUELSSON
 
@@ -392,10 +396,10 @@ bool SuffixTrie::_build_compute_mles(const mootLexfreqs &lf,
 					 const TagIDTable   &tagids,
 					 TagID eos_tagid)
 {
-  iterator                         ti;
-  SuffixTrieDataT::iterator        tdi;
-  SuffixTrieDataT::iterator        tdi_zero;
-  ProbT                      lextotal = lf.n_tokens;
+  iterator                    ti;
+  SuffixTrieDataT::iterator   tdi;
+  SuffixTrieDataT::iterator   tdi_zero;
+  ProbT                       lextotal = lf.n_tokens;
 #ifndef SMOOTH_EMPTY_AS_EMPTY
   ProbT                      ugtotal  = ng.ugtotal - ng.lookup(tagids.id2name(eos_tagid));
 #endif
@@ -410,8 +414,8 @@ bool SuffixTrie::_build_compute_mles(const mootLexfreqs &lf,
     //-- get mother Id and iterator
     NodeId           momid = ti->mother;
     const_iterator    momi = find_mother(*ti);
-    size_t         nesteps;
-    const_iterator  nemomi = find_ancestor_nonempty(*momi, &nesteps);
+    size_t          nesteps= 0;
+    const_iterator  nemomi = const_find_ancestor_nonempty(momi, &nesteps);
     SuffixTrieDataT::const_iterator  nemomdi;
 
     //-- process current and all sister nodes
@@ -448,7 +452,7 @@ bool SuffixTrie::_build_compute_mles(const mootLexfreqs &lf,
 	    if (tagid == 0) continue;
 
 	    //-- repeatedly smooth momp nesteps times
-	    for (size_t ns = 0; ns < nesteps; ns++) {
+	    for (size_t ns = 0; ns < -nesteps; ns++) {
 #ifdef SMOOTH_ALA_SAMUELSSON
 	      ProbT sqrtMomN = sqrt(nemomi->data[0]*lextotal);
 	      momp           = (sqrtMomN*momp + momp) / (1.0+sqrtMomN);

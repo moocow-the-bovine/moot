@@ -4,19 +4,19 @@
    libmoot : moocow's part-of-speech tagging library
    Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+   
+   This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+   
+   You should have received a copy of the GNU Lesser General Public
+   License along with this library; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
 /*--------------------------------------------------------------------------
@@ -49,7 +49,8 @@ class SuffixTrie : public TrieVector<SuffixTrieDataT>
 public:
   //------------------------------------------------------------
   // SuffixTrie: Static Data
-  static const size_t SuffixTrieDefaultMaxLen = 10;
+  //static const size_t SuffixTrieDefaultMaxLen = 10;
+  static const size_t SuffixTrieDefaultMaxLen = 0;
 
 public:
   //------------------------------------------------------------
@@ -79,7 +80,9 @@ public:
   /// \name Constructors etc.
   //@{
   /** Default constructor */
-  SuffixTrie(size_t max_length=SuffixTrieDefaultMaxLen, bool use_case=true, size_t max_count=10)
+  SuffixTrie(size_t max_length =SuffixTrieDefaultMaxLen,
+	     bool   use_case   =true,
+	     size_t max_count  =10)
     : TrieType(max_length,use_case),
       maxcount(max_count)
   {};
@@ -134,46 +137,38 @@ public:
   //@{
   /** Get first ancestor (or self) with non-empty data,
    * or end() on failure (read/write) */
-  inline iterator find_ancestor_nonempty(const node_type &dtr, size_t *nsteps=NULL)
+  inline iterator find_ancestor_nonempty(iterator dtr, size_t *matchlen=NULL)
   {
-    iterator ai;
-    if (nsteps) *nsteps = 0;
-    for (ai=find_mother(dtr); ai != end() && ai->data.empty(); ai=find_mother(*ai)) {
-      if (nsteps) (*nsteps)++;
+    if (matchlen) *matchlen = 0;
+    for ( ; dtr != end() && dtr->data.empty(); dtr=find_mother(*dtr)) {
+      if (matchlen) (*matchlen)--;
     }
-    return ai;
+    return dtr;
   };
 
   /** Get first real ancestor (or self) with non-empty data,
    * or end() on failure (read-only) */
-  inline const_iterator find_ancestor_nonempty(const node_type &dtr, size_t *nsteps=NULL)
+  inline const_iterator const_find_ancestor_nonempty(const_iterator dtr, size_t *matchlen=NULL)
     const
   {
-    const_iterator ai;
-    if (nsteps) *nsteps = 0;
-    for (ai=find_mother(dtr); ai != end() && ai->data.empty(); ai=find_mother(*ai)) {
-      if (nsteps) (*nsteps)++;
+    if (matchlen) *matchlen = 0;
+    for ( ; dtr != end() && dtr->data.empty(); dtr=find_mother(*dtr)) {
+      if (matchlen) (*matchlen)--;
     }
-    return ai;
+    return dtr;
   };
 
 
   /** Get reverse-longest match iterator with actual data, read/write */
   inline iterator rfind_longest_nonempty(const mootTokString &tokstr,
 					 size_t              *matchlen=NULL)
-  {
-    iterator ti = rfind_longest(tokstr, matchlen);
-    return (ti==end() || !ti->data.empty() ? ti : find_ancestor_nonempty(*ti));
-  };
+  { return find_ancestor_nonempty(rfind_longest(tokstr,matchlen),matchlen); };
 
   /** Get reverse-longest match iterator with actual data, read-only */
   inline const_iterator rfind_longest_nonempty(const mootTokString &tokstr,
 					       size_t              *matchlen=NULL)
     const
-  {
-    const_iterator ti = rfind_longest(tokstr, matchlen);
-    return (ti==end() || !ti->data.empty() ? ti : find_ancestor_nonempty(*ti));
-  };
+  { return const_find_ancestor_nonempty(rfind_longest(tokstr,matchlen),matchlen); };
 
 
   /** Get (log-) probability table tagid=>log(P(tokstr|tagid))

@@ -19,7 +19,7 @@ SHARE_MOOT ?= $(shell cd share-moot ; pwd -P)
 
 MOOTM_BINDIR ?= $(shell cd $(SHARE_MOOT)/../../bin ; pwd -P)
 MOOTM ?= $(MOOTM_BINDIR)/mootm
-MOOTM_FLAGS ?= -m $(SHARE_MOOT)/moot-stts-nofeatures.fst -d1024
+MOOTM_FLAGS ?= -a -m $(SHARE_MOOT)/moot-stts-nofeatures.fst -d1024
 
 ##-- Morph: MorphConsole
 MORPHC_BINDIR ?= $(MOOTM_BINDIR)

@@ -35,6 +35,7 @@ pkgdoc_DATA = \
 	$(PODS:.pod=.txt) \
 	AUTHORS \
 	COPYING \
+	COPYING.LIB \
 	ChangeLog
 
 #-----------------------------------------------------------------------

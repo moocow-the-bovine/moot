@@ -181,6 +181,7 @@ bool load_model(char *modelname)
  *--------------------------------------------------------------------------*/
 int main (int argc, char **argv)
 {
+ try {
   GetMyOptions(argc,argv);
 
   //-- the guts : load input model(s)
@@ -359,6 +360,11 @@ int main (int argc, char **argv)
     fprintf(stderr, "%s   Beam Width        : %g\n",
 	    cmts, hmm.beamwd);
   }
+ }
+ catch (exception &e) {
+   fprintf(stderr, "%s: Exception: %s\n", PROGNAME, e.what());
+   abort();
+ }
 
   return 0;
 }

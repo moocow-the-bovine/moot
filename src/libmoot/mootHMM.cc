@@ -4,19 +4,19 @@
    libmoot : moocow's part-of-speech tagging library
    Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+   
+   This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+   
+   You should have received a copy of the GNU Lesser General Public
+   License along with this library; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
 
@@ -52,6 +52,9 @@ using namespace mootio;
  *--------------------------------------------------------------------------*/
 //-- define this to resort to hapax counts when no suffix matches
 #define NO_SUFFIX_USE_HAPAX
+
+//-- define this to sort lexical assoc vectors by probability on compute_logprobs()
+//#define LEX_SORT_BYVALUE
 
 /*--------------------------------------------------------------------------
  * Constructor
@@ -1004,11 +1007,11 @@ bool mootHMM::estimate_wlambdas(const mootLexfreqs &lf)
 {
   //-- estimate lexical smoothing constants
   if (lf.n_tokens > 0) {
-    //wlambda0 = 0.5 / (ProbT)(lf.n_tokens);
-    wlambda0 = 1.0 / (ProbT)(lf.n_tokens);
+    wlambda0 = 0.5 / (ProbT)(lf.n_tokens);
+    //wlambda0 = 1.0 / (ProbT)(lf.n_tokens);
     wlambda1 = 1.0 - wlambda0;
   } else {
-    wlambda0 = DBL_EPSILON;
+    wlambda0 = mootProbEpsilon;
     wlambda1 = 1.0 - wlambda0;
   }
   return true;
@@ -1021,11 +1024,11 @@ bool mootHMM::estimate_clambdas(const mootClassfreqs &cf)
 {
   //-- estimate lexical-class smoothing constants
   if (cf.totalcount > 0) {
-    //clambda0 = 0.5 / (ProbT)(cf.totalcount);
-    clambda0 = 1.0 / (ProbT)(cf.totalcount);
+    clambda0 = 0.5 / (ProbT)(cf.totalcount);
+    //clambda0 = 1.0 / (ProbT)(cf.totalcount);
     clambda1 = 1.0 - clambda0;
   } else {
-    clambda0 = DBL_EPSILON;
+    clambda0 = mootProbEpsilon;
     clambda1 = 1.0 - clambda0;
   }
   return true;
@@ -1174,8 +1177,13 @@ bool mootHMM::compute_logprobs(void)
 	 lpsi != lpi->end();
 	 lpsi++)
       {
-	lpsi->second = log(wlambda0 + (wlambda1 * lpsi->second));
+	//lpsi->second = log(wlambda0 + (wlambda1 * lpsi->second));
+	lpsi->second = log(wlambda1 * lpsi->second);
       }
+#ifdef LEX_SORT_BYVALUE
+    //-- sort it
+    lpi->sort_byvalue();
+#endif
   }
 
   //-- class probabilities
@@ -1184,8 +1192,13 @@ bool mootHMM::compute_logprobs(void)
 	 lcpsi != lcpi->end();
 	 lcpsi++)
       {
-	lcpsi->second = log(clambda0 + (clambda1 * lcpsi->second));
+	//lcpsi->second = log(clambda0 + (clambda1 * lcpsi->second));
+	lcpsi->second = log(clambda1 * lcpsi->second);
       }
+#ifdef LEX_SORT_BYVALUE
+    //-- sort it
+    lcpi->sort_byvalue();
+#endif
   }
 
   //-- suffix-trie probabilities
@@ -1193,6 +1206,10 @@ bool mootHMM::compute_logprobs(void)
     for (SuffixTrieDataT::iterator stdi = sti->data.begin(); stdi != sti->data.end(); stdi++) {
       stdi->second = log(stdi->second);
     }
+#ifdef LEX_SORT_BYVALUE
+    //-- sort it
+    sti->data.sort_byvalue();
+#endif
   }
 
   //-- smoothing constants
@@ -1261,6 +1278,7 @@ void mootHMM::viterbi_clear(void)
   row = vtable->rows = viterbi_get_row();
   row->tagid         = start_tagid;
   row->row_next      = NULL;
+  row->wprob         = MOOT_PROB_ONE;
 
   nod = row->nodes   = viterbi_get_node();
   nod->tagid         = start_tagid;
@@ -1272,6 +1290,7 @@ void mootHMM::viterbi_clear(void)
 
   nod = vtable->rows = viterbi_get_node();
   nod->tagid         = start_tagid;
+  nod->wprob         = MOOT_PROB_ONE;
   nod->lprob         = MOOT_PROB_ONE;
 
 #endif // MOOT_USE_TRIGRAMS
@@ -1357,15 +1376,13 @@ void mootHMM::viterbi_step(TokID tokid,
 
   //-- set constants
   const LexProbSubTable *lps;
-  ProbT wclambda0, wclambda1;
+  ProbT wclambda0;
   if (tokid != 0) {
     lps   = &(lexprobs[tokid]);
     wclambda0 = wlambda0;
-    wclambda1 = wlambda1;
   }
   else if (use_lex_classes) {
     wclambda0 = wlambda0;
-    wclambda1 = wlambda1;
     if (classid != 0) {
       lps   = &(lcprobs[classid]);
     } else {
@@ -1383,7 +1400,6 @@ void mootHMM::viterbi_step(TokID tokid,
     if (!matchlen) lps = &(lexprobs[0]);
 #endif
     wclambda0 = wlambda0;
-    wclambda1 = wlambda1;
   }
 
   //-- Get next column
@@ -1810,7 +1826,7 @@ void mootHMM::txtdump(FILE *file)
 /*--------------------------------------------------------------------------
  * Debug: Viterbi Trellis Dump
  *--------------------------------------------------------------------------*/
-void mootHMM::viterbi_txtdump(TokenWriter *w)
+void mootHMM::viterbi_txtdump(TokenWriter *w, int ncols)
 {
   w->put_comment_block_begin();
   w->printf_raw("%%%%*********************************************************************\n");
@@ -1821,7 +1837,7 @@ void mootHMM::viterbi_txtdump(TokenWriter *w)
   size_t         coli;
 
   for (coli = 0, col = vtable; col != NULL; col = col->col_prev, coli++) {
-    viterbi_txtdump_col(w,col,coli);
+    viterbi_txtdump_col(w,col,ncols-coli);
   }
 
   w->printf_raw("%%%%*********************************************************************\n");
@@ -1833,7 +1849,7 @@ void mootHMM::viterbi_txtdump(TokenWriter *w)
 /*--------------------------------------------------------------------------
  * Debug: Viterbi Column Dump
  *--------------------------------------------------------------------------*/
-void mootHMM::viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, size_t colnum)
+void mootHMM::viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, int colnum)
 {
   w->put_comment_block_begin();
 
@@ -1843,7 +1859,7 @@ void mootHMM::viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, size_t col
   size_t          rowi;
 
   w->printf_raw("%%%%=================================================================\n");
-  w->printf_raw("%%%% COLUMN %u : (log) beamwd=%e ; bbestpr=%e ; bpprmin=%e ; cutoff=%e\n",
+  w->printf_raw("%%%% COLUMN %3d: (log) beamwd=%e ; bbestpr=%e ; bpprmin=%e ; cutoff=%e\n",
 		colnum, beamwd, col->bbestpr, col->bpprmin, col->bbestpr-beamwd);
   w->printf_raw("%%%%           : (exp) beamwd=%e ; bbestpr=%e ; bpprmin=%e ; cutoff=%e\n",
 		exp(beamwd), exp(col->bbestpr), exp(col->bpprmin), exp(col->bbestpr-beamwd));
@@ -1851,8 +1867,9 @@ void mootHMM::viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, size_t col
 
   for (rowi = 0, row = col->rows; row != NULL; row = row->row_next, rowi++) {
     w->printf_raw("%%%%-----------------------------------------------------\n");
-    w->printf_raw("%%%% ROW %u.%u [tag=%u(\"%s\")]\n",
-		  colnum, rowi, row->tagid, tagids.id2name(row->tagid).c_str());
+    w->printf_raw("%%%% ROW %d.%u [tag=%u(\"%s\")] ; l(wordp)=%e ; wordp=%e\n",
+		  colnum, rowi, row->tagid, tagids.id2name(row->tagid).c_str(),
+		  row->wprob, exp(row->wprob));
     w->printf_raw
       ("%%%% TagID(\"Str\")\t [PrevTagID(\"PStr\")]\t <PPrevTagID(\"PPStr\")>:\t log(p) (=p)\n");
 
@@ -1882,12 +1899,12 @@ void mootHMM::viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, size_t col
   ViterbiNode    *node;
 
   w->printf_raw("%%%%=================================================================\n");
-  w->printf_raw("%%%% COLUMN %u : (log) beamwd=%e ; bbestpr=%e ; bpprmin=%e ; cutoff=%e\n",
+  w->printf_raw("%%%% COLUMN %3d: (log) beamwd=%e ; bbestpr=%e ; bpprmin=%e ; cutoff=%e\n",
 		colnum, beamwd, col->bbestpr, col->bpprmin, col->bbestpr-beamwd);
   w->printf_raw("%%%%           : (exp) beamwd=%e ; bbestpr=%e ; bpprmin=%e ; cutoff=%e\n",
 		exp(beamwd), exp(col->bbestpr), exp(col->bpprmin), exp(col->bbestpr-beamwd));
 
-  w->printf_raw("%%%% TagID(\"Str\")\t <PrevTagID(\"PStr\")>:\t log(p)\t (=p)\n");
+  w->printf_raw("%%%% TagID(\"Str\")\t <PrevTagID(\"PStr\")>:\t log(p)\t (=p)\t log(wp)\t (=wp)\n");
 
   for (node = col->rows; node != NULL; node = node->nod_next) {
     if (node->pth_prev == NULL) {
@@ -1895,14 +1912,18 @@ void mootHMM::viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, size_t col
       w->printf_raw("%u(\"%s\")\t <(NULL)>\t: %e\t (=%e)\n",
 		    node->tagid,   tagids.id2name(node->tagid).c_str(),
 		    node->lprob,
-		    exp(node->lprob)
+		    exp(node->lprob),
+		    node->wprob,
+		    exp(node->wprob)
 		    );
     } else {
-      w->printf_raw("%u(\"%s\")\t <%u(\"%s\")>\t: %e\t (=%e)\n",
+      w->printf_raw("%u(\"%s\")\t <%u(\"%s\")>\t: %e\t (=%e)\t %e (=%e)\n",
 		    node->tagid,             tagids.id2name(node->tagid).c_str(),
 		    node->pth_prev->tagid,   tagids.id2name(node->pth_prev->tagid).c_str(),
 		    node->lprob,
-		    exp(node->lprob)
+		    exp(node->lprob),
+		    node->wprob,
+		    exp(node->wprob)
 		    );
     }
   }

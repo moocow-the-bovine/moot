@@ -22,7 +22,7 @@
 #define YY_mootLexfreqsParser_DEBUG  1
 #define YY_mootLexfreqsParser_ERROR_VERBOSE 
 #define YY_mootLexfreqsParser_LEX_BODY  =0
-#line 54 "mootLexfreqsParser.yy"
+#line 55 "mootLexfreqsParser.yy"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -78,13 +78,13 @@ typedef struct {
    virtual void yycarp(char *fmt, ...);
 #define YY_mootLexfreqsParser_CONSTRUCTOR_INIT  : lexfreqs(NULL), alltags(NULL)
 
-#line 125 "mootLexfreqsParser.yy"
+#line 126 "mootLexfreqsParser.yy"
 typedef union {
   moot::mootTokString *tokstr;         ///< for single tokens or tags (strings)
   moot::CountT           count;         ///< for tag-list counts
 } yy_mootLexfreqsParser_stype;
 #define YY_mootLexfreqsParser_STYPE yy_mootLexfreqsParser_stype
-#line 130 "mootLexfreqsParser.yy"
+#line 131 "mootLexfreqsParser.yy"
 
 /**
  * \typedef yy_mootLexfreqsParser_stype

@@ -11,7 +11,7 @@
 ##-----------------------------------------------------------------------
 
 ## --- recursion subdirectories
-SUBDIRS = libmoot programs
+SUBDIRS = libmoot programs tutorial
 
 #-----------------------------------------------------------------------
 # Variables: cleanup
@@ -32,7 +32,7 @@ MAINTAINERCLEANFILES = *~ .*~ Makefile Makefile.in
 #-----------------------------------------------------------------------
 # Variables: (un)install
 #-----------------------------------------------------------------------
-pkgdoc_UNINSTALL_FILES = libmoot programs README.txt
+pkgdoc_UNINSTALL_FILES = libmoot programs tutorial README.txt
 uninstall-local:
 	for f in $(pkgdoc_UNINSTALL_FILES) ; do \
 	   rm -rf $(DESTDIR)$(pkgdocdir)/$$f ;\

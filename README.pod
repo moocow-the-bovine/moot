@@ -2,7 +2,7 @@
 
 README for package 'moot'
 
-Last updated for moot version 2.0.0
+Last updated for moot version 2.0.4-pre2
 
 =head1 DESCRIPTION
 
@@ -147,7 +147,7 @@ Development of this package was supported by the project
 'Kollokationen im Wörterbuch'
 ("collocations in the dictionary", http://www.bbaw.de/forschung/kollokationen )
 in association with the project
-'Digitales Wörterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
+'Digitales Wörterbuch deutscher Sprache des 20. Jahrhunderts (DWDS)'
 ("digital dictionary of the German language of the 20th century", http://www.dwds.de )
 at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de )
 with funding from

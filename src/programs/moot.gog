@@ -83,6 +83,11 @@ Print everything.
 =back
 "
 
+flag  "no-header" H  "Suppres leading comments in destination file." \
+    details="
+Primarily useful as a workaround for nonconformant conservative XML output.
+"
+
 int   "dots"   d  "Print a dot for every NTOKS tokens processed." \
     arg="NTOKS" \
     default="0" \
@@ -164,10 +169,12 @@ on model file formats.
 
 int "trie-depth"  a "Maximum depth of suffix trie." \
     arg="LEN" \
-    default="10" \
+    default="0" \
     details="
 Use suffixes of up to LEN characters to estimate probabilities
 of unknown words.
+
+B<Warning>: this feature is B<EXPERIMENTAL>!  Use at your own risk.
 "
 
 int "trie-threshhold" A "Frequency upper bound for trie inclusion." \

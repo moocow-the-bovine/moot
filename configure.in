@@ -51,6 +51,10 @@ if test "$enable_debug" == "yes" ; then
    AC_MSG_RESULT(yes)
    AC_DISABLE_SHARED
    moot_OFLAGS="-g"
+
+   AC_DEFINE(MOOT_DEBUG_ENABLED,1,
+	     [Define this to enable debugging code])
+   DOXY_DEFINES="$DOXY_DEFINES MOOT_DEBUG_ENABLED=1"
    #CONFIG_OPTIONS="$CONFIG_OPTIONS DEBUG=1"
    CONFIG_OPTIONS="DEBUG=1"
 else
@@ -472,10 +476,12 @@ AC_ARG_WITH(docdir,
 	[docdir="\${datadir}/doc"])
 pkgdocdir="\${docdir}/\${PACKAGE}"
 pkgdocprogdir="\${docdir}/\${PACKAGE}/programs"
+pkgdoctutdir="\${docdir}/\${PACKAGE}/tutorial"
 
 AC_SUBST(docdir)
 AC_SUBST(pkgdocdir)
 AC_SUBST(pkgdocprogdir)
+AC_SUBST(pkgdoctutdir)
 
 AC_ARG_WITH(doc-formats,
 	AC_HELP_STRING([--with-doc-formats=LIST],
@@ -828,6 +834,7 @@ dnl AC_CONFIG_FILES(doc/libmoot/mainpage.dox)
 dnl AC_CONFIG_FILES(doc/libmoot/doxy-filter.cfg)
 AC_CONFIG_FILES(doc/libmoot/libmoot.doxy doc/libmoot/Makefile)
 AC_CONFIG_FILES(doc/programs/Makefile)
+AC_CONFIG_FILES(doc/tutorial/Makefile)
 AC_CONFIG_FILES(doc/Makefile)
 AC_CONFIG_FILES(config/Makefile)
 AC_CONFIG_FILES(Makefile)

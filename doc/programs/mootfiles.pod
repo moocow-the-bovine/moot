@@ -1004,7 +1004,7 @@ Bryan Jurish E<lt>moocow@ling.uni-potsdam.deE<gt>
 
 =head1 SEE ALSO
 
-L<mootpp>, L<mootrain>, L<mootm>, L<moothmm>, L<moot>
+L<mootutils>
 
 =cut
 

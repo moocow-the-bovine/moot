@@ -1,7 +1,16 @@
 ChangeLog for package moot
 
 Todo:
-	+ write perl-XS interface & utilities
+   + write perl-XS interface & utilities
+
+v2.0.4-pre2 Sun, 08 Aug 2004 15:59:56 +0200
+	+ set default trie length to zero pending debugging
+	+ changed license clause to LGPL in library files
+	+ added COPYING.LIB (LGP-2.1) in distribution root dir
+	+ added --no-header flag to 'moot'
+	  - suppresses leading comments in output files,
+	    hack to allow strict XML well-formedness
+	+ added doc/tutorial/ with moottut(1)
 
 v2.0.4-pre1 Sat, 31 Jul 2004 13:56:22 +0200
 	+ added mootTrieVector

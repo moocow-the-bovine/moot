@@ -4,19 +4,19 @@
    libmoot : moocow's part-of-speech tagging library
    Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+   
+   This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+   
+   You should have received a copy of the GNU Lesser General Public
+   License along with this library; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
 /*--------------------------------------------------------------------------
@@ -100,14 +100,11 @@
 #define MOOT_LEX_NONALPHA
 //#undef MOOT_LEX_NONALPHA
 
-
 /**
- * \def MOOT_VITERBI_DEBUG
- * If defined, Viterbi trellis will be dumped to stderr on
- * mootHMM::tag_sentence()
+ * \def MOOT_LEX_IS_TIEBREAKER
+ * Define this to use lexical probabilities to break ties.
  */
-//#define MOOT_VITERBI_DEBUG
-#undef MOOT_VITERBI_DEBUG
+#undef MOOT_LEX_IS_TIEBREAKER
 
 moot_BEGIN_NAMESPACE
 
@@ -340,6 +337,8 @@ public:
     TagID tagid;                  ///< Current Tag-ID for this node
 #ifdef MOOT_USE_TRIGRAMS
     TagID ptagid;                 ///< Previous Tag-ID for this node
+#else
+    ProbT wprob;                  ///< (log-)lexical probability p(word|tag)
 #endif
     ProbT lprob;                  ///< log-Probability of best path to this node
 
@@ -356,6 +355,7 @@ public:
   class ViterbiRow {
   public:
     TagID  tagid;                 ///< Current Tag-ID for this node (redundant)
+    ProbT  wprob;                 ///< (log-)lexical probability p(word|tag)
     class ViterbiNode *nodes;     ///< Trellis "pillar" node(s) for this row
     class ViterbiRow  *row_next;  ///< Next row
   };
@@ -735,8 +735,8 @@ public:
       if (!sent) continue;
       tag_sentence(*sent);
 
-#ifdef MOOT_VITERBI_DEBUG
-      if (save_dump_trellis) viterbi_txtdump(writer);
+#ifdef MOOT_DEBUG_ENABLED
+      if (save_dump_trellis) viterbi_txtdump(writer, sent->size()+1);
 #endif
 
       if (writer) writer->put_sentence(*sent);
@@ -1081,6 +1081,7 @@ public:
     if (probmin != MOOT_PROB_NONE) col->bpprmin = probmin;
     col->col_prev = vtable;
     row->nodes = NULL;
+    row->wprob = wordpr;
 
     for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
       vbestpr = MOOT_PROB_NEG;
@@ -1092,10 +1093,15 @@ public:
 
 	//-- probability lookup
 	vtagpr = pnod->lprob + tagp(pnod->ptagid, prow->tagid, curtagid);
-	if (vtagpr > vbestpr) {
-	  vbestpr = vtagpr;
-	  vbestpn = pnod;
-	}
+	if (vtagpr > vbestpr
+# ifdef MOOT_LEX_IS_TIEBREAKER
+	    || (vtagpr == vbestpr && wordpr > prow->wprob)
+# endif
+	    ) 
+	  {
+	    vbestpr = vtagpr;
+	    vbestpn = pnod;
+	  }
       }
 
       //-- set node information
@@ -1142,15 +1148,21 @@ public:
 
       //-- probability lookup
       vtagpr = pnod->lprob + tagp(pnod->tagid, curtagid);
-      if (vtagpr > vbestpr) {
-	vbestpr = vtagpr;
-	vbestpn = pnod;
-      }
+      if (vtagpr > vbestpr
+# ifdef MOOT_LEX_IS_TIEBREAKER
+	  || (vtagpr == vbestpr && wordpr > pnod->wprob)
+# endif
+	  )
+	{
+	  vbestpr = vtagpr;
+	  vbestpn = pnod;
+	}
     }
 
     //-- set node/row information
     nod           = viterbi_get_node();
     nod->tagid    = curtagid;
+    nod->wprob    = wordpr;
     nod->lprob    = vbestpr + wordpr;
     nod->pth_prev = vbestpn;
     nod->nod_next = col->rows;
@@ -1573,15 +1585,14 @@ public:
 
   /** \name Debugging */
   //@{
-
   /** Debugging method: dump basic HMM contents to a text file. */
   void txtdump(FILE *file);
 
   /** Debugging method: dump entire Viterbi trellis to a text file */
-  void viterbi_txtdump(TokenWriter *w);
+  void viterbi_txtdump(TokenWriter *w, int ncols=0);
 
   /** Debugging method: dump single Viterbi column to a text file */
-  void viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, size_t colnum=0);
+  void viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, int colnum=0);
   //@}
 };
 

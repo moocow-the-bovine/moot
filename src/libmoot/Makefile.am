@@ -181,6 +181,7 @@ pkginclude_HEADERS = \
 	\
 	mootEnum.h \
 	mootTypes.h \
+	mootSTLHacks.h \
 	\
 	mootPPLexer.h \
 	mootGenericLexer.h \
