@@ -423,9 +423,10 @@ public:
   //@{
   size_t             nsents;      /**< Total number of sentenced processed */
   size_t             ntokens;     /**< Total number of tokens processed */
+  size_t             nnewtokens;  /**< Total number of unknown-tokens processed */
   size_t             nunclassed;  /**< Number of classless tokens processed */
   size_t             nnewclasses; /**< Number of unknown-class tokens processed */
-  size_t             nunknown;    /**< Number of totally unknown tokens procesed */
+  size_t             nunknown;    /**< Number of totally unknown (token,class) pairs procesed */
   size_t             nfallbacks;  /**< Number of fallbacks in viterbi_step() */
   //@}
 
@@ -479,6 +480,7 @@ public:
       vtable(NULL),
       nsents(0),
       ntokens(0),
+      nnewtokens(0),
       nunclassed(0),
       nnewclasses(0),
       nunknown(0),
@@ -665,9 +667,13 @@ public:
       nunclassed++;
       viterbi_step(tokid);
     } else {
-      ClassID classid = class2id(lexclass);  //-- instantiates new class if unknown
+      //-- non-empty class : get ID
+      ClassID classid =
+	class2id(lexclass,1,1) //-- : creates new class if unknown (uniform dist) : RESULTS=GOOD
+	//class2id(lexclass,0,1) //-- : creates new class if unknown (empty dist) : RESULTS=?
+	//class2id(lexclass,0,0) //-- : assigns ID '0' if unknown                 : RESULTS=BAD
+	;
       if (classid==0) {
-	nnewclasses++;
 	viterbi_step(tokid);   //-- this should never happen! (?)
       }
       viterbi_step(tokid,classid,lexclass);
@@ -1014,14 +1020,18 @@ public:
 
   /**
    * Lookup the ClassID for the lexical-class \c lclass.
-   * A new class-ID will be generated if \c lclass is not currently defined.
-   * Additionally, if \c autopopulate is true (the default), the new class
-   * will be populated with a uniform distribution.
+   * @param autopopulate if true, new classes will be autopopulated with uniform distributions.
+   * @param autocreate if true, new classes will be created and assigned class-ids.
    */
-  inline ClassID class2id(const LexClass &lclass, bool autopopulate=true)
+  inline ClassID class2id(const LexClass &lclass,
+			  bool autopopulate=true,
+			  bool autocreate=true)
   {
     ClassID cid = classids.name2id(lclass);
     if (cid == 0) {
+      nnewclasses++;
+      if (!autopopulate && !autocreate) return cid;  //-- map unknown classes to zero
+
       //-- previously unknown class: fill 'er up with default values
       cid = classids.insert(lclass);
       if (cid >= lcprobs.size()) {

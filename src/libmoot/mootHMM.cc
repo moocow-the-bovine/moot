@@ -113,6 +113,7 @@ void mootHMM::clear(bool wipe_everything)
   vbestpn = NULL;
   nsents = 0;
   ntokens = 0;
+  nnewtokens = 0;
   nunclassed = 0;
   nnewclasses = 0;
   nunknown = 0;
@@ -725,7 +726,7 @@ void mootHMM::viterbi_step(TokID tokid)
   if (tokid >= n_toks) tokid = 0;
 
   //-- info: check for "unknown" token
-  if (tokid==0) nunknown++;
+  if (tokid==0) nnewtokens++;
 
   //-- Get map of possible destination tags
   const LexProbSubTable &lps = lexprobs[tokid];
@@ -784,7 +785,10 @@ void mootHMM::viterbi_step(TokID tokid, ClassID classid, const LexClass &lclass)
   if (!classid) classid = uclassid;
 
   //-- info: check for "unknown" token + class
-  if (tokid==0 && classid==uclassid) nunknown++;
+  if (tokid==0) {
+    nnewtokens++;
+    if (classid == uclassid) nunknown++;
+  }
 
   //-- Get map of possible destination tags
   const LexProbSubTable      &lps  = lexprobs[tokid];
