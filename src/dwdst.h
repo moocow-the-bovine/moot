@@ -10,6 +10,7 @@
 #define _DWDST_H_
 
 #ifdef HAVE_CONFIG_H
+# include "nopackage.h"
 # include <config.h>
 #endif
 
@@ -48,6 +49,7 @@ private:
   bool i_made_morph;
   bool i_made_syms;
 
+protected:
   // -- temporary variables
   FSM *result, *tmp;
   FSMSymbolString s;

@@ -1,19 +1,15 @@
 # -*- Mode: Text -*-
-# gengetopt specification for 'dwdst'
-package "dwdst"
-purpose	"Part-of-Speech tagger for the KDWDS project."
+# gengetopt specification for 'dwdstt'
+package "dwdstt"
+purpose	"Trainer for the part-of-speech tagger of the KDWDS project."
 
 # Options
 option	"verbose"	v	"Specify verbosity level"		int default="1"			no
-option	"avm"		a	"Produce AVM ('vector') output"		no
-
-option	"words"		w	"Args are input tokens, not filenames"	    no
 option  "list"		l       "Args are file-lists, not input filenames"  no
+option	"words"		w	"Args are input tokens, not filenames"	    no
 
 option	"output"	o	"Specify output file"			string default="-"		no
 
 option	"symbols"	s	"Specify symbols file"			string default="dwdst.sym"	no
 option	"morph"		m	"Specify morphological transducer"	string default="dwdst.fst"		no
 #option	"morph"		m	"Specify morphological transducer"	string default="dwdst-debug.fst"	no
-
-

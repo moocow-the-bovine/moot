@@ -17,7 +17,7 @@
 
 ## --- executable programs
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
-bin_PROGRAMS = dwdst dwdspp
+bin_PROGRAMS = dwdspp dwdst dwdstt
 
 ## --- libtool libraries
 #lib_LTLIBRARIES = ${lib_1}.la ... ${lib_N}.la
@@ -37,6 +37,13 @@ SUFFIXES = .ggo
 ## --- Required sources
 #${prog_i}_SOURCES =
 #${lib_i}_la_SOURCES =
+dwdspp_SOURCES = \
+	cmdutil.cc \
+	cmdutil.h \
+	dwdspp_lexer.ll \
+	dwdspp_main.cc \
+	dwdspp_cmdparser.ggo
+
 dwdst_SOURCES = \
 	cmdutil.cc \
 	cmdutil.h \
@@ -46,20 +53,25 @@ dwdst_SOURCES = \
 	dwdst_main.cc \
 	dwdst_cmdparser.ggo
 
-dwdspp_SOURCES = \
+dwdstt_SOURCES = \
 	cmdutil.cc \
 	cmdutil.h \
-	dwdspp_lexer.ll \
-	dwdspp_main.cc \
-	dwdspp_cmdparser.ggo
+	dwdst_lexer.ll \
+	dwdst.cc \
+	dwdst.h \
+	dwdstt.cc \
+	dwdstt.h \
+	dwdstt_main.cc \
+	dwdstt_cmdparser.ggo
 
 ## --- Extra (possible) sources
 #EXTRA_${prog_i}_SOURCES = 
 #EXTRA_${lib_i}_la_SOURCES = 
 
 ## --- Additional dependencies
-dwdst.o: dwdst_cmdparser.h dwdst_lexer.h
 dwdspp_main.o: dwdspp_cmdparser.h dwdspp_lexer.h
+dwdst.o: dwdst_cmdparser.h dwdst_lexer.h
+dwdstt.o: dwdstt_cmdparser.h dwdst_lexer.h
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -129,6 +141,9 @@ AM_CXXFLAGS = $(FSM_WFLAGS) $(FSM_OFLAGS)
 dwdst_LDFLAGS = @FSM_LFLAGS@
 dwdst_LDADD = @FSM_LIBS@
 
+dwdstt_LDFLAGS = @FSM_LFLAGS@
+dwdstt_LDADD = @FSM_LIBS@
+
 # dwdspp_LDFLAGS = @FSM_LFLAGS@
 # dwdspp_LDADD = @FSM_LIBS@
 
@@ -152,6 +167,7 @@ dwdst_LDADD = @FSM_LIBS@
 MAINTAINERCLEANFILES = \
 	*~ .*~ Makefile Makefile.in \
 	dwdst_cmdparser.cc dwdst_cmdparser.h \
+	dwdstt_cmdparser.cc dwdstt_cmdparser.h \
 	dwdspp_cmdparser.cc dwdspp_cmdparser.h
 
 ##-----------------------------------------------------------------------
@@ -164,6 +180,7 @@ EXTRA_DIST = \
 	dwdst_lexer.cc dwdst_lexer.h \
 	dwdspp_lexer.cc dwdspp_lexer.h \
 	dwdst_cmdparser.cc dwdst_cmdparser.h \
+	dwdstt_cmdparser.cc dwdstt_cmdparser.h \
 	dwdspp_cmdparser.cc dwdspp_cmdparser.h
 
 ## --- recursion subdirectories for 'make dist'

@@ -124,7 +124,7 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
 
   // -- sanity check
   if (!can_tag()) {
-    fprintf(stderr, "dwds_tagger::tag_strings(): cannot run uninitialized tagger!\n");
+    fprintf(stderr, "dwds_tagger::tag_stream(): cannot run uninitialized tagger!\n");
     return false;
   }
 
@@ -144,7 +144,7 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
       
       result = morph->fsm_lookup(s,tmp,true);  // v0.0.2 -- getting leaks here!
       tmp->fsm_strings(syms, &results, false, want_avm);
-      
+   
       fprintf(out, "%s: %d Analyse(n)\n", lexer.yytext, results.size());
       for (ri = results.begin(); ri != results.end(); ri++) {
 	fputs("\t", out);
@@ -185,7 +185,9 @@ bool dwds_tagger::tag_strings(int argc, char **argv, FILE *out=stdout)
 
     fprintf(out, "%s: %d Analyse(n)\n", *argv, results.size());
     for (ri = results.begin(); ri != results.end(); ri++) {
-      fprintf(out, "\t((%s)<%f>)\n", ri->istr.c_str(), ri->weight);
+	fputs("\t", out);
+	fputs(ri->istr.c_str(), out);
+	fprintf(out, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
     }
     fputc('\n',out);
 
