@@ -2,6 +2,7 @@ dwdspp
 dwdst
 dwdstt
 UnitMABBAW.cpp
+*.tt
 *.pp
 *.out
 *.tmp
@@ -19,6 +20,8 @@ UnitMABBAW.cpp
 *.lab
 *_cmdparser.cc
 *_cmdparser.h
+postag_lexer.cc
+postag_lexer.h
 dwdspp_lexer.cc
 dwdspp_lexer.h
 dwdst_lexer.cc

@@ -1,0 +1,5 @@
+symtest
+*.o
+*~
+*.lab
+*.sym
