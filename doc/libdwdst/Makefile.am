@@ -104,14 +104,17 @@ install-data-local:
 
 install-doc-sub:
 	  $(mkinstalldirs) $(DESTDIR)$(pkgdocdir)/$(DOXYBASE)
-	  test -e $(DOXYBASE).tag && \
-	    $(INSTALL_DATA) $(TAGFILE) $(DESTDIR)$(pkgdocdir)/$(DOXYBASE)/$(DOXYBASE).tag
+	  if test -e $(DOXYBASE).tag ; then \
+	    $(INSTALL_DATA) $(TAGFILE) $(DESTDIR)$(pkgdocdir)/$(DOXYBASE)/$(DOXYBASE).tag ;\
+	  fi
 	  for d in $(DOC_SUBDIRS) ; do \
-	    $(mkinstalldirs) $(DESTDIR)$(pkgdocdir)/$(DOXYBASE)/$$d ;\
-	    (cd $$d ;\
-	     for f in * ; do \
-	      $(INSTALL_DATA) $$f $(DESTDIR)$(pkgdocdir)/$(DOXYBASE)/$$d/$$f ;\
-	     done) ;\
+	    if test -d "$d" ; then \
+	      $(mkinstalldirs) $(DESTDIR)$(pkgdocdir)/$(DOXYBASE)/$$d ;\
+	      (cd $$d ;\
+	       for f in * ; do \
+	        $(INSTALL_DATA) $$f $(DESTDIR)$(pkgdocdir)/$(DOXYBASE)/$$d/$$f ;\
+	       done) ;\
+	    fi ;\
 	  done
 
 install-latex-sub:

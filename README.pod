@@ -1,10 +1,64 @@
 =pod
 
-README for package 'PACKAGENAME'
+README for package 'dwdst'
 
 =head1 DESCRIPTION
 
-PACKAGENAME - flobbing wiffle munger
+dwdst - Part-of-Speech tagger using Thomas Hanneforth's libFSM.
+
+=head1 REQUIREMENTS
+
+=over 4
+
+=item STLport E<gt>= 4.5.3
+
+Available from http://www.stlport.org
+
+
+=item pkg-config
+
+Available from:
+http://www.freedesktop.org/software/pkgconfig/
+
+
+=item flex++ , bison++
+
+Alain Coetmeur's C++ ports of the famous lexer/parser
+generator pair, available from:
+ftp://iecc.com/pub/file/bison++flex++
+
+or from the official distribution site of
+this package.
+
+
+=item libbumble E<gt>= 1.13.5
+
+Origninal sources available from
+http://www.bumblebeesoftware.com
+
+You will need a pkg-config metafile (libbumble.pc)
+for this requirement
+in your PKG_CONFIG_PATH in order to compile this
+package -- you can make one yourself, or you can
+get one from the official distribution site of
+this package.
+
+
+=item libFSM
+
+Currently available only from its original author,
+Thomas Hanneforth E<lt>tom@ling.uni-potsdam.deE<gt>.
+
+You will need a pkg-config metafile (libFSM.pc)
+for this requirement
+in your PKG_CONFIG_PATH in order to compile this
+package -- you can make one yourself, or you can
+get one from
+the official distribution site of this package.
+
+=back
+
+
 
 =head1 INSTALLATION
 
@@ -31,7 +85,16 @@ necessary build files.
 
 =head1 KNOWN BUGS
 
-Probably many.
+No config-file parsing.
+
+Horribly inaccurate.
+
+Too slow.
+
+No distribution site.
+
+Many, many more.
+
 
 =head1 ACKNOWLEDGEMENTS
 

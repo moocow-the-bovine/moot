@@ -158,7 +158,7 @@ AM_CXXFLAGS = $(FSM_WFLAGS) $(FSM_OFLAGS)
 LIBCUR = 0
 
 ## --- The implementation number of the CURRENT interface.
-LIBREV = 5
+LIBREV = 6
 
 ## --- The difference between the newest and oldest interfaces that this
 ##     library implements.  In other words, the library implements all the
@@ -179,8 +179,12 @@ LIBAGE = 0
 #libdwdst_la_LDFLAGS = @FSM_LFLAGS@
 #libdwdst_la_LIBADD  = -lFSMExt @FSM_LIBS@
 
+libdwdst_la_LDFLAGS = -version-info $(LIBCUR):$(LIBREV):$(LIBAGE)
+
 #libdwdst_la_LDFLAGS =
-libdwdst_la_LIBADD  = -lFSMExt -lFSM -lFSMSymSpec -lbumble++ @STL_LIBS@ -lz
+#libdwdst_la_LIBADD  = -lFSMExt -lFSM -lFSMSymSpec -lbumble++ @STL_LIBS@ -lz
+
+libdwdst_la_LIBADD = @FSMEXT_LIBS@
 
 ##-----------------------------------------------------------------------
 ## Variables: cleanup

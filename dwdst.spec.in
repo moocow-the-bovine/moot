@@ -1,0 +1,48 @@
+Name: @PACKAGE@
+Version: @VERSION@
+Release: @BINDIST_RELEASE@
+Copyright: Copyright (c) 2002-2003 by Bryan Jurish.  All Rights Reserved.
+Summary: Part-of-Speech tagger using libFSM.
+Group: dev
+Source: @PACKAGE@-@VERSION@.tar.gz
+#Patch: 
+BuildRoot: /var/tmp/%{name}-buildroot
+#BuildRoot: buildroot
+
+%description
+Part-of-Speech tagger using libFSM.
+
+
+%prep
+%setup -n @PACKAGE@-@VERSION@
+# %patch -p1 .buildroot
+
+%build
+./configure \
+	--prefix=/usr \
+	--with-doc-formats=man,html
+make all ifiles
+
+%install
+echo "-------------------- RPM_BUILD_ROOT=$RPM_BUILD_ROOT ----------------"
+test -n "$RPM_BUILD_ROOT" \
+    && test "$RPM_BUILD_ROOT" != "/" \
+    && rm -rf "$RPM_BUILD_ROOT"
+mkdir -p "$RPM_BUILD_ROOT"
+make prefix="$RPM_BUILD_ROOT/usr" install
+
+%clean
+make distclean
+test -n "$RPM_BUILD_ROOT" \
+    && test "$RPM_BUILD_ROOT" != "/" \
+    && rm -rf "$RPM_BUILD_ROOT"
+
+%post
+ldconfig
+
+# %files -f @PACKAGE@.ifiles
+%files
+%defattr(-,root,root)
+/usr/bin/dwds*
+/usr/share/doc/dwdst
+/usr/man/man1/dwds*
