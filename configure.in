@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.5)
 
-AC_INIT(dwdst, [1.0.0-pre3], [moocow@ling.uni-potsdam.de])
+AC_INIT(dwdst, [1.0.0_pre3], [moocow@ling.uni-potsdam.de])
 
 dnl source && aux dir
 AC_CONFIG_AUX_DIR(config)
@@ -10,7 +10,7 @@ dnl canonical target (sets $target, $target_(cpu|vendor|os) : used for bindist)
 AC_CANONICAL_TARGET
 
 dnl use automake
-AM_INIT_AUTOMAKE(dwdst, [1.0.0-pre3])
+AM_INIT_AUTOMAKE(dwdst, [1.0.0_pre3])
 
 dnl use autoheader
 AM_CONFIG_HEADER([src/libdwdst/dwdstConfig.h])
