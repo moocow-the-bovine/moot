@@ -109,23 +109,8 @@ typedef enum {
   TF_NFLAVORS   /**< number of flavors (not a flavor itself) */
 } mootTokFlavor;
 
-/** Useful for debugging token flavors */\
-const char mootTokFlavorNames[TF_NFLAVORS][16] =
-{
-  "TF_UNKNOWN",
-  "TF_TOKEN",
-  "TF_COMMENT",
-  "TF_EOS",
-  "TF_EOF",
-  /*-- internal lexer use only */
-  "TF_TEXT",
-  "TF_TAB",
-  "TF_TAG",
-  "TF_DETAILS",
-  "TF_COST",
-  "TF_NEWLINE",
-  "TF_IGNORE"
-};
+/** Useful for debugging token flavors */
+extern const char* mootTokFlavorNames[TF_NFLAVORS];
 
 /*--------------------------------------------------------------------------
  * mootToken
@@ -472,16 +457,9 @@ typedef enum {
   NTokTypes          /**< Not really a token-type */
 } TokenType;
 
+
 /** Convert token-types to symbolic names */
-const char TokenTypeNames[NTokTypes][16] =
-  {
-    "@ALPHA",
-    "@CARD",
-    "@CARDPUNCT",
-    "@CARDSUFFIX",
-    "@CARDSEPS",
-    "@UNKNOWN"
-  };
+extern const char *TokenTypeNames[NTokTypes];
 
 /** TnT compatibility hack */
 inline bool tok2type_isCardPunctChar(const char c) {

@@ -1,17 +1,17 @@
 #include <stdio.h>
-#include "mootToken.h"
+//#include "mootToken.h"
 #include "mootTokenLexer.h"
 
 using namespace moot;
 
-char **typnames = mootTokFlavorNames;
+#define typnames mootTokFlavorNames
 
 void churntest(int argc, char **argv) {
   mootTokenLexer lex;
   FILE *infile = stdin;
   int
     typ,
-    eoftyp = mootTokenLexer::TLEOF;
+    eoftyp = TF_EOF;
 
   if (argc > 1) {
     infile = fopen(argv[1], "r");
@@ -24,17 +24,8 @@ void churntest(int argc, char **argv) {
   lex.select_streams(infile,stdout);
 
   while ((typ = lex.yylex()) != eoftyp) {
-    printf("TOKEN (%d=%s): `%s'\n", typ, typnames[typ], lex.yytext);
-    if (typ == mootTokenLexer::TLTOKEN) {
-      printf("   Text=`%s'\n", lex.mtoken.toktext.c_str());
-      for (mootToken::AnalysisSet::const_iterator ai = lex.mtoken.analyses.begin();
-	   ai != lex.mtoken.analyses.end();
-	   ai++)
-	{
-	  printf("  Analysis: Tag=`%s' ; Details=`%s' ; Cost=%g\n",
-		 ai->tag.c_str(), ai->details.c_str(), ai->cost);
-	}
-    }
+    printf("TOKEN (%d=%s): `%s' (tok.txt=`%s')\n",
+	   typ, typnames[typ], lex.yytext, lex.mtoken.text().c_str());
   }
   printf("EOF\n");
 }

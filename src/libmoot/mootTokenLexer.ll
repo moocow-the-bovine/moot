@@ -221,27 +221,22 @@ tagchar    [^ \t\n\r\]]
 }
 
 
-<TOKEN>^{wordchar}+ {
-  /* TOKEN: non-empty token text */
+<TOKEN>^({tokchar}*){wordchar} {
+  //-- TOKEN: keep only internal whitespace
   theColumn += yyleng;
   mtoken.clear();
   mtoken.flavor(TF_TOKEN);
-  mtoken.tok_text.append((const char *)yytext);
-  lasttyp = TF_TEXT;
-}
-
-<TOKEN>{space}+/{wordchar} {
-  /* TOKEN: token-internal whitespace: keep it */
-  theColumn += yyleng;
-  mtoken.tok_text.append((const char *)yytext);
+  mtoken.text((const char *)yytext);
   lasttyp = TF_TEXT;
 }
 
 <TOKEN>{space}*/{eotchar} {
-  /* TOKEN: end-of-token (with trailing whitespace: ignored) */
+  //-- TOKEN: end-of-token
   theColumn += yyleng;
+
   if (first_analysis_is_best) current_analysis_is_best = true;
   if (ignore_first_analysis)  ignore_current_analysis = true;
+
   lasttyp = TF_TEXT;
   BEGIN(SEPARATORS);
 }

@@ -432,17 +432,18 @@ YY_mootTokenLexer_CLASS::YY_mootTokenLexer_CLASS(YY_mootTokenLexer_CONSTRUCTOR_P
 #endif
 
 /* % data tables for the DFA go here */ 
-#define YY_END_OF_BUFFER 25
+#define YY_END_OF_BUFFER 24
 typedef int yy_state_type;
-static const short int yy_accept[71] =
+static const short int yy_accept[72] =
     {   0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-       25,   20,   24,   19,   20,    1,    1,   19,   20,   17,
-       22,   12,   15,   15,   21,   21,   21,   21,    8,    7,
-        9,    5,    5,   19,    3,    5,    1,    1,   19,    3,
-       19,    0,    1,    0,   19,    0,   17,   12,   13,    0,
-        0,    0,    0,   11,    7,    4,    5,   19,    3,    5,
-        1,   19,    4,    3,    0,    2,    0,   14,    3,    0
+       24,   19,   23,   18,   19,    1,    1,   18,   19,   16,
+       21,   11,   14,   14,   20,   20,   20,   20,    7,    6,
+        8,    4,    4,   18,    3,    4,    1,    1,   18,    3,
+       18,    0,    1,    0,   18,    0,   16,   11,   12,    0,
+        0,    0,    0,   10,    6,    4,   18,    3,    0,    4,
+        1,   18,    3,    3,    0,    2,    0,   13,    3,    0,
+        0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -483,87 +484,85 @@ static const YY_CHAR yy_meta[14] =
         4,    4,    5
     } ;
 
-static const short int yy_base[83] =
+static const short int yy_base[84] =
     {   0,
         0,    4,    9,   21,   34,    0,   46,   50,   54,   58,
-       95,  159,  159,   28,   63,  159,  159,   27,   25,    0,
-      159,    0,  159,  159,   25,   63,  159,    0,  159,   24,
-      159,  159,  159,   71,    0,    0,  159,  159,   75,   22,
-       22,    0,  159,   15,    0,   79,    0,    0,  159,   15,
-       12,    9,    6,  159,   11,  159,  159,   82,    0,    0,
-      159,    0,    9,   86,   89,  159,   85,  159,   95,  159,
-      100,  105,  110,  115,  120,  124,  129,  134,  138,  143,
-      148,  153
+      120,  150,  150,  112,   63,  150,  150,  111,   83,    0,
+      150,    0,  150,  150,   28,   63,  150,    0,  150,   27,
+      150,  150,  150,   26,   25,    0,  150,  150,   71,   73,
+       24,    0,  150,   22,    0,   77,    0,    0,  150,   22,
+       14,   11,    8,  150,   13,  150,   12,   11,   10,    0,
+      150,    0,    0,   80,   83,  150,   79,  150,   89,    0,
+      150,   94,   99,  104,  109,  114,  118,  123,  128,  131,
+      134,  139,  144
     } ;
 
-static const short int yy_def[83] =
+static const short int yy_def[84] =
     {   0,
-       71,   71,   72,   72,   70,    5,   73,   73,   71,   74,
-       70,   70,   70,   70,   70,   70,   70,   15,   70,   75,
-       70,   76,   70,   70,   77,   70,   70,   78,   70,   70,
-       70,   70,   70,   79,   80,   15,   70,   70,   79,   80,
-       70,   15,   70,   70,   18,   81,   75,   76,   70,   77,
-       26,   70,   51,   70,   70,   70,   70,   79,   80,   15,
-       70,   39,   70,   82,   81,   70,   70,   70,   82,    0,
-       70,   70,   70,   70,   70,   70,   70,   70,   70,   70,
-       70,   70
+       72,   72,   73,   73,   71,    5,   74,   74,   72,   75,
+       71,   71,   71,   71,   71,   71,   71,   15,   71,   76,
+       71,   77,   71,   71,   78,   71,   71,   79,   71,   71,
+       71,   71,   71,   80,   81,   15,   71,   71,   81,   81,
+       71,   15,   71,   71,   18,   82,   76,   77,   71,   78,
+       26,   71,   51,   71,   71,   71,   80,   81,   81,   15,
+       71,   39,   40,   83,   82,   71,   71,   71,   83,   69,
+        0,   71,   71,   71,   71,   71,   71,   71,   71,   71,
+       71,   71,   71
     } ;
 
-static const short int yy_nxt[173] =
+static const short int yy_nxt[164] =
     {   0,
-       70,   70,   13,   70,   14,   15,   16,   17,   18,   19,
-       21,   13,   21,   21,   46,   55,   68,   67,   70,   50,
-       46,   21,   21,   13,   21,   21,   41,   64,   55,   50,
-       46,   45,   41,   21,   22,   23,   24,   23,   25,   22,
+       71,   71,   13,   71,   14,   15,   16,   17,   18,   19,
+       21,   13,   21,   21,   59,   59,   57,   55,   68,   67,
+       71,   21,   21,   13,   21,   21,   50,   46,   41,   59,
+       57,   55,   50,   21,   22,   23,   24,   23,   25,   22,
        22,   22,   22,   26,   27,   28,   22,   30,   31,   31,
        13,   30,   31,   31,   13,   32,   33,   32,   34,   36,
        37,   38,   39,   40,   42,   43,   43,   42,   44,   51,
-       52,   53,   57,   57,   57,   58,   60,   61,   61,   62,
-       63,   66,   66,   57,   57,   57,   58,   65,   66,   66,
-       65,   66,   66,   67,   70,   68,   65,   66,   66,   65,
+       52,   53,   60,   61,   61,   62,   63,   59,   64,   66,
+       66,   65,   66,   66,   70,   66,   66,   67,   46,   68,
+       65,   66,   66,   70,   12,   12,   12,   12,   12,   20,
 
-       12,   12,   12,   12,   12,   20,   20,   20,   20,   20,
-       29,   29,   29,   29,   29,   35,   35,   35,   35,   35,
-       47,   70,   70,   47,   48,   70,   70,   70,   48,   49,
-       70,   49,   49,   49,   54,   70,   70,   54,   56,   56,
-       56,   56,   56,   59,   70,   70,   59,   59,   65,   65,
-       65,   65,   65,   69,   69,   69,   69,   69,   11,   70,
-       70,   70,   70,   70,   70,   70,   70,   70,   70,   70,
-       70,   70
+       20,   20,   20,   20,   29,   29,   29,   29,   29,   35,
+       35,   35,   35,   35,   47,   45,   41,   47,   48,   71,
+       71,   71,   48,   49,   71,   49,   49,   49,   54,   71,
+       71,   54,   56,   56,   58,   71,   58,   58,   58,   65,
+       65,   65,   65,   65,   69,   69,   69,   69,   69,   11,
+       71,   71,   71,   71,   71,   71,   71,   71,   71,   71,
+       71,   71,   71
     } ;
 
-static const short int yy_chk[173] =
+static const short int yy_chk[164] =
     {   0,
         0,    0,    1,    0,    1,    2,    2,    2,    2,    2,
-        3,    3,    3,    3,   63,   55,   53,   52,   51,   50,
-       44,    3,    4,    4,    4,    4,   41,   40,   30,   25,
-       19,   18,   14,    4,    5,    5,    5,    5,    5,    5,
+        3,    3,    3,    3,   59,   58,   57,   55,   53,   52,
+       51,    3,    4,    4,    4,    4,   50,   44,   41,   35,
+       34,   30,   25,    4,    5,    5,    5,    5,    5,    5,
         5,    5,    5,    5,    5,    5,    5,    7,    7,    7,
         7,    8,    8,    8,    8,    9,    9,    9,    9,   10,
        10,   10,   10,   10,   15,   15,   15,   15,   15,   26,
-       26,   26,   34,   34,   34,   34,   39,   39,   39,   39,
-       39,   46,   46,   58,   58,   58,   58,   64,   64,   64,
-       64,   65,   65,   67,   11,   67,   69,   69,   69,   69,
+       26,   26,   39,   39,   39,   39,   39,   40,   40,   46,
+       46,   64,   64,   64,   64,   65,   65,   67,   19,   67,
+       69,   69,   69,   69,   72,   72,   72,   72,   72,   73,
 
-       71,   71,   71,   71,   71,   72,   72,   72,   72,   72,
-       73,   73,   73,   73,   73,   74,   74,   74,   74,   74,
-       75,    0,    0,   75,   76,    0,    0,    0,   76,   77,
-        0,   77,   77,   77,   78,    0,    0,   78,   79,   79,
-       79,   79,   79,   80,    0,    0,   80,   80,   81,   81,
-       81,   81,   81,   82,   82,   82,   82,   82,   70,   70,
-       70,   70,   70,   70,   70,   70,   70,   70,   70,   70,
-       70,   70
+       73,   73,   73,   73,   74,   74,   74,   74,   74,   75,
+       75,   75,   75,   75,   76,   18,   14,   76,   77,   11,
+        0,    0,   77,   78,    0,   78,   78,   78,   79,    0,
+        0,   79,   80,   80,   81,    0,   81,   81,   81,   82,
+       82,   82,   82,   82,   83,   83,   83,   83,   83,   71,
+       71,   71,   71,   71,   71,   71,   71,   71,   71,   71,
+       71,   71,   71
     } ;
 
 static yy_state_type yy_last_accepting_state;
 static YY_CHAR *yy_last_accepting_cpos;
 
 #if YY_mootTokenLexer_DEBUG != 0
-static const short int yy_rule_linenum[24] =
+static const short int yy_rule_linenum[23] =
     {   0,
-      201,  210,  224,  233,  240,  240,  251,  256,  261,  261,
-      294,  302,  309,  316,  325,  325,  380,  380,  392,  398,
-      403,  408,  408
+      201,  210,  224,  233,  233,  246,  251,  256,  256,  289,
+      297,  304,  311,  320,  320,  375,  375,  387,  393,  398,
+      403,  403
     } ;
 
 #endif
@@ -657,13 +656,13 @@ yy_match:
 	    while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = yy_def[yy_current_state];
-		if ( yy_current_state >= 71 )
+		if ( yy_current_state >= 72 )
 		    yy_c = yy_meta[yy_c];
 		}
 	    yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 	    ++yy_cp;
 	    }
-	while ( yy_current_state != 70 );
+	while ( yy_current_state != 71 );
 	yy_cp = yy_last_accepting_cpos;
 	yy_current_state = yy_last_accepting_state;
 #line 433 "/usr/local/share/flex++bison++/flexskel.cc"
@@ -740,11 +739,11 @@ case 2:
 case 3:
 #line 224 "mootTokenLexer.ll"
 {
-  /* TOKEN: non-empty token text */
+  //-- TOKEN: keep only internal whitespace
   theColumn += yyleng;
   mtoken.clear();
   mtoken.flavor(TF_TOKEN);
-  mtoken.tok_text.append((const char *)yytext);
+  mtoken.text((const char *)yytext);
   lasttyp = TF_TEXT;
 }
 	YY_BREAK
@@ -754,51 +753,41 @@ yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 #line 233 "mootTokenLexer.ll"
 {
-  /* TOKEN: token-internal whitespace: keep it */
+  //-- TOKEN: end-of-token
   theColumn += yyleng;
-  mtoken.tok_text.append((const char *)yytext);
-  lasttyp = TF_TEXT;
-}
-	YY_BREAK
-case 5:
-*yy_cp = yy_hold_char; /* undo effects of setting up yytext */
-yy_c_buf_p = yy_cp -= 1;
-YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 240 "mootTokenLexer.ll"
-{
-  /* TOKEN: end-of-token (with trailing whitespace: ignored) */
-  theColumn += yyleng;
+
   if (first_analysis_is_best) current_analysis_is_best = true;
   if (ignore_first_analysis)  ignore_current_analysis = true;
+
   lasttyp = TF_TEXT;
   BEGIN(SEPARATORS);
 }
 	YY_BREAK
 case YY_STATE_EOF(TOKEN):
-#line 249 "mootTokenLexer.ll"
+#line 244 "mootTokenLexer.ll"
 { BEGIN(SEPARATORS); }
 	YY_BREAK
-case 7:
-#line 251 "mootTokenLexer.ll"
+case 6:
+#line 246 "mootTokenLexer.ll"
 {
   //-- SEPARATORS: Separator character(s): increment column nicely
   theColumn = (((int)theColumn/8)+1)*8 + (yyleng ? yyleng-1 : 0);
   lasttyp = TF_TAB;
 }
 	YY_BREAK
-case 8:
+case 7:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 256 "mootTokenLexer.ll"
+#line 251 "mootTokenLexer.ll"
 {
   //-- SEPARATORS: end of separators
   theColumn += yyleng;
   BEGIN(DETAILS);
 }
 	YY_BREAK
-case 9:
-#line 261 "mootTokenLexer.ll"
+case 8:
+#line 256 "mootTokenLexer.ll"
 {
   //-- SEPARATORS/EOT: reset to initial state : see also <SEPARATORS><<EOF>>
   theLine++;
@@ -810,7 +799,7 @@ case 9:
 }
 	YY_BREAK
 case YY_STATE_EOF(SEPARATORS):
-#line 271 "mootTokenLexer.ll"
+#line 266 "mootTokenLexer.ll"
 {
   //fprintf(stderr, "<SEPARATORS>EOF: lasttyp=%s\n", mootTokenLexerTypeNames[lasttyp]);
   switch (lasttyp) {
@@ -833,11 +822,11 @@ case YY_STATE_EOF(SEPARATORS):
   return lasttyp;
 }
 	YY_BREAK
-case 11:
+case 10:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 294 "mootTokenLexer.ll"
+#line 289 "mootTokenLexer.ll"
 {
   //-- DETAILS: looks like a tag
   theColumn += yyleng;
@@ -846,8 +835,8 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
   BEGIN(TAG);
 }
 	YY_BREAK
-case 12:
-#line 302 "mootTokenLexer.ll"
+case 11:
+#line 297 "mootTokenLexer.ll"
 {
   //-- DETAILS: detail text
   theColumn += yyleng;
@@ -855,11 +844,11 @@ case 12:
   lasttyp = TF_DETAILS;
 }
 	YY_BREAK
-case 13:
+case 12:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 309 "mootTokenLexer.ll"
+#line 304 "mootTokenLexer.ll"
 {
   //-- DETAILS: internal whitespace: keep it
   theColumn += yyleng;
@@ -867,8 +856,8 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
   lasttyp = TF_DETAILS;
 }
 	YY_BREAK
-case 14:
-#line 316 "mootTokenLexer.ll"
+case 13:
+#line 311 "mootTokenLexer.ll"
 {
   //-- DETAILS/COST: add cost to current analysis
   theColumn += yyleng;
@@ -878,11 +867,11 @@ case 14:
   lasttyp = TF_COST;
 }
 	YY_BREAK
-case 15:
+case 14:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 325 "mootTokenLexer.ll"
+#line 320 "mootTokenLexer.ll"
 {
   //-- DETAILS/EOD: add & clear current analysis, if any : see also <DETAILS><<EOF>>
   //-- add & clear current analysis, if any
@@ -912,7 +901,7 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
 }
 	YY_BREAK
 case YY_STATE_EOF(DETAILS):
-#line 352 "mootTokenLexer.ll"
+#line 347 "mootTokenLexer.ll"
 {
   //fprintf(stderr, "<DETAILS>EOF : lasttyp=%s\n", mootTokenLexerTypeNames[lasttyp]);
   //-- add & clear current analysis, if any : see also <DETAILS>""/{eotchar}
@@ -941,8 +930,8 @@ case YY_STATE_EOF(DETAILS):
   return TF_TOKEN;
 }
 	YY_BREAK
-case 17:
-#line 380 "mootTokenLexer.ll"
+case 16:
+#line 375 "mootTokenLexer.ll"
 {
   //-- TAG: tag text
   theColumn += yyleng;
@@ -953,40 +942,40 @@ case 17:
 }
 	YY_BREAK
 case YY_STATE_EOF(TAG):
-#line 389 "mootTokenLexer.ll"
+#line 384 "mootTokenLexer.ll"
 { BEGIN(DETAILS); }
 	YY_BREAK
-case 19:
-#line 392 "mootTokenLexer.ll"
+case 18:
+#line 387 "mootTokenLexer.ll"
 {
   /* mostly ignore spaces */
   theColumn += yyleng;
   lasttyp = TF_IGNORE;
 }
 	YY_BREAK
+case 19:
+#line 393 "mootTokenLexer.ll"
+{
+  theColumn += yyleng;
+  yycarp("Unrecognized TOKEN character '%c'", *yytext);
+}
+	YY_BREAK
 case 20:
 #line 398 "mootTokenLexer.ll"
 {
   theColumn += yyleng;
-  yycarp("Unrecognized TOKEN character '%c'", *yytext);
+  yycarp("Unrecognized DETAIL character '%c'", *yytext);
 }
 	YY_BREAK
 case 21:
 #line 403 "mootTokenLexer.ll"
 {
   theColumn += yyleng;
-  yycarp("Unrecognized DETAIL character '%c'", *yytext);
-}
-	YY_BREAK
-case 22:
-#line 408 "mootTokenLexer.ll"
-{
-  theColumn += yyleng;
   yycarp("Unrecognized TAG character '%c'", *yytext);
 }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 414 "mootTokenLexer.ll"
+#line 409 "mootTokenLexer.ll"
 {
   //fprintf(stderr, "<>EOF: lasttyp=%d\n", lasttyp);
   switch (lasttyp) {
@@ -1003,8 +992,8 @@ case YY_STATE_EOF(INITIAL):
   return lasttyp;
 }
 	YY_BREAK
-case 24:
-#line 430 "mootTokenLexer.ll"
+case 23:
+#line 425 "mootTokenLexer.ll"
 ECHO;
 	YY_BREAK
 #line 463 "/usr/local/share/flex++bison++/flexskel.cc"
@@ -1250,7 +1239,7 @@ long YY_mootTokenLexer_CLASS::yy_get_previous_state_()
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 	    {
 	    yy_current_state = yy_def[yy_current_state];
-	    if ( yy_current_state >= 71 )
+	    if ( yy_current_state >= 72 )
 		yy_c = yy_meta[yy_c];
 	    }
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1300,11 +1289,11 @@ long YY_mootTokenLexer_CLASS::yy_try_NUL_trans_(long yy_current_state_)
     while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 	{
 	yy_current_state = yy_def[yy_current_state];
-	if ( yy_current_state >= 71 )
+	if ( yy_current_state >= 72 )
 	    yy_c = yy_meta[yy_c];
 	}
     yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-    yy_is_jam = (yy_current_state == 70);
+    yy_is_jam = (yy_current_state == 71);
 #line 721 "/usr/local/share/flex++bison++/flexskel.cc"
 
 #ifndef YY_USE_CLASS
@@ -1599,7 +1588,7 @@ void YY_mootTokenLexer_CLASS::YY_mootTokenLexer_INIT_BUFFER( YY_BUFFER_STATE b, 
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 430 "mootTokenLexer.ll"
+#line 425 "mootTokenLexer.ll"
 
 
 

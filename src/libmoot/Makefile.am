@@ -37,6 +37,7 @@ lib_LTLIBRARIES = libmoot.la
 #${prog_i}_SOURCES =
 #${lib_i}_la_SOURCES =
 libmoot_la_SOURCES = \
+	mootToken.cc \
 	mootTokenIO.cc \
 	mootTokenLexer.cc \
 	mootPPLexer.cc \
@@ -60,7 +61,9 @@ libmoot_la_SOURCES = \
 	mootHMMTrainer.cc \
 	mootEval.cc \
 	\
-	mootUtils.cc
+	mootUtils.cc \
+	\
+	mootXmlParser.cc
 
 #	mootCHMM.cc
 
@@ -161,7 +164,9 @@ pkginclude_HEADERS = \
 	mootHMMTrainer.h \
 	mootEval.h \
 	\
-	mootUtils.h
+	mootUtils.h \
+	\
+	mootXmlParser.h
 
 #	mootCHMM.h 
 #	mootTokenParser.h

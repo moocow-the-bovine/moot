@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.0pre6])
+define([THE_PACKAGE_VERSION], [2.0.0pre7])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
@@ -223,6 +223,58 @@ YACC="$BISONXX"
 AC_SUBST(YACC)
 AC_SUBST(BISONXX)
 
+dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+dnl check for expat
+dnl
+dnl expat: user-request
+AC_ARG_ENABLE(xml,
+	AC_HELP_STRING([--disable-xml],[Disable XML support (enabled by default)]),
+	[ac_cv_enable_xml="$enableval"],[ac_cv_enable_xml="yes"])
+
+dnl expat: headers
+if test "$ac_cv_enable_xml" != "no" ; then
+ for h in expat.h ; do
+  AC_CHECK_HEADER($h,
+	[moot_have_header="yes"], [moot_have_header="no"], [ ])
+  if test "$moot_have_header" = "no" ; then
+    AC_MSG_WARN([])
+    AC_MSG_WARN([------------------------------------------------------------------------])
+    AC_MSG_WARN([expat header '$h' not found!])
+    AC_MSG_WARN([(Are the expat headers in your 'CPPFLAGS' environment variable?)])
+    AC_MSG_WARN([------------------------------------------------------------------------])
+    AC_MSG_WARN([])
+    ac_cv_enable_xml="no"
+  fi
+ done
+fi ;##-- /ac_cv_enable_xml != no
+
+dnl expat: library: compile
+if test "$ac_cv_enable_xml" != "no" ; then
+
+ AC_CHECK_LIB(expat,XML_DefaultCurrent,[ac_cv_have_libexpat="yes"])
+
+ if test "$ac_cv_have_libexpat" != "yes" ; then
+  AC_MSG_WARN([])
+  AC_MSG_WARN([------------------------------------------------------------------------])
+  AC_MSG_WARN([expat library (-lexpat) not found!])
+  AC_MSG_WARN([Is the directory containing 'libexpat.a' in your LDFLAGS environment variable?])
+  AC_MSG_WARN([------------------------------------------------------------------------])
+  AC_MSG_WARN([])
+ else
+  LIBS="$LIBS -lexpat"
+ fi
+fi ;##-- /ac_cv_enable_xml != no
+
+dnl expat: config.h flag
+if test "$ac_cv_enable_xml" = "no" ; then
+  AC_MSG_NOTICE([XML support disabled.])
+else
+ ##-- ac_cv_enable_xml != no
+ AC_DEFINE(MOOT_XML_ENABLED,1,[Define this to enable XML support])
+fi
+dnl expat
+dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 dnl ------------------------------------------------------------
 dnl check for optgen.perl
@@ -284,7 +336,7 @@ AC_ARG_ENABLE(doc,
 
 AC_MSG_CHECKING([which documentation formats to build])
 if test "$enable_doc" != "yes" ; then
- ### disable all docs
+ ##-- disable all docs
  moot_doc_formats="none"
 fi
 AC_MSG_RESULT($moot_doc_formats)
