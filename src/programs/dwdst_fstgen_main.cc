@@ -66,6 +66,7 @@ void GetMyOptions(int argc, char **argv)
 
   // -- generator object setup : flags
   dwdstt.eos = args.eos_string_arg;
+  dwdstt.wordSeparator = args.word_boundary_arg;
   dwdstt.want_avm = false;
   dwdstt.want_features = !args.tags_only_given;
   dwdstt.verbose  = (args.verbose_arg > 0);
