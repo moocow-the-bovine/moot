@@ -180,7 +180,7 @@ LIBAGE = 0
 #libdwdst_la_LIBADD  = -lFSMExt @FSM_LIBS@
 
 #libdwdst_la_LDFLAGS =
-libdwdst_la_LIBADD  = -lFSMExt -lFSM -lFSMSymSpec @STL_LIBS@
+libdwdst_la_LIBADD  = -lFSMExt -lFSM -lFSMSymSpec -lbumble++ @STL_LIBS@ -lz
 
 ##-----------------------------------------------------------------------
 ## Variables: cleanup

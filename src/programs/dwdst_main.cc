@@ -5,16 +5,22 @@
  *   + PoS tagger for DWDS project : main()
  *--------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <sys/time.h>
-
-#include <dwdstTagger.h>
-
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
+
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+
+#ifdef HAVE_TIME_H
+#include <time.h>
+#endif
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+
+#include <dwdstTagger.h>
 
 #include "cmdutil.h"
 #include "dwdst_cmdparser.h"

@@ -149,7 +149,7 @@ AM_CXXFLAGS = $(FSM_WFLAGS) $(FSM_OFLAGS)
 LDFLAGS_COMMON = -L../libdwdst
 
 #LDADD_COMMON   = -ldwdst -lFSMExt @FSM_LIBS@
-LDADD_COMMON   = -ldwdst -lFSMExt -lFSM -lFSMSymSpec
+LDADD_COMMON   = -ldwdst -lFSMExt -lFSM -lFSMSymSpec -lbumble++ @STL_LIBS@ -lz
 
 dwdst_LDFLAGS = $(LDFLAGS_COMMON)
 dwdst_LDADD = $(LDADD_COMMON)

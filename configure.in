@@ -78,6 +78,16 @@ dnl check for strdup
 AC_CHECK_FUNC(strdup,[AC_DEFINE(HAVE_STRDUP,1,[Define this if you have the strdup() function])])
 
 
+dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+dnl check for time headers (argh)
+AC_CHECK_HEADERS([time.h sys/time.h],
+	[],
+	[AC_MSG_WARN([Required header file not found!])
+    	 AC_MSG_WARN([Are the 'struct timeval' and 'time()' headers in your 'CPPFLAGS' environment variable?])
+    	 AC_MSG_ERROR([Required headers not found -- aborting.])
+	])
+dnl time headers
+dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 dnl check for zlib  -- THIS CAN GO!
