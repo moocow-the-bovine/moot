@@ -154,6 +154,10 @@ pkginclude_HEADERS = \
 	\
 	mootConfig.h \
 	\
+	mootAssocVector.h \
+	mootTrieVector.h \
+	mootSuffixTrie.h \
+	\
 	mootIO.h \
 	mootCIO.h \
 	mootZIO.h \

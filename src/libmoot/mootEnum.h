@@ -56,7 +56,9 @@ const mootEnumID mootEnumNone = 0;
  * Requires: g++ flag "-ftemplate-depth-NN", where NN >= 19 for compilation
  * with gcc-2.95.4 using STLport-4.5.3.
  */
-template <class NameType, class NameHashFcn, class NameEqualFcn>
+template <class NameType,
+	  class NameHashFcn  = hash     <NameType>,
+	  class NameEqualFcn = equal_to <NameType>  >
 class mootEnum {
 public:
   //------ public typedefs
@@ -64,7 +66,7 @@ public:
   typedef hash_map<NameType,mootEnumID,NameHashFcn,NameEqualFcn> Name2IdMap;
 
   /** Type which maps numeric IDs back to symbolic names */
-  typedef vector<NameType>                                        Id2NameMap;
+  typedef vector<NameType>                                       Id2NameMap;
 
 public:
   //------ public data
