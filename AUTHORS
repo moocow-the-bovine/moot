@@ -1,1 +1,5 @@
-Bryan Jurish <moocow@ling.uni-potsdam.de>
+Thomas Hanneforth wrote the underlying FSM library and the
+original 'madwds' program.
+
+Bryan Jurish <moocow@ling.uni-potsdam.de> wrote and maintains
+the 'dwdst' package.

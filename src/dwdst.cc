@@ -141,14 +141,14 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
       results.clear();
       s = (char *)lexer.yytext;
       
-      result = morph->fsm_lookup(s,tmp,true);
-      /*tmp.fsm_strings(syms, &results, false, want_avm);
+      result = morph->fsm_lookup(s,tmp,true);  // v0.0.2 -- getting leaks here!
+      tmp->fsm_strings(syms, &results, false, want_avm);
       
       fprintf(out, "%s: %d Analyse(n)\n", lexer.yytext, results.size());
       for (ri = results.begin(); ri != results.end(); ri++) {
 	fprintf(out, "\t((%s)<%f>)\n", ri->istr.c_str(), ri->weight);
       }
-      fputc('\n',out);*/
+      fputc('\n',out);
       
       // -- verbosity
       if (verbose) {
