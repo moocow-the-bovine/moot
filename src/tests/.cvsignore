@@ -5,8 +5,8 @@
 *.a
 *.la
 *.lo
-dwdst_param_lexer.cc
-dwdst_param_lexer.h
+moot_param_lexer.cc
+moot_param_lexer.h
 parcpy
 plextest
 trim

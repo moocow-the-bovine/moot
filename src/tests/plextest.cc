@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "dwdst_param_lexer.h"
+#include "moot_param_lexer.h"
 
 // -- globals
-dwdst_param_lexer plex;
+moot_param_lexer plex;
 
 
 // -- churn
@@ -13,13 +13,13 @@ void plex_churn() {
     plex.theLine = 0;
     while ((tok = plex.yylex())) {
 	switch (tok) {
-	case dwdst_param_lexer::PF_REGEX:
+	case moot_param_lexer::PF_REGEX:
 	    fprintf(stderr, "regex: '%s'\n", plex.yytext);
 	    break;
-	case dwdst_param_lexer::PF_COUNT:
+	case moot_param_lexer::PF_COUNT:
 	    fprintf(stderr, "count: '%s' = %f\n", plex.yytext, atof((const char *)plex.yytext));
 	    break;
-	case dwdst_param_lexer::PF_NEWLINE:
+	case moot_param_lexer::PF_NEWLINE:
 	    fprintf(stderr, "newline\n");
 	    break;
 	default:

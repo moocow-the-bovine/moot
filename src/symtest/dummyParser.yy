@@ -29,7 +29,7 @@
 
 %header{
 #ifdef HAVE_CONFIG_H
-# include <dwdstConfig.h>
+# include <mootConfig.h>
 #endif
 
 # include <stdio.h>
@@ -40,7 +40,7 @@
 # include <string>
 
 # include <FSMSymSpec.h>
-# include "dwdstTypes.h"
+# include "mootTypes.h"
 
 // -- get rid of bumble's macros
 #undef YYACCEPT
@@ -50,7 +50,7 @@
 
 /**
  * \class dummyParser
- * \brief Bison++ parser for dwdst-pargen parameter files
+ * \brief Bison++ parser for moot-pargen parameter files
  */
 %}
 
@@ -66,7 +66,7 @@
    /* -- public methods */ \
    /** \brief report warnings */ \
    virtual void yywarn(const char *msg) { \
-      fprintf(stderr,"dwdstParamParser warning: %s\n", msg); \
+      fprintf(stderr,"mootParamParser warning: %s\n", msg); \
    };
 
 

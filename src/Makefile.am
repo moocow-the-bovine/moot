@@ -1,5 +1,5 @@
 # File: ./src/Makefile.am
-# Package: dwdst
+# Package: moot
 # Description:
 #   + source-level automake file for DWDS tagger
 #
@@ -11,7 +11,7 @@
 #-----------------------------------------------------------------------
 
 ## --- recursion subdirectories
-SUBDIRS = libdwdst programs
+SUBDIRS = libmoot programs
 
 #-----------------------------------------------------------------------
 # Variables: cleanup

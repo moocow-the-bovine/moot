@@ -25,9 +25,9 @@ endif
 #version=2.0.5
 #major=2
 # option 2, assuming the library is created as src/.libs/libfoo.so.2.0.5 or so
-version=`ls src/libdwdst/.libs/lib*.so.* | \
+version=`ls src/libmoot/.libs/lib*.so.* | \
  awk '{if (match($$0,/[0-9]+\.[0-9]+\.[0-9]+$$/)) print substr($$0,RSTART)}'`
-major=`ls src/libdwdst/.libs/lib*.so.* | \
+major=`ls src/libmoot/.libs/lib*.so.* | \
  awk '{if (match($$0,/\.so\.[0-9]+$$/)) print substr($$0,RSTART+4)}'`
 
 config.status: configure
@@ -77,12 +77,12 @@ install: build
 	$(MAKE) install \
 	  prefix=$(CURDIR)/debian/tmp/usr
 	# argh!
-	install -d -m 755 $(CURDIR)/debian/tmp/usr/share/doc/dwdst-doc
-	for d in programs libdwdst ; do \
-	  mv $(CURDIR)/debian/tmp/usr/share/doc/dwdst/$$d \
-	     $(CURDIR)/debian/tmp/usr/share/doc/dwdst-doc/$$d ;\
-	  ln -s ../dwdst-doc/$$d \
-	        $(CURDIR)/debian/tmp/usr/share/doc/dwdst/$$d ;\
+	install -d -m 755 $(CURDIR)/debian/tmp/usr/share/doc/moot-doc
+	for d in programs libmoot ; do \
+	  mv $(CURDIR)/debian/tmp/usr/share/doc/moot/$$d \
+	     $(CURDIR)/debian/tmp/usr/share/doc/moot-doc/$$d ;\
+	  ln -s ../moot-doc/$$d \
+	        $(CURDIR)/debian/tmp/usr/share/doc/moot/$$d ;\
 	done
 
 

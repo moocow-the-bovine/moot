@@ -225,15 +225,15 @@ void test_name2sym(const char *name) {
  */
 int main (int argc, char **argv) {
   list<string> msglist;
-  syms = new FSMSymSpec("dwdst.sym", &msglist, ATT_SYM_COMPAT);
+  syms = new FSMSymSpec("moot.sym", &msglist, ATT_SYM_COMPAT);
 
   if (!msglist.empty()) {
-    cerr << *argv << " Error loading symbols file 'dwdst.sym'\n";
+    cerr << *argv << " Error loading symbols file 'moot.sym'\n";
     abort();
   }
 
   // ??
-  //syms->save_att_label_file("dwdst.lab");
+  //syms->save_att_label_file("moot.lab");
 
 
   while (--argc > 0) {

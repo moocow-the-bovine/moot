@@ -11,9 +11,9 @@ CXX_IFLAGS = \
 	-I$(SRCDIR)
 CXXFLAGS = $(CXX_WFLAGS) $(CXX_OFLAGS) $(CXX_IFLAGS)
 LDFLAGS  = -L/usr/local/lib -L$(SRCDIR)/.libs
-LIBS     = -static -ldwdst -lFSMExt -lFSM -lFSMSymSpec -lbumble++ -lstlport_gcc -lpthread -lz -lm
+LIBS     = -static -lmoot -lFSMExt -lFSM -lFSMSymSpec -lbumble++ -lstlport_gcc -lpthread -lz -lm
 
-SRCDIR ?= ../libdwdst
+SRCDIR ?= ../libmoot
 FLEXXX ?= flex++
 #FLEXXX_SKEL = $(SRCDIR)/flexskel.cc
 #FLEXXX_HSKEL = $(SRCDIR)/flexskel.h
@@ -43,7 +43,7 @@ all: $(TARGETS)
 #----------------------------------------------------------------
 #plextest_DEPS = plextest.o
 parcpy_OBJS = parcpy.o
-parcpy_DEPS = $(SRCDIR)/libdwdst.la
+parcpy_DEPS = $(SRCDIR)/libmoot.la
 
 trim_OBJS = trim.o
 
@@ -65,8 +65,8 @@ parcpy: $(parcpy_OBJS) $(parcpy_DEPS)
 trim: $(trim_OBJS) $(trim_DEPS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(trim_OBJS) -lstlport_gcc -lpthread
 
-$(SRCDIR)/libdwdst.la:
-	$(MAKE) -C $(SRCDIR) libdwdst.la
+$(SRCDIR)/libmoot.la:
+	$(MAKE) -C $(SRCDIR) libmoot.la
 
 $(SRCDIR)/%: ;
 	$(MAKE) -C $(SRCDIR) $*
@@ -125,8 +125,8 @@ dskel: $(dskel)
 
 $(dskel): $(par)
 	( cd ../programs ;\
-	  $(MAKE) dwdst-fstgen ;\
-	  ./dwdst-fstgen -d -n ../tests/$(par) -F ../tests/$(dis) )
+	  $(MAKE) moot-fstgen ;\
+	  ./moot-fstgen -d -n ../tests/$(par) -F ../tests/$(dis) )
 	mv ../programs/dskeleton.fsa $(dskel)
 	mv ../programs/dskeleton.lab $(dskel:.fsa=.lab)
 
@@ -139,15 +139,15 @@ dis: $(dis)
 
 .par.fsa:
 	( cd ../programs ;\
-	  $(MAKE) dwdst-fstgen ;\
-	  ./dwdst-fstgen -d -n ../tests/$(par) -F ../tests/$(dis) )
+	  $(MAKE) moot-fstgen ;\
+	  ./moot-fstgen -d -n ../tests/$(par) -F ../tests/$(dis) )
 	test -e ../programs/dskeleton.fsa && cp ../programs/dskeleton.fsa $(dskel) || true
 	test -e ../programs/dskeleton.lab && cp ../programs/dskeleton.lab $(dskel:.fsa=.lab) || true
 
 .par.lab:
 	( cd ../programs ;\
-	  $(MAKE) dwdst-fstgen ;\
-	  ./dwdst-fstgen -d -n ../tests/$(par) -F ../tests/$(dis) )
+	  $(MAKE) moot-fstgen ;\
+	  ./moot-fstgen -d -n ../tests/$(par) -F ../tests/$(dis) )
 	test -e ../programs/dskeleton.fsa && cp ../programs/dskeleton.fsa $(dskel) || true
 	test -e ../programs/dskeleton.lab && cp ../programs/dskeleton.lab $(dskel:.fsa=.lab) || true
 
