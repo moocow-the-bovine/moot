@@ -62,7 +62,7 @@ void GetMyOptions(int argc, char **argv)
 
   // -- output file
   if (strcmp(args.output_arg,"-") != 0) {
-    in = fopen(args.output_arg, "w");
+    out = fopen(args.output_arg, "w");
   } else {
     out = stdout;
   }
