@@ -36,10 +36,15 @@ MORPHHACK ?= ./morphhack.perl
 XMLIFY ?= ./xmlify.perl
 OF_XML=xml,pretty
 
+##-- moot: suffix trie stuff
+a ?= 4
+A ?= 10
+theta ?= 0.1017023
+SUFFIX_TRIE_LEN ?= $(a)
+SUFFIX_TRIE_THRESH ?= $(A)
+SUFFIX_THETA  ?= $(theta)
+
 ##-- Globals: programs: moot
-SUFFIX_TRIE_LEN ?= 4
-SUFFIX_TRIE_THRESH ?= 10
-SUFFIX_THETA  ?= 0.1017023
 MOOT_BINDIR   ?= $(shell cd .. ; pwd -P)
 MOOTRAIN      ?= $(MOOT_BINDIR)/mootrain
 MOOTHMM       ?= $(MOOT_BINDIR)/moot
@@ -132,6 +137,9 @@ tt: $(TEST).tt
 
 dmt: $(TEST).dmt
 
+nott:
+	rm -f *.tt *.dmt *.cmt *.tnt-tt *.tnt-vtt
+
 %.tt: %.t $(MODEL).lex $(MODEL).123 $(MOOTHMM)
 	$(MOOTHMM) -M$(MODEL).lex,$(MODEL).123 $(MOOTHMM_FLAGS) $< -o $@
 
@@ -143,6 +151,9 @@ dmt: $(TEST).dmt
 
 ##-- eval
 eval: $(TEST).tt.eval $(TEST).dmt.eval $(TEST).cmt.eval
+
+noeval:
+	rm -f *.eval
 
 %.tt.eval: %.tt $(TRUTH) $(MOOTEVAL)
 	$(MOOTEVAL) -v4 -2 -o $@ $*.ttt $<
@@ -385,6 +396,11 @@ nolower: nolc
 nolc:
 	rm -f *.lc.*
 
+lc-tt: $(TEST).lc.tt
+
+nolc-tt:
+	rm -f *.lc.tt *.lc.dmt *.lc.tnt-tt *.lc.tnt-vtt
+
 %.lc.ttt: %.ttt
 	tr A-ZÄÖÜ a-zäöü < $< > $@
 
@@ -405,6 +421,14 @@ TNT_FLAGS ?= $(TNT_AFLAGS) $(TNT_DFLAGS) $(TNT_UFLAGS) $(TNT_NFLAGS)
 notnt:
 	rm -f *.tnt-tt *.tnt-tt.*
 
+tnt-tt: $(TEST).tnt-tt
+
+tnt-vtt: $(TEST).tnt-vtt
+
+lc-tnt-tt: $(TEST).lc.tnt-tt
+
+lc-tnt-vtt: $(TEST).lc.tnt-vtt
+
 %.lc.tnt-tt: %.lc.t $(LCMODEL).model
 	tnt $(TNT_FLAGS) $(LCMODEL) $< > $@
 
@@ -412,6 +436,16 @@ notnt:
 	tnt $(TNT_FLAGS) $(MODEL) $< > $@
 
 %.tnt-tt.eval: %.tnt-tt %.ttt
+	$(MOOTEVAL) -v3 -2 -Imedium $*.ttt $< -o $@
+
+
+%.lc.tnt-vtt: %.lc.t $(LCMODEL).model
+	tnt $(TNT_FLAGS) -z0 -Z0 $(LCMODEL) $< > $@
+
+%.tnt-vtt: %.t $(MODEL).model
+	tnt $(TNT_FLAGS) -z0 -Z0 $(MODEL) $< > $@
+
+%.tnt-vtt.eval: %.tnt-vtt %.ttt
 	$(MOOTEVAL) -v3 -2 -Imedium $*.ttt $< -o $@
 
 ##-- cleanup

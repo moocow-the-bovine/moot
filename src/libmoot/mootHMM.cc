@@ -61,6 +61,7 @@ mootHMM::mootHMM(void)
     ndots(0),
     save_ambiguities(false),
     save_flavors(false),
+    save_mark_unknown(false),
     use_lex_classes(true),
     start_tagid(0),
     unknown_lex_threshhold(1.0),
@@ -870,7 +871,7 @@ bool mootHMM::estimate_lambdas(const mootNgrams &ngrams)
   ProbT ngp3;    //-- adjusted unigram probability : (f(t3)       - 1) / (corpus_size - 1)
 
   //-- initialize
-  f_N       = ngrams.ugtotal;
+  f_N       = ngrams.ugtotal - ngrams.lookup(tagids.id2name(start_tagid));
   nglambda1 = 0.0;
   nglambda2 = 0.0;
   nglambda3 = 0.0;
@@ -936,7 +937,7 @@ bool mootHMM::estimate_lambdas(const mootNgrams &ngrams)
   ProbT ngp2;    //-- adjusted unigram probability : (f(t2)       - 1) / (corpus_size - 1)
 
   //-- initialize
-  f_N       = ngrams.ugtotal;
+  f_N       = ngrams.ugtotal - ngrams.lookup(tagids.id2name(start_tagid));
   nglambda1 = 0.0;
   nglambda2 = 0.0;
 
@@ -1565,18 +1566,52 @@ void mootHMM::tag_mark_best(mootSentence &sentence)
 	  (mootToken::Analysis(mootTokenFlavorNames[tokenFlavor(sri->text())]));
       }
 
-      if (tokids.name2id(sri->text()) == 0) continue;
-
-      for (
 #ifdef MOOT_USE_TRIGRAMS
-	   ViterbiRow *r = c->rows; r != NULL; r = r->row_next
-#else // !MOOT_USE_TRIGRAMS
-	   ViterbiNode *r = c->rows; r != NULL; r = r->nod_next
-#endif
-	   )
-	{
-	  sri->tok_analyses.push_back(tagids.id2name(r->tagid));
+      //-- get total column probability
+      ViterbiRow *r;
+      ViterbiNode *n;
+      ProbT pcolsum = 0;
+      ProbT trowpr;
+      for (r = c->rows; r != NULL; r = r->row_next) {
+	trowpr = MOOT_PROB_NEG;
+	for (n = r->nodes; n != NULL; n = n->nod_next) {
+	  if (n->lprob > trowpr) trowpr = n->lprob;
 	}
+	pcolsum += exp(trowpr);
+      }
+      //-- dump analyses to mootToken object
+      for (r = c->rows; r != NULL; r = r->row_next) {
+	trowpr = MOOT_PROB_NEG;
+	for (n = r->nodes; n != NULL; n = n->nod_next) {
+	  if (n->lprob > trowpr) trowpr = n->lprob;
+	}
+	sri->tok_analyses.push_back
+	  (mootToken::Analysis(tagids.id2name(r->tagid),
+			       "",
+			       exp(trowpr)/pcolsum));
+
+      }
+#else //-- !MOOT_USE_TRIGRAMS
+      //-- get total column probability
+      ViterbiRow *r;
+      ViterbiNode *n;
+      ProbT pcolsum = 0;
+      ProbT trowpr;
+      for (n = col->rows; n != NULL; n = n->nod_next) {
+	pcolsum += exp(n->lprob);
+      }
+      //-- dump analyses to mootToken object
+      for (ViterbiNode *n = c->rows; n != NULL; n = n->nod_next) {
+	sri->tok_analyses.push_back
+	  (mootToken::Analysis(tagids.id2name(n->tagid),
+			       "",
+			       exp(n->lprob)/pcolsum));
+      }
+#endif //-- MOOT_USE_TRIGRAMS
+
+      if (save_mark_unknown && tokids.name2id(sri->text()) == 0) {
+	sri->tok_analyses.push_back(mootToken::Analysis("*","*"));
+      }
     }
   }
 

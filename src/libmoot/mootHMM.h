@@ -409,14 +409,19 @@ public:
   size_t ndots;
 
   /**
-   * Add flavor names to @analyses members of mootToken elements on tag_mark_best()
+   * Add contents of Viterbi trellis to @analyses members of mootToken elements on tag_mark_best()
    */
   bool save_ambiguities;
 
   /**
-   * Add token flavors to @analyses members of mootToken elements on tag_mark_best()
+   * Add flavor names to @analyses members of mootToken elements on tag_mark_best()
    */
   bool save_flavors;
+
+  /**
+   * Mark unknown tokens with a single analysis '*' on tag_mark_best()
+   */
+  bool save_mark_unknown;
   //@}
 
   /*---------------------------------------------------------------------*/

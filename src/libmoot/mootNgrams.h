@@ -30,6 +30,7 @@
 #define _moot_NGRAMS_H
 
 #include <mootTypes.h>
+#include <mootToken.h>
 
 moot_BEGIN_NAMESPACE
 

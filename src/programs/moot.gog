@@ -330,6 +330,11 @@ flag "save-ambiguities" S "Annotate tagged tokens with lexical ambiguities" \
 Useful for debugging.
 "
 
+flag "mark-unknown" m "Mark unknown tokens." \
+  details="
+Useful for debugging.
+"
+
 #-----------------------------------------------------------------------------
 # Addenda
 #-----------------------------------------------------------------------------

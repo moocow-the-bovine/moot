@@ -32,12 +32,11 @@
 #ifndef _moot_TYPES_H
 #define _moot_TYPES_H
 
+//#include <mootToken.h>
 #include <string>
-#include <deque>
 #include <map>
 #include <set>
-
-#include <mootToken.h>
+#include <deque>
 
 #if defined(__GNUC__)
 #  if __GNUC__ >= 3
@@ -85,7 +84,10 @@ namespace moot_STL_NAMESPACE {
 moot_BEGIN_NAMESPACE
 
 using namespace std;
-using namespace moot_STL_NAMESPACE;
+
+#ifdef moot_STL_NAMESPACE
+ using namespace moot_STL_NAMESPACE;
+#endif
 
 /*----------------------------------------------------------------------
  * Basic Types

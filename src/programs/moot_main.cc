@@ -179,6 +179,7 @@ void GetMyOptions(int argc, char **argv)
   hmm.suftrie.maxcount = args.trie_threshhold_arg;
   hmm.suftrie.theta    = args.trie_theta_arg;
   hmm.save_ambiguities = args.save_ambiguities_given;
+  hmm.save_mark_unknown = args.mark_unknown_given;
 
   // -- assign "verbose" flag
   hmm.ndots = args.dots_arg;

@@ -35,6 +35,7 @@
 #include <vector>
 #include <set>
 #include <string>
+#include <mootTypes.h>
 
 /**
  * \def MOOT_TNT_COMPAT
@@ -107,6 +108,9 @@ public:
     /** Full analysis string (possibly with features) */
     mootTagString details;
 
+    /** Analysis probability */
+    ProbT prob;
+
     /*--------------------------------------------------
      * Constructor / Destructor
      */
@@ -118,24 +122,32 @@ public:
     Analysis(const mootTagString &my_tag
 	     //, mootTokenType typ=TokTypeVanilla
 	     )
-      : tag(my_tag)
-      //, type(typ)
+      : tag(my_tag),
+	prob(MOOT_PROB_ZERO)
     {};
 
     /** Constructor given tag and full analysis */
     Analysis(const mootTagString &my_tag,
-	     const mootTagString &my_details
-	     //, mootTokenType typ=TokTypeVanilla
-	     )
-      : tag(my_tag)
-      , details(my_details)
-      //, type(typ)
+	     const mootTagString &my_details)
+      : tag(my_tag),
+	details(my_details),
+	prob(MOOT_PROB_ZERO)
+    {};
+
+    /** Constructor given tag, full analysis, and probability */
+    Analysis(const mootTagString &my_tag,
+	     const mootTagString &my_details,
+	     const ProbT my_prob)
+      : tag(my_tag),
+	details(my_details),
+	prob(my_prob)
     {};
 
     /** Clear this object */
     inline void clear(void) {
       tag.clear();
       details.clear();
+      prob = MOOT_PROB_ZERO;
     };
 
     /** Check for empty analysis*/
@@ -146,6 +158,7 @@ public:
     /** Comparsion operator */
     friend bool operator<(const Analysis &x, const Analysis &y)
     {
+      if (x.prob != y.prob) return x.prob < y.prob;
       int tcomp = x.tag.compare(y.tag);
       return (tcomp < 0
 	      ? true
@@ -157,7 +170,7 @@ public:
     /** Equality operator */
     friend bool operator==(const Analysis &x, const Analysis &y)
     {
-      return x.tag == y.tag && x.details == y.details;
+      return x.prob == y.prob && x.tag == y.tag && x.details == y.details;
     }
     
   }; //-- /mootToken::Analysis

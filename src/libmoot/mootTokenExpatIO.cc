@@ -587,19 +587,17 @@ void TokenWriterExpat::_put_token_gen(const mootToken &token, mootio::mostream *
 	{
 	  if ((tw_format & tiofPruned) && ai->tag != token.besttag()) continue;
 
-	  if (ai->details.empty()) {
-	    os->printf("%s<%s %s=\"%s\"/>",
-		       (tw_format&tiofPretty ? "\n    " : ""),
-		       analysis_elt.c_str(),
-		       postag_attr.c_str(),
-		       ai->tag.c_str());
-	  }
+	  os->printf("%s<%s %s=\"%s\"",
+		     (tw_format&tiofPretty ? "\n    " : ""),
+		     analysis_elt.c_str(),
+		     postag_attr.c_str(),
+		     ai->tag.c_str());
+
+	  if (ai->prob != 0)       os->printf(" %s=\"%g\"", "prob", ai->prob);
+
+	  if (ai->details.empty()) os->puts("/>");
 	  else {
-	    os->printf("%s<%s %s=\"%s\">",
-		       (tw_format&tiofPretty ? "\n    " : ""),
-		       analysis_elt.c_str(),
-		       postag_attr.c_str(),
-		       ai->tag.c_str());
+	    os->putc('>');
 	    twx_recoder.string2mstream(ai->details.c_str(), os);
 	    os->printf("</%s>", analysis_elt.c_str());
 	  }
