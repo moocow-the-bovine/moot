@@ -57,7 +57,7 @@ public:
   string eos;
 
   /// Word-separator symbol, used for disambiguation.
-  FSMSymbolString wordSeparator;
+  FSMSymbolString wordBoundary;
 
   // ------- flags
 

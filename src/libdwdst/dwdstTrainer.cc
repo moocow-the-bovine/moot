@@ -302,12 +302,27 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
   rep->set_start_state(q0);
   rep->mark_state_as_final(q0,freecost);
 
-  // lookup our word-separator symbol
-  FSMSymbol wsSymbol = syms->symbolname_to_symbol(wordSeparator);
-  if (wsSymbol == FSMNOLABEL) {
-    fprintf(stderr,"%s: undefined word-separator symbol '%s': using EPSILON instead!\n",
-	    methodName, wordSeparator.c_str());
-    wsSymbol = EPSILON;
+  // lookup our word-separator symbol(s)
+  set<FSMSymbol> wbSymbols;
+  if (!syms->symbol_defined(wordBoundary)) {
+    fprintf(stderr,"%s: undefined word-boundary symbol '%s': using EPSILON instead!\n",
+	    methodName, wordBoundary.c_str());
+    wbSymbols.insert(EPSILON);
+  } else if (!syms->is_terminal(wordBoundary)) {
+    //set<FSMSymbol> *wbSubtypes = syms->subtypes_of(wordBoundary);
+    //for (set<FSMsymbol>::iterator wbsi = wbSubtypes->begin(); wbsi != wbSubtypes->end(); wbsi++) {
+    //  if (syms->is_terminal(syms->symbol_to_symbolname(*wbsi))) {
+    //	wbSymbols.insert(*wbsi);
+    //  }
+    //}
+    wbSymbols = *(syms->subtypes_of(wordBoundary));
+  } else {
+    wbSymbols.insert(syms->symbolname_to_symbol(wordBoundary));
+  }
+  if (wbSymbols.empty()) {
+    fprintf(stderr, "%s: empty expansion set for word-boundary '%s' -- using EPSILON instead!\n",
+	    methodName, wordBoundary.c_str());
+    wbSymbols.insert(EPSILON);
   }
 
   // set up nGram2State map
@@ -381,7 +396,9 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
 	  FSMSymbolString  theTag    = theNgram[theNgram.size()-1];
 	  FSMSymbol        tagSymbol = tags2symbols[theTag];
 	  FSMWeight        arcCost   = disambigArcCost(prevNgram, theTag, uniGramCount);
-	  rep->add_transition(prevState,  costState,  wsSymbol,  wsSymbol,  arcCost);
+	  for (set<FSMSymbol>::iterator wbi = wbSymbols.begin(); wbi != wbSymbols.end(); wbi++) {
+	    rep->add_transition(prevState, costState, *wbi, *wbi, arcCost);
+	  }
 	  rep->add_transition(costState, ngramState, tagSymbol, tagSymbol, freecost);
 	} else {
 	  // -- this should never happen!
@@ -445,7 +462,9 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
 	if (nngi != nGram2State.end()) {
 	  FSMState   costState  = nngi->second.first;
 	  FSMWeight  arcCost    = disambigArcCost(prevNgram, theTag, uniGramCount);
-	  rep->add_transition(prevState, costState, wsSymbol, wsSymbol, arcCost);
+	  for (set<FSMSymbol>::iterator wbi = wbSymbols.begin(); wbi != wbSymbols.end(); wbi++) {
+	    rep->add_transition(prevState, costState, *wbi, *wbi, arcCost);
+	  }
 # ifdef DWDST_DFSA_DEBUG_VERBOSE
 	  fprintf(stderr, "%s:     > cost='%f'\n", methodName, arcCost);
 # endif

@@ -8,10 +8,10 @@ purpose	"Generate FSTs for use with the KDWDS Part-of-Speech tagger.
 # ------- Options
 
 # ---- Flags:
-option	"verbose"	    v	"Specify verbosity level"		    int default="1"		no
-option	"tags-only"	    t	"Analyze only PoS tags, not morpho-syntactic features"			no
-option	"eos-string"	    e	"Use STRING as the EOS marker"		    string default="EOS"	no
-option	"word-boundary"	    b	"Use STRING as word-boundary symbol"	    string default="+++"	no
+option	"verbose"	    v	"Specify verbosity level"		    int default="1"			no
+option	"tags-only"	    t	"Analyze only PoS tags, not morpho-syntactic features"				no
+option	"eos-string"	    e	"Use STRING as the EOS marker"		    string default="EOS"		no
+option	"word-boundary"	    b	"Use STRING as word-boundary symbol"	    string default="WordBoundary"	no
 
 # ---- Operation Mode:
 # -- unknown-FSA generation (FSA used as analysis for unknown tokens)

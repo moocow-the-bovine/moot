@@ -31,6 +31,7 @@ dwdstTagger::dwdstTagger(FSMSymSpec *mysyms, FSM *mymorph)
   morph = mymorph;
   syms = mysyms;
   eos = "--EOS--";
+  wordBoundary = "WordBoundary";
   ufsa = NULL;
   dfsa = NULL;
 
