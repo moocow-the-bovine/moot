@@ -16,7 +16,7 @@ SHARE_MOOT ?= $(shell cd share-moot ; pwd -P)
 
 MOOTM_BINDIR ?= $(shell cd $(SHARE_MOOT)/../../bin ; pwd -P)
 MOOTM ?= $(MOOTM_BINDIR)/mootm
-MOOTM_FLAGS ?= -m $(SHARE_MOOT)/dwdst-stts-nofeatures.fst -d1024
+MOOTM_FLAGS ?= -m $(SHARE_MOOT)/moot-stts-nofeatures.fst -d1024
 
 ##-- Morph: MorphConsole
 MORPHC_BINDIR ?= $(MOOTM_BINDIR)
@@ -151,17 +151,11 @@ save: save/$(label).stamp
 unsave:
 	rm -rf save/$(label).stamp
 
-save/%.stamp: $(TEST).ttt $(TEST).mtt $(TRAIN).model
-	$(MAKE) $(TEST).tt.eval $(TEST).dmtt.eval $(TEST).cmtt.eval
-#--
-#	$(MAKE) $(TEST).tt.errors
-#	$(MAKE) $(TEST).dmtt.errors $(TEST).dmtt.cerrors
-#	$(MAKE) $(TEST).cmtt.errors $(TEST).cmtt.cerrors
-#--
-#	$(MAKE) $(TRAIN).tt.errors
-#	$(MAKE) $(TRAIN).dmtt.errors $(TRAIN).dmtt.cerrors
-#	$(MAKE) $(TRAIN).cmtt.errors $(TRAIN).cmtt.cerrors
-#--
+save/%.stamp: \
+	$(TEST).ttt $(TEST).mtt $(TRAIN).model
+	for ext in tt dmtt cmtt ; do \
+	  $(MAKE) $(TEST).$$ext $(TEST).$$ext.eval ;\
+	done
 	mkdir -p save/$*
 	mv \
 	   $(TRAIN).lex $(TRAIN).123 $(TRAIN).clx \
@@ -223,4 +217,5 @@ realclean: clean
 	  *.lex *.123 *.clx \
 	  *.mtt *.m0tt *.m1tt *.amtt \
 	  *.mttt *.m0ttt *.m1ttt \
-	  *.model *.hmm *.chmm *.dump *.cdump
+	  *.model *.hmm *.chmm *.dump *.cdump \
+	  *.errors *.cerrors *.icerrors *.eval

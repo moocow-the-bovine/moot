@@ -64,6 +64,13 @@
 #define MOOT_TNT_COMPAT 1
 //#undef MOOT_TNT_COMPAT
 
+/**
+ * \def MOOT_TOKEN_INLINE
+ * define this to inline mootToken methods
+ */
+#define MOOT_TOKEN_INLINE inline
+//#define MOOT_TOKEN_INLINE 
+
 namespace moot {
   using namespace std;
 
@@ -168,7 +175,7 @@ public:
     {};
 
     /** Clear this object */
-    inline void clear(void) {
+    MOOT_TOKEN_INLINE void clear(void) {
       tag.clear();
       details.clear();
       cost = 0.0;
@@ -216,19 +223,16 @@ public:
   mootTokString   tok_text;
   
   /**
-   * Set of possible analyses as a mootToken::AnalysisSet
-   * \warning Use the analyses() method(s) instead of accessing this directly!
-   */
-  AnalysisSet     tok_analyses;
-
-  /**
    * Best tag for this token.
    * \warning Use the besttag() method(s) instead of accessing this directly!
    */
   mootTagString   tok_besttag;
 
-  /** Comments associated with (read "preceeding") this token */
-  string          tok_comment;
+  /**
+   * Set of possible analyses as a mootToken::AnalysisSet
+   * \warning Use the analyses() method(s) instead of accessing this directly!
+   */
+  AnalysisSet     tok_analyses;
 
   /** Aribtrary user data associated with this token */
   void           *user_data;
@@ -239,19 +243,31 @@ public:
    */
   /** Default constructor: empty text, no analyses */
   mootToken(void)
-    : tok_flavor(TF_TOKEN), tok_text(""), tok_besttag(""), user_data(NULL)
-  {};
+    : tok_flavor(TF_TOKEN),
+      //tok_text(""),
+      //tok_besttag(""),
+      user_data(NULL)
+  {
+    //fprintf(stderr, "mootToken::mootToken() called\n");
+  };
 
   /** Constructor given only token text: no analyses */
   mootToken(const mootTokString &text)
-    : tok_flavor(TF_TOKEN), tok_text(text), tok_besttag(""), user_data(NULL)
-  {};
+    : tok_flavor(TF_TOKEN),
+      //tok_text(text),
+      //tok_besttag(""),
+      user_data(NULL)
+  {
+    //fprintf(stderr, "mootToken::mootToken(text=`%s') called\n", text.c_str());
+  };
 
   /** Constructor given text & analyses */
   mootToken(const mootTokString &text,
 	    const AnalysisSet &analyses)
     : tok_flavor(TF_TOKEN),
-      tok_text(text), tok_analyses(analyses), tok_besttag(""),
+      tok_text(text), 
+      //tok_besttag(""),
+      tok_analyses(analyses),
       user_data(NULL)
   {};
 
@@ -260,7 +276,9 @@ public:
 	    const AnalysisSet &analyses,
 	    const mootTagString &besttag)
     : tok_flavor(TF_TOKEN),
-      tok_text(text), tok_analyses(analyses), tok_besttag(besttag),
+      tok_text(text),
+      tok_besttag(besttag),
+      tok_analyses(analyses),
       user_data(NULL)
   {};
 
@@ -291,7 +309,7 @@ public:
    * Manipulators: General
    */
   /** Clear this object (except for user_data) */
-  inline void clear(void) {
+  MOOT_TOKEN_INLINE void clear(void) {
     tok_flavor = TF_TOKEN;
     tok_text.clear();
     tok_analyses.clear();
@@ -303,55 +321,55 @@ public:
    * Manipulators: specific
    */
   /** Get token text */
-  inline const mootTokString &text(void) const {
+  MOOT_TOKEN_INLINE const mootTokString &text(void) const {
     return tok_text;
   };
   /** Set token text */
-  inline mootTokString &text(const mootTokString &text) {
+  MOOT_TOKEN_INLINE mootTokString &text(const mootTokString &text) {
     tok_text = text;
     return tok_text;
   };
 
   /** Get best tag */
-  inline const mootTagString &besttag(void) const {
+  MOOT_TOKEN_INLINE const mootTagString &besttag(void) const {
     return tok_besttag;
   };
   /** Set best tag */
-  inline mootTagString &besttag(const mootTagString &besttag) {
+  MOOT_TOKEN_INLINE mootTagString &besttag(const mootTagString &besttag) {
     tok_besttag = besttag;
     return tok_besttag;
   };
 
   /** Get token flavor */
-  inline mootTokFlavor flavor(void) const { return tok_flavor; }
+  MOOT_TOKEN_INLINE mootTokFlavor flavor(void) const { return tok_flavor; }
   /** Set token flavor */
-  inline mootTokFlavor flavor(const mootTokFlavor flavr) {
+  MOOT_TOKEN_INLINE mootTokFlavor flavor(const mootTokFlavor flavr) {
     tok_flavor = flavr;
     return tok_flavor;
   };
 
   /** Get token analyses */
-  inline const AnalysisSet &analyses(void) const {
+  MOOT_TOKEN_INLINE const AnalysisSet &analyses(void) const {
     return tok_analyses;
   };
   /** Set token analyses */
-  inline const AnalysisSet &analyses(const AnalysisSet &analyses)
+  MOOT_TOKEN_INLINE const AnalysisSet &analyses(const AnalysisSet &analyses)
   {
     tok_analyses = analyses;
     return tok_analyses;
   };
   /** Insert an analysis */
-  inline void insert(const Analysis &analysis)
+  MOOT_TOKEN_INLINE void insert(const Analysis &analysis)
   {
     tok_analyses.insert(analysis);
   };
   /** Remove an analysis */
-  inline void erase(const Analysis &analysis)
+  MOOT_TOKEN_INLINE void erase(const Analysis &analysis)
   {
     tok_analyses.erase(analysis);
   };
   /** Prune analyses, retaining only those for 'besttag' */
-  inline void prune(void)
+  MOOT_TOKEN_INLINE void prune(void)
   {
     Analysis bound(tok_besttag,MOOT_COST_LB);
     tok_analyses.erase(tok_analyses.begin(),
@@ -362,12 +380,12 @@ public:
   };
 
   /** Find first analysis (if any) whose tag is <= tag */
-  inline AnalysisSet::const_iterator lower_bound(const mootTagString &tag) const
+  MOOT_TOKEN_INLINE AnalysisSet::const_iterator lower_bound(const mootTagString &tag) const
   {
     return tok_analyses.lower_bound(Analysis(tag,MOOT_COST_LB));
   };
   /** Find first analysis (if any) whose tag is > tag */
-  inline AnalysisSet::const_iterator upper_bound(const mootTagString &tag) const
+  MOOT_TOKEN_INLINE AnalysisSet::const_iterator upper_bound(const mootTagString &tag) const
   {
     return tok_analyses.upper_bound(Analysis(tag,MOOT_COST_UB));
   };
@@ -383,7 +401,7 @@ public:
    *
    * \warning current analysis-set is NOT cleared by this method.
    */
-  inline void tokImport(const mootTokString *src_toktext=NULL,
+  MOOT_TOKEN_INLINE void tokImport(const mootTokString *src_toktext=NULL,
 			const mootTagSet    *src_tagset=NULL)
   {
     if (src_toktext) tok_text = *src_toktext;
@@ -407,7 +425,7 @@ public:
 
    * \warning argument tagset is NOT cleared by this method.
    */
-  inline void tokExport(mootTokString *dst_toktext=NULL,
+  MOOT_TOKEN_INLINE void tokExport(mootTokString *dst_toktext=NULL,
 			mootTagSet *dst_tagset=NULL,
 			bool want_besttag_in_tagset = true) const
   {

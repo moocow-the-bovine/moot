@@ -136,4 +136,4 @@ public:
 
 }; /*moot_END_NAMESPACE*/
 
-#endif /* _moot_TOKEN_H */
+#endif /* _moot_TOKEN_IO_H */
