@@ -35,7 +35,6 @@ pkgdoc_DATA = \
 	$(PODS:.pod=.txt) \
 	AUTHORS \
 	COPYING \
-	INSTALL \
 	ChangeLog
 
 #-----------------------------------------------------------------------
@@ -218,6 +217,7 @@ MAINTAINERCLEANFILES = *~ \
 
 ## --- extra distribution files
 EXTRA_DIST = \
+	INSTALL \
 	$(PODS:.pod=.txt) \
 	$(DEBIAN_FILES) \
 	autogen.sh\

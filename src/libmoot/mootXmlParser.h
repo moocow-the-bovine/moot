@@ -83,7 +83,7 @@ namespace moot {
      * \bufsize: length of parse buffer for expat
      * \encoding: override document input encoding (broken?)
      */
-    mootXmlParser(size_t bufsize=MOO_DEFAULT_XML_BUFLEN, const char *encoding=NULL);
+    mootXmlParser(size_t bufsize=MOOT_DEFAULT_XML_BUFLEN, const char *encoding=NULL);
 
     /** Reset parser state */
     virtual void reset(const char *encoding=NULL);
@@ -278,4 +278,4 @@ namespace moot {
 
 #endif // moot_XML_ENABLED
 
-#endif /* MOOT_XML_PARSER_H */
+#endif // MOOT_XML_PARSER_H

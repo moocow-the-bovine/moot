@@ -23,6 +23,9 @@
 
 #ifdef MOOT_XML_ENABLED
 
+using namespace moot;
+using namespace std;
+
 /*----------------------------------------------------
  * mootXmlParser: Constructor
  */
