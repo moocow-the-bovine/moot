@@ -31,10 +31,11 @@ http://www.freedesktop.org/software/pkgconfig/
 Alain Coetmeur's C++ ports of the famous lexer/parser
 generator pair, available from:
 ftp://iecc.com/pub/file/bison++flex++
+or
+from the official distribution site of this package.
 
-or from the official distribution site of
-this package.
 Tested with flex++-v2.3.8-4 and bison++-v1.21-5.
+
 
 =begin comment text
 
@@ -51,6 +52,7 @@ get one from the official distribution site of
 this package.
 
 =end comment text
+
 
 =item libFSM E<gt>= v0.1.0.6
 
@@ -70,7 +72,7 @@ the official distribution site of this package.
 =end comment text
 
 
-=item libFSMext E<gt>= v0.0.1
+=item libFSMext E<gt>= v0.0.2
 
 Should be available wherever you got this package.
 
@@ -120,12 +122,12 @@ If you find one, let me know!
 
 =head1 ACKNOWLEDGEMENTS
 
-This package was developed in the context of the
-project 'Kollokationen im Wörterbuch'
+Development of this package was supported by the project
+'Kollokationen im Wörterbuch'
 ("collocations in the dictionary", http://www.bbaw.de/forschung/kollokationen)
 in association with the project
-'Digitales Wörterbuch deutscher Sprache (DWDS)'
-("digital dictionary of the German language", http://www.dwds.de)
+'Digitales Wörterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
+("digital dictionary of the German language of the 20th century", http://www.dwds.de)
 at the Berlin-Brandenburgische Akademie der Wissenschaften (http://www.bbaw.de)
 with funding from
 the Alexander von Humboldt Stiftung (http://www.avh.org)

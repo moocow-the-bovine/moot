@@ -1,6 +1,7 @@
 moot (1.0.4) unstable; urgency=low
 
-  * renaming to "moot" from "dwdst".
+  * renamed to "moot" from "dwdst".
+  * cleaned up configure.in a tad.
 
  -- Bryan Jurish <moocow@ling.uni-potsdam.de>  Tue,  2 Dec 2003 13:24:39 +0100
 

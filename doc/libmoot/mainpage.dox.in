@@ -75,12 +75,11 @@ improvement (3x) with respect to mootMorph on its own.
 
 \section Ack Acknowledgements
 
-This package was developed in the context of the
-project
-<A HREF=http://www.bbaw.de/forschung/kollokationen>Kollokationen im Wörterbuch</A>
+Development of this package was supported by the project
+<A HREF="http://www.bbaw.de/forschung/kollokationen">Kollokationen im Wörterbuch</A>
 ("collocations in the dictionary")
 in association with the project
-<A HREF=http://www.dwds.de>Digitales Wörterbuch deutscher Sprache (DWDS)</A>
+<A HREF="http://www.dwds.de">Digitales Wörterbuch der deutschen Sprache des 20. Jahrhunderts(DWDS)</A>
 ("digital dictionary of the German language")
 at the
 <A HREF="http://www.bbaw.de">Berlin-Brandenburgische Akademie der Wissenschaften</A>
