@@ -1,0 +1,2 @@
+$config_cppflags = "-I@top_srcdir@/src/libdwdst -I@top_builddir@/src/libdwdst";
+1;
