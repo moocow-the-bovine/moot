@@ -243,7 +243,7 @@ MAINTAINERCLEANFILES = \
 	dwdstNgramsLexer.cc dwdstNgramsLexer.h \
 	dwdstNgramsParser.cc dwdstNgramsParser.h \
 	dwdstLexfreqsLexer.cc dwdstLexfreqsLexer.h \
-	dwdstLexfreqsParser.cc dwdstLexfreqsParser.h \
+	dwdstLexfreqsParser.cc dwdstLexfreqsParser.h
 
 ##-----------------------------------------------------------------------
 ## Variables: distribution
@@ -263,7 +263,7 @@ EXTRA_DIST = \
 	flexskel.cc flexskel.h \
 	bison.cc bison.h
 
-dist_old =
+dist_old = \
 	dwdstAlphabetLexer.ll \
 	dwdstAlphabetParser.yy
 
