@@ -34,7 +34,8 @@ all-local: $(STAMPFILE)
 #-----------------------------------------------------------------------
 
 ## -- directories for prerequisite-search
-vpath %.h @top_srcdir@/src/libdwdst @top_builddir@/src/libdwdst
+DOXY_INCLUDES = $(top_srcdir)/src/libdwdst $(top_builddir)/src/libdwdst
+vpath %.h $(DOXY_INCLUDES)
 
 DOXY_INPUTS = \
 	mainpage.dox \
@@ -73,7 +74,7 @@ $(STAMPFILE): $(DOXY_INPUTS)
 #-----------------------------------------------------------------------
 # doxygen hack: build rules (recurse in this directory)
 #-----------------------------------------------------------------------
-.doxy.stamp:
+.doxy.stamp: doxy-filter.cfg
 	@(if test -n "$(DOXYGEN)" ; then \
 	  echo "$(DOXYGEN) $<" ;\
 	  $(DOXYGEN) $< ;\
@@ -88,6 +89,9 @@ $(STAMPFILE): $(DOXY_INPUTS)
 	 fi)
 	 touch $@
 
+doxy-filter.cfg:
+	echo -e '$$config_cppflags = "$(patsubst %,-I%,$(DOXY_INCLUDES))";\n1;' > doxy-filter.cfg
+
 #-----------------------------------------------------------------------
 # Variables: cleanup
 #-----------------------------------------------------------------------
@@ -96,7 +100,9 @@ $(STAMPFILE): $(DOXY_INPUTS)
 #MOSTLYCLEANFILES =
 
 ## --- clean:  built by 'make'
-CLEANFILES = $(STAMPFILE) $(TAGFILE) $(DOXYBASE).log doxy-filter.log
+CLEANFILES = $(STAMPFILE) $(TAGFILE) $(DOXYBASE).log \
+	doxy-filter.log \
+	doxy-filter.cfg
 
 clean-local:
 	rm -rf html latex man

@@ -488,7 +488,7 @@ dnl
 dnl output
 dnl
 AC_CONFIG_FILES(src/libdwdst/Makefile src/programs/Makefile src/Makefile)
-AC_CONFIG_FILES(doc/libdwdst/doxy-filter.cfg doc/libdwdst/mainpage.dox)
+AC_CONFIG_FILES(doc/libdwdst/mainpage.dox)
 AC_CONFIG_FILES(doc/libdwdst/libdwdst.doxy doc/libdwdst/Makefile)
 AC_CONFIG_FILES(doc/programs/Makefile)
 AC_CONFIG_FILES(doc/Makefile)
