@@ -1,3 +1,11 @@
+dwdst (0.0.7) unstable; urgency=low
+
+  * compatibility-fix for ambiguity-class alphabet files.
+
+ -- Bryan Jurish <moocow@ling.uni-potsdam.de>  Sat, 22 Mar 2003 11:21:01 +0100
+
+
+
 dwdst (0.0.6) unstable; urgency=low
 
   * Initial release in .deb format.

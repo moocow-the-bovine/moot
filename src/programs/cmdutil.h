@@ -72,7 +72,7 @@ private:
  * const char *get_from_environment(VAR_NAME,VAR_DEFAULT)
  *   + uses strdup()
  */
-extern char *get_from_environment(const char *varname, const char *vardefault=NULL);
+//extern char *get_from_environment(const char *varname, const char *vardefault=NULL);
 
 
 #endif // _CMDUTIL_H

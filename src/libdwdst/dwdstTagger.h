@@ -203,7 +203,7 @@ public:
   //-------------------------------------
 
   // -- low-level public methods: environment
-  const char *get_from_environment(const char *varname, const char *vardefault=NULL);
+  //const char *get_from_environment(const char *varname, const char *vardefault=NULL);
 
   // -- low-level public methods: loading
   /** low-level FSTfile loading utility */

@@ -238,8 +238,10 @@ FILE *cmdutil_file_churner::next_list_file() {
 /*
  * const char *get_from_environment(VAR_NAME,VAR_DEFAULT)
  */
+/*
 char *get_from_environment(const char *varname, const char *vardefault=NULL)
 {
   char *value = getenv(varname);
   return value ? strdup(value) : (vardefault ? strdup(vardefault) : NULL);
 }
+*/

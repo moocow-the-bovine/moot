@@ -58,6 +58,9 @@ void GetMyOptions(int argc, char **argv)
   if (cmdline_parser(argc, argv, &args) != 0)
     exit(1);
 
+  // -- load environmental defaults
+  cmdline_parser_envdefaults(&args);
+
   // -- show banner
   if (args.verbose_arg > 0)
     fprintf(stderr,
@@ -82,40 +85,12 @@ void GetMyOptions(int argc, char **argv)
   // -- get initialization start-time
   if (args.verbose_arg > 0) gettimeofday(&istarted, NULL);
 
-  // -- global setup: environment variables : tagger
-  if (!args.symbols_given)
-    args.symbols_arg = get_from_environment("DWDST_SYMBOLS","dwdst.sym");
-  if (!args.morph_given)
-    args.morph_arg = get_from_environment("DWDST_MORPH","dwdst.fst");
-
-  if (strcmp(get_from_environment("DWDST_OUTPUT_FORMAT",""),"MABBAW") != 0)
-    args.tnt_format_given = 1;
-  if (strcmp(get_from_environment("DWDST_AVM_FORMAT",""),"yes") == 0)
-    args.avm_given = 1;
-  if (strcmp(get_from_environment("DWDST_NUMERIC_FORMAT",""),"yes") == 0)
-    args.numeric_given = 1;
-  if (strcmp(get_from_environment("DWDST_TAGS_ONLY",""),"yes") == 0)
-    args.tags_only_given = 1;
-  
-  /*if (!args.eos_given)
-    args.eos_arg = get_from_environment("DWDST_EOS","--EOS--");*/
-
-  // -- global setup: environment variables: disambiguator
-  if (!args.alphabet_given)
-    args.alphabet_arg = get_from_environment("DWDST_ALPHABET", "dwdstd.alph");
-  if (!args.dsymbols_given)
-    args.dsymbols_arg = get_from_environment("DWDST_DSYMBOLS", "dwdstd.sym");
-  if (!args.disambig_given)
-    args.disambig_arg = get_from_environment("DWDST_DISAMBIG", "dwdstd.fst");
-  if (!args.bottom_given)
-    args.bottom_arg = get_from_environment("DWDST_BOTTOM", "BOTTOM");
-
   // -- tagger object setup : flags
   dwdst.want_avm = args.avm_given;
   dwdst.want_numeric = args.numeric_given;
   //dwdst.want_binary = args.binary_given;
   dwdst.want_features = !args.tags_only_given;
-  dwdst.want_tnt_format = args.tnt_format_given;
+  dwdst.want_tnt_format = args.tnt_format_given || !args.mabbaw_format_given;
   dwdst.verbose  = args.verbose_arg;
 
   // -- tagger object setup : symbols
@@ -227,7 +202,7 @@ int main (int argc, char **argv)
 
   // -- the guts
   if (args.words_given) {
-    fprintf(out.file, "# %s: Analyzing command-line tokens\n\n", PROGNAME);
+    //fprintf(out.file, "# %s: Analyzing command-line tokens\n\n", PROGNAME);
     dwdst.tag_strings(args.inputs_num, args.inputs, out.file);
   } else {
     // -- big loop
