@@ -49,6 +49,7 @@ pod2usage({-verbose=>0}) if ($help);
 ###############################################################
 
 ## -- read in parameter files
+if ($verbose > 0) { print "Reading input files...\n"; }
 %ngrams = ();
 while (defined($_ = <>)) {
   chomp($_);
@@ -69,6 +70,8 @@ while (defined($_ = <>)) {
   $weights{$weight}{$ngram} = undef;
 }
 
+
+if ($verbose > 0) { print "Examining n-gram tables...\n"; }
 %ambigs = ();
 while (($weight,$ngset) = each(%weights)) {
   # examine
@@ -90,7 +93,7 @@ while (($weight,$ngset) = each(%weights)) {
 	= $ambigs{"$weight"}{$ng1} = undef;
 
       ## -- DEBUG:
-      if ($verbose > 0) {
+      if ($verbose > 1) {
 	print("> Found ambiguity for weight $weight :\n",
 	      ">     Ngram_1: '$ng1'\n",
 	      ">  \!= Ngram_2: '$ng2'\n\n");
