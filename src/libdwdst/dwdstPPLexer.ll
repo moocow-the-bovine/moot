@@ -200,7 +200,7 @@ void dwdstPPLexer::step_streams(FILE *in, FILE *out)
 
 /*----------------------------------------------------------------------
  */
-bool dwdstPPLexer::tokenize_stream(FILE *in=stdin, FILE *out=stdout)
+bool dwdstPPLexer::tokenize_stream(FILE *in, FILE *out)
 {
   int tok;
   step_streams(in,out);

@@ -14,12 +14,26 @@
 
 #include <string>
 #include <deque>
-#include <hash_map>
-#include <hash_set>
 #include <map>
 #include <set>
 //#include <pair>
+//#include <hash_map>
+//#include <hash_set>
 
+#include <hash_map.h>
+#include <hash_set.h>
+#if defined(__GNUC__)
+#  if __GNUC__ >= 3
+#    if __GNUC_MINOR__ == 0
+#      define DWDST_STL_NAMESPACE std
+#    else
+#      define DWDST_STL_NAMESPACE __gnu__cxx
+#    endif /* __GNUC_MINOR__ == 0 */
+#  else  /* __GNUC__ >= 3 */
+#  endif /* __GNUC__ >= 3 */
+#else  /* defined(__GNUC__) */
+#  define DWDST_STL_NAMESPACE std
+#endif /* defiend(__GNUC__) */
 
 #include <FSM.h>
 #include <FSMSymSpec.h>
