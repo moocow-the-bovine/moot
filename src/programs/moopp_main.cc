@@ -20,7 +20,7 @@
 #include <sys/time.h>
 #endif
 
-#include <dwdstPPLexer.h>
+#include <mootPPLexer.h>
 #include "dwdspp_cmdparser.h"
 #include "cmdutil.h"
 
@@ -73,7 +73,7 @@ void GetMyOptions(int argc, char **argv)
  *--------------------------------------------------------------------------*/
 int main (int argc, char **argv)
 {
-  dwdstPPLexer lexer;
+  mootPPLexer lexer;
   int nfiles = 0;
   timeval started,stopped;
   double elapsed;

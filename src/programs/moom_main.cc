@@ -20,13 +20,13 @@
 #include <sys/time.h>
 #endif
 
-#include <dwdstMorph.h>
+#include <mootMorph.h>
 
 #include "cmdutil.h"
 #include "dwdsm_cmdparser.h"
 
 using namespace std;
-using namespace dwdst;
+using namespace moot;
 
 /*--------------------------------------------------------------------------
  * Globals
@@ -45,7 +45,7 @@ char *fstfile = NULL;
 cmdutil_file_info out;
 
 // -- global classes/structs
-dwdstMorph morph;
+mootMorph morph;
 
 // -- for verbose timing info
 timeval t1, t2, t3;
@@ -100,12 +100,12 @@ void GetMyOptions(int argc, char **argv)
   morph.want_mabbaw_format = args.mabbaw_given;
   morph.do_dequote         = args.dequote_given;
 
-  if      (args.verbose_arg <= vlSilent)   morph.verbose = dwdstMorph::vlSilent;
-  //else if (args.verbose_arg <= vlErrors)   morph.verbose = dwdstMorph::vlErrors;
-  //else if (args.verbose_arg <= vlProgress) morph.verbose = dwdstMorph::vlErrors;
-  else if (args.verbose_arg <= vlTiming)   morph.verbose = dwdstMorph::vlErrors;
-  else if (args.verbose_arg <= vlWarnings) morph.verbose = dwdstMorph::vlWarnings;
-  else                                     morph.verbose = dwdstMorph::vlEverything;
+  if      (args.verbose_arg <= vlSilent)   morph.verbose = mootMorph::vlSilent;
+  //else if (args.verbose_arg <= vlErrors)   morph.verbose = mootMorph::vlErrors;
+  //else if (args.verbose_arg <= vlProgress) morph.verbose = mootMorph::vlErrors;
+  else if (args.verbose_arg <= vlTiming)   morph.verbose = mootMorph::vlErrors;
+  else if (args.verbose_arg <= vlWarnings) morph.verbose = mootMorph::vlWarnings;
+  else                                     morph.verbose = mootMorph::vlEverything;
 
   //-- morphology object setup : symbols
   if (args.verbose_arg >= vlProgress)

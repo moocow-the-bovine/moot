@@ -1,6 +1,6 @@
 # -*- Mode: Shell-Script -*-
 #
-# Getopt::Gen specification for dwdst
+# Getopt::Gen specification for moot
 #-----------------------------------------------------------------------------
 program "dwdsm"
 #program_version "0.01"
@@ -14,7 +14,7 @@ on_reparse "warn"
 #-----------------------------------------------------------------------------
 details "
 'dwdsm' is a morphological analyzer
-program based on the 'libdwdst' library, using Thomas
+program based on the 'libmoot' library, using Thomas
 Hanneforth's FSM library for representation and manipulation
 of the underlying finite-state machines.
 "
@@ -104,8 +104,8 @@ group "Morphology Options"
 
 string "symbols" s "Specify morphological symbols file." \
     arg="FILE" \
-    default="dwdst.sym" \
-    edefault="DWDST_SYMBOLS" \
+    default="moot.sym" \
+    edefault="moot_SYMBOLS" \
     details="
 This symbols file will be used to analyze input-tokens and
 to generate output strings.
@@ -113,8 +113,8 @@ to generate output strings.
 
 string "morph" m "Specify morphological transducer." \
     arg="FILE" \
-    default="dwdst.fst" \
-    edefault="DWDST_MORPH" \
+    default="moot.fst" \
+    edefault="moot_MORPH" \
     details="
 This file should contain a finite-state transducer to be
 used for morphological analysis.
@@ -161,4 +161,4 @@ For details on the DWDS project, visit: http://www.dwds.de.
 
 "
 
-seealso "L<dwdspp>, L<dwdshmm>, L<dwdst>"
+seealso "L<dwdspp>, L<dwdshmm>, L<moot>"

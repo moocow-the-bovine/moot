@@ -3,13 +3,13 @@
 ########################################################################
 #        File: analyse-parfile.perl
 #      Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
-# Description: analyse a DWDST parameter file
+# Description: analyse a moot parameter file
 ########################################################################
 
 use Getopt::Long;
 use Pod::Usage;
 
-# USAGE = $0 < DWDST_PAR_FILE
+# USAGE = $0 < moot_PAR_FILE
 
 ########################################################################
 # Globals
@@ -137,7 +137,7 @@ __END__
 
 =head1 NAME
 
-analyse-parfile.perl - analyse a DWDST parameter file.
+analyse-parfile.perl - analyse a moot parameter file.
 
 =head1 SYNOPSIS
 

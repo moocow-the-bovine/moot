@@ -12,7 +12,7 @@
 #include "cmdutil.h"
 
 #ifdef HAVE_CONFIG_H
-# include <dwdstConfig.h>
+# include <mootConfig.h>
 #endif
 
 /*--------------------------------------------------------------------

@@ -1,8 +1,8 @@
 # -*- Mode: Shell-Script -*-
 #
-# Getopt::Gen specification for dwdst
+# Getopt::Gen specification for moot
 #-----------------------------------------------------------------------------
-program "dwdstrain"
+program "mootrain"
 #program_version "0.01"
 
 purpose	"Trainer for HMM Part-of-Speech taggers/disambiguators for the KDWDS project."
@@ -13,15 +13,15 @@ on_reparse "warn"
 # Details
 #-----------------------------------------------------------------------------
 details "
-'dwdstrain' gathers training data for HMM disambiguators used
-by 'dwdshmm' and 'dwdst'.
+'mootrain' gathers training data for HMM disambiguators used
+by 'dwdshmm' and 'moot'.
 "
 
 #-----------------------------------------------------------------------------
 # Files
 #-----------------------------------------------------------------------------
-rcfile "/etc/dwdstrainrc"
-rcfile "~/.dwdstrainrc"
+rcfile "/etc/mootrainrc"
+rcfile "~/.mootrainrc"
 
 
 #-----------------------------------------------------------------------------
@@ -34,7 +34,7 @@ by Thorsten Brants' tnt-para(1) program: one token per line,
 tags and tokens separated by a single TAB character.  Blank
 lines indicate end-of-sentence.
 
-Currently, 'dwdstrain' also accepts ambiguous input files,
+Currently, 'mootrain' also accepts ambiguous input files,
 although this feature may be optimized away to
 another program in the future.
 "
@@ -78,7 +78,7 @@ int "kmax" k "Specify maximum n-gram length (default=3)" \
   default="3" \
   details="
 Specifying any value less than 3 may cause lambda estimation
-to fail miserably in dwdstHMM and/or dwdstCHMM -- don't do it.
+to fail miserably in mootHMM and/or mootCHMM -- don't do it.
 "
 
 flag "verbose-ngrams" N "Generate long-form ngrams (default=no)"
@@ -90,8 +90,8 @@ addenda "
 
 =head2 Model Files
 
-The dwdstrain program produces text-format model files for use with
-dwdshmm(1) and/or dwdst(1).
+The mootrain program produces text-format model files for use with
+dwdshmm(1) and/or moot(1).
 
 A \"Text Model\" TMODEL is completely defined by a pair of files
 'TMODEL.lex' and 'TMODEL.123' (see below for details on these files).
@@ -157,4 +157,4 @@ For details on the DWDS project, visit: http://www.dwds.de.
 
 "
 
-seealso "L<dwdspp>, L<dwdshmm>, L<dwdsm>, L<dwdst>"
+seealso "L<dwdspp>, L<dwdshmm>, L<dwdsm>, L<moot>"

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------
- * File: dwdsttrain_main.cc
+ * File: moottrain_main.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
  *   + CHMM PoS tagger/disambiguator for DWDS project: trainer : main()
@@ -22,21 +22,21 @@
 
 #include <string>
 
-#include <dwdstLexfreqs.h>
-#include <dwdstNgrams.h>
-#include <dwdstHMMTrainer.h>
+#include <mootLexfreqs.h>
+#include <mootNgrams.h>
+#include <mootHMMTrainer.h>
 
 #include "cmdutil.h"
 #include "hmmutil.h"
-#include "dwdstrain_cmdparser.h"
+#include "mootrain_cmdparser.h"
 
 using namespace std;
-using namespace dwdst;
+using namespace moot;
 
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-char *PROGNAME = "dwdstrain";
+char *PROGNAME = "mootrain";
 
 // options & file-churning
 gengetopt_args_info  args;
@@ -47,9 +47,9 @@ cmdutil_file_info lfout;
 cmdutil_file_info ngout;
 
 // -- global classes/structs
-dwdstHMMTrainer hmmt;
-dwdstNgrams    &ngrams = hmmt.ngrams;
-dwdstLexfreqs  &lexfreqs = hmmt.lexfreqs;
+mootHMMTrainer hmmt;
+mootNgrams    &ngrams = hmmt.ngrams;
+mootLexfreqs  &lexfreqs = hmmt.lexfreqs;
 
 typedef enum {
   vlSilent=0,

@@ -1,12 +1,12 @@
 -----------------------------------------------------
 Fri Jan 17 15:31:18 CET 2003
 + TH fsm_strings()
-moocow@carrot:~/work/fsmdev/dwdst/src/programs$ ./dwdst narr.pp -o narr.out
-dwdst version 0.0.3 by Bryan Jurish <moocow@ling.uni-potsdam.de>
-dwdst: loading symbols-file 'dwdst.sym'... loaded.
-dwdst: loading morphology FST 'dwdst.fst'... loaded.
-dwdst: Initialization complete
-dwdst Summary:
+moocow@carrot:~/work/fsmdev/moot/src/programs$ ./moot narr.pp -o narr.out
+moot version 0.0.3 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+moot: loading symbols-file 'moot.sym'... loaded.
+moot: loading morphology FST 'moot.fst'... loaded.
+moot: Initialization complete
+moot Summary:
   + Files processed  : 1
   + Tokens processed : 161328
   + Unknown tokens   : 2533
@@ -17,13 +17,13 @@ dwdst Summary:
 -----------------------------------------------------
 -----------------------------------------------------
 Fri Jan 17 15:31:18 CET 2003
-+ TH fsm_strings(), added 'numeric' arg to dwdst
-moocow@carrot:~/work/fsmdev/dwdst/src/programs$ ./dwdst narr.pp -o narr.out
-dwdst version 0.0.3 by Bryan Jurish <moocow@ling.uni-potsdam.de>
-dwdst: loading symbols-file 'dwdst.sym'... loaded.
-dwdst: loading morphology FST 'dwdst.fst'... loaded.
-dwdst: Initialization complete
-dwdst Summary:
++ TH fsm_strings(), added 'numeric' arg to moot
+moocow@carrot:~/work/fsmdev/moot/src/programs$ ./moot narr.pp -o narr.out
+moot version 0.0.3 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+moot: loading symbols-file 'moot.sym'... loaded.
+moot: loading morphology FST 'moot.fst'... loaded.
+moot: Initialization complete
+moot Summary:
   + Files processed  : 1
   + Tokens processed : 161328
   + Unknown tokens   : 2533
@@ -35,12 +35,12 @@ dwdst Summary:
 -----------------------------------------------------
 Fri Jan 17 15:31:18 CET 2003
 + moo fsm_symbol_vectors(), numeric output
-moocow@carrot:~/work/fsmdev/dwdst/src/programs$ ./dwdst -n narr.pp -o narr.out
-dwdst version 0.0.3 by Bryan Jurish <moocow@ling.uni-potsdam.de>
-dwdst: loading symbols-file 'dwdst.sym'... loaded.
-dwdst: loading morphology FST 'dwdst.fst'... loaded.
-dwdst: Initialization complete
-dwdst Summary:
+moocow@carrot:~/work/fsmdev/moot/src/programs$ ./moot -n narr.pp -o narr.out
+moot version 0.0.3 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+moot: loading symbols-file 'moot.sym'... loaded.
+moot: loading morphology FST 'moot.fst'... loaded.
+moot: Initialization complete
+moot Summary:
   + Files processed  : 1
   + Tokens processed : 161328
   + Unknown tokens   : 2533
@@ -55,7 +55,7 @@ dwdst Summary:
 -----------------------------------------------------
 SOURCE: katholisch.pp
 OFLAGS='-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000'
-dwdst Summary:
+moot Summary:
   + Files processed  : 1
   + Tokens processed : 5871
   + Unknown tokens   : 972
@@ -68,7 +68,7 @@ dwdst Summary:
 -----------------------------------------------------
 SOURCE: katholisch.pp
 OFLAGS='-O3 -ffast-math'
-dwdst Summary:
+moot Summary:
   + Files processed  : 1
   + Tokens processed : 5871
   + Unknown tokens   : 972
@@ -84,7 +84,7 @@ dwdst Summary:
 ----------------------------------------------------
 SOURCE: narr.pp
 OFLAGS='-O3 -fomit-frame-pointer -funroll-loops'
-dwdst Summary:
+moot Summary:
   + Files processed  : 1
   + Tokens processed : 161328
   + Unknown tokens   : 26888
@@ -97,7 +97,7 @@ dwdst Summary:
 ----------------------------------------------------
 SOURCE: narr.pp
 OFLAGS='-O3 -ffast-math'
-dwdst Summary:
+moot Summary:
   + Files processed  : 1
   + Tokens processed : 161328
   + Unknown tokens   : 26888
@@ -110,7 +110,7 @@ dwdst Summary:
 ----------------------------------------------------
 SOURCE: narr.pp
 OFLAGS='-O3 -ffast-math'
-dwdst Summary:
+moot Summary:
   + Files processed  : 1
   + Tokens processed : 161328
   + Unknown tokens   : 26888

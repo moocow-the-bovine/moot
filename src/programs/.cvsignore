@@ -1,11 +1,11 @@
-dwdstrain
+mootrain
 dwdspp
-dwdst
-dwdstt
+moot
+moott
 dwdsm
 dwdshmm
-dwdst-pargen
-dwdst-fstgen
+moot-pargen
+moot-fstgen
 *.pod
 *.1
 *.xml

@@ -1,5 +1,5 @@
-/* just include the config.h for libdwdst */
-#include <dwdstConfig.h>
+/* just include the config.h for libmoot */
+#include <mootConfig.h>
 
 /* PACKAGE does not jive well with multiple-program pacakges
    using 'gengetopt'.  'autoheader' doesn't like to undefine
@@ -11,5 +11,5 @@
 #endif
 */
 
-//#endif // _DWDST_CONFIG_H
+//#endif // _moot_CONFIG_H
 
