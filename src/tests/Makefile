@@ -120,7 +120,8 @@ dskel = dskeleton.fsa
 nodskel: ; rm -f $(dskel)
 dskel: $(dskel)
 	@echo ">> N-Gram Parameter File    = $(par)"
-	@echo ">> Disambiguation-Skeleton  = $(dis)"
+	@echo ">> Disambiguation-Skeleton  = $(dskel)"
+	FSMinto $(dskel)
 
 $(dskel): $(par)
 	( cd ../programs ;\
@@ -134,6 +135,7 @@ nodis: ; rm -f $(dis)
 dis: $(dis)
 	@echo ">> N-Gram Parameter File = $(par)"
 	@echo ">> Disambiguation-FSA    = $(dis)"
+	FSMinfo $(dis)
 
 .par.fsa:
 	( cd ../programs ;\
