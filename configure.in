@@ -158,8 +158,8 @@ if test "$ac_cv_enable_zlib" != "no" ; then
     AC_MSG_WARN([             'CPPFLAGS' environment variable?])
     AC_MSG_WARN([----------------------------------------------------------------])
     AC_MSG_WARN([])
+    ac_cv_enable_zlib="no"
   fi
-  ac_cv_enable_zlib="no"
  done
 fi
 
