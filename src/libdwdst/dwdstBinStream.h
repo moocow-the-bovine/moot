@@ -14,8 +14,8 @@
 #include <unistd.h>
 #include <zlib.h>
 
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 
 namespace dwdstBinStream {
   using namespace std;

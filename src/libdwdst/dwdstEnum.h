@@ -10,10 +10,29 @@
 #ifndef _DWDST_ENUM_H
 #define _DWDST_ENUM_H
 
-#include <hash_map>
+#if defined(__GNUC__)
+#  if __GNUC__ >= 3
+#    if __GNUC_MINOR__ == 0
+#      define DWDST_STL_NAMESPACE std
+#    else
+#      define DWDST_STL_NAMESPACE __gnu_cxx
+#    endif /* __GNUC_MINOR__ == 0 */
+#    include <ext/hash_map>
+#    include <ext/hash_set>
+#  else  /* __GNUC__ >= 3 */
+#    include <hash_map>
+#    include <hash_set>
+#  endif /* __GNUC__ >= 3 */
+#else  /* defined(__GNUC__) */
+#  include <hash_map>
+#  include <hash_set>
+#  define DWDST_STL_NAMESPACE std
+#endif /* defiend(__GNUC__) */
+
 #include <vector>
 
 using namespace std;
+using namespace DWDST_STL_NAMESPACE;
 
 /**
  * Value type for runtime enumerations.  The value '0' (zero) is reserved.
@@ -103,7 +122,7 @@ public:
   /** Lookup ID for name, returns 0 if name is unregistered. */
   inline dwdstEnumID name2id(const NameType &name) const
   {
-    Name2IdMap::const_iterator i = names2ids.find(name);
+    typename Name2IdMap::const_iterator i = names2ids.find(name);
     return i == names2ids.end() ? 0 : i->second;
   };
 

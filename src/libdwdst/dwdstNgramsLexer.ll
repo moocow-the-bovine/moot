@@ -174,7 +174,7 @@ void dwdstNgramsLexer::select_streams(FILE *in, FILE *out) {
 /*
  * void dwdstNgramsLexer::select_string(const char *in, FILE *out=stdout)
  */
-void dwdstNgramsLexer::select_string(const char *in, FILE *out=stdout) {
+void dwdstNgramsLexer::select_string(const char *in, FILE *out) {
   select_streams(stdin,out);  // flex __really__ wants a real input stream
 
   // -- string-buffer stuff

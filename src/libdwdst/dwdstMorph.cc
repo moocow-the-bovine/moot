@@ -85,7 +85,7 @@ FSMSymSpec *dwdstMorph::load_morph_symbols(const char *filename)
 /*
  * FSM *dwdstMorph::load_fsm_file(const char *filename, FSM **fsm, bool *i_made_fsm=NULL);
  */
-FSM *dwdstMorph::load_fsm_file(const char *filename, FSM **fsm, bool *i_made_fsm=NULL)
+FSM *dwdstMorph::load_fsm_file(const char *filename, FSM **fsm, bool *i_made_fsm)
 {
   // -- cleanup old FSM first
   if (*fsm && i_made_fsm && *i_made_fsm) { delete *fsm; }
@@ -110,7 +110,7 @@ FSM *dwdstMorph::load_fsm_file(const char *filename, FSM **fsm, bool *i_made_fsm
  * Top-level tagging methods
  *--------------------------------------------------------------------------*/
 
-bool dwdstMorph::tag_stream(FILE *in=stdin, FILE *out, char *srcname)
+bool dwdstMorph::tag_stream(FILE *in, FILE *out, char *srcname)
 {
   dwdstTaggerLexer lexer;
 

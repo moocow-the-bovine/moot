@@ -13,8 +13,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#include <hash_map>
-
 #include "dwdstTypes.h"
 #include "dwdstLexfreqs.h"
 #include "dwdstNgrams.h"

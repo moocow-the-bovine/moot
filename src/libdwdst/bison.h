@@ -48,6 +48,15 @@ $ /* %{ and %header{ and %union, during decl */
 #define yystype YY_@_STYPE
 #endif
 #endif
+/* use goto to be compatible */
+#ifndef YY_@_USE_GOTO
+#define YY_@_USE_GOTO 1
+#endif
+#endif
+
+/* use no goto to be clean in C++ */
+#ifndef YY_@_USE_GOTO
+#define YY_@_USE_GOTO 0
 #endif
 
 #ifndef YY_@_PURE
@@ -153,32 +162,42 @@ $ /* #defines token */
 #ifndef YY_@_CONSTRUCTOR_PARAM
 #define YY_@_CONSTRUCTOR_PARAM
 #endif
+/* choose between enum and const */
+#ifndef YY_@_USE_CONST_TOKEN
+#define YY_@_USE_CONST_TOKEN 0
+/* yes enum is more compatible with flex,  */
+/* so by default we use it */ 
+#endif
+#if YY_@_USE_CONST_TOKEN != 0
+#ifndef YY_@_ENUM_TOKEN
+#define YY_@_ENUM_TOKEN yy_@_enum_token
+#endif
+#endif
 
-/** bison++ generated parser class */
 class YY_@_CLASS YY_@_INHERIT
 {
-public: /* static const int token ... */
+public: 
+#if YY_@_USE_CONST_TOKEN != 0
+/* static const int token ... */
 $ /* decl const */
+#else
+enum YY_@_ENUM_TOKEN { YY_@_NULL_TOKEN=0
+$ /* enum token */
+     }; /* end of enum declaration */
+#endif
 public:
- /** Perform parsing */
  int YY_@_PARSE(YY_@_PARSE_PARAM);
- /** report errors */
- virtual void YY_@_ERROR(const char *msg) YY_@_ERROR_BODY;
+ virtual void YY_@_ERROR(char *msg) YY_@_ERROR_BODY;
 #ifdef YY_@_PURE
 #ifdef YY_@_LSP_NEEDED
- /** get next token from input stream */
  virtual int  YY_@_LEX(YY_@_STYPE *YY_@_LVAL,YY_@_LTYPE *YY_@_LLOC) YY_@_LEX_BODY;
 #else
- /** get next token from input stream */
  virtual int  YY_@_LEX(YY_@_STYPE *YY_@_LVAL) YY_@_LEX_BODY;
 #endif
 #else
- /** get next token from input stream */
  virtual int YY_@_LEX() YY_@_LEX_BODY;
- /** semantic value of current token */
  YY_@_STYPE YY_@_LVAL;
 #ifdef YY_@_LSP_NEEDED
- /** current parser location */
  YY_@_LTYPE YY_@_LLOC;
 #endif
  int YY_@_NERRS;
@@ -186,11 +205,9 @@ public:
 #endif
 #if YY_@_DEBUG != 0
 public:
- /** debug flag: nonzero means print parse trace */
- int YY_@_DEBUG_FLAG;
+ int YY_@_DEBUG_FLAG;	/*  nonzero means print parse trace	*/
 #endif
 public:
- /** constructor */
  YY_@_CLASS(YY_@_CONSTRUCTOR_PARAM);
 public:
  YY_@_MEMBERS 

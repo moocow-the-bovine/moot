@@ -169,7 +169,7 @@ void dwdstLexfreqsLexer::select_streams(FILE *in, FILE *out) {
 /*
  * void dwdstLexfreqsLexer::select_string(const char *in, FILE *out=stdout)
  */
-void dwdstLexfreqsLexer::select_string(const char *in, FILE *out=stdout) {
+void dwdstLexfreqsLexer::select_string(const char *in, FILE *out) {
   select_streams(stdin,out);  // flex __really__ wants a real input stream
 
   // -- string-buffer stuff
