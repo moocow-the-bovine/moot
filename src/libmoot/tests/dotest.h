@@ -2,7 +2,10 @@
 #define DOTEST_H
 
 #include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <stdio.h>
+#include <string.h>
 
 timeval tv_started;
 timeval tv_stopped;
@@ -40,6 +43,42 @@ void dotest_report(const char *label,
 void memprompt(const char *label="none") {
   fprintf(stderr, "Check memory (label=\"%s\") ? ", label);
   fgetc(stdin);
+}
+
+
+size_t memrss(void)
+{
+  pid_t mypid = getpid();
+  char statfilename[256];
+  sprintf(statfilename, "/proc/%d/status", mypid);
+  FILE *statfile = fopen(statfilename, "r");
+  if (!statfile) {
+    fprintf(stderr, "memrss(): could not open %s\n", statfilename);
+    return 0;
+  }
+
+  //-- parse
+  const char   *FieldName    = "VmRSS:";
+  const size_t  FieldNameLen = strlen(FieldName);
+  char    *line = NULL;
+  size_t  linesize = 0;
+  int   linelen = 0;
+  size_t rss = 0;
+  while (!feof(statfile) && (linelen = getline(&line,&linesize,statfile)) != -1) {
+    if (strstr(line,FieldName)==line) {
+      sscanf(line+FieldNameLen, "%u", &rss);
+      break;
+    }
+  }
+
+  //-- cleanup
+  if (line) free(line);
+  fclose(statfile);
+  return rss;
+}
+
+void showmem(const char *label="none") {
+  fprintf(stderr, "-> rss(label=\"%s\")=%u\n", label, memrss());
 }
 
 #endif // DOTEST_H

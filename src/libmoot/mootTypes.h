@@ -91,8 +91,18 @@ using namespace moot_STL_NAMESPACE;
  * Basic Types
  *----------------------------------------------------------------------*/
 
+//#define MOOT_USE_DOUBLE
+
+#ifdef MOOT_USE_DOUBLE
+/** Type for probabilities */
+typedef double ProbT;
+#else
+/** Type for probabilities */
+typedef float ProbT;
+#endif //-- MOOT_USE_DOUBLE
+
 /** Count types (for raw frequencies) */
-typedef float CountT;
+typedef ProbT CountT;
 
 
 moot_END_NAMESPACE

@@ -49,34 +49,42 @@
 /**
  * \def mootProbEpsilon
  * Constant representing a minimal probability.
- * Used for default constructor.  The standard value
- * should be appropriate for an IEEE 754-1985 float,
- * but we want our probabilities bigger, so we use
- * DBL_EPSILON if we can.
+ * Used for default constructor. 
+ * The standard value should be appropriate for an IEEE 754-1985 float.
  */
-//#define mootProbEpsilon FLT_EPSILON
-//#define mootProbEpsilon 1e-32
-#ifdef DBL_EPSILON
-# define mootProbEpsilon DBL_EPSILON
+#define mootProbEpsilon  1.19209290E-06F
+/*
+#ifdef FLT_EPSILON
+//#define mootProbEpsilon FLT_EPSILON*10
+# define mootProbEpsilon  FLT_EPSILON*10
 #else
-# define mootProbEpsilon 1.19209290E-07
+# define mootProbEpsilon  1.19209290E-06F
+//#define mootProbEpsilon 1.19209290E-07F
 #endif
+*/
 
 /** \def MOOT_PROB_ZERO
- * Probability lower-bound
+ * Probability lower-bound.
+ * The standard value should be appropriate for an IEEE 754-1985 float.
  *
  * \def MOOT_PROB_ONE
  * Probability upper-bound
+ * The standard value should be appropriate for an IEEE 754-1985 float.
  */
-#ifdef DBL_MAX
-#  define MOOT_PROB_NEG  -DBL_MAX
+#define MOOT_PROB_NEG  -3E+38
+#define MOOT_PROB_ZERO -1E+38
+#define MOOT_PROB_ONE   0.0
+/*
+#ifdef FLT_MAX
+#  define MOOT_PROB_NEG  -FLT_MAX
 #  define MOOT_PROB_ZERO -1E+38
 #  define MOOT_PROB_ONE   0.0
-# else //-- !DBL_MAX
+# else //-- !(DBL|FLT)_MAX
 #  define MOOT_PROB_NEG  -3E+38
 #  define MOOT_PROB_ZERO -1E+38
 #  define MOOT_PROB_ONE   0.0
-#endif //-- /DBL_MAX
+#endif //-- /(DBL|FLT)_MAX
+*/
 
 /**
  * \def MOOT_LEX_UNKNOWN_TOKENS
@@ -151,14 +159,6 @@ public:
     vlEverything  /**< Report everything we can */
   } VerbosityLevel;
 
-
-  /**
-   * Type for a single probability value.
-   * We use \c double here, since our probabilties can get wee tiny small
-   * for longish sentences.
-   */
-  typedef double ProbT;
-  //typedef float ProbT;
 
   /** Type for a tag-identifier. Zero indicates an unknown tag. */
   typedef mootEnumID TagID;
