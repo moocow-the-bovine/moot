@@ -51,9 +51,12 @@ int mootEval::compareTokens(const mootToken &tok1, const mootToken &tok2)
     status |= MEF_EmptyClass1;
   } else {
     bound = tok1.lower_bound(tok1.besttag());
-    if (bound == tok1.analyses().end() || bound->tag != tok1.besttag()) status |= MEF_ImpClass1;
+    if (bound == tok1.analyses().end() || bound->tag != tok1.besttag())
+	status |= MEF_ImpClass1;
+
     bound = tok1.lower_bound(tok2.besttag());
-    if (bound == tok1.analyses().end() || bound->tag != tok1.besttag()) status |= MEF_XImpClass1;
+    if (bound == tok1.analyses().end() || bound->tag != tok2.besttag())
+	status |= MEF_XImpClass1;
   }
 
   if (tok2.analyses().empty()) {
@@ -61,9 +64,12 @@ int mootEval::compareTokens(const mootToken &tok1, const mootToken &tok2)
     status |= MEF_EmptyClass2;
   } else {
     bound = tok2.lower_bound(tok2.besttag());
-    if (bound == tok2.analyses().end() || bound->tag != tok2.besttag()) status |= MEF_ImpClass2;
+    if (bound == tok2.analyses().end() || bound->tag != tok2.besttag())
+	status |= MEF_ImpClass2;
+
     bound = tok2.lower_bound(tok1.besttag());
-    if (bound == tok2.analyses().end() || bound->tag != tok1.besttag()) status |= MEF_XImpClass2;
+    if (bound == tok2.analyses().end() || bound->tag != tok1.besttag())
+	status |= MEF_XImpClass2;
   }
 
   return status;

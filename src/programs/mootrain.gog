@@ -5,7 +5,7 @@
 program "mootrain"
 #program_version "0.01"
 
-purpose	"moocow's trainer for HMM part-of-speech taggers/disambiguators."
+purpose	"moocow's PoS tagger : HMM trainer."
 author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
 on_reparse "warn"
 
@@ -13,8 +13,8 @@ on_reparse "warn"
 # Details
 #-----------------------------------------------------------------------------
 details "
-'mootrain' gathers training data for HMM disambiguators used
-by 'moothmm' and 'moot'.
+'mootrain' gathers training data for the HMM tagger
+used by 'moot' from a tagged training corpus.
 "
 
 #-----------------------------------------------------------------------------
@@ -35,6 +35,7 @@ tags and tokens separated by a single TAB character.  A blank
 line indicates a sentence boundary.  The initial analysis for
 each token is considered the 'best' analysis.  Subsequent
 analyses are used to construct lexical class frequencies.
+
 See L<mootfiles> for details.
 "
 
@@ -123,4 +124,4 @@ Only ca. 99.998% compatible with tnt-para(1).
 #-----------------------------------------------------------------------------
 acknowledge `cat acknowledge.pod`
 
-seealso "L<mootpp>, L<moothmm>, L<moot>"
+seealso "L<mootpp>, L<mootm>, L<moot>, L<mooteval>, L<mootfiles>"

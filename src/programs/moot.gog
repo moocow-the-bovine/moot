@@ -80,7 +80,6 @@ flag  "best"  b "Prune non-optimal tags (analyses) from the output." \
 #-----------------------------------------------------------------------------
 # Compilation Options
 #-----------------------------------------------------------------------------
-
 group "Compilation Options"
 
 string "compile" C "Compile binary HMM model file." \
@@ -193,4 +192,4 @@ None known.
 #-----------------------------------------------------------------------------
 acknowledge `cat acknowledge.pod`
 
-seealso "L<mootpp>, L<mootrain>, L<mootm>, L<moot>"
+seealso "L<mootpp>, L<mootm>, L<mootrain>, L<mooteval>, L<mootfiles>"

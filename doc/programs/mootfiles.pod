@@ -352,17 +352,17 @@ tokens matched (or at least were compatible).
 An example "refried" file is:
 
  %% Example refried file for moot
- %% Sentence 1 : analysis-set tags bracketed for clarity
- This   PDAT    [NE]    [PDAT]    [PDIS]
- is     VVFIN   [VAFIN] [VVFIN]
- a      ART     [ART]   [CARD]
- test   NN      [NN]    [VVFIN]
- .      $.      [$.]
-
- %% Sentence 2 : analysis-tags embedded in complete analyses
- This   PDAT    [NE type="last"] This <420>  [PDAT num="sg"] this <24.7>
- too    ADV     [ADV] too <0.0>
- .      $.      [$.] . <-42>
+ %% FLAGS       TOK1    TOK1TAG1 ...            /       TOK2    TOK2TAG1 ...
+ %%------------------------------------------------------------------------------------
+ t-:---:---	Dis	PDAT	[PDAT]	[PDIS]	/	This	PDAT	[PDAT]	[PDIS]
+ -b:---:---	is	VAFIN	[VAFIN]	[VVFIN]	/	is	VVFIN	[VAFIN]	[VVFIN]
+ --:e--:---	a	ART	/	a	ART	[ART]	[CARD]
+ -b:-i-:---	test	NN	[VVFIN]	/	test	VVFIN	[NN]	[VVFIN]
+ --:---:---	.	$.	[$.]	/	.	$.	[$.]
+ 
+ -b:--x:---	This	PDAT	[PDAT]	/	This	PDIS	[PDAT]	[PDIS]
+ --:---:-ix	too	ADV	[ADV]	[PTKA]	/	too	ADV	[CONJ]
+ --:---:e--	.	$.	[$.]	/	.	$.
 
 =back
 

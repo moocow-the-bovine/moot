@@ -1,5 +1,24 @@
 ChangeLog for package moot
 
+Todo:
+	+ (added, untested) add & test binary I/O for mootClassfreqs
+	+ rename 'moothmm' -> 'moot'
+	+ move compilation / dump to a separate program 'mootcompile' ?
+	+ add XML I/O (subclass of mootToken(Reader|Writer) ?)
+	  - test effect of virtuals here
+	+ find gaspode bug
+
+v2.0.0pre3 Sat, 05 Jun 2004 18:33:07 +0200
+	+ added perl script 'morphhack.perl' to make
+	  (old) morph output more negra-compatible
+	  - raises accuracy on test corpus to 96.51%
+	
+v2.0.0pre2 Fri, 04 June 2004 15:49:23 +0200
+	+ added class 'mootEval'
+	+ added evaluator program 'mooteval' - better than tnt-diff
+	+ added verbose information tracking to HMM
+
+	
 v2.0.0pre1 Sat, 29 May 2004 01:59:14 +0200
 	+ added mootToken.h: mootToken, mootSentence interface classes
   	  - old string-based methods now deprecated
@@ -36,14 +55,6 @@ v2.0.0pre1 Sat, 29 May 2004 01:59:14 +0200
 	    by removing .clx (class-frequency) file
 	+ CHMM behavior reduced to HMM tests OK (good ol' 95.67% correct)
 	  - weirdness: gaspode class fixes bungled... must investigate
-	+ added verbose information tracking to HMM
-	+ added evaluator program 'mooteval' : could use more stats
-	+ Todo:
-	  - (added, untested) add & test binary I/O for mootClassfreqs
-	  - rename 'moothmm' -> 'moot'
-	  - move compilation / dump to a separate program 'mootcompile' ?
-	  - add XML I/O (subclass of mootToken(Reader|Writer) ?)
-	    ~ test effect of virtuals here
 	
 v1.0.5 Fri, 21 May 2004 14:14:31 +0200
   + extracting FSM dependencies to 'mootm' package

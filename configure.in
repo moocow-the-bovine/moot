@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.0pre2])
+define([THE_PACKAGE_VERSION], [2.0.0pre3])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
@@ -315,7 +315,8 @@ if test "$moot_doc_formats" != "none" ; then
   ### -- docs: .gog file linkup
   #moot_program_gogs="moot.gog mootpp.gog moot-fstgen.gog moot-pargen.gog"
   #moot_program_gogs="mootpp.gog mootrain.gog moothmm.gog mootm.gog moot.gog"
-  moot_program_gogs="mootpp.gog mootrain.gog moothmm.gog moot.gog"
+  #moot_program_gogs="mootpp.gog mootrain.gog moothmm.gog moot.gog"
+  moot_program_gogs="mootpp.gog mootrain.gog moot.gog mooteval.gog"
   for g in $moot_program_gogs ; do
     AC_CONFIG_LINKS(doc/programs/${g}:src/programs/${g})  
   done
@@ -520,7 +521,7 @@ dnl
 dnl output
 dnl
 AC_CONFIG_FILES(src/libmoot/Makefile src/programs/Makefile src/Makefile)
-AC_CONFIG_FILES(doc/libmoot/mainpage.dox)
+dnl AC_CONFIG_FILES(doc/libmoot/mainpage.dox)
 AC_CONFIG_FILES(doc/libmoot/libmoot.doxy doc/libmoot/Makefile)
 AC_CONFIG_FILES(doc/programs/Makefile)
 AC_CONFIG_FILES(doc/Makefile)

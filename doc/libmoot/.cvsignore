@@ -29,4 +29,3 @@ config.status
 config.cache
 libtool
 doxy-filter.cfg
-mainpage.dox

@@ -42,6 +42,7 @@
 bool hmm_parse_textmodel(char *model, char **lexfile, char **ngfile, char **lcfile)
 {
   char *comma = strchr(model, ',');
+  char *comma2 = comma ? strchr(comma+1,',') : NULL;
   if (comma) {
     *comma = '\0';
     if (!*lexfile) *lexfile = (char *)malloc(strlen(model)+1);
@@ -49,13 +50,17 @@ bool hmm_parse_textmodel(char *model, char **lexfile, char **ngfile, char **lcfi
     *comma = ',';
     
     comma++;
+    if (comma2) *comma2 = '\0';
     if (!*ngfile) *ngfile = (char *)malloc(strlen(comma)+1);
     strcpy(*ngfile, comma);
 
-    if (lcfile) {
-      comma++;
-      if (!*lcfile) *lcfile = (char *)malloc(strlen(comma)+1);
-      strcpy(*lcfile, comma);
+    if (comma2) {
+      *comma2 = ',';
+      if (lcfile) {
+	comma2++;
+	if (!*lcfile) *lcfile = (char *)malloc(strlen(comma2)+1);
+	strcpy(*lcfile, comma2);
+      }
     }
 
     return true;

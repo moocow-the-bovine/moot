@@ -325,11 +325,11 @@ void print_summary(FILE *outfile)
 
   //----------------------------------------------------
   // Accuracy
-  fprintf(outfile, "%%%%  + Tokens Equal / Diff : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+  fprintf(outfile, "%%%%  + Tokens Equal  (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  ntokens-ntokmisses, 100.0*(double)(ntokens-ntokmisses)/(double)ntokens,
 	  ntokmisses, 100.0*(double)(ntokmisses)/(double)ntokens);
 
-  fprintf(outfile, "%%%%  + Tags Equal / Diff   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+  fprintf(outfile, "%%%%  + Tags Equal    (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  ntokens-nbestmisses, 100.0*(double)(ntokens-nbestmisses)/(double)ntokens,
 	  nbestmisses, 100.0*(double)(nbestmisses)/(double)ntokens);
 
@@ -354,26 +354,26 @@ void print_summary_file(FILE *outfile,
 {
   //----------------------------------------------------
   // File-N
-  fprintf(outfile, "%%%%    - Avg. Class Size   : %12.2f\n",
+  fprintf(outfile, "%%%%    - Avg. Class Size   : %39.2f\n",
 	  (double)nanls/(double)(ntokens-nempties)
 	  );
-  fprintf(outfile, "%%%%    - Class Given / Not : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+  fprintf(outfile, "%%%%    - Class Given (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  ntokens-nempties, 100.0*(double)(ntokens-nempties)/(double)ntokens,
 	  nempties, 100.0*(double)nempties/(double)ntokens
 	  );
-  fprintf(outfile, "%%%%    - Class Sane / Not  : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  ntokens-nimps, 100.0*(double)(ntokens-nimps)/(double)ntokens,
-	  nimps, 100.0*(double)nimps/(double)ntokens
-	  );
-  fprintf(outfile, "%%%%    - Class XSane / Not : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  ntokens-nximps, 100.0*(double)(ntokens-nximps)/(double)ntokens,
-	  nximps, 100.0*(double)nximps/(double)ntokens
-	  );
-  fprintf(outfile, "%%%%    - XSaves / Failures : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+  fprintf(outfile, "%%%%    - Saves       (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  nsaves, 100.0*(double)nsaves/(double)nempties,
 	  nempties-nsaves, 100.0*(double)(nempties-nsaves)/(double)nempties
 	  );
-  fprintf(outfile, "%%%%    - Catches / Fumbles : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+  fprintf(outfile, "%%%%    - Int. Cover  (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  ntokens-nimps, 100.0*(double)(ntokens-nimps)/(double)ntokens,
+	  nimps, 100.0*(double)nimps/(double)ntokens
+	  );
+  fprintf(outfile, "%%%%    - Ext. Cover  (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
+	  ntokens-nximps, 100.0*(double)(ntokens-nximps)/(double)ntokens,
+	  nximps, 100.0*(double)nximps/(double)ntokens
+	  );
+  fprintf(outfile, "%%%%    - Disambig.   (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  (ntokens-nximps-nfumbles),100.0*(double)(ntokens-nximps-nfumbles)/(double)(ntokens-nximps),
 	  nfumbles, 100.0*(double)(nfumbles)/(double)(ntokens-nximps)
 	  );

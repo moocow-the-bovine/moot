@@ -381,7 +381,6 @@ int main (int argc, char **argv)
       fflush(stderr);
     }
   }
-  out.close();
 
   // -- summary
   if (args.verbose_arg > 1) {
@@ -392,7 +391,9 @@ int main (int argc, char **argv)
       ielapsed = astarted.tv_sec-istarted.tv_sec + (double)(astarted.tv_usec-istarted.tv_usec)/1000000.0;
 
       print_summary(stderr);
+      if (out.file != stdout) print_summary(out.file);
   }
+  out.close();
 
   return 0;
 }

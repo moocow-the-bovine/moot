@@ -669,8 +669,8 @@ public:
     } else {
       //-- non-empty class : get ID
       ClassID classid =
-	class2id(lexclass,1,1) //-- : creates new class if unknown (uniform dist) : RESULTS=GOOD
-	//class2id(lexclass,0,1) //-- : creates new class if unknown (empty dist) : RESULTS=?
+	//class2id(lexclass,1,1) //-- : creates new class if unknown (uniform dist) : RESULTS=GOOD
+	class2id(lexclass,0,1) //-- : creates new class if unknown (empty dist) : RESULTS=GOOD
 	//class2id(lexclass,0,0) //-- : assigns ID '0' if unknown                 : RESULTS=BAD
 	;
       if (classid==0) {
@@ -1003,8 +1003,8 @@ public:
   {
     if (!lclass) lclass = new LexClass();
     //-- ... for all tags in the class (utsi)
-    for (mootTagSet::const_iterator tsi = unknown_tagset.begin();
-	 tsi != unknown_tagset.end();
+    for (mootTagSet::const_iterator tsi = tagset.begin();
+	 tsi != tagset.end();
 	 tsi++)
       {
 	//-- lookup or assign a tag id

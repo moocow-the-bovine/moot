@@ -9,6 +9,9 @@ void churntest(int argc, char **argv) {
   TokenReader tr;
   FILE *infile = stdin;
 
+  tr.lexer.first_analysis_is_best = true;
+  tr.lexer.ignore_first_analysis = true;
+
 #ifdef MOOT_TOKEN_VERSION
   printf("MOOT_TOKEN_VERSION=%d\n", MOOT_TOKEN_VERSION);
   printf("MOOT_TOKEN_REVISION=%d\n", MOOT_TOKEN_REVISION);
@@ -58,6 +61,7 @@ void churntest(int argc, char **argv) {
     else {
       printf("{cost=%g\t ; tag=%s\t ; details=`%s'}\n",
 	     bound->cost, bound->tag.c_str(), bound->details.c_str());
+
     }
 
     //------- prune
