@@ -38,6 +38,10 @@ share-dwdst
 *.xml
 *.pre-xml
 *.post-xml
+*.hmm
+*.chmm
+*.hmm-dump
+*.chmm-dump
 *1
 *2
 *3

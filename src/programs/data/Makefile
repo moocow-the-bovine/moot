@@ -41,7 +41,10 @@ MOOTHMM = ../moot
 #MOOTHMM_FLAGS = -d1024
 MOOTHMM_FLAGS =
 MOOTEVAL = ../mooteval
+
 MOOTCOMPILE = ../mootcompile
+#MOOTCOMPILE_FLAGS = -z9
+
 MOOTDUMP = ../mootdump
 
 MOOTCHURN = ../mootchurn
@@ -201,10 +204,10 @@ hmm: $(MODEL).hmm
 chmm: $(MODEL).chmm
 
 %.hmm: %.model $(MOOTCOMPILE)
-	$(MOOTCOMPILE) -o $@ "$*.lex,$*.123"
+	$(MOOTCOMPILE) $(MOOTCOMPILE_FLAGS) -o $@ "$*.lex,$*.123"
 
 %.chmm: %.model $(MOOTDUMP)
-	$(MOOTCOMPILE) -o $@ "$*.lex,$*.123,$*.clx"
+	$(MOOTCOMPILE) $(MOOTCOMPILE_FLAGS) -o $@ "$*.lex,$*.123,$*.clx"
 
 
 ##-- dumps
@@ -218,6 +221,14 @@ cdump: $(MODEL).cdump
 %.cdump: %.model $(MOOTDUMP)
 	$(MOOTDUMP) -o $@ "$*.lex,$*.123,$*.clx"
 
+hmm-dump: $(MODEL).hmm-dump
+chmm-dump: $(MODEL).chmm-dump
+
+%.hmm-dump: %.hmm $(MOOTDUMP)
+	$(MOOTDUMP) -o $@ $<
+
+%.chmm-dump: %.chmm $(MOOTDUMP)
+	$(MOOTDUMP) -o $@ $<
 
 ##-- XML: conversion text->xml
 %.pre-xml: % $(XMLIFY)

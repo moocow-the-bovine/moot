@@ -55,7 +55,7 @@ namespace mootio {
     ///\name Constructors etc.
     //@{
     /** Default constructor */
-    mzstream(gzFIle zf=NULL) : zfile(zf) {};
+    mzstream(gzFile zf=NULL) : zfile(zf) {};
 
     /** Destructor */
     ~mzstream(void) {};
@@ -129,7 +129,7 @@ namespace mootio {
 
     /** Write @n bytes from @buf to the stream */
     virtual bool write(const char *buf, size_t n) {
-      return zfile ? (gzwrite(zfile,buf,n) == n) : false;
+      return zfile ? (gzwrite(zfile,buf,n) == (int)n) : false;
     };
 
     /** Write a single byte to the stream */
@@ -139,11 +139,13 @@ namespace mootio {
 
     /** Write a C string to the stream */
     virtual bool puts(const char *s) {
-      return zfile ? (gzputs(file,s) >= 0) : false;
+      return zfile ? (gzputs(zfile,s) >= 0) : false;
     };
     /** Write a C++ string to the stream */
     virtual bool puts(const std::string &s) {
-      return zfile ? (gzwrite(zfile,s.data(),s.size()) == s.size()) : false;
+      return (zfile
+	      ? (gzwrite(zfile,s.data(),s.size()) == (int)s.size())
+	      : false);
     };
 
     /** printf() to the stream, va_list version */
@@ -321,7 +323,7 @@ namespace mootio {
     };
 
     /** Constructor given filename and mode as C++ strings */
-    mofstream(const std::string &filename, const std::string &mode="") {
+    mozfstream(const std::string &filename, const std::string &mode="") {
       default_mode = "wb";
       open(filename,mode);
     };
