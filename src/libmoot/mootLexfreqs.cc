@@ -51,6 +51,62 @@ void mootLexfreqs::clear(void)
 
 // (inlined)
 
+/*----------------------------------------------------------------------
+ * Compilation
+ *----------------------------------------------------------------------*/
+void mootLexfreqs::compute_specials(void)
+{
+  LexfreqEntry *entries[NTokTypes];
+  int typ;
+  
+  //-- initialize entry pointers
+  for (typ = 0; typ < NTokTypes; typ++) {
+    if (typ == TokTypeAlpha) { //  || typ == TokTypeUnknown
+      entries[typ] = NULL;
+    } else {
+      entries[typ] = &(lftable[TokenTypeNames[typ]]);
+      entries[typ]->clear();
+    }
+  }
+
+  //-- iterate over all tokens
+  for (LexfreqTokTable::const_iterator lfti = lftable.begin();
+       lfti != lftable.end();
+       lfti++)
+    {
+      typ = token2type(lfti->first);
+      if (lfti->first[0] == '@' || typ == TokTypeAlpha) // || typ == TokTypeUnknown
+	continue;
+      
+      //-- found a special: add its counts to proper subtable
+      entries[typ]->count += lfti->second.count;
+      for (LexfreqSubtable::const_iterator lsi = lfti->second.freqs.begin();
+	   lsi != lfti->second.freqs.end();
+	   lsi++)
+	{
+	  entries[typ]->freqs[lsi->first] += lsi->second;
+	}
+    }
+};
+
+/*----------------------------------------------------------------------
+ * Information
+ *----------------------------------------------------------------------*/
+size_t mootLexfreqs::n_pairs(void)
+{
+  size_t n = 0;
+
+  //-- iterate over all tokens
+  for (LexfreqTokTable::const_iterator lfti = lftable.begin();
+       lfti != lftable.end();
+       lfti++)
+    {
+      if (lfti->first[0] == '@') continue; //-- ignore specials
+      n += lfti->second.freqs.size();
+    }
+  return n;
+};
+
 
 /*----------------------------------------------------------------------
  * I/O
@@ -103,7 +159,7 @@ bool mootLexfreqs::save(FILE *file, char *filename)
   //-- iterate through sorted keys
   for (set<mootTokString>::const_iterator toki = toks.begin(); toki != toks.end(); toki++) {
     const LexfreqEntry  &entry  = lftable[*toki];
-    fprintf(file, "%s\t%g", toki->c_str(), entry.total);
+    fprintf(file, "%s\t%g", toki->c_str(), entry.count);
 
     for (LexfreqSubtable::const_iterator ei = entry.freqs.begin(); ei != entry.freqs.end(); ei++) {
       fprintf(file, "\t%s\t%g", ei->first.c_str(), ei->second);

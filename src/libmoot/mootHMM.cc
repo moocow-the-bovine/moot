@@ -131,8 +131,8 @@ void mootHMM::clear(bool wipe_everything)
  * Compilation
  *--------------------------------------------------------------------------*/
 bool mootHMM::compile(const mootLexfreqs &lexfreqs,
-		       const mootNgrams &ngrams,
-		       const mootTagString &start_tag_str)
+		      const mootNgrams &ngrams,
+		      const mootTagString &start_tag_str)
 {
   //-- sanity check
   if (ngrams.ugtotal == 0) {
@@ -186,14 +186,15 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 #ifdef moot_USE_TRIGRAMS
   TagID                       tagid3;         //-- next-next tag-ID (for trigrams)
 #endif
-  //mootNgrams::Ngram          ngtmp;           //-- temporary string-ngram (for lookup)
-  //mootNgrams::NgramCount     pnTotal;         //-- parent ngram-total (for bigrams/trigrams)
   mootLexfreqs::LexfreqCount unTotal = 0 ;    //-- total "unknown" token count
   LexProbSubTable            &untagcts        //-- "unknown" tag counts (later, probabilites)
       = lexprobs[0];
-  bool                     is_valid_token;    //-- watch out for special tokens (@CARD & friends)
-  int                      i;
- 
+  //bool                     is_valid_token;    //-- watch out for special tokens (@CARD & friends)
+  //int                      i;
+
+  //-- compile lexical probabilities : let lexfreqs figure out specials (elsewhere!)
+  //lexfreqs.compute_specials();
+
   //-- compile lexical probabilities : for all tokens (lfti)
   for (mootLexfreqs::LexfreqTokTable::const_iterator lfti = lexfreqs.lftable.begin();
        lfti != lexfreqs.lftable.end();
@@ -201,20 +202,14 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
     {
       const mootTokString &tokstr = lfti->first;
       const mootLexfreqs::LexfreqEntry &entry = lfti->second;
-      const mootLexfreqs::LexfreqCount toktotal = entry.total;
+      const mootLexfreqs::LexfreqCount toktotal = entry.count;
 
       //-- sanity check
       if (toktotal == 0) continue;
 
-      //-- check for special tokens
-      is_valid_token = true;
-      for (i = 0; i < NTokTypes; i++) {
-	if (tokstr == typnames[i]) {
-	  is_valid_token = false;
-	  break;
-	}
-      }
-      if (!is_valid_token) continue;
+      //-- get token type, id
+      toktyp = token2type(tokstr);
+      tokid  = toktyp != TokTypeUnknown ? tokids.name2id(tokstr) : typids[toktyp];
 
       //-- ... for all tags occurring with this token(lftagi)
       for (mootLexfreqs::LexfreqSubtable::const_iterator lftagi = entry.freqs.begin();
@@ -228,10 +223,8 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	  //-- sanity check
 	  if (tagtotal == 0) continue;
   
-	  //-- get IDs
+	  //-- get tag-ID
 	  tagid  = tagids.name2id(tagstr);
-	  toktyp = token2type(tokstr);
-	  tokid  = toktyp == TokTypeAlpha ? tokids.name2id(tokstr) : typids[toktyp];
 	  
 	  //-- "unknown" token check
 	  if (toktyp == TokTypeAlpha && toktotal <= unknown_lex_threshhold) {
@@ -306,65 +299,6 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	}
     }
 
-  /*-- OLD VERSION -- */
-  /*
-  //-- Compute ngram probabilites
-  for (mootNgrams::NgramStringTable::const_iterator ngti = ngrams.ngtable.begin();
-       ngti != ngrams.ngtable.end();
-       ngti++)
-    {
-      if (ngti->first.size() == 1) {
-	//-- congratulations, it's a unigram: getID
-	tagid = tagids.name2id(ngti->first[0]);  
-
-	//-- compute unigram probability
-	ngprobs1[tagid] = ngti->second / ngrams.ugtotal;
-      }
-      else if (ngti->first.size() == 2) {
-	//-- it's a bigram
-
-	//-- get IDs
-	ptagid = tagids.name2id(ngti->first[0]);
-	tagid  = tagids.name2id(ngti->first[1]);
-
-	//-- get unigram count for previous tag
-	ngtmp.clear();
-	ngtmp.push_back(ngti->first[0]);
-	pnTotal = ngrams.lookup(ngtmp);
-	if (pnTotal == 0) continue;
-
-	//-- compute bigram probability
-	ngprobs2[(n_tags*ptagid)+tagid] = ngti->second / pnTotal;
-      }
-      else if (ngti->first.size() == 3) {
-	//-- it's a trigram
-
-#ifdef moot_USE_TRIGRAMS
-	//-- get IDs
-	pptagid = tagids.name2id(ngti->first[0]);
-	ptagid  = tagids.name2id(ngti->first[1]);
-	tagid   = tagids.name2id(ngti->first[2]);
-
-	//-- get bigram count for bigram (pptagid,ptagid)
-	ngtmp.clear();
-	ngtmp.push_back(ngti->first[0]);
-	ngtmp.push_back(ngti->first[1]);
-	pnTotal = ngrams.lookup(ngtmp);
-	if (pnTotal == 0) continue;
-
-	//-- compute trigram probability
-	ngprobs3[Trigram(pptagid,ptagid,tagid)] = ngti->second / pnTotal;
-#else // moot_USE_TRIGRAMS
-	;
-#endif // moot_USE_TRIGRAMS
-      }
-      else {
-	//-- Otherwise, it's not a uni-, bi-, or tri-gram: ignore it
-	carp("mootHMM::compile(): ignoring %u-gram!\n", ngti->first.size());
-      }
-    }
-   */
-
   viterbi_clear();
   return true;
 }
@@ -407,7 +341,9 @@ void mootHMM::assign_ids_lf(const mootLexfreqs &lexfreqs)
 	  //-- always assign a tag-id
 	  if (!tagids.nameExists(tagstr)) tagids.insert(tagstr);
 
-	  if (typ != TokTypeAlpha) continue; //-- otherwise ignore special token-types
+	  if (typ != TokTypeAlpha)
+	    //-- ignore non-alphabetics
+	    continue; 
 
 	  if (
             #ifndef moot_LEX_UNKNOWN_TOKENS

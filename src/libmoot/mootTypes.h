@@ -32,8 +32,6 @@
 #ifndef _moot_TYPES_H
 #define _moot_TYPES_H
 
-#include <ctype.h>
-
 #include <string>
 #include <deque>
 #include <map>
@@ -95,70 +93,6 @@ using namespace moot_STL_NAMESPACE;
 
 /** Count types (for raw frequencies) */
 typedef float CountT;
-
-/*----------------------------------------------------------------------
- * Token Typification
- *----------------------------------------------------------------------*/
-
-//namespace mootTokenUtils {
-//using namespace std;
-
-    /** Enum typedef for token2id() */
-    typedef enum {
-	TokTypeAlpha,      /**< (Mostly) alphabetic token: "foo", "bar", "foo2bar" */
-	TokTypeCard,       /**< @CARD: Digits-only: "42" */
-	TokTypeCardPunct,  /**< @CARDPUNCT: Digits with punctuation suffix: "42." */
-	TokTypeCardSuffix, /**< @CARDSUFFIX: Digits with any suffix: "42nd" */
-	TokTypeCardSeps,   /**< @CARDEPS: Digits with interpunctuation: "420.24/7" */
-	TokTypeUnknown,    /**< @UNKNOWN: Special "Unknown" token-type */
-	//TokTypeSpecial,    /**< A literal '@CARD', '@CARDPUNCT', etc. */
-	NTokTypes          /**< Not really a token-type */
-    } TokenType;
-
-    /** Get the TokenType for a given token */
-    inline TokenType token2type(const mootTokString &token)
-    {
-	mootTokString::const_iterator ti = token.begin();
-    
-	if (ti==token.end() || !isdigit(*ti)) return TokTypeAlpha;
-    
-	//-- ^[:digit:]
-	for (ti++; ti != token.end() && isdigit(*ti); ti++) {;}  //-- find first non-digit
-	//-- ^([:digit:]+)
-    
-	if (ti == token.end())  //-- ^([:digit:]+)$
-	    return TokTypeCard;
-    
-	else if (ispunct(*ti)) {
-	    //-- ^([:digit:]+)([:punct:])
-	    for (ti++; ti != token.end() && ispunct(*ti); ti++) {;}
-	    //-- ^([:digit:]+)([:punct:]+)
-      
-	    if (ti == token.end())      //-- ^([:digit:]+)([:punct:]+)$
-		return TokTypeCardPunct;
-      
-	    else if (isdigit(*ti)) {
-		//-- ^([:digit:]+)([:punct:]+)([:digit:])
-		for (ti++; ti != token.end() && (isdigit(*ti) || ispunct(*ti)); ti++) {;}
-		//-- ^([:digit:]+)([:punct:]+)(([:digit:]|[:punct:]+))
-		if (ti == token.end())
-		    //-- ^([:digit:]+)([:punct:]+)(([:digit:]|[:punct:]+))$
-		    return TokTypeCardSeps;
-	    }
-	}
-    
-	//-- ^([:digit:]+)([[:digit:][:punct]]*)([^[:digit:][:punct:]])
-	for (ti++; ti != token.end() && !isdigit(*ti); ti++) {;}
-	//-- ^([:digit:]+)([[:digit:][:punct]]*)([^[:digit:][:punct:]])([^[:digit]]*)
-    
-	if (ti == token.end())
-	    //-- ^([:digit:]+)([[:digit:][:punct]]*)([^[:digit:][:punct:]])([^[:digit]]*)$
-	    return TokTypeCardSuffix;
-    
-	return TokTypeAlpha;
-    };
-
-//}; //-- namespace mootTokUtils
 
 
 moot_END_NAMESPACE

@@ -10,7 +10,7 @@ void churntest(int argc, char **argv) {
   FILE *infile = stdin;
 
   tr.lexer.first_analysis_is_best = true;
-  tr.lexer.ignore_first_analysis = true;
+  tr.lexer.ignore_first_analysis = false;
 
   if (argc > 1) {
     infile = fopen(argv[1], "r");
@@ -40,7 +40,7 @@ void churntest(int argc, char **argv) {
 		   ai->cost, ai->tag.c_str(), ai->details.c_str());
 	  }
       }
-  } while (!sent.empty() || !feof(infile));
+  } while (tr.lexer.lasttyp != mootTokenLexer::TLEOF);
   printf("EOF\n");
 }
 

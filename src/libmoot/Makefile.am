@@ -40,14 +40,22 @@ libmoot_la_SOURCES = \
 	mootTokenIO.cc \
 	mootTokenLexer.cc \
 	mootPPLexer.cc \
+	\
 	mootNgrams.cc \
 	mootNgramsLexer.cc \
 	mootNgramsParser.cc \
 	mootNgramsCompiler.cc \
+	\
 	mootLexfreqs.cc \
 	mootLexfreqsLexer.cc \
 	mootLexfreqsParser.cc \
 	mootLexfreqsCompiler.cc \
+	\
+	mootClassfreqs.cc \
+	mootClassfreqsLexer.cc \
+	mootClassfreqsParser.cc \
+	mootClassfreqsCompiler.cc \
+	\
 	mootHMM.cc \
 	mootHMMTrainer.cc
 
@@ -81,10 +89,22 @@ mootLexfreqsLexer.cc: $(FLEXXX_DEPS)
 mootLexfreqsParser.h: $(BISONXX_DEPS)
 mootLexfreqsParser.cc: $(BISONXX_DEPS)
 
+mootClassfreqs.lo: mootClassfreqsLexer.h mootClassfreqsParser.h 
+mootClassfreqs.o: mootClassfreqsLexer.h mootClassfreqsParser.h
+mootClassfreqsCompiler.lo: mootClassfreqsLexer.h mootClassfreqsParser.h 
+mootClassfreqsCompiler.o: mootClassfreqsLexer.h mootClassfreqsParser.h
+mootClassfreqsLexer.lo: mootClassfreqsLexer.h mootClassfreqsParser.h
+mootClassfreqsLexer.o: mootClassfreqsLexer.h mootClassfreqsParser.h
+mootClassfreqsLexer.h: $(FLEXXX_DEPS)
+mootClassfreqsLexer.cc: $(FLEXXX_DEPS)
+mootClassfreqsParser.h: $(BISONXX_DEPS)
+mootClassfreqsParser.cc: $(BISONXX_DEPS)
+
 mootTokenLexer.lo: mootTokenLexer.h
 mootTokenLexer.o: mootTokenLexer.h
 mootTokenIO.lo: mootTokenLexer.h
 mootTokenIO.o: mootTokenLexer.h
+
 #mootTokenLexer.lo: mootTokenLexer.h mootTokenParser.h
 #mootTokenLexer.o: mootTokenLexer.h mootTokenParser.h
 #mootTokenLexer.h: $(FLEXXX_DEPS)
@@ -118,14 +138,22 @@ pkginclude_HEADERS = \
 	mootTypes.h \
 	mootTokenLexer.h \
 	mootPPLexer.h \
+	\
+	mootNgrams.h \
 	mootNgramsLexer.h \
 	mootNgramsParser.h \
 	mootNgramsCompiler.h \
-	mootNgrams.h \
+	\
+	mootLexfreqs.h \
 	mootLexfreqsLexer.h \
 	mootLexfreqsParser.h \
 	mootLexfreqsCompiler.h \
-	mootLexfreqs.h \
+	\
+	mootClassfreqs.h \
+	mootClassfreqsLexer.h \
+	mootClassfreqsParser.h \
+	mootClassfreqsCompiler.h \
+	\
 	mootHMM.h \
 	mootHMMTrainer.h
 
@@ -236,16 +264,26 @@ libmoot_la_LDFLAGS = -version-info $(LIBCUR):$(LIBREV):$(LIBAGE)
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = \
 	*~ .*~ Makefile Makefile.in \
+	\
 	mootTokenLexer.cc mootTokenLexer.h \
 	mootTokenParser.cc mootTokenParser.h \
+	\
 	mootPPLexer.cc mootPPLexer.h \
+	\
 	mootTaglistLexer.cc mootTaglistLexer.h \
+	\
 	mootAlphabetLexer.cc mootAlphabetLexer.h \
 	mootAlphabetParser.cc mootAlphabetParser.h \
+	\
 	mootNgramsLexer.cc mootNgramsLexer.h \
 	mootNgramsParser.cc mootNgramsParser.h \
+	\
 	mootLexfreqsLexer.cc mootLexfreqsLexer.h \
 	mootLexfreqsParser.cc mootLexfreqsParser.h \
+	\
+	mootClassfreqsLexer.cc mootClassfreqsLexer.h \
+	mootClassfreqsParser.cc mootClassfreqsParser.h \
+	\
 	gmon.out
 
 ##-----------------------------------------------------------------------
@@ -261,7 +299,9 @@ EXTRA_DIST = \
 	mootNgramsLexer.ll \
 	mootNgramsParser.yy \
 	mootLexfreqsLexer.ll \
-	mootLexfreqsParser.yy
+	mootLexfreqsParser.yy \
+	mootClassfreqsLexer.ll \
+	mootClassfreqsParser.yy
 
 dist_old = \
 	mootTokenParser.yy \

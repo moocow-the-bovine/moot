@@ -23,7 +23,7 @@
  * File: mootLexfreqs.h
  * Author:  Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *    Class for storage & retrieval of lexical frequencies (pair version)
+ *    Class for storage & retrieval of lexical frequencies (nested map<> version)
  *============================================================================*/
 
 #ifndef _moot_LEXFREQS_H
@@ -52,13 +52,21 @@ public:
    */
   class LexfreqEntry {
   public:
-    LexfreqCount     total;     /**< Total occurrences of this lexeme */
-    LexfreqSubtable  freqs;     /**< Maps tags to occurrences of this lexeme with key tag */
+    LexfreqCount     count;  /**< Total occurrences of this lexeme */
+    LexfreqSubtable  freqs;  /**< Maps tags to occurrences of this lexeme with key tag */
   public:
-    LexfreqEntry(const LexfreqCount tok_total=0) : total(tok_total) {};
-    LexfreqEntry(const LexfreqCount tok_total, const LexfreqSubtable &tok_tagfreqs)
-      : total(tok_total), freqs(tok_tagfreqs)
+    LexfreqEntry(const LexfreqCount tok_count=0)
+      : count(tok_count)
     {};
+    LexfreqEntry(const LexfreqCount tok_count,
+		 const LexfreqSubtable &tok_tagfreqs)
+      : count(tok_count), freqs(tok_tagfreqs)
+    {};
+    /** Reset to empty */
+    void clear(void) {
+      count = 0;
+      freqs.clear();
+    };
   };
 
   /**
@@ -108,7 +116,7 @@ public:
       lfi->second.freqs[tag] = count;
     } else {
       //-- known token
-      lfi->second.total += count;
+      lfi->second.count += count;
 
       LexfreqSubtable::iterator lsi = lfi->second.freqs.find(tag);
       if (lsi == lfi->second.freqs.end()) {
@@ -139,18 +147,32 @@ public:
     return tagi == tagtable.end() ? 0 : tagi->second;
   };
 
+  /**
+   * Add counts for 'special' tokens to the object.
+   * This should be called after you have added
+   * all 'real' tokens.
+   *
+   * \see token2type().
+   */
+  void compute_specials(void);
+
+  /**
+   * Return the number of distinct (token,tag) pairs we've counted.
+   */
+  size_t n_pairs(void);
+
   //------ public methods: i/o
 
-  /** Load n-grams from a TnT-style parameter file */
+  /** Load data from a TnT-style parameter file */
   bool load(char *filename);
 
-  /** Load n-grams from a TnT-style parameter file (stream version) */
+  /** Load data from a TnT-style parameter file (stream version) */
   bool load(FILE *file, char *filename = NULL);
 
-  /** Save n-grams to a TnT-style paramater file */
+  /** Save data to a TnT-style paramater file */
   bool save(char *filename);
 
-  /** Save n-grams to a TnT-style paramater file (stream version) */
+  /** Save data to a TnT-style paramater file (stream version) */
   bool save(FILE *file, char *filename = NULL);
 };
 

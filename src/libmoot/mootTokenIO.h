@@ -60,9 +60,10 @@ public:
    */
 
   /** Default constructor
-   * @param first_analysis_is_best Whether first analysis should be used to instantiate 'besttag'
+   * @param first_analysis_is_best Whether first analysis should be used to instantiate 'besttag' (default=true)
+   * @param ignore_first_analysis Whether to (otherwise) ignore first analysis (default=false)
    */
-  TokenReader(bool first_analysis_is_best=false, bool ignore_first_analysis=false)
+  TokenReader(bool first_analysis_is_best=true, bool ignore_first_analysis=false)
   {
     lexer.first_analysis_is_best = first_analysis_is_best;
     lexer.ignore_first_analysis = ignore_first_analysis;

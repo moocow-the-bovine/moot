@@ -19,26 +19,26 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 /*----------------------------------------------------------------------
- * Name: mootLexfreqsLexer.ll
+ * Name: mootClassfreqsLexer.ll
  * Author: Bryan Jurish
  * Description:
- *   + Lexer for TnT-style lexical-frequency parameter files
+ *   + Lexer for lexical-class frequency parameter files
  *   + process with Alain Coetmeur's 'flex++' to produce a C++ lexer
  *----------------------------------------------------------------------*/
 
 /* --- Lexer name --- */
-%name mootLexfreqsLexer
+%name mootClassfreqsLexer
 
 %header{
 
 #include "mootTypes.h"
-#include "mootLexfreqsParser.h"
+#include "mootClassfreqsParser.h"
 
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
 /**
-\class mootLexfreqsLexer
+\class mootClassfreqsLexer
 \brief Flex++ lexer for (TnT-style) moot lexical frequency parameter files. 
 
 \details Supports comments introduced with '%%'.
@@ -46,10 +46,10 @@
 %}
 
 %define LEX_PARAM \
-  YY_mootLexfreqsParser_STYPE *yylval, YY_mootLexfreqsParser_LTYPE *yylloc
+  YY_mootClassfreqsParser_STYPE *yylval, YY_mootClassfreqsParser_LTYPE *yylloc
 
 
-%define CLASS mootLexfreqsLexer
+%define CLASS mootClassfreqsLexer
 %define MEMBERS \
   public: \
     /* -- public typedefs */\
@@ -69,7 +69,7 @@
     char *stringbuf; \
   public: \
     /** virtual destructor to shut up gcc */\
-    virtual ~mootLexfreqsLexer(void) {};\
+    virtual ~mootClassfreqsLexer(void) {};\
     /** use stream input */\
     void select_streams(FILE *in=stdin, FILE *out=stdout); \
     /** use string input */\
@@ -92,7 +92,7 @@
     return result = len;\
   }\
   /* black magic */\
-  return result= fread(buffer, 1, max_size, YY_mootLexfreqsLexer_IN);
+  return result= fread(buffer, 1, max_size, YY_mootClassfreqsLexer_IN);
 
 
 
@@ -122,8 +122,7 @@ textorsp   [^\n\r\t]
 
 ({whitespace}*)"\t"({whitespace}*) {
   // -- tab: return the current token-buffer
-  //theColumn += yyleng+7; // -- interpret tab as 8 spaces
-  theColumn += yyleng; // -- interpret tab as 8 spaces
+  theColumn += (((int)theColumn/8)+1)*8 + (yyleng ? yyleng-1 : 0);
   return '\t';
 }
 
@@ -132,14 +131,14 @@ textorsp   [^\n\r\t]
   //theLine++; theColumn = 0;
   theColumn += yyleng;
   yylval->count = atof((const char *)yytext);
-  return mootLexfreqsParser::COUNT;
+  return mootClassfreqsParser::COUNT;
 }
 
-{textchar}({textorsp}*{textchar})? {
-  // -- any other text: append to the token-buffer
+{textchar}+ {
+  // -- text characters: just return
   theColumn += yyleng;
-  yylval->tokstr = new moot::mootTokString((const char *)yytext);
-  return mootLexfreqsParser::TOKEN;
+  yylval->tagstr = new moot::mootTagString((const char *)yytext);
+  return mootClassfreqsParser::TAG;
 }
 
 {newline} {
@@ -155,7 +154,7 @@ textorsp   [^\n\r\t]
 . {
   // -- huh? -- just ignore it!
   theColumn += yyleng;
-  fprintf(stderr,"mootLexfreqsLexer warning: unrecognized character '%c' (ignored) at line %d, column %d, near `%s'.\n",
+  fprintf(stderr,"mootClassfreqsLexer warning: unrecognized character '%c' (ignored) at line %d col %d, near `%s'.\n",
           yytext[YY_MORE_ADJ], theLine, theColumn, yytext);
 }
 
@@ -169,13 +168,13 @@ textorsp   [^\n\r\t]
 
 
 /*----------------------------------------------------------------------
- * Local Methods for mootLexfreqsLexer
+ * Local Methods for mootClassfreqsLexer
  *----------------------------------------------------------------------*/
 
 /*
- * void mootLexfreqsLexer::select_streams(FILE *in, FILE *out)
+ * void mootClassfreqsLexer::select_streams(FILE *in, FILE *out)
  */
-void mootLexfreqsLexer::select_streams(FILE *in, FILE *out) {
+void mootClassfreqsLexer::select_streams(FILE *in, FILE *out) {
   yyin = in;
   yyout = out;
   use_string = false;
@@ -187,9 +186,9 @@ void mootLexfreqsLexer::select_streams(FILE *in, FILE *out) {
 }
 
 /*
- * void mootLexfreqsLexer::select_string(const char *in, FILE *out=stdout)
+ * void mootClassfreqsLexer::select_string(const char *in, FILE *out=stdout)
  */
-void mootLexfreqsLexer::select_string(const char *in, FILE *out) {
+void mootClassfreqsLexer::select_string(const char *in, FILE *out) {
   select_streams(stdin,out);  // flex __really__ wants a real input stream
 
   // -- string-buffer stuff
@@ -201,7 +200,7 @@ void mootLexfreqsLexer::select_string(const char *in, FILE *out) {
 /*
  * tokbuf_append(text,leng)
  */
-inline void mootLexfreqsLexer::tokbuf_append(char *text, int leng) {
+inline void mootClassfreqsLexer::tokbuf_append(char *text, int leng) {
   if (tokbuf_clear) {
     tokbuf = (char *)text;
     tokbuf_clear = false;

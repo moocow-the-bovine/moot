@@ -453,11 +453,6 @@ public:
       vbestpn(NULL),
       vbestpath(NULL)
   {
-    typnames[TokTypeAlpha] = "@UNKNOWN"; // -- ?!
-    typnames[TokTypeCard]  = "@CARD";
-    typnames[TokTypeCardPunct] = "@CARDPUNCT";
-    typnames[TokTypeCardSeps]  = "@CARDSEPS";
-    typnames[TokTypeUnknown] = "@UNKNOWN";
     for (TokID i = 0; i < NTokTypes; i++) { typids[i] = 0; }
   };
 
@@ -508,6 +503,9 @@ public:
   inline void unknown_token_name(const mootTokString &name)
   {
     tokids.unknown_name(name);
+    for (int i = 0; i < NTokTypes; i++) {
+      typnames[i] = TokenTypeNames[i];
+    }
     typnames[TokTypeUnknown] = name;
   };
 

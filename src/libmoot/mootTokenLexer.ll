@@ -76,6 +76,20 @@
  *
  */
 
+/** Useful for debugging token-types */\
+const char mootTokenLexerTypeNames[12][16] = {
+      "TLUNKNOWN",
+      "TLEOF",
+      "TLEOS", 
+      "TLTOKEN", 
+      "TLTEXT", 
+      "TLTAB", 
+      "TLTAG", 
+      "TLDETAILS", 
+      "TLCOST", 
+      "TLNEWLINE", 
+      "TLIGNORE" 
+  };
 %}
 
 /*%define LEX_PARAM \
@@ -118,11 +132,11 @@
    moot::mootToken::Analysis manalysis;\
    /** last token type */ \
    TokenType lasttyp; \
-   /** whether first analysis parsed should be considered 'best' */ \
+   /** whether first analysis parsed should be considered 'best' (default=true) */ \
    bool first_analysis_is_best; \
    /** whether we're parsing a 'best' analysis */\
    bool current_analysis_is_best; \
-   /** whether to (otherwise) ignore first analysis */ \
+   /** whether to (otherwise) ignore first analysis (default=false) */ \
    bool ignore_first_analysis; \
    /** whether to ignore current analysis */\
    bool ignore_current_analysis; \
@@ -159,8 +173,10 @@
   theLine(1), \
   theColumn(0), \
   lasttyp(TLEOS), \
-  first_analysis_is_best(false), \
+  first_analysis_is_best(true), \
   current_analysis_is_best(false), \
+  ignore_first_analysis(false), \
+  ignore_current_analysis(false), \
   itokbuf_clear(true), \
   srcname("(unknown)"),\
   use_string(false), \
@@ -249,6 +265,7 @@ tagchar    [^ \t\n\r\]]
   BEGIN(SEPARATORS);
 }
 
+<TOKEN><<EOF>> { BEGIN(SEPARATORS); }
 
 <SEPARATORS>{tab}({space}*) {
   //-- SEPARATORS: Separator character(s): increment column nicely
@@ -261,11 +278,32 @@ tagchar    [^ \t\n\r\]]
   BEGIN(DETAILS);
 }
 <SEPARATORS>{newline} {
-  //-- SEPARATORS/EOT: reset to initial state
+  //-- SEPARATORS/EOT: reset to initial state : see also <SEPARATORS><<EOF>>
   BEGIN(TOKEN);
   //-- return token flag (actual data is in 'mtoken' member)
   lasttyp = TLTOKEN;
   return TLTOKEN;
+}
+
+<SEPARATORS><<EOF>> {
+  //fprintf(stderr, "<SEPARATORS>EOF: lasttyp=%s\n", mootTokenLexerTypeNames[lasttyp]);
+  switch (lasttyp) {
+   case TLTEXT:
+     lasttyp = TLTOKEN;
+     break;
+   case TLNEWLINE:
+   case TLTOKEN:
+     lasttyp = TLEOS;
+     break;
+   case TLEOS:
+   case TLEOF:
+     lasttyp = TLEOF;
+     break;
+   default:
+     lasttyp = TLEOS;
+  }
+  //fprintf(stderr, "<SEPARATORS>EOF: returning=%s\n", mootTokenLexerTypeNames[lasttyp]);
+  return lasttyp;
 }
 
 
@@ -301,8 +339,35 @@ tagchar    [^ \t\n\r\]]
 }
 
 <DETAILS>""/{eotchar} {
-  //-- DETAILS/EOD: add & clear current analysis, if any */
+  //-- DETAILS/EOD: add & clear current analysis, if any : see also <DETAILS><<EOF>>
   //-- add & clear current analysis, if any
+  if (lasttyp != TLTAB) {
+    //-- set default tag
+    if (manalysis.tag.empty()) {
+      manalysis.tag.swap(manalysis.details);
+      //manalysis.details.clear();
+    } 
+
+    if (ignore_current_analysis) {
+      ignore_current_analysis=false;
+    } else {
+      mtoken.insert(manalysis);
+    }
+
+    //-- set best tag if applicable
+    if (current_analysis_is_best) {
+      mtoken.besttag(manalysis.tag);
+      current_analysis_is_best = false;
+    }
+
+    //-- clear
+    manalysis.clear();
+  }
+  BEGIN(SEPARATORS);
+}
+<DETAILS><<EOF>> {
+  //fprintf(stderr, "<DETAILS>EOF : lasttyp=%s\n", mootTokenLexerTypeNames[lasttyp]);
+  //-- add & clear current analysis, if any : see also <DETAILS>""/{eotchar}
   if (lasttyp != TLTAB) {
     //-- set default tag
     if (manalysis.tag.empty()) {
@@ -322,7 +387,10 @@ tagchar    [^ \t\n\r\]]
     //-- clear
     manalysis.clear();
   }
-  BEGIN(SEPARATORS);
+  //-- return the token NOW
+  BEGIN(TOKEN);
+  lasttyp = TLTOKEN;
+  return TLTOKEN;
 }
 
 <TAG>{tagchar}+ {
@@ -333,6 +401,8 @@ tagchar    [^ \t\n\r\]]
   lasttyp = TLTAG;
   BEGIN(DETAILS);
 }
+
+<TAG><<EOF>> { BEGIN(DETAILS); }
 
 
 {space}+ {
@@ -358,13 +428,14 @@ tagchar    [^ \t\n\r\]]
 
 
 <<EOF>> {
+  //fprintf(stderr, "<>EOF: lasttyp=%d\n", lasttyp);
   switch (lasttyp) {
-   case TLNEWLINE:
-     lasttyp = TLEOS;
-     break;
    case TLEOS:
    case TLEOF:
      lasttyp = TLEOF;
+     break;
+   case TLNEWLINE:
+     lasttyp = TLEOS;
      break;
    default:
      lasttyp = TLEOS;

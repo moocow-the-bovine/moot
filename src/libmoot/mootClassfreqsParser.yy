@@ -19,21 +19,21 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 /*----------------------------------------------------------------------
- * Name: mootLexfreqsParser.yy
+ * Name: mootClassfreqsParser.yy
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + specification for lexical frequency parameter-file parser moot tagger
+ *   + specification for lexical-class frequency parameter-file parser for moot PoS-tagger
  *   + process with Alain Coetmeur's 'bison++' to produce a C++ parser
  *----------------------------------------------------------------------*/
 
-%name mootLexfreqsParser
+%name mootClassfreqsParser
 
 /* -- bison++ flags --- */
 /* -- force use of location stack : defines global 'yyltype' by default */
 %define LSP_NEEDED
 
 // -- ... so we define yyltype ourselves ... (see %header section)
-%define LTYPE mootLexfreqsParserLType
+%define LTYPE mootClassfreqsParserLType
 
 // -- debugging (see below)
 %define DEBUG 1
@@ -43,7 +43,7 @@
 /* %define ERROR_BODY =0 */
 
 // -- use inline error-reporting : gotta do this below, 'cause msg ain't declared
-/* %define ERROR_BODY { yycarp("mootLexfreqsParser: Error: %s", msg); } */
+/* %define ERROR_BODY { yycarp("mootClassfreqsParser: Error: %s", msg); } */
 
 // -- use pure-function lexer body
 //%define LEX_BODY =0
@@ -61,7 +61,7 @@
 #include <string.h>
 
 #include "mootTypes.h"
-#include "mootLexfreqs.h"
+#include "mootClassfreqs.h"
 
 // -- get rid of bumble's macros
 #undef YYACCEPT
@@ -79,11 +79,11 @@ typedef struct {
   int last_line;
   int last_column;
   char *text;
-} mootLexfreqsParserLType;
+} mootClassfreqsParserLType;
 
 
 /**
- * \class mootLexfreqsParser
+ * \class mootClassfreqsParser
  * \brief Bison++ parser for (TnT-style) moot lexical frequency parameter files.
  */
 %}
@@ -94,27 +94,29 @@ typedef struct {
 #endif
 %}
 
-%define CLASS mootLexfreqsParser
+%define CLASS mootClassfreqsParser
 %define MEMBERS \
   public: \
    /* -- public instance members go here */ \
-   /** a pointer to the lexfreq-parameter object to hold the data we're parsing */ \
-   moot::mootLexfreqs        *lexfreqs; \
-   /* to keep track of all possible tags we've parsed (optional). */ \
-   std::set<moot::mootTagString>  *alltags; \
-  private: \
-   /* private instance members go here */ \
+   /** a pointer to the parameter object to hold the data we're parsing */ \
+   moot::mootClassfreqs            *cfreqs; \
+  protected: \
+   /* protected instance members go here */ \
+   /** current lexical class begin built  */ \
+   moot::mootClassfreqs::LexClass   lclass; \
   public: \
    /* public methods */ \
+   /** virtual destructor to shut up gcc */\
+   virtual ~mootClassfreqsParser(void) {};\
    /* report warnings */\
    virtual void yywarn(const char *msg) { \
-      yycarp("mootLexfreqsParser: Warning: %s", msg);\
+      yycarp("mootClassfreqsParser: Warning: %s", msg);\
    }; \
    /** report anything */\
    virtual void yycarp(char *fmt, ...);
    
 
-%define CONSTRUCTOR_INIT : lexfreqs(NULL), alltags(NULL)
+%define CONSTRUCTOR_INIT : cfreqs(NULL)
 
 
 
@@ -123,22 +125,22 @@ typedef struct {
  *------------------------------------------------------------*/
 
 %union {
-  moot::mootTokString *tokstr;         ///< for single tokens or tags (strings)
+  moot::mootTagString  *tagstr;         ///< for single tags (strings)
   moot::CountT           count;         ///< for tag-list counts
 }
 
 %header{
 /**
- * \typedef yy_mootLexfreqsParser_stype
+ * \typedef yy_mootClassfreqsParser_stype
  * \brief Bison++ semantic value typedef for moot-pargen parameter-file parser.
  */
 %}
 
 // -- Type declarations
-%token <tokstr>   TOKEN
+%token <tagstr>   TAG
 %token <count>    COUNT
-%type  <tokstr>   token tag entryBody
-%type  <count>    count total          tab newline entry entries
+%type  <tagstr>   tag
+%type  <count>    count total entryBody lclass tab newline entry entries
 
 // -- Operator precedence and associativity
 //%left TAB       // -- lexfreq-construction operator
@@ -155,34 +157,37 @@ entries:	/* empty */ { $$ = 0; }
 
 entry:		entryBody newline
 		{
-		  delete $1;
+                  lclass.clear();
                   $$ = 0;
 		}
 	;
 
-entryBody:	token { $$ = $1; }
-	|	token   tab   total { $$ = $1; /* total is optional (not really) */ }
+entryBody:	lclass { $$ = $1; }
+	|	lclass   tab   total { $$ = $1; /* total is optional (not really) */ }
 	|	entryBody   tab   tag   tab   count
 		{
-		  lexfreqs->add_count(*$1, *$3, $5);
-                  delete $3;
+		  cfreqs->add_count(lclass, *$3, $5);
+		  delete $3;
                   $$ = $1;
 		}
 	;
 
-token:		TOKEN
+lclass:		/* empty */ { $$ = 0; }
+	|	lclass tag
 		{
-		  $$ = $1;
+		  lclass.insert(*$2);
+                  delete $2;
+                  $$ = 0;
 		}
-	|	COUNT
+	|	lclass COUNT
 		{
-		  $$ = new moot::mootTokString((const char *)yylloc.text);
+		  lclass.insert((const char *)yylloc.text);
+		  $$ = 0;
 		}
 	;
 
-tag:		token
+tag:		TAG
 		{
-		  if (alltags) alltags->insert(*$1);
 		  $$ = $1;
 		}
 	;
@@ -222,12 +227,12 @@ newline:	'\n' { $$=0; }
  * Error Methods
  *----------------------------------------------------------------*/
 
-void mootLexfreqsParser::yyerror(char *msg)
+void mootClassfreqsParser::yyerror(char *msg)
 {
-    yycarp("mootLexfreqsParser: Error: %s\n", msg);
+    yycarp("mootClassfreqsParser: Error: %s\n", msg);
 }
 
-void mootLexfreqsParser::yycarp(char *fmt, ...)
+void mootClassfreqsParser::yycarp(char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);

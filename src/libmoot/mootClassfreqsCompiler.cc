@@ -20,7 +20,7 @@
 */
 
 /*============================================================================
- * File: mootLexfreqsCompiler.cc
+ * File: mootClassfreqsCompiler.cc
  * Author:  Bryan Jurish <moocow@ling.uni-potsdam.de>
  *
  * Description:
@@ -31,10 +31,10 @@
 
 //#include <FSM.h>
 
-#include "mootLexfreqs.h"
-#include "mootLexfreqsLexer.h"
-#include "mootLexfreqsParser.h"
-#include "mootLexfreqsCompiler.h"
+#include "mootClassfreqs.h"
+#include "mootClassfreqsLexer.h"
+#include "mootClassfreqsParser.h"
+#include "mootClassfreqsCompiler.h"
 
 moot_BEGIN_NAMESPACE
 
@@ -49,7 +49,7 @@ moot_BEGIN_NAMESPACE
 /*----------------------------------------------------------------
  * Public Methods: PARSING
  *----------------------------------------------------------------*/
-int mootLexfreqsCompiler::yylex()
+int mootClassfreqsCompiler::yylex()
 {
   yylloc.first_line=theLexer.theLine;
   yylloc.first_column=theLexer.theColumn;
@@ -61,16 +61,16 @@ int mootLexfreqsCompiler::yylex()
 }
 
 
-mootLexfreqs *mootLexfreqsCompiler::parse_lexfreqs()
+mootClassfreqs *mootClassfreqsCompiler::parse_classfreqs()
 {
   // sanity check
-  if (!lexfreqs) {
-    yyerror("Cannot compile to a NULL lexfreqs object!");
+  if (!cfreqs) {
+    yyerror("Cannot compile() to a NULL mootClassfreqs pointer!");
     return NULL;
   }
   // actual parsing
   if (yyparse() != 0) return NULL;
-  return lexfreqs;
+  return cfreqs;
 }
 
 
@@ -78,16 +78,16 @@ mootLexfreqs *mootLexfreqsCompiler::parse_lexfreqs()
  * Public Methods: Errors & Warnings
  *----------------------------------------------------------------*/
 
-void mootLexfreqsCompiler::yyerror(const char *msg) {
+void mootClassfreqsCompiler::yyerror(const char *msg) {
     fprintf(stderr,"%s: error:%s%s at line %d, column %d, near token '%s': %s\n",
-	    (objname ? objname : "mootLexfreqsCompiler"),
+	    (objname ? objname : "mootClassfreqsCompiler"),
 	    (srcname ? " in file " : ""),
 	    (srcname ? srcname : ""),
 	    yylloc.first_line, yylloc.first_column, yylloc.text, msg);
 }
-void mootLexfreqsCompiler::yywarn(const char *msg) {
+void mootClassfreqsCompiler::yywarn(const char *msg) {
     fprintf(stderr,"%s: warning:%s%s at line %d, column %d, near token '%s': %s\n",
-	  (objname ? objname : "mootLexfreqsCompiler"),
+	  (objname ? objname : "mootClassfreqsCompiler"),
 	  (srcname ? " in file " : ""),
 	  (srcname ? srcname : ""),
 	  yylloc.first_line, yylloc.first_column, yylloc.text, msg);

@@ -32,6 +32,8 @@
 #define MOOT_TOKEN_VERSION 1
 #define MOOT_TOKEN_REVISION 0
 
+#include <ctype.h>
+
 #include <list>
 #include <set>
 #include <string>
@@ -55,6 +57,13 @@
 
 #endif /* defined(__GNUC__) */
 
+/**
+ * \def MOOT_TNT_COMPAT
+ * Whether to typify tokens the "right" way, or as TnT does it
+ */
+#define MOOT_TNT_COMPAT 1
+//#undef MOOT_TNT_COMPAT
+
 namespace moot {
   using namespace std;
 
@@ -67,6 +76,9 @@ typedef string mootTagString;
 
 /** Token-string type */
 typedef string mootTokString;
+
+/** Tagset (read "lexical class") type */
+typedef set<mootTagString> mootTagSet;
 
 /*--------------------------------------------------------------------------
  * mootToken
@@ -82,7 +94,7 @@ public:
 
   /** Type for analysis weights */
   typedef float Cost;
-
+ 
   /** Type for a single morphological analysis */
   class Analysis {
   public:
@@ -155,7 +167,7 @@ public:
    * \warning Use the text() method(s) instead of accessing this directly!
    */
   mootTokString   tok_text;
-
+  
   /**
    * Set of possible analyses as a mootToken::AnalysisSet
    * \warning Use the analyses() method(s) instead of accessing this directly!
@@ -270,7 +282,6 @@ public:
     return tok_analyses.upper_bound(Analysis(tag,MOOT_COST_UB));
   };
 
-
   /*------------------------------------------------------------
    * Compatibility
    */
@@ -281,11 +292,11 @@ public:
    * NOTE: current analysis-set is NOT cleared by this method.
    */
   inline void tokImport(const mootTokString *src_toktext=NULL,
-			const set<mootTagString> *src_tagset=NULL)
+			const mootTagSet    *src_tagset=NULL)
   {
     if (src_toktext) tok_text = *src_toktext;
     if (src_tagset) {
-      for (set<mootTagString>::const_iterator tsi = src_tagset->begin();
+      for (mootTagSet::const_iterator tsi = src_tagset->begin();
 	   tsi != src_tagset->end();
 	   tsi++)
 	{
@@ -301,7 +312,7 @@ public:
    * NOTE: argument tagset is NOT cleared by this method.
    */
   inline void tokExport(mootTokString *dst_toktext=NULL,
-			set<mootTagString> *dst_tagset=NULL) const
+			mootTagSet *dst_tagset=NULL) const
   {
     if (dst_toktext) *dst_toktext = tok_text;
     if (dst_tagset) {
@@ -326,6 +337,116 @@ public:
  * Sentences are just lists of mootToken objects
  */
 typedef list<mootToken> mootSentence;
+
+
+/*----------------------------------------------------------------------
+ * Pattern-based Typification
+ *----------------------------------------------------------------------*/
+
+/** Enum for TnT-style token typification */
+typedef enum {
+  TokTypeAlpha,      /**< (Mostly) alphabetic token: "foo", "bar", "foo2bar" */
+  TokTypeCard,       /**< @CARD: Digits-only: "42" */
+  TokTypeCardPunct,  /**< @CARDPUNCT: Digits with single-char punctuation suffix: "42." */
+  TokTypeCardSuffix, /**< @CARDSUFFIX: Digits with (almost any) suffix: "42nd" */
+  TokTypeCardSeps,   /**< @CARDEPS: Digits with interpunctuation: "420.24/7" */
+  TokTypeUnknown,    /**< @UNKNOWN: Special "Unknown" token-type */
+  //TokTypeSpecial,    /* A literal '@CARD', '@CARDPUNCT', etc. */
+  NTokTypes          /**< Not really a token-type */
+} TokenType;
+
+/** Convert token-types to symbolic names */
+const char TokenTypeNames[NTokTypes][16] =
+  {
+    "@ALPHA",
+    "@CARD",
+    "@CARDPUNCT",
+    "@CARDSUFFIX",
+    "@CARDSEPS",
+    "@UNKNOWN"
+  };
+
+/** TnT compatibility hack */
+inline bool tok2type_isCardPunctChar(const char c) {
+  return
+#if !defined(MOOT_TNT_COMPAT)
+    (ispunct(c));             //-- This is the "right" way to do it
+#else
+    (c=='.'||c==','||c=='-'); //-- ... but TnT seems to do it this way
+#endif // MOOT_TNT_COMPAT
+};
+
+/** TnT compatibility hack */
+inline bool tok2type_isCardSuffixChar(const char c) {
+  //bool answer = !tok2type_isCardPunctChar(c);
+  //bool answer = !ispunct(c);
+  //fprintf(stderr, "tok2type_isCardSuffixChar(%c)=%d\n", c, answer);
+  //return answer;
+  return true;
+};
+
+/** Get the TokenType for a given token */
+inline TokenType token2type(const mootTokString &token)
+{
+  mootTokString::const_iterator ti = token.begin();
+  bool leading_punct = false;
+
+  if (ti==token.end()) return TokTypeAlpha;
+  else if (tok2type_isCardPunctChar(*ti)) {
+    leading_punct = true;
+    ti++;
+  }
+  
+  if (!isdigit(*ti))
+    return TokTypeAlpha;
+    
+  //-- ^[:digit:]
+  for (ti++; ti != token.end() && isdigit(*ti); ti++) {;}  //-- find first non-digit
+  //-- ^([:digit:]+)
+  
+  if (ti == token.end()) {
+    //-- ^([:digit:]+)$
+    if (!leading_punct) return TokTypeCard;
+    else return TokTypeCardSeps;
+  }
+
+  else if (tok2type_isCardPunctChar(*ti)) {
+    //-- ^([:digit:]+)([:CardPunct:])
+
+    if (++ti == token.end())
+      //-- ^([:digit:]+)([:CardPunct:])$
+      return TokTypeCardPunct;
+
+    else if (isdigit(*ti)  || tok2type_isCardPunctChar(*ti)) {
+      //-- ^([:digit:]+)([:CardPunct:])([:digit:])
+      for (ti++; ti != token.end() && (isdigit(*ti) || tok2type_isCardPunctChar(*ti)); ti++) {;}
+      //-- ^([:digit:]+)([:CardPunct:])([[:digit:][:CardPunct:]]+)
+      if (ti == token.end())
+	//-- ^([:digit:]+)([:CardPunct:])([[:digit:]|[:CardPunct:]]+)$
+	return TokTypeCardSeps;
+    }
+  }
+
+#if defined(MOOT_TNT_COMPAT)
+  //-- allow at most 3-character suffixes
+  for (int i=0 ; ti != token.end() && i < 3 ; ti++, i++) {;}
+  //-- ^([:digit:]+)([[:digit:][:CardPunct]]*)([^[:digit:][:CardPunct:]])(.{0,3})
+
+  if (ti == token.end())
+    //-- ^([:digit:]+)([[:digit:][:CardPunct]]*)([^[:digit:][:CardPunct:]])(.{0,3})$
+    return TokTypeCardSuffix;
+
+#else // !defined(MOOT_TNT_COMPAT)
+  //-- allow suffixes of arbitrary length
+  //for ( ; ti != token.end() && tok2type_isCardSuffixChar(*ti); ti++) {;}
+  //-- ^([:digit:]+)([[:digit:][:CardPunct]]*)(([^[:digit:][:CardPunct:]]+)?)([:CardSuffixChar:]*)
+  return TokTypeCardSuffix;
+
+#endif // MOOT_TNT_COMPAT
+  
+  return TokTypeAlpha;
+};
+
 
 }; /* namespace moot */
 

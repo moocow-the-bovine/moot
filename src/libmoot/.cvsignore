@@ -12,12 +12,16 @@
 *.lab
 mootConfig.h
 mootConfig.h.in
-mootPPLexer.cc
-mootPPLexer.h
-mootTaggerLexer.cc
-mootTaggerLexer.h
-mootTokenLexer.cc
-mootTokenLexer.h
+
+#mootPPLexer.cc
+#mootPPLexer.h
+
+#mootTaggerLexer.cc
+#mootTaggerLexer.h
+
+#mootTokenLexer.cc
+#mootTokenLexer.h
+
 mootTaglistLexer.cc
 mootTaglistLexer.h
 mootParamLexer.cc
@@ -25,15 +29,20 @@ mootParamLexer.h
 mootParamParser.cc
 mootParamParser.h
 
-mootNgramsLexer.cc
-mootNgramsLexer.h
-mootNgramsParser.cc
-mootNgramsParser.h
+#mootNgramsLexer.cc
+#mootNgramsLexer.h
+#mootNgramsParser.cc
+#mootNgramsParser.h
 
-mootLexfreqsLexer.cc
-mootLexfreqsLexer.h
-mootLexfreqsParser.cc
-mootLexfreqsParser.h
+#mootLexfreqsLexer.cc
+#mootLexfreqsLexer.h
+#mootLexfreqsParser.cc
+#mootLexfreqsParser.h
+
+#mootClassfreqsLexer.cc
+#mootClassfreqsLexer.h
+#mootClassfreqsParser.cc
+#mootClassfreqsParser.h
 
 mootAlphabetLexer.cc
 mootAlphabetLexer.h
