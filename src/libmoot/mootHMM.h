@@ -45,46 +45,7 @@
 #include <mootClassfreqs.h>
 #include <mootNgrams.h>
 #include <mootEnum.h>
-
-/**
- * \def mootProbEpsilon
- * Constant representing a minimal probability.
- * Used for default constructor. 
- * The standard value should be appropriate for an IEEE 754-1985 float.
- */
-#define mootProbEpsilon  1.19209290E-06F
-/*
-#ifdef FLT_EPSILON
-//#define mootProbEpsilon FLT_EPSILON*10
-# define mootProbEpsilon  FLT_EPSILON*10
-#else
-# define mootProbEpsilon  1.19209290E-06F
-//#define mootProbEpsilon 1.19209290E-07F
-#endif
-*/
-
-/** \def MOOT_PROB_ZERO
- * Probability lower-bound.
- * The standard value should be appropriate for an IEEE 754-1985 float.
- *
- * \def MOOT_PROB_ONE
- * Probability upper-bound
- * The standard value should be appropriate for an IEEE 754-1985 float.
- */
-#define MOOT_PROB_NEG  -3E+38
-#define MOOT_PROB_ZERO -1E+38
-#define MOOT_PROB_ONE   0.0
-/*
-#ifdef FLT_MAX
-#  define MOOT_PROB_NEG  -FLT_MAX
-#  define MOOT_PROB_ZERO -1E+38
-#  define MOOT_PROB_ONE   0.0
-# else //-- !(DBL|FLT)_MAX
-#  define MOOT_PROB_NEG  -3E+38
-#  define MOOT_PROB_ZERO -1E+38
-#  define MOOT_PROB_ONE   0.0
-#endif //-- /(DBL|FLT)_MAX
-*/
+#include <mootSuffixTrie.h>
 
 /**
  * \def MOOT_LEX_UNKNOWN_TOKENS
@@ -98,12 +59,16 @@
 /**
  * \def MOOT_USE_TRIGRAMS
  * If defined, trigrams will be used in addition to uni- and bi-grams.
+ *
+ * \see mootConfig.h
  */
 
 /**
  * \def MOOT_RELAX
  * If defined, pre-analyses will be used only as "hints" ; otherwise,
  * they are considered hard restrictions.
+ *
+ * \see mootConfig.h
  */
 
 /**
@@ -112,6 +77,8 @@
  * trigrams will be stored in a hash table.
  * Otherwise, trigrams will be stored in a sparse and
  * memory-hogging (but fast) C array
+ *
+ * \see mootConfig.h
  */
 
 /**

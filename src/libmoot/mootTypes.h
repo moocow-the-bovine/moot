@@ -105,6 +105,46 @@ typedef float ProbT;
 typedef ProbT CountT;
 
 
+/**
+ * \def mootProbEpsilon
+ * Constant representing a minimal probability.
+ * Used for default HMM constructor. 
+ * The standard value should be appropriate for an IEEE 754-1985 float.
+ */
+#define mootProbEpsilon  1.19209290E-06F
+/*
+#ifdef FLT_EPSILON
+//#define mootProbEpsilon FLT_EPSILON*10
+# define mootProbEpsilon  FLT_EPSILON*10
+#else
+# define mootProbEpsilon  1.19209290E-06F
+//#define mootProbEpsilon 1.19209290E-07F
+#endif
+*/
+
+/** \def MOOT_PROB_ZERO
+ * Probability lower-bound.
+ * The standard value should be appropriate for an IEEE 754-1985 float.
+ *
+ * \def MOOT_PROB_ONE
+ * Probability upper-bound
+ * The standard value should be appropriate for an IEEE 754-1985 float.
+ */
+#define MOOT_PROB_NEG  -3E+38
+#define MOOT_PROB_ZERO -1E+38
+#define MOOT_PROB_ONE   0.0
+/*
+#ifdef FLT_MAX
+#  define MOOT_PROB_NEG  -FLT_MAX
+#  define MOOT_PROB_ZERO -1E+38
+#  define MOOT_PROB_ONE   0.0
+# else //-- !(DBL|FLT)_MAX
+#  define MOOT_PROB_NEG  -3E+38
+#  define MOOT_PROB_ZERO -1E+38
+#  define MOOT_PROB_ONE   0.0
+#endif //-- /(DBL|FLT)_MAX
+*/
+
 moot_END_NAMESPACE
 
 #endif /* _moot_TYPES_H */

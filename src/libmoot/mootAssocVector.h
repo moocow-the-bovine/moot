@@ -90,6 +90,15 @@ namespace moot {
     //--------------------------------------------------
     /// \name Operators
     //@{
+    inline ThisT& operator=(const ThisT &x)
+    {
+      if (&x != this) {
+	node_key = x.node_key;
+	node_val = x.node_val;
+      }
+      return *this;
+    };
+
     inline bool operator==(const ThisT &x) const
     { return node_key==x.node_key && node_val==x.node_val; };
 

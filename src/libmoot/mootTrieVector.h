@@ -34,9 +34,9 @@
 #ifdef MOOT_TRIE_VECTOR_DEBUG
 # include <stdio.h>
 # include <stdlib.h>
-# include <ctype.h>
 #endif
 
+#include <ctype.h>
 #include <vector>
 #include <string>
 #include <map>
@@ -146,7 +146,7 @@ public:
 template<class DataT, typename CharT = char, typename UCharT = unsigned char>
 class TrieVector
   : public TrieVectorBase,
-    public std::vector<TrieNode<DataT,CharT,UCharT> >
+    public std::vector<TrieVectorNode<DataT,CharT,UCharT> >
 {
 public:
   //--------------------------------------------------------------------
@@ -160,7 +160,7 @@ public:
      trie_type;
 
   typedef
-     TrieNode<data_type,char_type,uchar_type>
+     TrieVectorNode<data_type,char_type,uchar_type>
      node_type;
 
   typedef std::vector<node_type>                   vector_type;
@@ -343,6 +343,22 @@ public:
     return (di==end() ? NoNode : (di-begin()));
   };
 
+
+  /**
+   * Daughter iteration, read/write
+   *
+   * Find the first daughter of the node @from.
+   * On success, returns an iterator pointing to the daughter.
+   * Returns end() if no such daughter exists.
+   * \li Requires a compiled transition table.
+   * \li @from should be a valid node
+   */
+  inline iterator first_dtr(const node_type &from)
+  { return ( from.ndtrs == 0 ? end() : (begin()+from.mindtr) ); };
+
+  /** Daughter lookup, iterator, read-only */
+  inline const_iterator first_dtr(const node_type &from) const
+  { return ( from.ndtrs == 0 ? end() : (begin()+from.mindtr) ); };
 
   /**
    * Mother lookup, iterator, read/write
