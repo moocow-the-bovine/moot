@@ -82,6 +82,40 @@ void test_features_of_cat(const char *cat) {
 }
 
 
+
+/*
+ * terminal_signs() => A..Z, ... // 900 lines, all terminals
+ */
+void test_terminal_signs() {
+  //FSMSymbolString s = cat;
+  const set<FSMSymbolString> *results = syms->signs();
+
+  cout << "signs() = "
+       << (results->empty() ? " --empty--\n" : "\n");
+  for (set<FSMSymbolString>::const_iterator r = results->begin(); r != results->end(); r++) {
+      cout << "\t" << r->c_str()
+	   << (syms->is_terminal(*r) ? " [terminal]" : "[non-terminal]") << "\n";
+  }
+}
+
+
+/*
+ * terminal_symbols() => A..Z, NOUN, _NOUN, ... // 1085 lines : 185 nonterms ; 899 terminals
+ */
+void test_terminal_symbols() {
+  //FSMSymbolString s = cat;
+  const set<FSMSymbolString> *results = syms->symbols();
+
+  cout << "symbols() = "
+       << (results->empty() ? " --empty--\n" : "\n");
+  for (set<FSMSymbolString>::const_iterator r = results->begin(); r != results->end(); r++) {
+      cout << "\t" << r->c_str()
+	   << (syms->is_terminal(*r) ? " [terminal]" : " [non-terminal]") << "\n";
+  }
+}
+
+
+
 /*
  * signs() => "A".."Z", "NOUN", "VERB", ...   // 1063 lines
  *   + NOT i.e. "Case"
@@ -188,13 +222,15 @@ int main (int argc, char **argv) {
     ++argv;
 
     //test_type_inference(*argv);
-    //test_subtypes_of(*argv);
+    test_subtypes_of(*argv);
     //test_supertypes_of(*argv);
-    test_features_of_cat(*argv);
+    //test_features_of_cat(*argv);
     //test_name2sym(*argv);
   }
   //test_signs();
   //test_symbols();
   //test_categories1();
   //test_categories2();
+  //test_terminal_signs();
+  //test_terminal_symbols();
 }
