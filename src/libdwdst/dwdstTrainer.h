@@ -21,11 +21,8 @@
 # include <dwdstConfig.h>
 #endif
 
-#include <hash_map>
-#include <deque>
-#include <set>
-
 #include "dwdstTagger.h"
+#include "dwdstTypes.h"
 
 using namespace std;
 
@@ -33,10 +30,10 @@ using namespace std;
  * dwdstTrainer : tagger-trainer class
  *--------------------------------------------------------------------------*/
 
-/// High-level class gather and format training data for a dwdstTagger.
+/// High-level class to gather and format training data for a dwdstTagger.
 class dwdstTrainer : public dwdstTagger {
 public:
-  // -- typedefs (see dwdstTagger.h)
+  // -- typedefs (see dwdstTypes.h)
 private:
   // -- private data
 public:

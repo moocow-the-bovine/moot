@@ -14,8 +14,8 @@
 
 #include <string.h>
 #include <string>
-#include <FSMSymSpec.h>
 
+#include <FSMSymSpec.h>
 #include "dwdstParamParser.h"
 
 /*============================================================================

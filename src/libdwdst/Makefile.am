@@ -41,6 +41,7 @@ libdwdst_la_SOURCES = \
 	dwdstPPLexer.cc \
 	dwdstParamLexer.cc \
 	dwdstParamParser.cc \
+	dwdstParamCompiler.cc \
 	dwdstTaglistLexer.cc \
 	dwdstTagger.cc \
 	dwdstTrainer.cc
@@ -50,8 +51,10 @@ libdwdst_la_SOURCES = \
 #EXTRA_${lib_i}_la_SOURCES = 
 
 ## --- Additional dependencies
-dwdstTrainer.lo: dwdstParamLexer.h dwdstParamParser.h
-dwdstTrainer.o: dwdstParamLexer.h dwdstParamParser.h
+dwdstTrainer.o: dwdstParamCompiler.h
+dwdstTrainer.lo: dwdstParamCompiler.h
+dwdstParamCompiler.lo: dwdstParamLexer.h dwdstParamParser.h
+dwdstParamCompiler.o: dwdstParamLexer.h dwdstParamParser.h
 dwdstParamLexer.lo: dwdstParamLexer.h dwdstParamParser.h
 dwdstParamLexer.o: dwdstParamLexer.h dwdstParamParser.h
 
@@ -62,11 +65,13 @@ dwdstParamLexer.o: dwdstParamLexer.h dwdstParamParser.h
 ## --- installable headers: @includedir@/@pkgname@
 #pkginclude_HEADERS = ${hfile_1} ... ${hfile_N}
 pkginclude_HEADERS = \
+	dwdstTypes.h \
 	dwdstTagger.h \
 	dwdstTaggerLexer.h \
 	dwdstPPLexer.h \
 	dwdstParamLexer.h \
 	dwdstParamParser.h \
+	dwdstParamCompiler.h \
 	dwdstTrainer.h \
 	dwdstTaglistLexer.h
 

@@ -18,10 +18,10 @@
 //%define ERROR_VERBOSE
 
 // -- use pure-function errors
-//%define ERROR_BODY =0
+%define ERROR_BODY =0
 
 // -- use inline error-reporting
-%define ERROR_BODY { fprintf(stderr,"dwdstParamParser error: %s\n", msg); }
+//%define ERROR_BODY { fprintf(stderr,"dwdstParamParser error: %s\n", msg); }
 
 // -- use pure-function lexer body
 //%define LEX_BODY =0
@@ -35,12 +35,12 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <math.h>
-# include <string.h>
 
 # include <string>
-# include <FSMSymSpec.h>
+# include <string.h>
 
-# include "dwdstTagger.h"
+# include <FSMSymSpec.h>
+# include "dwdstTypes.h"
 
 // -- get rid of bumble's macros
 #undef YYACCEPT
@@ -50,16 +50,16 @@
 
 /**
  * \class dwdstParamParser
- * \brief Bison++ parser for dwdst-pargen parameter files
+ * \brief Bison++ parser for dwdst-pargen parameter files.
  */
 %}
 
 %define CLASS dwdstParamParser
 %define MEMBERS \
   public: \
-   /* public instance members go here */ \
-   /** \brief a pointer to the parameter-map we're constructing */ \
-   dwdstTagger::NGramTable *ngtable; \
+   /* -- public instance members go here */ \
+   /** \brief a pointer to the parameter map we are constructing. */ \
+   NGramTable *ngtable; \
   private: \
    /* private instance members go here */ \
   public: \
@@ -68,17 +68,20 @@
    virtual void yywarn(const char *msg) { \
       fprintf(stderr,"dwdstParamParser warning: %s\n", msg); \
    };
+   
 
-%define CONSTRUCTOR_INIT : \
-   ngtable(NULL)
+%define CONSTRUCTOR_INIT : ngtable(NULL)
+
+
 
 /*------------------------------------------------------------
  * Parser Properties
  *------------------------------------------------------------*/
+
 %union {
-  dwdstTagger::NGramVector *ngram;    // -- for tag-lists
-  FSMSymbolString *symstr;            // -- for single-tag regex-strings
-  float             count;            // -- for tag-list counts
+  NGramVector      *ngram;            ///< for tag-lists
+  FSMSymbolString *symstr;            ///< for single-tag regex-strings
+  float             count;            ///< for tag-list counts
 }
 
 %header{
@@ -125,7 +128,7 @@ param:		ngram tab count newline
 ngram:		regex
 		{
 		    // -- single regex: make a new vector
-		    $$ = new dwdstTagger::NGramVector;
+		    $$ = new NGramVector();
                     $$->clear();
                     $$->push_back(*$1);
                     delete $1;
@@ -180,5 +183,7 @@ newline:	'\n' { $$=0; }
 /*----------------------------------------------------------------
  * Parsing Methods
  *----------------------------------------------------------------*/
-//void FSMRegexParser::yyerror(char *msg) { fprintf(stderr, "FSMRegexParser error: %s\n", msg); }
+void dwdstParamParser::yyerror(char *msg) {
+  fprintf(stderr, "dwdstParamParser Error: %s\n", msg);
+}
 

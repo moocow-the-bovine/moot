@@ -37,18 +37,6 @@
 /// High-level class to perform morphological analysis and PoS-tagging.
 class dwdstTagger {
 public:
-  // ------ public typedefs
-
-  /// Type for a single 'n-gram' (used by training methods)
-  typedef deque<FSMSymbolString>        NGramVector;
-
-  /// N-gram->count lookup table (used by training methods)
-  typedef map<NGramVector,float>        NGramTable;
-
-  /// used by training methods to construct n-grams
-  typedef deque<set<FSMSymbolString> *> FSMSymbolStringQueue;
-
-public:
   // ------ public data
 
   /// the symspec to use for tagging

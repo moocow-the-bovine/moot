@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <errno.h>
 
+#include "dwdstTypes.h"
 #include "dwdstTrainer.h"
 #include "dwdstTaglistLexer.h"
 #include "dwdstParamLexer.h"
