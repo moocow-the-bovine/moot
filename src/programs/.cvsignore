@@ -8,7 +8,7 @@ dwdshmm
 moothmm
 moot-pargen
 moot-fstgen
-*.pod
+[^a]*.pod
 *.1
 *.xml
 *.list

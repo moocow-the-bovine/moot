@@ -373,15 +373,6 @@ Must specify absolute pathnames for compilation.
 #-----------------------------------------------------------------------------
 # Footer
 #-----------------------------------------------------------------------------
-acknowledge "
-
-Development of this package began in the context
-of the DWDS/Collocations project
-('Kollokationen im digitalen W\"orterbuch deutscher Sprache'
-= 'collocations in the digital dictionary of the German language') at the
-Berlin-Brandenburgische Akademie der Wissenschaften.
-For details on the DWDS project, visit: http://www.dwds.de.
-
-"
+acknowledge `cat acknowledge.pod`
 
 seealso "L<mootpp>, L<mootrain>, L<mootm>, L<moothmm>"

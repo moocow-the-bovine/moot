@@ -57,15 +57,6 @@ as filenames of the input files themselves.
 #-----------------------------------------------------------------------------
 # Footer
 #-----------------------------------------------------------------------------
-acknowledge "
+acknowledge `cat acknowledge.pod`
 
-Development of this package begin in the context of
-of the DWDS/Collocations project
-('Kollokationen im digitalen W\"orterbuch der deutschen Sprache'
-= 'collocations in the digital dictionary of the German language') at the
-Berlin-Brandenburgische Akademie der Wissenschaften.
-For details on the DWDS project, visit: http://www.dwds.de.
-
-"
-
-seealso "L<mootm>, L<moothmm>."
+seealso "L<mootm>, L<moothmm>, L<moot>."
