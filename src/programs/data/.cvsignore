@@ -2,6 +2,7 @@ save
 negra
 share-moot
 share-dwdst
+*.raw
 *~
 .*~
 *.model

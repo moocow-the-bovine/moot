@@ -5,6 +5,10 @@ Todo:
 
 v2.0.0 Fri, 09 Jul 2004 00:18:26 +0200
 	+ Documentation and general cleanup
+	+ added 'static' binary distribution build target
+	  - linker complains about getpwuid() [used by
+	    command-line parsers] requiring native glibc...
+	+ added famous "no warranty" banner
 
 v2.0.0pre11 Fri, 09 Jul 2004 00:18:21 +0200
 	+ Added abstract 'mootio' layer:

@@ -38,9 +38,9 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_LANG(C++)
 
-dnl ------------------------------------------------------------
-dnl debug ?
-dnl
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## debug ?
+##
 AC_MSG_CHECKING([whether to build debug version])
 AC_ARG_ENABLE(debug,
 	AC_HELP_STRING([--enable-debug], [build debug version (default=no)]))
@@ -56,7 +56,10 @@ else
   moot_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops"
 fi
 AC_SUBST(moot_OFLAGS)
-dnl ^--- /debug
+##
+## /debug ?
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 dnl v--- needed if Makefile.am uses _LTLIBRARIES targets
 AC_PROG_LIBTOOL
@@ -395,7 +398,7 @@ dnl
 dnl libxml2: user-request
 AC_ARG_ENABLE(libxml,
 	AC_HELP_STRING([--enable-libxml],
-	               [Enable experimental libxml2 XML support (off by default)]),
+	               [Enable experimental libxml2 XML support (default=no)]),
 	[ac_cv_enable_libxml="$enableval"],[ac_cv_enable_libxml="no"])
 
 dnl libxml2: pkg-config
@@ -418,18 +421,15 @@ else
 
  DOXY_DEFINES="$DOXY_DEFINES MOOT_LIBXML_ENABLED=1"
 fi
-dnl libxml2
-dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+## /libxml2
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-dnl ------------------------------------------------------------
-dnl check for optgen.perl
-dnl
+
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## check for optgen.perl
+##
 AC_ARG_VAR(OPTGEN_PERL, [Path to the 'optgen.perl' script.])
-AC_ARG_WITH([optgen-perl],
-	AC_HELP_STRING([--with-optgen-perl=PATH],
-		       [Specify location of optgen.perl]),
-	[OPTGEN_PERL="$withval"])
 
 if test -z "$OPTGEN_PERL" ; then
   AC_PATH_PROG(OPTGEN_PERL,[optgen.perl],[])
@@ -441,12 +441,15 @@ if test -z "$OPTGEN_PERL" ; then
   fi
 fi
 AC_SUBST(OPTGEN_PERL)
+##
+## /check for optgen.perl
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 
-dnl ------------------------------------------------------------
-dnl documentation
-dnl
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## documentation
+##
 AC_ARG_WITH(docdir,
 	AC_HELP_STRING([--with-docdir=DIR],
 		[install documentation in DIR/AC_PACKAGE_NAME (default=DATADIR/doc)]),
@@ -476,7 +479,7 @@ moot_doc_formats=`echo "$ac_cv_doc_formats" | sed 's/\,/ /g'`
 
 
 AC_ARG_ENABLE(doc,
-	AC_HELP_STRING([--enable-doc],[Synonym for --with-doc-formats=none]),
+	AC_HELP_STRING([--disable-doc],[Synonym for --with-doc-formats="none"]),
 	[enable_doc="$enableval"],[enable_doc="yes"])
 
 
@@ -662,6 +665,10 @@ if test "$moot_doc_formats" != "none" ; then
   #done 
   AC_SUBST(DOXY_TAGFILES)   
 fi; # if "$moot_doc_formats" != "none" ...
+##
+## /Documentation
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 
 #---------------------------------------------------------------
@@ -699,9 +706,9 @@ dnl cxxflags: template depth
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-dnl ------------------------------------------------------------
-dnl warnings ?
-dnl
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## warnings ?
+##
 AC_MSG_CHECKING([whether to display compiler warnings])
 AC_ARG_ENABLE(warnings,
 	AC_HELP_STRING([--disable-warnings],[disable compiler warnings (default=no)]))
@@ -714,6 +721,9 @@ else
   moot_WFLAGS=""
 fi
 AC_SUBST(moot_WFLAGS)
+##
+## /warnings
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 dnl

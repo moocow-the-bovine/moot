@@ -86,8 +86,9 @@ void GetMyOptions(int argc, char **argv)
   //-- show banner
   if (args.verbose_arg > 1)
     fprintf(stderr,
-	    "\n%s version %s by Bryan Jurish <moocow@ling.uni-potsdam.de>\n\n",
-	    PROGNAME, VERSION);
+	    moot_program_banner(PROGNAME,
+				PACKAGE_VERSION,
+				"Bryan Jurish <jurish@ling.uni-potsdam.de>").c_str());
 
   //-- output file
   if (!out.open(args.output_arg,"w")) {

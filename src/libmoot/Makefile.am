@@ -1,4 +1,4 @@
-## File: src/Makefile.am
+## File: src/libmoot/Makefile.am
 ## Package: moot
 ## Description:
 ##   + source-level automake file for DWDS tagger

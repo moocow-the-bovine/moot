@@ -32,9 +32,18 @@
 #include <ctype.h>
 #include <errno.h>
 
+#include <mootConfig.h>
+
 #include <mootUtils.h>
 #include <mootIO.h>
 #include <mootCIO.h>
+
+#ifdef MOOT_EXPAT_ENABLED
+# include <expat.h>
+#endif
+#ifdef MOOT_ZLIB_ENABLED
+# include <zlib.h>
+#endif
 
 namespace moot {
   using namespace std;
@@ -366,6 +375,67 @@ FILE *cmdutil_file_churner::next_list_file() {
     abort();
   }
   return list.file;
+}
+
+
+/*----------------------------------------------------------------------
+ * moot_banner
+ */
+std::string moot_banner(void)
+{
+  string s = ("  libmoot version "
+	      PACKAGE_VERSION
+	      " (c) 2004 Bryan Jurish.\n");
+  //--
+
+#ifdef MOOT_EXPAT_ENABLED
+  s.append("  expat XML parser by James Clark and others.\n");
+#endif // MOOT_EXPAT_ENABLED
+
+#ifdef MOOT_LIBXML_ENABLED
+  s.append("  libxml2 by Daniel Veillard and others.\n");
+
+#endif // MOOT_LIBXML_ENABLED
+
+#ifdef MOOT_RECODE_ENABLED
+  s.append("  librecode recoding library by François Pinard.\n");
+#endif // MOOT_RECODE_ENABLED
+
+#ifdef MOOT_ZLIB_ENABLED
+  s.append("  zlib compression library by Jean-loup Gailly and Mark Adler.\n");
+#endif
+
+  return s;
+}
+
+/*----------------------------------------------------------------------
+ * moot_program_banner
+ */
+std::string moot_program_banner(const std::string &prog_name, 
+				const std::string &prog_version,
+				const std::string &prog_author,
+				bool is_free)
+{
+  string s = prog_name;
+  s.append(" version ");
+  s.append(prog_version);
+  s.append(" by ");
+  s.append(prog_author);
+  s.append("\n\n");
+  //--
+
+  s.append(moot_banner());
+  s.push_back('\n');
+
+  //--
+
+  if (is_free) {
+    s.append("This program comes with ABSOLUTELY NO WARRANTY. It is free software. You are\n"
+	     "welcome redistribute it under certain conditions. See the file COPYING which\n"
+	     "cam with the distribution for details.\n\n");
+  }
+
+  return s;
 }
 
 }; //-- namespace moot

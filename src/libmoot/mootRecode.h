@@ -54,8 +54,12 @@ public:
 #ifdef MOOT_RECODE_ENABLED
   RECODE_OUTER   rc_outer;   ///< outer context for librecode
   RECODE_REQUEST rc_request; ///< actual recode request
-  std::string    rc_reqstr;  ///< request string
+#else
+  void *         rc_outer;   ///< outer context for librecode (dummy)
+  void *         rc_request; ///< actual recode request (dummy)
 #endif // MOOT_RECODE_ENABLED
+  std::string    rc_reqstr;  ///< request string
+
 
 
 public:

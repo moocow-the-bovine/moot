@@ -115,6 +115,7 @@ $(BINDIST_TGZ): $(BINDIST_DEB)
 notgz:
 	rm -f $(BINDIST_TGZ)
 
+
 #-----------------------------------------------------------------------
 # Rules: binary package: hacked native
 #-----------------------------------------------------------------------
@@ -125,13 +126,35 @@ $(BINDIST_NATIVE).tar.gz: all
 	rm -rf $(BINDIST_NATIVE)
 	mkdir $(BINDIST_NATIVE)
 	($(MAKE) prefix="$(PWD)/$(BINDIST_NATIVE)" install \
-	  && cd $(BINDIST_NATIVE) \
-	  && fakeroot $(AMTAR) cof - . | GZIP=$(GZIP_ENV) gzip -c >../$@ \
+	  && fakeroot $(AMTAR) cof - $(BINDIST_NATIVE) | GZIP=$(GZIP_ENV) gzip -c >$@ \
 	)
 	rm -rf $(BINDIST_NATIVE)
 
 nobindist:
 	rm -f $(PACKAGE)-*-*-$(BINDIST_CPU)-$(BINDIST_OS).tar.gz
+
+
+#-----------------------------------------------------------------------
+# Rules: binary package: static .tar.gz
+#-----------------------------------------------------------------------
+BINDIST_STATIC = $(BINDIST_NATIVE)-static
+
+static: $(BINDIST_STATIC).tar.gz
+$(BINDIST_STATIC).tar.gz: distdir
+	mv $(distdir) $(BINDIST_STATIC)
+	( cd $(BINDIST_STATIC) \
+	  && ./configure --disable-shared \
+	     CXXFLAGS="-mcpu=$(BINDIST_CPU)" \
+	  && $(MAKE) all LDFLAGS="-all-static" \
+	  && mkdir $(BINDIST_STATIC) \
+	  && $(MAKE) prefix="`pwd`/$(BINDIST_STATIC)" install \
+	  && fakeroot $(AMTAR) cof - $(BINDIST_STATIC) | GZIP=$(GZIP_ENV) gzip -c >../$@ \
+	) && \
+	rm -rf $(BINDIST_STATIC)
+
+nostatic:
+	rm -rf $(PACKAGE)-*-*-$(BINDIST_CPU)-$(BINDIST_OS)-static*
+
 
 #-----------------------------------------------------------------------
 # Rules: binary package: rpm

@@ -319,6 +319,19 @@ namespace moot {
   };
   //@}
 
+  /*----------------------------------------------------------------------*/
+  /** \name Command-line utilities */
+  //@{
+  /** Return a banner string for the library */
+  std::string moot_banner(void);
+
+  /** Return a full banner string for a program using the library. */
+  std::string moot_program_banner(const std::string &prog_name,
+				  const std::string &prog_version,
+				  const std::string &prog_author,
+				  bool is_free=true);
+  //@}
+
 }; /* namespace moot */
 
 #endif /* _moot_UTILS_H */
