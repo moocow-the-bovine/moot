@@ -1,6 +1,7 @@
 dwdspp
 dwdst
 dwdstt
+dwdsm
 dwdshmm
 dwdst-pargen
 dwdst-fstgen
@@ -15,6 +16,15 @@ dwdst-fstgen
 *.ttt
 *.tt
 *.t
+*.mtt
+*.dmtt
+*.mdmtt
+*.fmtt
+*.bin
+*.cbin
+*.fbin
+*.dump
+beforeepsclosure.fsm
 negra*.lex
 negra*.123
 *.pp
@@ -39,6 +49,7 @@ negra*.123
 *.afsa
 *.dot
 *.lab
+*.scl
 *_cmdparser.cc
 *_cmdparser.h
 stamp-h*

@@ -11,11 +11,18 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <errno.h>
+#include <string.h>
 
 #include "dwdstHMM.h"
 #include "dwdstTaggerLexer.h"
 
+#include <zlib.h>
+#include "dwdstBinIO.h"
+#include "dwdstBinStream.h"
+
 using namespace std;
+using namespace dwdstBinIO;
 
 /*--------------------------------------------------------------------------
  * clear, freeing dynamic data
@@ -72,7 +79,12 @@ void dwdstHMM::clear(bool wipe_everything)
     tokids.clear();
     tagids.clear();
 
+    for (int i = 0; i < NTokTypes; i++) {
+      typids[i] = 0;
+    }
+
     start_tagid = 0;
+    unknown_lex_threshhold = 1;
     n_tags = 0;
     n_toks = 0;
   }
@@ -83,8 +95,7 @@ void dwdstHMM::clear(bool wipe_everything)
  *--------------------------------------------------------------------------*/
 bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
 		       const dwdstNgrams &ngrams,
-		       const dwdstTagString &start_tag_str,
-		       const dwdstLexfreqs::LexfreqCount unknownLexThreshhold)
+		       const dwdstTagString &start_tag_str)
 {
   //-- sanity check
   if (ngrams.ugtotal == 0) {
@@ -93,7 +104,7 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
   }
 
   //-- assign IDs
-  assign_ids_lf(lexfreqs, unknownLexThreshhold);
+  assign_ids_lf(lexfreqs);
   assign_ids_ng(ngrams);
 
   //-- get or assign start-tag-ID
@@ -161,7 +172,7 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
       tokid = tokids.name2id(tokstr);
 
       //-- "unknown" token check
-      if (toktotal <= unknownLexThreshhold) {
+      if (toktotal <= unknown_lex_threshhold) {
 	//-- "unknown" token: just store the raw counts for now
 	
 	//-- ... and add to "unknown" counts
@@ -184,12 +195,12 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
   for (LexProbSubTable::iterator lpsi = untagcts.begin();
        lpsi != untagcts.end();
        lpsi++)
-      {
-	  if (lpsi->second == 0) continue;
-	  const dwdstTagString &tagstr = tagids.id2name(lpsi->first);
-	  const dwdstLexfreqs::LexfreqCount tagtotal = lexfreqs.taglookup(tagstr);
-	  lpsi->second /= tagtotal;
-      }
+    {
+      if (lpsi->second == 0) continue;
+      const dwdstTagString &tagstr = tagids.id2name(lpsi->first);
+      const dwdstLexfreqs::LexfreqCount tagtotal = lexfreqs.taglookup(tagstr);
+      lpsi->second /= tagtotal;
+    }
 
   //-- Compute ngram probabilites
   for (dwdstNgrams::NgramStringTable::const_iterator ngti = ngrams.ngtable.begin();
@@ -254,9 +265,24 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
 /*--------------------------------------------------------------------------
  * Compilation utilities: ID-assignment
  *--------------------------------------------------------------------------*/
-void dwdstHMM::assign_ids_lf(const dwdstLexfreqs &lexfreqs,
-			     const dwdstLexfreqs::LexfreqCount unknownLexThreshhold)
+void dwdstHMM::assign_ids_lf(const dwdstLexfreqs &lexfreqs)
 {
+  //-- add special type-tokens
+  typids[TokTypeAlpha] = 0;
+ 
+  dwdstTokString str;
+  str = "@CARD";
+  typids[TokTypeCard] = tokids.nameExists(str) ? tokids.name2id(str) : tokids.insert(str);
+
+  str = "@CARDPUNCT";
+  typids[TokTypeCardPunct] = tokids.nameExists(str) ? tokids.name2id(str) : tokids.insert(str);
+
+  str = "@CARDSUFFIX";
+  typids[TokTypeCardSuffix] = tokids.nameExists(str) ? tokids.name2id(str) : tokids.insert(str);
+
+  str = "@CARDSEPS";
+  typids[TokTypeCardSeps] = tokids.nameExists(str) ? tokids.name2id(str) : tokids.insert(str);
+
   //-- compile lexical IDs
   for (dwdstLexfreqs::LexfreqStringTable::const_iterator lfti = lexfreqs.lftable.begin();
        lfti != lexfreqs.lftable.end();
@@ -271,10 +297,13 @@ void dwdstHMM::assign_ids_lf(const dwdstLexfreqs &lexfreqs,
       //-- always assign a tag-id
       if (!tagids.nameExists(tagstr)) tagids.insert(tagstr);
 
+      TokenType typ = token2type(tokstr);
+      if (typ != TokTypeAlpha) continue; //-- ignore special token-types
+
       if (
       #ifndef DWDST_LEX_UNKNOWN_TOKENS
 	  //-- unknown threshhold check
-          toktotal > unknownLexThreshhold &&
+          toktotal > unknown_lex_threshhold &&
       #endif
 	  !tokids.nameExists(tokstr))
 	{
@@ -409,10 +438,23 @@ bool dwdstHMM::estimate_lambdas(const dwdstNgrams &ngrams)
 }
 
 
+bool dwdstHMM::estimate_wlambdas(const dwdstLexfreqs &lf)
+{
+  //-- estimate lexical smoothing constants
+  if (lf.n_tokens > 0) {
+    wlambda2 = 1.0 / (ProbT)(lf.n_tokens);
+    wlambda1 = 1.0 - wlambda2;
+  } else {
+    wlambda2 = DBL_EPSILON;
+    wlambda1 = 1.0 - wlambda2;
+  }
+  return true;
+}
+
 /*--------------------------------------------------------------------------
- * Top-level
+ * Top-level: stream
  *--------------------------------------------------------------------------*/
-void dwdstHMM::tag_stream(FILE *in, FILE *out, char *infilename)
+void dwdstHMM::tag_stream(FILE *in, FILE *out, char *srcname)
 {
   dwdstTaggerLexer lexer;
 
@@ -442,7 +484,7 @@ void dwdstHMM::tag_stream(FILE *in, FILE *out, char *infilename)
 	if (curtags.empty()) {
 	  viterbi_step(tokens.back());
 	} else {
-	  viterbi_step(tokids.name2id(tokens.back()), curtags);
+	  viterbi_step(token2id(tokens.back()), curtags);
 	  curtags.clear();
 	}
         ntokens++;
@@ -460,13 +502,39 @@ void dwdstHMM::tag_stream(FILE *in, FILE *out, char *infilename)
       default:
 	carp("%s: Error: unknown token '%s' in file '%s' at line %d, column %d\n",
 	     "dwdstHMM::tag_stream()",
-	     (infilename ? infilename : "(unknown)"),
+	     (srcname ? srcname : "(unknown)"),
 	     lexer.yytext,
 	     lexer.theLine,
 	     lexer.theColumn);
 	break;
       }
   }
+}
+
+
+/*--------------------------------------------------------------------------
+ * Top-level: strings
+ *--------------------------------------------------------------------------*/
+void dwdstHMM::tag_strings(int argc, char **argv, FILE *out, char *infilename)
+{
+  //-- prepare variables
+  tokens.clear();
+  curtags.clear();
+  viterbi_clear();
+
+  for ( ; --argc >= 0; argv++) {
+    tokens.push_back((const char *)*argv);
+    viterbi_step(tokens.back());
+    ntokens++;
+  }
+  viterbi_finish();
+  tag_print_best_path(out);
+  nsents++;
+
+  //-- cleanup
+  tokens.clear();
+  curtags.clear();
+  viterbi_clear();
 }
 
 
@@ -481,6 +549,7 @@ void dwdstHMM::txtdump(FILE *file)
   fprintf(file, "%%%%-----------------------------------------------------\n");
   fprintf(file, "%%%% Smoothing Constants\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
+  fprintf(file, "%%start_tag\tID=%u(\"%s\")\n", start_tagid, tagids.id2name(start_tagid).c_str());
   fprintf(file, "%%nglambda1\t%g\n", nglambda1);
   fprintf(file, "%%nglambda2\t%g\n", nglambda2);
 #ifdef DWDST_USE_TRIGRAMS
@@ -609,6 +678,262 @@ void dwdstHMM::viterbi_txtdump(FILE *file)
 	      node->prob);
     }
   }
+}
+
+/*--------------------------------------------------------------------------
+ * Binary I/O: save
+ *--------------------------------------------------------------------------*/
+
+const HeaderInfo::VersionT BINCOMPAT_MIN_VER = 1;
+const HeaderInfo::VersionT BINCOMPAT_MIN_REV = 2;
+
+const HeaderInfo::VersionT BINCOMPAT_VER = 1;
+const HeaderInfo::VersionT BINCOMPAT_REV = 2;
+
+
+bool dwdstHMM::save(const char *filename, int compression_level)
+{
+  //-- sanity checks
+  if (compression_level != Z_DEFAULT_COMPRESSION
+      && (compression_level > Z_BEST_COMPRESSION || compression_level < Z_NO_COMPRESSION))
+    {
+      carp("dwdstHMM::save(): bad compression level %d defaults to %d\n",
+	   compression_level, Z_DEFAULT_COMPRESSION);
+      compression_level = Z_DEFAULT_COMPRESSION;
+    }
+
+  //-- open file
+  gzFile gzf = gzopen(filename, "wb");
+  if (!gzf) {
+    carp("dwdstHMM::save(): open failed for file '%s': %s",
+	 filename, gzerror(gzf, &errno));
+    return false;
+  }
+  gzsetparams(gzf, compression_level, Z_DEFAULT_STRATEGY);
+
+
+  //-- setup stream-hack
+  dwdstBinStream::ozBinStream ozs(gzf);
+
+  //-- and save
+  bool rc = save(ozs, filename);
+  ozs.close();
+  return rc;
+}
+
+bool dwdstHMM::save(dwdstBinStream::oBinStream &obs, const char *filename=NULL)
+{
+  HeaderInfo hi(string("dwdstHMM"),
+		BINCOMPAT_VER,     BINCOMPAT_REV,
+		BINCOMPAT_MIN_VER, BINCOMPAT_MIN_REV,
+		0);
+  Item<HeaderInfo> hi_item;
+  Item<size_t>     size_item;
+  Item<char *>     cmt_item;
+  char comment[512];
+  sprintf(comment, "\ndwdstHMM Version %u.%u\n", BINCOMPAT_VER, BINCOMPAT_REV);
+
+  //-- get checksum
+  size_t crc = start_tagid + n_tags + n_toks;
+  if (! (hi_item.save(obs, hi)
+	 && size_item.save(obs, crc)
+	 && cmt_item.save(obs, comment)
+	 ))
+    {
+      carp("dwdstHMM::save(): could not save header%s%s\n",
+	   (filename ? " to file " : ""), (filename ? filename : ""));
+      return false;
+    }
+
+  return _bindump(obs, filename);
+}
+
+bool dwdstHMM::_bindump(dwdstBinStream::oBinStream &obs, const char *filename=NULL)
+{
+  //-- variables
+  Item<size_t> size_item;
+  Item<TagID> tagid_item;
+  Item<TokID> tokid_item;
+  Item<ProbT> probt_item;
+  Item<TokIDTable> tokids_item;
+  Item<TagIDTable> tagids_item;
+  Item<LexProbTable> lexprobs_item;
+
+  if (! (tagid_item.save(obs, start_tagid)
+	 && probt_item.save(obs, unknown_lex_threshhold)
+	 && probt_item.save(obs, nglambda1)
+	 && probt_item.save(obs, nglambda2)
+#ifdef DWDST_USE_TRIGRAMS
+	 && probt_item.save(obs, nglambda3)
+#else
+	 && probt_item.save(obs, 0.0)
+#endif
+	 && probt_item.save(obs, wlambda1)
+	 && probt_item.save(obs, wlambda2)
+	 && tokids_item.save(obs, tokids)
+	 && tagids_item.save(obs, tagids)
+	 && (tokid_item.save(obs, typids[TokTypeAlpha])
+	     && tokid_item.save(obs, typids[TokTypeCard])
+	     && tokid_item.save(obs, typids[TokTypeCardPunct])
+	     && tokid_item.save(obs, typids[TokTypeCardSuffix])
+	     && tokid_item.save(obs, typids[TokTypeCardSeps]))
+	 && size_item.save(obs, n_tags)
+	 && size_item.save(obs, n_toks)
+	 && lexprobs_item.save(obs, lexprobs)
+	 && probt_item.save_n(obs, ngprobs1, n_tags)
+	 && probt_item.save_n(obs, ngprobs2, n_tags*n_tags)
+	 ))
+    {
+      carp("dwdstHMM::save(): could not save data%s%s\n",
+	   (filename ? " to file " : ""), (filename ? filename : ""));
+      return false;
+    }
+
+  return true;
+}
+
+/*--------------------------------------------------------------------------
+ * Binary I/O: load
+ *--------------------------------------------------------------------------*/
+
+bool dwdstHMM::load(const char *filename=NULL)
+{
+  //-- setup gzFile
+  gzFile gzs = gzopen(filename, "rb");
+  if (!gzs) {
+    carp("dwdstHMM::load(): could not open file '%s' for read: %s",
+	 filename, strerror(errno));
+    return false;
+  }
+
+  //-- setup stream-hack
+  dwdstBinStream::izBinStream izs(gzs);
+
+  bool rc = load(izs, filename);
+  izs.close();
+  return rc;
+}
+
+bool dwdstHMM::load(dwdstBinStream::iBinStream &ibs, const char *filename=NULL)
+{
+  clear(true); //-- make sure the object is totally empty
+
+  HeaderInfo hi, hi_magic(string("dwdstHMM"));
+  size_t     crc;
+
+  Item<HeaderInfo> hi_item;
+  Item<size_t>     size_item;
+  Item<string>     cmt_item;
+  string comment;
+
+  //-- load headers
+  if (! (hi_item.load(ibs, hi)
+	 && size_item.load(ibs, crc)
+	 && cmt_item.load(ibs, comment)
+	 ))
+    {
+      carp("dwdstHMM::load(): could not load header%s%s",
+	   (filename ? " from file " : ""), (filename ? filename : ""));
+      return false;
+    }
+  else if (hi.magic != hi_magic.magic)
+    {
+      carp("dwdstHMM::load(): bad magic 0x%x%s%s",
+	   hi.magic,
+	   (filename ? " in file " : ""), (filename ? filename : ""));
+      return false;
+    }
+  else if (hi.version < BINCOMPAT_MIN_VER
+	   || (hi.version == BINCOMPAT_MIN_VER && hi.revision < BINCOMPAT_MIN_REV)
+	   || BINCOMPAT_VER < hi.minver
+	   || (BINCOMPAT_VER == hi.minver && BINCOMPAT_MIN_REV < hi.minrev))
+    {
+      carp("dwdstHMM::load(): incompatible file version %u.%u%s%s",
+	   hi.version, hi.revision,
+	   (filename ? " in file " : ""), (filename ? filename : ""));
+    }
+
+  if(!_binload(ibs, filename))
+    return false;
+
+  if (crc != (start_tagid + n_tags + n_toks)) {
+    carp("dwdstHMM::load(): checksum failed%s%s",
+	 (filename ? " for file " : ""), (filename ? filename : ""));
+  }
+
+  viterbi_clear(); //-- (re-)initialize Viterbi table
+  return true;
+}
+
+
+bool dwdstHMM::_binload(dwdstBinStream::iBinStream &ibs, const char *filename=NULL)
+{
+  //-- variables
+  Item<size_t> size_item;
+  Item<TagID> tagid_item;
+  Item<TokID> tokid_item;
+  Item<ProbT> probt_item;
+  Item<TokIDTable> tokids_item;
+  Item<TagIDTable> tagids_item;
+  Item<LexProbTable> lexprobs_item;
+#ifndef DWDST_USE_TRIGRAMS
+  ProbT dummy_nglambda3;
+#endif
+
+  size_t ngprobs1_size  = 0;
+  size_t ngprobs2_size  = 0;
+
+  if (! (tagid_item.load(ibs, start_tagid)
+	 && probt_item.load(ibs, unknown_lex_threshhold)
+	 && probt_item.load(ibs, nglambda1)
+	 && probt_item.load(ibs, nglambda2)
+#ifdef DWDST_USE_TRIGRAMS
+	 && probt_item.load(ibs, nglambda3)
+#else
+	 && probt_item.load(ibs, dummy_nglambda3)
+#endif
+	 && probt_item.load(ibs, wlambda1)
+	 && probt_item.load(ibs, wlambda2)
+	 ))
+    {
+      carp("dwdstHMM::load(): could not load smoothing constants%s%s\n",
+	   (filename ? " from file " : ""), (filename ? filename : ""));
+      return false;
+    }
+
+  if (!(tokids_item.load(ibs, tokids)
+	&& tagids_item.load(ibs, tagids)))
+    {
+      carp("dwdstHMM::load(): could not load ID data%s%s\n",
+	   (filename ? " from file " : ""), (filename ? filename : ""));
+      return false;
+    }
+
+  if (! (tokid_item.load(ibs, typids[TokTypeAlpha])
+	 && tokid_item.load(ibs, typids[TokTypeCard])
+	 && tokid_item.load(ibs, typids[TokTypeCardPunct])
+	 && tokid_item.load(ibs, typids[TokTypeCardSuffix])
+	 && tokid_item.load(ibs, typids[TokTypeCardSeps])
+	 && size_item.load(ibs, n_tags)
+	 && size_item.load(ibs, n_toks)
+	 ))
+    {
+      carp("dwdstHMM::load(): could not load base data%s%s\n",
+	   (filename ? " from file " : ""), (filename ? filename : ""));
+      return false;
+    }
+
+  if (! (lexprobs_item.load(ibs, lexprobs)
+	 && probt_item.load_n(ibs, ngprobs1, ngprobs1_size)
+	 && probt_item.load_n(ibs, ngprobs2, ngprobs2_size)
+	 ))
+    {
+      carp("dwdstHMM::load(): could not load table data%s%s\n",
+	   (filename ? " from file " : ""), (filename ? filename : ""));
+      return false;
+    }
+  
+  return true;
 }
 
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <string>
 
@@ -9,11 +10,10 @@
 
 #define ESTIMATE_LAMBDAS 1
 
-#define START_TAG_STR "__$"
-
 //#define UNKNOWN_LEX_THRESH 0
 #define UNKNOWN_LEX_THRESH 1
 
+#define START_TAG_STR "__$"
 
 dwdstLexfreqs lf;
 dwdstNgrams   ng;
@@ -22,12 +22,16 @@ dwdstHMM     hmm;
 
 int main (int argc, char **argv) {
   char *progname = *argv;
-  if (argc < 3) {
-    fprintf(stderr, "Usage: %s LEXFREQS NGRAMS\n", progname);
+  int compression_level = -1;
+
+  if (argc < 4) {
+    fprintf(stderr, "Usage: %s LEXFREQS NGRAMS OUTFILE [COMPRESS_LEVEL]\n", progname);
     exit(1);
   }
   char *lexfile = *(++argv);
   char *ngfile  = *(++argv);
+  char *hmmfile = *(++argv);
+  if (argc > 4) compression_level = atoi(*(++argv));
 
   //-- load lexfreqs
   fprintf(stderr, "%s: loading lexical frequencies from '%s'... ",
@@ -64,9 +68,12 @@ int main (int argc, char **argv) {
   hmm.nglambda2 = 1.0;
 #endif /* ESTIMATE_LAMBDAS */
 
-  fprintf(stderr, "Done. (Press return to dump) ");
-  fgetc(stdin);
-
-  hmm.txtdump(stdout);
+  fprintf(stderr, "%s: dumping binary data to '%s' , compress=%d... ",
+	  progname, hmmfile, compression_level);
+  if (!hmm.save(hmmfile, compression_level)) {
+    fprintf(stderr, "FAILED.\n");
+  } else {
+    fprintf(stderr, "done.\n");
+  }
   return 0;
 }

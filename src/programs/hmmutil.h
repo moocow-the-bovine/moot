@@ -16,10 +16,17 @@
  *---------------------------------------------------------------------*/
 
 /**
- * Parse string 'model' into lexical-file and ngram-file parts.
- * (*lexfile) and (*ngfile) will be allocated if they are NULL.
+ * Parse string 'model' into 'binfile', 'lexfile', and 'ngfile'
+ * parts.  Rules:
+ *  1) If file (model) exists, then binfile="MODEL",
+ *     'lexfile' and 'ngfile' are untouched.
+ *  2) Else, if (model) contains a comma (model ~= "MODEL.lex,MODEL.123"),
+ *     lexfile="MODEL.lex", ngfile="MODEL.123", binfile=(untouched)
+ *  3) Else, lexfile="(model).lex", ngfile="(model).123", binfile=(untouched).
+ * 
+ * The assigned (*file) strings will be allocated if they are NULL.
  */
-bool hmm_parse_model(char *model, char **lexfile, char **ngfile);
+bool hmm_parse_model(char *model, char **binfile, char **lexfile, char **ngfile);
 
 /**
  * Parse a comma-separated list of doubles (at most 'ndbls') from str into dbls.

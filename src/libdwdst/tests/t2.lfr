@@ -1,0 +1,5 @@
+foo	3	ATAG	1	BTAG	1	CTAG	1
+bar	3	ATAG	1	BTAG	1	CTAG	1
+baz	3	ATAG	1	BTAG	1	CTAG	1
+unk	1	UNK	1
+eos	2	__$	2

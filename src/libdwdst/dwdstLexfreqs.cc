@@ -19,6 +19,7 @@
 
 void dwdstLexfreqs::clear(void)
 {
+  n_tokens = 0;
   lftable.clear();
   lftotals.clear();
   lftags.clear();

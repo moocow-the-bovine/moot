@@ -47,10 +47,12 @@ libdwdst_la_SOURCES = \
 	dwdstLexfreqsLexer.cc \
 	dwdstLexfreqsParser.cc \
 	dwdstLexfreqsCompiler.cc \
-	dwdstTagger.cc \
-	dwdstHMM.cc
+	dwdstMorph.cc \
+	dwdstHMM.cc \
+	dwdstCHMM.cc
 
 libdwdst_old = \
+	dwdstTagger.cc \
 	dwdstTaglistLexer.cc \
 	dwdstTrainer.cc \
 	dwdstAlphabetLexer.cc \
@@ -107,9 +109,10 @@ dwdstLexfreqsParser.cc: $(BISONXX_DEPS)
 ## --- installable headers: @includedir@/@pkgname@
 #pkginclude_HEADERS = ${hfile_1} ... ${hfile_N}
 pkginclude_HEADERS = \
+	dwdstBinIO.h \
+	dwdstBinStream.h \
 	dwdstEnum.h \
 	dwdstTypes.h \
-	dwdstTagger.h \
 	dwdstTaggerLexer.h \
 	dwdstPPLexer.h \
 	dwdstNgramsLexer.h \
@@ -120,9 +123,12 @@ pkginclude_HEADERS = \
 	dwdstLexfreqsParser.h \
 	dwdstLexfreqsCompiler.h \
 	dwdstLexfreqs.h \
-	dwdstHMM.h
+	dwdstHMM.h \
+	dwdstCHMM.h \
+	dwdstMorph.h
 
 pkgheaders_old = \
+	dwdstTagger.h \
 	dwdstTrainer.h \
 	dwdstTaglistLexer.h \
 	dwdstAlphabetLexer.h \

@@ -13,7 +13,8 @@ on_reparse "warn"
 #-----------------------------------------------------------------------------
 details "
 dwdspp is a pre-processor for raw text intended to be
-used to prepare documents for PoS tagging by L<dwdst>.
+used to prepare documents for PoS tagging by 'dwdsm' (see L<dwdsm>)
+or 'dwdshmm' (see L<dwdshmm>).
 "
 
 #-----------------------------------------------------------------------------
@@ -66,4 +67,4 @@ For details on the DWDS project, visit: http://www.dwds.de.
 
 "
 
-seealso "L<dwdst>."
+seealso "L<dwdsm>, L<dwdshmm>."

@@ -11,12 +11,17 @@
 
 #include <float.h>
 #include <string.h>
+#include <ctype.h>
+
 #include <hash_map>
 
 #include "dwdstTypes.h"
 #include "dwdstLexfreqs.h"
 #include "dwdstNgrams.h"
 #include "dwdstEnum.h"
+#include "dwdstBinStream.h"
+
+#include <zlib.h>
 
 /**
  * Define this for verbose debugging information to stderr.
@@ -35,8 +40,8 @@
  * Constant representing a minimal probability.
  */
 //#define dwdstProbEpsilon FLT_EPSILON
-#define dwdstProbEpsilon DBL_EPSILON
 //#define dwdstProbEpsilon 1e-32
+#define dwdstProbEpsilon DBL_EPSILON
 
 /**
  * Define this to include real lexical entries for tokens with counts
@@ -48,6 +53,7 @@
  * Define this to use trigrams (not yet implemented)
 */
 #undef DWDST_USE_TRIGRAMS
+
 
 /*--------------------------------------------------------------------------
  * dwdstHMM : HMM class
@@ -68,6 +74,16 @@ public:
 
   /** Type for a token-identider */
   typedef dwdstEnumID TokID;
+
+  /** Enum typedef for token2id */
+  typedef enum {
+    TokTypeAlpha,      /**< (Mostly) alphabetic token: "foo", "bar", "foo2bar" */
+    TokTypeCard,       /**< Digits-only: "42" */
+    TokTypeCardPunct,  /**< Digits with punctuation suffix: "42." */
+    TokTypeCardSuffix, /**< Digits with any suffix: "42nd" */
+    TokTypeCardSeps,   /**< Digits with interpunctuation: "420.24/7" */
+    NTokTypes          /**< Not really a token-type */
+  } TokenType;
 
   /** Typedef for token-id lookup table */
   typedef dwdstEnum<dwdstTokString,
@@ -175,6 +191,7 @@ public:
 public:
   //------ public data: various pragmatic constants
   TagID             start_tagid;  /**< Initial/final tag, used for bootstrapping */
+  ProbT             unknown_lex_threshhold;  /**< Unknown lexical threshhold */
 
   //------ public data: smoothing constants
   ProbT             nglambda1;    /**< Smoothing constant for unigrams */
@@ -186,8 +203,10 @@ public:
   ProbT             wlambda2;     /**< Smoothing constant lexical probabilities */
 
   //------ public data: ID-lookup tables
-  TokIDTable        tokids;     /** Token-ID lookup table */
-  TagIDTable        tagids;     /** Tag-ID lookup table */
+  TokIDTable        tokids;     /**< Token-ID lookup table */
+  TagIDTable        tagids;     /**< Tag-ID lookup table */
+
+  TokID             typids[NTokTypes]; /**< Token-type to Token-ID lookup table for non-alphas */
 
   //------ public data: probability-lookup tables
   size_t            n_tags;     /**< Number of known tags: used to compute lookup indices */
@@ -206,12 +225,12 @@ public:
   size_t             nsents;    /**< Number of sentenced processed */
   size_t             ntokens;   /**< Number of tokens processed */
 
-private:
-  //------ private data: recycling bins
+protected:
+  //------ protected data: recycling bins
   ViterbiNode   *trash_nodes;   /**< Recycling bin for Viterbi state-table nodes */
   ViterbiColumn *trash_columns; /**< Recycling bin for Viterbi state-table columns */
 
-  //------ private data: for Viterbi
+  //------ protected data: for Viterbi
   TagID             vtagid;     /**< Current tag-id under consideration for viterbi_step() */
   ProbT             vbestpr;    /**< Best probability for viterbi_step() */
   ProbT             vtagpr;     /**< Probability for current tag-id for viterbi_step() */
@@ -220,7 +239,7 @@ private:
 
   ViterbiPath       vbestpath;  /**< Best path constant */
 
-  //-- private data: for tagging
+  //-- protected data: for tagging
   vector<dwdstTokString> tokens;  /**< Temporarily stores input tokens for tag_stream() */
   set<TagID>             curtags; /**< Temporarily stores input token-tags for tag_stream() */
 
@@ -230,6 +249,7 @@ public:
   /** Default constructor */
   dwdstHMM(void)
     : start_tagid(0),
+      unknown_lex_threshhold(1.0),
       nglambda1(dwdstProbEpsilon),
       nglambda2(1.0 - dwdstProbEpsilon),
       wlambda1(1.0 - dwdstProbEpsilon),
@@ -244,7 +264,9 @@ public:
       trash_nodes(NULL),
       trash_columns(NULL),
       vbestpn(NULL)
-  {};
+  {
+    for (int i = 0; i < NTokTypes; i++) { typids[i] = 0; }
+  };
 
   /** Destructor */
   ~dwdstHMM(void)
@@ -252,6 +274,26 @@ public:
     clear();
   };
 
+  //------------------------------------------------------------
+  // public methods: binary load / save
+
+  /** Save to a binary file */
+  bool save(const char *filename, int compression_level=Z_DEFAULT_COMPRESSION);
+
+  /** Save to a binary stream */
+  bool save(dwdstBinStream::oBinStream &obs, const char *filename=NULL);
+
+  /** Low-level: save guts to a binary stream */
+  bool _bindump(dwdstBinStream::oBinStream &obs, const char *filename=NULL);
+
+  /** Load from a binary file */
+  bool load(const char *filename=NULL);
+
+  /** Load from a binary stream */
+  bool load(dwdstBinStream::iBinStream &ibs, const char *filename=NULL);
+
+  /** Low-level: load guts from a binary stream */
+  bool _binload(dwdstBinStream::iBinStream &ibs, const char *filename=NULL);
 
   //------------------------------------------------------------
   // public methods: access
@@ -282,19 +324,23 @@ public:
    */
   bool compile(const dwdstLexfreqs &lexfreqs,
 	       const dwdstNgrams &ngrams,
-	       const dwdstTagString &start_tag_str=dwdstTagString(),
-	       const dwdstLexfreqs::LexfreqCount unknownLexThreshhold=1);
+	       const dwdstTagString &start_tag_str=dwdstTagString());
 
   /** Assign IDs for tokens and tags from lexfreqs: called by compile() */
-  void assign_ids_lf(const dwdstLexfreqs &lexfreqs,
-		     const dwdstLexfreqs::LexfreqCount unknownLexThreshhold=1);
+  void assign_ids_lf(const dwdstLexfreqs &lexfreqs);
 
- /** Assign IDs for tokens and tags from ngrams: called by compile() */
+  /** Assign IDs for tokens and tags from ngrams: called by compile() */
   void assign_ids_ng(const dwdstNgrams   &ngrams);
 
-  /** Estimate n-gram smoothing constants: NOT called by compile() */
+  /**
+   * Estimate ngram-smoothing constants: NOT called by compile().
+   */
   bool estimate_lambdas(const dwdstNgrams &ngrams);
 
+  /**
+   * Estimate lexical smoothing constants: NOT called by compile().
+   */
+  bool estimate_wlambdas(const dwdstLexfreqs &lf);
 
   //------------------------------------------------------------
   // Viterbi utilities: nodes
@@ -421,7 +467,7 @@ public:
    * Really just a wrapper for viterbi_step(TokID tokid).
    */
   inline void viterbi_step(const dwdstTokString &token) {
-    return viterbi_step(tokids.name2id(token));
+    return viterbi_step(token2id(token));
   };
 
 
@@ -498,7 +544,7 @@ public:
       {
 	tags_ids.insert(tagids.name2id(*tagi));
       }
-    return viterbi_step(tokids.name2id(token), tags_ids);
+    return viterbi_step(token2id(token), tags_ids);
   };
 
 
@@ -549,7 +595,7 @@ public:
    */
   inline void viterbi_step(const dwdstTokString &token, const dwdstTagString &tag)
   {
-    return viterbi_step(tokids.name2id(token), tagids.name2id(tag));
+    return viterbi_step(token2id(token), tagids.name2id(tag));
   };
 
 
@@ -688,6 +734,61 @@ public:
     }
   };
 
+  //------------------------------------------------------------
+  // public methods: low-level: token-type identification
+
+  /** Get the TokID for a given token, uses type-based lookup */
+  inline TokID token2id(const dwdstTokString &token) const
+  {
+    TokenType typ = token2type(token);
+    return typids[typ]==0 ? tokids.name2id(token) : typids[typ];
+  };
+
+  /** Get the TokenType for a given token */
+  inline TokenType token2type(const dwdstTokString &token) const
+  {
+    dwdstTokString::const_iterator ti = token.begin();
+    
+    if (ti==token.end() || !isdigit(*ti))
+      return TokTypeAlpha;
+    
+    //-- ^[:digit:]
+    for (ti++; ti != token.end() && isdigit(*ti); ti++) {;}  //-- find first non-digit
+    //-- ^([:digit:]+)
+    
+    if (ti == token.end())  //-- ^([:digit:]+)$
+      return TokTypeCard;
+    
+    else if (ispunct(*ti)) {
+      //-- ^([:digit:]+)([:punct:])
+      for (ti++; ti != token.end() && ispunct(*ti); ti++) {;}
+      //-- ^([:digit:]+)([:punct:]+)
+      
+      if (ti == token.end())      //-- ^([:digit:]+)([:punct:]+)$
+	return TokTypeCardPunct;
+      
+      else if (isdigit(*ti)) {
+	//-- ^([:digit:]+)([:punct:]+)([:digit:])
+	for (ti++; ti != token.end() && (isdigit(*ti) || ispunct(*ti)); ti++) {;}
+	//-- ^([:digit:]+)([:punct:]+)(([:digit:]|[:punct:]+))
+	if (ti == token.end())
+	  //-- ^([:digit:]+)([:punct:]+)(([:digit:]|[:punct:]+))$
+	  return TokTypeCardSeps;
+      }
+    }
+    
+    //-- ^([:digit:]+)([[:digit:][:punct]]*)([^[:digit:][:punct:]])
+    for (ti++; ti != token.end() && !isdigit(*ti); ti++) {;}
+    //-- ^([:digit:]+)([[:digit:][:punct]]*)([^[:digit:][:punct:]])([^[:digit]]*)
+    
+    if (ti == token.end())
+      //-- ^([:digit:]+)([[:digit:][:punct]]*)([^[:digit:][:punct:]])([^[:digit]]*)$
+      return TokTypeCardSuffix;
+    
+    return TokTypeAlpha;
+  };
+
+
 
   //------------------------------------------------------------
   // public methods: low-level: lexical probability lookup
@@ -710,7 +811,7 @@ public:
    */
   inline const ProbT wordp(const dwdstTokString token, const dwdstTagString tag) const
   {
-    return wordp(tokids.name2id(token), tagids.name2id(tag));
+    return wordp(token2id(token), tagids.name2id(tag));
   };
 
 
@@ -795,18 +896,18 @@ public:
   //------------------------------------------------------------
   // public methods: top-level: tagging
 
-  /** Top-level tagging interface: string input */
-  //void tag_strings(int argc, char **argv, FILE *out=stdout, char *infilename=NULL);
-
   /** Top-level tagging interface: file input */
-  void tag_stream(FILE *in=stdin, FILE *out=stdout, char *infilename=NULL);
+  void tag_stream(FILE *in=stdin, FILE *out=stdout, char *srcname=NULL);
+
+  /** Top-level tagging interface: string input */
+  void tag_strings(int argc, char **argv, FILE *out=stdout, char *infilename=NULL);
 
   /** Top-level tagging interface: dump best path */
   inline void tag_print_best_path(FILE *out=stdout)
   {
-    viterbi_best_path();
+    viterbi_best_path(); //-- populate 'vbestpath' with (ViterbiNode*)s
     for (size_t i = 0; i < tokens.size(); i++) {
-      if (i >= vbestpath.size()) {
+      if (i+1 >= vbestpath.size()) {
 	carp("%s: Error: no tag for token number %u of sentence number %u: '%s'\n",
 	     i, nsents, tokens[i].c_str());
 	continue;

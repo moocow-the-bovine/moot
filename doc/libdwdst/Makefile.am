@@ -37,6 +37,8 @@ all-local: $(STAMPFILE)
 vpath %.h @top_srcdir@/src/libdwdst @top_builddir@/src/libdwdst
 
 DOXY_INPUTS = \
+	dwdstBinStream.h \
+	dwdstBinIO.h \
 	dwdstConfig.h \
 	dwdstTypes.h \
 	dwdstEnum.h \
@@ -46,10 +48,13 @@ DOXY_INPUTS = \
 	dwdstNgrams.h \
 	dwdstPPLexer.h \
 	dwdstTaggerLexer.h \
+	dwdstMorph.h \
 	dwdstHMM.h \
-	dwdstTagger.h
+	dwdstCHMM.h
 
 DOXY_INPUTS_old = \
+	dwdstCHMM.h \
+	dwdstTagger.h \
 	dwdstTaglistLexer.h \
 	dwdstParamLexer.h \
 	dwdstParamParser.h \
@@ -90,7 +95,7 @@ $(STAMPFILE): $(DOXY_INPUTS)
 #MOSTLYCLEANFILES =
 
 ## --- clean:  built by 'make'
-CLEANFILES = $(STAMPFILE) $(TAGFILE) $(DOXYBASE).log
+CLEANFILES = $(STAMPFILE) $(TAGFILE) $(DOXYBASE).log doxy-filter.log
 
 clean-local:
 	rm -rf html latex man

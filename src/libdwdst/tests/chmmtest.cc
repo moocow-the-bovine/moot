@@ -5,29 +5,32 @@
 
 #include "dwdstLexfreqs.h"
 #include "dwdstNgrams.h"
-#include "dwdstHMM.h"
+#include "dwdstMorph.h"
+#include "dwdstCHMM.h"
 
 #define ESTIMATE_LAMBDAS 1
-
-#define START_TAG_STR "__$"
 
 //#define UNKNOWN_LEX_THRESH 0
 #define UNKNOWN_LEX_THRESH 1
 
+#define START_TAG_STR "__$"
 
 dwdstLexfreqs lf;
 dwdstNgrams   ng;
-dwdstHMM     hmm;
+dwdstCHMM    hmm;
 
 
 int main (int argc, char **argv) {
   char *progname = *argv;
-  if (argc < 3) {
-    fprintf(stderr, "Usage: %s LEXFREQS NGRAMS\n", progname);
+  if (argc < 5) {
+    fprintf(stderr, "Usage: %s LEXFREQS NGRAMS SYMBOLS MORPH\n", progname);
     exit(1);
   }
   char *lexfile = *(++argv);
   char *ngfile  = *(++argv);
+  char *symfile = *(++argv);
+  char *fstfile = *(++argv);
+
 
   //-- load lexfreqs
   fprintf(stderr, "%s: loading lexical frequencies from '%s'... ",
@@ -47,16 +50,37 @@ int main (int argc, char **argv) {
   }
   fprintf(stderr, "loaded.\n");
 
+  //-- load symbols
+  fprintf(stderr, "%s: loading symbols from '%s'... ", progname, symfile);
+  if (!hmm.morph.load_morph_symbols(symfile)) {
+    fprintf(stderr, "FAILED.\n");
+    exit(4);
+  }
+  fprintf(stderr, "loaded.\n");
+
+  //-- load FST
+  fprintf(stderr, "%s: loading FST from '%s'... ", progname, fstfile);
+  if (!hmm.morph.load_morph_fst(fstfile)) {
+    fprintf(stderr, "FAILED.\n");
+    exit(5);
+  }
+  fprintf(stderr, "loaded.\n");
+
   //-- compile HMM
   fprintf(stderr, "%s: compiling HMM... ", progname);
   if (!hmm.compile(lf, ng, START_TAG_STR, UNKNOWN_LEX_THRESH)) {
     fprintf(stderr, "FAILED.\n");
-    exit(3);
+    exit(6);
   }
   fprintf(stderr, "compiled.\n");
 
 #ifdef ESTIMATE_LAMBDAS
-  fprintf(stderr, "%s: using estimated lambdas.\n", progname);
+  fprintf(stderr, "%s: estimating lambdas... ", progname);
+  if (!hmm.estimate_lambdas(ng) || !hmm.estimate_wlambdas(lf)) {
+    fprintf(stderr, "FAILED.\n");
+    exit(7);
+  }
+  fprintf(stderr, "done.\n");
 #else
   //-- dont't estimate lambdas: use constants
   fprintf(stderr, "%s: NOT estimating lambdas.\n", progname);

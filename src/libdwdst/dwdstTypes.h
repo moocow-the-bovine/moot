@@ -40,14 +40,13 @@ typedef string dwdstTokString;
  * Symbol Vectors (binary)
  *----------------------------------------------------------------------*/
 
-/** STL utilities for symbol-vectors */
+/** STL utilities for symbol-vectors (currently unused) */
 class dwdstSymbolVectorUtils {
 public:
   struct HashFcn {
     inline size_t operator()(const FSM::FSMSymbolVector &x) const {
       size_t hv = 0;
       for (FSM::FSMSymbolVector::const_iterator xi = x.begin(); xi != x.end(); xi++) {
-	//hv += (hv<<5)-hv + *xi;
 	hv += 5*hv + *xi;
       }
       return hv;

@@ -9,6 +9,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "cmdutil.h"
+
 #ifdef HAVE_CONFIG_H
 # include <dwdstConfig.h>
 #endif
@@ -17,8 +19,15 @@
  * utility functions: parsing
  *---------------------------------------------------------------------*/
 
-bool hmm_parse_model(char *model, char **lexfile, char **ngfile)
+bool hmm_parse_model(char *model, char **binfile, char **lexfile, char **ngfile)
 {
+  //-- binary file: easy
+  if (file_exists(model)) {
+    if (!*binfile) *binfile = (char *)malloc(strlen(model)+1);
+    strcpy(*binfile, model);
+    return true;
+  }
+
   char *comma = strchr(model, ',');
   if (comma) {
     *comma = '\0';

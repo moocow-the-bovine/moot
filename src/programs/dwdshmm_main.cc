@@ -88,17 +88,32 @@ void GetMyOptions(int argc, char **argv)
   // -- get initialization start-time
   if (args.verbose_arg > 1) gettimeofday(&istarted, NULL);
 
-  // -- assign "unknown" ids
+  // -- assign "unknown" ids & other flags
   hmm.unknown_token_name(args.unknown_token_arg);
   hmm.unknown_tag_name(args.unknown_tag_arg);
+  hmm.unknown_lex_threshhold = args.unknown_threshhold_arg;
 
   // -- parse model spec
+  char *binfile=NULL;
   char *lexfile=NULL;
   char *ngfile=NULL;
-  if (!hmm_parse_model(args.model_arg, &lexfile, &ngfile)) {
+  if (!hmm_parse_model(args.model_arg, &binfile, &lexfile, &ngfile)) {
     fprintf(stderr, "%s: could not parse model specification '%s'\n",
 	    PROGNAME, args.model_arg);
     exit(1);
+  }
+
+  // -- load model: binary
+  if (binfile) {
+    if (args.verbose_arg > 1)
+      fprintf(stderr, "%s: loading binary HMM model file '%s'...", PROGNAME, binfile);
+    if (!hmm.load(binfile)) {
+      fprintf(stderr,"\n%s: load FAILED for binary HMM model file '%s'\n",
+	      PROGNAME, binfile);
+      exit(1);
+    } else if (args.verbose_arg > 1) {
+      fprintf(stderr," loaded.\n");
+    }
   }
 
   // -- load model: lexical frequencies
@@ -127,71 +142,118 @@ void GetMyOptions(int argc, char **argv)
     }
   }
 
-  // -- parse n-gram smoothing constants (nlambdas)
-  if (args.nlambdas_arg) {
-    double nlambdas[3] = {0,1,0};
-    if (!hmm_parse_doubles(args.nlambdas_arg, nlambdas, 3)) {
-      fprintf(stderr, "%s: could not parse N-Gram smoothing constants '%s'\n",
-	      PROGNAME, args.nlambdas_arg);
-      exit(1);
-    }
-    hmm.nglambda1 = nlambdas[0];
-    hmm.nglambda2 = nlambdas[1];
-#ifdef DWDST_USE_TRIGRAMS
-    hmm.nglambda3 = nlambdas[2];
-#endif
-  } else {
+  // -- compile HMM
+  if (!binfile) {
     if (args.verbose_arg > 1)
-      fprintf(stderr, "%s: estimating lambdas...", PROGNAME);
-    if (!hmm.estimate_lambdas(ngrams)) {
-      fprintf(stderr,"\n%s: lambda estimation FAILED.\n", PROGNAME);
+      fprintf(stderr, "%s: compiling HMM...", PROGNAME);
+    if (!hmm.compile(lexfreqs, ngrams, args.eos_tag_arg)) {
+      fprintf(stderr,"\n%s: HMM compilation FAILED\n", PROGNAME);
       exit(1);
     } else if (args.verbose_arg > 1) {
-      fprintf(stderr," done.\n");
+      fprintf(stderr," compiled.\n");
     }
-  }
 
-  // -- parse lexical smoothing constants (wlambdas)
-  if (args.wlambdas_arg) {
-    double wlambdas[2] = {1,0};
-    if (!hmm_parse_doubles(args.wlambdas_arg, wlambdas, 2)) {
-      fprintf(stderr, "%s: could not parse lexical smoothing constants '%s'\n",
-	      PROGNAME, args.wlambdas_arg);
-      exit(1);
+    // -- parse n-gram smoothing constants (nlambdas)
+    if (args.nlambdas_arg) {
+      double nlambdas[3] = {0,1,0};
+      if (!hmm_parse_doubles(args.nlambdas_arg, nlambdas, 3)) {
+	fprintf(stderr, "%s: could not parse N-Gram smoothing constants '%s'\n",
+		PROGNAME, args.nlambdas_arg);
+	exit(1);
+      }
+      hmm.nglambda1 = nlambdas[0];
+      hmm.nglambda2 = nlambdas[1];
+#ifdef DWDST_USE_TRIGRAMS
+      hmm.nglambda3 = nlambdas[2];
+#endif
+    } else {
+      if (args.verbose_arg > 1)
+	fprintf(stderr, "%s: estimating n-gram lambdas...", PROGNAME);
+      if (!hmm.estimate_lambdas(ngrams)) {
+	fprintf(stderr,"\n%s: n-gram lambda estimation FAILED.\n", PROGNAME);
+	exit(1);
+      } else if (args.verbose_arg > 1) {
+	fprintf(stderr," done.\n");
+      }
     }
-    hmm.wlambda1 = wlambdas[0];
-    hmm.wlambda2 = wlambdas[1];
-  }
 
-  // -- compile HMM
-  if (args.verbose_arg > 1)
-    fprintf(stderr, "%s: compiling HMM...", PROGNAME);
-  if (!hmm.compile(lexfreqs, ngrams, args.eos_tag_arg, args.unknown_threshhold_arg)) {
-    fprintf(stderr,"\n%s: HMM compilation FAILED\n", PROGNAME);
-    exit(1);
-  } else if (args.verbose_arg > 1) {
-    fprintf(stderr," compiled.\n");
+    // -- parse lexical smoothing constants (wlambdas)
+    if (args.wlambdas_arg) {
+      double wlambdas[2] = {1,0};
+      if (!hmm_parse_doubles(args.wlambdas_arg, wlambdas, 2)) {
+	fprintf(stderr, "%s: could not parse lexical smoothing constants '%s'\n",
+		PROGNAME, args.wlambdas_arg);
+	exit(1);
+      }
+      hmm.wlambda1 = wlambdas[0];
+      hmm.wlambda2 = wlambdas[1];
+    } else {
+      if (args.verbose_arg > 1)
+	fprintf(stderr, "%s: estimating lexical lambdas...", PROGNAME);
+      if (!hmm.estimate_wlambdas(lexfreqs)) {
+	fprintf(stderr,"\n%s: lexical lambda estimation FAILED.\n", PROGNAME);
+	exit(1);
+      } else if (args.verbose_arg > 1) {
+	fprintf(stderr," done.\n");
+      }
+    }
+
+    if (args.compile_given) {
+      if (args.verbose_arg > 1)
+	fprintf(stderr, "%s: saving binary HMM model '%s' ...", PROGNAME, args.compile_arg);
+      if (!hmm.save(args.compile_arg, args.compress_arg)) {
+	fprintf(stderr,"\n%s: binary HMM dump FAILED\n", PROGNAME);
+	exit(1);
+      } else if (args.verbose_arg > 1) {
+	fprintf(stderr," saved.\n");
+      }
+      exit(0);
+    }
   }
 
   // -- report
   if (args.verbose_arg > 1) {
     fprintf(stderr, "%s: Initialization complete\n", PROGNAME);
-    fprintf(stderr, "%s:   Freq. Threshhold : %g\n", PROGNAME, args.unknown_threshhold_arg);
-    fprintf(stderr, "%s:   Unknown Token    : %s\n", PROGNAME, args.unknown_token_arg);
-    fprintf(stderr, "%s:   Unknown Tag      : %s\n", PROGNAME, args.unknown_tag_arg);
-    fprintf(stderr, "%s:   Border Tag       : %s\n", PROGNAME, args.eos_tag_arg);
-    fprintf(stderr, "%s:   N-Gram lambdas   : lambda1=%g, lambda2=%g",
-	    PROGNAME, hmm.nglambda1, hmm.nglambda2);
-#ifdef DWDST_USE_TRIGRAMS
-      fprintf(stderr, " lambda3=%g", hmm.nglambda3);
-#endif
-    fprintf(stderr, "\n");
-    fprintf(stderr, "%s:   Lexical lambdas  : lambdaw1=%g, lambdaw2=%g\n",
-	    PROGNAME, hmm.wlambda1, hmm.wlambda2);
-    fprintf(stderr, "\n");
   }
+
+  //-- dump if requested
+  if (args.dump_given) {
+    if (args.verbose_arg > 1)
+      fprintf(stderr, "%s: dumping HMM debugging output to '%s' ...", PROGNAME, out.name);
+
+    hmm.txtdump(out.file);
+
+    if (args.verbose_arg > 1)
+      fprintf(stderr," dumped.\n");
+
+    exit(0);
+  }
+
+  //-- get comment-string
+  char cmts[3] = "%%";
+
+  //-- get time
+  time_t now_time = time(NULL);
+  tm     now_tm;
+  localtime_r(&now_time, &now_tm);
+
+  //-- report to output-file
+  fprintf(out.file, "%s %s output file generated on %s", cmts, PROGNAME, asctime(&now_tm));
+  fprintf(out.file, "%s Configuration:\n", cmts);
+  fprintf(out.file, "%s   Lex. Threshhold   : %g\n", cmts, hmm.unknown_lex_threshhold);
+  fprintf(out.file, "%s   Unknown Token     : %s\n", cmts, hmm.tokids.id2name(0).c_str());
+  fprintf(out.file, "%s   Unknown Tag       : %s\n", cmts, hmm.tagids.id2name(0).c_str());
+  fprintf(out.file, "%s   Border Tag        : %s\n", cmts, hmm.tagids.id2name(hmm.start_tagid).c_str());
+  fprintf(out.file, "%s   N-Gram lambdas    : lambda1=%g, lambda2=%g",
+	  cmts, hmm.nglambda1, hmm.nglambda2);
+#ifdef DWDST_USE_TRIGRAMS
+  fprintf(out.file, " lambda3=%g", hmm.nglambda3);
+#endif
+  fprintf(out.file, "\n");
+  fprintf(out.file, "%s   Lexical lambdas  : lambdaw1=%g, lambdaw2=%g\n",
+	  cmts, hmm.wlambda1, hmm.wlambda2);
 }
-  
+ 
 
 
 /*--------------------------------------------------------------------------
@@ -216,7 +278,7 @@ int main (int argc, char **argv)
       }
     }
     if (args.verbose_arg > 1) {
-      fprintf(out.file, "\n%%%% %s: File: %s\n\n", PROGNAME, churner.in.name);
+      fprintf(out.file, "\n%%%% File: %s\n\n", churner.in.name);
     }
 
     hmm.tag_stream(churner.in.file, out.file, churner.in.name);

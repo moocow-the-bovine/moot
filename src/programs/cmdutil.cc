@@ -235,13 +235,12 @@ FILE *cmdutil_file_churner::next_list_file() {
  * Global utility functions
  *---------------------------------------------------------------------*/
 
-/*
- * const char *get_from_environment(VAR_NAME,VAR_DEFAULT)
- */
-/*
-char *get_from_environment(const char *varname, const char *vardefault=NULL)
+bool file_exists(const char *filename)
 {
-  char *value = getenv(varname);
-  return value ? strdup(value) : (vardefault ? strdup(vardefault) : NULL);
+  FILE *f = fopen(filename, "r");
+  if (f) {
+    fclose(f);
+    return true;
+  }
+  return false;
 }
-*/

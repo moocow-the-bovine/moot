@@ -68,5 +68,7 @@ private:
  * Global utility functions
  *---------------------------------------------------------------------*/
 
+/** Check whether a file exists by trying to open it with 'fopen()' */
+bool file_exists(const char *filename);
 
 #endif // _CMDUTIL_H

@@ -33,11 +33,13 @@ dwdst_libs='-lFSMext -lFSM -lFSMSymSpec -lstlport_gcc -lpthread -lz -lbumble++'
 
 xflags=''
 
+xlibs=''
+
 xcomp() {
   if [ -z "$base" ] ; then
     echo "varible \$base is not defined!"
   else
-    g++ $xflags $dwdst_cflags $base.cc -o $base -L$PWD/.libs -static $dwdst_libs \
+    g++ $xflags $dwdst_cflags $base.cc -o $base -L$PWD/.libs -static $xlibs $dwdst_libs \
       && echo "$base compiled ok" \
       || echo "$base compilation FAILED"
   fi
@@ -46,7 +48,7 @@ xdcomp() {
   if [ -z "$base" ] ; then
     echo "varible \$base is not defined!"
   else
-    g++ $xflags $dwdst_cflags $base.cc -o $base -L$PWD/.libs -static -ldwdst $dwdst_libs \
+    g++ $xflags $dwdst_cflags $base.cc -o $base -L$PWD/.libs -static -ldwdst $xlibs $dwdst_libs \
       && echo "$base compiled ok" \
       || echo "$base compilation FAILED"
   fi
@@ -56,7 +58,7 @@ xdlink() {
   if [ -z "$base" ] ; then
     echo "varible \$base is not defined!"
   else
-    g++ $xflags -o $base $base.o -L$PWD/.libs -static -ldwdst $dwdst_libs \
+    g++ $xflags -o $base $base.o -L$PWD/.libs -static $xlibs -ldwdst $dwdst_libs \
       && echo "$base linked ok" \
       || echo "$base linking FAILED"
   fi

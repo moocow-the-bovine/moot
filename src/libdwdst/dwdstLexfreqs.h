@@ -69,11 +69,12 @@ public:
   LexfreqStringTable lftable;
   LexfreqTotalTable  lftotals;
   LexfreqTagTable    lftags;
+  LexfreqCount       n_tokens;
 
 public:
   //------ public methods
   /** Default constructor */
-  dwdstLexfreqs(size_t initial_bucket_count=0)
+  dwdstLexfreqs(size_t initial_bucket_count=0) : n_tokens(0)
   {
     if (initial_bucket_count != 0) {
       lftable.resize(initial_bucket_count);
@@ -114,6 +115,8 @@ public:
     } else {
       tagi->second += count;
     }
+    //-- adjust total token-count
+    n_tokens += count;
     //-- return
     return ti->second;
   };
