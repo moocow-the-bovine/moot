@@ -1,7 +1,12 @@
 ChangeLog for package moot
 
-moot-v1.0.4 Tue,  2 Dec 2003 13:26:40 +0100
+moot-v1.0.4 Fri, 12 Dec 2003 02:06:59 +0100
   + renamed from 'dwdst' to 'moot'
+  + added additional detection routines for libFSM >= v0.1.1.1
+  + added --disable-fsm flag to ./configure
+  + added placebo classes methods in src/libmoot/mootFSM.h
+	- now compiles without libFSM: nothing much interesting works,
+	  but at least it compiles...
 	
 v1.0.3 Tue,  2 Dec 2003 02:13:52 +0100
   + changes for compilation with g++-3.2

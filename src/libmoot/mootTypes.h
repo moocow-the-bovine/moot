@@ -61,6 +61,11 @@
 
 #include <mootFSM.h>
 
+/** Maximum weight */
+#ifndef MAXFLOAT
+#include <values.h>
+#endif
+
 /** Whether to load symspecs in AT&T-compatibility mode */
 #define moot_SYM_ATT_COMPAT true
 

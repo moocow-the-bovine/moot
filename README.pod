@@ -74,6 +74,7 @@ the official distribution site of this package.
 
 =item libFSMext E<gt>= v0.0.2
 
+Only needed for libFSM <= v0.1.1.1.
 Should be available wherever you got this package.
 
 You will need a pkg-config metafile (libFSMext.pc)
@@ -135,13 +136,14 @@ and from the Zukunftsinvestitionsprogramm of the
 German federal government.
 
 I am grateful to Christiane Fellbaum, Alexander Geyken,
-Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
-for offering useful insights in the course of development
+Thomas Hanneforth, Gerald Neumann, Edmund Pohl, Alexey Sokirko,
+and others for offering useful insights in the course of development
 of this package.
 
 Thomas Hanneforth wrote and maintains the libFSM C++ library
 for finite-state device operations used by the
-class-based HMM tagger / disambiguator.
+class-based HMM tagger / disambiguator, without which this
+package could not have been built.
 
 Alexander Geyken and Thomas Hanneforth developed the
 rule-based morphological analysis system for German

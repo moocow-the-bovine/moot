@@ -23,12 +23,12 @@
  * Name: mootFSM.h
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + moot-relevant FSM includes (or dummies)
+ *   + moot-relevant FSM includes (or placebos, if the real thing is unavailable)
  *----------------------------------------------------------------------*/
 /**
  * \file mootFSM.h
  * \brief FSM interface for libmoot.
- * \detail May define dummy classes, etc. if HAVE_LIBFSM is not defines
+ * \detail May define placebo classes, etc. if HAVE_LIBFSM is not defined
  */
 
 #ifndef _moot_FSM_H
@@ -42,10 +42,13 @@
 # include <FSMTypes.h>
 # include <FSM.h>
 # include <FSMSymSpec.h>
+# include <FSMCost.h>
 #else /* HAVE_LIBFSM */
 
 #include <vector>
 #include <string>
+#include <list>
+#include <set>
 
 /*-------------------------------------------------------------
  * gcc hacks
@@ -62,7 +65,7 @@
     namespace FSM_STL_NAMESPACE
     {
       template<> struct hash<std::string> {
-        std::size_t operator()(const string &s) const {
+        std::size_t operator()(const std::string &s) const {
           return __stl_hash_string(s.c_str());
         }
       };
@@ -83,20 +86,69 @@ typedef short int FSMSymbol;
 
 typedef float FSMWeight;
 
+#define EPSILON 0
+#define FSMNOLABEL -1
+
+void FSMplacebo(const char *name);
+
 /*-------------------------------------------------------------
  * FSMSymSpec
  */
-/** Dummy FSMSymSpec class */
+/** Placebo FSMSymSpec class */
 class FSMSymSpec {
- public:
+public:
+  /*------------------------------------------------
+   * typedefs
+   */
+
+public:
+  /*------------------------------------------------
+   * data
+   */
+  list<std::string> *messages;
+
+public:
+  /*------------------------------------------------
+   * methods
+   */
+  FSMSymSpec(char *filename=NULL, list<std::string> *msgs=NULL, bool att_compat=true)
+    : messages(msgs) {};
+
+  std::string &symbol_vector_to_string(const vector<FSMSymbol> &vec,
+				       std::string &str,
+				       const bool use_categories=false,
+				       const bool warn_on_undefined=true)
+  {
+    FSMplacebo("FSMSymSpec::symbol_vector_to_string()");
+    return str;
+  };
+
+  const set<FSMSymbolString> *signs(void) {
+    FSMplacebo("FSMSymSpec::signs()");
+    return NULL;
+  }
+  const set<FSMSymbolString> *symbols(void) {
+    FSMplacebo("FSMSymSpec::symbols()");
+    return NULL;
+  }
+
+  const FSMSymbolString *symbol_to_symbolname(FSMSymbol sym) {
+    FSMplacebo("FSMSymSpec::symbol_to_symbolname()");
+    return NULL;
+  }
+
+  operator bool() { return false; }
 };
 
 /*-------------------------------------------------------------
  * FSM
  */
-/** Dummy FSM class */
+/** Placebo FSM class */
 class FSM {
  public:
+  /*------------------------------------------------
+   * typedefs
+   */
   typedef vector<FSMSymbol> FSMSymbolVector;
 
   template <class T> class FSMWeightedIOPair
@@ -116,23 +168,84 @@ class FSM {
     //-- Comparators
     friend bool operator<(const FSMWeightedIOPair& x, const FSMWeightedIOPair& y)
     {
-      if (x.weight < y.weight) {
-	return true;
-      }
-      else if (x.weight == y.weight) {
-	if (x.istr < y.istr) {
-	  return true;
-	}
-	else if (x.istr == y.istr) {
-	  return x.ostr < y.ostr;
-	}
-      }
+      FSMplacebo("FSM::FSMWeightedIOPair::operator<");
       return false;
     }
   };
 
   typedef FSMWeightedIOPair<FSMSymbolVector> FSMWeightedSymbolVector;
+  typedef FSMWeightedIOPair<FSMSymbolString> FSMStringWeight;
+
+  typedef set<FSMWeightedSymbolVector> FSMWeightedSymbolVectorSet;
+
  public:
+  /*------------------------------------------------
+   * methods
+   */
+
+  FSM(const char *filename=NULL) {
+    FSMplacebo("FSM::FSM()");
+  }
+
+  bool fsm_use_symbol_spec(FSMSymSpec *)
+  {
+    FSMplacebo("FSM::fsm_use_symbol_spec()");
+    return false;
+  }
+
+  void fsm_clear(void) { return; }
+
+  FSM *fsm_lookup(FSMSymbolString &s, FSM *result=NULL, bool do_connect=true)
+  {
+    FSMplacebo("FSM::fsm_lookup()");
+    return result;
+  }
+
+  set<FSMWeightedSymbolVector> &fsm_symbol_vectors(set<FSMWeightedSymbolVector> &vectors,
+						  bool cycle_test=true)
+  {
+    FSMplacebo("FSM::fsm_symbol_vectors()");
+    return vectors;
+  }
+
+  FSM *fsm_lookup_vector(const FSMSymbolVector &v, FSM *result=NULL, bool connect=true)
+  {
+    FSMplacebo("FSM::fsm_lookup_vector()");
+    return result;
+  }
+
+  operator bool() const { return false; }
+
+  size_t fsm_no_of_states() { return 0; }
+  size_t fsm_no_of_final_states() { return 0; }
+  size_t fsm_no_of_transitions() { return 0; }
+};
+
+/*-------------------------------------------------------------
+ * FSM
+ */
+/** Placebo FSMRegexCompiler class */
+class FSMRegexCompiler {
+public:
+  /*------------------------------------------------
+   * typedefs
+   */
+
+public:
+  /*------------------------------------------------
+   * methods
+   */
+  void use_symbol_spec(FSMSymSpec *symspec) {
+    FSMplacebo("FSMRegexCompiler::use_symbol_spec()");
+  }
+
+  FSM *parse_from_string(const char *str, const char *srcname=NULL)
+  {
+    FSMplacebo("FSMRegexCompiler::parse_from_string()");
+    return NULL;
+  }
+  
+
 };
 
 

@@ -1,6 +1,9 @@
+
+/*-*- Mode: C++ -*-*/
+
 /*
-   moot-utils version 1.0.4 : moocow's part-of-speech tagger
-   Copyright (C) 2002-2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   libmoot version 1.0.4 : moocow's part-of-speech tagging library
+   Copyright (C) 2003 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,18 +20,21 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 
-/* just include the config.h for libmoot */
-#include <mootConfig.h>
+/*----------------------------------------------------------------------
+ * Name: mootFSM.cc
+ * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Description:
+ *   + moot-relevant FSM placebos in case the real thing is unavailable
+ *----------------------------------------------------------------------*/
 
-/* PACKAGE does not jive well with multiple-program pacakges
-   using 'gengetopt'.  'autoheader' doesn't like to undefine
-   it, so we include this extra little header file to do that
-*/
-/*
-#ifdef PACKAGE
-# undef PACKAGE
-#endif
-*/
+#ifndef HAVE_LIBFSM
 
-//#endif // _MOOT_CONFIG_H
+#include "mootFSM.h"
+
+void FSMplacebo(const char *name) {
+  fprintf(stderr, "Placebo method called: %s\n", name);
+  abort();
+}
+
+#endif /* HAVE_LIBFSM */
 

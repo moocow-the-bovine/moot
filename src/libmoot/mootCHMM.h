@@ -36,8 +36,6 @@
 
 #include <zlib.h>
 
-#include <FSMCost.h>
-
 moot_BEGIN_NAMESPACE
 
 /*--------------------------------------------------------------------------

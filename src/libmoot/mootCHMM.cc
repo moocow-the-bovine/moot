@@ -35,8 +35,6 @@
 #include <string.h>
 #include <errno.h>
 
-#include <FSMRegexCompiler.h>
-
 #include "mootCHMM.h"
 #include "mootTaggerLexer.h"
 

@@ -37,6 +37,7 @@ lib_LTLIBRARIES = libmoot.la
 #${prog_i}_SOURCES =
 #${lib_i}_la_SOURCES =
 libmoot_la_SOURCES = \
+	mootFSM.cc \
 	mootTaggerLexer.cc \
 	mootPPLexer.cc \
 	mootNgrams.cc \
@@ -112,6 +113,7 @@ pkginclude_HEADERS = \
 	mootBinStream.h \
 	mootEnum.h \
 	mootTypes.h \
+	mootFSM.h \
 	mootTaggerLexer.h \
 	mootPPLexer.h \
 	mootNgramsLexer.h \

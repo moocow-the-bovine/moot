@@ -40,9 +40,7 @@
 //#include <hash_map>
 //#include <hash_set>
 #include <mootTypes.h>
-
-#include <FSM.h>
-#include <FSMTypes.h>
+#include <mootFSM.h>
 
 #include <mootEnum.h>
 #include <mootMorph.h>

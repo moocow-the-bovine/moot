@@ -124,20 +124,16 @@ AC_ARG_ENABLE(fsm,
 	[ac_cv_enable_fsm="$enableval"], [ac_cv_enable_fsm="yes"])
 
 if test "$ac_cv_enable_fsm" = "yes" ; then
-  PKG_CHECK_MODULES(FSMLIB, libFSM >= 0.1.1.1,
-	[PC_LIBFSM_VERSION="0_1_1"],
-	[PC_LIBFSM_VERSION=""])
-  if test -z "$PC_LIBFSM_VERSION" ; then
-    PKG_CHECK_MODULES(FSMLIB, libFSM >= 0.1.0.6,
-	[PC_LIBFSM_VERSION="0_1_0"],
-	[PC_LIBFSM_VERSION=""])
-  fi
-  #CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I libFSM`"
-  #LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L libFSM`"
-  #FSM_LIBS="`$PKG_CONFIG --libs-only-l libFSM`"
-  if test -z "$PC_LIBFSM_VERSION" ; then
+  PKG_CHECK_MODULES(FSMLIB, libFSM >= 0.1.0.6,
+	[PC_HAVE_FSMLIB="yes"],
+	[PC_HAVE_FSMLIB=""])
+  
+  if test -z "$PC_HAVE_FSMLIB" ; then
     ac_cv_enable_fsm="no"
+    ac_cv_fsm_version="-1"
     enable_fsm_errors="$PKG_CONFIG_ERRORS"
+  else
+    ac_cv_fsm_version=`pkg-config --modversion libFSM`
   fi
 else
   enable_fsm_errors="(disabled by user)"
@@ -151,10 +147,8 @@ dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # ------------------------------------------------------------
 # libFSMext (via pkg-config)
 
-case "$PC_LIBFSM_VERSION" in
-  "")
-	;;
-  0_1_0)
+case "$ac_cv_fsm_version" in
+  0.1.0.*)
     PKG_CHECK_MODULES(FSMEXT, libFSMext >= 0.0.1,
 	[PC_HAVE_LIBFSMEXT=1],
 	[PC_HAVE_LIBFSMEXT=""])
@@ -166,13 +160,32 @@ case "$PC_LIBFSM_VERSION" in
        ac_cv_enable_fsm="no"
        enable_fsm_errors="$PKG_CONFIG_ERRORS"
     fi
+    FSM_API_REVISION=0
     ;;
 
-  *)
+  0.1.1.*)
     CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I libFSM`"
     LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L libFSM`"
     FSMEXT_LIBS="`$PKG_CONFIG --libs-only-l libFSM`"
+    FSM_API_REVISION=1
     ;;
+
+  *)
+     FSM_API_REVISION=-1
+
+     ##-- check for zlib
+     AC_CHECK_LIB(z,deflate,[ac_cv_have_libz="yes"])
+     if test "$ac_cv_have_libz" != "yes" ; then
+       AC_MSG_WARN([zlib library (-lz) not found!])
+       AC_MSG_WARN([Is the directory containing 'libz.a' in your LDFLAGS environment variable?])
+       AC_MSG_ERROR([Required package not found -- aborting.])
+     else
+       LIBS="$LIBS -lz"
+     fi
+dnl zlib
+dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+     ;;
 esac
 AC_SUBST(FSMEXT_LIBS)
 dnl libFSMext
@@ -182,6 +195,7 @@ dnl ------------------------------------------------------------
 dnl libFSM (defines)
 if test "$ac_cv_enable_fsm" = "yes" ; then
     AC_DEFINE([HAVE_LIBFSM],1,[Define this to use Thomas Hanneforth's libFSM])
+    AC_DEFINE_UNQUOTED([FSM_API_REVISION], $FSM_API_REVISION, [The revision of your libFSM API])
 else
     AC_MSG_WARN()
     AC_MSG_WARN()
