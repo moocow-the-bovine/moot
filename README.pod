@@ -35,14 +35,18 @@ Probably many.
 
 =head1 ACKNOWLEDGEMENTS
 
-This package was developed as part of the DWDS project
-("Digitales Wörterbuch deutscher Sprache"
-= "digital dictionary of the German language") at the
-Berlin-Brandenburgische Akademie der Wissenschaften.
+This package was developed as part of the KDWDS project
+("Kollokationen im Digitalen Wörterbuch der deutschen Sprache"
+= "collocations in the digital dictionary of the German language")
+at the Berlin-Brandenburgische Akademie der Wissenschaften.
 For details on the DWDS project, visit: http://www.dwds.de.
 
-=head1 AUTHOR / MAINTAINER
+=head1 AUTHORS
+
+Thomas Hanneforth wrote the underlying FSM library and
+the original 'madwds' program.
 
 Bryan Jurish E<lt>moocow@ling.uni-potsdam.deE<gt>
+wrote and maintains the 'dwdst' package itself.
 
 =cut
