@@ -52,7 +52,7 @@ you may specify a tag-extraction transducer (yet another FSM) which
 maps morphological output paths to PoS tags.
 
 \see \link dwdst::dwdstMorph dwdstMorph\endlink
-\see dwdsm(1)
+\see <A HREF="../../programs/dwdsm.html">dwdsm(1)</A>
 
 
 
