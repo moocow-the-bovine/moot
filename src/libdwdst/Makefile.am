@@ -255,7 +255,6 @@ MAINTAINERCLEANFILES = \
 EXTRA_DIST = \
 	dwdstTaggerLexer.ll \
 	dwdstPPLexer.ll \
-	dwdstTaglistLexer.ll \
 	dwdstNgramsLexer.ll \
 	dwdstNgramsParser.yy \
 	dwdstLexfreqsLexer.ll \
@@ -264,6 +263,7 @@ EXTRA_DIST = \
 	bison.cc bison.h
 
 dist_old = \
+	dwdstTaglistLexer.ll \
 	dwdstAlphabetLexer.ll \
 	dwdstAlphabetParser.yy
 

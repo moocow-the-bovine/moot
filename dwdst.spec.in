@@ -1,3 +1,4 @@
+# -*- Mode: Shell-Script -*-
 Name: @PACKAGE@
 Version: @VERSION@
 Release: @BINDIST_RELEASE@

@@ -1,3 +1,10 @@
+dwdst (1.0.0-pre3) unstable; urgency=low
+
+ * added class 'dwdstHMM', program 'dwdshmm'
+ * general cleanup
+
+ -- Bryan Jurish <moocow@ling.uni-potsdam.de>  Tue, 12 Aug 2003 00:28:36 +0200
+
 dwdst (0.0.7) unstable; urgency=low
 
   * compatibility-fix for ambiguity-class alphabet files.
