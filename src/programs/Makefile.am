@@ -194,7 +194,8 @@ mootrain_LDADD = $(LDADD_COMMON)
 MAINTAINERCLEANFILES = \
 	*~ .*~ Makefile Makefile.in \
 	*_cmdparser.cc *_cmdparser.h \
-	*.pod *.man *.1 *.html *.txt *.tex
+	$(filter-out acknowledge.pod,$(wildcard *.pod)) \
+	*.man *.1 *.html *.txt *.tex
 
 ##-----------------------------------------------------------------------
 ## Variables: distribution

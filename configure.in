@@ -7,6 +7,7 @@ define([THE_PACKAGE_VERSION], [2.0.0])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
+dnl AC_INIT(moot, 2.0.0, moocow@ling.uni-potsdam.de)
 
 dnl source && aux dir
 AC_CONFIG_AUX_DIR(config)
@@ -16,6 +17,7 @@ AC_CANONICAL_TARGET
 
 dnl use automake
 AM_INIT_AUTOMAKE(THE_PACKAGE_NAME, THE_PACKAGE_VERSION)
+dnl AM_INIT_AUTOMAKE
 
 dnl use autoheader
 AM_CONFIG_HEADER([src/libmoot/mootConfig.h])
