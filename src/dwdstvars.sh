@@ -11,6 +11,11 @@ case "$uname" in
        bumble_base=/usr/local
        stlp_base=/usr/local
        ;;
+     "lore")
+       fsm_base=/usr
+       bumble_base=/usr
+       stlp_base=/usr/local
+       ;;
      *)
        fsm_base=/usr/local
        bumble_base=/usr/local

@@ -62,6 +62,9 @@ group "Output Format Options"
 flag "avm"       a "Produce AVM ('vector') output." \
     details="Ambiguous-mode only"
 
+flag "dequote"   q "Auto-dequote output tags." \
+    details="For compatibility."
+
 #flag "numeric"   n "Produce numeric output." \
 #    detilas="Useful for further automated processing."
 

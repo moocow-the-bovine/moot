@@ -90,6 +90,7 @@ void GetMyOptions(int argc, char **argv)
   dwdst.want_mabbaw_format = args.mabbaw_format_given;
   dwdst.verbose  = args.verbose_arg;
   dwdst.track_statistics = args.verbose_arg > 1;
+  dwdst.do_dequote = args.dequote_given;
 
   // -- tagger object setup : symbols
   if (args.verbose_arg > 1)

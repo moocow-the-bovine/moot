@@ -41,6 +41,7 @@ dwdstTagger::dwdstTagger(FSMSymSpec *mysyms, FSM *mymorph)
   want_avm = false;
   want_mabbaw_format = false;
   track_statistics = false;
+  do_dequote = false;
   verbose = 1;
 
   // -- private data
@@ -278,6 +279,64 @@ dwdstTagger::get_fsm_tag_strings(FSM *fsa, set<FSMSymbolString> *tag_strings=NUL
  *--------------------------------------------------------------------------*/
 
 //(inlined)
+
+
+void dwdstTagger::symbol_vector_to_string_dq(const vector<FSMSymbol> &vec, FSMSymbolString &str)
+{
+  str.clear();
+  for (vector<FSMSymbol>::const_iterator vi = vec.begin(); vi != vec.end(); ) {
+    if (*vi == EPSILON || *vi == FSMNOLABEL) {
+      vi++;
+      continue;
+    }
+    register const FSMSymbolString *isym = syms->symbol_to_symbolname(*vi);
+    if (isym == NULL) {
+      if (verbose > 2) {
+	carp("dwdstTagger::symbol_vector_to_string_sq(): Error: undefined symbol '%d' -- ignored", *vi);
+      }
+      vi++;
+      continue;
+    }
+    else { //-- isym==NULL
+      // -- it's a kosher symbol
+      if ((*isym)[0] == '_') {
+	// -- it's a category (hack!)
+	str.append(*isym, 1, isym->length());
+	const vector<FSMSymbolString>* feat = syms->features_of_category(*isym);
+	vi++;
+	for (vector<FSMSymbolString>::const_iterator fi = feat->begin();
+	     fi != feat->end() && vi != vec.end();
+	     vi++, fi++)
+	  {
+	    const set<FSMSymbol> *fsubtypes = syms->subtypes_of(*fi);
+	    if (fsubtypes->find(*vi) == fsubtypes->end()) {
+	      // -- not a valid value for this feature -- assume the category is done
+	      break;
+	    }
+	    isym = syms->symbol_to_symbolname(*vi);
+	    str.push_back('.');
+	    str.append(*isym);
+	  }
+	// -- done with this category
+	str.push_back('.');  //-- just in case
+	continue; // -- we've already incremented vi enough
+      }
+      else { //-- isym[0]=='_' : non-category
+	if (isym->length() > 1) {
+	  str.append(*isym);
+	  str.push_back('.');
+	} else {
+	  str.push_back((*isym)[0]);
+	}
+      }
+    }
+    vi++;
+  }
+  //-- delete trailing '.'
+  if (str[str.size()-1] == '.') str.pop_back();
+};
+
+
 
 
 /*--------------------------------------------------------------------------

@@ -49,3 +49,4 @@ Makefile
 Makefile.in
 README.txt
 configure
+data

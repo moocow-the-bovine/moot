@@ -38,4 +38,7 @@ avg-analyses.data
 *.afst
 *.lab
 *.scl
+*.save
+*.dis
+*.alph
 

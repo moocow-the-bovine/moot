@@ -78,6 +78,9 @@ public:
 
   /** track ntokens and nuknown? (default = false) */
   bool track_statistics;
+
+  /** Do automatic NEGRA-style dequoting ? (default = false) */
+  bool do_dequote;
   
   /**
    * output verbosity level (0..3)
@@ -233,7 +236,7 @@ public:
     for (analyses_i = ans->begin(); analyses_i != ans->end(); analyses_i++) {
       //-- stringify this analysis
       analysis_str.clear();
-      syms->symbol_vector_to_string(analyses_i->istr, analysis_str, want_avm, verbose > 2);
+      symbol_vector_to_string(analyses_i->istr, analysis_str);
       analysis_strings.insert(analysis_str);
     }
     return analysis_strings;
@@ -262,7 +265,7 @@ public:
       for (analyses_i = ans->begin(); analyses_i != ans->end(); analyses_i++) {
 	//-- stringify this analysis
 	analysis_str.clear();
-	syms->symbol_vector_to_string(analyses_i->istr, analysis_str, want_avm, verbose > 2);
+	symbol_vector_to_string(analyses_i->istr, analysis_str);
 	//-- ... and print it
 	fputc('\t', out);
 	fputs(analysis_str.c_str(), out);
@@ -274,7 +277,7 @@ public:
       for (analyses_i = ans->begin(); analyses_i != ans->end(); analyses_i++) {
 	//-- stringify this analysis
 	analysis_str.clear();
-	syms->symbol_vector_to_string(analyses_i->istr, analysis_str, want_avm, verbose > 2);
+	symbol_vector_to_string(analyses_i->istr, analysis_str);
 	//-- ... and print it
 	fputc('\t', out);
 	fputs(analysis_str.c_str(), out);
@@ -284,6 +287,18 @@ public:
     }
   };
 
+  /** Convert symbol-vectors to pretty strings: general */
+  inline void symbol_vector_to_string(const vector<FSMSymbol> &vec, FSMSymbolString &str)
+  {
+    if (do_dequote) {
+      syms->symbol_vector_to_string(vec, str, want_avm, verbose > 2);
+    } else {
+      symbol_vector_to_string_dq(vec, str);
+    }
+  };
+
+  /** Convert symbol-vectors to pretty strings: dequoting (ugly, but useful) */
+  void symbol_vector_to_string_dq(const vector<FSMSymbol> &vec, FSMSymbolString &str);
 
   //-------------------------------------
   // debugging & error reporting etc.
