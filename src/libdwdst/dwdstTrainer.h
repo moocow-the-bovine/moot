@@ -46,7 +46,6 @@ private:
   // -- private data
 public:
   // ----- public data: tagsets
-
   /// set of PoS tags for open-classes (used for unknown-FST generation)
   set<FSMSymbolString>  opentags;  
 
@@ -60,11 +59,24 @@ public:
   /// Caveat: time and space complexity grows exponentially with kmax!
   int kmax;
 
+
+  /// Whether to allow for incomplete (non-total) categories
+  /// when compiling regexes.
+  bool allow_incomplete_categories;
+
+  // ----- public data: mid-/low-level stuff
+
   /// Table of n-gram counts indexed by n-grams.
   NGramTable            ngtable;
 
   /// Working data for n-ngram generation.
   FSMSymbolStringQueue  stringq;
+
+  /// Tag-to-symbol map for disambiguation fsa skeleton .
+  dwdstStringToSymbolMap tags2symbols;
+
+  /// Used by disambigArcCost() when fallback strategy fails.
+  float uniGramCount;
 
 private:
   NGramTable::iterator ngti;
@@ -92,7 +104,7 @@ public:
   // ----- public methods: constructor/destructor
 
   /// constructor
-  dwdstTrainer(FSMSymSpec *mysyms=NULL, FSM *mymorph=NULL) {};
+  dwdstTrainer(FSMSymSpec *mysyms=NULL, FSM *mymorph=NULL) : kmax(2), allow_incomplete_categories(true) {};
 
   /// destructor
   ~dwdstTrainer();
@@ -114,7 +126,20 @@ public:
   set<FSMState> fsm_add_pos_arc(FSM *fsm, const FSMState qfrom, const FSMSymbolString &pos,
 				const FSMWeight cost = FSM_default_cost_structure.freecost());
 
-  // -- public methods: low-level: disambig-fsa utilities
+  // ----- mid-level: disambig-fsa utilities
+
+  /// For disambiguation, generate 'tags2symbols', a map from known tags to FSMSymbols.
+  /// Also computes 'uniGramCount' -- this behavior should change!
+  bool generate_tag_map();
+
+  /// Generate a skeleton FSA for the disambiguator.
+  FSM *generate_disambig_skeleton();
+
+  /// For disambiguation, apply substitutions indicated by 'tags2symbols' to
+  /// the skeleton disambiguation fsa in 'dfsa'.
+  FSM *expand_disambig_skeleton();
+
+  // -- low-level: disambig-fsa utilities
   /// Low-level: get the cost of final transition for nGram.
   FSMWeight disambigArcCost(NGramVector &nGram, FSMSymbolString &tagTo, float uniGramCost=0);
   /// Low-level: get the count for a single nGram, using fallback strategy.

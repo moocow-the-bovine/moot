@@ -1,0 +1,9 @@
+EOS	10
+EOS	[NOUN]	5
+EOS	[VERB]	5
+[NOUN]		5
+[NOUN]	[NOUN]	1
+[NOUN]	[VERB]	4
+[VERB]		5
+[VERB]	[NOUN]	2
+[VERB]	[VERB]	3

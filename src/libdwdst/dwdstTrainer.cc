@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <errno.h>
 
+#include "FSMRegexCompiler.h"
+
 #include "dwdstTypes.h"
 #include "dwdstTrainer.h"
 #include "dwdstTaglistLexer.h"
@@ -135,57 +137,164 @@ FSM *dwdstTrainer::generate_unknown_fsa()
  */
 FSM *dwdstTrainer::generate_disambig_fsa()
 {
-  // Mecker!
+  // -- for error reporting
+  const char methodName[] = "dwdstTrainer::generate_disambig_fsa()";
+
   /*
-    fprintf(stderr,"dwdstTrainer::generate_disambig_fsa(): not yet implemented!");
-    abort();
+    // -- Mecker!
+    fprintf(stderr,"%s: not yet implemented!\n", methodName);
     return NULL;
   */
 
-  // -- sanity check(s)
+  // -- sanity check: symbols
+  if (!syms) {
+    fprintf(stderr,"%s: cannot generate disambiguation fsa without an FSMSymSpec!\n", methodName);
+    return NULL;
+  }
+  // -- sanity check: kmax
   if (kmax <= 0) {
     for (NGramTable::iterator ngti = ngtable.begin(); ngti != ngtable.end(); ngti++) {
       if ((int)ngti->first.size() > kmax)
 	kmax = ngti->first.size();
     }
-    fprintf(stderr,"dwdstTrainer::generate_disambig_fsa(): using implicit value %d for kmax.\n",kmax);
+    fprintf(stderr,"%s: using implicit kmax=%d.\n", methodName, kmax);
   }
 
+#ifdef DWDST_DFSA_DEBUG
+  fprintf(stderr, "%s: before erase(eos=%s), alltags.size()=%d\n", methodName, eos.c_str(), alltags.size());
+#endif
+
+  alltags.erase(eos); // -- HACK: temporarily remove EOS from the tagset
+
+#ifdef DWDST_DFSA_DEBUG
+  fprintf(stderr, "%s: after erase(eos=%s), alltags.size()=%d\n", methodName, eos.c_str(), alltags.size());
+#endif
+
+  // -- generate tag-to-symbol map for skeleton fsa
+  tags2symbols.clear();
+  if (!generate_tag_map()) return NULL;
+
+#ifdef DWDST_DFSA_DEBUG
+  fprintf(stderr, "dwdstTrainer::generate_tag_map(): generated %d skeleton tag-symbols.\n", tags2symbols.size());
+#endif
+
+  // -- generate the skeleton dfsa
+  dfsa = generate_disambig_skeleton();
+  if (!dfsa || !*dfsa) {
+    if (dfsa) {
+      delete dfsa;
+      dfsa = NULL;
+    }
+    return NULL;
+  }
+
+#ifdef DWDST_DFSA_DEBUG
+  // debug: save skeleton tag-labels
+  FILE *labfile = fopen("dskeleton.lab","w");
+  if (labfile) {
+    for (dwdstStringToSymbolMap::iterator t2si =  tags2symbols.begin();
+	 t2si != tags2symbols.end();
+	 t2si++)
+      {
+	fprintf(labfile,"%s\t%d\n", t2si->first.c_str(), t2si->second);
+      }
+    fclose(labfile);
+  } else {
+    fprintf(stderr, "%s: could not open 'dskeleton.lab' for write: %s\n", methodName, strerror(errno));
+  }
+  // -- debug: save skeleton FSM
+  if (!dfsa->fsm_save_to_binary_file("dskeleton.fsa", false)) {
+    fprintf(stderr, "%s: save failed for skeleton FSA 'dskeleton.fsa'.\n", methodName);
+  }
+#endif
+
+  // -- now substitute in the FSMs resulting from each tag's compilation
+  //    as a regex.
+  dfsa = expand_disambig_skeleton();
+  if (!dfsa || !*dfsa) {
+    if (dfsa) {
+      delete dfsa;
+      dfsa = NULL;
+    }
+    return NULL;
+  }
+
+  alltags.insert(eos);  // -- HACK: re-insert removed EOS back into the tagset
+  return dfsa;
+}
+
+/**
+ * Compile each key (pseudo-tag) in 'tags2symbols' as a regex,
+ * and substitute the resultant FSM into the skeleton 'dfsa'.
+ */
+FSM *dwdstTrainer::expand_disambig_skeleton()
+{
+  // -- for error reporting
+  const char methodName[] = "dwdstTrainer::expand_disambig_skeleton()";
+
+  // -- setup a regex-compiler
+  FSMRegexCompiler recomp;
+  recomp.symspec = syms;
+  recomp.allow_incomplete_categories = allow_incomplete_categories;
+  //recomp.objname = (char *)methodName;
+  recomp.verbose = verbose;
+  recomp.theLexer.theLine = 0;
+
+  // -- construct an FSMSubstitutionMap using tags2symbols
+  FSM::FSMSubstitutionMap syms2fsms;
+  syms2fsms.clear();
+  for (dwdstStringToSymbolMap::iterator t2si = tags2symbols.begin(); t2si != tags2symbols.end(); t2si++) {
+    recomp.theLexer.theLine++;
+    recomp.theLexer.theColumn = 0;
+    if (!recomp.parse_from_string(t2si->first.c_str())) {
+      fprintf(stderr, "%s: could not compile pseudo-tag '%s' as a regular expression -- using <epsilon>!\n",
+	      methodName, t2si->first.c_str());
+      recomp.result_fsm = recomp.epsilon_fsm();
+    }
+    syms2fsms[t2si->second] = recomp.result_fsm;
+    recomp.result_fsm = NULL;
+  }
+
+  // -- perform the substitution on dfsa
+  dfsa->fsm_substitute(syms2fsms,FSM::FSMModeDestructive);
+  if (!dfsa || !*dfsa) {
+    fprintf(stderr, "%s: could not expand disambiguator skeleton!\n", methodName);
+    if (dfsa) {
+      delete dfsa;
+      dfsa = NULL;
+    }
+    return NULL;
+  }
+
+  // -- cleanup our temporaries
+  for (FSM::FSMSubstitutionMap::iterator s2fi = syms2fsms.begin(); s2fi != syms2fsms.end(); s2fi++) {
+    if (s2fi->second) {
+      delete s2fi->second;
+      s2fi->second = NULL;
+    }
+  }
+  syms2fsms.clear();
+
+  return dfsa;
+}
+
+/**
+ * Generate a skeleton statistical PoS-disambiguation FSA based on internal
+ * N-Gram tables.  The skeleton FSA uses a single symbol for each possible
+ * tag.  Later, these symbols should be replaced by the sub-FSAs resulting
+ * from compiling the 'tag' as a regex.
+ */
+FSM *dwdstTrainer::generate_disambig_skeleton()
+{
+  // -- for error-reporting
+  const char methodName[] = "dwdstTrainer::generate_disambig_skeleton()";
+
+  // -- create & initialize dfsa
   if (dfsa) { delete dfsa; }
   dfsa = new FSM();
   dfsa->set_fsm_type(false,true);
   FSMRepresentation *rep = dfsa->fsm_representation();
   FSMWeight freecost = rep->cost_structure()->freecost();
-
-  // -- HACK: temporarily remove EOS from the tagset
-#ifdef DWDST_DFSA_DEBUG
-  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): before erase(eos=%s), alltags.size()=%d\n",
-	  eos.c_str(), alltags.size());
-#endif
-  alltags.erase(eos);
-#ifdef DWDST_DFSA_DEBUG
-  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): after erase(eos=%s), alltags.size()=%d\n",
-	  eos.c_str(), alltags.size());
-#endif
-
-  // -- build a symbol-map for all tags we know
-  FSMSymbol symMax = 0;
-  float uniGramCount = 0;
-  dwdstStringToSymbolMap tags2symbols;
-  for (set<FSMSymbolString>::iterator si = alltags.begin(); si != alltags.end(); si++) {
-    tags2symbols[*si] = ++symMax;
-    // -- count unigrams
-    theNgram.clear();
-    theNgram.push_back(*si);
-    NGramTable::iterator ngfi;
-    if ((ngfi = ngtable.find(theNgram)) != ngtable.end()) {
-      uniGramCount += ngfi->second;
-    }
-  }
-
-#ifdef DWDST_DFSA_DEBUG
-  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): generated %d skeleton tag-symbols.\n", symMax);
-#endif
 
   // -- generate a skeleton-FSA using a single-symbol for each pseudo-tag
   //    initialization: BOS
@@ -213,8 +322,7 @@ FSM *dwdstTrainer::generate_disambig_fsa()
     //    and also  len=kmax, because we don't need states for those.
 
 # ifdef DWDST_DFSA_DEBUG_VERBOSE
-    fprintf(stderr,
-	    "dwdstTrainer::generate_disambig_fsa(): BOS-bootstrap len=%d.\n", len);
+    fprintf(stderr, "%s: BOS-bootstrap len=%d.\n", methodName, len);
 # endif
 
     for (tagIters_begin(tagIters,alltags,len);
@@ -229,7 +337,7 @@ FSM *dwdstTrainer::generate_disambig_fsa()
 	}
 	
 # ifdef DWDST_DFSA_DEBUG_VERBOSE
-	fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): BOS-bootstrap nGram=<");
+	fprintf(stderr, "%s: BOS-bootstrap nGram=<", methodName);
 	for (NGramVector::iterator dbg_ngvi = theNgram.begin(); dbg_ngvi != theNgram.end(); dbg_ngvi++) {
 	  fprintf(stderr,"%s,",dbg_ngvi->c_str());
 	}
@@ -256,7 +364,7 @@ FSM *dwdstTrainer::generate_disambig_fsa()
 	  rep->add_transition(prevState, theState, tagSymbol, tagSymbol, arcCost);
 	} else {
 	  // -- this should never happen!
-	  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): missing state in BOS bootstrap!\n");
+	  fprintf(stderr, "%s: missing state in BOS bootstrap!\n", methodName);
 	  continue;
 	}
       }
@@ -267,8 +375,7 @@ FSM *dwdstTrainer::generate_disambig_fsa()
   NGramVector nextNgram;
 
 # ifdef DWDST_DFSA_DEBUG_VERBOSE
-    fprintf(stderr,
-	    "dwdstTrainer::generate_disambig_fsa(): (kmax=%d)-linkup.\n", kmax);
+    fprintf(stderr, "%s: (kmax=%d)-linkup.\n", methodName, kmax);
 # endif
 
   for (tagIters_begin(tagIters,alltags,kmax-1);
@@ -285,7 +392,7 @@ FSM *dwdstTrainer::generate_disambig_fsa()
       }
 
 # ifdef DWDST_DFSA_DEBUG_VERBOSE
-      fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): kmax-linkup prevNgram=<");
+      fprintf(stderr, "%s: kmax-linkup prevNgram=<", methodName);
       for (NGramVector::iterator dbg_ngvi = prevNgram.begin(); dbg_ngvi != prevNgram.end(); dbg_ngvi++) {
 	fprintf(stderr,"%s,",dbg_ngvi->c_str());
       }
@@ -298,7 +405,7 @@ FSM *dwdstTrainer::generate_disambig_fsa()
 	prevState = pngi->second;
       } else {
 	// -- this should never happen
-	fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): missing source-state in kmax-linkup!\n");
+	fprintf(stderr, "%s: missing source-state in kmax-linkup!\n", methodName);
 	continue;
       }
 
@@ -308,7 +415,7 @@ FSM *dwdstTrainer::generate_disambig_fsa()
       for (set<FSMSymbolString>::iterator tsi = alltags.begin(); tsi != alltags.end(); tsi++) {
 
 # ifdef DWDST_DFSA_DEBUG_VERBOSE
-	fprintf(stderr, "dwdstTrainer::generate_disambig_fsa():   + theTag='%s'\n", tsi->c_str());
+	fprintf(stderr, "%s:   + theTag='%s'\n", methodName, tsi->c_str());
 # endif
 
 	FSMSymbolString theTag = *tsi;
@@ -320,42 +427,41 @@ FSM *dwdstTrainer::generate_disambig_fsa()
 	  FSMWeight  arcCost    = disambigArcCost(prevNgram, theTag, uniGramCount);
 	  rep->add_transition(prevState, theState, tagSymbol, tagSymbol, arcCost);
 # ifdef DWDST_DFSA_DEBUG_VERBOSE
-	  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa():     > cost='%f'\n", arcCost);
+	  fprintf(stderr, "%s:     > cost='%f'\n", methodName, arcCost);
 # endif
 	} else {
 	  // -- this should never happen!
-	  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): missing sink-state in kmax-linkup!\n");
+	  fprintf(stderr, "%s: missing sink-state in kmax-linkup!\n", methodName);
 	}
 	nextNgram.pop_back();
       }
     }
-#ifdef DWDST_DFSA_DEBUG
-  // debug: save skeleton tag-labels
-  FILE *labfile = fopen("dskeleton.lab","w");
-  if (labfile) {
-    for (dwdstStringToSymbolMap::iterator t2si =  tags2symbols.begin();
-	 t2si != tags2symbols.end();
-	 t2si++)
-      {
-	fprintf(labfile,"%s\t%d\n", t2si->first.c_str(), t2si->second);
-      }
-    fclose(labfile);
-  } else {
-    fprintf(stderr,
-	    "dwdstTrainer::generate_disambig_fsa(): could not open 'dskeleton.lab': %s\n",
-	    strerror(errno));
-  }
-  // debug: save skeleton FSM
-  //if (!dfsa->fsm_save_to_binary_file("dskeleton.fsa", false)) {
-  //  fprintf(stderr, "dwdstTrainer::generate_disambig_fsa(): save failed for 'dskeleton.fsa'\n");
-  //}
-#endif
-
-  // -- HACK: re-insert removed EOS back into the tagset
-  alltags.insert(eos);
-
   return dfsa;
 }
+
+
+/**
+ * Generate a 1-1 map from possible tags to symbols in this->tags2symbols.
+ * Also calculates uniGramCount for use by disambigArcCost().
+ */
+bool dwdstTrainer::generate_tag_map()
+{
+  // -- build a symbol-map for all tags we know
+  uniGramCount = 0;
+  FSMSymbol symMax = syms->alphabet_size(); // -- avoid collisions with existing symbols
+  for (set<FSMSymbolString>::iterator si = alltags.begin(); si != alltags.end(); si++) {
+    tags2symbols[*si] = ++symMax;
+    // -- count unigrams
+    theNgram.clear();
+    theNgram.push_back(*si);
+    NGramTable::iterator ngfi;
+    if ((ngfi = ngtable.find(theNgram)) != ngtable.end()) {
+      uniGramCount += ngfi->second;
+    }
+  }
+  return true;
+}
+
 
 /*--------------------------------------------------------------------------
  * Public Methods: weight-calculation utilities

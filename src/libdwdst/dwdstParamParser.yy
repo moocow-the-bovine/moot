@@ -10,8 +10,11 @@
 %name dwdstParamParser
 
 /* -- bison++ flags --- */
-// -- force use of location stack
+// -- force use of location stack : defines global 'yyltype' by default
 %define LSP_NEEDED
+
+// -- ... so we define yyltype ourselves ... (see %header section)
+%define LTYPE dwdstParamParserLType
 
 // -- debugging (see below)
 %define DEBUG 1
@@ -47,6 +50,16 @@
 #undef YYABORT
 #undef YYERROR
 #undef YYRECOVERING
+
+/// \brief Location-stack element type for bison++ parser.
+typedef struct {
+  int timestamp;
+  int first_line;
+  int first_column;
+  int last_line;
+  int last_column;
+  char *text;
+} dwdstParamParserLType;
 
 /**
  * \class dwdstParamParser
