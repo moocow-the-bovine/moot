@@ -3,6 +3,9 @@ ChangeLog for package moot
 Todo:
 	+ write perl-XS interface & utilities
 
+v2.0.1 Fri, 16 Jul 2004 14:02:07 +0200
+	+ fixed XML parsing bug which somehow snuck into version 2.0.0
+
 v2.0.0 Fri, 09 Jul 2004 00:18:26 +0200
 	+ Documentation and general cleanup
 	+ added 'static' binary distribution build target

@@ -39,6 +39,7 @@ using namespace mootio;
 mootExpatParser::mootExpatParser(size_t bufsize, const std::string &encoding)
   : xp_istream(NULL),
     xp_istream_created(false),
+    xml_buf(NULL),
     xml_buflen(bufsize),
     xml_encoding(encoding),
     //xml_done(1),
@@ -269,7 +270,7 @@ bool mootExpatParser::parse_chunk(int &nbytes, int &is_final, mootio::mistream *
   //-- fill 'er up
   nbytes = in->read(xml_buf, xml_buflen);
   if (!in->valid()) {
-    xpcarp("parseChunk(): Read error");
+    xpcarp("parse_chunk(): Read error");
     return false;
   }
 
