@@ -31,10 +31,6 @@
 %define LEX_BODY =0
 
 %header{
-#ifdef HAVE_CONFIG_H
-# include <dwdstConfig.h>
-#endif
-
 # include <stdio.h>
 # include <stdlib.h>
 # include <stdarg.h>
@@ -44,8 +40,6 @@
 # include <string.h>
 
 # include <FSMSymSpec.h>
-
-# include "cleanConfig.h"
 
 # include <FSM.h>
 # include <FSMRegexCompiler.h>
@@ -72,6 +66,12 @@ typedef struct {
  * \class dwdstAlphabetParser
  * \brief Bison++ parser for dwdst-pargen alphabeteter files.
  */
+%}
+
+%{
+#ifdef HAVE_CONFIG_H
+# include <dwdstConfig.h>
+#endif
 %}
 
 %define CLASS dwdstAlphabetParser

@@ -204,9 +204,10 @@ MAINTAINERCLEANFILES = \
 ## Variables: distribution
 ##-----------------------------------------------------------------------
 
+#	dwdst.sym
+
 ## --- extra distribution files
 EXTRA_DIST = \
-	dwdst.sym \
 	dwdstTaggerLexer.ll \
 	dwdstPPLexer.ll \
 	dwdstTaglistLexer.ll \

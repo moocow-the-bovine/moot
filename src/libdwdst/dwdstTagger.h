@@ -23,11 +23,6 @@
 #include "dwdstTaggerLexer.h"
 #include "dwdstDisambiguator.h"
 
-#ifdef HAVE_CONFIG_H
-/*# include "nopackage.h"*/
-# include <dwdstConfig.h>
-#endif
-
 /*--------------------------------------------------------------------------
  * dwdstTagger : tagger class
  *--------------------------------------------------------------------------*/

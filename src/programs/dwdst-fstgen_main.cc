@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------
- * File: dwdst_fstgen_main.cc
+ * File: dwdst-fstgen-main.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
  *   + PoS tagger-trainer for DWDS project : main()
@@ -16,7 +16,7 @@
 # include <config.h>
 #endif
 
-#include "dwdst_fstgen_cmdparser.h"
+#include "dwdst-fstgen_cmdparser.h"
 
 using namespace std;
 

@@ -1,0 +1,69 @@
+# -*- Mode: Shell-Script -*-
+# Getopt::Gen specification for 'dwdspp'
+#-----------------------------------------------------------------------------
+program "dwdspp"
+#program_version "0.01"
+
+purpose	"Tokenizer for the KDWDS project."
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details "
+dwdspp is a pre-processor for raw text intended to be
+used to prepare documents for PoS tagging by L<dwdst>.
+"
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+argument "FILE(s)" "Input files" \
+    details="See the L<--list> option."
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+
+int "verbose" v "Verbosity level." \
+    arg="LEVEL" \
+    default="1" \
+    details="Range: 0..1"
+
+string	"output" o "Write output to FILE." \
+    arg="FILE" \
+    default="-" \
+    details="
+Output files are in Brill format: one sentence per line, tokens
+separated by whitespace.
+"
+
+flag "list" l "Arguments are input-file lists." \
+    default="0" \
+    details="
+If this flag is given, the FILE(s) arguments should be lists
+of input filenames, one filename per line, which should be
+processed.  Otherwise, the FILE(s) arguments are interpreted
+as filenames of the input files themselves.
+"
+
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+acknowledge "
+
+This package was developed as part of the DWDS/Collocations project
+('Kollokationen im digitalen W\"orterbuch der deutschen Sprache'
+= 'collocations in the digital dictionary of the German language') at the
+Berlin-Brandenburgische Akademie der Wissenschaften.
+For details on the DWDS project, visit: http://www.dwds.de.
+
+"
+
+seealso "L<dwdst>."

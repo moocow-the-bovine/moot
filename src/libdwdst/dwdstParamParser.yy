@@ -30,11 +30,13 @@
 //%define LEX_BODY =0
 %define LEX_BODY =0
 
-%header{
+%{
 #ifdef HAVE_CONFIG_H
 # include <dwdstConfig.h>
 #endif
+%}
 
+%header{
 # include <stdio.h>
 # include <stdlib.h>
 # include <math.h>

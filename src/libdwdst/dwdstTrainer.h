@@ -28,11 +28,6 @@
 #include "dwdstTagger.h"
 #include "dwdstTypes.h"
 
-#ifdef HAVE_CONFIG_H
-//# include "nopackage.h"
-# include <dwdstConfig.h>
-#endif
-
 using namespace std;
 
 /*--------------------------------------------------------------------------

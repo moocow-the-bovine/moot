@@ -1,7 +1,7 @@
 ## File: src/programs/Makefile.am
 ## Package: dwdst
 ## Description:
-##   + source-level automake file for DWDS PoS tagger programs
+##   + src-level automake file for DWDS PoS tagger programs
 ##
 ## Process this file with Automake to create Makefile.in.
 ##-----------------------------------------------------------------------
@@ -32,7 +32,9 @@ bin_PROGRAMS = dwdspp dwdst dwdst-fstgen dwdst-pargen
 ## sources
 ##-----------------------------------------------------------------------
 
-SUFFIXES = .ggo
+SUFFIXES = \
+	.gog _cmdparser.c _cmdparser.cc _cmdparser.h \
+	.pod .txt .1 .html .tex
 
 ## --- Required sources
 #${prog_i}_SOURCES =
@@ -40,21 +42,21 @@ SUFFIXES = .ggo
 dwdspp_SOURCES = \
 	cmdutil.cc cmdutil.h \
 	dwdspp_main.cc \
-	dwdspp_cmdparser.ggo
+	dwdspp_cmdparser.cc dwdspp_cmdparser.h
 
 dwdst_SOURCES = \
 	cmdutil.cc cmdutil.h \
 	dwdst_main.cc \
-	dwdst_cmdparser.ggo
+	dwdst_cmdparser.cc dwdst_cmdparser.h
 
 dwdst_fstgen_SOURCES = \
-	dwdst_fstgen_main.cc \
-	dwdst_fstgen_cmdparser.ggo
+	dwdst-fstgen_main.cc \
+	dwdst-fstgen_cmdparser.cc dwdst-fstgen_cmdparser.h
 
 dwdst_pargen_SOURCES = \
 	cmdutil.cc cmdutil.h \
-	dwdst_pargen_main.cc \
-	dwdst_pargen_cmdparser.ggo
+	dwdst-pargen_main.cc \
+	dwdst-pargen_cmdparser.cc dwdst-pargen_cmdparser.h
 
 ## --- Extra (possible) sources
 #EXTRA_${prog_i}_SOURCES = 
@@ -63,8 +65,8 @@ dwdst_pargen_SOURCES = \
 ## --- Additional dependencies
 dwdspp_main.o: dwdspp_cmdparser.h
 dwdst_main.o: dwdst_cmdparser.h
-dwdst_fstgen_main.o: dwdst_fstgen_cmdparser.h
-dwdst_pargen_main.o: dwdst_pargen_cmdparser.h
+dwdst-fstgen_main.o: dwdst-fstgen_cmdparser.h
+dwdst-pargen_main.o: dwdst-pargen_cmdparser.h
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -80,13 +82,50 @@ noinst_HEADERS = config.h
 ## pre-compile rules: gengetopt
 ##-----------------------------------------------------------------------
 
-.ggo.h:
-	gengetopt -u -F$* < $^
-	mv $*.c $*.cc
+#.ggo.h:
+#	gengetopt -u -F$* < $^
+#	mv $*.c $*.cc
 
-.ggo.cc:
-	gengetopt -u -F$* < $^
-	mv $*.c $*.cc
+#.ggo.cc:
+#	gengetopt -u -F$* < $^
+#	mv $*.c $*.cc
+
+##-----------------------------------------------------------------------
+## pre-compile rules: Getopt::Gen
+##-----------------------------------------------------------------------
+
+.SECONDARY:
+
+OPTGENFLAGS = -u -l
+
+.gog_cmdparser.h:
+	optgen.perl $(OPTGENFLAGS) --nopod -F $*_cmdparser $<
+	mv $*_cmdparser.c $*_cmdparser.cc
+
+.gog_cmdparser.cc:
+	optgen.perl $(OPTGENFLAGS) --nopod -F $*_cmdparser $<
+	mv $*_cmdparser.c $*_cmdparser.cc
+
+.gog.pod:
+	optgen.perl $(OPTGENFLAGS) --nocfile --nohfile -F $* $<
+
+##-----------------------------------------------------------------------
+## pod conversion
+##-----------------------------------------------------------------------
+
+POD2MANFLAGS = --center="KDWDS PoS Tagging Tools"
+
+.pod.1:
+	pod2man $(POD2MANFLAGS) --section=1 $< $@
+
+.pod.txt:
+	pod2text $< $@
+
+.pod.html:
+	pod2html --infile=$< --outfile=$@
+
+.pod.tex:
+	pod2latex --full --out $@ $<
 
 ##-----------------------------------------------------------------------
 ## compile flags
@@ -140,10 +179,8 @@ dwdspp_LDADD = $(LDADD_COMMON)
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = \
 	*~ .*~ Makefile Makefile.in \
-	dwdst_cmdparser.cc dwdst_cmdparser.h \
-	dwdst_fstgen_cmdparser.cc dwdst_fstgen_cmdparser.h \
-	dwdst_pargen_cmdparser.cc dwdst_pargen_cmdparser.h \
-	dwdspp_cmdparser.cc dwdspp_cmdparser.h
+	*_cmdparser.cc *_cmdparser.h \
+	*.pod *.man *.1 *.html *.txt *.tex
 
 ##-----------------------------------------------------------------------
 ## Variables: distribution
@@ -152,10 +189,10 @@ MAINTAINERCLEANFILES = \
 ## --- extra distribution files
 EXTRA_DIST = \
 	dwdst.sym \
-	dwdst_cmdparser.cc dwdst_cmdparser.h \
-	dwdst_fstgen_cmdparser.cc dwdst_fstgen_cmdparser.h \
-	dwdst_pargen_cmdparser.cc dwdst_pargen_cmdparser.h \
-	dwdspp_cmdparser.cc dwdspp_cmdparser.h
+	dwdst.gog \
+	dwdst-fstgen.gog \
+	dwdst-pargen.gog \
+	dwdspp.gog
 
 ## --- recursion subdirectories for 'make dist'
 #DIST_SUBDIRS = $(SUBDIRS)

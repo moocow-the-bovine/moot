@@ -16,7 +16,7 @@
 # include <config.h>
 #endif
 
-#include "dwdst_pargen_cmdparser.h"
+#include "dwdst-pargen_cmdparser.h"
 #include "cmdutil.h"
 
 using namespace std;

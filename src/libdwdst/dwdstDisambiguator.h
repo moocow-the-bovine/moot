@@ -20,11 +20,6 @@
 #include <FSMSymSpec.h>
 #include <FSM.h>
 
-#ifdef HAVE_CONFIG_H
-/*# include "nopackage.h"*/
-# include <dwdstConfig.h>
-#endif
-
 #include "dwdstTypes.h"
 #include "dwdstParamCompiler.h"
 

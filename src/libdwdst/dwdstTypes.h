@@ -17,16 +17,9 @@
 #include <set>
 //#include <pair>
 
-#include "cleanConfig.h"
 
 #include <FSM.h>
 #include <FSMSymSpec.h>
-
-#ifdef HAVE_CONFIG_H
-/*# include "nopackage.h"*/
-# include <dwdstConfig.h>
-#endif
-
 
 /** Whether to load symspecs in AT&T-compatibility mode */
 #define DWDST_SYM_ATT_COMPAT true

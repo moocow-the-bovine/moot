@@ -5,6 +5,10 @@
  *   + PoS tagger for DWDS project : the guts
  *--------------------------------------------------------------------------*/
 
+#ifdef HAVE_CONFIG_H
+# include <dwdstConfig.h>
+#endif
+
 #include <stdio.h>
 #include <stdarg.h>
 

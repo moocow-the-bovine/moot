@@ -5,6 +5,10 @@
  *   + Trainer for KDWDS PoS-tagger: the guts
  *--------------------------------------------------------------------------*/
 
+#ifdef HAVE_CONFIG_H
+# include <dwdstConfig.h>
+#endif
+
 #include <stdio.h>
 #include <errno.h>
 

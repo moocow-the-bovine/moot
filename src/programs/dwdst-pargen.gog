@@ -1,0 +1,198 @@
+# -*- Mode: Shell-Script -*-
+#
+# Getopt::Gen specification for dwdst-pargen
+#-----------------------------------------------------------------------------
+program "dwdst-pargen"
+#program_version "0.01-alpha"
+
+purpose	"Parameter-file generator for use with dwdst."
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details "
+'dwdst-pargen' generates N-gram parameter files from
+raw (untagged) Brill-format input text files, using the 'libdwdst'
+PoS tagging library.  It is intended to be used in the
+process of generating a disambiguator for the 'dwdst'
+program.
+
+B<Warning>:
+The author considers this program to be quirky alpha-state software.
+"
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+argument "INPUT(s)" "Input files / file-lists / words." \
+    details="See the '--list' and '--words' options."
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+#group "Basic Options"
+int "verbose" v "Verbosity level." \
+    arg="LEVEL" \
+    default="1" \
+    details="Be more or less verbose.  Recognized values are in the range 0..2."
+
+flag  "words"  w  "INPUTs are input tokens, not filenames." \
+    details="Useful for testing."
+
+flag  "list"   l  "INPUTs are file-lists, not filenames." \
+    details="Useful for large batch-processing jobs."
+
+string "output"	o "Specify output file (default=stdout)." \
+    arg="FILE" \
+    default="-"
+
+
+#---------------------------------------------------
+# Output format options
+#---------------------------------------------------
+group "Output Format Options"
+
+flag "avm"       a "Produce AVM ('vector') output." \
+    details="Ambiguous-mode only"
+
+flag "numeric"   n "Produce numeric output." \
+    detilas="Useful for further automated processing."
+
+flag "tags-only" t "Do not output morphological features." \
+    details="This results in much smaller output files."
+
+
+#---------------------------------------------------
+# Morphology Options
+#---------------------------------------------------
+group "Morphology Options"
+
+string "symbols" s "Specify morphological symbols file." \
+    arg="FILE" \
+    default="dwdst.sym" \
+    envdefault="DWDST_SYMBOLS" \
+    details="
+This symbols file will be used to analyze input-tokens and for
+de-compilation of the morphological analyses into strings.
+"
+
+string "morph" m "Specify morphological transducer." \
+    arg="FILE" \
+    default="dwdst.fst" \
+    envdefault="DWDST_MORPH" \
+    details="
+This file should contain a finite-state transducer to be
+used for morphological analysis.
+"
+
+#---------------------------------------------------
+# Generation Options
+#---------------------------------------------------
+int   "kgram-max"   k  "Maximal size of k-gram window." \
+    arg="MAXLEN" \
+    default="2"  \
+    details="
+Complexity grows exponentially with respect to this value.
+You have been warned.
+
+This option may disappear in future releases.
+"
+
+string "eos-string"  e   "Specify end-of-sentence marker." \
+    arg="STRING" \
+    default="EOS" \
+    details="
+More properly a 'begging-of-sentence' marker, this pseudo-tag
+occurs in the generated parameter files as a placeholder for
+unfilled positions in the k-gram window, which is cleared
+on each end-of-sentence recognized in the input file.
+
+This option may disappear in future releases.
+"
+
+string  "unknown-fsa"  u "Specify unknown-analysis input FSA file." \
+    arg="FILE" \
+    default="dwdst-unknown.fst" \
+    details="
+This FSA is used as the default analysis for tokens unknown
+to the morphological analysis FST (see the '--morph' option).
+
+This option may disappear in future releases.
+"
+
+#option  "word-separator" W      "Use STRING as the word-separator"          string default="\t"         no
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+addenda {
+
+=head2 Parameter Generation from Untagged Text
+
+With dwdst-pargen, it is possible to generate n-gram parameter
+files from untagged input files.  In the future, dwdst-pargen
+may understand pre-tagged training-corpora as well: currently,
+it does not (use something like 'tnt-para -v' instead).
+
+Parameter generation from unknown text relies on the output
+of the morphological analyzer: each token "w" in the input file
+is processed by the morphology FST, and the resulting analysis-FSA
+"MA_w" is decomposed into a set of analysis-strings
+"SA_w" = {"a_w,1",...,"a_w,N"}, where
+each "a_w,i" represents the symbols along a complete path thouth "MA_w".
+
+Thus, a k-gram window (for some k>=1) is a list of analysis-sets
+"LoS" = E<lt> "SA_w_1",...,"SA_w_k" E<gt>, rather than the more conventional
+sequence of tags E<lt> "t_1",..., "t_k" E<gt>.
+
+Just as conventional
+algorithms increment the n-gram count for a tag-window
+E<lt> "t_1",..., "t_k" E<gt> by 1 each time that window is encountered
+in the training corpus, so does dwdst-pargen increment the B<total>
+count for an analysis-set window E<lt> "SA_w_1",...,"SA_w_k" E<gt>
+by 1 each time this window is encountered.  This is done by
+first 'multiplying out' the analysis-set window into a set-of-lists
+
+ "SoL" = { E<lt> "t_w_1,1" ,..., "t_w_k,1" E<gt>,
+           ...,
+           E<lt> "t_w_1,n" ,..., "t_w_k,m" E<gt> }
+
+of all possible paths through the list-of-sets "LoS".  Since there are
+"n_paths" = |"SA_w_1"| * |"SA_w_2"| * ... * |"SA_w_k"|
+possible paths through "LoS", |"SoL"| = "n_paths", assuming none
+of the "t_w_i,j" is an epsilon-analysis.  To 'count' the
+occurrence of the transformed n-gram window "SoL", 'dwdst-pargen'
+increments the stored count-value for each grounded
+sequence in "SoL" by 1 / |"SoL"|.
+
+This method reduces to the conventional method when tag-assignment
+is univocal, but may prove useful for "bootstrapping"
+parameter-assignments from (large quantities of) untagged text.
+
+}
+
+#-----------------------------------------------------------------------------
+# Bugs
+#-----------------------------------------------------------------------------
+bugs "
+
+Too numerous to mention.
+
+"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+acknowledge {
+
+This package was developed as part of the DWDS/Collocations project
+('Kollokationen im digitalen W"orterbuch der deutschen Sprache'
+= 'collocations in the digital dictionary of the German language') at the
+Berlin-Brandenburgische Akademie der Wissenschaften.
+For details on the DWDS project, visit: http://www.dwds.de.
+
+}
+
+seealso "L<dwdspp>, L<dwdst>, L<dwdst-fstgen>"
