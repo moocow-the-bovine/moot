@@ -46,6 +46,7 @@ void memprompt(const char *label="none") {
 }
 
 
+size_t dotest_rss = 0;
 size_t memrss(void)
 {
   pid_t mypid = getpid();
@@ -74,11 +75,15 @@ size_t memrss(void)
   //-- cleanup
   if (line) free(line);
   fclose(statfile);
+  dotest_rss = rss;
   return rss;
 }
 
 void showmem(const char *label="none") {
-  fprintf(stderr, "-> rss(label=\"%s\")=%u\n", label, memrss());
+  size_t lastrss = dotest_rss;
+  size_t newrss  = memrss();
+  fprintf(stderr, "-> rss(label=\"%s\")=%u [last=%u ; diff=%u]\n",
+	  label, newrss, lastrss, newrss-lastrss);
 }
 
 #endif // DOTEST_H
