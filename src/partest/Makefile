@@ -19,8 +19,14 @@ all:
 	@echo "You must specify either filenames or one of the"
 	@echo "following variable/target combinations:"
 	@echo ""
+	@echo " Common Variables:"
+	@echo "  sym=SYMFILE"
+	@echo "  morph=MORPHFST"
+	@echo ""
+	@echo " Common Targets:"
+	@echo "  re=REGEX (re|re-ps|re-gv)"
 	@echo "  utags=TAGLIST ufst"
-	@echo "  dfst=DISAMBIG_FST [par=PARFILE] [atags=ALLTAGS] dfst"
+	@echo "  dfsa=DISAMBIGFSA [par=PARFILE] [atags=ALLTAGS] (dfsa|dfsa-ps|dfsa-gv)"
 	@echo "-----------------------------------------------------"
 
 #-----------------------------------------------------------------------
@@ -38,8 +44,10 @@ DWDSPP = ../programs/dwdspp
 # doc tagging
 #-----------------------------------------------------------------------
 DWDST    = ../programs/dwdst
-sym     ?= dwdst.sym
-morph   ?= dwdst.fst
+#sym     ?= dwdst.sym
+#morph   ?= dwdst.fst
+sym     ?= test.sym
+morph   ?= test.fst
 
 .pp.tag:
 	$(DWDST) --symbols=$(sym) --morph=$(morph) $< -o $@
@@ -87,18 +95,22 @@ $(ufst): $(FSTGEN) $(sym) $(utags)
 	  -F $@
 
 #-----------------------------------------------------------------------
-# disambig-fst generation
+# disambig-fsa generation
 #-----------------------------------------------------------------------
-dfst  ?= dwdst-disambig.fst
+dfsa  ?= dwdst-disambig.fsa
+dfst   = dfsa
 atags ?= /dev/null
-par   ?= $(dfst:.fst=.par)
+par   ?= $(dfsa:.fsa=.par)
 
-.PHONY: disambig dfst
+.PHONY: disambig dfst dfsa
 
-disambig: $(dfst)
-dfst: $(dfst)
+disambig: $(dfsa)
+dfst: $(dfsa)
+dfsa: $(dfsa)
+dfsa-ps: $(dfsa:.fsa=.ps)
+dfsa-gv: dfsa-ps ; gv $(dfsa:.fsa=.ps) &
 
-$(dfst): $(FSTGEN) $(sym) $(utags) $(atags) $(par)
+$(dfsa): $(FSTGEN) $(sym) $(utags) $(atags) $(par)
 	$(FSTGEN) --disambig \
 	  --symbols=$(sym) \
 	  --open-class-list=$(utags) \
@@ -123,10 +135,13 @@ re      ?= [<epsilon>]
 refile  ?= re.fst
 arefile ?= are.afst
 
-gvre: $(refile:.fst=.ps); gv $(refile:.fst=.ps)
+
 re: $(refile)
-$(refile): ../FSMcompre $(SYMFILE)
-	../FSMcompre $(COMPAT_FLAGS) -s $(SYMFILE) $(reflags) -F $@ "$(re)"
+re-ps: $(refile:.fst=.ps)
+re-gv: $(refile:.fst=.ps); gv $(refile:.fst=.ps)
+
+$(refile):  $(SYMFILE)
+	FSMcompre $(COMPAT_FLAGS) -s $(SYMFILE) $(reflags) -F $@ "$(re)"
 
 areflags =
 
