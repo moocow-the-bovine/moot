@@ -4,6 +4,7 @@
 int main (int argc, char **argv) {
   dwdstNgrams ngrams;
   FILE *infile = stdin;
+  bool compact = false;
 
   if (argc > 1) {
     infile = fopen(argv[1], "r");
@@ -31,7 +32,7 @@ int main (int argc, char **argv) {
 
 
 
-  if (!ngrams.save(stdout)) {
+  if (!ngrams.save(stdout, "STDOUT", compact)) {
     fprintf(stderr, "save failed!\n");
     exit(2);
   }

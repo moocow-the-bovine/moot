@@ -47,6 +47,11 @@ dwdstNgrams *dwdstNgramsCompiler::parse_ngrams()
     yyerror("Cannot compile to a NULL ngrams object!");
     return NULL;
   }
+
+  // cleanup any stale ngrams
+  prevngram.clear();
+  curngram.clear();
+
   // actual parsing
   if (yyparse() != 0) return NULL;
   return ngrams;

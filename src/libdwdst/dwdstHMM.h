@@ -36,27 +36,67 @@ public:
   typedef dwdstEnumID TokID;
 
   /** Typedef for token-id lookup table */
-  typedef dwdstEnum<dwdstTokString, hash<dwdstTokString>, equal_to<dwdstTokString> > TokIDTable;
+  typedef dwdstEnum<dwdstTokString,
+		    hash<dwdstTokString>,
+		    equal_to<dwdstTokString> >
+          TokIDTable;
 
   /** Typedef for tag-id lookup table */
-  typedef dwdstEnum<dwdstTagString, hash<dwdstTagString>, equal_to<dwdstTagString> > TagIDTable;
+  typedef dwdstEnum<dwdstTagString,
+		    hash<dwdstTagString>,
+		    equal_to<dwdstTagString> >
+          TagIDTable;
+
+  /** Type for an identifier-pair.  Instances are keys of probability lookup tables */
+  typedef pair<dwdstEnumID,dwdstEnumID> IDPair;
+
+  /** Hash-function struct for IDPair, needed by hash_map */
+  struct IDPairHashFcn {
+  public:
+    inline size_t operator()(const IDPair &x) const
+    {
+      return
+	//(x.first<<5)-x.first + x.second;
+	5*x.first + x.second;
+    };
+  };
+
+  /** Equality struct for IDPair, needed by hash_map */
+  struct IDPairEqualFcn {
+  public:
+    inline size_t operator()(const IDPair &x, const IDPair &y) const
+    {
+      return x.first == y.first && x.second == y.second;
+    };
+  };
+
+  /** Key type for lexical probability table: IDPair(tokid,tagid) */
+  typedef IDPair LexProbKey;
+
+  /** Key type for bigram probability table: IDPair(tagid,prevtagid) */
+  typedef IDPair BigramProbKey;
 
   /**
-   * Type for a single lexical probability entry (subtable), numeric form.
-   * Keys are tag-ids, values are counts.
-   * Also used for unigram probabilities.
+   * Type for unigram probability table.
    */
   typedef hash_map<TagID,ProbT> TagProbTable;
 
   /**
-   * Type for (TokID->(TagID->p(TokID|TagID))) lookup table.
+   * Type for (pair(id,id)->probability) lookup table.
    */
-  typedef hash_map<TokID,TagProbTable *> LexProbTable;
+  typedef hash_map<IDPair,ProbT,IDPairHashFcn,IDPairEqualFcn> IDPairProbTable;
 
   /**
-   * Type for bigram (TagID->(prevTagID->p(TagID|PrevTagID))) lookup table
+   * Type for lexical frequency lookup table:
+   * (IDPair(TokID,TagID)->p(TokID|TagID))
    */
-  typedef hash_map<TagID,TagProbTable *> BigramProbTable;
+  typedef IDPairProbTable LexProbTable;
+
+  /**
+   * Type for bigram probability lookup table:
+   * (IDPair(TagID,PrevTagID)->p(TagID|PrevTagID)))
+   */
+  typedef IDPairProbTable BigramProbTable;
 
 public:
   // ------ public data: ID-lookup tables
@@ -105,23 +145,31 @@ public:
 
   //------ public methods: mid-level: lexical probability lookup
   /**
-   * Looks up and returns lexical probability: p(tokid|tagid).
+   * Looks up and returns lexical probability: p(tokid|tagid)
+   * given IDPair(tokid,tagid).
    */
-  inline const ProbT wordp(const TokID tokid, const TagID tagid)
+  inline const ProbT wordp(const IDPair tok_tag_idpair) const
   {
-    LexProbTable::const_iterator wi = lexprobs.find(tokid);
-    if (wi == lexprobs.end() || wi->second == NULL) return 0;
-    TagProbTable::const_iterator ti = wi->second->find(tagid);
-    if (ti == wi->second->end()) return 0;
-    return ti->second;
+    LexProbTable::const_iterator ti = lexprobs.find(tok_tag_idpair);
+    return ti == lexprobs.end() ? 0 : ti->second;
   };
 
   /**
-   * Looks up and returns lexical probability: p(token|tag), string-version.
+   * Looks up and returns lexical probability: p(tokid|tagid)
+   * given tokid, tagid.
    */
-  inline const ProbT wordp(const dwdstTokString token, const dwdstTagString tag)
+  inline const ProbT wordp(const TokID tokid, const TagID tagid) const
   {
-    return wordp(tokids.name2id(token), tagids.name2id(tag));
+    return wordp(IDPair(tokid,tagid));
+  };
+
+  /**
+   * Looks up and returns lexical probability: p(token|tag)
+   * given token, tag.
+   */
+  inline const ProbT wordp(const dwdstTokString token, const dwdstTagString tag) const
+  {
+    return wordp(IDPair(tokids.name2id(token), tagids.name2id(tag)));
   };
 
 
@@ -129,11 +177,10 @@ public:
   /**
    * Looks up and returns unigram probability: p(tagid).
    */
-  inline const ProbT tagp(const TagID tagid)
+  inline const ProbT tagp(const TagID tagid) const
   {
     TagProbTable::const_iterator ti = ngprobs1.find(tagid);
-    if (ti == ngprobs1.end()) return 0;
-    return ti->second;
+    return ti == ngprobs1.end() ? 0 : ti->second;
   };
 
   /**
@@ -147,15 +194,22 @@ public:
 
   //------ public methods: mid-level: bigram probability lookup
   /**
-   * Looks up and returns bigram probability: p(tagid|prevtagid).
+   * Looks up and returns bigram probability: p(tagid|prevtagid),
+   * given IDPair(tagid,prevtagid).
+   */
+  inline const ProbT tagp(const IDPair tag_prevtag_idpair) const
+  {
+    BigramProbTable::const_iterator ti = ngprobs2.find(tag_prevtag_idpair);
+    return ti == ngprobs2.end() ? 0 : ti->second;
+  };
+
+  /**
+   * Looks up and returns bigram probability: p(tagid|prevtagid),
+   * given tagid, prevtagid.
    */
   inline const ProbT tagp(const TagID tagid, const TagID prevtagid)
   {
-    BigramProbTable::const_iterator ti = ngprobs2.find(tagid);
-    if (ti == ngprobs2.end() || ti->second == NULL) return 0;
-    TagProbTable::const_iterator pti = ti->second->find(prevtagid);
-    if (pti == ti->second->end()) return 0;
-    return pti->second;
+    return tagp(IDPair(tagid,prevtagid));
   };
 
   /**
@@ -163,8 +217,12 @@ public:
    */
   inline const ProbT tagp(const dwdstTagString tag, const dwdstTagString prevtag)
   {
-    return tagp(tagids.name2id(tag), tagids.name2id(prevtag));
+    return tagp(IDPair(tagids.name2id(tag), tagids.name2id(prevtag)));
   };
+
+  //------ public methods: low-level: debugging
+  /** Debugging method: dump HMM contents to a text file. */
+  void txtdump(FILE *file);
 
 };
 

@@ -19,13 +19,6 @@
 
 void dwdstLexfreqs::clear(void)
 {
-  for (LexfreqStringTable::iterator ti = lftable.begin(); ti != lftable.end(); ti++) {
-    if (ti->second != NULL) {
-      ti->second->clear();
-      delete ti->second;
-      ti->second = NULL;
-    }
-  }
   lftable.clear();
   lftotals.clear();
 }
@@ -78,32 +71,30 @@ bool dwdstLexfreqs::save(char *filename)
 
 bool dwdstLexfreqs::save(FILE *file, char *filename)
 {
-  set<dwdstTokString> tokens;
+  set<LexfreqKey> keys;
 
-  //-- prepare sorted token-list
+  //-- prepare sorted key-list
   for (LexfreqStringTable::const_iterator lfti = lftable.begin(); lfti != lftable.end(); lfti++) {
-    tokens.insert(lfti->first);
+    keys.insert(lfti->first);
   }
 
-  //-- iterate through sorted tokens
-  set<dwdstTagString> tags;
-  LexfreqSubtable    *subt;
-  for (set<dwdstTokString>::const_iterator toki = tokens.begin(); toki != tokens.end(); toki++) {
-    //-- prepare sorted tag-list
-    tags.clear();
-    subt = lftable[*toki];
-    if (subt==NULL || subt->empty()) continue;
-    for (LexfreqSubtable::const_iterator sti = subt->begin(); sti != subt->end(); sti++) {
-      tags.insert(sti->first);
+  //-- iterate through sorted keys
+  dwdstTokString lasttok;
+  for (set<LexfreqKey>::const_iterator keyi = keys.begin(); keyi != keys.end(); keyi++) {
+    const dwdstTokString &curtok = keyi->first;
+    const dwdstTagString &curtag = keyi->second;
+
+    //-- do we have a new token?
+    if (keyi == keys.begin() || curtok != lasttok) {
+      if (keyi != keys.begin()) fputc('\n', file);
+      fprintf(file, "%s\t%g", curtok.c_str(), lookup(curtok));
+      lasttok = curtok;
     }
 
-    //-- finally, output
-    fprintf(file, "%s\t%g", toki->c_str(), lookup(*toki));
-    for (set<dwdstTagString>::const_iterator tagi = tags.begin(); tagi != tags.end(); tagi++) {
-      fprintf(file, "\t%s\t%g", tagi->c_str(), (*subt)[*tagi]);
-    }
-    fputc('\n', file);
+    //-- output tags
+    fprintf(file, "\t%s\t%g", curtag.c_str(), lookup(*keyi));
   }
+  fputc('\n', file);
 
   return 1;
 }

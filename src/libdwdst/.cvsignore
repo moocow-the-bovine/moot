@@ -37,6 +37,8 @@ dwdstAlphabetLexer.cc
 dwdstAlphabetLexer.h
 dwdstAlphabetParser.cc
 dwdstAlphabetParser.h
+
+gmon.out
 *.output
 stamp-h*
 config.h
@@ -48,3 +50,8 @@ README.txt
 configure
 graveyard
 
+negra.lex
+negra.123
+
+prof
+save

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "dwdstLexfreqs.h"
 
-int main (int argc, char **argv) {
+void churntest(int argc, char **argv) {
   dwdstLexfreqs lfreqs;
   FILE *infile = stdin;
 
@@ -18,6 +18,9 @@ int main (int argc, char **argv) {
     exit(1);
   }
 
+  //-- check buckets used
+  fprintf(stderr, "-- using %u buckets\n", lfreqs.lftable.bucket_count());
+
   //-- test lookup
   fprintf(stderr, "lookup(foo,NN)=%g\n", lfreqs.lookup("foo","NN"));
   fprintf(stderr, "lookup(bar,VVFIN)=%g\n", lfreqs.lookup("bar","VVFIN"));
@@ -28,6 +31,23 @@ int main (int argc, char **argv) {
     fprintf(stderr, "save failed!\n");
     exit(2);
   }
+
+  /*
+  fprintf(stderr, "clearing... (press return to continue) ");
+  char c;
+  c = fgetc(stdin);
+
+  lfreqs.clear();
+
+  fprintf(stderr, "cleared. (press return to continue)");
+  c = fgetc(stdin);
+  */
+}
+
+int main (int argc, char **argv) {
+
+  //for (int i = 0; i < 10; i++)
+  churntest(argc, argv);
 
   return 0;
 }

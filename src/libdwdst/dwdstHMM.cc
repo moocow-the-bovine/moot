@@ -22,24 +22,8 @@ void dwdstHMM::clear(void)
 {
   tokids.clear();
   tagids.clear();
-  ngprobs1.clear();
-
-  for (LexProbTable::iterator lpi = lexprobs.begin(); lpi != lexprobs.end(); lpi++) {
-    if (lpi->second != NULL) {
-      lpi->second->clear();
-      delete lpi->second;
-      lpi->second = NULL;
-    }
-  }
   lexprobs.clear();
-
-  for (BigramProbTable::iterator bgi = ngprobs2.begin(); bgi != ngprobs2.end(); bgi++) {
-    if (bgi->second != NULL) {
-      bgi->second->clear();
-      delete bgi->second;
-      bgi->second = NULL;
-    }
-  }
+  ngprobs1.clear();
   ngprobs2.clear();
 }
 
@@ -51,77 +35,155 @@ bool dwdstHMM::compile(const dwdstLexfreqs &lexfreqs,
 		       const dwdstNgrams &ngrams,
 		       const dwdstLexfreqs::LexfreqCount unknownLexThreshhold)
 {
-  fprintf(stderr, "dwdstHMM::compile(): not yet implemented!\n");
+  //-- sanity check
+  if (ngrams.ugtotal == 0) {
+    fprintf(stderr, "dwdstHMM::compile(): Error bad unigram total in 'ngrams'!\n");
+    return 0;
+  }
 
-  dwdstLexfreqs::LexfreqCount unTotal;  //-- total "unknown" token count
+  TokID                       tokid;          //-- current token-ID
+  TagID                       tagid;          //-- current tag-ID
+  TagID                       ptagid;         //-- previous tag-ID (for bigrams)
+  dwdstNgrams::NgramString    ngtmp;          //-- temporary string-ngram (for lookup)
+  dwdstNgrams::NgramCount     ptTotal;        //-- previous tag-total (for bigrams)
+  dwdstLexfreqs::LexfreqCount unTotal = 0;    //-- total "unknown" token count
+  TagProbTable                untagcts;       //-- "unknown" tag counts
 
-  //-- prepare tokids
-  for (dwdstLexfreqs::LexfreqTotalTable::const_iterator lftoti = lexfreqs.lftotals.begin();
-       lftoti != lexfreqs.lftotals.end();
-       lftoti++)
+  //-- compile lexical probabilities : for all lexical keys (lfti)
+  for (dwdstLexfreqs::LexfreqStringTable::const_iterator lfti = lexfreqs.lftable.begin();
+       lfti != lexfreqs.lftable.end();
+       lfti++)
     {
-      if (lftoti->second > unknownLexThreshhold) {
-	//-- it's a kosher token
-	if (!tokids.nameExists(lftoti->first))
-	  tokids.insert(lftoti->first);
+      const dwdstTokString &tokstr = lfti->first.first;
+      const dwdstTagString &tagstr = lfti->first.second;
+      const dwdstLexfreqs::LexfreqCount toktotal = lexfreqs.lookup(tokstr);
+
+      //-- always get or assign a tag-id
+      tagid = tagids.nameExists(tagstr)
+	? tagids.name2id(tagstr)
+	: tagids.insert(tagstr);
+
+      //-- sanity check
+      if (toktotal == 0) continue;
+
+      //-- unknown threshhold check
+      if (toktotal > unknownLexThreshhold) {
+	//-- it's a kosher token : get or assign token-ID
+	tokid = tokids.nameExists(tokstr)
+	  ? tokids.name2id(tokstr)
+	  : tokids.insert(tokstr);
+
+	//-- ... and compute lexical probability
+	lexprobs[IDPair(tokid,tagid)] = lfti->second / toktotal;
       }
       else {
-	//-- otherwise, it's below the unknown threshhold, so we can skip assigning it an id
-	unTotal += lftoti->second;
+	//-- otherwise, it's below the unknown threshhold, so we assign it the constant "unknown" ID
+	tokid = 0;
+
+	//-- get or assign tag-ID
+	tagid = tagids.nameExists(tagstr)
+	  ? tagids.name2id(tagstr)
+	  : tagids.insert(tagstr);
+	    
+	//-- ... and add to "unknown" counts
+	unTotal += lfti->second;
+	if (untagcts.find(tagid) == untagcts.end()) {
+	  untagcts[tagid] = lfti->second;
+	} else {
+	  untagcts[tagid] += lfti->second;
+	}
       }
-      
-      //-- get tag ids from Lexfreqs, too...
-      dwdstLexfreqs::LexfreqSubtable *subt = lexfreqs.lftable[lftoti->first];
-      if (subt != NULL) {
-	for (dwdstLexfreqs::LexfreqSubtable::const_iterator subti = subt->begin();
-	     subti != subt->end();
-	     subti++)
-	  {
-	    if (!tagids.nameExists(subti->first))
-	      tagids.insert(subti->first);
-	  }
-      }
+
     }
-  
-  //-- get tag-ids from ngrams
+
+  //-- Compute "unknown" lexical probabilities
+  if (unTotal != 0) {
+    IDPair unkey(0,0);
+    for (TagProbTable::iterator upi = untagcts.begin(); upi != untagcts.end(); upi++) {
+      unkey.second = upi->first;
+      lexprobs[unkey] = upi->second / unTotal;
+    }
+  }
+
+  //-- Compute ngram probabilites
   for (dwdstNgrams::NgramStringTable::const_iterator ngti = ngrams.ngtable.begin();
        ngti != ngrams.ngtable.end();
        ngti++)
     {
-      if (ngti.size() == 1) {
+      if (ngti->first.size() == 1) {
 	//-- congratulations, it's a unigram...
-	if (!tagids.nameExists(ngti->first))
-	  tagids.insert(ngti->first);
+	tagid = tagids.nameExists(ngti->first[0])
+	  ? tagids.name2id(ngti->first[0])
+	  : tagids.insert(ngti->first[0]);
+
+	//-- compute unigram probability
+	ngprobs1[tagid] = ngti->second / ngrams.ugtotal;
       }
-      //-- otherwise, skip it.
+      else if (ngti->first.size() == 2) {
+	//-- it's a bigram
+
+	//-- get or assign previous tag-id
+	ptagid = tagids.nameExists(ngti->first[0])
+	  ? tagids.name2id(ngti->first[0])
+	  : tagids.insert(ngti->first[0]);
+
+	//-- get or assign current tag-id
+	tagid  = tagids.nameExists(ngti->first[1])
+	  ? tagids.name2id(ngti->first[1])
+	  : tagids.insert(ngti->first[1]);
+
+	//-- get unigram count for previous tag
+	ngtmp.clear();
+	ngtmp.push_back(ngti->first[0]);
+	ptTotal = ngrams.lookup(ngtmp);
+	if (ptTotal == 0) continue;
+
+	//-- compute bigram probability
+	ngprobs2[IDPair(tagid,ptagid)] = ngti->second / ptTotal;
+      }
+      //-- Otherwise, it's neither unigram nor bigram: ignore it
     }
 
-  //-- compute lexical probabilities.
-  TokID tokid;
-  TagID tagid;
-  for (dwdstLexfreqs::LexfreqStringTable::const_iterator lfi = lexfreqs.lftable.begin();
-       lfi != lexfreqs.lftable.end();
-       lfi++)
-    {
-      if (lfi->second == NULL) continue; //-- skip empty subtables
+  return true;
+}
 
-      //--- ARGH. continue here!
+void dwdstHMM::txtdump(FILE *file)
+{
+  fprintf(file, "%% dwdstHMM text dump\n\n");
 
-      //-- ensure we have a subtable for this token
-      tokid = tokids.name2id(lfi->first);
-      if (lexprobs.find(tokid) == lexprobs.end() || lexprobs[tokid] == NULL)
-	lexprobs[tokid] = new TagProbTable();
+  fprintf(file, "%%-----------------------------------------------------\n");
+  fprintf(file, "%% Lexical Probabilities\n");
+  fprintf(file, "%% TokID(\"TokStr\")\tTagID(\"TagStr\")\tp(TokID|TagID)\n");
+  fprintf(file, "%%-----------------------------------------------------\n");
+  for (LexProbTable::const_iterator lpi = lexprobs.begin(); lpi != lexprobs.end(); lpi++) {
+    fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%g\n",
+	    lpi->first.first, tokids.id2name(lpi->first.first).c_str(),
+	    lpi->first.second, tagids.id2name(lpi->first.second).c_str(),
+	    lpi->second);
+  }
+  fprintf(file, "\n");
 
-      for (dwdstLexfreqs::LexfreqSubtable::const_iterator lfsi = lfi->second->begin();
-	   lfsi != lfi->second->end();
-	   lfsi++)
-	{
-	  tagid = tagids.name2id(lfsi->first);
-	  
-	}
-    }
+  fprintf(file, "%%-----------------------------------------------------\n");
+  fprintf(file, "%% Unigram Probabilities\n");
+  fprintf(file, "%% TagID(\"TagStr\")\tp(TagID)\n");
+  fprintf(file, "%%-----------------------------------------------------\n");
+  for (TagProbTable::const_iterator tpi = ngprobs1.begin(); tpi != ngprobs1.end(); tpi++) {
+    fprintf(file, "%u(\"%s\")\t%g\n",
+	    tpi->first, tagids.id2name(tpi->first).c_str(),
+	    tpi->second);
+  }
+  fprintf(file, "\n");
 
+  fprintf(file, "%%-----------------------------------------------------\n");
+  fprintf(file, "%% Bigram Probabilities\n");
+  fprintf(file, "%% PrevTagID(\"PrevTagStr\")\tTagID(\"TagStr\")\tp(TagID|PrevTagID)\n");
+  fprintf(file, "%%-----------------------------------------------------\n");
+  for (BigramProbTable::const_iterator bpi = ngprobs2.begin(); bpi != ngprobs2.end(); bpi++) {
+    fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%g\n",
+	    bpi->first.second, tagids.id2name(bpi->first.second).c_str(),
+	    bpi->first.first,  tagids.id2name(bpi->first.first).c_str(),
+	    bpi->second);
+  }
 
-
-  return false;
+  fprintf(file, "\n");
 }

@@ -86,8 +86,14 @@ public:
 
 
   //------ access
+  /** Return maximum id */
+  inline dwdstEnumID size(void) const
+  {
+    return ids2names.size();
+  };
+
   /** Lookup ID for name, returns 0 if name is unregistered. */
-  inline dwdstEnumID name2id(const NameType &name)
+  inline dwdstEnumID name2id(const NameType &name) const
   {
     Name2IdMap::const_iterator i = names2ids.find(name);
     return i == names2ids.end() ? 0 : i->second;
@@ -97,7 +103,7 @@ public:
    * Lookup name for id.  Returns the "unknown" name
    * if id is unregistered.
    */
-  inline NameType &id2name(const dwdstEnumID id)
+  inline const NameType &id2name(const dwdstEnumID id) const
   {
     return ids2names.size() <= id ? ids2names[0] : ids2names[id];
   };

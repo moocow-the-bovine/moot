@@ -242,7 +242,8 @@ MAINTAINERCLEANFILES = \
 	dwdstNgramsLexer.cc dwdstNgramsLexer.h \
 	dwdstNgramsParser.cc dwdstNgramsParser.h \
 	dwdstLexfreqsLexer.cc dwdstLexfreqsLexer.h \
-	dwdstLexfreqsParser.cc dwdstLexfreqsParser.h
+	dwdstLexfreqsParser.cc dwdstLexfreqsParser.h \
+	gmon.out
 
 ##-----------------------------------------------------------------------
 ## Variables: distribution

@@ -38,7 +38,8 @@ public:
 	     xi++)
 	  {
 	    for (dwdstTagString::const_iterator xii = xi->begin();
-		 *xii != '\0' && xii != xi->end();
+		 // (*xii) != '\0' &&
+		 xii != xi->end();
 		 xii++)
 	      {
 		hv += (hv<<5)-hv + *xii;
@@ -73,9 +74,20 @@ public:
 public:
   //------ public methods
   /** Default constructor */
-  dwdstNgrams() {};
+  dwdstNgrams(void) : ugtotal(0) {};
+
+  /** Default destructor */
+  ~dwdstNgrams() {
+    clear(); 
+  };
 
   //------ public methods: manipulation
+
+  /** Clear the ngrams object */
+  void clear(void) {
+    ngtable.clear();
+    ugtotal = 0;
+  };
 
   /** Add 'count' to the current count for 'ngram', returns new count */
   inline NgramCount add_count(const NgramString &ngram, const NgramCount count)
@@ -93,7 +105,7 @@ public:
   //------ public methods: lookup
 
   /** Returns current count for ngram, returns 0 if unknown */
-  inline const NgramCount lookup(const NgramString &ngram)
+  inline const NgramCount lookup(const NgramString &ngram) const
   {
     NgramStringTable::const_iterator ngti = ngtable.find(ngram);
     return ngti == ngtable.end() ? 0 : ngti->second;
@@ -109,10 +121,10 @@ public:
   bool load(FILE *file, char *filename = NULL);
 
   /** Save n-grams to a TnT-style paramater file */
-  bool save(char *filename);
+  bool save(char *filename, bool compact=false);
 
   /** Save n-grams to a TnT-style paramater file (stream version) */
-  bool save(FILE *file, char *filename = NULL);
+  bool save(FILE *file, char *filename = NULL, bool compact=false);
 };
 
 

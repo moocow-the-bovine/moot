@@ -79,13 +79,19 @@ typedef struct {
   public: \
    /* -- public instance members go here */ \
    /** a pointer to the ngram-parameter object to hold the data we're parsing */ \
-   dwdstNgrams          *ngrams; \
-   /* to keep track of all possible tags we've parsed (optional). */ \
-   set<dwdstTagString>  *alltags; \
+   dwdstNgrams              *ngrams; \
+   /** to keep track of all possible tags we've parsed (optional). */ \
+   set<dwdstTagString>      *alltags; \
+   /** previous  ngram parsed (for brief file format */ \
+   dwdstNgrams::NgramString  prevngram; \
+   /** current ngram being parsed */ \
+   dwdstNgrams::NgramString  curngram; \
   private: \
    /* private instance members go here */ \
   public: \
    /* public methods */ \
+   /** virtual destructor to shut up gcc */\
+   virtual ~dwdstNgramsParser(void) {};\
    /* report warnings */\
    virtual void yywarn(const char *msg) { \
       yycarp("dwdstNgramsParser: Warning: %s", msg);\
@@ -94,8 +100,9 @@ typedef struct {
    virtual void yycarp(char *fmt, ...);
    
 
-%define CONSTRUCTOR_INIT : ngrams(NULL), alltags(NULL)
-
+%define CONSTRUCTOR_INIT : \
+   ngrams(NULL), \
+   alltags(NULL)
 
 
 /*------------------------------------------------------------
@@ -119,8 +126,8 @@ typedef struct {
 %token <tagstr>  TAG
 %token <count>   COUNT
 %type  <tagstr>  tag
-%type  <count>   count    tab newline param params
-%type  <ngram>   ngram
+%type  <ngram>   ngram ngtag
+%type  <count>   count        tab newline param params
 
 // -- Operator precedence and associativity
 //%left TAB       // -- ngram-construction operator
@@ -138,30 +145,49 @@ params:		/* empty */ { $$ = 0; }
 param:		ngram tab count newline
 		{
 		  // -- single-parameter: add the parsed parameter to our table
-		  ngrams->add_count(*$1, $3);
-		  // -- and delete any components
-		  $1->clear();
-                  delete $1;
+		  ngrams->add_count(curngram, $3);
+                  // -- remember current ngram
+                  prevngram.swap(curngram);
+                  //prevngram = curngram;
+		  // -- ... and then clear it
+		  curngram.clear();
 		  $$ = 0;
 		}
 	;
 
-ngram:		tag
+ngram:		ngtag
 		{
-		    // -- single tag: make a new vector
-		    $$ = new dwdstNgrams::NgramString();
-                    $$->clear();
-                    $$->push_back(*$1);
-                    delete $1;
-		}
-	|	ngram tab tag
-		{
-		    // -- tab-separated tags: add to the 'current' ngram
-                    $1->push_back(*$3);
-                    delete $3;
 		    $$ = $1;
 		}
+	|	ngram tab ngtag
+		{
+		    // -- tab-separated tags: add to the current ngram (implicit in ngtag rule)
+		    $$ = $3;
+		}
 	;
+
+
+ngtag:		/* empty */
+		{
+		    // -- empty: add corresponding tag from previous ngram to current ngram
+		    if (prevngram.empty()) {
+			yyerror("no corresponding tag in previous n-gram.");
+		    }
+                    //dwdstTagString s = prevngram.front();
+		    curngram.push_back(prevngram.front());
+                    prevngram.pop_front();
+                    $$ = &curngram;
+		}
+	|	tag
+		{
+		    // -- single tag: add it to the current ngram
+		    curngram.push_back(*$1);
+                    delete $1;
+                    // -- pop previous ngram for purity
+                    if (!prevngram.empty()) prevngram.pop_front();
+                    $$ = &curngram;                  
+		}
+        ;
 
 tag:		TAG
 		{
