@@ -216,7 +216,7 @@ if test "$enable_debug" == "yes" ; then
 else
   AC_MSG_RESULT(no)
   #FSM_OFLAGS="-O2"
-  FSM_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops"
+  FSM_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
 fi
 
 dnl

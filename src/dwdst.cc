@@ -133,6 +133,7 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
     switch (tok) {
     case EOS:
       /* do something spiffy */
+      fputs("<<EOS>>\n\n", out);
       break;
 
     case TOKEN:
@@ -146,7 +147,9 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
       
       fprintf(out, "%s: %d Analyse(n)\n", lexer.yytext, results.size());
       for (ri = results.begin(); ri != results.end(); ri++) {
-	fprintf(out, "\t((%s)<%f>)\n", ri->istr.c_str(), ri->weight);
+	fputs("\t", out);
+	fputs(ri->istr.c_str(), out);
+	fprintf(out, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
       }
       fputc('\n',out);
       

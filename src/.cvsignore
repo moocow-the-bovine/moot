@@ -1,5 +1,9 @@
 dwdst
 dwdspp
+UnitMABBAW.cpp
+*.pp
+*.out
+*.tmp
 *~
 .*~
 *.o
