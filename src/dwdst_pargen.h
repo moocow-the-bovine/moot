@@ -40,7 +40,7 @@ public:
   int kmax;
   StringToCountTable    strings2counts;
   FSMSymbolStringQueue  stringq;
-  set<FSMSymbolString>  tagset;
+    //set<FSMSymbolString>  tagset;
 
 private:
   StringToCountTable::iterator sci;

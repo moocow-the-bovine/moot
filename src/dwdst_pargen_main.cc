@@ -118,7 +118,7 @@ void GetMyOptions(int argc, char **argv)
 
   // -- report
   if (args.verbose_arg > 0) {
-    fprintf(stderr, "%s: Initialization complete\n\n", PROGNAME);
+    fprintf(stderr, "%s: Initialization complete.\n\n", PROGNAME);
   }
 }
   
@@ -192,8 +192,12 @@ int main (int argc, char **argv)
       // -- print summary
       fprintf(stderr, "\n-----------------------------------------------------\n");
       fprintf(stderr, "%s Summary:\n", PROGNAME);
-      fprintf(stderr, "  + Files processed  : %d\n", nfiles);
-      fprintf(stderr, "  + Tokens processed : %d\n", pargen.ntokens);
+      fprintf(stderr, "  + kmax                       : %d\n", pargen.kmax);
+      fprintf(stderr, "  + tags-only                  : %s\n", pargen.want_features ? "no" : "yes");
+      fprintf(stderr, "  + Files processed            : %d\n", nfiles);
+      fprintf(stderr, "  + Tokens processed           : %d\n", pargen.ntokens);
+      fprintf(stderr, "  + Total number of tags       : %d\n", pargen.alltags.size());
+      fprintf(stderr, "  + Total number of j<=%d-grams : %d\n", pargen.kmax, pargen.strings2counts.size());
       fprintf(stderr, "-----------------------------------------------------\n");
   }
 
