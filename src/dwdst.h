@@ -36,6 +36,7 @@ public:
   dwdst_lexer lexer;
 
   string eos;
+  string wdsep;
 
   // -- flags
   bool want_avm;

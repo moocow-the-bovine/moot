@@ -80,6 +80,7 @@ void GetMyOptions(int argc, char **argv)
   // -- trainer object setup : flags
   //dwdst.want_avm = args.avm_given;
   dwdstt.want_avm = false;
+  dwdstt.want_features = !args.tags_only_given;
   dwdstt.verbose  = (args.verbose_arg > 0);
 
   // -- trainer object setup : symbols
@@ -148,7 +149,6 @@ void GetMyOptions(int argc, char **argv)
     exit(1);
   }
 
-
   // -- report
   if (args.verbose_arg > 0) {
     fprintf(stderr, "%s: Initialization complete\n\n", PROGNAME);
@@ -169,10 +169,11 @@ int main (int argc, char **argv)
   // -- get init-stop time = analysis-start time
   //if (args.verbose_arg > 0) gettimeofday(&astarted, NULL);
 
-
   // -- the guts
   if (args.words_given) {
-    fprintf(out.file, "# %s: Analyzing command-line tokens\n\n", PROGNAME);
+    if (args.verbose_arg > 0) {
+      fprintf(stderr, "%s: Analyzing command-line tokens\n\n", PROGNAME);
+    }
     dwdstt.train_from_strings(args.inputs_num, args.inputs, out.file);
   } else {
     // -- big loop
@@ -184,17 +185,26 @@ int main (int argc, char **argv)
 	  fflush(stderr);
 	}
       }
-      fprintf(out.file, "\n# %s: File: %s\n\n", PROGNAME, churner.in.name);
+#    ifdef DWDSTT_DEBUG
+      fprintf(out.file, "\n# %s (DEBUG): File: %s\n\n", PROGNAME, churner.in.name);
+#    endif
       
       dwdstt.train_from_stream(churner.in.file, out.file);
-      
+
       if (args.verbose_arg > 1) {
 	fprintf(stderr," done.\n");
 	fflush(stderr);
       }
     }
-    out.close();
   }
+
+#ifdef DWDSTT_DEBUG
+  fprintf(out.file, "\n");
+#endif
+
+  // -- paramater file
+  dwdstt.write_param_file(out.file);
+  out.close();
 
   // -- summary
   if (args.verbose_arg > 0) {

@@ -9,6 +9,9 @@
 #ifndef _DWDSTT_H_
 #define _DWDSTT_H_
 
+#define DWDSTT_DEBUG
+//#undef DWDSTT_DEBUG
+
 #ifdef HAVE_CONFIG_H
 # include "nopackage.h"
 # include <config.h>
@@ -40,8 +43,8 @@ public:
   StringQueue          stringq;
   FSM                  *ufsa;
   set<FSMSymbolString> tagset;
-  
 private:
+  StringToCountTable::iterator sci;
 
   // -- methods
 public:
@@ -53,10 +56,12 @@ public:
   set<FSMSymbolString> get_pos_tags(const char *filename=NULL);
   FSM *generate_unknown_fsa();
 
-  // -- public methods: training
+  // -- public methods: training: output = DEBUG
   bool train_from_strings(int argc, char **argv, FILE *out=stdout);
   bool train_from_stream(FILE *in=stdin, FILE *out=stdout);
 
+  // -- public methods: training: parameter-file output
+  bool write_param_file(FILE *out=stdout);
 };
 
 #endif // _DWDSTT_H_

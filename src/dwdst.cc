@@ -31,6 +31,7 @@ dwds_tagger::dwds_tagger(FSM *mymorph, FSMSymSpec *mysyms)
   morph = mymorph;
   syms = mysyms;
   eos = "<<EOS>>";
+  wdsep = "=";
 
   // -- public flags
   want_avm = false;
@@ -154,6 +155,7 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
       result = morph->fsm_lookup(s,tmp,true);  // v0.0.2 -- getting leaks here!
 
       fputs((char *)lexer.yytext, out);
+
       if (want_features) {
 	// -- all features
 	tmp->fsm_strings(syms, &results, false, want_avm);

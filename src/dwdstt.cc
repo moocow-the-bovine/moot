@@ -208,28 +208,44 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
     curtags = stringq.front();
     stringq.pop_front();
 
-    // -- get the 'current' tags
+    // -- get the 'current' tag-set
     curtags->clear();
-    get_fsm_tag_strings(tmp,curtags);
-
+    if (want_features) {
+      results.clear();
+      tmp->fsm_strings(syms, &results, false, want_avm);
+      // -- set curtags to full string results
+      for (ri = results.begin(); ri != results.end(); ri++) {
+	curtags->insert(ri->istr);
+      }
+    } else {
+      // -- all features
+      get_fsm_tag_strings(tmp,curtags);
+    }
     // -- unknown token?
     if (curtags->empty()) get_fsm_tag_strings(ufsa,curtags);
 
-    // -- push 'current' tags onto the queue
+    // -- push 'current' tags onto the back of the queue
     stringq.push_back(curtags);
 
+    // -- counting: unigrams
+    for (t = curtags->begin(); t != curtags->end(); t++) {
+      if ((sci = strings2counts.find(*t)) != strings2counts.end()) {
+	strings2counts[*t] += curtags->size() >= 0 ? 1.0/(float)curtags->size() : 0;
+      } else {
+	strings2counts[*t] = curtags->size() >= 0 ? 1.0/(float)curtags->size() : 0;
+      }
+    }
+
+#  ifdef DWDSTT_DEBUG
+    // -- output (debug)
     fprintf(out, "%s", s.c_str());
     for (t = curtags->begin(); t != curtags->end(); t++) {
       fputc('\t', out);
       fputs(*(t->c_str()) == '_' ? t->c_str()+1 : t->c_str(), out);
+      fprintf(out, "<%f>", curtags->size() >= 0 ? 1.0/(float)curtags->size() : 0);
     }
     fputc('\n',out);
-
-    /* tmp->fsm_strings(syms, &results, false, want_avm);
-    for (ri = results.begin(); ri != results.end(); ri++) {
-      fprintf(out, "\t((%s)<%f>)\n", ri->istr.c_str(), ri->weight);
-    }
-    fputc('\n',out);*/
+#  endif // DWDSTT_DEBUG
 
     // -- verbosity
     if (verbose) {
@@ -249,6 +265,22 @@ bool dwds_tagger_trainer::train_from_strings(int argc, char **argv, FILE *out=st
   return true;
 }
 
+/*--------------------------------------------------------------------------
+ * Parameter File Output
+ *--------------------------------------------------------------------------*/
+
+/*
+ * bool dwds_tagger_trainer::write_param_file(FILE *out=stdout);
+ */
+bool dwds_tagger_trainer::write_param_file(FILE *out=stdout)
+{
+  // -- Unigrams
+  fputs("%% Unigrams\n", out);
+  for (sci = strings2counts.begin(); sci != strings2counts.end(); sci++) {
+    fprintf(out, "%s\t%f\n", sci->first.c_str(), sci->second);
+  }
+  return true;
+}
 
 /*--------------------------------------------------------------------------
  *--------------------------------------------------------------------------*/
