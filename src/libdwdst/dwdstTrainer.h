@@ -48,10 +48,10 @@ private:
 public:
   // ----- public data: tagsets
   /// set of PoS tags for open-classes (used for unknown-FST generation)
-  set<FSMSymbolString>  opentags;  
+  FSMSymbolStringSet  opentags;  
 
   /// set of all PoS tags (to be used for disambig-FST generation)
-  set<FSMSymbolString>  alltags;
+  FSMSymbolStringSet  alltags;
 
 
   // ----- public data: count parameters
@@ -84,20 +84,20 @@ private:
   bool is_eos;
 
   // -- training variables
-  set<FSMSymbolString> *curtags;
-  set<FSMSymbolString> *tmptags, *swaptags;
-  set<FSMSymbolString>::iterator cti;
+  FSMSymbolStringSet *curtags;
+  FSMSymbolStringSet *tmptags, *swaptags;
+  FSMSymbolStringSet::iterator cti;
 
-  NGramVector      theNgram;
-  set<NGramVector> *curngrams;
-  set<NGramVector> *nextngrams;
-  set<NGramVector> *tmpngrams;
+  NGramVector     theNgram;
+  NGramVectorSet *curngrams;
+  NGramVectorSet *nextngrams;
+  NGramVectorSet *tmpngrams;
 
   set<NGramVector>::iterator ngi;
 
   //FSMSymbolStringQueue::reverse_iterator qri;
   FSMSymbolStringQueue::iterator qi;
-  set<FSMSymbolString>::iterator qii;
+  FSMSymbolStringSet::iterator qii;
 
 
   // -- methods
@@ -105,7 +105,9 @@ public:
   // ----- public methods: constructor/destructor
 
   /// constructor
-  dwdstTrainer(FSMSymSpec *mysyms=NULL, FSM *mymorph=NULL) : kmax(2), allow_incomplete_categories(true) {};
+  dwdstTrainer(FSMSymSpec *mysyms=NULL, FSM *mymorph=NULL)
+    : kmax(2), allow_incomplete_categories(true)
+  {};
 
   /// destructor
   ~dwdstTrainer();
@@ -124,8 +126,10 @@ public:
   // ----- mid-/low-level methods: FSM generation
 
   /// low-level: add an PoS-"arc" to an FSA: this needs an overhaul!
-  set<FSMState> fsm_add_pos_arc(FSM *fsm, const FSMState qfrom, const FSMSymbolString &pos,
-				const FSMWeight cost = FSM_default_cost_structure.freecost());
+  FSMStateSet fsm_add_pos_arc(FSM *fsm,
+			      const FSMState qfrom,
+			      const FSMSymbolString &pos,
+			      const FSMWeight cost = FSM_default_cost_structure.freecost());
 
   // ----- mid-level: disambig-fsa utilities
 
@@ -133,12 +137,20 @@ public:
   /// Also computes 'uniGramCount' -- this behavior should change!
   bool generate_tag_map();
 
+  /// Common preparations for disambig-generation
+  bool generate_disambig_init();
+
   /// Generate a skeleton FSA for the disambiguator.
   FSM *generate_disambig_skeleton();
 
   /// For disambiguation, apply substitutions indicated by 'tags2symbols' to
   /// the skeleton disambiguation fsa in 'dfsa'.
   FSM *expand_disambig_skeleton();
+
+  /// For skeleton-generation debugging.
+  bool save_skeleton_labels(const char *labfilename=NULL);
+  /// For skeleton-generation debugging.
+  bool save_skeleton_labels(FILE *labfile=NULL);
 
   // -- low-level: disambig-fsa utilities
   /// Low-level: get the cost of final transition for nGram.
@@ -157,6 +169,10 @@ public:
 
 
   // ----- mid/low-level
+
+  /// low-level: lookup symbolName in the symspec, producing warnings etc.
+  /// Used by training methods for word-boundary symbols.
+  FSMSymbol get_symbol_value(const char *methodName, const FSMSymbolString &symbolName);
 
   /// low-level: training for the 'current' token
   inline void train_next_token(void);
@@ -179,13 +195,13 @@ public:
   /// Read in a list of all PoS tags from filename.
   /// Any PoS tags encountered during training do not need
   /// to be in this file.
-  set<FSMSymbolString> get_all_pos_tags(const char *filename=NULL) {
+  FSMSymbolStringSet &get_all_pos_tags(const char *filename=NULL) {
     return read_taglist_file(alltags, filename); 
   };
 
   /// Read in set of 'open-class' tags from a file.
   /// These tags are used for unknown-analysis-FSA generation.
-  set<FSMSymbolString> get_open_class_tags(const char *filename=NULL) {
+  FSMSymbolStringSet &get_open_class_tags(const char *filename=NULL) {
     read_taglist_file(opentags, filename);
     alltags.insert(opentags.begin(),opentags.end());
     return opentags;
@@ -195,7 +211,8 @@ public:
   // --- public methods: low-level : taglist file reading
 
   /// Low-level: read a PoS-taglist file.
-  set<FSMSymbolString> read_taglist_file(set<FSMSymbolString> &tagset, const char *filename=NULL);
+  FSMSymbolStringSet &read_taglist_file(FSMSymbolStringSet &tagset,
+					const char *filename=NULL);
 
 
   // --- public methods: low-level : initialize & cleanup
@@ -212,13 +229,13 @@ public:
   // -- public methods: low-level: tagset-iteration utilities
 
   /// Low-level possible tagset-ngram iteration initializer.
-  tagSetIterVector &tagIters_begin(tagSetIterVector &tagIters, set<FSMSymbolString> &tagSet, int len);
+  tagSetIterVector &tagIters_begin(tagSetIterVector &tagIters, FSMSymbolStringSet &tagSet, int len);
 
   /// Low-level possible tagset-ngram iteration incrementer.
-  tagSetIterVector &tagIters_next(tagSetIterVector &tagIters, set<FSMSymbolString> &tagSet);
+  tagSetIterVector &tagIters_next(tagSetIterVector &tagIters, FSMSymbolStringSet &tagSet);
 
   /// Low-level possible tagset-ngram iteration termination-test predicate.
-  bool tagIters_done(tagSetIterVector &tagIters, set<FSMSymbolString> &tagSet);
+  bool tagIters_done(tagSetIterVector &tagIters, FSMSymbolStringSet &tagSet);
 };
 
 #endif // _DWDST_TRAINER_H_

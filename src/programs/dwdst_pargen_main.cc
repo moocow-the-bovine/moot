@@ -77,7 +77,7 @@ void GetMyOptions(int argc, char **argv)
 
   // -- trainer object setup : symbols
   if (args.verbose_arg > 0) fprintf(stderr, "%s: loading symbols-file '%s'...", PROGNAME, args.symbols_arg);
-  if (!dwdstt.load_symbols(args.symbols_arg)) {
+  if (!dwdstt.load_morph_symbols(args.symbols_arg)) {
     fprintf(stderr,"\n%s: load FAILED for symbols-file '%s'\n", PROGNAME, args.symbols_arg);
   } else if (args.verbose_arg > 0) {
     fprintf(stderr," loaded.\n");

@@ -44,7 +44,11 @@ libdwdst_la_SOURCES = \
 	dwdstParamCompiler.cc \
 	dwdstTaglistLexer.cc \
 	dwdstTagger.cc \
-	dwdstTrainer.cc
+	dwdstTrainer.cc \
+	dwdstAlphabetLexer.cc \
+	dwdstAlphabetParser.cc \
+	dwdstAlphabetCompiler.cc \
+	dwdstDisambiguator.cc
 
 ## --- Extra (possible) sources
 #EXTRA_${prog_i}_SOURCES = 
@@ -62,6 +66,17 @@ dwdstParamLexer.cc: $(FLEXXX_DEPS)
 dwdstParamParser.h: $(BISONXX_DEPS)
 dwdstParamParser.cc: $(BISONXX_DEPS)
 
+dwdstDisambiguator.o: dwdstAlphabetCompiler.h
+dwdstDisambiguator.lo: dwdstAlphabetCompiler.h
+dwdstAlphabetCompiler.lo: dwdstAlphabetLexer.h dwdstAlphabetParser.h 
+dwdstAlphabetCompiler.o: dwdstAlphabetLexer.h dwdstAlphabetParser.h
+dwdstAlphabetLexer.lo: dwdstAlphabetLexer.h dwdstAlphabetParser.h
+dwdstAlphabetLexer.o: dwdstAlphabetLexer.h dwdstAlphabetParser.h
+dwdstAlphabetLexer.h: $(FLEXXX_DEPS)
+dwdstAlphabetLexer.cc: $(FLEXXX_DEPS)
+dwdstAlphabetParser.h: $(BISONXX_DEPS)
+dwdstAlphabetParser.cc: $(BISONXX_DEPS)
+
 ##-----------------------------------------------------------------------
 ## headers
 ##-----------------------------------------------------------------------
@@ -77,7 +92,12 @@ pkginclude_HEADERS = \
 	dwdstParamParser.h \
 	dwdstParamCompiler.h \
 	dwdstTrainer.h \
-	dwdstTaglistLexer.h
+	dwdstTaglistLexer.h \
+	dwdstAlphabetLexer.h \
+	dwdstAlphabetParser.h \
+	dwdstAlphabetCompiler.h \
+	dwdstDisambiguator.h
+
 
 ## --- no-install headers
 #noinst_HEADERS = nopackage.h
@@ -176,7 +196,9 @@ MAINTAINERCLEANFILES = \
 	*~ .*~ Makefile Makefile.in \
 	dwdstTaggerLexer.cc dwdstTaggerLexer.h \
 	dwdstPPLexer.cc dwdstPPLexer.h \
-	dwdstTaglistLexer.cc dwdstTaglistLexer.h
+	dwdstTaglistLexer.cc dwdstTaglistLexer.h \
+	dwdstAlphabetLexer.cc dwdstAlphabetLexer.h \
+	dwdstAlphabetParser.cc dwdstAlphabetParser.h
 
 ##-----------------------------------------------------------------------
 ## Variables: distribution
@@ -190,6 +212,8 @@ EXTRA_DIST = \
 	dwdstTaglistLexer.ll \
 	dwdstParamLexer.ll \
 	dwdstParamParser.yy \
+	dwdstAlphabetLexer.ll \
+	dwdstAlphabetParser.yy \
 	flexskel.cc flexskel.h \
 	bison.cc bison.h
 

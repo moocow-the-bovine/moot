@@ -22,6 +22,10 @@ dwdstParamLexer.cc
 dwdstParamLexer.h
 dwdstParamParser.cc
 dwdstParamParser.h
+dwdstAlphabetLexer.cc
+dwdstAlphabetLexer.h
+dwdstAlphabetParser.cc
+dwdstAlphabetParser.h
 *.output
 stamp-h*
 config.h

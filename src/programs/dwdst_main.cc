@@ -82,20 +82,25 @@ void GetMyOptions(int argc, char **argv)
   //dwdst.want_binary = args.binary_given;
   dwdst.want_features = !args.tags_only_given;
   dwdst.want_tnt_format = args.tnt_format_given;
-  dwdst.verbose  = (args.verbose_arg > 0);
+  dwdst.verbose  = args.verbose_arg;
 
   // -- tagger object setup : symbols
-  if (args.verbose_arg > 0) fprintf(stderr, "%s: loading symbols-file '%s'...", PROGNAME, args.symbols_arg);
-  if (!dwdst.load_symbols(args.symbols_arg)) {
-    fprintf(stderr,"\n%s: load FAILED for symbols-file '%s'\n", PROGNAME, args.symbols_arg);
+  if (args.verbose_arg > 0)
+    fprintf(stderr, "%s: loading morphological symbols-file '%s'...", PROGNAME, args.symbols_arg);
+  if (!dwdst.load_morph_symbols(args.symbols_arg)) {
+    fprintf(stderr,"\n%s: load FAILED for morphological symbols-file '%s'\n",
+	    PROGNAME, args.symbols_arg);
+    exit(1);
   } else if (args.verbose_arg > 0) {
     fprintf(stderr," loaded.\n");
   }
 
   // -- tagger object setup : morphology FST
-  if (args.verbose_arg > 0) fprintf(stderr, "%s: loading morphology FST '%s'...", PROGNAME, args.morph_arg);
+  if (args.verbose_arg > 0)
+    fprintf(stderr, "%s: loading morphological FST '%s'...", PROGNAME, args.morph_arg);
   if (!dwdst.load_morph(args.morph_arg)) {
-    fprintf(stderr,"\n%s: load FAILED for morphology FST '%s'\n", PROGNAME, args.morph_arg);
+    fprintf(stderr,"\n%s: load FAILED for morphological FST '%s'\n", PROGNAME, args.morph_arg);
+    exit(1);
   } else if (args.verbose_arg > 0) {
     fprintf(stderr," loaded.\n");
   }
@@ -106,6 +111,64 @@ void GetMyOptions(int argc, char **argv)
 	    PROGNAME, args.symbols_arg, args.morph_arg);
     exit(1);
   }
+
+  // -- disambiguator setup
+  if (args.no_disambig_given) {
+    dwdst.dis = NULL;
+  }
+  else {
+    dwdst.dis = new dwdstDisambiguator();
+    if (!dwdst.dis) {
+      fprintf(stderr, "%s: could not create disambiguator!\n", PROGNAME);
+      exit(2);
+    }
+
+    // -- disambiguator setup : flags
+    dwdst.dis->bottom = args.bottom_arg;
+    dwdst.dis->verbose = args.verbose_arg;
+
+    // -- disambiguator setup : symbols
+    if (args.verbose_arg > 0)
+      fprintf(stderr, "%s: loading disambiguation symbols-file '%s'...",
+	      PROGNAME, args.dsymbols_arg);
+    if (!dwdst.load_disambig_symbols(args.dsymbols_arg)) {
+      fprintf(stderr,"\n%s: load FAILED for disambiguation symbols-file '%s'\n",
+	      PROGNAME, args.dsymbols_arg);
+      exit(2);
+    } else if (args.verbose_arg > 0) {
+      fprintf(stderr," loaded.\n");
+    }
+
+    // -- disambiguator setup : disambig FST
+    if (args.verbose_arg > 0)
+      fprintf(stderr, "%s: loading disambiguation FST '%s'...", PROGNAME, args.disambig_arg);
+    if (!dwdst.load_disambig_fst(args.disambig_arg)) {
+      fprintf(stderr,"\n%s: load FAILED for disambiguation FST '%s'\n", PROGNAME, args.disambig_arg);
+      exit(2);
+    } else if (args.verbose_arg > 0) {
+      fprintf(stderr," loaded.\n");
+    }
+
+    // -- link disambig-FST to dsymbols file (unnecessary)
+    if (!dwdst.dis->dfst->fsm_use_symbol_spec(dwdst.dis->syms)) {
+      fprintf(stderr,"%s ERROR: could not use symbols from '%s' in FST from '%s'\n",
+	      PROGNAME, args.symbols_arg, args.morph_arg);
+      exit(2);
+    }
+
+    // -- load alphabet file
+    if (args.verbose_arg > 0)
+      fprintf(stderr, "%s: loading disambiguation alphabet file '%s'...", PROGNAME, args.alphabet_arg);
+    if (!dwdst.load_disambig_alphabet(args.alphabet_arg, (args.compact_arg > 0))) {
+      fprintf(stderr,"\n%s ERROR: load FAILED for disambiguation alphabet '%s'\n",
+	      PROGNAME, args.alphabet_arg);
+      exit(2);
+    } else if (args.verbose_arg > 0) {
+      fprintf(stderr," loaded %d ambiguity classes.\n", dwdst.dis->class2sym.size());
+    }
+  }
+  // DEBUG
+  //dwdst.dis->dump_class_map(stdout);
 
   // -- report
   if (args.verbose_arg > 0) {
@@ -142,7 +205,10 @@ int main (int argc, char **argv)
 	  fflush(stderr);
 	}
       }
-      fprintf(out.file, "\n# %s: File: %s\n\n", PROGNAME, churner.in.name);
+      fprintf(out.file, "\n%s %s: File: %s\n\n",
+	      (args.tnt_format_given ? "%%" : "#"),
+	      PROGNAME,
+	      churner.in.name);
       
       dwdst.tag_stream(churner.in.file, out.file);
       
@@ -165,19 +231,42 @@ int main (int argc, char **argv)
       // -- print summary
       fprintf(stderr, "\n-----------------------------------------------------\n");
       fprintf(stderr, "%s Summary:\n", PROGNAME);
-      fprintf(stderr, "  + Files processed  : %d\n", nfiles);
-      fprintf(stderr, "  + Tokens processed : %d\n", dwdst.ntokens);
-      fprintf(stderr, "  + Unknown tokens   : %d\n", dwdst.nunknown);
-      fprintf(stderr, "  + Recognition Rate : ");
+      fprintf(stderr, "  + Morphology\n");
+      fprintf(stderr, "    - Tokens processed    : %d\n", dwdst.ntokens);
+      fprintf(stderr, "    - Unknown tokens      : %d\n", dwdst.nunknown);
       if (dwdst.ntokens > 0) {
 	// -- avoid div-by-zero errors
-	fprintf(stderr, "%.2f %%\n", 100.0*(double)(dwdst.ntokens-dwdst.nunknown)/(double)dwdst.ntokens);
+	fprintf(stderr, "    - Recognition Rate    : %.2f %%\n",
+		100.0*(double)(dwdst.ntokens-dwdst.nunknown)/(double)dwdst.ntokens);
       } else {
-	fprintf(stderr, "-NaN-\n");
+	fprintf(stderr, "    - Recognition Rate    : -NaN-\n");
       }
-      fprintf(stderr, "  + Initialize Time  : %.2f sec\n", ielapsed);
-      fprintf(stderr, "  + Analysis Time    : %.2f sec\n", aelapsed);
-      fprintf(stderr, "  + Throughput       : %.2f tok/sec\n", (float)dwdst.ntokens/aelapsed);
+      if (!args.no_disambig_given) {
+	fprintf(stderr, "  + Disambiguation\n");
+	fprintf(stderr, "    - Unknown classes     : %d\n", dwdst.dis->nunknown_classes);
+	if (dwdst.ntokens > 0) {
+	  fprintf(stderr, "    - Class Coverage      : %.2f %%\n",
+		  100.0*(double)(dwdst.ntokens - dwdst.dis->nunknown_classes)/(double)dwdst.ntokens);
+	} else {
+	  fprintf(stderr, "    - Class Coverage      : -NaN-\n");
+	}
+	fprintf(stderr, "    - Sentences Processed : %d\n", dwdst.dis->nsentences);
+	fprintf(stderr, "    - Failed Sent-lookups : %d\n", dwdst.dis->nunknown_sentences);
+	if (dwdst.dis->nsentences > 0) {
+	  fprintf(stderr, "    - Sentence Coverage   : %.2f %%\n",
+		  100.0
+		  * ((double)(dwdst.dis->nsentences - dwdst.dis->nunknown_sentences)
+		     /
+		     (double)dwdst.dis->nsentences));
+	} else {
+	  fprintf(stderr, "    - Sentence Coverage   : -NaN-\n");
+	}
+      }
+      fprintf(stderr, "  + General\n");
+      fprintf(stderr, "    - Files processed     : %d\n", nfiles);
+      fprintf(stderr, "    - Initialize Time     : %.2f sec\n", ielapsed);
+      fprintf(stderr, "    - Analysis Time       : %.2f sec\n", aelapsed);
+      fprintf(stderr, "    - Throughput          : %.2f tok/sec\n", (float)dwdst.ntokens/aelapsed);
       fprintf(stderr, "-----------------------------------------------------\n");
   }
 

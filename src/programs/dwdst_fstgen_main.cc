@@ -66,14 +66,15 @@ void GetMyOptions(int argc, char **argv)
 
   // -- generator object setup : flags
   dwdstt.eos = args.eos_string_arg;
-  dwdstt.wordBoundary = args.word_boundary_arg;
+  dwdstt.wordStart = args.bow_arg;
+  dwdstt.wordEnd = args.eow_arg;
   dwdstt.want_avm = false;
   dwdstt.want_features = !args.tags_only_given;
   dwdstt.verbose  = (args.verbose_arg > 0);
 
   // -- generator object setup : symbols
   if (args.verbose_arg > 0) fprintf(stderr, "%s: loading symbols-file '%s'...", PROGNAME, args.symbols_arg);
-  if (!dwdstt.load_symbols(args.symbols_arg)) {
+  if (!dwdstt.load_morph_symbols(args.symbols_arg)) {
     fprintf(stderr,"\n%s: load FAILED for symbols-file '%s'\n", PROGNAME, args.symbols_arg);
   } else if (args.verbose_arg > 0) {
     fprintf(stderr," loaded.\n");
@@ -191,23 +192,48 @@ int main (int argc, char **argv)
     
     // -- disambig-fsa generation
     if (args.verbose_arg > 0)
-      fprintf(stderr, "%s: generating disambiguation FSA...", PROGNAME);
-    if (!dwdstt.generate_disambig_fsa()) {
-      fprintf(stderr,"\n%s: generation FAILED for disambiguation FSA!\n", PROGNAME);
-    } else if (args.verbose_arg > 0) {
-      fprintf(stderr," generated.\n");
+      fprintf(stderr, "%s: generating disambiguation %s...",
+	      PROGNAME,
+	      args.skeleton_given ? "skeleton" : "FSA");
+
+    if (args.skeleton_given) {
+      // -- skeleton-only
+      if (dwdstt.generate_disambig_init() && dwdstt.generate_disambig_skeleton()) {
+	if (args.verbose_arg > 0) fprintf(stderr," generated.\n");
+      } else {
+	fprintf(stderr,"\n%s: generation FAILED for disambiguation skeleton!\n", PROGNAME);
+	exit(1);
+      }
+
+      if (!dwdstt.save_skeleton_labels(args.labels_arg)) {
+	fprintf(stderr, "%s: save FAILED for disambiguation skeleton labels file '%s'!\n",
+		PROGNAME, args.labels_arg);
+      }
+    }
+    else {
+      // -- full disambig-fsa
+      if (dwdstt.generate_disambig_fsa()) {
+	if (args.verbose_arg > 0) fprintf(stderr," generated.\n");
+      } else {
+	fprintf(stderr,"\n%s: generation FAILED for disambiguation FSA!\n", PROGNAME);
+      }
     }
 
     // -- save disambig FSA
     if (args.verbose_arg > 0) {
-      fprintf(stderr, "%s: saving disambiguation FSA to file '%s'...",
-	      PROGNAME, args.output_file_arg);
+      fprintf(stderr, "%s: saving disambiguation %s to file '%s'...",
+	      PROGNAME,
+	      args.skeleton_given ? "skeleton" : "FSA",
+	      args.output_file_arg);
     }
+
     dwdstt.dfsa->fsm_convert(FSM::FSMCTTable);
     FSM *dfsa_t = dwdstt.dfsa;
     if (!dfsa_t->fsm_save_to_binary_file(args.output_file_arg)) {
-      fprintf(stderr, "\n%s Error: could not save disambiguation FSA to file '%s'.\n",
-	      PROGNAME, args.output_file_arg);
+      fprintf(stderr, "\n%s Error: could not save disambiguation %s to file '%s'.\n",
+	      PROGNAME,
+	      args.skeleton_given ? "skeleton" : "FSA",
+	      args.output_file_arg);
       exit(1);
     } else if (args.verbose_arg > 0) {
       fprintf(stderr, " saved.\n");

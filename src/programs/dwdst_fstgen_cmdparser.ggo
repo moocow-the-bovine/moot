@@ -11,12 +11,18 @@ purpose	"Generate FSTs for use with the KDWDS Part-of-Speech tagger.
 option	"verbose"	    v	"Specify verbosity level"		    int default="1"			no
 option	"tags-only"	    t	"Analyze only PoS tags, not morpho-syntactic features"				no
 option	"eos-string"	    e	"Use STRING as the EOS marker"		    string default="EOS"		no
-option	"word-boundary"	    b	"Use STRING as word-boundary symbol"	    string default="WordBoundary"	no
+#option	"word-boundary"	    b	"Use STRING as word-boundary symbol"	    string default="WordBoundary"	no
+option	"bow"	    B	"Use STRING as BOW symbol"  string default="WordStart"	no
+option	"eow"	    E	"Use STRING as EOW symbol"  string default="WordEnd"	no
+
 
 # ---- Operation Mode:
 # -- unknown-FSA generation (FSA used as analysis for unknown tokens)
-option	 "unknown"	    u	"Generate a binary unknown-FSA"						no
-option  "disambig"	    d	"Generate a binary disambiguation-FSA (WORK IN PROGRESS)"		no
+option	 "unknown"    u	"Generate a binary unknown-FSA"				     no
+
+option  "disambig"    d	"Generate a binary disambiguation-FSA (WORK IN PROGRESS)"    no
+option	"skeleton"    S	"Generate only skeleton disambiguation-FSA (for debugging)"  no
+option	"labels"      L	"For skelton-mode: save skelton-labels to STRING"	     string default="dskeleton.lab"	no
 
 # ---- Standard Files:
 option	"symbols"	    s	"Specify symbols file"			string default="dwdst.sym"	no

@@ -43,7 +43,8 @@ dwdstTrainer::~dwdstTrainer() {
  * Implicitly clears 'tagset'.
  * If 'filename' is NULL, 'tagset' is set to all categories according to 'syms' data member.
  */
-set<FSMSymbolString> dwdstTrainer::read_taglist_file(set<FSMSymbolString> &tagset, const char *filename=NULL)
+FSMSymbolStringSet
+&dwdstTrainer::read_taglist_file(FSMSymbolStringSet &tagset, const char *filename=NULL)
 {
   // -- sanity check
   tagset.clear();
@@ -55,7 +56,7 @@ set<FSMSymbolString> dwdstTrainer::read_taglist_file(set<FSMSymbolString> &tagse
       return tagset;
     }
     const set<FSMSymbolString> *symbols = syms->symbols();
-    for (set<FSMSymbolString>::iterator p = symbols->begin(); p != symbols->end(); p++) {
+    for (set<FSMSymbolString>::const_iterator p = symbols->begin(); p != symbols->end(); p++) {
       if (!syms->is_category(*p)) continue;
       tagset.insert("_"+(*p));
     }
@@ -102,8 +103,8 @@ FSM *dwdstTrainer::generate_unknown_fsa()
 {
   FSMRepresentation *base;
   FSMState q0;
-  set<FSMState> pstates;
-  set<FSMState>::iterator ps;
+  FSMStateSet pstates;
+  FSMStateSet::iterator ps;
 
   // -- ensure that ufsa exists
   if (ufsa) ufsa->fsm_clear();
@@ -117,7 +118,7 @@ FSM *dwdstTrainer::generate_unknown_fsa()
   q0 = base->set_start_state(base->add_state(base->new_state()));
 
   // -- return an FSA ambiguous between all tags in 'tagset'
-  for (set<FSMSymbolString>::iterator p = opentags.begin(); p != opentags.end(); p++) {
+  for (FSMSymbolStringSet::iterator p = opentags.begin(); p != opentags.end(); p++) {
     pstates = fsm_add_pos_arc(ufsa, q0, *p, FSM_default_cost_structure.freecost());
     for (ps = pstates.begin(); ps != pstates.end(); ps++) {
       base->mark_state_as_final(*ps);
@@ -132,18 +133,17 @@ FSM *dwdstTrainer::generate_unknown_fsa()
  *--------------------------------------------------------------------------*/
 
 /**
- * Generate a statistical PoS-disambiguation FSA based on internal
- * N-Gram tables.
+ * Prepare for disambig-generation
  */
-FSM *dwdstTrainer::generate_disambig_fsa()
+bool dwdstTrainer::generate_disambig_init()
 {
   // -- for error reporting
-  const char methodName[] = "dwdstTrainer::generate_disambig_fsa()";
+  const char methodName[] = "dwdstTrainer::generate_disambig_init()";
 
   // -- sanity check: symbols
   if (!syms) {
     fprintf(stderr,"%s: cannot generate disambiguation fsa without an FSMSymSpec!\n", methodName);
-    return NULL;
+    return false;
   }
   // -- sanity check: kmax
   if (kmax <= 0) {
@@ -166,13 +166,28 @@ FSM *dwdstTrainer::generate_disambig_fsa()
 
   // -- generate tag-to-symbol map for skeleton fsa
   tags2symbols.clear();
-  if (!generate_tag_map()) return NULL;
+  if (!generate_tag_map()) return false;
 
 #ifdef DWDST_DFSA_DEBUG
   fprintf(stderr,
 	  "dwdstTrainer::generate_tag_map(): generated %d skeleton tag-symbols.\n",
 	  tags2symbols.size());
 #endif
+
+  return true;
+}
+
+/**
+ * Generate a statistical PoS-disambiguation FSA based on internal
+ * N-Gram tables.
+ */
+FSM *dwdstTrainer::generate_disambig_fsa()
+{
+  // -- for error reporting
+  //const char methodName[] = "dwdstTrainer::generate_disambig_fsa()";
+
+  // -- initialize
+  if (!generate_disambig_init()) return NULL;
 
   // -- generate the skeleton dfsa
   dfsa = generate_disambig_skeleton();
@@ -183,27 +198,6 @@ FSM *dwdstTrainer::generate_disambig_fsa()
     }
     return NULL;
   }
-
-#ifdef DWDST_DFSA_DEBUG
-  // debug: save skeleton tag-labels
-  FILE *labfile = fopen("dskeleton.lab","w");
-  if (labfile) {
-    fprintf(labfile,"<eps>\t0\n");
-    for (dwdstStringToSymbolMap::iterator t2si =  tags2symbols.begin();
-	 t2si != tags2symbols.end();
-	 t2si++)
-      {
-	fprintf(labfile,"%s\t%d\n", t2si->first.c_str(), t2si->second);
-      }
-    fclose(labfile);
-  } else {
-    fprintf(stderr, "%s: could not open 'dskeleton.lab' for write: %s\n", methodName, strerror(errno));
-  }
-  // -- debug: save skeleton FSM
-  if (!dfsa->fsm_save_to_binary_file("dskeleton.fsa", false)) {
-    fprintf(stderr, "%s: save failed for skeleton FSA 'dskeleton.fsa'.\n", methodName);
-  }
-#endif
 
   // -- now substitute in the FSMs resulting from each tag's compilation
   //    as a regex.
@@ -221,9 +215,122 @@ FSM *dwdstTrainer::generate_disambig_fsa()
 }
 
 /**
+ * Save tags-to-symbols map for skeleton as an AT&T .lab file.
+ */
+bool dwdstTrainer::save_skeleton_labels(const char *labfilename=NULL)
+{
+  if (!labfilename) return save_skeleton_labels(stdout);
+  const char *methodName = "dwdstTrainer::save_skeleton_labels()";
+  FILE *labfile = fopen(labfilename,"w");
+  if (!labfile) {
+    fprintf(stderr, "%s: could not open '%s' for write: %s\n",
+	    methodName, labfilename, strerror(errno));
+    return false;
+  }
+  bool savedok = save_skeleton_labels(labfile);
+  fclose(labfile);
+  return savedok;
+}
+
+/**
+ * Save tags-to-symbols map for skeleton as an AT&T .lab file.
+ */
+bool dwdstTrainer::save_skeleton_labels(FILE *labfile=NULL)
+{
+  if (!labfile) labfile = stdout;
+  //fprintf(labfile,"<epsilon>\t0\n");
+  
+  // -- carryover from old symbols file
+  const set<FSMSymbolString> *symbols = syms->symbols();
+  for (set<FSMSymbolString>::const_iterator si = symbols->begin(); si != symbols->end(); si++)
+    {
+      FSMSymbol symval = syms->symbolname_to_symbol(*si);
+      if (symval != FSMNOLABEL) {
+	fprintf(labfile, "%s\t%d\n", si->c_str(), symval);
+      }
+    }
+
+  // -- new symbols
+  for (dwdstStringToSymbolMap::iterator t2si =  tags2symbols.begin();
+       t2si != tags2symbols.end();
+       t2si++)
+    {
+      fprintf(labfile,"%s\t%d\n", t2si->first.c_str(), t2si->second);
+    }
+  return true;
+}
+
+
+
+/**
  * Compile each key (pseudo-tag) in 'tags2symbols' as a regex,
  * and substitute the resultant FSM into the skeleton 'dfsa'.
  */
+#define DWDST_EXPAND_BATCH
+#ifdef DWDST_EXPAND_BATCH
+FSM *dwdstTrainer::expand_disambig_skeleton()
+{
+  // -- for error reporting
+  const char methodName[] = "dwdstTrainer::expand_disambig_skeleton()";
+
+  // -- setup a regex-compiler
+  FSMRegexCompiler recomp;
+  recomp.symspec = syms;
+  recomp.allow_incomplete_categories = allow_incomplete_categories;
+  //recomp.objname = (char *)methodName;
+  recomp.verbose = verbose;
+  recomp.theLexer.theLine = 0;
+
+  // -- construct an FSMSubstitutionMap using tags2symbols
+  FSM::FSMSubstitutionMap syms2fsms;
+  for (dwdstStringToSymbolMap::iterator t2si = tags2symbols.begin();
+       t2si != tags2symbols.end();
+       t2si++)
+    {
+      recomp.theLexer.theLine++;
+      recomp.theLexer.theColumn = 0;
+      if (!recomp.parse_from_string(t2si->first.c_str())) {
+	fprintf(stderr,
+		"%s: could not compile pseudo-tag '%s' as a regex -- using epsilon-FSM!\n",
+		methodName, t2si->first.c_str());
+	recomp.result_fsm = recomp.epsilon_fsm();
+      }
+      
+      // -- add fsm to the substitution-map
+      syms2fsms[t2si->second] = recomp.result_fsm;
+      recomp.result_fsm = NULL;
+    }
+
+  // -- do substition for *ALL PSEUDO-TAGS AT ONCE*
+  dfsa->fsm_substitute(syms2fsms,FSM::FSMModeDestructive);
+  //dfsa->fsm_representation()->renumber_states();
+
+  // -- cleanup
+  for (FSM::FSMSubstitutionMap::iterator smi = syms2fsms.begin();
+       smi != syms2fsms.end();
+       smi++)
+    {
+      smi->second->fsm_clear();
+      delete smi->second;
+    }
+  syms2fsms.clear();
+  
+  // -- sanity check
+  if (!dfsa || !*dfsa) {
+    fprintf(stderr, "%s: could not expand disambiguator skeleton!\n", methodName);
+    if (dfsa) {
+      delete dfsa;
+      dfsa = NULL;
+    }
+    return NULL;
+  }
+
+  return dfsa;
+}
+
+
+#else /* DWDST_EXPAND_BATCH */
+
 FSM *dwdstTrainer::expand_disambig_skeleton()
 {
   // -- for error reporting
@@ -248,6 +355,10 @@ FSM *dwdstTrainer::expand_disambig_skeleton()
       recomp.result_fsm = recomp.epsilon_fsm();
     }
 
+#if 1
+    fprintf(stderr, "\n%s: expanding pseudo-tag '%s'...", methodName, t2si->first.c_str());
+#endif
+
     // -- generate a temporary substitution-map
     syms2fsms.clear();
     syms2fsms[t2si->second] = recomp.result_fsm;
@@ -270,18 +381,26 @@ FSM *dwdstTrainer::expand_disambig_skeleton()
       return NULL;
     }
   }
+#if 1
+    fprintf(stderr, "\n%s: expandsino complete.\n", methodName);
+#endif
+
   syms2fsms.clear();
   return dfsa;
 }
+#endif /*DWDST_EXPAND_BATCH*/
 
 /**
  * Generate a skeleton statistical PoS-disambiguation FSA based on internal
  * N-Gram tables.  The skeleton FSA uses a single symbol for each possible
  * tag.  Later, these symbols should be replaced by the sub-FSAs resulting
  * from compiling the 'tag' as a regex.
- * HACK: Pseudo-tag transitions in the skeleton are prefixed with
- * an epsilon-transition, which is assigned the generated weight -- otherwise,
- * we lose the weights when we call 'fsm_substitute()' [*grumble*].
+ *
+ *   HACK: Pseudo-tag transitions in the skeleton are prefixed with
+ *   an epsilon-transition, which is assigned the generated weight -- otherwise,
+ *   we lose the weights when we call 'fsm_substitute()' [*grumble*].
+ *
+ *   UNHACKED but not fixed: let's try and do this at expansion-time...
  */
 FSM *dwdstTrainer::generate_disambig_skeleton()
 {
@@ -303,40 +422,23 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
   rep->mark_state_as_final(q0,freecost);
 
   // lookup our word-separator symbol(s)
-  set<FSMSymbol> wbSymbols;
-  if (!syms->symbol_defined(wordBoundary)) {
-    fprintf(stderr,"%s: undefined word-boundary symbol '%s': using EPSILON instead!\n",
-	    methodName, wordBoundary.c_str());
-    wbSymbols.insert(EPSILON);
-  } else if (!syms->is_terminal(wordBoundary)) {
-    //set<FSMSymbol> *wbSubtypes = syms->subtypes_of(wordBoundary);
-    //for (set<FSMsymbol>::iterator wbsi = wbSubtypes->begin(); wbsi != wbSubtypes->end(); wbsi++) {
-    //  if (syms->is_terminal(syms->symbol_to_symbolname(*wbsi))) {
-    //	wbSymbols.insert(*wbsi);
-    //  }
-    //}
-    wbSymbols = *(syms->subtypes_of(wordBoundary));
-  } else {
-    wbSymbols.insert(syms->symbolname_to_symbol(wordBoundary));
-  }
-  if (wbSymbols.empty()) {
-    fprintf(stderr, "%s: empty expansion set for word-boundary '%s' -- using EPSILON instead!\n",
-	    methodName, wordBoundary.c_str());
-    wbSymbols.insert(EPSILON);
-  }
+  /*
+  FSMSymbol bowsym = get_symbol_value(methodName,wordStart);
+  FSMSymbol eowsym = get_symbol_value(methodName,wordEnd);
+  */
 
   // set up nGram2State map
   NGramToStateMap nGram2State;
   theNgram.clear();
   theNgram.push_back(eos);
   nGram2State.clear();
-  nGram2State[theNgram] = pair<FSMState,FSMState>(q0,q0);
+  nGram2State[theNgram] = q0;
 
   tagSetIterVector tagIters;
   tagIters.clear();
 
   int len;
-  FSMState prevState;
+  FSMState prevState = -1;
   NGramVector prevNgram;
 
   for (len = 1; len < kmax; len++) {
@@ -367,39 +469,32 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
 	fprintf(stderr, ">\n");
 # endif
 
-	// -- add a non-final state for the current nGram's cost: [context="wordSep@<cost>.nGram"]
-	FSMState costState = rep->new_state();
-	rep->add_state(costState);
-
-	// -- add a final state for the current nGram itself: [context="wordSep@<cost>nGram."]
+	// -- add a final state for the current nGram: [context="(nGram)."]
 	FSMState ngramState = rep->new_state();
 	rep->add_state(ngramState);
 	rep->mark_state_as_final(ngramState, freecost);
 
-	// -- remember what we've done: we may be needing it later
-	nGram2State[theNgram] = pair<FSMState,FSMState>(costState,ngramState);
+	// -- remember what we've done: we will be needing it later
+	nGram2State[theNgram] = ngramState;
 
 	// -- add transitions from the 'preceeding' nGram's state, if it exists
 	//    (BOS-bootstrap)
 	//    States:
-	//     prevState  : [context=".<cost>nGram."]
-	//     costState  : [context="<cost>.nGram."]
-	//     ngramState : [context="<cost>nGram."]
+	//     ngramState : [context="(nGram/<cost>)."]
 	//    Transits:
-	//      prevState --($wordSeparator/$cost)--> costState --($tag/0)--> ngramState
+	//      prevState --(nGram/$cost)--> ngramState
+	//    Saved Data:
+	//      nGram2State[$ngram] = ngramState
 	prevNgram = theNgram;
 	prevNgram.pop_back();
 	if (prevNgram[0] != eos) { prevNgram.push_front(eos); }
 	NGramToStateMap::const_iterator pngi = nGram2State.find(prevNgram);
 	if (pngi != nGram2State.end()) {
-	  prevState                  = pngi->second.second;
+	  prevState                  = pngi->second; // ngramState for previous nGram
 	  FSMSymbolString  theTag    = theNgram[theNgram.size()-1];
 	  FSMSymbol        tagSymbol = tags2symbols[theTag];
 	  FSMWeight        arcCost   = disambigArcCost(prevNgram, theTag, uniGramCount);
-	  for (set<FSMSymbol>::iterator wbi = wbSymbols.begin(); wbi != wbSymbols.end(); wbi++) {
-	    rep->add_transition(prevState, costState, *wbi, *wbi, arcCost);
-	  }
-	  rep->add_transition(costState, ngramState, tagSymbol, tagSymbol, freecost);
+	  rep->add_transition(prevState, ngramState, tagSymbol, tagSymbol, arcCost);
 	} else {
 	  // -- this should never happen!
 	  fprintf(stderr, "%s: missing state in BOS bootstrap!\n", methodName);
@@ -440,7 +535,7 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
       // -- source-state lookup
       NGramToStateMap::const_iterator pngi = nGram2State.find(prevNgram);
       if (pngi != nGram2State.end()) {      
-	prevState = pngi->second.second;
+	prevState = pngi->second; // -- ngramState for previous nGram
       } else {
 	// -- this should never happen
 	fprintf(stderr, "%s: missing source-state in kmax-linkup!\n", methodName);
@@ -450,21 +545,20 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
       // -- build (kmax-1)-Gram for destination state from prevNgram
       nextNgram = prevNgram;
       nextNgram.pop_front();
-      for (set<FSMSymbolString>::iterator tsi = alltags.begin(); tsi != alltags.end(); tsi++) {
+      for (FSMSymbolStringSet::iterator tsi = alltags.begin(); tsi != alltags.end(); tsi++) {
 
 # ifdef DWDST_DFSA_DEBUG_VERBOSE
 	fprintf(stderr, "%s:   + theTag='%s'\n", methodName, tsi->c_str());
 # endif
 
-	FSMSymbolString theTag = *tsi;
+	FSMSymbolString    theTag = *tsi;
+	FSMSymbol       tagSymbol = tags2symbols[theTag];
 	nextNgram.push_back(theTag);
 	NGramToStateMap::const_iterator nngi = nGram2State.find(nextNgram);
 	if (nngi != nGram2State.end()) {
-	  FSMState   costState  = nngi->second.first;
-	  FSMWeight  arcCost    = disambigArcCost(prevNgram, theTag, uniGramCount);
-	  for (set<FSMSymbol>::iterator wbi = wbSymbols.begin(); wbi != wbSymbols.end(); wbi++) {
-	    rep->add_transition(prevState, costState, *wbi, *wbi, arcCost);
-	  }
+	  FSMState   ngramState  = nngi->second;
+	  FSMWeight  arcCost     = disambigArcCost(prevNgram, theTag, uniGramCount);
+	  rep->add_transition(prevState, ngramState, tagSymbol, tagSymbol, arcCost);
 # ifdef DWDST_DFSA_DEBUG_VERBOSE
 	  fprintf(stderr, "%s:     > cost='%f'\n", methodName, arcCost);
 # endif
@@ -481,6 +575,39 @@ FSM *dwdstTrainer::generate_disambig_skeleton()
 
 
 /**
+ * Get a univocal symbol value.  If symbol is not found,
+ * returns EPSILON.  If multiple values are found (nonterminal symbol),
+ * returns the "first" (least) symbol-value in the subtypes-set.
+ */
+FSMSymbol dwdstTrainer::get_symbol_value(const char *methodName,
+					 const FSMSymbolString &symbolName)
+{
+  FSMSymbol symval = FSMNOLABEL;
+  if (syms->symbol_defined(symbolName)) {
+    if (syms->is_terminal(symbolName)) {
+      symval = syms->symbolname_to_symbol(symbolName);
+    }
+    else {
+      const set <FSMSymbol> *wbsymbols = syms->subtypes_of(symbolName);
+      if (!wbsymbols->empty()) {
+	symval = *wbsymbols->begin();
+      }
+      if (wbsymbols->size() > 1) {
+	fprintf(stderr, "%s: warning: size()>1 for symbol '%s' -- using first element only!\n",
+		methodName, symbolName.c_str());
+      }
+    }
+  }
+  if (symval==FSMNOLABEL) {
+    fprintf(stderr, "%s: warning: could not find symbol-value for '%s' -- using EPSILON instead!\n",
+	    methodName, symbolName.c_str());
+    symval = EPSILON;
+  }
+  return symval;
+}
+
+
+/**
  * Generate a 1-1 map from possible tags to symbols in this->tags2symbols.
  * Also calculates uniGramCount for use by disambigArcCost().
  */
@@ -489,7 +616,7 @@ bool dwdstTrainer::generate_tag_map()
   // -- build a symbol-map for all tags we know
   uniGramCount = 0;
   FSMSymbol symMax = syms->alphabet_size(); // -- avoid collisions with existing symbols
-  for (set<FSMSymbolString>::iterator si = alltags.begin(); si != alltags.end(); si++) {
+  for (FSMSymbolStringSet::iterator si = alltags.begin(); si != alltags.end(); si++) {
     tags2symbols[*si] = ++symMax;
     // -- count unigrams
     theNgram.clear();
@@ -589,7 +716,7 @@ NGramCountFallbacksPair dwdstTrainer::nGramCountFallbacks(NGramVector &nGram)
  * for \b tagSet.
  */
 tagSetIterVector &dwdstTrainer::tagIters_begin(tagSetIterVector &tagIters,
-					       set<FSMSymbolString> &tagSet,
+					       FSMSymbolStringSet &tagSet,
 					       int len)
 {
   // -- initialize
@@ -605,7 +732,7 @@ tagSetIterVector &dwdstTrainer::tagIters_begin(tagSetIterVector &tagIters,
  * Get next possible ${tagIters.size()}-gram iterator-vector for tagSet
  */
 tagSetIterVector &dwdstTrainer::tagIters_next(tagSetIterVector &tagIters,
-					       set<FSMSymbolString> &tagSet)
+					       FSMSymbolStringSet &tagSet)
 {
   for (int j = tagIters.size()-1; j >= 0; j--) {
     /*
@@ -628,7 +755,7 @@ tagSetIterVector &dwdstTrainer::tagIters_next(tagSetIterVector &tagIters,
 /**
  * Are we done iterating yet?
  */
-bool dwdstTrainer::tagIters_done(tagSetIterVector &tagIters, set<FSMSymbolString> &tagSet)
+bool dwdstTrainer::tagIters_done(tagSetIterVector &tagIters, FSMSymbolStringSet &tagSet)
 {
   return tagIters[0] == tagSet.end();
 }
@@ -639,19 +766,19 @@ bool dwdstTrainer::tagIters_done(tagSetIterVector &tagIters, set<FSMSymbolString
  *--------------------------------------------------------------------------*/
 
 /*
- * set<FSMState>
+ * FSMStateSet
  * dwdstTrainer::fsm_add_pos_arc(FSM *fsm, FSMState qfrom, FSMSymbolString &pos,
  *                                      FSMWeight cost = FSM_default_cost_structure.freecost())
  *   + returns set of "final" states for the arc
  *   + honors the 'want_features' data-member
  */
-set<FSMState>
+FSMStateSet
 dwdstTrainer::fsm_add_pos_arc(FSM *fsm, const FSMState qfrom, const FSMSymbolString &pos,
 				     const FSMWeight cost = FSM_default_cost_structure.freecost())
 {
   FSMRepresentation *base = fsm->fsm_representation();
   FSMState qi;
-  set<FSMState> pstates;
+  FSMStateSet pstates;
 
   // -- return an FSA ambiguous between all tags in 'tagset' -- no features!
   qi = base->add_state(base->new_state());
@@ -671,7 +798,7 @@ dwdstTrainer::fsm_add_pos_arc(FSM *fsm, const FSMState qfrom, const FSMSymbolStr
       set<FSMSymbol> *values = syms->subtypes_of(*f);
       qf = base->add_state(base->new_state());
       for (set<FSMSymbol>::iterator v = values->begin(); v != values->end(); v++) {
-	for (set<FSMState>::iterator ps = pstates.begin(); ps != pstates.end(); ps++) {
+	for (FSMStateSet::iterator ps = pstates.begin(); ps != pstates.end(); ps++) {
 	  base->add_transition(*ps, qf, *v, *v, FSM_default_cost_structure.freecost());
 	}
       }
@@ -747,8 +874,8 @@ inline bool dwdstTrainer::init_training_temps(FILE *in=NULL, FILE *out=NULL)
   int i;
 
   // -- ngram temps
-  curngrams = new set<NGramVector>();
-  nextngrams = new set<NGramVector>();
+  curngrams = new NGramVectorSet();
+  nextngrams = new NGramVectorSet();
 
   // -- files
   infile = in;
@@ -756,9 +883,9 @@ inline bool dwdstTrainer::init_training_temps(FILE *in=NULL, FILE *out=NULL)
 
   // -- initialize string-sets
   for (i = 0; i < kmax; i++) {
-    stringq.push_back(new set<FSMSymbolString>());
+    stringq.push_back(new FSMSymbolStringSet());
   }
-  tmptags = new set<FSMSymbolString>();
+  tmptags = new FSMSymbolStringSet();
   return true;
 }
 
@@ -887,7 +1014,7 @@ inline void dwdstTrainer::train_next_token(void)
   fprintf(stderr, "\n<DEBUG> stringq=<");
   for (FSMSymbolStringQueue::iterator dbgqi = stringq.begin(); dbgqi != stringq.end(); dbgqi++) {
     fprintf(stderr, "\n<DEBUG>   {");
-    for (set<FSMSymbolString>::iterator dbgi = (*dbgqi)->begin(); dbgi != (*dbgqi)->end(); dbgi++) {
+    for (FSMSymbolStringSet::iterator dbgi = (*dbgqi)->begin(); dbgi != (*dbgqi)->end(); dbgi++) {
       fprintf(stderr, "%s,", dbgi->c_str());
     }
     fprintf(stderr, "},");

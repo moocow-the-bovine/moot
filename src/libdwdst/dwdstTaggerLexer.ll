@@ -26,9 +26,19 @@
       TOKEN\
     } TokenType;\
   public: \
+   /* -- local data */ \
+   /** \brief current line*/\
+   int theLine;\
+   /** \brief current column*/\
+   int theColumn;\
+  public: \
     /* -- local methods */ \
     /** \brief hack for non-global yywrap() */\
     void step_streams(FILE *in, FILE *out);
+
+%define CONSTRUCTOR_INIT :\
+  theLine(1), \
+  theColumn(1)
 
 %header{
 /*============================================================================
@@ -56,13 +66,13 @@ wchar      [^ \t\n\r]
  *----------------------------------------------------------------------*/
 %%
 
-{newline}+                     { return EOS; }
-{space}+                       { /* ignore spaces */ }
+{newline}+                     { theLine += yyleng; theColumn = 0; return EOS; }
+{space}+                       { theColumn += yyleng; /* ignore spaces */ }
 
-^{space}*\#([^\r\n]*){newline} { /* ignore comments */ }
+^{space}*\#([^\r\n]*){newline} { theLine++; theColumn = 0; /* ignore comments */ }
 
-{wchar}+                       { return TOKEN; }
-.                              { return UNKNOWN; }
+{wchar}+                       { theColumn += yyleng; return TOKEN; }
+.                              { theColumn += yyleng; return UNKNOWN; }
 
 <<EOF>>                        { return DTEOF; }
 
