@@ -39,6 +39,10 @@ cmdutil_file_info out;
 // -- global classes/structs
 dwds_tagger dwdst;
 
+// -- for verbose timing info
+timeval istarted, astarted, astopped;
+double ielapsed, aelapsed;
+
 /*--------------------------------------------------------------------------
  * Option Processing
  *--------------------------------------------------------------------------*/
@@ -68,6 +72,8 @@ void GetMyOptions(int argc, char **argv)
   churner.ninputs = args.inputs_num;
   churner.use_list = args.list_given;
 
+  // -- get initialization start-time
+  if (args.verbose_arg > 0) gettimeofday(&istarted, NULL);
 
   // -- tagger object setup : flags
   dwdst.want_avm = args.avm_given;
@@ -105,11 +111,6 @@ void GetMyOptions(int argc, char **argv)
 int main (int argc, char **argv)
 {
   int nfiles = 0;
-  timeval istarted, astarted, astopped;
-  double ielapsed, aelapsed;
-
-  // -- get initialization start-time
-  if (args.verbose_arg > 0) gettimeofday(&istarted, NULL);
 
   GetMyOptions(argc,argv);
 
@@ -148,8 +149,8 @@ int main (int argc, char **argv)
       // -- timing
       gettimeofday(&astopped, NULL);
 
-      aelapsed = astopped.tv_sec-astarted.tv_sec + (astopped.tv_usec-astarted.tv_usec)/1000000.0;
-      ielapsed = astarted.tv_sec-istarted.tv_sec + (astarted.tv_usec-istarted.tv_usec)/1000000.0;
+      aelapsed = astopped.tv_sec - astarted.tv_sec + (double)(astopped.tv_usec - astarted.tv_usec) / 1000000.0;
+      ielapsed = astarted.tv_sec - istarted.tv_sec + (double)(astarted.tv_usec - istarted.tv_usec) / 1000000.0;
 
       // -- print summary
       fprintf(stderr, "\n-----------------------------------------------------\n");
@@ -160,13 +161,13 @@ int main (int argc, char **argv)
       fprintf(stderr, "  + Recognition Rate : ");
       if (dwdst.ntokens > 0) {
 	// -- avoid div-by-zero errors
-	fprintf(stderr, "%.2f\n", (double)(dwdst.ntokens-dwdst.nunknown)/(double)dwdst.ntokens);
+	fprintf(stderr, "%.2f %%\n", 100.0*(double)(dwdst.ntokens-dwdst.nunknown)/(double)dwdst.ntokens);
       } else {
 	fprintf(stderr, "-NaN-\n");
       }
-      fprintf(stderr, "  + Init Time        : %.2f sec\n", ielapsed);
+      fprintf(stderr, "  + Initialize Time  : %.2f sec\n", ielapsed);
       fprintf(stderr, "  + Analysis Time    : %.2f sec\n", aelapsed);
-      fprintf(stderr, "  + Throughput       : %.2f toks/sec\n", (float)dwdst.ntokens/aelapsed);
+      fprintf(stderr, "  + Throughput       : %.2f tok/sec\n", (float)dwdst.ntokens/aelapsed);
       fprintf(stderr, "-----------------------------------------------------\n");
   }
 
