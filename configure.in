@@ -124,11 +124,18 @@ AC_ARG_ENABLE(fsm,
 	[ac_cv_enable_fsm="$enableval"], [ac_cv_enable_fsm="yes"])
 
 if test "$ac_cv_enable_fsm" = "yes" ; then
-  PKG_CHECK_MODULES(FSMLIB, libFSM >= 0.1.0.6, [PC_HAVE_LIBFSM=1], [PC_HAVE_LIBFSM=""])
+  PKG_CHECK_MODULES(FSMLIB, libFSM >= 0.1.1.1,
+	[PC_LIBFSM_VERSION="0_1_1"],
+	[PC_LIBFSM_VERSION=""])
+  if test -z "$PC_LIBFSM_VERSION" ; then
+    PKG_CHECK_MODULES(FSMLIB, libFSM >= 0.1.0.6,
+	[PC_LIBFSM_VERSION="0_1_0"],
+	[PC_LIBFSM_VERSION=""])
+  fi
   #CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I libFSM`"
   #LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L libFSM`"
   #FSM_LIBS="`$PKG_CONFIG --libs-only-l libFSM`"
-  if test -z "$PC_HAVE_LIBFSM" ; then
+  if test -z "$PC_LIBFSM_VERSION" ; then
     ac_cv_enable_fsm="no"
     enable_fsm_errors="$PKG_CONFIG_ERRORS"
   fi
@@ -143,16 +150,30 @@ dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ------------------------------------------------------------
 # libFSMext (via pkg-config)
-PKG_CHECK_MODULES(FSMEXT, libFSMext >= 0.0.1, [PC_HAVE_LIBFSMEXT=1], [PC_HAVE_LIBFSMEXT=""])
 
-if test "$ac_cv_enable_fsm" = "yes" -a -n "$PC_HAVE_LIBFSMEXT" ; then
-  CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I libFSMext`"
-  LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L libFSMext`"
-  FSMEXT_LIBS="`$PKG_CONFIG --libs-only-l libFSMext`"
-elif test "$ac_cv_enable_fsm" = "yes" ; then
-  ac_cv_enable_fsm="no"
-  enable_fsm_errors="$PKG_CONFIG_ERRORS"
-fi
+case "$PC_LIBFSM_VERSION" in
+  "")
+	;;
+  0_1_0)
+    PKG_CHECK_MODULES(FSMEXT, libFSMext >= 0.0.1,
+	[PC_HAVE_LIBFSMEXT=1],
+	[PC_HAVE_LIBFSMEXT=""])
+    if test "$ac_cv_enable_fsm" = "yes" -a -n "$PC_HAVE_LIBFSMEXT" ; then
+       CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I libFSMext`"
+       LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L libFSMext`"
+       FSMEXT_LIBS="`$PKG_CONFIG --libs-only-l libFSMext`"
+    elif test "$ac_cv_enable_fsm" = "yes" ; then
+       ac_cv_enable_fsm="no"
+       enable_fsm_errors="$PKG_CONFIG_ERRORS"
+    fi
+    ;;
+
+  *)
+    CPPFLAGS="$CPPFLAGS `$PKG_CONFIG --cflags-only-I libFSM`"
+    LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L libFSM`"
+    FSMEXT_LIBS="`$PKG_CONFIG --libs-only-l libFSM`"
+    ;;
+esac
 AC_SUBST(FSMEXT_LIBS)
 dnl libFSMext
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
