@@ -62,7 +62,8 @@ dwdstt_SOURCES = \
 	dwdstt.cc \
 	dwdstt.h \
 	dwdstt_main.cc \
-	dwdstt_cmdparser.ggo
+	dwdstt_cmdparser.ggo \
+	postag_lexer.ll
 
 ## --- Extra (possible) sources
 #EXTRA_${prog_i}_SOURCES = 
@@ -71,7 +72,7 @@ dwdstt_SOURCES = \
 ## --- Additional dependencies
 dwdspp_main.o: dwdspp_cmdparser.h dwdspp_lexer.h
 dwdst.o: dwdst_cmdparser.h dwdst_lexer.h
-dwdstt.o: dwdstt_cmdparser.h dwdst_lexer.h
+dwdstt.o: dwdstt_cmdparser.h dwdst_lexer.h postag_lexer.h
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -166,6 +167,9 @@ dwdstt_LDADD = @FSM_LIBS@
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = \
 	*~ .*~ Makefile Makefile.in \
+	dwdst_lexer.cc dwdst_lexer.h \
+	dwdspp_lexer.cc dwdspp_lexer.h \
+	postag_lexer.cc postag_lexer.h \
 	dwdst_cmdparser.cc dwdst_cmdparser.h \
 	dwdstt_cmdparser.cc dwdstt_cmdparser.h \
 	dwdspp_cmdparser.cc dwdspp_cmdparser.h
@@ -179,6 +183,7 @@ EXTRA_DIST = \
 	dwdst.sym \
 	dwdst_lexer.cc dwdst_lexer.h \
 	dwdspp_lexer.cc dwdspp_lexer.h \
+	postag_lexer.cc postag_lexer.h \
 	dwdst_cmdparser.cc dwdst_cmdparser.h \
 	dwdstt_cmdparser.cc dwdstt_cmdparser.h \
 	dwdspp_cmdparser.cc dwdspp_cmdparser.h

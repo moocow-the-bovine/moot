@@ -5,7 +5,10 @@ purpose	"Part-of-Speech tagger for the KDWDS project."
 
 # Options
 option	"verbose"	v	"Specify verbosity level"		int default="1"			no
-option	"avm"		a	"Produce AVM ('vector') output"		no
+
+option	"avm"		a	"Produce AVM ('vector') output"				no
+option	"tnt-format"	T	"Produce TnT-style output (1 tok/line)"			no
+option	"tags-only"	t	"Only output PoS tags, not morpho-syntactic features"	no
 
 option	"words"		w	"Args are input tokens, not filenames"	    no
 option  "list"		l       "Args are file-lists, not input filenames"  no

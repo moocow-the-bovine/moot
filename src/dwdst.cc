@@ -30,9 +30,12 @@ dwds_tagger::dwds_tagger(FSM *mymorph, FSMSymSpec *mysyms)
   // -- public data
   morph = mymorph;
   syms = mysyms;
+  eos = "<<EOS>>";
 
   // -- public flags
   want_avm = false;
+  want_features = true;
+  want_tnt_format = false;
   verbose = false;
 
   // -- private data
@@ -133,30 +136,68 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
     switch (tok) {
     case EOS:
       /* do something spiffy */
-      fputs("<<EOS>>\n\n", out);
+      if (want_tnt_format) {
+	fputc('\n', out);
+      } else {
+	fputs(eos.c_str(), out);
+	fputs("\n\n", out);
+      }
       break;
 
     case TOKEN:
     default:
+      if (verbose) ntokens++;
+
       tmp->fsm_clear();
       results.clear();
       s = (char *)lexer.yytext;
-      
       result = morph->fsm_lookup(s,tmp,true);  // v0.0.2 -- getting leaks here!
-      tmp->fsm_strings(syms, &results, false, want_avm);
-   
-      fprintf(out, "%s: %d Analyse(n)\n", lexer.yytext, results.size());
-      for (ri = results.begin(); ri != results.end(); ri++) {
-	fputs("\t", out);
-	fputs(ri->istr.c_str(), out);
-	fprintf(out, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
-      }
-      fputc('\n',out);
-      
-      // -- verbosity
-      if (verbose) {
-	ntokens++;
-	if (results.empty()) nunknown++;
+
+      fputs((char *)lexer.yytext, out);
+      if (want_features) {
+	// -- all features
+	tmp->fsm_strings(syms, &results, false, want_avm);
+	if (verbose && tagresults.empty()) nunknown++;
+	if (want_tnt_format) {
+	  // -- all features, one tok/line
+	  for (ri = results.begin(); ri != results.end(); ri++) {
+	    fputs("\t", out);
+	    fputs(ri->istr.c_str(), out);
+	    if (ri->weight) fprintf(out, "<%f>", ri->weight);
+	  }
+	  fputc('\n',out);
+	} else {
+	  // -- all features, madwds native format
+	  fprintf(out, ": %d Analyse(n)\n", results.size());
+	  for (ri = results.begin(); ri != results.end(); ri++) {
+	    fputs("\t", out);
+	    fputs(ri->istr.c_str(), out);
+	    fprintf(out, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
+	  }
+	  fputc('\n',out);
+	} 
+      } else {
+	// -- tags only
+	get_fsm_tag_strings(tmp, &tagresults);
+	if (verbose && tagresults.empty()) nunknown++;
+	
+	if (want_tnt_format) {
+	  // -- tags-only, one tok/line
+	  for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
+	    fputc('\t', out);
+	    fputs(*(tri->c_str()) == '_' ? tri->c_str()+1 : tri->c_str(), out);
+	  }
+	  fputc('\n', out);
+	} else {
+	  // -- tags-only, madwds native format
+	  fprintf(out, ": %d Analyse(n)\n", tagresults.size());
+	  for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
+	    fputs("\t[", out);
+	    fputs(tri->c_str(), out);
+	    fputs("]\n", out);
+	  }
+	  fputc('\n',out);
+	}
       }
     }
   }
@@ -176,27 +217,115 @@ bool dwds_tagger::tag_strings(int argc, char **argv, FILE *out=stdout)
   
   // -- ye olde guttes
   for ( ; --argc >= 0; argv++) {
+    // -- verbosity
+    if (verbose) ntokens++;
+
     tmp->fsm_clear();
     results.clear();
     s = *argv;
 
     result = morph->fsm_lookup(s,tmp,true);
-    tmp->fsm_strings(syms, &results, false, want_avm);
 
-    fprintf(out, "%s: %d Analyse(n)\n", *argv, results.size());
-    for (ri = results.begin(); ri != results.end(); ri++) {
-	fputs("\t", out);
-	fputs(ri->istr.c_str(), out);
-	fprintf(out, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
-    }
-    fputc('\n',out);
+    fputs(*argv, out);
+    if (want_features) {
+      // -- all features
+      tmp->fsm_strings(syms, &results, false, want_avm);
+      if (verbose && tagresults.empty()) nunknown++;
+      if (want_tnt_format) {
+	// -- all features, one tok/line
+	for (ri = results.begin(); ri != results.end(); ri++) {
+	  fputs("\t", out);
+	  fputs(ri->istr.c_str(), out);
+	  if (ri->weight) fprintf(out, "<%f>", ri->weight);
+	}
+	fputc('\n',out);
+      } else {
+	// -- all features, madwds native format
+	fprintf(out, ": %d Analyse(n)\n", results.size());
+	for (ri = results.begin(); ri != results.end(); ri++) {
+	  fputs("\t", out);
+	  fputs(ri->istr.c_str(), out);
+	  fprintf(out, (ri->weight ? "\t<%f>\n" : "\n"), ri->weight);
+	}
+	fputc('\n',out);
+      } 
+    } else {
+      // -- tags only
+      get_fsm_tag_strings(tmp, &tagresults);
+      if (verbose && tagresults.empty()) nunknown++;
 
-    // -- verbosity
-    if (verbose) {
-      ntokens++;
-      if (results.empty()) nunknown++;
+      if (want_tnt_format) {
+	// -- tags-only, one tok/line
+	for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
+	  fputc('\t', out);
+	  fputs(*(tri->c_str()) == '_' ? tri->c_str()+1 : tri->c_str(), out);
+	}
+	fputc('\n', out);
+      } else {
+	// -- tags-only, madwds native format
+	fprintf(out, ": %d Analyse(n)\n", tagresults.size());
+	for (tri = tagresults.begin(); tri != tagresults.end(); tri++) {
+	  fputs("\t[", out);
+	  fputs(tri->c_str(), out);
+	  fputs("]\n", out);
+	}
+	fputc('\n',out);
+      }
     }
   }
 
   return true;
+}
+
+
+/*--------------------------------------------------------------------------
+ * Low-level methods
+ *--------------------------------------------------------------------------*/
+
+/*
+ * set<FSMSymbol> *dwdst_tagger::get_fsm_tags(FSM *fsa, set<FSMSymbol> *tags=NULL);
+ */
+set<FSMSymbol> *dwds_tagger::get_fsm_tags(FSM *fsa, set<FSMSymbol> *tags=NULL)
+{
+  FSMState q0;
+  FSMTransitions *arcs;
+  FSMTransition  *arc;
+  FSMBaseRepresentation *rep = fsa->representation();
+
+  // -- ensure 'tags' is defined
+  if (!tags) tags = new set<FSMSymbol>();
+
+  // -- get start-state
+  q0 = rep->start_state();
+  if (q0 == FSMNOSTATE) return tags;
+
+  // -- get input-labels for all transitions from q0
+  //    --> WARNING: if you get an '<epsilon>' in here, you
+  //                 DO NOT have all initial symbols!
+  arcs = rep->transitions(q0,false);
+  while ((arc = arcs->next_transition()) != NULL) {
+    tags->insert(arc->ilabel);
+  }
+  rep->delete_transition_iterator(arcs,false);
+
+  return tags;
+}
+
+
+/*
+ * set<FSMSymbolString> *dwdst_tagger::get_fsm_tag_strings(FSM *fsa, set<FSMSymbolString> *tag_strings=NULL);
+ */
+set<FSMSymbolString> *dwds_tagger::get_fsm_tag_strings(FSM *fsa, set<FSMSymbolString> *tag_strings=NULL)
+{
+  set<FSMSymbol> *tags = get_fsm_tags(fsa,NULL);
+
+  // -- ensure 'tag_strings' is defined
+  if (!tag_strings) tag_strings = new set<FSMSymbolString>();
+
+  for (set<FSMSymbol>::const_iterator t = tags->begin(); t != tags->end(); t++) {
+    tag_strings->insert(*(syms->symbol_to_symbolname(*t)));
+  }
+
+  delete tags;
+  return tag_strings;
 }

@@ -35,8 +35,12 @@ public:
 
   dwdst_lexer lexer;
 
+  string eos;
+
   // -- flags
   bool want_avm;
+  bool want_features;
+  bool want_tnt_format;
   bool verbose;
 
   // -- verbose data
@@ -55,6 +59,8 @@ protected:
   FSMSymbolString s;
   set<FSMStringWeight> results;
   set<FSMStringWeight>::iterator ri;
+  set<FSMSymbolString> tagresults;
+  set<FSMSymbolString>::iterator tri;
 
 public:
   // -- public methods: constructor/destructor
@@ -71,6 +77,11 @@ public:
 
   // -- public methods: sanity checks
   bool can_tag(void) const { return morph && syms; }
+
+  // -- public methods: low-level
+  set<FSMSymbol> *get_fsm_tags(FSM *fsa, set<FSMSymbol> *tags=NULL);
+  set<FSMSymbolString> *get_fsm_tag_strings(FSM *fsa, set<FSMSymbolString> *tag_strings=NULL);
+
 };
 
 #endif // _DWDST_H_

@@ -8,6 +8,8 @@ option	"verbose"	v	"Specify verbosity level"		    int default="1"		no
 option  "list"		l       "Args are file-lists, not input filenames"  no
 option	"words"		w	"Args are input tokens, not filenames"	    no
 
+option	"kgram-max"	k	"Size of k-gram window"                     int default="2"		no
+
 # -- unknown-FSA generation (FSA used as analysis for unknown tokens)
 option  "unknown-output" u	"Specify unknown-FSA output file"	string				no
 option	"pos-list"	 p	"Specify PoS-tag listfile"		string				no
