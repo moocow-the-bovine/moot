@@ -40,6 +40,7 @@ dwds_tagger::dwds_tagger(FSM *mymorph, FSMSymSpec *mysyms)
   i_made_syms = false;
 
   // -- temporary variables
+  tmp = new FSM();
   result = NULL;
 }
 
@@ -76,9 +77,7 @@ FSM *dwds_tagger::load_morph(char *filename)
   int fsmtype;
 
   // -- cleanup old FSM first
-  if (morph && i_made_morph) {
-    morph->fsm_free();
-  }
+  if (morph && i_made_morph) morph->fsm_free();
 
   morph = new FSM(filename);
   fsmtype = morph->fsm_type();
@@ -102,14 +101,14 @@ FSM *dwds_tagger::load_morph(char *filename)
  * dwds_tagger::~dwds_tagger()
  */
 dwds_tagger::~dwds_tagger() {
-  if (morph && i_made_morph) {
-    morph->fsm_free();
-  }
+  if (tmp) tmp->fsm_free();
+  if (morph && i_made_morph) morph->fsm_free();
   if (syms && i_made_syms) delete syms;
 
   morph = NULL;
   syms = NULL;
   result = NULL;
+  tmp = NULL;
 }
 
 /*--------------------------------------------------------------------------
@@ -138,18 +137,18 @@ bool dwds_tagger::tag_stream(FILE *in, FILE *out)
 
     case TOKEN:
     default:
-      tmp.fsm_clear();
+      tmp->fsm_clear();
       results.clear();
       s = (char *)lexer.yytext;
       
-      result = morph->fsm_lookup(s,&tmp,true);
-      tmp.fsm_strings(syms, &results, false, want_avm);
+      result = morph->fsm_lookup(s,tmp,true);
+      /*tmp.fsm_strings(syms, &results, false, want_avm);
       
       fprintf(out, "%s: %d Analyse(n)\n", lexer.yytext, results.size());
       for (ri = results.begin(); ri != results.end(); ri++) {
 	fprintf(out, "\t((%s)<%f>)\n", ri->istr.c_str(), ri->weight);
       }
-      fputc('\n',out);
+      fputc('\n',out);*/
       
       // -- verbosity
       if (verbose) {
@@ -174,12 +173,12 @@ bool dwds_tagger::tag_strings(int argc, char **argv, FILE *out=stdout)
   
   // -- ye olde guttes
   for ( ; --argc >= 0; argv++) {
-    tmp.fsm_clear();
+    tmp->fsm_clear();
     results.clear();
     s = *argv;
 
-    result = morph->fsm_lookup(s,&tmp,true);
-    tmp.fsm_strings(syms, &results, false, want_avm);
+    result = morph->fsm_lookup(s,tmp,true);
+    tmp->fsm_strings(syms, &results, false, want_avm);
 
     fprintf(out, "%s: %d Analyse(n)\n", *argv, results.size());
     for (ri = results.begin(); ri != results.end(); ri++) {

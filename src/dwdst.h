@@ -49,7 +49,7 @@ private:
   bool i_made_syms;
 
   // -- temporary variables
-  FSM *result, tmp;
+  FSM *result, *tmp;
   FSMSymbolString s;
   set<FSMStringWeight> results;
   set<FSMStringWeight>::iterator ri;
