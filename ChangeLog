@@ -1,6 +1,6 @@
 ChangeLog for package moot
 
-v2.0.0 Sat, 29 May 2004 01:59:14 +0200
+v2.0.0pre1 Sat, 29 May 2004 01:59:14 +0200
 	+ added mootToken.h: mootToken, mootSentence interface classes
   	  - old string-based methods now deprecated
 	+ added mootTokenLexer - replaces old 'mootTaggerLexer'
