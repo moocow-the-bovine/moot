@@ -928,9 +928,13 @@ public:
    */
   inline std::string token2string(const mootToken &token)
   {
+    mostream *tw_ostream_old = tw_ostream;
     twn_tmpbuf.clear();
-    _put_token(token,&twn_tmpbuf);
-    return std::string(twn_tmpbuf.data(), twn_tmpbuf.size());
+    tw_ostream = &twn_tmpbuf;
+    _put_token(token,tw_ostream);
+    std::string t2s(twn_tmpbuf.data(), twn_tmpbuf.size());
+    tw_ostream = tw_ostream_old;
+    return t2s;
   };
 
   /** Clear internal buffer and stringify sentence into it,

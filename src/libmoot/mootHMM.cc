@@ -1642,19 +1642,19 @@ void mootHMM::txtdump(FILE *file)
   fprintf(file, "%%%% Constants\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   fprintf(file, "start_tagid\t%u(\"%s\")\n", start_tagid, tagids.id2name(start_tagid).c_str());
-  fprintf(file, "nglambda1\t%g (=%g)\n", nglambda1, exp(nglambda1));
-  fprintf(file, "nglambda2\t%g (=%g)\n", nglambda2, exp(nglambda2));
+  fprintf(file, "nglambda1\t%e (=%e)\n", nglambda1, exp(nglambda1));
+  fprintf(file, "nglambda2\t%e (=%e)\n", nglambda2, exp(nglambda2));
 #ifdef MOOT_USE_TRIGRAMS
-  fprintf(file, "nglambda3\t%g (=%g)\n", nglambda3, exp(nglambda3));
+  fprintf(file, "nglambda3\t%e (=%e)\n", nglambda3, exp(nglambda3));
 #endif
-  fprintf(file, "wlambda0\t%g (=%g)\n", wlambda0, exp(wlambda0));
-  fprintf(file, "wlambda1\t%g (=%g)\n", wlambda1, exp(wlambda1));
+  fprintf(file, "wlambda0\t%e (=%e)\n", wlambda0, exp(wlambda0));
+  fprintf(file, "wlambda1\t%e (=%e)\n", wlambda1, exp(wlambda1));
 
-  fprintf(file, "clambda0\t%g (=%g)\n", clambda0, exp(clambda0));
-  fprintf(file, "clambda1\t%g (=%g)\n", clambda1, exp(clambda1));
+  fprintf(file, "clambda0\t%e (=%e)\n", clambda0, exp(clambda0));
+  fprintf(file, "clambda1\t%e (=%e)\n", clambda1, exp(clambda1));
   fprintf(file, "use_lex_classes\t%d\n", use_lex_classes ? 1 : 0);
 
-  fprintf(file, "beamwd\t%g (=%g)\n", beamwd, exp(beamwd));
+  fprintf(file, "beamwd\t%e (=%e)\n", beamwd, exp(beamwd));
 
   fputs("uclass\t", file);
   for (LexClass::const_iterator lci = uclass.begin();  lci != uclass.end(); lci++) {
@@ -1683,7 +1683,7 @@ void mootHMM::txtdump(FILE *file)
 	{
 	  TagID tagid = lpsi->first;
 	  ProbT prob  = lpsi->second;
-	  fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%g\t%g\n",
+	  fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%e\t%e\n",
 		  tokid, tokids.id2name(tokid).c_str(),
 		  tagid, tagids.id2name(tagid).c_str(),
 		  prob,
@@ -1720,7 +1720,7 @@ void mootHMM::txtdump(FILE *file)
 	  TagID ctagid = cpsi->first;
 	  ProbT cprob  = cpsi->second;
 
-	  fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%g\t%g\n",
+	  fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%e\t%e\n",
 		  cid, classname.c_str(),
                   ctagid, tagids.id2name(ctagid).c_str(), cprob, exp(cprob));
 	}
@@ -1745,7 +1745,7 @@ void mootHMM::txtdump(FILE *file)
 	  for (tagid = 0; tagid < n_tags; tagid++) {
 	    prob = tagp(pptagid, ptagid, tagid);
 	    if (prob != MOOT_PROB_ZERO) {
-	      fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%u(\"%s\")\t%g\t%g\n",
+	      fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%u(\"%s\")\t%e\t%e\n",
 		      pptagid,  tagids.id2name(pptagid).c_str(),
 		      ptagid,  tagids.id2name(ptagid).c_str(),
 		      tagid, tagids.id2name(tagid).c_str(),
@@ -1773,7 +1773,7 @@ void mootHMM::txtdump(FILE *file)
       for (tagid = 0; tagid < n_tags; tagid++) {
 	prob = ngprobs2[(n_tags*ptagid)+tagid];
 	//if (prob == 0) continue;
-	fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%g\t%g\n",
+	fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%e\t%e\n",
 		ptagid,  tagids.id2name(ptagid).c_str(),
 		tagid, tagids.id2name(tagid).c_str(),
 		prob,
@@ -1788,14 +1788,14 @@ void mootHMM::txtdump(FILE *file)
   fprintf(file, "\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   fprintf(file, "%%%% Suffix Trie\n");
-  fprintf(file, "%%%% maxlen=%u ; theta=%g\n", suftrie.maxlen(), suftrie.theta);
+  fprintf(file, "%%%% maxlen=%u ; theta=%e\n", suftrie.maxlen(), suftrie.theta);
   fprintf(file, "%%%% \"Suffix\"\tTagID(\"TagStr\")\tlog(p(Suffix|TagID))\tp\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   for (SuffixTrie::const_iterator sti = suftrie.begin(); sti != suftrie.end(); sti++) {
     string suf = suftrie.node_string(*sti);
     for (SuffixTrieDataT::const_iterator stdi=sti->data.begin(); stdi != sti->data.end(); stdi++)
       {
-	fprintf(file, "\"%s\"\t%u(\"%s\")\t%g\t%g\n",
+	fprintf(file, "\"%s\"\t%u(\"%s\")\t%e\t%e\n",
 		suf.c_str(),
 		stdi->first,
 		tagids.id2name(stdi->first).c_str(),
@@ -1843,30 +1843,35 @@ void mootHMM::viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, size_t col
   size_t          rowi;
 
   w->printf_raw("%%%%=================================================================\n");
-  w->printf_raw("%%%% COLUMN %u ; beamwd=%g ; bbestpr=%g ; bpprmin=%g ; cutoff=%g\n",
+  w->printf_raw("%%%% COLUMN %u : (log) beamwd=%e ; bbestpr=%e ; bpprmin=%e ; cutoff=%e\n",
 		colnum, beamwd, col->bbestpr, col->bpprmin, col->bbestpr-beamwd);
+  w->printf_raw("%%%%           : (exp) beamwd=%e ; bbestpr=%e ; bpprmin=%e ; cutoff=%e\n",
+		exp(beamwd), exp(col->bbestpr), exp(col->bpprmin), exp(col->bbestpr-beamwd));
+
 
   for (rowi = 0, row = col->rows; row != NULL; row = row->row_next, rowi++) {
     w->printf_raw("%%%%-----------------------------------------------------\n");
     w->printf_raw("%%%% ROW %u.%u [tag=%u(\"%s\")]\n",
 		  colnum, rowi, row->tagid, tagids.id2name(row->tagid).c_str());
     w->printf_raw
-      ("%%%% TagID(\"Str\")\t [PrevTagID(\"PStr\")]\t <PPrevTagID(\"PPStr\")>:\t Prob\n");
+      ("%%%% TagID(\"Str\")\t [PrevTagID(\"PStr\")]\t <PPrevTagID(\"PPStr\")>:\t log(p) (=p)\n");
 
     for (node = row->nodes; node != NULL; node = node->nod_next) {
       if (node->pth_prev == NULL) {
 	//-- BOS
-	w->printf_raw("%u(\"%s\")\t [%u(\"%s\")]\t <(NULL)>\t: %g\n",
+	w->printf_raw("%u(\"%s\")\t [%u(\"%s\")]\t <(NULL)>\t: %e\t (=%e)\n",
 		      node->tagid,   tagids.id2name(node->tagid).c_str(),
 		      node->ptagid,  tagids.id2name(node->ptagid).c_str(),
-		      node->lprob
+		      node->lprob,
+		      exp(node->lprob)
 		      );
       } else {
-	w->printf_raw("%u(\"%s\")\t [%u(\"%s\")]\t <%u(\"%s\")>\t: %g\n",
+	w->printf_raw("%u(\"%s\")\t [%u(\"%s\")]\t <%u(\"%s\")>\t: %e\t (=%e)\n",
 		      node->tagid,             tagids.id2name(node->tagid).c_str(),
 		      node->ptagid,            tagids.id2name(node->ptagid).c_str(),
 		      node->pth_prev->ptagid,  tagids.id2name(node->pth_prev->ptagid).c_str(),
-		      node->lprob
+		      node->lprob,
+		      exp(node->lprob)
 		      );
       }
     }
@@ -1877,21 +1882,27 @@ void mootHMM::viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, size_t col
   ViterbiNode    *node;
 
   w->printf_raw("%%%%=================================================================\n");
-  w->printf_raw("%%%% COLUMN %u\n", colnum);
-  w->printf_raw("%%%% TagID(\"Str\")\t <PrevTagID(\"PStr\")>:\t Prob\n");
+  w->printf_raw("%%%% COLUMN %u : (log) beamwd=%e ; bbestpr=%e ; bpprmin=%e ; cutoff=%e\n",
+		colnum, beamwd, col->bbestpr, col->bpprmin, col->bbestpr-beamwd);
+  w->printf_raw("%%%%           : (exp) beamwd=%e ; bbestpr=%e ; bpprmin=%e ; cutoff=%e\n",
+		exp(beamwd), exp(col->bbestpr), exp(col->bpprmin), exp(col->bbestpr-beamwd));
+
+  w->printf_raw("%%%% TagID(\"Str\")\t <PrevTagID(\"PStr\")>:\t log(p)\t (=p)\n");
 
   for (node = col->rows; node != NULL; node = node->nod_next) {
     if (node->pth_prev == NULL) {
       //-- BOS
-      w->printf_raw("%u(\"%s\")\t <(NULL)>\t: %g\n",
+      w->printf_raw("%u(\"%s\")\t <(NULL)>\t: %e\t (=%e)\n",
 		    node->tagid,   tagids.id2name(node->tagid).c_str(),
-		    node->lprob
+		    node->lprob,
+		    exp(node->lprob)
 		    );
     } else {
-      w->printf_raw("%u(\"%s\")\t <%u(\"%s\")>\t: %g\n",
+      w->printf_raw("%u(\"%s\")\t <%u(\"%s\")>\t: %e\t (=%e)\n",
 		    node->tagid,             tagids.id2name(node->tagid).c_str(),
 		    node->pth_prev->tagid,   tagids.id2name(node->pth_prev->tagid).c_str(),
-		    node->lprob
+		    node->lprob,
+		    exp(node->lprob)
 		    );
     }
   }

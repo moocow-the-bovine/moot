@@ -39,6 +39,7 @@
 #include <mootEval.h>
 
 #include <mootCIO.h>
+#include <mootBufferIO.h>
 #include <mootUtils.h>
 #include "mooteval_cmdparser.h"
 
@@ -548,9 +549,11 @@ void put_tok_results(FILE *file, const mootToken &tok1, const mootToken &tok2)
     {
       fputs(eval.status_string().c_str(), file);
       fputc('\t', file);
+
       string t2s = twriter1->token2string(tok1);
       if (!t2s.empty()) t2s.erase(t2s.size()-1);
       fputs(t2s.c_str(), file);
+
       fputs("\t/\t", file);
       twriter2->put_token(tok2);
     }

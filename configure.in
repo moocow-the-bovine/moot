@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.4-pre1])
+define([THE_PACKAGE_VERSION], [2.0.4-pre2])
 define([THE_PACKAGE_MAINTAINER],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -727,10 +727,10 @@ dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ##
 AC_MSG_CHECKING([whether to use trigrams])
 AC_ARG_ENABLE(trigrams,
-	AC_HELP_STRING([--enable-trigrams], [Use trigrams (default=no)]),
-	[ac_cv_enable_trigrams="$enableval"],[ac_cv_enable_trigrams="no"])
+	AC_HELP_STRING([--disable-trigrams], [Use trigrams (default=yes)]),
+	[ac_cv_enable_trigrams="$enableval"],[ac_cv_enable_trigrams="yes"])
 
-if test "$ac_cv_enable_trigrams" != "no" ; then
+if test "$ac_cv_enable_trigrams" = "yes" ; then
   AC_MSG_RESULT(yes)
   AC_DEFINE(MOOT_USE_TRIGRAMS,1,
 	    [Define this to enable use of trigrams])

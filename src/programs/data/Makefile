@@ -37,7 +37,7 @@ XMLIFY ?= ./xmlify.perl
 OF_XML=xml,pretty
 
 ##-- moot: suffix trie stuff
-a ?= 4
+a ?= 0
 A ?= 10
 theta ?= 0.1017023
 SUFFIX_TRIE_LEN ?= $(a)
