@@ -243,7 +243,6 @@ FSM *dwdstTrainer::expand_disambig_skeleton()
 
   // -- construct an FSMSubstitutionMap using tags2symbols
   FSM::FSMSubstitutionMap syms2fsms;
-  syms2fsms.clear();
   for (dwdstStringToSymbolMap::iterator t2si = tags2symbols.begin(); t2si != tags2symbols.end(); t2si++) {
     recomp.theLexer.theLine++;
     recomp.theLexer.theColumn = 0;
@@ -252,33 +251,30 @@ FSM *dwdstTrainer::expand_disambig_skeleton()
 	      methodName, t2si->first.c_str());
       recomp.result_fsm = recomp.epsilon_fsm();
     }
+
+    // -- generate a temporary substitution-map
+    syms2fsms.clear();
     syms2fsms[t2si->second] = recomp.result_fsm;
+
+    // -- do substition for *THIS PSEUDO-TAG ONLY* 
+    dfsa->fsm_substitute(syms2fsms,FSM::FSMModeDestructive);
+
+    // -- cleanup
+    delete recomp.result_fsm;
     recomp.result_fsm = NULL;
-  }
 
-  // -- perform the substitution on dfsa
-  FSM *dfsa2 = new FSM;
-  *dfsa2 = dfsa->fsm_substitute(syms2fsms,FSM::FSMModeConstructive);
-  delete dfsa;
-  dfsa = dfsa2;
-  if (!dfsa2 || !*dfsa2) {
-    fprintf(stderr, "%s: could not expand disambiguator skeleton!\n", methodName);
-    if (dfsa) {
-      delete dfsa;
-      dfsa = NULL;
-    }
-    return NULL;
-  }
-
-  // -- cleanup our temporaries
-  for (FSM::FSMSubstitutionMap::iterator s2fi = syms2fsms.begin(); s2fi != syms2fsms.end(); s2fi++) {
-    if (s2fi->second) {
-      delete s2fi->second;
-      s2fi->second = NULL;
+    // -- sanity check
+    if (!dfsa || !*dfsa) {
+      fprintf(stderr, "%s: could not expand disambiguator skeleton for pseudo-tag '%s'!\n",
+	      methodName, t2si->first.c_str());
+      if (dfsa) {
+	delete dfsa;
+	dfsa = NULL;
+      }
+      return NULL;
     }
   }
   syms2fsms.clear();
-
   return dfsa;
 }
 

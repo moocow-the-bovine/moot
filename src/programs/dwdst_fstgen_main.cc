@@ -23,6 +23,10 @@ using namespace std;
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
+
+//#define DWDST_FSTGEN_DEBUG
+//#undef DWDST_FSTGEN_DEBUG
+
 char *PROGNAME = "dwdst-fstgen";
 
 // options & file-churning
@@ -131,7 +135,7 @@ void GetMyOptions(int argc, char **argv)
 
   // -- report
   if (args.verbose_arg > 0) {
-    fprintf(stderr, "%s: Initialization complete\n\n", PROGNAME);
+    fprintf(stderr, "%s: Initialization complete.\n\n", PROGNAME);
   }
 }
   
@@ -182,11 +186,6 @@ int main (int argc, char **argv)
     fprintf(stderr,
 	    "%s: WARNING: generation of disambiguation-FSAs is EXPERIMENTAL!\n",
 	    PROGNAME);
-
-
-    // -- debug
-    fprintf(stderr,
-	    "%s: dwdstt.alltags.size() = %d\n", PROGNAME, dwdstt.alltags.size());
 
     
     // -- disambig-fsa generation

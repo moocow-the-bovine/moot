@@ -114,9 +114,10 @@ dis = $(addsuffix .fsa,$(parbase))
 dskel = dskeleton.fsa
 .SUFFIXES: .par .apar .tpar .atpar .dps
 
-#.PHONY: dskel dis
+.PHONY: nodskel nodis dskel dis
 
 ### generation: disambig-skeleton
+nodskel: ; rm -f $(dskel)
 dskel: $(dskel)
 	@echo ">> N-Gram Parameter File    = $(par)"
 	@echo ">> Disambiguation-Skeleton  = $(dis)"
@@ -129,6 +130,7 @@ $(dskel): $(par)
 	mv ../programs/dskeleton.lab $(dskel:.fsa=.lab)
 
 ### generation: disambig-fsa
+nodis: ; rm -f $(dis)
 dis: $(dis)
 	@echo ">> N-Gram Parameter File = $(par)"
 	@echo ">> Disambiguation-FSA    = $(dis)"
@@ -137,15 +139,15 @@ dis: $(dis)
 	( cd ../programs ;\
 	  $(MAKE) dwdst-fstgen ;\
 	  ./dwdst-fstgen -d -n ../tests/$(par) -F ../tests/$(dis) )
-	mv ../programs/dskeleton.fsa $(dskel)
-	mv ../programs/dskeleton.lab $(dskel:.fsa=.lab)
+	test -e ../programs/dskeleton.fsa && cp ../programs/dskeleton.fsa $(dskel) || true
+	test -e ../programs/dskeleton.lab && cp ../programs/dskeleton.lab $(dskel:.fsa=.lab) || true
 
 .par.lab:
 	( cd ../programs ;\
 	  $(MAKE) dwdst-fstgen ;\
 	  ./dwdst-fstgen -d -n ../tests/$(par) -F ../tests/$(dis) )
-	mv ../programs/dskeleton.fsa $(dskel)
-	mv ../programs/dskeleton.lab $(dskel:.fsa=.lab)
+	test -e ../programs/dskeleton.fsa && cp ../programs/dskeleton.fsa $(dskel) || true
+	test -e ../programs/dskeleton.lab && cp ../programs/dskeleton.lab $(dskel:.fsa=.lab) || true
 
 ### viewing: disambig-fsa
 .PHONY: disgv
@@ -154,8 +156,7 @@ disps = $(parbase).dps
 
 disps: $(disps)
 $(disps): $(dis) $(LABFILE)
-	FSMprint $(dis) | fsmcompile -F $(parbase).afsa
-	fsmdraw -i $(LABFILE) $(parbase).afsa > $(parbase).dot
+	FSMdraw -s $(sym) $(dis) -o $(parbase).dot
 	dot -Tps $(parbase).dot > $@
 disgv: $(disps)
 	gv $(disps)
