@@ -5,8 +5,8 @@
  * Description:
  *   + lexer for KDWDS tagger
  *   + assumes pre-tokenized input
- *     - space-separated tokens
- *     - one sentence per line
+ *     - one token per line
+ *     - blank lines mark end-of-sentence
  *     - raw text (no markup!)
  *   + process with Coetmeur's flex++ to produce 'dwdstTaggerLexer.cc'
  *----------------------------------------------------------------------*/
@@ -48,7 +48,7 @@
  * \class dwdstTaggerLexer
  * \brief
  * Flex++ lexer for KDWDS tagger.  Assumes pre-tokenized input:
- * space-separated tokens, one sentence per line, raw text (no markup!).
+ * one token per line,  blank lines = EOS, raw text only (no markup!).
  */
 
 %}
