@@ -355,13 +355,13 @@ int main (int argc, char **argv)
       fprintf(stderr, "    - Sentences Processed : %9u sent\n", hmm.nsents);
       fprintf(stderr, "    - Tokens Processed    : %9u tok\n", hmm.ntokens);
       fprintf(stderr, "  + Analysis\n");
-      fprintf(stderr, "    - Unclassed Tokens    : %9u (%7.2f%%)\n",
+      fprintf(stderr, "    - Unclassed Tokens    : %9u (%6.2f%%)\n",
 	      hmm.nunclassed, (double)hmm.nunclassed/(double)hmm.ntokens);
-      fprintf(stderr, "    - Unknown Classes     : %9u (%7.2f%%)\n",
+      fprintf(stderr, "    - Unknown Classes     : %9u (%6.2f%%)\n",
 	      hmm.nnewclasses, (double)hmm.nnewclasses/(double)hmm.ntokens);
-      fprintf(stderr, "    - Unknown Tokens      : %9u (%7.2f%%)\n",
+      fprintf(stderr, "    - Unknown Tokens      : %9u (%6.2f%%)\n",
 	      hmm.nunknown, (double)hmm.nunknown/(double)hmm.ntokens);
-      fprintf(stderr, "    - Fallbacks           : %9u (%7.2f%%)\n",
+      fprintf(stderr, "    - Fallbacks           : %9u (%6.2f%%)\n",
 	      hmm.nfallbacks, (double)hmm.nfallbacks/(double)hmm.ntokens);
       fprintf(stderr, "  + Performance\n");
       fprintf(stderr, "    - Initialize Time     : %12.2f sec\n", ielapsed);
