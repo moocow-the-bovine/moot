@@ -71,7 +71,7 @@ dwdst_pargen_SOURCES = \
 	dwdst.cc \
 	dwdst.h \
 	dwdst_trainer.cc \
-	dwdst_fstgen.h \
+	dwdst_trainer.h \
 	dwdst_pargen_main.cc \
 	dwdst_pargen_cmdparser.ggo \
 	postag_lexer.ll \

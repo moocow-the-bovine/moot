@@ -45,14 +45,15 @@ MAINTAINERCLEANFILES = \
 ## --- extra distribution files
 EXTRA_DIST = \
 	Makefile.in \
-	config.guess \
-	config.sub \
 	depcomp \
 	install-sh \
-	ltmain.sh \
 	mkinstalldirs \
-	missing
+	missing \
+	ylwrap
 
+#	ltmain.sh
+#	config.guess 
+#	config.sub 
 #	texinfo.tex
 
 ## --- recursion subdirectories for 'make dist'
