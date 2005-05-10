@@ -353,7 +353,8 @@ EXTRA_DIST = \
 	mootLexfreqsLexer.ll \
 	mootLexfreqsParser.yy \
 	mootClassfreqsLexer.ll \
-	mootClassfreqsParser.yy
+	mootClassfreqsParser.yy \
+	myosfcn.h
 
 dist_old = \
 	mootTokenLexer.ll \
