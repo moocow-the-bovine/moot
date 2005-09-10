@@ -2,7 +2,7 @@
 
 README for package 'moot'
 
-Last updated for moot version 2.0.4-pre2
+Last updated for moot version 2.0.4
 
 =head1 DESCRIPTION
 
@@ -96,7 +96,8 @@ documentation, library documentation, etc.
 =item Getopt::Gen
 
 A Perl module used to generate command-line option parsers.
-Should be available from the author of this package.
+Available from:
+http://www.ling.uni-potsdam.de/~moocow/projects/perl/index.html#gog
 
 =item pod2man, pod2text, pod2html (Optional)
 
@@ -136,9 +137,49 @@ which should be available from wherever you acquired
 these sources.
 
 
-=head1 KNOWN BUGS
+=head1 KNOWN ISSUES
 
-If you find one, let me know...
+
+=head2 Common Warnings
+
+=over 4
+
+=item "flex++bison++.pc not found"
+
+If you want this to go away, install my (old, unmaintained)
+flex++bison++ package from
+http://www.ling.uni-potsdam.de/~moocow/projects/moot/flex++bison++-0.0.5.tar.gz
+Otherwise, keep your distro's versions and
+ignore the warning.
+
+=item  "cannot find optgen.pl program"
+
+If you're building from CVS, this will be fatal. Get my Getopt::Gen
+perl module (and perl, if you haven't already), build it,
+install it, then run moot's ./configure again.
+
+=back
+
+
+=head2 Known Bugs
+
+=over 4
+
+=item "osfcn.h No such file or directory"
+
+osfcn.h appears to be a relic of my antiquated flex++bison++
+package; you may attempt to use and/or modify the file
+'src/libmoot/myosfcn.h' that comes with the distribution as a
+workaround. Otherwise, you should try to rebuild the lexer/parser
+.cc and .h files by hand:
+
+  bash$ cd moot-XX.YY
+  bash$ touch ./src/libmoot/*.ll ./src/libmoot/*.yy
+  bash$ make
+
+... ought to do the trick.
+
+=back
 
 
 =head1 ACKNOWLEDGEMENTS
