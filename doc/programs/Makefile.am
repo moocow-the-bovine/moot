@@ -154,12 +154,16 @@ MAINTAINERCLEANFILES = \
 
 ## --- extra distribution files
 EXTRA_DIST = \
-	mootfiles.pod \
 	mootutils.skel \
+	mootutils.pod \
+	$(moot_program_gogs:.gog=.pod) \
+	mootfiles.pod \
+	mootconfig.pod \
 	@DOC_PROG_TXT_TARGETS@ \
 	@DOC_PROG_MAN1_TARGETS@ \
 	@DOC_PROG_MAN5_TARGETS@ \
-	@DOC_PROG_HTML_TARGETS@
+	@DOC_PROG_HTML_TARGETS@ \
+	$(INDEX_SKEL:.skel=.html)
 
 ## --- recursion subdirectories for 'make dist'
 #DIST_SUBDIRS = $(SUBDIRS)

@@ -19,7 +19,7 @@
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
 #bin_PROGRAMS = mootpp mootm moothmm moot mootrain
 #bin_PROGRAMS = mootpp moothmm moot mootrain
-bin_PROGRAMS = mootpp mootrain mootcompile mootdump moot mooteval mootchurn
+bin_PROGRAMS = mootpp mootrain mootcompile mootdump moot mooteval mootchurn moottype
 #mootconfig
 
 #bin_SCRIPTS = ${script1} ... ${scriptN}
@@ -75,6 +75,10 @@ mootchurn_SOURCES = \
 	mootchurn_main.cc \
 	mootchurn_cmdparser.cc mootchurn_cmdparser.h
 
+moottype_SOURCES = \
+	moottype_main.cc \
+	moottype_cmdparser.cc moottype_cmdparser.h
+
 ## --- Extra (possible)sources
 #EXTRA_${prog_i}_SOURCES = 
 #EXTRA_${lib_i}_la_SOURCES = 
@@ -87,6 +91,7 @@ mootdump_main.o: mootdump_cmdparser.h
 moot_main.o: moot_cmdparser.h
 mooteval_main.o: mooteval_cmdparser.h
 mootchurn_main.o: mootchurn_cmdparser.h
+moottype_main.o: moottype_cmdparser.h
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -197,6 +202,10 @@ mooteval_LDADD = $(LDADD_COMMON)
 mootchurn_LDFLAGS = $(LDFLAGS_COMMON)
 mootchurn_LDADD = $(LDADD_COMMON)
 
+moottype_LDFLAGS = $(LDFLAGS_COMMON)
+moottype_LDADD = $(LDADD_COMMON)
+
+
 #${lib_i}_la_LDFLAGS = -L. -version-info ${lib_i_current}:${lib_i_rev}:${lib_i_age}
 #${lib_i}_LIBADD     = -lotherlib
 
@@ -235,6 +244,7 @@ EXTRA_DIST = \
 	moot.gog \
 	mooteval.gog \
 	mootchurn.gog \
+	moottype.gog \
 	acknowledge.pod
 
 #	moothmm.gog 
