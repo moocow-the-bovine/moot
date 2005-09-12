@@ -84,11 +84,11 @@ namespace moot {
     //--------------------------------------------------
     /// \name Accessors
     //@{
-    inline       key_type   &key   (void)       { return first; };
-    inline const key_type   &key   (void) const { return first; };
+    inline       key_type   &key   (void)       { return this->first; };
+    inline const key_type   &key   (void) const { return this->first; };
 
-    inline       value_type &value (void)       { return second; };
-    inline const value_type &value (void) const { return second; };
+    inline       value_type &value (void)       { return this->second; };
+    inline const value_type &value (void) const { return this->second; };
     //@}
 
     //--------------------------------------------------
@@ -96,11 +96,11 @@ namespace moot {
     //@{
     inline bool operator<(const ThisT &x) const
     {
-      return (first < x.first
+      return (this->first < x.first
 	      ? true
-	      : (first > x.first
+	      : (this->first > x.first
 		 ? false
-		 : second < x.second));
+		 : this->second < x.second));
     };
     //@}
   }; //-- /AssocVectorNode
@@ -171,7 +171,7 @@ namespace moot {
     /** Constructor given size */
     inline AssocVector(const size_t mysize)
     {
-      reserve(mysize);
+      this->reserve(mysize);
     };
 
     /** Destructor */
@@ -186,7 +186,7 @@ namespace moot {
     inline iterator find(const KeyT &key)
     {
       iterator i;
-      for (i = begin(); i != end() && i->first != key; i++) ;
+      for (i = this->begin(); i != this->end() && i->first != key; i++) ;
       return i;
     };
 
@@ -195,7 +195,7 @@ namespace moot {
     inline const_iterator find(const KeyT &key) const
     {
       const_iterator i;
-      for (i = begin(); i != end() && i->first != key; i++) ;
+      for (i = this->begin(); i != this->end() && i->first != key; i++) ;
       return i;
     };
 
@@ -204,7 +204,7 @@ namespace moot {
     inline iterator get(const KeyT &key)
     {
       iterator i = find(key);
-      return (i == end() ? assoc_vector_type::insert(i,key) : i);
+      return (i == this->end() ? assoc_vector_type::insert(i,key) : i);
     };
 
     /**
@@ -256,19 +256,19 @@ namespace moot {
     //@{
     /** Sort contents in ascending order by key,value */
     inline void sort_bykey(void)
-    { std::sort(begin(),end()); };
+    { std::sort(this->begin(),this->end()); };
 
     /** Sort contents in descending order by key,value */
     inline void rsort_bykey(void)
-    { std::sort(rbegin(),rend()); };
+    { std::sort(this->rbegin(),this->rend()); };
 
     /** Sort contents in ascending order by value,key */
     inline void sort_byvalue(void)
-    { std::sort(begin(),end(),value_sort_func()); };
+    { std::sort(this->begin(),this->end(),value_sort_func()); };
 
     /** Sort contents in descending order by value,key */
     inline void rsort_byvalue(void)
-    { std::sort(rbegin(),rend(),value_sort_func()); };
+    { std::sort(this->rbegin(),this->rend(),value_sort_func()); };
     //@}
 
   }; //-- /AssocVector

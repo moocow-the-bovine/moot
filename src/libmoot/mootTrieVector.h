@@ -168,7 +168,10 @@ public:
   typedef typename vector_type::iterator           iterator;
   typedef typename vector_type::const_iterator     const_iterator;
 
-  typedef std::string<char_type>                       string_type;
+  //-- moo: gcc-3.4 don't like this
+  //typedef std::string<char_type>                     string_type;
+  typedef std::string                                  string_type;
+
   typedef typename string_type::iterator               string_iterator;
   typedef typename string_type::const_iterator         const_string_iterator;
   typedef typename string_type::reverse_iterator       reverse_string_iterator;
@@ -338,10 +341,10 @@ public:
     UCharT    dn;
     iterator  di;
     if (!trie_use_case) label = tolower(label);
-    for (dn=0, di=begin()+from.mindtr; di != end() && dn < from.ndtrs; di++, dn++) {
+    for (dn=0, di=this->begin()+from.mindtr; di != this->end() && dn < from.ndtrs; di++, dn++) {
       if (di->label == label) return di;
     }
-    return end();
+    return this->end();
   };
 
   /** Daughter lookup, iterator, read-only */
@@ -350,17 +353,17 @@ public:
     UCharT         dn;
     const_iterator di;
     if (!trie_use_case) label = tolower(label);
-    for (dn=0, di=begin()+from.mindtr; di != end() && dn < from.ndtrs; di++, dn++) {
+    for (dn=0, di=this->begin()+from.mindtr; di != this->end() && dn < from.ndtrs; di++, dn++) {
       if (di->label == label) return di;
     }
-    return end();
+    return this->end();
   };
 
   /** Daughter lookup, NodeId, read-only */
   inline NodeId find_dtr_id(NodeId fromid, CharT label) const
   {
-    const_iterator di = find_dtr(*(begin()+fromid), label);
-    return (di==end() ? NoNode : (di-begin()));
+    const_iterator di = find_dtr(*(this->begin()+fromid), label);
+    return (di==this->end() ? NoNode : (di-this->begin()));
   };
 
 
@@ -374,11 +377,11 @@ public:
    * \li @from should be a valid node
    */
   inline iterator first_dtr(const node_type &from)
-  { return ( from.ndtrs == 0 ? end() : (begin()+from.mindtr) ); };
+  { return ( from.ndtrs == 0 ? this->end() : (this->begin()+from.mindtr) ); };
 
   /** Daughter lookup, iterator, read-only */
   inline const_iterator first_dtr(const node_type &from) const
-  { return ( from.ndtrs == 0 ? end() : (begin()+from.mindtr) ); };
+  { return ( from.ndtrs == 0 ? this->end() : (this->begin()+from.mindtr) ); };
 
   /**
    * Mother lookup, iterator, read/write
@@ -390,15 +393,15 @@ public:
    * \li @to should be a valid node
    */
   inline iterator find_mother(const node_type &to)
-  { return (to.mother == NoNode ? end() : (begin()+to.mother)); };
+  { return (to.mother == NoNode ? this->end() : (this->begin()+to.mother)); };
 
   /** Mother lookup, iterator, read-only */
   inline const_iterator find_mother(const node_type &to) const
-  { return (to.mother == NoNode ? end() : (begin()+to.mother)); };
+  { return (to.mother == NoNode ? this->end() : (this->begin()+to.mother)); };
 
   /** Mother lookup, NodeId, read-only */
   inline NodeId find_mother_id(NodeId toid) const
-  { return (begin()+toid)->mother; };
+  { return (this->begin()+toid)->mother; };
 
   /** Get full path to node @node as a reverse string */
   inline string_type node_rstring(const node_type &node) const
@@ -406,7 +409,7 @@ public:
     if (node.mother == NoNode) return string_type();
     string_type s(1, node.label);
     const_iterator mi;
-    for (mi=find_mother(node); mi != end() && mi->mother != NoNode; mi=find_mother(*mi)) {
+    for (mi=find_mother(node); mi != this->end() && mi->mother != NoNode; mi=find_mother(*mi)) {
       s.push_back(mi->label);
     }
     return s;
@@ -414,7 +417,7 @@ public:
 
   /** Get full path to node with id @nodeid as a string */
   inline string_type node_rstring(NodeId nodeid) const
-  { return node_rstring(*(begin()+nodeid)); };
+  { return node_rstring(*(this->begin()+nodeid)); };
 
   /** Get full path to node @node as a string */
   inline string_type node_string(const node_type &node) const
@@ -426,7 +429,7 @@ public:
 
   /** Get full path to node with id @nodeid as a string */
   inline string_type node_string(NodeId nodeid) const
-  { return node_string(*(begin()+nodeid)); };
+  { return node_string(*(this->begin()+nodeid)); };
 
 
   /** Get depth of node @node */
@@ -434,7 +437,7 @@ public:
   {
     size_t         depth = 0;
     const_iterator mi;
-    for (mi=find_mother(node); mi != end() && mi->mother != NoNode; mi=find_mother(*mi)) {
+    for (mi=find_mother(node); mi != this->end() && mi->mother != NoNode; mi=find_mother(*mi)) {
       ++depth;
     }
     return depth;
@@ -442,7 +445,7 @@ public:
 
   /** Get depth of node with id @nodeid */
   inline size_t node_depth(NodeId nodeid) const
-  { return node_depth(*(begin()+nodeid)); };
+  { return node_depth(*(this->begin()+nodeid)); };
   //@}
 
 
@@ -485,7 +488,7 @@ public:
 			      0,                    //  , ndtrs
 			      trie_default_data));  //  , data)
 
-	  node_type &mnode = operator[](knodid);    //-- get mother-node
+	  node_type &mnode = this->operator[](knodid);    //-- get mother-node
 	  ++mnode.ndtrs;                            //-- update num/dtrs for mom
 
 	  if (mnode.mindtr == NoNode)
@@ -520,7 +523,7 @@ public:
 			       size_t *matchlen=NULL)
   {
     const_string_iterator si;
-    iterator              di, i = begin();
+    iterator              di, i = this->begin();
     size_t                pos;
 
     for (si  = s.begin() ,  di  = i        , pos=0;
@@ -528,7 +531,7 @@ public:
 	 si++            ,   i  = di       , pos++)
       {
 	di = find_dtr(*di,*si);
-	if (di==end()) break;
+	if (di==this->end()) break;
       }
     if (matchlen) *matchlen = pos;
     return i;
@@ -540,7 +543,7 @@ public:
     const
   {
     const_string_iterator si;
-    const_iterator        di, i = begin();
+    const_iterator        di, i = this->begin();
     size_t                pos;
 
     for (si  = s.begin() ,  di  = i        , pos=0;
@@ -548,7 +551,7 @@ public:
 	 si++            ,   i  = di       , pos++)
       {
 	di = find_dtr(*di,*si);
-	if (di==end()) break;
+	if (di==this->end()) break;
       }
     if (matchlen) *matchlen = pos;
     return i;
@@ -563,7 +566,7 @@ public:
 				size_t *matchlen=NULL)
   {
     const_reverse_string_iterator si;
-    iterator                      di, i = begin();
+    iterator                      di, i = this->begin();
     size_t                        pos;
 
     for (si  = s.rbegin()  ,  di  = i        , pos=0;
@@ -571,7 +574,7 @@ public:
 	 si++              ,   i  = di       , pos++)
       {
 	di = find_dtr(*di,*si);
-	if (di==end()) break;
+	if (di==this->end()) break;
       }
     if (matchlen) *matchlen = pos;
     return i;
@@ -583,7 +586,7 @@ public:
     const
   {
     const_reverse_string_iterator si;
-    const_iterator                di, i = begin();
+    const_iterator                di, i = this->begin();
     size_t                        pos;
 
     for (si  = s.rbegin()  ,  di  = i        , pos=0;
@@ -591,7 +594,7 @@ public:
 	 si++              ,   i  = di       , pos++)
       {
 	di = find_dtr(*di,*si);
-	if (di==end()) break;
+	if (di==this->end()) break;
       }
     if (matchlen) *matchlen = pos;
     return i;
@@ -608,7 +611,7 @@ public:
   void dump(FILE *out, const CharT delim=0)
   {
     const_iterator   i, mi;
-    for (i = begin(); i != end(); i++) {
+    for (i = this->begin(); i != this->end(); i++) {
       string_type s = node_rstring(*i);
       if (s.empty()) continue;
       s.push_back(delim);
@@ -618,16 +621,16 @@ public:
 
   /** Dump binary table to a file */
   void bindump(FILE *out) {
-    for (const_iterator i=begin(); i != end(); i++) {
+    for (const_iterator i=this->begin(); i != this->end(); i++) {
       fwrite(&(*i), sizeof(node_type), 1, out);
     }
   };
 
   /** Dump arc table to a file */
   void arcdump(FILE *out) {
-    for (const_iterator i=begin(); i != end(); i++) {
+    for (const_iterator i=this->begin(); i != this->end(); i++) {
       fprintf(out,"node=%u\t mom=%u\t mindtr=%u\t label=%c\t ndtrs=%u\n",
-	      i-begin(), i->mother, i->mindtr, i->label, i->ndtrs);
+	      i-this->begin(), i->mother, i->mindtr, i->label, i->ndtrs);
     }
   };
   //@}

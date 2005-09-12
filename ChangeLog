@@ -3,6 +3,13 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
+v2.0.5-pre1 Mon, 12 Sep 2005 12:05:51 +0200
+        + added many "this->" prefixes in mootAssocVector.h , mootSuffixTrie.h
+	  to enable compilation with g++-3.4 (stricter c++ standard conformance)
+	
+v2.0.4 Wed, 17 Aug 2005 Mon, 10:42:31 +0200
+	+ fixed compilation / distribution bugs; packed & uploaded
+	
 v2.0.4-pre2 Sun, 08 Aug 2004 15:59:56 +0200
 	+ set default trie length to zero pending debugging
 	+ changed license clause to LGPL in library files

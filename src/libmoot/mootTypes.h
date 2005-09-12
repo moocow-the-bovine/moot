@@ -38,10 +38,17 @@
 #include <deque>
 #include <mootSTLHacks.h>
 
-/** Maximum weight */
-#ifndef MAXFLOAT
-# include <values.h>
-#endif
+/* Maximum weight */
+#if !defined(MAXFLOAT)
+# if defined(HAVE_VALUES_H)
+#  include <values.h>
+# elif defined(HAVE_FLOAT_H)
+#  include <float.h>
+# endif /* HAVE_VALUES_H */
+# if !defined(MAXFLOAT)
+#  define MAXFLOAT 1E38
+# endif /* !defined(MAXFLOAT) [2nd] */
+#endif /* !defined(MAXFLOAT) */
 
 moot_BEGIN_NAMESPACE
 

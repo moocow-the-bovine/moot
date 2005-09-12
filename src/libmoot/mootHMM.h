@@ -29,12 +29,13 @@
 #ifndef _MOOT_HMM_H
 #define _MOOT_HMM_H
 
-#ifdef __GNUC__
+#ifdef HAVE_FLOAT_H
 # include <float.h>
-#endif // __GNUC__
+#endif /* HAVE_FLOAT_H */
 
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 #include <mootTypes.h>
 #include <mootIO.h>
