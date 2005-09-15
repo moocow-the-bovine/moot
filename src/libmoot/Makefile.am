@@ -9,7 +9,7 @@
 ##-----------------------------------------------------------------------
 ## subdirectories
 ##-----------------------------------------------------------------------
-#SUBDIRS = 
+SUBDIRS = gnulib
 
 ##-----------------------------------------------------------------------
 ## primary targets
@@ -256,6 +256,7 @@ BISONXX_FLAGS = -d -v
 
 ## --- preprocessor flags
 #AM_CPPFLAGS = $(FSM_IFLAGS)
+AM_CPPFLAGS = -I$(SRCDIR)/gnulib
 
 ## --- compiler flags (c++)
 AM_CXXFLAGS = $(moot_WFLAGS) $(moot_OFLAGS)
@@ -288,16 +289,11 @@ LIBREV = 0
 #${lib_i}_la_LDFLAGS = -L. -version-info ${lib_i_current}:${lib_i_rev}:${lib_i_age}
 #${lib_i}_la_LIBADD  = -lotherlib
 
-#libmoot_la_LDFLAGS = @FSM_LFLAGS@
-#libmoot_la_LIBADD  = -lFSMExt @FSM_LIBS@
+#libmoot_la_LDFLAGS = -version-info $(LIBCUR):$(LIBREV):$(LIBAGE)
 
+#libmoot_la_LDFLAGS = -version-info $(LIBCUR):$(LIBREV):$(LIBAGE) -rpath $(libdir)
 libmoot_la_LDFLAGS = -version-info $(LIBCUR):$(LIBREV):$(LIBAGE)
-
-#libmoot_la_LDFLAGS =
-#libmoot_la_LIBADD  = -lFSMExt -lFSM -lFSMSymSpec -lbumble++ @STL_LIBS@ -lz
-
-#libmoot_la_LIBADD = @FSMEXT_LIBS@
-#libmoot_la_LIBADD =
+libmoot_la_LIBADD = gnulib/libgnu.la
 
 ##-----------------------------------------------------------------------
 ## Variables: cleanup

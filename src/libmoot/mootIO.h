@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -40,6 +40,11 @@
 #include <assert.h>
 
 #include <string>
+
+/*-- gnulib stuff --*/
+extern "C" {
+  extern int vasprintf(char **, const char *, va_list);
+}
 
 /** \brief Namespace for I/O stream wrappers */
 namespace mootio {
@@ -143,14 +148,14 @@ namespace mootio {
     //@{
 
     /** Read a single byte of data.  Returns EOF on eof. */
-    virtual int getc(void) { return EOF; }
+    virtual int getbyte(void) { return EOF; }
 
     /** Read up to @n bytes of data into @buf,
      *  returns number of bytes actually read. */
     virtual ByteCount read(char *buf, size_t n) {
       size_t nread = 0;
       int c;
-      for (c = this->getc(); nread < n && c != EOF; nread++, c = this->getc()) {
+      for (c = this->getbyte(); nread < n && c != EOF; nread++, c = this->getbyte()) {
 	*buf++ = c;
       }
       return (ByteCount)nread;
@@ -165,7 +170,7 @@ namespace mootio {
       ByteCount nread = 0;
       int c;
       s.clear();
-      for (c = this->getc(); c != EOF; nread++, c = this->getc()) {
+      for (c = this->getbyte(); c != EOF; nread++, c = this->getbyte()) {
 	s.push_back((char)c);
 	if (delim.find(c) != delim.npos) break;
       }

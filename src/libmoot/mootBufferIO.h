@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2004-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -147,7 +147,7 @@ namespace mootio {
     };
 
     /** Read a single byte of data */
-    virtual int getc(void) {
+    virtual int getbyte(void) {
       if (cb_offset >= cb_used) return EOF;
       return cb_rdata[cb_offset++];
     };

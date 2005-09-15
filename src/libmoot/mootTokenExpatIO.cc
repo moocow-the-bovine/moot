@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -402,7 +402,7 @@ void TokenReaderExpat::carp(char *fmt, ...)
 
 moot_END_NAMESPACE
 
-#endif // moot_EXPAT_ENABLED
+/*#endif // moot_EXPAT_ENABLED*/
 
 /*======================================================================
  * WRITER
@@ -676,5 +676,7 @@ void TokenWriterExpat::_put_raw_buffer(const char *buf, size_t len, mootio::most
   os->write(buf, len);
 }
 
-
 moot_END_NAMESPACE
+
+#endif // moot_EXPAT_ENABLED
+

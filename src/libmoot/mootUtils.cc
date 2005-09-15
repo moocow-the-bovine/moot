@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -44,6 +44,9 @@
 #ifdef MOOT_ZLIB_ENABLED
 # include <zlib.h>
 #endif
+
+/*-- gnulib stuff --*/
+#include "memrchr.h"
 
 namespace moot {
   using namespace std;
@@ -154,6 +157,15 @@ void moot_strtok(const std::string &s,
 /*--------------------------------------------------------------------
  * Named File Utilities
  *---------------------------------------------------------------------*/
+
+/*------------------------------------------------------
+ * Named File Utilities : moot_extension
+ */
+char *moot_extension(const char *filename, size_t pos)
+{
+  return (char *)memrchr(filename, '.', pos);
+}
+
 
 /*------------------------------------------------------
  * Named File Utilities : moot_file_exists
@@ -385,7 +397,7 @@ std::string moot_banner(void)
 {
   string s = ("  libmoot version "
 	      PACKAGE_VERSION
-	      " (c) 2004 Bryan Jurish.\n");
+	      " (c) 2005 Bryan Jurish.\n");
   //--
 
 #ifdef MOOT_EXPAT_ENABLED
@@ -394,7 +406,6 @@ std::string moot_banner(void)
 
 #ifdef MOOT_LIBXML_ENABLED
   s.append("  libxml2 by Daniel Veillard and others.\n");
-
 #endif // MOOT_LIBXML_ENABLED
 
 #ifdef MOOT_RECODE_ENABLED

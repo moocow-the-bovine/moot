@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -352,7 +352,7 @@ public:
 
 moot_END_NAMESPACE
 
-#endif // moot_EXPAT_ENABLED
+/*#endif // moot_EXPAT_ENABLED*/
 
 
 moot_BEGIN_NAMESPACE
@@ -554,5 +554,7 @@ public:
 };
 
 moot_END_NAMESPACE
+
+#endif // moot_EXPAT_ENABLED
 
 #endif // MOOT_EXPAT_TOKEN_IO_H

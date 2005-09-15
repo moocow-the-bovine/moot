@@ -111,7 +111,7 @@ namespace mootio {
     };
 
     /** Read a single byte of data.  Returns EOF on eof. */
-    virtual int getc(void) {
+    virtual int getbyte(void) {
       int c = zfile ? gzgetc(zfile) : -1;
       return c==-1 ? EOF : c;
     };
