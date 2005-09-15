@@ -77,7 +77,7 @@ IMAGE_PATH             =
 ## because doxygen is too stupid to handle heavy-duty
 ## macro usage a la flex++/bison++.
 ##
-INPUT_FILTER           = $(PERL) @srcdir@/doxy-filter.perl
+INPUT_FILTER           = "@PERL@ @srcdir@/doxy-filter.perl"
 ##
 ## Whether to use filtered output for the source browser
 ##
@@ -209,9 +209,10 @@ DOT_CLEANUP            = YES
 # Configuration::addtions related to the search engine   
 #---------------------------------------------------------------------------
 SEARCHENGINE           = NO
-CGI_NAME               = search.cgi
-CGI_URL                = 
-DOC_URL                = 
-DOC_ABSPATH            = 
-BIN_ABSPATH            = /usr/local/bin/
-EXT_DOC_PATHS          = 
+##-- obsolete (?)
+#CGI_NAME               = search.cgi
+#CGI_URL                = 
+#DOC_URL                = 
+#DOC_ABSPATH            = 
+#BIN_ABSPATH            = /usr/local/bin/
+#EXT_DOC_PATHS          = 

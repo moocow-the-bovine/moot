@@ -3,6 +3,23 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
+v2.0.5-pre2 Thu, 15 Sep 2005 12:20:45 +0200
+        + added gnulib wrappers for memrchr(), vasprintf()
+	+ added configure.in checks for pwd.h, getuid(), getpwuid()
+	  - requires Getopt::Gen v0.09 to avoid compilation errors for
+	    the same on impoverished systems (i.e. mingw32)
+	+ renamed mootIO::mistream::getc() to mootIO::mistream::getbyte()
+	  - hopefully fixes reported compilation errors for
+	    Borland C++
+	+ upgraded to automake-1.9: many complaints about various
+	  3rd-party m4 packages by aclocal; no visible actual errors
+	+ added configure.in check for perl executable, hopefully fixes 
+	  doxygen handling of doc/libmoot/doxy-filter.perl (again)
+	+ added check for HAVE_GETTIMEOFDAY and alternative timing
+	  mechanism using clock()
+	  - we should probably just switch to clock() entirely (POSIX)
+	  
+	
 v2.0.5-pre1 Mon, 12 Sep 2005 12:05:51 +0200
         + added many "this->" prefixes in mootAssocVector.h , mootSuffixTrie.h
 	  to enable compilation with g++-3.4 (stricter c++ standard conformance)

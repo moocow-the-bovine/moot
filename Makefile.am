@@ -20,6 +20,9 @@ SUBDIRS = config src doc
 ## --- pseudo-deps for '.SUFFIXES'
 SUFFIXES = .pod .txt .deb .rpm .spec .ifiles
 
+##-- for gnulib
+ACLOCAL_AMFLAGS = -I m4
+
 #-----------------------------------------------------------------------
 # Additional Variables & Rules: PODS
 #-----------------------------------------------------------------------
@@ -242,6 +245,8 @@ MAINTAINERCLEANFILES = *~ \
 ## --- extra distribution files
 EXTRA_DIST = \
 	INSTALL \
+	AUTHORS \
+	$(PODS) \
 	$(PODS:.pod=.txt) \
 	$(DEBIAN_FILES) \
 	autogen.sh\
