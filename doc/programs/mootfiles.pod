@@ -143,7 +143,7 @@ thus impossible to declare an "empty" token.  An example
  a
  test
  .
-
+ 
  %% Sentence 2
  This
  too
@@ -202,7 +202,7 @@ An example "medium rare" file is:
  a      ART     CARD
  test   NN      VVIN
  .      $.
-
+ 
  %% Sentence 2 : detailed analyses, with unknown word "foo".
  This   This [NE type="name"] <420>      <24.7> this [_PDAT][_sg]
  foo
@@ -247,7 +247,7 @@ An example "medium" file is:
  a      ART
  test   NN
  .      $.
-
+ 
  %% Sentence 2 : tags embedded in detailed analyses
  This   <24.7> this [PDAT num="sg"]
  too    <0.0> too [ADV]
@@ -288,7 +288,7 @@ An example "well done" file is:
  a      ART     [ART]   [CARD]
  test   NN      [NN]    [VVFIN]
  .      $.      [$.]
-
+ 
  %% Sentence 2 : analysis-tags embedded in complete analyses
  This   PDAT    [NE type="last"] This <420>  [PDAT num="sg"] this <24.7>
  too    ADV     [ADV] too <0.0>
