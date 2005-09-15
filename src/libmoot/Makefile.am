@@ -73,7 +73,8 @@ libmoot_la_SOURCES = \
 	mootHMMTrainer.cc \
 	mootEval.cc \
 	\
-	mootUtils.cc
+	mootUtils.cc \
+	mootIO.cc
 
 #	mootCHMM.cc
 #	mootEvent.cc

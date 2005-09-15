@@ -41,11 +41,6 @@
 
 #include <string>
 
-/*-- gnulib stuff --*/
-extern "C" {
-  extern int vasprintf(char **, const char *, va_list);
-}
-
 /** \brief Namespace for I/O stream wrappers */
 namespace mootio {
 
@@ -222,14 +217,8 @@ namespace mootio {
      * Default implementation uses a dynamically allocated
      * temporary buffer and calls write()
      */
-    virtual bool vprintf(const char *fmt, va_list &ap) {
-      char *obuf = NULL;
-      size_t len = 0;
-      len = vasprintf(&obuf, fmt, ap);
-      bool rc = len >= 0 && write(obuf, len);
-      if (obuf) free(obuf);
-      return rc;
-    };
+    virtual bool vprintf(const char *fmt, va_list &ap);
+
     /**
      * printf() to the stream, arglist version.  Default
      * version calls vprintf()
