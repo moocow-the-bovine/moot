@@ -184,7 +184,7 @@ TAGFILES               = @DOXY_TAGFILES@
 GENERATE_TAGFILE       = libmoot.tag
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES
-PERL_PATH              = /usr/bin/perl
+PERL_PATH              = @PERL@
 
 #---------------------------------------------------------------------------
 # Configuration options related to the dot tool   
