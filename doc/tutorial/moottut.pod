@@ -53,7 +53,7 @@ If you have a text-format corpus in the file
 "corpus.ttt" which is pre-tagged with the "best"
 part-of-speech tags, then the incantation:
 
-  mootrain --lex --ngrams corpus.ttt
+ mootrain --lex --ngrams corpus.ttt
 
 will produce the model files "corpus.lex" and "corpus.123"
 required for runtime tagging of tokens cooked "rare".
@@ -71,7 +71,7 @@ If you have a text-format corpus in the file
 part-of-speech tags as well as lexical classes,
 then the incantation:
 
-  mootrain --lex --ngrams --classes corpus.mttt
+ mootrain --lex --ngrams --classes corpus.mttt
 
 will produce the model files "corpus.lex", "corpus.123",
 and "corpus.clx" required for runtime tagging of

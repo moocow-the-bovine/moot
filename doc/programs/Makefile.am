@@ -94,7 +94,7 @@ OPTGEN_SKELFLAGS = \
 POD2MANFLAGS = \
 	--center="moot PoS Tagger" \
 	--release="moot v$(VERSION)"
-POD2HTMLFLAGS = --podpath="$(srcdir):." --htmlroot="."
+POD2HTMLFLAGS = --podpath="$(srcdir):." --htmlroot="." --css "mootprogs.css"
 
 .pod.1:
 	$(POD2MAN) $(POD2MANFLAGS) --section=1 $< $@
@@ -154,6 +154,7 @@ MAINTAINERCLEANFILES = \
 
 ## --- extra distribution files
 EXTRA_DIST = \
+	mootprogs.css \
 	mootutils.skel \
 	mootutils.pod \
 	$(moot_program_gogs:.gog=.pod) \

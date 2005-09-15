@@ -19,6 +19,7 @@
 man1_MANS = moottut.1
 
 pkgdoctut_DATA = \
+	moottut.css \
 	moottut.txt \
 	moottut.html \
 	corpus.ttt \
@@ -61,7 +62,7 @@ POD2MANFLAGS = \
 	--center="moot PoS Tagger" \
 	--release="moot v$(VERSION)"
 #POD2HTMLFLAGS = --podpath="$(srcdir):." --htmlroot="."
-POD2HTMLFLAGS = --podpath="$(srcdir):$(srcdir)/../programs:.:./../programs" --htmlroot="."
+POD2HTMLFLAGS = --podpath="$(srcdir):$(srcdir)/../programs:.:./../programs" --htmlroot="." --css="moottut.css"
 
 .pod.1:
 	$(POD2MAN) $(POD2MANFLAGS) --section=1 $< $@
