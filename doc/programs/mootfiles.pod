@@ -676,7 +676,7 @@ Same thing, even shorter:
 
 Same thing, using filename conventions:
 
- moot input.moot.t output.moot.tt
+ moot input.moot.t -o output.moot.tt
 
 =item *
 Read medium rare (pre-analyzed) XML, write well-done native text:
@@ -685,7 +685,7 @@ Read medium rare (pre-analyzed) XML, write well-done native text:
 
 Same thing, using filename conventions:
 
- moot input.mr.xml output.wd.moot
+ moot input.mr.xml -o output.wd.moot
 
 =back
 
