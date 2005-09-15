@@ -594,6 +594,7 @@ if test "$moot_doc_formats" != "none" ; then
 	moot.gog \
 	mooteval.gog \
 	mootchurn.gog \
+	moottype.gog \
 	"
   for g in $moot_program_gogs ; do
     AC_CONFIG_LINKS(doc/programs/${g}:src/programs/${g})  
@@ -651,7 +652,7 @@ if test "$moot_doc_formats" != "none" ; then
           DOC_SUBDIRS="$DOC_SUBDIRS html"
 	fi
 	if test -n "$POD2HTML" ; then
-	  DOC_PROG_HTML_TARGETS=`echo "$moot_pods" | sed 's/\.pod/\.html/g'`
+	  DOC_PROG_HTML_TARGETS="mootprogs.css `echo "$moot_pods" | sed 's/\.pod/\.html/g'`"
 	else
 	  AC_MSG_WARN(pod2html not found -- program html docs will not be built!)
 	fi
