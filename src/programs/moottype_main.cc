@@ -18,10 +18,10 @@
 */
 
 /*--------------------------------------------------------------------------
- * File: mootpp_main.cc
+ * File: moottype_main.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + moocow's tagger: preprocessor : main()
+ *   + moot HMM PoS tagger/disambiguator : typifier: main()
  *--------------------------------------------------------------------------*/
 
 #ifdef HAVE_CONFIG_H
@@ -31,43 +31,51 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <stdarg.h>
 
-#ifdef HAVE_TIME_H
-#include <time.h>
-#endif
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
+#include <string>
 
-#include <mootPPLexer.h>
-#include <mootUtils.h>
-#include <mootCIO.h>
-#include <mootToken.h>
 #include <mootTokenIO.h>
-
-#include "mootpp_cmdparser.h"
+#include <mootTokenExpatIO.h>
+#include <mootCIO.h>
+#include <mootUtils.h>
+#include "moottype_cmdparser.h"
 
 using namespace std;
 using namespace moot;
-using namespace mootio;
+
+typedef enum {
+  vlSilent = 0,
+  vlErrors = 1,
+  vlWarnings = 2,
+  vlSummary = 3,
+  vlProgress = 4,
+  vlEverything = 5
+} verbosityLevel;
 
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-char *PROGNAME = "mootpp";
+char *PROGNAME = "moottype";
 
-//-- files
+// options & file-churning
+gengetopt_args_info  args;
+cmdutil_file_churner churner;
+
+// -- files
 mofstream out;
 
-//-- Token I/O
-int ofmt = tiofNone;
-int ofmt_implied = tiofNone;
-int ofmt_default = tiofRare;
-TokenWriter *writer = NULL;
+// -- token i/o
+int ifmt         = tiofNone;
+int ifmt_implied = tiofNone;
+int ifmt_default = tiofMediumRare;
 
-//-- options & file-churning
-gengetopt_args_info args;
-cmdutil_file_churner churner;
+int  ofmt         = tiofNone;
+int  ofmt_implied = tiofTagged;
+int &ofmt_default = ifmt;
+
+TokenReader *reader = NULL;
+TokenWriter *writer = NULL;
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -77,26 +85,34 @@ void GetMyOptions(int argc, char **argv)
   if (cmdline_parser(argc, argv, &args) != 0)
     exit(1);
 
-  // -- show banner
-  if (args.verbose_arg > 0)
+  //-- load environmental defaults
+  cmdline_parser_envdefaults(&args);
+
+  //-- show banner
+  if (args.verbose_arg > vlSilent)
     fprintf(stderr,
 	    moot_program_banner(PROGNAME,
 				PACKAGE_VERSION,
 				"Bryan Jurish <jurish@ling.uni-potsdam.de>").c_str());
 
-
-  // -- output file
+  //-- output file
   if (!out.open(args.output_arg,"w")) {
-    fprintf(stderr,"%s: open failed for output-file \"%s\": %s\n",
+    fprintf(stderr,"%s: open failed for output-file '%s': %s\n",
 	    PROGNAME, out.name.c_str(), strerror(errno));
     exit(1);
   }
 
-  // -- set up file-churner
+  //-- set up file-churner
   churner.progname = PROGNAME;
   churner.inputs = args.inputs;
   churner.ninputs = args.inputs_num;
   churner.use_list = args.list_given;
+
+  //-- i/o format : input
+  ifmt = TokenIO::parse_format_request(args.input_format_arg,
+				       (args.inputs_num>0 ? args.inputs[0] : NULL),
+				       ifmt_implied,
+				       ifmt_default);
 
   //-- i/o format : output
   ofmt = TokenIO::parse_format_request(args.output_format_arg,
@@ -104,85 +120,63 @@ void GetMyOptions(int argc, char **argv)
 				       ofmt_implied,
 				       ofmt_default);
 
-  //-- setup token-writer
+  //-- io: new_reader, new_writer
+  reader = TokenIO::new_reader(ifmt);
   writer = TokenIO::new_writer(ofmt);
+
+#ifdef MOOT_EXPAT_ENABLED
+  //-- io: encoding: reader
+  if (ifmt&tiofXML && args.input_encoding_given) {
+    ((TokenReaderExpat *)reader)->setEncoding(string(args.input_encoding_arg));
+  }
+  //-- io: encoding: writer
+  if (ofmt&tiofXML && args.output_encoding_given) {
+    ((TokenWriterExpat *)writer)->setEncoding(string(args.output_encoding_arg));
+  }
+#endif
+
+  //-- io: writer: sink
   writer->to_mstream(&out);
 }
+
 
 /*--------------------------------------------------------------------------
  * main
  *--------------------------------------------------------------------------*/
 int main (int argc, char **argv)
 {
-  mootPPLexer *lexer = new mootPPLexer();
-  int nfiles = 0;
-
   GetMyOptions(argc,argv);
-  lexer->verbose = args.verbose_arg;
+  mootSentence *sent;
+  int rtok;
 
-  // -- big loop
+  // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
-    if (args.verbose_arg > 0) {
-      nfiles++;
-      if (args.verbose_arg > 1) {
-	fprintf(stderr,"%s: processing file '%s'... ",
-		PROGNAME, churner.in.name.c_str());
-	fflush(stderr);
-      }
+    if (args.verbose_arg >= vlProgress) {
+      writer->printf_comment("\n     File: %s\n", churner.in.name.c_str());
+      fprintf(stderr,"%s: analyzing file '%s'...", PROGNAME, churner.in.name.c_str());
+      fflush(stderr);
     }
-    writer->printf_comment("\n    File: %s\n", churner.in.name.c_str());
 
-    lexer->from_mstream(&churner.in);
-    lexer->to_mstream(&out);
+    //hmm.tag_file(churner.in.file, out.file, churner.in.name);
 
-    int lxtok;
-    mootSentence sent;
-    while ((lxtok = lexer->yylex()) != mootPPLexer::PPEOF) {
-      if (args.verbose_arg > 0) lexer->ntokens++;
-      switch (lxtok) { 
-      case mootPPLexer::EOS:
-	if (lexer->yytext[0] != '<') {  //-- hack: check for xml markup
-	  sent.push_back(mootToken((const char *)lexer->yytext));
-	  writer->put_sentence(sent);
-	  sent.clear();
-	}
-	break;
-
-      case mootPPLexer::XML_START_TAG:
-      case mootPPLexer::XML_END_TAG:
-	//-- ignore XML tags
-	break;
-
-      default:
-	//-- write it as its own token
-	sent.push_back(mootToken((const char *)lexer->yytext));
-	break;
+    reader->from_mstream(&churner.in);
+    while (reader && (rtok = reader->get_sentence()) != TokTypeEOF) {
+      sent = reader->sentence();
+      for (mootSentence::iterator si=sent->begin(); si != sent->end(); si++) {
+	mootTokenFlavor flav = tokenFlavor(si->text());
+	si->besttag(mootTokenFlavorNames[flav]);
       }
+      if (writer) writer->put_sentence(*sent);
     }
-    if (!sent.empty()) writer->put_sentence(sent); //-- put final sentence
-
-    if (args.verbose_arg > 1) {
+    
+    if (args.verbose_arg >= vlProgress) {
       fprintf(stderr," done.\n");
       fflush(stderr);
     }
   }
+
   writer->close();
   out.close();
-
-  // -- summary
-  if (args.verbose_arg > 0) {
-    double elapsed = ((double)clock()) / CLOCKS_PER_SEC;
-
-    // -- print summary
-    fprintf(stderr, "\n-----------------------------------------------------\n");
-    fprintf(stderr, "%s Summary:\n", PROGNAME);
-    fprintf(stderr, "  + Files processed : %d\n", nfiles);
-    fprintf(stderr, "  + Tokens found    : %d\n", lexer->ntokens);
-    fprintf(stderr, "  + Time Elsapsed   : %.2f sec\n", elapsed);
-    fprintf(stderr, "  + Throughput      : %.2f toks/sec\n", (float)lexer->ntokens/elapsed);
-    fprintf(stderr, "-----------------------------------------------------\n");
-  }
-  
   return 0;
 }
 

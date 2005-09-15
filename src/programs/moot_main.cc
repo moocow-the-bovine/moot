@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2002-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -95,7 +95,6 @@ TokenReader *reader = NULL;
 TokenWriter *writer = NULL;
 
 // -- for verbose timing info
-timeval istarted, astarted, astopped;
 double  ielapsed, aelapsed;
 
 /*--------------------------------------------------------------------------
@@ -133,10 +132,6 @@ void GetMyOptions(int argc, char **argv)
   churner.inputs = args.inputs;
   churner.ninputs = args.inputs_num;
   churner.use_list = args.list_given;
-
-  //-- get initialization start-time
-  if (args.verbose_arg >= vlSummary) gettimeofday(&istarted, NULL);
-
 
   //-- i/o format : input
   ifmt = TokenIO::parse_format_request(args.input_format_arg,
@@ -269,13 +264,16 @@ void GetMyOptions(int argc, char **argv)
 
   //-- get time
   time_t now_time = time(NULL);
+  /*
   tm     now_tm;
   localtime_r(&now_time, &now_tm);
+  */
+  tm *now_tm = localtime(&now_time);
 
   //-- report to output-file
   if (!args.no_header_given) {
     writer->put_comment_block_begin();
-    writer->printf_raw("\n %s output file generated on %s", PROGNAME, asctime(&now_tm));
+    writer->printf_raw("\n %s output file generated on %s", PROGNAME, asctime(now_tm));
     writer->printf_raw(" Configuration:\n");
     writer->printf_raw("   Unknown Token     : %s\n", hmm.tokids.id2name(0).c_str());
     writer->printf_raw("   Unknown Tag       : %s\n", hmm.tagids.id2name(0).c_str());
@@ -370,7 +368,9 @@ int main (int argc, char **argv)
   GetMyOptions(argc,argv);
 
   // -- get init-stop time = analysis-start time
-  if (args.verbose_arg >= vlSummary) gettimeofday(&astarted, NULL);
+  if (args.verbose_arg >= vlSummary) {
+    ielapsed = ((double)clock()) / CLOCKS_PER_SEC;
+  }
 
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
@@ -398,15 +398,7 @@ int main (int argc, char **argv)
   // -- summary
   if (args.verbose_arg >= vlSummary) {
       // -- timing
-      gettimeofday(&astopped, NULL);
-
-      aelapsed =
-	astopped.tv_sec-astarted.tv_sec
-	+ (double)(astopped.tv_usec-astarted.tv_usec)/1000000.0;
-
-      ielapsed =
-	astarted.tv_sec-istarted.tv_sec
-	+ (double)(astarted.tv_usec-istarted.tv_usec)/1000000.0;
+      aelapsed  = ((double)clock()) / CLOCKS_PER_SEC - ielapsed;
 
       if (out.file != stdout) print_summary(writer);
       print_summary_to_file(stderr);

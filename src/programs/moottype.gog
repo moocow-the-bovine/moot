@@ -1,0 +1,162 @@
+# -*- Mode: Shell-Script -*-
+#
+# Getopt::Gen specification for moot
+#-----------------------------------------------------------------------------
+program "moottype"
+#program_version "0.01"
+
+purpose	"moocow's HMM part-of-speech tagger: token type classifier."
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details "
+'moottype' shows the types of its input tokens, as determined
+by compiled-in rules.  Mainly useful for debugging.
+
+It takes as its input one or more 'rare' (-tagged,-analyzed)
+or 'medium rare' (-tagged,+analyzed) files and produces a
+'medium' (+tagged,-analyzed) or 'well done' (+tagged,+analyzed)
+file, respectively.  See L<mootfiles> for details on moot file
+formats.
+"
+
+#-----------------------------------------------------------------------------
+# Files
+#-----------------------------------------------------------------------------
+rcfile "/etc/moottyperc"
+rcfile "~/.moottyperc"
+
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+argument "INPUT(s)" "Input files / file-lists." \
+    details="
+Input files should be 'cooked' text files
+of either the 'rare' (-tagged,-analyzed) or
+'medium rare' (-tagged,+analyzed) variety.
+
+See also the '--list' option.
+
+For details on moot file formats, see L<mootfiles>.
+"
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+#group "Basic Options"
+int "verbose" v "Verbosity level." \
+    arg="LEVEL" \
+    default="3" \
+    details="
+Be more or less verbose.  Recognized values are in the range 0..5:
+
+=over 4
+
+=item 0
+
+Be silent.
+
+=item 1
+
+Print error messages to stderr.
+
+=item 2
+
+Print warnings to stderr.
+
+=item 3
+
+Print summary information to stderr.
+
+=item 4
+
+Print progress information to stderr.
+
+=item 5
+
+Print everything.
+
+=back
+"
+
+flag  "list"   l  "INPUTs are file-lists, not filenames." \
+    details="Useful for large batch-processing jobs."
+
+string "output"	o "Specify output file (default=stdout)." \
+    arg="FILE" \
+    default="-"
+
+#---------------------------------------------------
+# Format options
+#---------------------------------------------------
+group "Format Options"
+
+string "input-format" I "Specify input file(s) format(s)." \
+    arg="FORMAT" \
+    details="
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+
+Default='MediumRare'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+"
+
+string "output-format" O "Specify output file format." \
+  arg="FORMAT" \
+  details="
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+
+Default='WellDone'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+"
+
+string "input-encoding" - "Override XML document input encoding." \
+    arg="ENCODING" \
+    details="
+Potentially useful for XML documents without encoding declarations.
+"
+
+string "output-encoding" - "Set default XML output encoding." \
+    arg="ENCODING" \
+    details="
+Slower, but potentially useful for human-readable XML output.
+"
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+#addenda ""
+
+#-----------------------------------------------------------------------------
+# Bugs
+#-----------------------------------------------------------------------------
+bugs "
+
+None known.
+
+"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+acknowledge `cat acknowledge.pod`
+
+seealso "
+L<moot>
+L<mootfiles>
+L<mootpp>,
+mootm(1),
+L<mootrain>,
+L<mootcompile>,
+L<mootdump>,
+L<mooteval>,
+"

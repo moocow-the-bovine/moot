@@ -227,21 +227,24 @@ int main (int argc, char **argv)
 
   //-- get time
   time_t now_time = time(NULL);
+  /*
   tm     now_tm;
   localtime_r(&now_time, &now_tm);
+  */
+  tm *now_tm = localtime(&now_time);
 
   //-- initialize summary info
   if (hmmt.want_lexfreqs) {
     lfout.printf("%s %s lexical frequency file generated on %s",
-		 cmts, PROGNAME, asctime(&now_tm));
+		 cmts, PROGNAME, asctime(now_tm));
   }
   if (hmmt.want_ngrams) {
     ngout.printf("%s %s ngram frequency file generated on %s",
-		 cmts, PROGNAME, asctime(&now_tm));
+		 cmts, PROGNAME, asctime(now_tm));
   }
   if (hmmt.want_classfreqs) {
     lcout.printf("%s %s class frequency file generated on %s",
-		 cmts, PROGNAME, asctime(&now_tm));
+		 cmts, PROGNAME, asctime(now_tm));
   }
 
   // -- the guts

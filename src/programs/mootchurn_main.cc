@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2004-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -86,7 +86,6 @@ size_t nfiles = 0;      //-- total number of input files
 int ndots = 0;
 
 // -- for verbose timing info
-timeval started, stopped;
 double  elapsed;
 
 //-- verbosity levels
@@ -203,8 +202,6 @@ int main (int argc, char **argv)
     abort();
   }
 
-  if (args.verbose_arg >= vlSummary) gettimeofday(&started, NULL);
-
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file())
     {
@@ -270,11 +267,7 @@ int main (int argc, char **argv)
 
   //-- report summary
   if (args.verbose_arg >= vlSummary) {
-    gettimeofday(&stopped, NULL);
-    elapsed =
-      stopped.tv_sec-started.tv_sec
-      + (double)(stopped.tv_usec-started.tv_usec)/1000000.0;
-
+    elapsed = ((double)clock()) / CLOCKS_PER_SEC;
     print_summary(stderr);
   }
 

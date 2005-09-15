@@ -157,7 +157,7 @@ POD2MANFLAGS = --center="moocow's tagging tools"
 ##-----------------------------------------------------------------------
 
 ## --- preprocessor flags
-AM_CPPFLAGS = $(FSM_IFLAGS) -I@srcdir@/../libmoot -I../libmoot
+AM_CPPFLAGS = -I@srcdir@/../libmoot -I@srcdir@/../libmoot/gnulib -I../libmoot
 
 ## --- compiler flags (c++)
 AM_CXXFLAGS = $(moot_WFLAGS) $(moot_OFLAGS)
