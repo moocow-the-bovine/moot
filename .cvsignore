@@ -11,6 +11,7 @@ moot.spec
 *.gz
 *.bz2
 *.deb
+*.zip
 *.changes
 *.dsc
 *.rpm

@@ -156,6 +156,15 @@ $(BINDIST_STATIC).tar.gz: distdir
 	) && \
 	rm -rf $(BINDIST_STATIC)
 
+static-zip: $(BINDIST_STATIC).zip
+
+$(BINDIST_STATIC).zip:
+	test -f $(BINDIST_STATIC).tar.gz || false
+	rm -rf $(BINDIST_STATIC)
+	gunzip -c $(BINDIST_STATIC).tar.gz | $(AMTAR) xf -
+	zip -r -9 $(BINDIST_STATIC).zip $(BINDIST_STATIC)
+	rm -rf $(BINDIST_STATIC)
+
 nostatic:
 	rm -rf $(PACKAGE)-*-*-$(BINDIST_CPU)-$(BINDIST_OS)-static*
 
