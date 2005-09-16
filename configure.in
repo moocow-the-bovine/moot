@@ -744,21 +744,29 @@ fi; # if "$moot_doc_formats" != "none" ...
 
 #---------------------------------------------------------------
 # Binary distribution
-BINDIST_RELEASE=1
+AC_ARG_VAR(BINDIST_RELEASE, [Release number for binary distribution builds])
+AC_ARG_VAR(BINDIST_CPU,     [Architecture for binary distribution builds])
+AC_ARG_VAR(BINDIST_OS,      [Target OS for binary distribution builds])
+
+
+test -z "$BINDIST_RELEASE" && BINDIST_RELEASE=1
 
 ## -- hack: canonicalize package-name to lower-case (for debian)
 BINDIST_PKGNAME=`echo "$PACKAGE" | tr '[[:upper:]]' '[[:lower:]]'`
 
 ## -- hack: downgrade ix86 -> i386
-case "$target_cpu" in
+if test -z "$BINDIST_CPU" ; then
+ case "$target_cpu" in
   i[[3-9]]86)
 	BINDIST_CPU=i386
 	;;
   *)
 	BINDIST_CPU="$target_cpu"
 	;;
-esac
-BINDIST_OS="$target_os"
+ esac
+fi
+
+test -z "$BINDIST_OS" && BINDIST_OS="$target_os"
 
 AC_SUBST(BINDIST_PKGNAME)
 AC_SUBST(BINDIST_RELEASE)

@@ -148,11 +148,11 @@ $(BINDIST_STATIC).tar.gz: distdir
 	mv $(distdir) $(BINDIST_STATIC)
 	( cd $(BINDIST_STATIC) \
 	  && ./configure --disable-shared \
-	     CXXFLAGS="-mcpu=$(BINDIST_CPU)" \
+	     CXXFLAGS="-march=$(BINDIST_CPU)" \
 	  && $(MAKE) all LDFLAGS="-all-static" \
 	  && mkdir $(BINDIST_STATIC) \
 	  && $(MAKE) prefix="`pwd`/$(BINDIST_STATIC)" install \
-	  && fakeroot $(AMTAR) cof - $(BINDIST_STATIC) | GZIP=$(GZIP_ENV) gzip -c >../$@ \
+	  && $(AMTAR) cof - $(BINDIST_STATIC) | GZIP=$(GZIP_ENV) gzip -c >../$@ \
 	) && \
 	rm -rf $(BINDIST_STATIC)
 
@@ -256,15 +256,35 @@ EXTRA_DIST = \
 DIST_SUBDIRS = $(SUBDIRS)
 
 ## --- dist-hook: when another 'Makefile.am' is overkill
-#DISTHOOK_DIRS = foo
-#DISTHOOK_FILES = foo/bar.txt foo/baz.txt
-#dist-hook:
-#	for d in $(DISTHOOK_DIRS); do\
-#	  mkdir -p $(distdir)/$$d ;\
-#	done
-#	for f in $(DISTHOOK_FILES); do\
-#	  cp -p $(srcdir)/$$f $(distdir)/$$f ;\
-#	done
+DISTHOOK_DIRS = m4
+DISTHOOK_FILES = \
+	m4/alloca.m4 \
+	m4/eoverflow.m4 \
+	m4/gnulib-cache.m4 \
+	m4/gnulib-comp.m4 \
+	m4/gnulib-tool.m4 \
+	m4/intmax_t.m4 \
+	m4/inttypes_h.m4 \
+	m4/longdouble.m4 \
+	m4/longlong.m4 \
+	m4/memrchr.m4 \
+	m4/onceonly_2_57.m4 \
+	m4/signed.m4 \
+	m4/size_max.m4 \
+	m4/stdint_h.m4 \
+	m4/vasnprintf.m4 \
+	m4/vasprintf.m4 \
+	m4/wchar_t.m4 \
+	m4/wint_t.m4 \
+	m4/xsize.m4
+
+dist-hook:
+	for d in $(DISTHOOK_DIRS); do\
+	  mkdir -p $(distdir)/$$d ;\
+	done
+	for f in $(DISTHOOK_FILES); do\
+	  cp -p $(srcdir)/$$f $(distdir)/$$f ;\
+	done
 
 
 #-----------------------------------------------------------------------
