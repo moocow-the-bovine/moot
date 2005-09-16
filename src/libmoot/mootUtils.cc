@@ -34,6 +34,11 @@
 
 #include <mootConfig.h>
 
+/*-- gnulib stuff --*/
+extern "C" {
+#include "memrchr.h"
+}
+
 #include <mootUtils.h>
 #include <mootIO.h>
 #include <mootCIO.h>
@@ -44,9 +49,6 @@
 #ifdef MOOT_ZLIB_ENABLED
 # include <zlib.h>
 #endif
-
-/*-- gnulib stuff --*/
-#include "memrchr.h"
 
 namespace moot {
   using namespace std;

@@ -27,9 +27,12 @@
  *--------------------------------------------------------------------------*/
 
 #include <mootIO.h>
+#include <mootConfig.h>
 
 /*-- gnulib stuff --*/
+extern "C" {
 #include "vasprintf.h"
+}
 
 namespace mootio {
 

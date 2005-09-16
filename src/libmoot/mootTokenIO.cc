@@ -40,6 +40,10 @@
 # include <mootTokenExpatIO.h>
 #endif /* MOOT_EXPAT_ENABLED */
 
+/*-- gnulib stuff --*/
+#include "vasprintf.h"
+
+
 /*moot_BEGIN_NAMESPACE*/
 namespace moot {
   using namespace std;
