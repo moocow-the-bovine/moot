@@ -173,10 +173,8 @@ AM_CXXFLAGS = $(moot_WFLAGS) $(moot_OFLAGS)
 #LDFLAGS_COMMON = @FSM_LFLAGS@ -L../libmoot
 LDFLAGS_COMMON = -L../libmoot
 
-#LDADD_COMMON   = -lmoot -lFSMExt @FSM_LIBS@
-#LDADD_COMMON   = -lmoot -lFSMExt -lFSM -lFSMSymSpec -lbumble++ @STL_LIBS@ -lz
-
-LDADD_COMMON   = ../libmoot/libmoot.la @moot_LIBS@
+#LDADD_COMMON   = ../libmoot/libmoot.la @moot_LIBS@
+LDADD_COMMON   = @MOOT_LIBMOOT_LDADD@ @moot_LIBS@
 
 #mootconfig_LDFLAGS = $(LDFLAGS_COMMON)
 #mootconfig_LDADD =

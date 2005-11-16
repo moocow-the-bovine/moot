@@ -10,11 +10,13 @@ MY_ALDIRS="."
 MY_AHDIRS="."
 MY_AMDIRS="."
 MY_ACDIRS="."
+MY_LTDIRS="."
 
 test -z "$ACLOCAL" && ACLOCAL="aclocal -I m4"
 test -z "$AUTOHEADER" && AUTOHEADER=autoheader
 test -z "$AUTOMAKE" && AUTOMAKE=automake
 test -z "$AUTOCONF" && AUTOCONF=autoconf
+test -z "$LIBTOOLIZE" && LIBTOOLIZE="libtoolize --automake"
 
 if test -n "$MY_ALDIRS"; then
  for d in $MY_ALDIRS ; do
@@ -41,6 +43,13 @@ if test -n "$MY_ACDIRS"; then
  for d in $MY_ACDIRS ; do
     echo "(cd $d ; $AUTOCONF)"
     (cd $d ; $AUTOCONF)
+ done
+fi
+
+if test -n "$MY_LTDIRS"; then
+ for d in $MY_LTDIRS ; do
+    echo "(cd $d ; $LIBTOOLIZE)"
+    (cd $d ; $LIBTOOLIZE)
  done
 fi
 

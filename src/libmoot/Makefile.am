@@ -17,7 +17,6 @@ SUBDIRS = gnulib
 
 ## --- executable programs
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
-#bin_PROGRAMS = dwdspp moot moot-fstgen moot-pargen
 
 ## --- libtool libraries
 #lib_LTLIBRARIES = ${lib_1}.la ... ${lib_N}.la
@@ -80,8 +79,21 @@ libmoot_la_SOURCES = \
 #	mootEvent.cc
 #	mootEventLexer.cc
 
+##----------------------------------------------------
+## gnulib sources (hack!)
 
-## --- Extra (possible) sources
+#libmoot_la_SOURCES += \
+#	gnulib/asnprintf.c \
+#	gnulib/asprintf.c \
+#	gnulib/memrchr.c \
+#	gnulib/printf-args.c \
+#	gnulib/printf-parse.c \
+#	gnulib/vasnprintf.c \
+#	gnulib/vasprintf.c
+
+
+##----------------------------------------------------
+## Extra (possible) sources
 #EXTRA_${prog_i}_SOURCES = 
 #EXTRA_${lib_i}_la_SOURCES = 
 
@@ -294,6 +306,7 @@ LIBREV = 0
 
 #libmoot_la_LDFLAGS = -version-info $(LIBCUR):$(LIBREV):$(LIBAGE) -rpath $(libdir)
 libmoot_la_LDFLAGS = -version-info $(LIBCUR):$(LIBREV):$(LIBAGE)
+
 libmoot_la_LIBADD = gnulib/libgnu.la
 
 ##-----------------------------------------------------------------------

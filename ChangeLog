@@ -3,6 +3,9 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
+v2.0.5-pre2 Mon, 10 Oct 2005 14:10:33 +0200
+	+ fixed compilation under gcc-4.0.2 / debian
+
 v2.0.5-pre2 Thu, 15 Sep 2005 12:20:45 +0200
         + added gnulib wrappers for memrchr(), vasprintf()
 	+ added configure.in checks for pwd.h, getuid(), getpwuid()
