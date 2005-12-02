@@ -15,7 +15,7 @@
 AUTOMAKE_OPTIONS = foreign dist-bzip2
 
 ## --- recursion subdirectories
-SUBDIRS = config src doc
+SUBDIRS = config m4 src doc
 
 ## --- pseudo-deps for '.SUFFIXES'
 SUFFIXES = .pod .txt .deb .rpm .spec .ifiles
@@ -264,28 +264,9 @@ EXTRA_DIST = \
 ## --- recursion subdirectories for 'make dist'
 DIST_SUBDIRS = $(SUBDIRS)
 
-## --- dist-hook: when another 'Makefile.am' is overkill
-DISTHOOK_DIRS = m4
-DISTHOOK_FILES = \
-	m4/alloca.m4 \
-	m4/eoverflow.m4 \
-	m4/gnulib-cache.m4 \
-	m4/gnulib-comp.m4 \
-	m4/gnulib-tool.m4 \
-	m4/intmax_t.m4 \
-	m4/inttypes_h.m4 \
-	m4/longdouble.m4 \
-	m4/longlong.m4 \
-	m4/memrchr.m4 \
-	m4/onceonly_2_57.m4 \
-	m4/signed.m4 \
-	m4/size_max.m4 \
-	m4/stdint_h.m4 \
-	m4/vasnprintf.m4 \
-	m4/vasprintf.m4 \
-	m4/wchar_t.m4 \
-	m4/wint_t.m4 \
-	m4/xsize.m4
+## --- dist-hook: when another 'Makefile.am' is overkill (weirdness!)
+#DISTHOOK_DIRS =
+#DISTHOOK_FILES =
 
 dist-hook:
 	for d in $(DISTHOOK_DIRS); do\

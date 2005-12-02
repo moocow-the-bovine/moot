@@ -48,7 +48,7 @@ html: $(moot_pods:.pod=.html) $(INDEX_SKEL:.skel=.html)
 
 latex: $(moot_pods:.pod=.tex) $(INDEX_SKEL:.skel=.tex)
 
-dvi: $(moot_pods:.pod=.dvi) $(INDEX_SKEL:.skel=.dvi)
+dvi-programs: $(moot_pods:.pod=.dvi) $(INDEX_SKEL:.skel=.dvi)
 
 ps: $(moot_pods:.pod=.ps) $(INDEX_SKEL:.skel=.ps)
 
