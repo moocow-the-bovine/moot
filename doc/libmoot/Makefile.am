@@ -68,8 +68,8 @@ builddir ?= $(top_builddir)/doc/libmoot
 	  if test \( -n "$(DOC_LATEX_TARGETS)" -a -d ./latex \) ; then \
 	    $(MAKE) -i -C ./latex $(DOC_LATEX_TARGETS) ;\
 	  fi ;\
-	  if test \( -d "$(builddir)/html" \) ; then \
-	    $(INSTALL_DATA) @srcdir@/libmoot.css $(builddir)/html/libmoot.css ;\
+	  if test \( -d "$(builddir)html" \) ; then \
+	    $(INSTALL_DATA) @srcdir@/libmoot.css $(builddir)html/libmoot.css ;\
 	  fi ;\
 	 else \
 	  echo "-------------------------------------------------------------------" ;\
