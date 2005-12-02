@@ -33,7 +33,6 @@ MAINTAINERCLEANFILES = \
 	install-sh \
 	ltmain.sh \
 	missing \
-	mkinstalldirs \
 	texinfo.tex
 
 #	ylwrap
@@ -48,7 +47,6 @@ EXTRA_DIST = \
 	Makefile.in \
 	depcomp \
 	install-sh \
-	mkinstalldirs \
 	missing
 
 #	ylwrap

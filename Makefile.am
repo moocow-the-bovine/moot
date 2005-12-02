@@ -12,7 +12,8 @@
 #-----------------------------------------------------------------------
 
 ## --- automake options
-AUTOMAKE_OPTIONS = foreign dist-bzip2
+#AUTOMAKE_OPTIONS = foreign dist-bzip2
+AUTOMAKE_OPTIONS = foreign
 
 ## --- recursion subdirectories
 SUBDIRS = config m4 src doc
@@ -31,11 +32,15 @@ PODS = README.pod
 .pod.txt:
 	pod2text $< $@
 
+.pod.html:
+	pod2html --outfile $@ $<
+
 #-----------------------------------------------------------------------
 # Variables: docs (requires that 'pkgdocdir' gets set in configure.in
 #-----------------------------------------------------------------------
 pkgdoc_DATA = \
 	$(PODS:.pod=.txt) \
+	$(PODS:.pod=.html) \
 	AUTHORS \
 	COPYING \
 	COPYING.LIB \
@@ -227,7 +232,8 @@ nodist:
 #MOSTLYCLEANFILES =
 
 ## --- clean: built by 'make'
-#CLEANFILES =
+CLEANFILES = \
+	*.tmp
 
 ## --- distclean: built by 'configure'
 DISTCLEANFILES = \
