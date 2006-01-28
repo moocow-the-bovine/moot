@@ -16,6 +16,7 @@ mooteval compares two  'medium' (+tagged,-analyzed) and/or
 'well done' (+tagged,+analyzed) input files, and summarizes
 the differences between them.
 See L<mootfiles> for details on moot file formats.
+See below for more details on the summary information printed.
 "
 
 #-----------------------------------------------------------------------------
@@ -106,6 +107,109 @@ Potentially useful for XML documents without encoding declarations.
 # Addenda
 #-----------------------------------------------------------------------------
 addenda "
+
+=head2 Summary Information
+
+The summary data printed by mooteval for each evaluated file
+(E-file) is interpreted with respect to the other file specified
+on the command line (the \"truth\", or T-file) as follows:
+
+=over 4
+
+=item Average Class Size
+
+The average number
+of distinct tags in the set of (morphological) analyses assigned to a token
+in the E-file.
+Only meaningful for well-done E-files:
+
+ avg_class_size() := sum(class_size(tok,Efile)) / |Efile|
+
+ class_size(tok)  := card(class(tok,Efile))
+
+
+=item Class Given
+
+The total number of
+tokens in the E-file for which an analysis (a non-empty ambiguity class)
+was supplied.
+Only meaningful for well-done E-files.
+
+ class_given(Toks,Efile) := sum(class_given(tok,Efile)) / |Efile|
+
+ class_given(tok,Efile)   = / 1 if class(tok,Efile) != {}
+                            \ 0 otherwise
+
+
+
+=item Saves
+
+The number of unanalyzed tokens in the E-file (-\"Class Given\")
+whose best-tag matched that of the corresponding token in the T-file (+\"Tags Equal\").
+
+ saves(Toks,Efile)  := sum(save(tok,Efile)) / sum(!class_given(tok,Efile))
+
+ save(tok,Efile)     = / 1 if !class_given(tok,Efile) and tag(tok,Efile)==tag(tok,Tfile)
+                       \ 0 otherwise
+
+
+
+=item Internal Coverage
+
+The number of analyzed tokens in the E-file (+\"Class Given\")
+whose tag according to the B<E-file> is associated with some analysis
+assigned to that token in the B<E-file> (a \"possible\" or \"coherent\" analysis,tag pair
+internal to the E-file itself):
+
+ internal_coverage(Toks,Efile) := sum(covers(tok,Efile,Efile)) / |Efile|
+
+                                   / 1 if class_given(tok,AnFile)
+ covers(tok,AnFile,TagFile)    := <       and tag(tok,TagFile) in class(tok,AnFile)
+                                   \ 0 otherwise
+
+
+=item External Coverage
+
+The number of analyzed tokens in the E-file (+\"Class Given\"),
+whose tag according to the B<T-file> is associated with some analysis
+assigned to that token in the B<E-file> (a \"possible\" or \"coherent\" analysis,tag
+pair; where the analyses are drawn from the E-file and the tags from the T-file):
+
+ external_coverage(Toks,Efile) := sum(covers(tok,Efile,Tfile)) / |Efile|
+
+
+
+=item Disambiguation Rate
+
+The number of cross-coherent tokens in the E-file whose best tag matches that
+of the corresponding token in the T-file:
+
+ disambigutation_rate(Efile,Tfile) := sum(disambig(tok,Efile,Tfile))
+                                      / (|Efile|-sum(covers(tok,Efile,Tfile)))
+
+                                       / 1 if covers(tok,Efile,Tfile)
+ disambig(tok,Efile,Tfile)         := <      and tag(tok,Efile)==tag(tok,Tfile)
+                                       \ 0 otherwise
+
+
+
+=item Tokens Equal
+
+The number of tokens in the E-file whose text matched that of
+the corresponding token in the T-file.  Any value other than 100%
+here is usually indicative of a format error.
+
+
+=item Tags Equal
+
+The number of tokens in the E-file whose best tag matched that
+of the corresponding token in the T-file.
+Indicative of overall tagging precision.
+
+=back
+
+
+
 
 =head2 Caveats
 
