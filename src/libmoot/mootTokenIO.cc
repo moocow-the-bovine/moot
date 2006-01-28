@@ -129,13 +129,13 @@ int TokenIO::guess_filename_format(const char *filename)
       else if (*exti == "r"   ) flags |= tiofRare;
       else if (*exti == "rt"  ) flags |= tiofRare;
 
+      else if (*exti == "mr"  ) flags |= tiofMediumRare;
+      else if (*exti == "mrt" ) flags |= tiofMediumRare;
+
       else if (*exti == "tt"  ) flags |= tiofMedium;
       else if (*exti == "ttt" ) flags |= tiofMedium;
       else if (*exti == "m"   ) flags |= tiofMedium;
       else if (*exti == "mt"  ) flags |= tiofMedium;
-
-      else if (*exti == "mr"  ) flags |= tiofMediumRare;
-      else if (*exti == "mrt" ) flags |= tiofMediumRare;
 
       else if (*exti == "wd"  ) flags |= tiofWellDone;
       else if (*exti == "wdt" ) flags |= tiofWellDone;
