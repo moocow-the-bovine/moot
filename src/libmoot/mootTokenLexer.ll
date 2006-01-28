@@ -336,10 +336,10 @@ anlchar    [^ \t\n\r]
  */
 %}
 
-<DETAILS>"["/{tagchar} {
+<DETAILS>"["_?/{tagchar} {
   //-- DETAILS: looks like a tag
   theColumn += yyleng;
-  manalysis->details.push_back('[');
+  manalysis->details.append((const char*)yytext, yyleng);
   lasttyp = LexTypeDetails;
   BEGIN(TAG);
 }
