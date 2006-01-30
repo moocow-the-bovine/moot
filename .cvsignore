@@ -15,6 +15,7 @@ moot.spec
 *.changes
 *.dsc
 *.rpm
+*.tmp
 rpm
 
 .libs
@@ -26,6 +27,7 @@ Makefile
 Makefile.in
 
 README.txt
+README.html
 configure
 config.log
 config.status
