@@ -97,6 +97,7 @@ void GetMyOptions(int argc, char **argv)
   churner.inputs = args.inputs;
   churner.ninputs = args.inputs_num;
   churner.use_list = args.list_given;
+  churner.paranoid = !args.recover_given;
 
   //-- i/o format : output
   ofmt = TokenIO::parse_format_request(args.output_format_arg,

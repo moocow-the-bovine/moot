@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2002-2006 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -116,6 +116,7 @@ void GetMyOptions(int argc, char **argv)
   churner.inputs = args.inputs;
   churner.ninputs = args.inputs_num;
   churner.use_list = 0;
+  churner.paranoid = true;
 
   // -- parse model spec
   string lexfile;

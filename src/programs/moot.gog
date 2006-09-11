@@ -97,7 +97,22 @@ int   "dots"   d  "Print a dot for every NTOKS tokens processed." \
 #    details="Useful for testing."
 
 flag  "list"   l  "INPUTs are file-lists, not filenames." \
-    details="Useful for large batch-processing jobs."
+    details="
+If this flag is given, the FILE(s) arguments should be lists
+of input filenames, one filename per line, which should be
+processed.  Otherwise, the FILE(s) arguments are interpreted
+as filenames of the input files themselves.
+
+Potentially useful for large batch-processing jobs.
+"
+
+flag  "recover"   r  "Attempt to recover from minor errors." \
+    details="
+Minor errors such as missing files, etc. cause an error message to be
+emitted but do not cause the program to abort if this option is specified.
+
+Potentially useful for large automated batch-processing jobs.
+"
 
 string "output"	o "Specify output file (default=stdout)." \
     arg="FILE" \

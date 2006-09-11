@@ -51,6 +51,13 @@ processed.  Otherwise, the FILE(s) arguments are interpreted
 as filenames of the input files themselves.
 "
 
+flag  "recover"   r  "Attempt to recover from minor errors." \
+    details="
+Minor errors such as missing files, etc. cause an error message to be
+emitted but do not cause the program to abort if this option is specified.
+Useful for large automated batch-processing jobs.
+"
+
 string "output-format" O "Specify output file format." \
   arg="FORMAT" \
   details="

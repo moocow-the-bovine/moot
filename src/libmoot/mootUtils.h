@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2006 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -274,7 +274,8 @@ namespace moot {
     int    ninputs;   /**< Number of inputs given (i.e. argc) */
 
     // -- operation flags
-    bool use_list;    /**< Whether inputs are filenames or list-filenames */
+    bool use_list;        /**< Whether inputs are filenames or list-filenames */
+    bool paranoid;        /**< Whether to abort() for unreadable files */
 
     // -- file data
     mifstream           in;    /**< Current real input file, wrapped */
@@ -283,25 +284,35 @@ namespace moot {
     // -- buffer data
     std::string         line; /**< Input line buffer */
 
+  private:
+    bool is_first_input;      /**< true until next_input_name() has been called at least once */
+
   public:
     /** Constructor */
     cmdutil_file_churner(char *my_progname=NULL,
 			 char **my_inputs=NULL,
 			 int my_ninputs=0,
-			 bool my_use_list=false)
+			 bool my_use_list=false,
+			 bool my_paranoid=true)
       : progname(my_progname),
 	inputs(my_inputs),
 	ninputs(my_ninputs),
-	use_list(my_use_list)
+	use_list(my_use_list),
+	paranoid(my_paranoid),
+	is_first_input(true)
     {};
 
     /** Destructor */
     ~cmdutil_file_churner() {};
 
-    /** Step to the first input file; returns NULL if no input files were given */
+    /** Step to the first (valid) input file; returns NULL if no input files were given
+     *  : OBSOLETE: use next_input_file() instead.
+     */
     FILE *first_input_file();
 
-    /** Step to the first input file, without opening it */
+    /** Step to the first (valid) input file, without opening it
+     *  : OBSOLETE: use next_input_name() instead.
+     */
     std::string &first_input_name();
 
     /** Step the the next input file: returns NULL if no input files are left */
@@ -311,7 +322,7 @@ namespace moot {
     std::string &next_input_name();
 
   private:
-    /** Step the the next input file (list-mode): returns NULL if no input files are left */
+    /** Step the the next input-list filename (list mode): returns NULL if no input files are left */
     FILE *next_list_file();
   };
   //@}

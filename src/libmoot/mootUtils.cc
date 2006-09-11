@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2006 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -275,33 +275,48 @@ bool hmm_parse_model_name_text(const string &modelname,
  *   + get first input file
  */
 FILE *cmdutil_file_churner::first_input_file() {
+  is_first_input = true;
+  return next_input_file();
+}
+/*
+{
   if (first_input_name().empty()) return NULL;
-  if (!in.reopen()) {
-    fprintf(stderr, "%s: open failed for input-file '%s': %s\n",
-	    progname, in.name.c_str(), strerror(errno));
-    abort();
+  while (!in.reopen()) {
+    fprintf(stderr, "%s: open failed for input-file '%s': %s%s\n",
+	    progname, in.name.c_str(), strerror(errno),
+	    (!paranoid ? ": skipping" : ""));
+    if (paranoid) abort();
   }
   return in.file;
 }
+*/
 
 /*
  * in = cmdutil_file_churner::next_input_file();
  */
 FILE *cmdutil_file_churner::next_input_file() {
-  if (next_input_name().empty()) return NULL;
-  if (!in.reopen()) {
-    fprintf(stderr, "%s: open failed for input-file '%s': %s\n",
-	    progname, in.name.c_str(), strerror(errno));
-    abort();
-  }
-  return in.file;
+  do {
+    in.close();
+    if (next_input_name().empty()) return NULL;
+    if (in.reopen()) return in.file;
+    //-- open error
+    fprintf(stderr, "%s: open failed for input-file '%s': %s%s\n",
+	    progname, in.name.c_str(), strerror(errno),
+	    (!paranoid ? ": skipping" : ""));
+    if (paranoid) abort();
+  } while ( 1 );
+  return NULL;
 }
+
 
 /*
  * name = cmdutil_file_churner::first_input_name();
  *   + get first input name
  */
 std::string &cmdutil_file_churner::first_input_name() {
+  return next_input_name();
+}
+/*std::string &cmdutil_file_churner::first_input_name() {
   if (use_list) {
     // -- args/inputs are file-LISTS
     if (ninputs <= 0) {
@@ -312,10 +327,11 @@ std::string &cmdutil_file_churner::first_input_name() {
       list.name = inputs[0];
     }
     // -- sanity check
-    if (!list.reopen()) {
-      fprintf(stderr,"%s: open failed for input list-file '%s': %s\n",
-	      progname, list.name.c_str(), strerror(errno));
-      abort();
+    while (!list.reopen()) {
+      fprintf(stderr, "%s: open failed for input list-file '%s': %s%s\n",
+	      progname, in.name.c_str(), strerror(errno),
+	      (!paranoid ? ": skipping" : ""));
+      if (paranoid) abort();
     }
 
     // -- read next input filename from list-file
@@ -343,7 +359,7 @@ std::string &cmdutil_file_churner::first_input_name() {
   }
   return in.name;
 }
-
+*/
 
 /*
  * in = cmdutil_file_churner::next_input_name();
@@ -351,24 +367,42 @@ std::string &cmdutil_file_churner::first_input_name() {
 std::string &cmdutil_file_churner::next_input_name() {
   in.close();
   if (use_list) {
-    // -- read next file
-    while (list.getline(line) == EOF) { //-- no more data left
+    //-- list mode: read next input-filename from list-file
+    while (list.getline(line) == EOF) {
+      //-- no more data remaining in list-file (?)
       if (list.eof()) {
 	if (!next_list_file()) return in.name = "";
       } else {
-	fprintf(stderr, "%s: Error reading input-list-file '%s': %s\n",
-		progname, list.name.c_str(), strerror(errno));
-	abort();
+	//-- other error condition (?)
+	fprintf(stderr, "%s: Error reading input-list-file '%s': %s%s\n",
+		progname, list.name.c_str(), strerror(errno),
+		(paranoid ? ": skipping" : ""));
+	if (paranoid) abort();
+	if (!next_list_file()) return in.name = "";
       }
     }
     in.name = line;
     in.name.erase(in.name.size()-1);  // eliminate trailing newline
-    return in.name;
+  }
+  else {
+    //-- args/inputs are file-NAMES
+    if (ninputs-- <= 0) {
+      if (is_first_input) {
+	//-- no inputs specified, initial input-file requested: read from stdin
+	in.name = "-";
+      } else {
+	//-- no inputs specified, (n+1)th input-file requested: EOI
+	in.name = "";
+      }
+    }
+    else {
+      //-- get next file from 'inputs' array
+      in.name = *(inputs++);
+    }
   }
 
-  //-- args/inputs are file-NAMES
-  if (--ninputs <= 0) { return in.name = ""; }
-  in.name = *(++inputs);
+  //-- return
+  is_first_input = false;
   return in.name;
 }
 
@@ -378,17 +412,17 @@ std::string &cmdutil_file_churner::next_input_name() {
  */
 FILE *cmdutil_file_churner::next_list_file() {
   if (!use_list) return NULL;
-  list.close();
-  if (--ninputs <= 0) return NULL;
-  
-  list.name = *(++inputs);
-  
-  if (!list.reopen()) {
-    fprintf(stderr,"%s: open failed for input list-file '%s': %s\n",
-	    progname, list.name.c_str(), strerror(errno));
-    abort();
+  while (ninputs-- > 0) {
+    list.close();
+    list.name = *(inputs++);
+    if (list.reopen()) return list.file;
+    //-- open error
+    fprintf(stderr,"%s: open failed for input list-file '%s': %s%s\n",
+	    progname, list.name.c_str(), strerror(errno),
+	    (!paranoid ? ": skipping" : ""));
+    if (paranoid) abort();
   }
-  return list.file;
+  return NULL;
 }
 
 
@@ -399,7 +433,7 @@ std::string moot_banner(void)
 {
   string s = ("  libmoot version "
 	      PACKAGE_VERSION
-	      " (c) 2005 Bryan Jurish.\n");
+	      " (c) 2006 Bryan Jurish.\n");
   //--
 
 #ifdef MOOT_EXPAT_ENABLED
