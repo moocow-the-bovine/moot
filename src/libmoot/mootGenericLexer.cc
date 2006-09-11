@@ -83,6 +83,19 @@ namespace moot {
     }
   };
 
+  /*====================================================================
+   * Generic Lexer: Required wrapper methods
+   *====================================================================*/
+
+  void **GenericLexer::mgl_yy_current_buffer_p(void)
+  { return NULL; }
+  //{ return &((void *)yy_current_buffer); }
+
+  void GenericLexer::mgl_begin(int stateno)
+  { return; };
+  //{ BEGIN(stateno); };
+
+
 
   /*====================================================================
    * Generic Lexer: Input Selection

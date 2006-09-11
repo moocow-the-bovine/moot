@@ -163,15 +163,14 @@ public:
   /*------------------------------------------------------------*/
   /** \name Required Wrapper Methods */
   //@{
-  virtual void **mgl_yy_current_buffer_p(void)
-  { return NULL; };
+  virtual void **mgl_yy_current_buffer_p(void);
   //{ return &((void *)yy_current_buffer); }
 
   /**
    * Set current start-state.
    * Descendants must override this method (section 3 only!)
    */
-  virtual void mgl_begin(int stateno) {};
+  virtual void mgl_begin(int stateno);
   //{ BEGIN(stateno); };
 
   /** Flex++ should define this, but it doesn't get through to us */
