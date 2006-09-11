@@ -72,8 +72,8 @@ negra*.123
 *.dot
 *.lab
 *.scl
-*_cmdparser.cc
-*_cmdparser.h
+#*_cmdparser.cc
+#*_cmdparser.h
 stamp-h*
 config.h
 config.h.in
