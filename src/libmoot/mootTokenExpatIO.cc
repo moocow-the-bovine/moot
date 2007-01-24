@@ -186,8 +186,32 @@ void TokenReaderExpat::save_context_data(const char *text, size_t len,
 }
 
 /*======================================================================
+ * XML Context: DEBUG
+ *======================================================================*/
+#ifdef MOOT_DEBUG_EXPAT
+
+void TokenReaderExpat::save_context(mootTokenType toktype, int info)
+{
+  if (!save_raw_xml && toktype == TokTypeXMLRaw) return;
+  if (!info) info = top_node_info();
+  ContextBuffer ctb(parser);
+  save_context_data(ctb, toktype, info);
+};
+
+void TokenReaderExpat::save_context_data(const mootio::micbuffer &buf, mootTokenType toktype, int info)
+{
+  save_context_data(buf.cb_rdata + buf.cb_offset,
+		    buf.cb_used  - buf.cb_offset,
+		    toktype, info);
+};
+
+
+#endif /* MOOT_DEBUG_EXPAT */
+
+/*======================================================================
  * XML HANDLERS
  *======================================================================*/
+
 
 /*----------------------------------------------------
  * TokenReaderExpat: Handlers: xmlDecl
@@ -505,14 +529,16 @@ void TokenWriterExpat::_put_token_raw(const mootToken &token, mootio::mostream *
 
   case TokTypeVanilla:
   case TokTypeLibXML:
-    //-- raw mode: just print besttag
-    os->printf("%s<%s>",
-	       (tw_format&tiofPretty ? "  " : ""),
-	       besttag_elt.c_str());
-    twx_recoder.string2mstream(token.besttag(), os);
-    os->printf("</%s>%s",
-	       besttag_elt.c_str(),
-	       (tw_format&tiofPretty ? "\n    " : ""));
+    //-- raw mode (unsafe): just print besttag (if we're outputting (new) tags at all)
+    if (tw_format&tiofTagged) {
+      os->printf("%s<%s>",
+		 (tw_format&tiofPretty ? "  " : ""),
+		 besttag_elt.c_str());
+      twx_recoder.string2mstream(token.besttag(), os);
+      os->printf("</%s>%s",
+		 besttag_elt.c_str(),
+		 (tw_format&tiofPretty ? "\n    " : ""));
+    }
     break;
     
   case TokTypeXMLRaw:

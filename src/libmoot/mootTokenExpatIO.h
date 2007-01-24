@@ -49,6 +49,8 @@
 
 #include <list>
 
+/*#define MOOT_DEBUG_EXPAT*/
+
 moot_BEGIN_NAMESPACE
 
 using namespace std;
@@ -276,6 +278,20 @@ public:
     return stack.empty() ? emptyStackValue : stack.front();
   };
 
+
+#ifdef MOOT_DEBUG_EXPAT
+  /**
+   * Save current parser context as a mootToken to the callback sentence buffer.
+   */
+  void save_context(mootTokenType toktype=TokTypeXMLRaw, int info=0);
+
+  /**
+   * Save a mootToken to the callback sentence buffer
+   */
+  void save_context_data(const mootio::micbuffer &buf, mootTokenType toktype=TokTypeXMLRaw, int info=0);
+
+#else
+
   /**
    * Save current parser context as a mootToken to the callback sentence buffer.
    */
@@ -287,17 +303,22 @@ public:
     save_context_data(ctb, toktype, info);
   };
 
-  /** Save a mootToken to the callback sentence buffer */
-  void save_context_data(const mootio::micbuffer &buf,
-			 mootTokenType toktype=TokTypeXMLRaw,
-			 int info=0)
+  /**
+   * Save a mootToken to the callback sentence buffer, micbuffer version
+   */
+  inline void save_context_data(const mootio::micbuffer &buf,
+				mootTokenType toktype=TokTypeXMLRaw,
+				int info=0)
   {
     save_context_data(buf.cb_rdata + buf.cb_offset,
 		      buf.cb_used  - buf.cb_offset,
 		      toktype, info);
   };
+#endif /* MOOT_DEBUG_EXPAT */
 
-  /** Save a mootToken to the callback sentence buffer */
+  /**
+   * Save a mootToken to the callback sentence buffer, string version
+   */
   void save_context_data(const char *text, size_t len,
 			 mootTokenType toktype=TokTypeXMLRaw,
 			 int info=0);
