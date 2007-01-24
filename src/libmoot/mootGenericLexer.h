@@ -91,7 +91,8 @@ public:
   /*--------------------------------------------------------------------------
    * mootGenericLexer: Statics
    */
-  static const int MGL_DEFAULT_BUFFER_SIZE = 8192;
+  /*static const int MGL_DEFAULT_BUFFER_SIZE = 8192;*/ //-- old: flex++ now uses 16384
+  static const int MGL_DEFAULT_BUFFER_SIZE = 16384;
 
 public:
   /*--------------------------------------------------------------------
@@ -150,7 +151,7 @@ public:
       tokbuf_clear(false)
   {};
 
-  /** Destructor */
+ /** Destructor */
   virtual ~GenericLexer(void);
 
   /** Reset lexer state */

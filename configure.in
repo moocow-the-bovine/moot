@@ -65,7 +65,7 @@ if test "$enable_debug" != "yes" ; then
 
    #moot_OFLAGS="-O2"
    #moot_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
-   moot_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops"
+   moot_OFLAGS="-O3 -funroll-loops" #-- "-O,-O2,-O3,-Os" all imply -fomit-frame-pointer
    #CONFIG_OPTIONS="$CONFIG_OPTIONS DEBUG=0"
    CONFIG_OPTIONS="DEBUG=0"
 else
