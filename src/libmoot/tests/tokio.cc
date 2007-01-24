@@ -6,12 +6,11 @@
 using namespace moot;
 
 void churntest(int argc, char **argv) {
-  FILE *infile = stdin;
-  if (argc > 1) {
-    infile = fopen(argv[1], "r");
-  }
-  if (!infile) {
-    fprintf(stderr, "open failed for '%s'\n", argv[1]);
+  char *filename = "-";
+  if (argc > 1) { filename = argv[1]; }
+  mifstream mif(filename);
+  if (!mif.valid()) {
+    fprintf(stderr, "open failed for '%s'\n", filename);
     exit(1);
   }
 
@@ -19,16 +18,16 @@ void churntest(int argc, char **argv) {
 	     | tiofWellDone
 	     );
   TokenReaderNative tr(fmt);
-  tr.fromFile(infile);
+  tr.from_mstream(&mif);
 
-  mootSentence sent;
+  mootSentence *sent;
   int lxtyp;
   while ((lxtyp = tr.get_sentence()) != TokTypeEOF) {
     sent = tr.sentence();
 
     printf("SENTENCE:\n");
-    for (mootSentence::const_iterator si = sent.begin();
-	 si != sent.end();
+    for (mootSentence::const_iterator si = sent->begin();
+	 si != sent->end();
 	 si++)
       {
 	printf("\t+ TOKEN: type=`%s' ; toktext=`%s'\t ; besttag=`%s'\n",
