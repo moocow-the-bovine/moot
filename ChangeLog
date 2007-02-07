@@ -3,6 +3,9 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
+v2.0.6 Wed, 07 Feb 2007 23:27:48 +0100
+	+ bugfixes for compilation on OS-X
+	
 v2.0.5 Mon, 11 Sep 2006 15:03:16 +0200
 	+ added '--recover' flag to moot, mootpp for error recovery during
 	  automated batch processing

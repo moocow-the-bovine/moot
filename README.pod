@@ -2,7 +2,7 @@
 
 README for package 'moot'
 
-Last updated for moot version 2.0.4
+Last updated for moot version 2.0.6-pre1
 
 =head1 DESCRIPTION
 
@@ -33,8 +33,8 @@ For gcc-2.x, I recommend STLport E<gt>= 4.5.3,
 available from http://www.stlport.org
 You will have to set the environment variables
 CPPFLAGS, LDFLAGS, and LIBS according to
-your installation before building.
-
+your installation before building.  Newer gcc versions (3.x,4.x)
+have native STL support.
 
 =item flex++ , bison++ (Optional)
 
@@ -47,7 +47,12 @@ from the official distribution site of this package.
 Tested with flex++-v2.3.8-4 and bison++-v1.21-5.
 
 Should only be required if you want/need to mess with
-the native I/O formats.
+the native I/O formats.  If the build fails during 'make',
+just run:
+
+ touch src/libmoot/*Lexer.*[ch] src/libmoot/*Parser.*[ch]
+
+from the distribution root directory, and call make again.
 
 
 =item expat (Optional)
@@ -93,17 +98,27 @@ Get it from http://www.cpan.org or http://www.perl.com
 Required for building command-line parsers, utility
 documentation, library documentation, etc.
 
-=item Getopt::Gen
+
+=item Getopt::Gen (Optional)
 
 A Perl module used to generate command-line option parsers.
 Available from:
 http://www.ling.uni-potsdam.de/~moocow/projects/perl/index.html#gog
 
+If make fails due to lacking optgen.perl, either get & install this
+module, or run:
+
+ touch src/programs/*_cmdparser.*[ch]
+
+from the distribution root directory, and call make again.
+
+
 =item pod2man, pod2text, pod2html (Optional)
 
 The Perl documentation converstion utilities, required
 for building the correspdonding program documentation
-formats, should have come with your Perl.
+formats.  These should have come with your Perl.  On Debian
+derivates, they live in the "perl-doc" package.
 
 =back
 
@@ -135,6 +150,21 @@ necessary build files.
 You will also need Perl and the Getopt::Gen Perl module,
 which should be available from wherever you acquired
 these sources.
+
+
+=head1 SYSTEMS ON WHICH MOOT HAS SUCCESSFULLY COMPILED
+
+=over 4
+
+=item linux / gcc
+
+=item MacOS-X / gcc
+
+=item win32 / mingw32
+
+=item ... more to come, maybe...
+
+=back
 
 
 =head1 KNOWN ISSUES
