@@ -30,19 +30,19 @@
 #define _MOOT_STL_HACKS_H
 
 #if defined(__GNUC__)
-#  if __GNUC__ >= 3
-#    if __GNUC_MINOR__ == 0
+#  if __GNUC__ >= 3                                         /* gcc >= v3.0 */
+#    if __GNUC__ == 3 && __GNUC_MINOR__ == 0                /* gcc == v3.0 */
 #      define moot_STL_NAMESPACE std
-#    else
+#    else  /* !( __GNUC__ == 3 && __GNUC_MINOR__ == 0 ) */  /* gcc >  v3.0 */
 #      define moot_STL_NAMESPACE __gnu_cxx
-#    endif /* __GNUC_MINOR__ == 0 */
+#    endif /*  ( __GNUC__ == 3 && __GNUC_MINOR__ == 0 ) */
 #    include <ext/hash_map>
 #    include <ext/hash_set>
-#  else  /* __GNUC__ >= 3 */
+#  else    /* !( __GNUC__ >= 3 ) */                         /* gcc <  v3.0 */
 #    define moot_STL_NAMESPACE std
 #    include <hash_map>
 #    include <hash_set>
-#  endif /* __GNUC__ >= 3 */
+#  endif   /*  ( __GNUC__ >= 3 ) */
 
 #  ifndef MOOT_HAVE_HASH_STRING
 /*-- hack for string hashing --*/
@@ -55,11 +55,11 @@ namespace moot_STL_NAMESPACE {
 };
 #  endif // MOOT_HAVE_HASH_STRING
 
-#else  /* !defined(__GNUC__) */
+#else  /* !( defined(__GNUC__) ) */
 #  include <hash_map>
 #  include <hash_set>
 #  define moot_STL_NAMESPACE std
-#endif /* defined(__GNUC__) */
+#endif /*  ( defined(__GNUC__) ) */
 
 /* Namespace definitions */
 #define moot_NAMESPACE moot
