@@ -123,6 +123,8 @@ noinst_HEADERS = config.h
 
 OPTGENFLAGS = -u -l
 
+if HAVE_OPTGEN
+
 .gog_cmdparser.h:
 	optgen.perl $(OPTGENFLAGS) --nopod -F $*_cmdparser $<
 	mv $*_cmdparser.c $*_cmdparser.cc
@@ -133,6 +135,8 @@ OPTGENFLAGS = -u -l
 
 .gog.pod:
 	optgen.perl $(OPTGENFLAGS) --nocfile --nohfile -F $* $<
+
+endif
 
 ##-----------------------------------------------------------------------
 ## pod conversion

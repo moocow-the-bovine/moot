@@ -47,7 +47,7 @@ html: moottut.html
 
 latex: moottut.tex
 
-dvi: moottut.dvi
+dvi_doc: moottut.dvi
 
 ps: moottut.ps
 
@@ -64,17 +64,25 @@ POD2MANFLAGS = \
 #POD2HTMLFLAGS = --podpath="$(srcdir):." --htmlroot="."
 POD2HTMLFLAGS = --podpath="$(srcdir):$(srcdir)/../programs:.:./../programs" --htmlroot="." --css="moottut.css"
 
+if HAVE_POD2MAN
 .pod.1:
 	$(POD2MAN) $(POD2MANFLAGS) --section=1 $< $@
+endif
 
+if HAVE_POD2TEXT
 .pod.txt:
 	$(POD2TEXT) $< $@
+endif
 
+if HAVE_POD2HTML
 .pod.html:
 	$(POD2HTML) $(POD2HTMLFLAGS) --infile=$< --outfile=$@
+endif
 
+if HAVE_POD2LATEX
 .pod.tex:
 	$(POD2LATEX) --full --out $@ $<
+endif
 
 ##-----------------------------------------------------------------------
 ## latex compilation
@@ -120,15 +128,29 @@ POD2HTMLFLAGS = --podpath="$(srcdir):$(srcdir)/../programs:.:./../programs" --ht
 
 ## --- clean:  built by 'make'
 CLEANFILES = \
-	*.man *.1 *.5 *.html moottut.txt *.tex *.dvi *.ps *.pdf \
+	*.dvi *.ps *.pdf \
 	*.log *.aux *.toc *.idx *~~ *.tmp \
 	*.lex *.123 test.mtt test.tt test.t
+
+if HAVE_POD2MAN
+CLEANFILES += *.man *.1 *.5
+endif
+if HAVE_POD2HTML
+CLEANFILES += *.html
+endif
+if HAVE_POD2TEXT
+CLEANFILES += moottut.txt
+endif
+if HAVE_POD2LATEX
+CLEANFILES += *.tex
+endif
 
 ## --- distclean: built by 'configure'
 #DISTCLEANFILES =
 
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = \
+	*.man *.1 *.5 *.html moottut.txt *.tex \
 	*~ .*~ Makefile Makefile.in \
 	$(CLEANFILES)
 
@@ -140,7 +162,8 @@ MAINTAINERCLEANFILES = \
 EXTRA_DIST = \
 	$(pkgdoctut_DATA) \
 	moottut.pod \
-	moottut.1
+	moottut.1 \
+	moottut.txt
 
 ## --- recursion subdirectories for 'make dist'
 #DIST_SUBDIRS = $(SUBDIRS)

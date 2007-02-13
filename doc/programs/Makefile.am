@@ -63,8 +63,9 @@ pdf: $(moot_pods:.pod=.pdf) $(INDEX_SKEL:.skel=.pdf)
 
 OPTGENFLAGS = -l
 
+if HAVE_OPTGEN
 mootconfig.pod: mootconfig.gog
-	optgen.perl $(OPTGENFLAGS) --nocfile --nohfile \
+	$(OPTGEN_PERL) $(OPTGENFLAGS) --nocfile --nohfile \
 	--no-handle-help \
 	--no-handle-version \
 	--no-handle-rcfile \
@@ -72,7 +73,8 @@ mootconfig.pod: mootconfig.gog
 	-F $* $<
 
 .gog.pod:
-	optgen.perl $(OPTGENFLAGS) --nocfile --nohfile -F $* $<
+	$(OPTGEN_PERL) $(OPTGENFLAGS) --nocfile --nohfile -F $* $<
+endif
 
 ##-----------------------------------------------------------------------
 ## pod compilation rules: Getopt::Gen (from skel)
@@ -84,8 +86,10 @@ OPTGEN_SKELFLAGS = \
 	--no-handle-rcfile \
 	--no-handle-error
 
+if HAVE_OPTGEN
 .skel.pod:
-	echo | optgen.perl $(OPTGEN_SKELFLAGS) --template=$< - > $@ 2>/dev/null
+	echo | $(OPTGEN_PERL) $(OPTGEN_SKELFLAGS) --template=$< - > $@ 2>/dev/null
+endif
 
 ##-----------------------------------------------------------------------
 ## pod conversion rules
@@ -96,20 +100,28 @@ POD2MANFLAGS = \
 	--release="moot v$(VERSION)"
 POD2HTMLFLAGS = --podpath="$(srcdir):." --htmlroot="." --css "mootprogs.css"
 
+if HAVE_POD2MAN
 .pod.1:
 	$(POD2MAN) $(POD2MANFLAGS) --section=1 $< $@
 
 .pod.5:
 	$(POD2MAN) $(POD2MANFLAGS) --section=5 $< $@
+endif
 
+if HAVE_POD2TEXT
 .pod.txt:
 	$(POD2TEXT) $< $@
+endif
 
+if HAVE_POD2HTML
 .pod.html:
 	$(POD2HTML) $(POD2HTMLFLAGS) --infile=$< --outfile=$@
+endif
 
+if HAVE_POD2LATEX
 .pod.tex:
 	$(POD2LATEX) --full --out $@ $<
+endif
 
 ##-----------------------------------------------------------------------
 ## latex compilation
@@ -134,10 +146,26 @@ POD2HTMLFLAGS = --podpath="$(srcdir):." --htmlroot="." --css "mootprogs.css"
 
 ## --- clean:  built by 'make'
 CLEANFILES = \
-	$(moot_program_gogs:.gog=.pod) \
-	$(INDEX_SKEL:.skel=.pod) \
-	*.man *.1 *.5 *.html *.txt *.tex *.dvi *.ps *.pdf \
+	*.dvi *.ps *.pdf \
 	*.log *.aux *.toc *.idx *~~ *.tmp
+
+if HAVE_OPTGEN
+CLEANFILES += \
+	$(moot_program_gogs:.gog=.pod) \
+	$(INDEX_SKEL:.skel=.pod)
+endif
+if HAVE_POD2MAN
+CLEANFILES += *.man *.1 *.5
+endif
+if HAVE_POD2HTML
+CLEANFILES += *.html
+endif
+if HAVE_POD2TEXT
+CLEANFILES += *.txt
+endif
+if HAVE_POD2LATEX
+CLEANFILES += *.tex
+endif
 
 ## --- distclean: built by 'configure'
 DISTCLEANFILES = \
@@ -145,7 +173,10 @@ DISTCLEANFILES = \
 
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = \
+	$(moot_program_gogs:.gog=.pod) \
+	$(INDEX_SKEL:.skel=.pod) \
 	*~ .*~ Makefile Makefile.in \
+	*.man *.1 *.5 *.html *.txt *.tex \
 	$(CLEANFILES)
 
 ##-----------------------------------------------------------------------
@@ -164,7 +195,10 @@ EXTRA_DIST = \
 	@DOC_PROG_MAN1_TARGETS@ \
 	@DOC_PROG_MAN5_TARGETS@ \
 	@DOC_PROG_HTML_TARGETS@ \
-	$(INDEX_SKEL:.skel=.html)
+	$(INDEX_SKEL:.skel=.pod) \
+	$(INDEX_SKEL:.skel=.html) \
+	$(INDEX_SKEL:.skel=.txt) \
+	$(INDEX_SKEL:.skel=.1)
 
 ## --- recursion subdirectories for 'make dist'
 #DIST_SUBDIRS = $(SUBDIRS)

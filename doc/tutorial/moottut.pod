@@ -36,10 +36,11 @@ of possible analyses (a "lexical class") for that token.
 =head1 Training
 
 Before an input file can be tagged, statistical data in the
-form of a "model" must first be provided.
+form of a B<model> must first be provided.
 The easiest way to produce such a model is by using the
-"mootrain" (L<mootrain>) utility to derive frequency
-data from a pre-tagged corpus.
+"mootrain" (L<mootrain>) utility to gather frequency
+data from a pre-tagged corpus, thus inducing a maximum-likelihood
+model.
 
 =cut
 
@@ -50,7 +51,7 @@ data from a pre-tagged corpus.
 =head2 Training from a Tagged Corpus
 
 If you have a text-format corpus in the file
-"corpus.ttt" which is pre-tagged with the "best"
+"corpus.ttt" which is pre-tagged with the "correct"
 part-of-speech tags, then the incantation:
 
  mootrain --lex --ngrams corpus.ttt
@@ -67,7 +68,7 @@ required for runtime tagging of tokens cooked "rare".
 =head2 Training from a Tagged and Analyzed Corpus
 
 If you have a text-format corpus in the file
-"corpus.ttt" which is pre-tagged with the "best"
+"corpus.ttt" which is pre-tagged with the "correct"
 part-of-speech tags as well as lexical classes,
 then the incantation:
 
@@ -83,9 +84,26 @@ tags (and not analyses), you may generate an appropriate
 "well done" corpus file "corpus.mttt" from "corpus.ttt"
 by calling:
 
- mootm -12 -m morph.fst -s morph.sym -a -o corpus.mttt corpus.mttt
+ mootm -12 -m morph.gfst -s morph.lab -a -o corpus.mttt corpus.mttt
 
-before calling "mootrain".
+before calling "mootrain".  See the mootm(1) manpage for details.
+
+=head3 Caveat Praeceptor
+
+Note that training a model from a "well-done" corpus in the manner
+described above
+B<only> makes sense if you plan to pass "medium-rare" files
+produced by B<exactly the same analyzer> to "moot"
+when tagging new texts.
+In particular, if not all of the analyses to be passed in "medium-rare" files
+to the runtime tagger "moot" are encoded in the analysis fst "morph.gfst"
+(e.g. if some analyses are produced by a preprocessing stage), then such
+"extra" analyses should also be included in the "well-done" training corpus.
+Such an incompatibility between training and runtime analysis formats may
+seriously degrade tagger performance.
+Optionally, you can disregard the analysis information
+present in the model (if any) at tagger runtime by specifying the C<--use-classes=0>
+option to "moot".
 
 =cut
 
@@ -117,16 +135,20 @@ to the tagger or to an external analysis program.
 If you have an external analysis program such as mootm(1)
 which assigns (possibly empty) lexical classes to input tokens,
 and if your model contains lexical class information (i.e. if
-you trained from a "well done" corpus, and the file "corpus.clx"
+you trained from a "well done" corpus analyzed by the same program,
+and if the file "corpus.clx"
 contains entries for more than one lexical class), then you
-may wish at this point to filter "test.t" through your analysis
+may at this point wish to filter "test.t" through your analysis
 program, yielding "test.mt".
 
-For "mootm" with an analysis
-transducer "morph.fst" and analysis symbols "morph.sym",
-the incantation is:
+For analyzing incoming tokens with the "mootm" program built
+with libgfsm support, using an analysis
+transducer "morph.gfst" and analysis labels "morph.lab",
+the appropriate incantation is:
 
- mootm --morph=morph.fst --symbols=morph.sym --avm -o test.mt test.t
+ mootm -m morph.gfst -s morph.lab -a -o test.mt test.t
+
+See the mootm(1) manpage for details.
 
 =cut
 
