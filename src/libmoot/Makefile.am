@@ -234,14 +234,14 @@ pkginclude_HEADERS = \
 SRCDIR = @srcdir@
 
 ## --- flex++/bison++ flags
-FLEXXX ?= flex++
+#FLEXXX ?= flex++
 #FLEXXX_SKEL = $(SRCDIR)/flexskel.cc
 #FLEXXX_HSKEL = $(SRCDIR)/flexskel.h
 #FLEXXX_DEPS = $(FLEXXX_SKEL) $(FLEXXX_HSKEL)
 #FLEXXX_FLAGS = -8 -S$(FLEXXX_SKEL) -H$(FLEXXX_HSKEL)
 FLEXXX_FLAGS = -8
 
-BISONXX ?= bison++
+#BISONXX ?= bison++
 #BISONXX_SKEL = $(SRCDIR)/bison.cc
 #BISONXX_HSKEL = $(SRCDIR)/bison.h
 #BISONXX_DEPS = $(BISONXX_SKEL) $(BISONXX_HSKEL)
@@ -249,17 +249,21 @@ BISONXX ?= bison++
 BISONXX_FLAGS = -d -v
 #BISONXX_FLAGS = --debug -d -v
 
+if HAVE_FLEXXX
 .ll.h: $(FLEXXX_DEPS)
 	$(FLEXXX) $(FLEXXX_FLAGS) -h$*.h -o$*.cc $<
 
 .ll.cc: $(FLEXXX_DEPS)
 	$(FLEXXX) $(FLEXXX_FLAGS) -h$*.h -o$*.cc $<
+endif
 
+if HAVE_BISONXX
 .yy.cc: $(BISONXX_DEPS)
 	$(BISONXX) $(BISONXX_FLAGS) -o $*.cc -h $*.h  $<
 
 .yy.h: $(BISONXX_DEPS)
 	$(BISONXX) $(BISONXX_FLAGS) -o $*.cc -h $*.h  $<
+endif
 
 ##-----------------------------------------------------------------------
 ## compile flags

@@ -29,11 +29,15 @@ ACLOCAL_AMFLAGS = -I m4
 #-----------------------------------------------------------------------
 PODS = README.pod
 
+if HAVE_POD2TEXT
 .pod.txt:
 	pod2text $< $@
+endif
 
+if HAVE_POD2HTML
 .pod.html:
 	pod2html --outfile $@ $<
+endif
 
 #-----------------------------------------------------------------------
 # Variables: docs (requires that 'pkgdocdir' gets set in configure.in
@@ -244,6 +248,7 @@ DISTCLEANFILES = \
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = *~ \
 	$(PODS:.pod=.txt) \
+	$(PODS:.pod=.html) \
 	Makefile Makefile.in \
 	aclocal.m4 \
 	configure
@@ -263,8 +268,9 @@ EXTRA_DIST = \
 	AUTHORS \
 	$(PODS) \
 	$(PODS:.pod=.txt) \
+	$(PODS:.pod=.html) \
 	$(DEBIAN_FILES) \
-	autogen.sh\
+	autogen.sh \
 	configure
 
 ## --- recursion subdirectories for 'make dist'
@@ -273,14 +279,14 @@ DIST_SUBDIRS = $(SUBDIRS)
 ## --- dist-hook: when another 'Makefile.am' is overkill (weirdness!)
 #DISTHOOK_DIRS =
 #DISTHOOK_FILES =
-
-dist-hook:
-	for d in $(DISTHOOK_DIRS); do\
-	  mkdir -p $(distdir)/$$d ;\
-	done
-	for f in $(DISTHOOK_FILES); do\
-	  cp -p $(srcdir)/$$f $(distdir)/$$f ;\
-	done
+#
+#dist-hook:
+#	for d in $(DISTHOOK_DIRS); do\
+#	  mkdir -p $(distdir)/$$d ;\
+#	done
+#	for f in $(DISTHOOK_FILES); do\
+#	  cp -p $(srcdir)/$$f $(distdir)/$$f ;\
+#	done
 
 
 #-----------------------------------------------------------------------

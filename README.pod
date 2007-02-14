@@ -53,7 +53,11 @@ just run:
  touch src/libmoot/*Lexer.*[ch] src/libmoot/*Parser.*[ch]
 
 from the distribution root directory, and call make again.
+Better yet, calling ./configure with:
 
+ ./configure FLEXXX=no BISONXX=no
+
+ought to do the trick too.
 
 =item expat (Optional)
 
@@ -113,12 +117,20 @@ module, or run:
 from the distribution root directory, and call make again.
 
 
-=item pod2man, pod2text, pod2html (Optional)
+=item pod2man, pod2text, pod2html, ... (Optional)
 
 The Perl documentation converstion utilities, required
-for building the correspdonding program documentation
+for (re-)building the correspdonding program documentation
 formats.  These should have come with your Perl.  On Debian
-derivates, they live in the "perl-doc" package.
+derivates, they live in the "perl-doc" package.  They should be
+automatically detected by ./configure if they are installed in your
+PATH.  Otherwise, you can use the variables POD2MAN, POD2TEXT;
+POD2HTML, and/or POD2LATEX to specify their locations.
+
+Manpages and HTML documentation are distributed with the "official" source
+distribution, so you should only need the "pod2xyz" programs if you're
+building from CVS, or if you want to generate one or more additional
+documentation formats (e.g. text, DVI, PostScript, or PDF).
 
 =back
 
@@ -174,15 +186,25 @@ these sources.
 
 =over 4
 
+=item "WARNING: ..." from configure
+
+This is a warning.
+This is only a warning.
+It may be responsible for fatal errors from 'make' B<if and only if>
+you are building from CVS.  Otherwise, you can safely ignore it (probably).
+
+
 =item "flex++bison++.pc not found"
 
 If you want this to go away, install my (old, unmaintained)
-flex++bison++ package from
-http://www.ling.uni-potsdam.de/~moocow/projects/moot/flex++bison++-0.0.5.tar.gz
+flex++bison++ package from:
+
+ http://www.ling.uni-potsdam.de/~moocow/projects/moot/flex++bison++-0.0.5.tar.gz
+
 Otherwise, keep your distro's versions and
 ignore the warning.
 
-=item  "cannot find optgen.pl program"
+=item "cannot find optgen.pl program"
 
 If you're building from CVS, this will be fatal. Get my Getopt::Gen
 perl module (and perl, if you haven't already), build it,
@@ -194,6 +216,17 @@ install it, then run moot's ./configure again.
 =head2 Known Bugs
 
 =over 4
+
+=item "Unknown 'strict' tag(s) '1' at ... Parse/Template.pm line 2"
+
+Your Parse::Lex module is broken.
+It turns out that Parse::Lex v2.15 is Just Plain Broken, and it appears to be
+unmaintained.
+Get the sources from CPAN, and comment out all of the offending 'use strict ...' lines,
+or just install the hacked version from:
+
+ http://www.ling.uni-potsdam.de/~moocow/projects/perl/ParseLex-2.15-hacked.tar.gz
+
 
 =item "osfcn.h No such file or directory"
 
@@ -207,7 +240,8 @@ workaround. Otherwise, you should try to rebuild the lexer/parser
   bash$ touch ./src/libmoot/*.ll ./src/libmoot/*.yy
   bash$ make
 
-... ought to do the trick.
+... ought to do the trick, assuming you have Coetmeur's flex++ and bison++
+installed.
 
 =back
 

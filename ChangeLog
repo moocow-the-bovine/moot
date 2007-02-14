@@ -4,13 +4,16 @@ Todo:
    + write perl-XS interface & utilities
 
 v2.0.6 Mon, 12 Feb 2007 09:47:01 +0100
-	+ bughunt on MacOSX/PowerPC/g++-v4.0.1: STL-related?
+	+ build system updated to build more cleanly on non-development systems
+	  - i.e. missing Getopt::Gen, pod2x, flex++, bison++, etc.
 	+ fixed mootSTLHacks.h to correctly recognize g++-v4.0.x
 	  - due to an oversight, g++-v4.0.x was being recognized
 	    as g++ v3.0.x (STL namespace 'std') and not g++ >v3.0.x
 	    (STL namespace '__gnu_cxx').
+	  - thanks to Norman Rosner for identifying the bug & its cause
 	+ changed default flex++ buffer size to 16k; jives with flex++ defaults
 	  - flex++ buffer usage & re-allocation needs an overhaul
+	  - thanks to Michael Brandt for discovering the bug
 
 v2.0.5 Mon, 11 Sep 2006 15:03:16 +0200
 	+ added '--recover' flag to moot, mootpp for error recovery during

@@ -20,7 +20,6 @@ man1_MANS = moottut.1
 
 pkgdoctut_DATA = \
 	moottut.css \
-	moottut.txt \
 	moottut.html \
 	corpus.ttt \
 	corpus.mttt \
@@ -161,9 +160,8 @@ MAINTAINERCLEANFILES = \
 ## --- extra distribution files
 EXTRA_DIST = \
 	$(pkgdoctut_DATA) \
-	moottut.pod \
 	moottut.1 \
-	moottut.txt
+	moottut.pod
 
 ## --- recursion subdirectories for 'make dist'
 #DIST_SUBDIRS = $(SUBDIRS)

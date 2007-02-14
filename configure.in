@@ -158,7 +158,6 @@ dnl pkg-config
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-
 dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 dnl check for time headers (argh)
 AC_CHECK_HEADERS([time.h sys/time.h],
@@ -183,25 +182,41 @@ dnl AC_CHECK_FUNCS([memrchr vasprintf vprintf],[],[])
 gl_FUNC_MEMRCHR
 gl_FUNC_VASPRINTF
 
-dnl -- for optgen.perl
+dnl-- for optgen.perl / user-specific config files
 AC_CHECK_HEADERS([pwd.h],[],[])
 AC_CHECK_FUNCS([getuid getpwuid],[],[])
-
 dnl gnulib: useful functions
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+## ------------------------------------------------------------
+## DISTCHECK: simulate missing development-only packages
+AC_ARG_VAR(DISTCHECK,
+	[(Maintainer): set to nonempty value to simulate missing development packages])
+if test -n "$DISTCHECK" ; then
+   test -z "$OPTGEN_PERL" && OPTGEN_PERL=no
+   test -z "$DOXYGEN" && DOXYGEN=no
+   test -z "$POD2X" && POD2TEXT=no
+   test -z "$POD2X" && POD2MAN=no
+   test -z "$POD2X" && POD2HTML=no
+   test -z "$POD2X" && POD2LATEX=no
+   test -z "$FLEXXX" && FLEXXX=no
+   test -z "$BISONXX" && BISONXX=no
+fi
+## /DISTCHECK
+## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-dnl check for zlib
-dnl
-dnl zlib: user-request
+
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## zlib
+##
 AC_ARG_ENABLE(zlib,
 	AC_HELP_STRING([--disable-zlib],
 	               [Disable zlib compression support]),
-	[ac_cv_enable_zlib="$enableval"],[ac_cv_enable_zlib="yes"])
+	[ac_cv_enable_zlib="$enableval"],
+	[ac_cv_enable_zlib="yes"])
 
 if test "$ac_cv_enable_zlib" != "no" ; then
- dnl zlib: headers
+ ##-- zlib: headers
  for h in zlib.h ; do
   AC_CHECK_HEADER($h,
 	[moot_have_header="yes"], [moot_have_header="no"], [ ])
@@ -220,7 +235,7 @@ if test "$ac_cv_enable_zlib" != "no" ; then
 fi
 
 if test "$ac_cv_enable_zlib" != "no" ; then
- dnl zlib: library: compile
+ ##-- zlib: library: compile
  AC_CHECK_LIB(z,deflate,[ac_cv_have_libz="yes"])
  if test "$ac_cv_have_libz" != "yes" ; then
     AC_MSG_WARN([])
@@ -256,8 +271,8 @@ dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 dnl ------------------------------------------------------------
 dnl check for flex++bison++
 dnl
-AC_ARG_VAR(FLEXXX, [Path to Alain Coetmeur's flex++ program.])
-AC_ARG_VAR(BISONXX, [Path to Alain Coetmeur's bison++ program.])
+AC_ARG_VAR(FLEXXX, [Path to Alain Coetmeur's flex++ program, "no" for none])
+AC_ARG_VAR(BISONXX, [Path to Alain Coetmeur's bison++ program, "no" for none])
 
 PKG_CHECK_MODULES(FBXX, flex++bison++ >= 0.0.5,
 	[ac_cv_have_pkg_fbxx="yes"],
@@ -274,53 +289,68 @@ fi
 dnl ------------------------------------------------------------
 dnl check for flex++
 dnl
+##-- flex++: user flag or path search
 if test -z "$FLEXXX" ; then
   if test "$ac_cv_have_pkg_fbxx" = "yes"; then
     FLEXXX="`$PKG_CONFIG --variable=prefix flex++bison++`/bin/flex++"
     test -x "$FLEXXX" || FLEXXX=""
   fi
   if test -z "$FLEXXX" ; then
-    AC_PATH_PROG(FLEXXX,[flex++],[])
-  fi
-  if test -z "$FLEXXX" ; then
-    AC_MSG_WARN([])
-    AC_MSG_WARN([----------------------------------------------------------------])
-    AC_MSG_WARN([                Coetmeur's flex++ not found!])
-    AC_MSG_WARN([])
-    AC_MSG_WARN([         Does your FLEXXX environment variable contain])
-    AC_MSG_WARN([              the full path to the flex++ program?])
-    AC_MSG_WARN([])
-    AC_MSG_WARN([                  Your build might fail!])
-    AC_MSG_WARN([----------------------------------------------------------------])
-    AC_MSG_WARN([])
+    AC_PATH_PROG(FLEXXX,[flex++],[no])
   fi
 fi
+##-- flex++: Coetmeur's?
+if test "$FLEXXX" != "no"; then
+  AC_MSG_CHECKING([for Coetmeur's flex++])
+  if $FLEXXX -? 2>&1 | grep -q coetmeur; then
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no])
+    FLEXXX="no"
+  fi
+fi
+##-- flex++: notices/warnings
+AC_MSG_NOTICE([setting FLEXXX=$FLEXXX])
+if test "$FLEXXX" = "no"; then
+  AC_MSG_WARN([Coetmeur's flex++ is missing, broken, or disabled])
+  AC_MSG_WARN([- interpretation of .ll lexer source files disabled])
+fi
+##-- flex++: automake conditional
+AM_CONDITIONAL(HAVE_FLEXXX,[test "$FLEXXX" != "no"])
 
 
 dnl ------------------------------------------------------------
 dnl check for bison++
 dnl
+##-- bison++: user flag or path search
 if test -z "$BISONXX" ; then
   if test "$ac_cv_have_pkg_fbxx" = "yes" ; then
     BISONXX="`$PKG_CONFIG --variable=prefix flex++bison++`/bin/bison++"
     test -x "$BISONXX" || BISONXX=""
   fi
   if test -z "$BISONXX" ; then
-    AC_PATH_PROG(BISONXX,[bison++],[])
-  fi
-  if test -z "$BISONXX" ; then
-    AC_MSG_WARN([])
-    AC_MSG_WARN([----------------------------------------------------------------])
-    AC_MSG_WARN([                Coetmeur's bison++ not found!])
-    AC_MSG_WARN([])
-    AC_MSG_WARN([         Does your BISONXX environment variable contain])
-    AC_MSG_WARN([              the full path to the bison++ program?])
-    AC_MSG_WARN([])
-    AC_MSG_WARN([                  Your build might fail!])
-    AC_MSG_WARN([----------------------------------------------------------------])
-    AC_MSG_WARN([])
+    AC_PATH_PROG(BISONXX,[bison++],[no])
   fi
 fi
+##-- bison++: Coetmeur's?
+if test "$BISONXX" != "no"; then
+  AC_MSG_CHECKING([for Coetmeur's bison++])
+  if $BISONXX -V 2>&1 | grep -q coetmeur; then
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no])
+    BISONXX="no"
+  fi
+fi
+##-- bison++: notices & warnings
+AC_MSG_NOTICE([setting BISONXX=$BISONXX])
+if test "$BISONXX" = "no"; then
+  AC_MSG_WARN([Coetmeur's bison++ is missing, broken, or disabled])
+  AC_MSG_WARN([- interpretation of .yy parser source files disabled])
+fi
+##-- bison++: conditional
+AM_CONDITIONAL(HAVE_BISONXX,[test "$BISONXX" != "no"])
+
 YACC="$BISONXX"
 AC_SUBST(YACC)
 AC_SUBST(BISONXX)
@@ -487,22 +517,6 @@ fi
 
 
 dnl ------------------------------------------------------------
-dnl DISTCHECK: simulate missing development-only packages
-AC_ARG_VAR(DISTCHECK,
-	[(Maintainer): set to nonempty value to simulate missing development packages])
-if test -n "$DISTCHECK" ; then
-   test -z "$OPTGEN_PERL" && OPTGEN_PERL=no
-   test -z "$DOXYGEN" && DOXYGEN=no
-   test -z "$POD2X" && POD2TEXT=no
-   test -z "$POD2X" && POD2MAN=no
-   test -z "$POD2X" && POD2HTML=no
-   test -z "$POD2X" && POD2LATEX=no
-fi
-dnl /DISTCHECK
-dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-dnl ------------------------------------------------------------
 dnl check for perl
 AC_ARG_VAR(PERL, [Path to your perl interpreter.])
 if test -z "$PERL" ; then
@@ -520,7 +534,6 @@ AC_ARG_VAR(OPTGEN_PERL, [Path to the 'optgen.perl' script (disable with OPTGEN_P
 
 ##-- test for working optgen.perl
 AC_MSG_CHECKING([whether Getopt::Gen works])
-  #if $OPTGEN_PERL --version >>config.log 2>&1 ; then
   if $PERL -MGetopt::Gen -e'exit 0;' >>config.log 2>&1; then
   AC_MSG_RESULT([yes])
 else
@@ -562,34 +575,34 @@ AC_ARG_WITH(docdir,
 pkgdocdir="\${docdir}/\${PACKAGE}"
 pkgdocprogdir="\${docdir}/\${PACKAGE}/programs"
 pkgdoctutdir="\${docdir}/\${PACKAGE}/tutorial"
+pkgdoclibdir="\${docdir}/\${PACKAGE}/lib\${PACKAGE}"
 
 AC_SUBST(docdir)
 AC_SUBST(pkgdocdir)
 AC_SUBST(pkgdocprogdir)
 AC_SUBST(pkgdoctutdir)
+AC_SUBST(pkgdoclibdir)
 
 AC_ARG_WITH(doc-formats,
 	AC_HELP_STRING([--with-doc-formats=LIST],
 		       [Build documentation formats in LIST. \
                         Available formats: txt, man, html, dvi, ps, pdf, none.
-	                Default='txt man html'.  Requires Perl, pod2xxx, doxygen.]),
+	                Default='man html'.  Requires Perl, pod2xxx, doxygen.]),
 	[ac_cv_doc_formats="$withval"])
-
-## -- set default doc formats if unspecified
-if test -z "$ac_cv_doc_formats" ; then
-  ac_cv_doc_formats="txt man html"
-fi
-
-## -- un-comma-tize the doc-formats
-moot_doc_formats=`echo "$ac_cv_doc_formats" | sed 's/\,/ /g'`
-
-
 AC_ARG_ENABLE(doc,
 	AC_HELP_STRING([--disable-doc],[Synonym for --with-doc-formats="none"]),
 	[enable_doc="$enableval"],[enable_doc="yes"])
 
 
 AC_MSG_CHECKING([which documentation formats to build])
+## -- set default doc formats if unspecified
+if test -z "$ac_cv_doc_formats" ; then
+  ac_cv_doc_formats="man html"
+fi
+
+## -- un-comma-tize the doc-formats
+moot_doc_formats=`echo "$ac_cv_doc_formats" | sed 's/\,/ /g'`
+
 if test "$enable_doc" != "yes" -o -z "$PERL" ; then
  ##-- disable all docs
  moot_doc_formats="none"
@@ -597,21 +610,57 @@ fi
 AC_MSG_RESULT($moot_doc_formats)
 #echo ">> post RESULT"
 
+
+##-- doxygen: var
 AC_ARG_VAR(DOXYGEN,[Path to doxygen documentation generator (disable by setting DOXYGEN=no)])
 
 if test "$moot_doc_formats" != "none" ; then
-  ### docs: prog doxygen
+  ##-- docs: prog doxygen
   if test -z "$DOXYGEN" ; then
     AC_PATH_PROG(DOXYGEN,doxygen,[no])
   fi
 
-  ###-- report doxygen-check results
+  ##-- report doxygen-check results
   if test -z "$DOXYGEN" -o "$DOXYGEN" = "no"; then
     DOXYGEN="no"
     AC_MSG_WARN([doxygen not found: library documentation will not be built!]) 
   fi
   AC_MSG_NOTICE([setting DOXYGEN=$DOXYGEN])
   AM_CONDITIONAL(HAVE_DOXYGEN, [test "$DOXYGEN" != "no"])
+
+  ##-- doxygen: test for working 'doxy-filter.perl'
+  AC_ARG_VAR(DOXY_FILTER,[doxygen input filter; "no" to disable])
+  AC_MSG_CHECKING([for doxygen input filter])
+  if test -z "$DOXY_FILTER"; then
+    DOXY_SRCDIR="`find ${srcdir}/doc/ -name 'lib*' -print | head -n1`"
+    if test -d "$DOXY_SRCDIR"; then
+      DOXY_SRCDIR=`cd "$DOXY_SRCDIR"; pwd`
+      DOXY_FILTER="$PERL $DOXY_SRCDIR/doxy-filter.perl"
+    else
+      DOXY_FILTER="no"
+    fi
+  fi
+  AC_MSG_RESULT([$DOXY_FILTER])
+  ##
+  if test "$DOXY_FILTER" != "no"; then
+    AC_MSG_CHECKING([whether doxygen input filter works])
+    if test -n "$DOXY_FILTER" && $DOXY_FILTER </dev/null 2>&1 >>config.log ; then
+      AC_MSG_RESULT([yes])
+    else
+      AC_MSG_RESULT([no])
+      DOXY_FILTER="no"
+    fi
+  fi
+  AC_MSG_NOTICE([setting DOXY_FILTER=$DOXY_FILTER])
+  if test "$DOXY_FILTER" != "no"; then
+    DOXY_INPUT_FILTER="$DOXY_FILTER"
+  else
+    DOXY_INPUT_FILTER=""
+  fi
+  AC_SUBST(DOXY_FILTER)
+  AC_SUBST(DOXY_INPUT_FILTER)
+  AM_CONDITIONAL(HAVE_DOXY_FILTER, [test "$DOXY_FILTER" != "no"])
+
 
   ##-- doxygen: sources
   AC_SUBST(DOXYGEN_SOURCES)
@@ -643,145 +692,104 @@ if test "$moot_doc_formats" != "none" ; then
   AM_CONDITIONAL(HAVE_POD2LATEX, [test "$POD2LATEX" != "no"])
 
   ### -- docs: .gog file linkup
-  #moot_program_gogs="moot.gog mootpp.gog moot-fstgen.gog moot-pargen.gog"
-  #moot_program_gogs="mootpp.gog mootrain.gog moothmm.gog mootm.gog moot.gog"
-  #moot_program_gogs="mootpp.gog mootrain.gog moothmm.gog moot.gog"
-  moot_program_gogs="\
+  DOC_MAN1_GOGS="\
+	moot.gog \
 	mootconfig.gog \
 	mootpp.gog \
 	mootrain.gog \
 	mootcompile.gog \
 	mootdump.gog \
-	moot.gog \
 	mooteval.gog \
 	mootchurn.gog \
 	moottype.gog \
 	"
-  for g in $moot_program_gogs ; do
+  for g in $DOC_MAN1_GOGS ; do
     AC_CONFIG_LINKS(doc/programs/${g}:src/programs/${g})  
   done
-  AC_SUBST(moot_program_gogs)
+  DOC_GOGS="$DOC_MAN1_GOGS"
+  AC_SUBST(DOC_MAN1_GOGS)
+  AC_SUBST(DOC_GOGS)
   AC_CONFIG_LINKS(doc/programs/acknowledge.pod:src/programs/acknowledge.pod)
 
-  ##-- index-skeleton
+  ##-- index-skeleton (section 1)
   DOC_PROG_INDEX_SKEL="mootutils.skel"
-  DOC_PROG_INDEX_POD="mootutils.pod"
-  DOC_PROG_INDEX_MAN="mootutils.1"
   AC_SUBST(DOC_PROG_INDEX_SKEL)
 
-  ##-- hack, must add section-5 stuff below in 'mans' section too!
-  moot_pods="mootfiles.pod mootutils.pod `echo \"$moot_program_gogs\" | sed 's/\.gog/\.pod/g'`"
-  AC_SUBST(moot_pods)
+  ##-- section 5 pods
+  DOC_MAN5_PODS="mootfiles.pod"
+  AC_SUBST(DOC_MAN5_PODS)
 
-  ### -- initialize defaults
-  DOC_SUBDIRS=""
-  DOC_LATEX_TARGETS=""
-  DOXY_WANT_HTML="NO"
-  DOXY_WANT_MAN="NO"
-  DOXY_WANT_LATEX="NO"
+  ##-- collected pods
+  DOC_PODS="$DOC_MAN5_PODS mootutils.pod `echo \"$moot_program_gogs\" | sed 's/\.gog/\.pod/g'`"
+  AC_SUBST(DOC_PODS)
 
+  ##-- set "CONFIG_DOC_WANT_*" variables
+  ##   + test with automake conditionals "DOC_WANT_*"
+  CONFIG_DOC_WANT_TXT="no"
+  CONFIG_DOC_WANT_MAN="no"
+  CONFIG_DOC_WANT_HTML="no"
+  CONFIG_DOC_WANT_LATEX="no"
+  CONFIG_DOC_WANT_DVI="no"
+  CONFIG_DOC_WANT_PS="no"
+  CONFIG_DOC_WANT_PDF="no"
+
+  ##-- check requested foc formats
   for fmt in $moot_doc_formats ; do
     case "$fmt" in
-
       txt)
-	##-- program text docs are pre-built & distributed!
-dnl	if test "$POD2TEXT" != "no" ; then
-	  DOC_PROG_TXT_TARGETS=`echo "$moot_pods" | sed 's/\.pod/\.txt/g'`
-dnl	else
-dnl	  AC_MSG_WARN(pod2text not found -- program text docs will not be built!)
-dnl	fi
+        CONFIG_DOC_WANT_TXT="yes"
 	;;
-
       man)
-	if test "$DOXYGEN" != "no" ; then
-	  DOXY_WANT_MAN="YES"
-          DOC_MANDIRS="man/man3"
-          DOC_MAN3_MANS="man/man3/*"
-	fi
-	##-- program manpages are pre-built & distributed!
-dnl	if test "$POD2MAN" != "no" ; then
-	  DOC_PROG_MAN1_TARGETS="$DOC_PROG_INDEX_MAN \
-	                        `echo \"$moot_program_gogs\" \
-	                         | sed 's/\.gog/\.1/g'`"
-	  DOC_PROG_MAN5_TARGETS="mootfiles.5"
-dnl	else
-dnl	  AC_MSG_WARN(pod2man not found -- program manpages will not be built!)
-dnl	fi
+        CONFIG_DOC_WANT_MAN="yes"
 	;;
-
       html)
-	if test "$DOXYGEN" != "no" ; then
-          DOXY_WANT_HTML="YES"
-          DOC_SUBDIRS="$DOC_SUBDIRS html"
-	fi
-	if test "$POD2HTML" != "no" ; then
-	  DOC_PROG_HTML_TARGETS="mootprogs.css `echo "$moot_pods" | sed 's/\.pod/\.html/g'`"
-	else
-	  AC_MSG_WARN(pod2html not found -- program html docs will not be built!)
-	fi
+        CONFIG_DOC_WANT_HTML="yes"
 	;;
-
       dvi)
-	if test "$DOXYGEN" != "no" ; then
-	  DOXY_WANT_LATEX="YES"
-	  DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.dvi"
-	fi
-	if test "$POD2LATEX" != "no" ; then
-	  DOC_PROG_DVI_TARGETS=`echo "$moot_pods" | sed 's/\.pod/\.dvi/g'`
-	else
-	  AC_MSG_WARN(pod2latex not found -- program dvi docs will not be built!)
-	fi
+        CONFIG_DOC_WANT_LATEX="yes"
+        CONFIG_DOC_WANT_DVI="yes"
 	;;
-
       ps)
-	if test "$DOXYGEN" != "no" ; then
-	  DOXY_WANT_LATEX="YES"
-	  DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.ps"
-	fi
-	if test "$POD2LATEX" != "no" ; then
-	  DOC_PROG_PS_TARGETS=`echo "$moot_pods" | sed 's/\.pod/\.ps/g'`
-	else
-	  AC_MSG_WARN(pod2latex not found -- program postscript docs will not be built!)
-	fi
+	CONFIG_DOC_WANT_LATEX="yes"
+        CONFIG_DOC_WANT_PS="yes"
 	;;
-
       pdf)
-	if test "$DOXYGEN" != "no" ; then
-	  DOXY_WANT_LATEX="YES"
-    	  DOC_LATEX_TARGETS="${DOC_LATEX_TARGETS} refman.pdf"
-	fi
-	if test "$POD2LATEX" != "no" ; then
-	  DOC_PROG_PDF_TARGETS=`echo "$moot_pods" | sed 's/\.pod/\.pdf/g'`
-	else
-	  AC_MSG_WARN(pod2latex not found -- program pdf docs will not be built!)
-	fi
+        CONFIG_DOC_WANT_LATEX="yes"
+	CONFIG_DOC_WANT_PDF="yes"
 	;;
-
       *)
 	AC_MSG_WARN(ignoring unknown documentation format: $fmt)
 	;;
     esac; # case "$fmt" in ...
   done; # for fmt in $moot_doc_formats ...
 
-  AC_SUBST(DOXY_DEFINES)
+  ##-- set automake documentation conditionals
+  AM_CONDITIONAL(DOC_WANT_TXT, [test "$CONFIG_DOC_WANT_TXT"  != "no"])
+  AM_CONDITIONAL(DOC_WANT_MAN, [test "$CONFIG_DOC_WANT_MAN"  != "no"])
+  AM_CONDITIONAL(DOC_WANT_HTML,[test "$CONFIG_DOC_WANT_HTML" != "no"])
+  AM_CONDITIONAL(DOC_WANT_LATEX, [test "$CONFIG_DOC_WANT_LATEX"  != "no"])
+  AM_CONDITIONAL(DOC_WANT_DVI, [test "$CONFIG_DOC_WANT_DVI"  != "no"])
+  AM_CONDITIONAL(DOC_WANT_PS,  [test "$CONFIG_DOC_WANT_PS"   != "no"])
+  AM_CONDITIONAL(DOC_WANT_PDF, [test "$CONFIG_DOC_WANT_PDF"  != "no"])
 
-  AC_SUBST(DOXY_WANT_HTML)
+  ##-- automake conditionals: indicator values
+  AC_SUBST(CONFIG_DOC_WANT_TXT)
+  AC_SUBST(CONFIG_DOC_WANT_MAN)
+  AC_SUBST(CONFIG_DOC_WANT_HTML)
+  AC_SUBST(CONFIG_DOC_WANT_LATEX)
+  AC_SUBST(CONFIG_DOC_WANT_DVI)
+  AC_SUBST(CONFIG_DOC_WANT_PS)
+  AC_SUBST(CONFIG_DOC_WANT_PDF)
+
+  ##-- doxygen vars (compatibility hack)
+  DOXY_WANT_MAN="$CONFIG_DOC_WANT_MAN"
+  DOXY_WANT_HTML="$CONFIG_DOC_WANT_HTML"
+  DOXY_WANT_LATEX="$CONFIG_DOC_WANT_LATEX"
+  DOXY_WANT_HTMLHELP="NO"
   AC_SUBST(DOXY_WANT_MAN)
+  AC_SUBST(DOXY_WANT_HTML)
   AC_SUBST(DOXY_WANT_LATEX)
-
-  AC_SUBST(DOC_SUBDIRS)
-  AC_SUBST(DOC_MANDIRS)
-  AC_SUBST(DOC_MAN3_MANS)
-  AC_SUBST(DOC_LATEX_TARGETS)
-  AC_SUBST(POD_DOC_SUFFIXES)
-
-  AC_SUBST(DOC_PROG_TXT_TARGETS)
-  AC_SUBST(DOC_PROG_MAN1_TARGETS)
-  AC_SUBST(DOC_PROG_MAN5_TARGETS)
-  AC_SUBST(DOC_PROG_HTML_TARGETS)
-  AC_SUBST(DOC_PROG_DVI_TARGETS)
-  AC_SUBST(DOC_PROG_PS_TARGETS)
-  AC_SUBST(DOC_PROG_PDF_TARGETS)
+  AC_SUBST(DOXY_WANT_HTMLHELP)
 
 
   ##-- check for tag-files (this needs an overhaul!)
@@ -799,6 +807,10 @@ dnl	fi
   #done 
   AC_SUBST(DOXY_TAGFILES)   
 fi; # if "$moot_doc_formats" != "none" ...
+
+##-- extra defines for doxygen
+AC_SUBST(DOXY_DEFINES)
+
 ##
 ## /Documentation
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

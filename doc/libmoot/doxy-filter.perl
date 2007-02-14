@@ -24,7 +24,13 @@ GetOptions(
 	   "no-preprocess|no-cpp|np|n"=>sub { $DO_CPP = 0; },
 	   "logfile|l=s"=>\$logfile,
 	   "I=s"=>\@includes,
+	   'help|h'=>\$help,
 	  );
+
+if ($help) {
+  print STDERR "Usage: $0 [-(only|no|)-preprocess|-logfile FILE|-IDIR] FILE(s)...\n";
+  exit 0;
+}
 
 $config_cppflags = join(' ', map { "-I$_" } @includes);
 do "doxy-filter.cfg";
@@ -33,8 +39,10 @@ do "doxy-filter.cfg";
 # Globals
 #-----------------------------------------------------------------------
 $CPP = $ENV{CPP} || 'cpp';
-$CPPFLAGS = ('-C '         ## -- preserve comments
-	     .'-x c++'     ## -- parse c++ code
+$CPP = $config_cpp if (defined($config_cpp));
+$CPPFLAGS = (''
+	     #.' -C '         ## -- preserve comments
+	     #.' -x c++'     ## -- parse c++ code
 	     .' '.($ENV{CPPFLAGS} || '')
 	     .' '.$config_cppflags
 	    );
@@ -46,11 +54,16 @@ $ppextra = '(?s:\bbison\.h\b)|(?s:\bflexskel\.h\b)';
   );
 @suffixes = qw(\.c \.h \.cc \.cpp \.cxx \.l \.y \.ll \.yy);
 
+##-- temp
+$TMPDIR = $ENV{TMP} || '/tmp';
+$TMPDIR = $config_tmpdir if (defined($config_tmpdir));
+
 #-----------------------------------------------------------------------
 # DEBUG
 #-----------------------------------------------------------------------
 #$DEBUG = 2;
-$DEBUG = 1;
+#$DEBUG = 1;
+$DEBUG=0;
 sub logopen {
   $logfile = 'doxy-filter.log' if (!defined($logfile));
   if ($logfile ne '-') {
@@ -98,7 +111,7 @@ foreach $file (@ARGV) {
 	if ($DEBUG>2) {
 	  print LOG ("> filebase='$filebase', ppbase='$ppbase', ppsuff='$ppsuff'\n");
 	}
-	
+
 	if ($ppfile eq $file) {
 	  $wantline = 1;
 	  print LOG ("> ACCEPT: literal filename match: $line") if ($DEBUG>1);
