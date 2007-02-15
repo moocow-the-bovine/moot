@@ -516,15 +516,15 @@ fi
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-dnl ------------------------------------------------------------
-dnl check for perl
+##------------------------------------------------------------
+## check for perl
 AC_ARG_VAR(PERL, [Path to your perl interpreter.])
 if test -z "$PERL" ; then
   AC_PATH_PROG(PERL,[perl],[])
 fi
 AC_SUBST(PERL)
-dnl perl
-dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+## /perl
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 dnl ------------------------------------------------------------
@@ -538,22 +538,18 @@ AC_MSG_CHECKING([whether Getopt::Gen works])
   AC_MSG_RESULT([yes])
 else
   AC_MSG_RESULT([no])
-  AC_MSG_WARN([])
   AC_MSG_WARN([Getopt::Gen (or something it depends on) is broken!])
   AC_MSG_WARN([- you probably need to fix your Parse::Lex module])
-  AC_MSG_WARN([- hope you're not building from CVS])
-  AC_MSG_WARN([])
   OPTGEN_PERL="no"
 fi
 
 if test -z "$OPTGEN_PERL" ; then
   AC_PATH_PROG(OPTGEN_PERL,[optgen.perl],[no])
-  if test "$OPTGEN_PERL" = "no" ; then
-    AC_MSG_WARN([])
-    AC_MSG_WARN([missing or broken optgen.perl program])
-    AC_MSG_WARN([- builds from CVS will probably fail])
-    AC_MSG_WARN([])
-  fi
+fi
+if test "$OPTGEN_PERL" = "no" ; then
+  AC_MSG_WARN([optgen.perl script is missing, broken, or disabled.])
+  AC_MSG_WARN([- regeneration of command-line parsers from .gog specifications disabled.])
+  AC_MSG_WARN([- regeneration of POD documentation from .gog specifications disabled.])
 fi
 
 AC_SUBST(OPTGEN_PERL)
@@ -628,7 +624,8 @@ if test "$moot_doc_formats" != "none" ; then
   AC_MSG_NOTICE([setting DOXYGEN=$DOXYGEN])
   AM_CONDITIONAL(HAVE_DOXYGEN, [test "$DOXYGEN" != "no"])
 
-  ##-- doxygen: test for working 'doxy-filter.perl'
+  ##-- doxygen: filter: doc/lib*/'doxy-filter.perl'
+  ##
   AC_ARG_VAR(DOXY_FILTER,[doxygen input filter; "no" to disable])
   AC_MSG_CHECKING([for doxygen input filter])
   if test -z "$DOXY_FILTER"; then
@@ -660,12 +657,14 @@ if test "$moot_doc_formats" != "none" ; then
   AC_SUBST(DOXY_FILTER)
   AC_SUBST(DOXY_INPUT_FILTER)
   AM_CONDITIONAL(HAVE_DOXY_FILTER, [test "$DOXY_FILTER" != "no"])
-
+  ##
+  ##--/doxygen:filter
 
   ##-- doxygen: sources
   AC_SUBST(DOXYGEN_SOURCES)
 
-  ### docs: pod converters
+  ##-- docs:pod2x
+  ##
   AC_ARG_VAR(POD2TEXT, [Path to perl 'pod2text' script; "no" for none])
   AC_ARG_VAR(POD2MAN,  [Path to perl 'pod2man' script; "no" for none])
   AC_ARG_VAR(POD2HTML, [Path to perl 'pod2html' script; "no" for none])
@@ -690,8 +689,11 @@ if test "$moot_doc_formats" != "none" ; then
   AM_CONDITIONAL(HAVE_POD2MAN,   [test "$POD2MAN"   != "no"]) 
   AM_CONDITIONAL(HAVE_POD2HTML,  [test "$POD2HTML"  != "no"])
   AM_CONDITIONAL(HAVE_POD2LATEX, [test "$POD2LATEX" != "no"])
+  ##
+  ##--/docs:pod2x
 
-  ### -- docs: .gog file linkup
+  ##-- docs: .gog sources
+  ##
   DOC_MAN1_GOGS="\
 	moot.gog \
 	mootconfig.gog \
@@ -710,6 +712,8 @@ if test "$moot_doc_formats" != "none" ; then
   AC_SUBST(DOC_MAN1_GOGS)
   AC_SUBST(DOC_GOGS)
   AC_CONFIG_LINKS(doc/programs/acknowledge.pod:src/programs/acknowledge.pod)
+  ##
+  ##-- /doc: .gog sources
 
   ##-- index-skeleton (section 1)
   DOC_PROG_INDEX_SKEL="mootutils.skel"
@@ -733,7 +737,8 @@ if test "$moot_doc_formats" != "none" ; then
   CONFIG_DOC_WANT_PS="no"
   CONFIG_DOC_WANT_PDF="no"
 
-  ##-- check requested foc formats
+  ##-- docs: parse user requests
+  ##
   for fmt in $moot_doc_formats ; do
     case "$fmt" in
       txt)

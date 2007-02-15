@@ -2,13 +2,12 @@
 ## Package: moot
 ## Description:
 ##   + automake file for documentation subdir for
-##     KDWDS PoS-tagger library
+##     libmoot PoS-tagger library
 ##
 ## Process this file with Automake to create Makefile.in.
 ##-----------------------------------------------------------------------
 
 SUFFIXES = .doxy .stamp .tag .log
-
 
 ##-----------------------------------------------------------------------
 ## Conditional targets
@@ -141,9 +140,6 @@ else
 	touch $@
 endif
 ##--/HAVE_DOXYGEN
-
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## OLD
 
 #-----------------------------------------------------------------------
 # Variables: cleanup
