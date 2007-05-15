@@ -1,0 +1,8 @@
+v2.0.6 Tue, 15 May 2007 10:32:53 +0200
+  + mootTokenLexer: re-integrate analysis COST parsing a la FSM
+    - Idea (token regex):
+      TEXT (SIMPLE_TAG | (PRE_DETAILS? "[" TAG)) POST_DETAILS? ("<"COST">")?
+    - must also pull this through to:
+      ~ class mootToken (add a property)
+      ~ other I/O classes (XML, *Writer)
+    - check with Micha Brandt re: compatibility
