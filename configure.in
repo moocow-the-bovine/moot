@@ -622,7 +622,6 @@ if test "$moot_doc_formats" != "none" ; then
     AC_MSG_WARN([doxygen not found: library documentation will not be built!]) 
   fi
   AC_MSG_NOTICE([setting DOXYGEN=$DOXYGEN])
-  AM_CONDITIONAL(HAVE_DOXYGEN, [test "$DOXYGEN" != "no"])
 
   ##-- doxygen: filter: doc/lib*/'doxy-filter.perl'
   ##
@@ -656,7 +655,6 @@ if test "$moot_doc_formats" != "none" ; then
   fi
   AC_SUBST(DOXY_FILTER)
   AC_SUBST(DOXY_INPUT_FILTER)
-  AM_CONDITIONAL(HAVE_DOXY_FILTER, [test "$DOXY_FILTER" != "no"])
   ##
   ##--/doxygen:filter
 
@@ -685,10 +683,6 @@ if test "$moot_doc_formats" != "none" ; then
   AC_SUBST(POD2MAN)
   AC_SUBST(POD2HTML)
   AC_SUBST(POD2LATEX)
-  AM_CONDITIONAL(HAVE_POD2TEXT,  [test "$POD2TEXT"  != "no"])
-  AM_CONDITIONAL(HAVE_POD2MAN,   [test "$POD2MAN"   != "no"]) 
-  AM_CONDITIONAL(HAVE_POD2HTML,  [test "$POD2HTML"  != "no"])
-  AM_CONDITIONAL(HAVE_POD2LATEX, [test "$POD2LATEX" != "no"])
   ##
   ##--/docs:pod2x
 
@@ -768,15 +762,6 @@ if test "$moot_doc_formats" != "none" ; then
     esac; # case "$fmt" in ...
   done; # for fmt in $moot_doc_formats ...
 
-  ##-- set automake documentation conditionals
-  AM_CONDITIONAL(DOC_WANT_TXT, [test "$CONFIG_DOC_WANT_TXT"  != "no"])
-  AM_CONDITIONAL(DOC_WANT_MAN, [test "$CONFIG_DOC_WANT_MAN"  != "no"])
-  AM_CONDITIONAL(DOC_WANT_HTML,[test "$CONFIG_DOC_WANT_HTML" != "no"])
-  AM_CONDITIONAL(DOC_WANT_LATEX, [test "$CONFIG_DOC_WANT_LATEX"  != "no"])
-  AM_CONDITIONAL(DOC_WANT_DVI, [test "$CONFIG_DOC_WANT_DVI"  != "no"])
-  AM_CONDITIONAL(DOC_WANT_PS,  [test "$CONFIG_DOC_WANT_PS"   != "no"])
-  AM_CONDITIONAL(DOC_WANT_PDF, [test "$CONFIG_DOC_WANT_PDF"  != "no"])
-
   ##-- automake conditionals: indicator values
   AC_SUBST(CONFIG_DOC_WANT_TXT)
   AC_SUBST(CONFIG_DOC_WANT_MAN)
@@ -815,6 +800,23 @@ fi; # if "$moot_doc_formats" != "none" ...
 
 ##-- extra defines for doxygen
 AC_SUBST(DOXY_DEFINES)
+
+##-- conditionals
+AM_CONDITIONAL(HAVE_DOXYGEN,     [test -n "$DOXYGEN"     -a "$DOXYGEN"     != "no"])
+AM_CONDITIONAL(HAVE_DOXY_FILTER, [test -n "$DOXY_FILTER" -a "$DOXY_FILTER" != "no"])
+
+AM_CONDITIONAL(HAVE_POD2TEXT,    [test -n "$POD2TEXT"  -a "$POD2TEXT"  != "no"])
+AM_CONDITIONAL(HAVE_POD2MAN,     [test -n "$POD2MAN"   -a "$POD2MAN"   != "no"]) 
+AM_CONDITIONAL(HAVE_POD2HTML,    [test -n "$POD2HTML"  -a "$POD2HTML"  != "no"])
+AM_CONDITIONAL(HAVE_POD2LATEX,   [test -n "$POD2LATEX" -a "$POD2LATEX" != "no"])
+
+AM_CONDITIONAL(DOC_WANT_TXT,     [test -n "$CONFIG_DOC_WANT_TXT"   -a "$CONFIG_DOC_WANT_TXT"   != "no"])
+AM_CONDITIONAL(DOC_WANT_MAN,     [test -n "$CONFIG_DOC_WANT_MAN"   -a "$CONFIG_DOC_WANT_MAN"   != "no"])
+AM_CONDITIONAL(DOC_WANT_HTML,    [test -n "$CONFIG_DOC_WANT_HTML"  -a "$CONFIG_DOC_WANT_HTML"  != "no"])
+AM_CONDITIONAL(DOC_WANT_LATEX,   [test -n "$CONFIG_DOC_WANT_LATEX" -a "$CONFIG_DOC_WANT_LATEX" != "no"])
+AM_CONDITIONAL(DOC_WANT_DVI,     [test -n "$CONFIG_DOC_WANT_DVI"   -a "$CONFIG_DOC_WANT_DVI"   != "no"])
+AM_CONDITIONAL(DOC_WANT_PS,      [test -n "$CONFIG_DOC_WANT_PS"    -a "$CONFIG_DOC_WANT_PS"    != "no"])
+AM_CONDITIONAL(DOC_WANT_PDF,     [test -n "$CONFIG_DOC_WANT_PDF"   -a "$CONFIG_DOC_WANT_PDF"   != "no"])
 
 ##
 ## /Documentation
