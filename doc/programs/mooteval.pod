@@ -1,0 +1,448 @@
+
+=pod
+
+=head1 NAME
+
+mooteval - Output evaluator for moocow's PoS tagger.
+
+
+
+=head1 SYNOPSIS
+
+mooteval [OPTIONS] FILE1 FILE2
+
+ Arguments:
+    FILE1 FILE2  Files to compare.
+
+ Options
+    -h          --help                     Print help and exit.
+    -V          --version                  Print version and exit.
+    -cFILE      --rcfile=FILE              Read an alternate configuration file.
+    -vLEVEL     --verbose=LEVEL            Verbosity level.
+    -1          --eval-first               Evaluate FILE1 vs. baseline FILE2
+    -2          --eval-second              Evaluate FILE2 vs. baseline FILE1
+    -oFILE      --output=FILE              Write output to FILE.
+    -IFORMAT    --input-format=FORMAT      Specify input file formats.
+                --input-encoding=ENCODING  Override XML document input encoding.
+
+=cut
+
+###############################################################
+# Description
+###############################################################
+=pod
+
+=head1 DESCRIPTION
+
+Output evaluator for moocow's PoS tagger.
+
+
+mooteval compares two  'medium' (+tagged,-analyzed) and/or
+'well done' (+tagged,+analyzed) input files, and summarizes
+the differences between them.
+See L<mootfiles> for details on moot file formats.
+See below for more details on the summary information printed.
+
+
+=cut
+
+###############################################################
+# Arguments
+###############################################################
+=pod
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item C<FILE1 FILE2>
+
+Files to compare.
+
+=back
+
+
+
+=cut
+
+
+###############################################################
+# Options
+###############################################################
+=pod
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--help> , C<-h>
+
+Print help and exit.
+
+Default: '0'
+
+
+
+
+=item C<--version> , C<-V>
+
+Print version and exit.
+
+Default: '0'
+
+
+
+
+=item C<--rcfile=FILE> , C<-cFILE>
+
+Read an alternate configuration file.
+
+Default: 'NULL'
+
+See also: L<CONFIGURATION FILES>.
+
+
+
+
+=item C<--verbose=LEVEL> , C<-vLEVEL>
+
+Verbosity level.
+
+Default: '2'
+
+
+Valid values are in the the range [0..4].
+
+=over 4
+
+=item 0
+
+Silent operation.
+
+=item 1
+
+Report basic summary information.
+
+=item 2
+
+Report extended summary information.
+
+=item 3
+
+Print a verbose listing of all tokens associated with
+any mismatch condition.
+
+=item 4
+
+Print a verbose listing of all tokens in the input files.
+
+=back
+
+
+
+
+
+
+=item C<--eval-first> , C<-1>
+
+Evaluate FILE1 vs. baseline FILE2
+
+Default: '0'
+
+
+Only useful if --verbose >= 2.
+
+If neither --eval-first nor --eval-second
+is given, both input files are evaluated against one another.
+
+
+
+
+
+=item C<--eval-second> , C<-2>
+
+Evaluate FILE2 vs. baseline FILE1
+
+Default: '0'
+
+
+Only useful if --verbose >= 2.
+
+If neither --eval-first nor --eval-second
+is given, both input files are evaluated against one another.
+
+
+
+
+
+=item C<--output=FILE> , C<-oFILE>
+
+Write output to FILE.
+
+Default: '-'
+
+
+If --verbose >= 1, a summary will always be printed to stderr.
+
+
+
+
+
+=item C<--input-format=FORMAT> , C<-IFORMAT>
+
+Specify input file formats.
+
+Default: 'NULL'
+
+
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.  Both input files should have the same format.
+
+Default='WellDone'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+
+
+
+
+
+=item C<--input-encoding=ENCODING>
+
+Override XML document input encoding.
+
+Default: 'NULL'
+
+
+Potentially useful for XML documents without encoding declarations.
+
+
+
+
+
+=back
+
+
+
+
+=cut
+
+###############################################################
+# configuration files
+###############################################################
+=pod
+
+=head1 CONFIGURATION FILES
+
+Configuration files are expected to contain lines of the form:
+
+    LONG_OPTION_NAME    OPTION_VALUE
+
+where LONG_OPTION_NAME is the long name of some option,
+without the leading '--', and OPTION_VALUE is the value for
+that option, if any.  Fields are whitespace-separated.
+Blank lines and comments (lines beginning with '#')
+are ignored.
+
+No configuration files are read by default.
+
+=cut
+
+
+
+###############################################################
+# Addenda
+###############################################################
+=pod
+
+=head1 ADDENDA
+
+
+
+=head2 Summary Information
+
+The summary data printed by mooteval for each evaluated file
+(E-file) is interpreted with respect to the other file specified
+on the command line (the "truth", or T-file) as follows:
+
+=over 4
+
+=item Average Class Size
+
+The average number
+of distinct tags in the set of (morphological) analyses assigned to a token
+in the E-file.
+Only meaningful for well-done E-files:
+
+ avg_class_size() := sum(class_size(tok,Efile)) / |Efile|
+
+ class_size(tok)  := card(class(tok,Efile))
+
+
+=item Class Given
+
+The total number of
+tokens in the E-file for which an analysis (a non-empty ambiguity class)
+was supplied.
+Only meaningful for well-done E-files.
+
+ class_given(Toks,Efile) := sum(class_given(tok,Efile)) / |Efile|
+
+ class_given(tok,Efile)   = / 1 if class(tok,Efile) != {}
+                            \ 0 otherwise
+
+
+
+=item Saves
+
+The number of unanalyzed tokens in the E-file (-"Class Given")
+whose best-tag matched that of the corresponding token in the T-file (+"Tags Equal").
+
+ saves(Toks,Efile)  := sum(save(tok,Efile)) / sum(!class_given(tok,Efile))
+
+ save(tok,Efile)     = / 1 if !class_given(tok,Efile) and tag(tok,Efile)==tag(tok,Tfile)
+                       \ 0 otherwise
+
+
+
+=item Internal Coverage
+
+The number of analyzed tokens in the E-file (+"Class Given")
+whose tag according to the B<E-file> is associated with some analysis
+assigned to that token in the B<E-file> (a "possible" or "coherent" analysis,tag pair
+internal to the E-file itself):
+
+ internal_coverage(Toks,Efile) := sum(covers(tok,Efile,Efile)) / |Efile|
+
+                                   / 1 if class_given(tok,AnFile)
+ covers(tok,AnFile,TagFile)    := <       and tag(tok,TagFile) in class(tok,AnFile)
+                                   \ 0 otherwise
+
+
+=item External Coverage
+
+The number of analyzed tokens in the E-file (+"Class Given"),
+whose tag according to the B<T-file> is associated with some analysis
+assigned to that token in the B<E-file> (a "possible" or "coherent" analysis,tag
+pair; where the analyses are drawn from the E-file and the tags from the T-file):
+
+ external_coverage(Toks,Efile) := sum(covers(tok,Efile,Tfile)) / |Efile|
+
+
+
+=item Disambiguation Rate
+
+The number of cross-coherent tokens in the E-file whose best tag matches that
+of the corresponding token in the T-file:
+
+ disambigutation_rate(Efile,Tfile) := sum(disambig(tok,Efile,Tfile))
+                                      / (|Efile|-sum(covers(tok,Efile,Tfile)))
+
+                                       / 1 if covers(tok,Efile,Tfile)
+ disambig(tok,Efile,Tfile)         := <      and tag(tok,Efile)==tag(tok,Tfile)
+                                       \ 0 otherwise
+
+
+
+=item Tokens Equal
+
+The number of tokens in the E-file whose text matched that of
+the corresponding token in the T-file.  Any value other than 100%
+here is usually indicative of a format error.
+
+
+=item Tags Equal
+
+The number of tokens in the E-file whose best tag matched that
+of the corresponding token in the T-file.
+Indicative of overall tagging precision.
+
+=back
+
+
+
+
+=head2 Caveats
+
+Both input files should be in compatible formats (either
+native text or XML).
+
+Output is always in native text 'refried' format.
+
+
+
+=head2 About this Document
+
+Documentation file auto-generated by optgen.perl version 0.05.
+Translation was initiated on
+Tue Oct 16 12:01:43 CEST 2007
+as:
+
+   /usr/local/bin/optgen.perl -l --nocfile --nohfile -F mooteval mooteval.gog
+
+=cut
+
+
+###############################################################
+# Bugs
+###############################################################
+=pod
+
+=head1 BUGS AND LIMITATIONS
+
+Unknown.
+
+=cut
+
+###############################################################
+# Footer
+###############################################################
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+
+Development of this package was supported by the project
+'Kollokationen im Wörterbuch'
+( "collocations in the dictionary", http://www.bbaw.de/forschung/kollokationen )
+in association with the project
+'Digitales Wörterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
+( "digital dictionary of the German language of the 20th century", http://www.dwds.de )
+at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de )
+with funding from
+the Alexander von Humboldt Stiftung ( http://www.avh.de )
+and from the Zukunftsinvestitionsprogramm of the
+German federal government.
+
+I am grateful to Christiane Fellbaum, Alexander Geyken,
+Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
+for offering useful insights in the course of development
+of this package.
+
+Thomas Hanneforth wrote and maintains the libFSM C++ library
+for finite-state device operations used by the
+class-based HMM tagger / disambiguator, without which
+this package could not have been built.
+
+Alexander Geyken and Thomas Hanneforth developed the
+rule-based morphological analysis system for German
+which was used in the development and testing of the
+class-based HMM tagger / disambiguator.
+
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@ling.uni-potsdam.deE<gt>
+
+=head1 SEE ALSO
+
+
+L<mootfiles>,
+mootm(1),
+L<moot>
+
+
+=cut
+
+
+

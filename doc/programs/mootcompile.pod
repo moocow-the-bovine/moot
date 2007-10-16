@@ -1,0 +1,539 @@
+
+=pod
+
+=head1 NAME
+
+mootcompile - moocow's HMM part-of-speech tagger/disambiguator: model compiler.
+
+
+
+=head1 SYNOPSIS
+
+mootcompile [OPTIONS] MODEL(s)
+
+ Arguments:
+    MODEL(s)  Text-format input models.
+
+ Options
+    -h        --help                       Print help and exit.
+    -V        --version                    Print version and exit.
+    -cFILE    --rcfile=FILE                Read an alternate configuration file.
+    -vLEVEL   --verbose=LEVEL              Verbosity level.
+    -oFILE    --output=FILE                Specify output file (default=stdout).
+    -zLEVEL   --compress=LEVEL             Compression level for output file.
+
+ HMM Options
+    -aLEN     --trie-depth=LEN             Maximum depth of suffix trie.
+    -AFREQ    --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.
+              --trie-theta=FLOAT           Suffix backoff coefficient.
+    -LBOOL    --use-classes=BOOL           Whether to use lexical class-probabilities.
+    -NFLOATS  --nlambdas=FLOATS            N-Gram smoothing constants (default=estimate)
+    -WFLOATS  --wlambdas=FLOATS            Lexical smoothing constants (default=estimate)
+    -CFLOATS  --clambdas=FLOATS            Lexical-class smoothing constants (default=estimate)
+    -tDOUBLE  --unknown-threshhold=DOUBLE  Freq. threshhold for 'unknown' lexical probabilities
+    -TDOUBLE  --class-threshhold=DOUBLE    Freq. threshhold for 'unknown' class probabilities
+    -uNAME    --unknown-token=NAME         Symbolic name of the 'unknown' token
+    -UNAME    --unknown-tag=NAME           Symbolic name of the 'unknown' tag
+    -eTAG     --eos-tag=TAG                Specify boundary tag (default=__$)
+    -ZDOUBLE  --beam-width=DOUBLE          Specify cutoff factor for beam pruning
+
+=cut
+
+###############################################################
+# Description
+###############################################################
+=pod
+
+=head1 DESCRIPTION
+
+moocow's HMM part-of-speech tagger/disambiguator: model compiler.
+
+
+'mootcompile' compiles binary Hidden Markov Model parameter
+files for use with the 'moot(1)' program
+from one or more text model files.
+
+See L<mootfiles> for details on moot model file formats.
+
+
+=cut
+
+###############################################################
+# Arguments
+###############################################################
+=pod
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item C<MODEL(s)>
+
+Text-format input models.
+
+
+For details on moot file formats, see L<mootfiles>.
+
+
+=back
+
+
+
+=cut
+
+
+###############################################################
+# Options
+###############################################################
+=pod
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--help> , C<-h>
+
+Print help and exit.
+
+Default: '0'
+
+
+
+
+=item C<--version> , C<-V>
+
+Print version and exit.
+
+Default: '0'
+
+
+
+
+=item C<--rcfile=FILE> , C<-cFILE>
+
+Read an alternate configuration file.
+
+Default: 'NULL'
+
+See also: L<CONFIGURATION FILES>.
+
+
+
+
+=item C<--verbose=LEVEL> , C<-vLEVEL>
+
+Verbosity level.
+
+Default: '2'
+
+Be more or less verbose.  Recognized values are in the range 0..3.
+
+
+
+
+=item C<--output=FILE> , C<-oFILE>
+
+Specify output file (default=stdout).
+
+Default: '-'
+
+
+Binary model will be written to FILE.
+
+
+
+
+
+=item C<--compress=LEVEL> , C<-zLEVEL>
+
+Compression level for output file.
+
+Default: '-1'
+
+
+
+
+=back
+
+=cut
+
+#--------------------------------------------------------------
+# Option-Group HMM Options
+#--------------------------------------------------------------
+=pod
+
+=head2 HMM Options
+
+=over 4
+
+=item C<--trie-depth=LEN> , C<-aLEN>
+
+Maximum depth of suffix trie.
+
+Default: '0'
+
+
+Use suffixes of up to LEN characters to estimate probabilities
+of unknown words.
+
+EXPERIMENTAL.
+
+
+
+
+
+=item C<--trie-threshhold=FREQ> , C<-AFREQ>
+
+Frequency upper bound for trie inclusion.
+
+Default: '10'
+
+
+Use words of at most frequency FREQ to construct the suffix trie.
+
+
+
+
+
+=item C<--trie-theta=FLOAT>
+
+Suffix backoff coefficient.
+
+Default: '0'
+
+
+Specify suffix-trie backoff coefficient for smoothing.
+Specifying a value of zero (the default) causes the
+smoothing coefficient to be estimated.
+
+
+
+
+
+=item C<--use-classes=BOOL> , C<-LBOOL>
+
+Whether to use lexical class-probabilities.
+
+Default: '1'
+
+
+Only useful if your file contains a priori analyses.
+Default behavior is to try and use classes if you specify
+a non-empty class-frequency file.
+
+
+
+
+
+=item C<--nlambdas=FLOATS> , C<-NFLOATS>
+
+N-Gram smoothing constants (default=estimate)
+
+Default: 'NULL'
+
+
+FLOATS should be a string of the form "LAMBDA1,LAMBDA2,LAMBDA3"
+(without the quotes), where each LAMBDA$i is a floating-point constant.
+
+=over 4
+
+=item LAMBDA_1
+
+is the constant smoothing coefficient for unigram probabilities,
+
+=item LAMBDA_2
+
+is the constant smoothing coefficient for bigram probabilities,
+
+=item LAMBDA_3
+
+is the constant smoothing coefficient for trigram probabilities
+(only meaningful if libmoot was built with '--enable-trigrams=yes'.
+See the output of
+
+ mootconfig --options
+
+for details.
+
+=back
+
+If you override the default values, you should choose values such that
+LAMBDA_1 + LAMBDA_2 + LAMBDA_3 == 1.0.
+
+
+
+
+
+=item C<--wlambdas=FLOATS> , C<-WFLOATS>
+
+Lexical smoothing constants (default=estimate)
+
+Default: 'NULL'
+
+
+FLOATS should be a string of the form "LAMBDA_W0,LAMBDA_W1"
+(without the quotes), where each LAMBDA_W$i is a floating-point
+constant.
+
+=over 4
+
+=item LAMBDA_W0
+
+is the constant minimum lexical probability,
+
+=item LAMBDA_W1
+
+is the constant smoothing coefficient for lexical probabilities.
+
+=back
+
+If you override the default values, you should choose values such that
+LAMBDA_W0 + LAMBDA_W1 == 1.0.
+
+
+
+
+
+=item C<--clambdas=FLOATS> , C<-CFLOATS>
+
+Lexical-class smoothing constants (default=estimate)
+
+Default: 'NULL'
+
+
+LAMBDAS should be a string of the form "LAMBDA_C0,LAMBDA_C1"
+(without the quotes), where each LAMBDA_C$i is a floating-point constant.
+
+=over 4
+
+=item LAMBDA_C0
+
+is the constant minimum lexical-class probability,
+
+=item LAMBDA_C1
+
+is the constant smoothing coefficient for lexical-class probabilities.
+
+=back
+
+If you override the default values, you should choose values such that
+LAMBDA_C0 + LAMBDA_C1 == 1.0.
+
+
+
+
+
+=item C<--unknown-threshhold=DOUBLE> , C<-tDOUBLE>
+
+Freq. threshhold for 'unknown' lexical probabilities
+
+Default: '1.0'
+
+
+Lexical probabilities for unknown tokens in the input are estimated
+from tokens which occur at most FLOAT times in the model.
+
+
+
+
+
+=item C<--class-threshhold=DOUBLE> , C<-TDOUBLE>
+
+Freq. threshhold for 'unknown' class probabilities
+
+Default: '1.0'
+
+
+Class probabilities for unrecognized tokens  in the input are estimated
+from classes which occur at most FLOAT times in the model
+and/or from the empty class.
+
+
+
+
+
+=item C<--unknown-token=NAME> , C<-uNAME>
+
+Symbolic name of the 'unknown' token
+
+Default: '@UNKNOWN'
+
+
+You can use this value to include lexical frequency information
+for unknown input tokens in the lexical model file.
+
+
+
+
+
+=item C<--unknown-tag=NAME> , C<-UNAME>
+
+Symbolic name of the 'unknown' tag
+
+Default: 'UNKNOWN'
+
+You should never see or need this tag.
+
+
+
+
+=item C<--eos-tag=TAG> , C<-eTAG>
+
+Specify boundary tag (default=__$)
+
+Default: '__$'
+
+
+This is the pseudo-tag used in the n-gram model file to represent
+sentence boundaries, both beginning- and end-of-sentence.  It should
+not be an element of the actual tag-set -- that is, it should not
+be a valid analysis for any token.
+
+
+
+
+
+=item C<--beam-width=DOUBLE> , C<-ZDOUBLE>
+
+Specify cutoff factor for beam pruning
+
+Default: '1000'
+
+
+During Viterbi search, paths will be ignored if their probabilities
+are less than 1/NUM*p_best , where p_best is the probability of
+the current best path.  Setting this option to zero disables
+beam pruning.
+
+
+
+
+
+=back
+
+
+
+
+=cut
+
+###############################################################
+# configuration files
+###############################################################
+=pod
+
+=head1 CONFIGURATION FILES
+
+Configuration files are expected to contain lines of the form:
+
+    LONG_OPTION_NAME    OPTION_VALUE
+
+where LONG_OPTION_NAME is the long name of some option,
+without the leading '--', and OPTION_VALUE is the value for
+that option, if any.  Fields are whitespace-separated.
+Blank lines and comments (lines beginning with '#')
+are ignored.
+
+The following configuration files are read by default:
+
+=over 4
+
+=item * /etc/mootcompilerc
+
+=item * ~/.mootcompilerc
+
+=back
+
+=cut
+
+
+
+###############################################################
+# Addenda
+###############################################################
+=pod
+
+=head1 ADDENDA
+
+
+
+=head2 About this Document
+
+Documentation file auto-generated by optgen.perl version 0.05.
+Translation was initiated on
+Tue Oct 16 12:01:42 CEST 2007
+as:
+
+   /usr/local/bin/optgen.perl -l --nocfile --nohfile -F mootcompile mootcompile.gog
+
+=cut
+
+
+###############################################################
+# Bugs
+###############################################################
+=pod
+
+=head1 BUGS AND LIMITATIONS
+
+
+
+None known.
+
+
+
+=cut
+
+###############################################################
+# Footer
+###############################################################
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+
+Development of this package was supported by the project
+'Kollokationen im Wörterbuch'
+( "collocations in the dictionary", http://www.bbaw.de/forschung/kollokationen )
+in association with the project
+'Digitales Wörterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
+( "digital dictionary of the German language of the 20th century", http://www.dwds.de )
+at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de )
+with funding from
+the Alexander von Humboldt Stiftung ( http://www.avh.de )
+and from the Zukunftsinvestitionsprogramm of the
+German federal government.
+
+I am grateful to Christiane Fellbaum, Alexander Geyken,
+Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
+for offering useful insights in the course of development
+of this package.
+
+Thomas Hanneforth wrote and maintains the libFSM C++ library
+for finite-state device operations used by the
+class-based HMM tagger / disambiguator, without which
+this package could not have been built.
+
+Alexander Geyken and Thomas Hanneforth developed the
+rule-based morphological analysis system for German
+which was used in the development and testing of the
+class-based HMM tagger / disambiguator.
+
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@ling.uni-potsdam.deE<gt>
+
+=head1 SEE ALSO
+
+
+L<mootfiles>
+mootm(1),
+L<mootrain>,
+L<mootdump>,
+L<moot>
+
+
+=cut
+
+
+

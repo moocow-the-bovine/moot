@@ -1,0 +1,414 @@
+
+=pod
+
+=head1 NAME
+
+mootchurn - File format converter for moocow's PoS tagger.
+
+
+
+=head1 SYNOPSIS
+
+mootchurn [OPTIONS] INPUT(s)
+
+ Arguments:
+    INPUT(s)  Input files / file-lists.
+
+ Options
+    -h          --help                      Print help and exit.
+    -V          --version                   Print version and exit.
+    -cFILE      --rcfile=FILE               Read an alternate configuration file.
+    -vLEVEL     --verbose=LEVEL             Verbosity level.
+    -dNTOKS     --dots=NTOKS                Print a dot for every NTOKS tokens processed.
+    -l          --list                      INPUTs are file-lists, not filenames.
+    -oFILE      --output=FILE               Specify output file (default=stdout).
+
+ Format Options
+    -t          --tokens                    Read input token-wise.
+    -IFORMAT    --input-format=FORMAT       Specify input file(s) format(s).
+    -OFORMAT    --output-format=FORMAT      Specify output file format.
+
+ XML Options
+                --input-encoding=ENCODING   Override XML document input encoding
+                --output-encoding=ENCODING  Set default XML output encoding
+
+=cut
+
+###############################################################
+# Description
+###############################################################
+=pod
+
+=head1 DESCRIPTION
+
+File format converter for moocow's PoS tagger.
+
+
+'mootchurn' is a file-format converter for use with the
+'moot' part-of-speech tagging tools.  See L<mootfiles>
+for details on moot file formats.
+
+
+=cut
+
+###############################################################
+# Arguments
+###############################################################
+=pod
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item C<INPUT(s)>
+
+Input files / file-lists.
+
+
+Input files should be 'cooked' in some format
+known to moot.
+
+See also the '--list' option.
+
+For details on moot file formats, see L<mootfiles>.
+
+
+=back
+
+
+
+=cut
+
+
+###############################################################
+# Options
+###############################################################
+=pod
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--help> , C<-h>
+
+Print help and exit.
+
+Default: '0'
+
+
+
+
+=item C<--version> , C<-V>
+
+Print version and exit.
+
+Default: '0'
+
+
+
+
+=item C<--rcfile=FILE> , C<-cFILE>
+
+Read an alternate configuration file.
+
+Default: 'NULL'
+
+See also: L<CONFIGURATION FILES>.
+
+
+
+
+=item C<--verbose=LEVEL> , C<-vLEVEL>
+
+Verbosity level.
+
+Default: '5'
+
+
+Be more or less verbose.  Recognized values are in the range 0..5:
+
+=over 4
+
+=item 0
+
+Be silent.
+
+=item 1
+
+Print error messages to stderr.
+
+=item 2
+
+Print warnings to stderr.
+
+=item 3
+
+Print summary information to stderr.
+
+=item 4
+
+Print progress information to stderr.
+
+=item 5
+
+Print everything.
+
+=back
+
+
+
+
+
+=item C<--dots=NTOKS> , C<-dNTOKS>
+
+Print a dot for every NTOKS tokens processed.
+
+Default: '0'
+
+Zero (the default) means that no dots will be printed.
+
+
+
+
+=item C<--list> , C<-l>
+
+INPUTs are file-lists, not filenames.
+
+Default: '0'
+
+Useful for large batch-processing jobs.
+
+
+
+
+=item C<--output=FILE> , C<-oFILE>
+
+Specify output file (default=stdout).
+
+Default: '-'
+
+
+
+
+=back
+
+=cut
+
+#--------------------------------------------------------------
+# Option-Group Format Options
+#--------------------------------------------------------------
+=pod
+
+=head2 Format Options
+
+=over 4
+
+=item C<--tokens> , C<-t>
+
+Read input token-wise.
+
+Default: '0'
+
+
+Default behavior is to read sentence-wise.
+
+
+
+
+
+=item C<--input-format=FORMAT> , C<-IFORMAT>
+
+Specify input file(s) format(s).
+
+Default: 'NULL'
+
+
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+
+Default='WellDone'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+
+
+
+
+
+=item C<--output-format=FORMAT> , C<-OFORMAT>
+
+Specify output file format.
+
+Default: 'NULL'
+
+
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+
+Default='WellDone'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+
+
+
+
+
+=back
+
+=cut
+
+#--------------------------------------------------------------
+# Option-Group XML Options
+#--------------------------------------------------------------
+=pod
+
+=head2 XML Options
+
+=over 4
+
+=item C<--input-encoding=ENCODING>
+
+Override XML document input encoding
+
+Default: 'NULL'
+
+
+Potentially useful for XML documents without encoding declarations
+
+
+
+
+
+=item C<--output-encoding=ENCODING>
+
+Set default XML output encoding
+
+Default: 'NULL'
+
+
+Potentially useful for human-readable XML documents,
+but also dangerous.
+
+
+
+
+
+=back
+
+
+
+
+=cut
+
+###############################################################
+# configuration files
+###############################################################
+=pod
+
+=head1 CONFIGURATION FILES
+
+Configuration files are expected to contain lines of the form:
+
+    LONG_OPTION_NAME    OPTION_VALUE
+
+where LONG_OPTION_NAME is the long name of some option,
+without the leading '--', and OPTION_VALUE is the value for
+that option, if any.  Fields are whitespace-separated.
+Blank lines and comments (lines beginning with '#')
+are ignored.
+
+The following configuration files are read by default:
+
+=over 4
+
+=item * /etc/mootchurnrc
+
+=item * ~/.mootchurnrc
+
+=back
+
+=cut
+
+
+
+###############################################################
+# Addenda
+###############################################################
+=pod
+
+=head1 ADDENDA
+
+
+
+=head2 Caveats
+
+When converting to XML, you should first ensure that your data
+is properly encoded, using either character entities or UTF-8
+to encode non-ASCII characters.
+
+When convering from XML, all data will be written in the
+encoding declared in the document, or in UTF-8 if no encoding
+was declared.
+
+
+
+=head2 About this Document
+
+Documentation file auto-generated by optgen.perl version 0.05.
+Translation was initiated on
+Tue Oct 16 12:01:43 CEST 2007
+as:
+
+   /usr/local/bin/optgen.perl -l --nocfile --nohfile -F mootchurn mootchurn.gog
+
+=cut
+
+
+###############################################################
+# Bugs
+###############################################################
+=pod
+
+=head1 BUGS AND LIMITATIONS
+
+
+
+None known.
+
+
+
+=cut
+
+###############################################################
+# Footer
+###############################################################
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl by Larry Wall.
+
+Getopt::Gen by Bryan Jurish.
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@ling.uni-potsdam.deE<gt>
+
+=head1 SEE ALSO
+
+
+L<mootfiles>
+L<mootpp>,
+mootm(1),
+L<mootrain>,
+L<mootcompile>,
+L<mootdump>,
+L<moot>,
+L<mooteval>
+
+
+=cut
+
+
+
