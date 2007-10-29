@@ -264,7 +264,7 @@ int main (int argc, char **argv)
 
 	//-- check for too many 'hard' errors
 	if (nharderrors > nharderrors_max) {
-	  fprintf(stderr, "%s: too many hard errors (%u > %u) -- bailing out!\n",
+	  fprintf(stderr, "%s: too many hard errors (%ld > %ld) -- bailing out!\n",
 		  PROGNAME, nharderrors, nharderrors_max);
 	  break;
 	}
@@ -319,7 +319,7 @@ int main (int argc, char **argv)
 	    continue;
 	  }
 	  //-- report real eos mismatch
-	  fprintf(stderr, "%s: sentence lengths differ at lines %u/%u!\n",
+	  fprintf(stderr, "%s: sentence lengths differ at lines %ld/%ld!\n",
 		  PROGNAME, treader1->line_number(), treader2->line_number());
 	  nharderrors++;
 
@@ -352,7 +352,7 @@ int main (int argc, char **argv)
 	  }
 
 	  //-- report real eof mismatch
-	  fprintf(stderr, "%s: file lengths differ at lines %u/%u!\n",
+	  fprintf(stderr, "%s: file lengths differ at lines %ld/%ld!\n",
 		  PROGNAME, treader1->line_number(), treader2->line_number());
 	  nharderrors++;
 	  continue;

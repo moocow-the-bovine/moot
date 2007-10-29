@@ -179,9 +179,9 @@ void print_summary(FILE *file)
   fprintf(file, "%%%%    - Output Format       : \"%s\"\n",
 	  TokenIO::format_canonical_string(ofmt).c_str());
   fprintf(file, "%%%%  + General\n");
-  fprintf(file, "%%%%    - Files Processed     : %9u file(s)\n", nfiles);
-  fprintf(file, "%%%%    - Sentences Processed : %9u sent\n", nsents);
-  fprintf(file, "%%%%    - Tokens Processed    : %9u tok\n", ntokens);
+  fprintf(file, "%%%%    - Files Processed     : %9ld file(s)\n", nfiles);
+  fprintf(file, "%%%%    - Sentences Processed : %9ld sent\n", nsents);
+  fprintf(file, "%%%%    - Tokens Processed    : %9ld tok\n", ntokens);
   fprintf(file, "%%%%  + Performance\n");
   fprintf(file, "%%%%    - Processing Time     : %12.2f sec\n", elapsed);
   fprintf(file, "%%%%    - Throughput Rate     : %12.2f tok/sec\n", (double)ntokens/elapsed);

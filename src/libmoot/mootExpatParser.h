@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -87,8 +87,9 @@ namespace moot {
 	: mootio::micbuffer(NULL,0)
       {
 	assert(parser != NULL);
-	cb_rdata  = XML_GetInputContext(parser, (int*)&cb_offset, (int*)&cb_used);
-	cb_rdata += cb_offset;
+	int cb_offset_i, cb_used_i;
+	cb_rdata  = XML_GetInputContext(parser, &cb_offset_i, &cb_used_i);
+	cb_rdata += cb_offset_i;
 	cb_offset = 0;
 	cb_used   = XML_GetCurrentByteCount(parser);
       };

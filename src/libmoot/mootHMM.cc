@@ -1804,7 +1804,7 @@ void mootHMM::txtdump(FILE *file)
   fprintf(file, "\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   fprintf(file, "%%%% Suffix Trie\n");
-  fprintf(file, "%%%% maxlen=%u ; theta=%e\n", suftrie.maxlen(), suftrie.theta);
+  fprintf(file, "%%%% maxlen=%lu ; theta=%e\n", suftrie.maxlen(), suftrie.theta);
   fprintf(file, "%%%% \"Suffix\"\tTagID(\"TagStr\")\tlog(p(Suffix|TagID))\tp\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   for (SuffixTrie::const_iterator sti = suftrie.begin(); sti != suftrie.end(); sti++) {
