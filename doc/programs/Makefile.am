@@ -174,11 +174,10 @@ mootconfig.pod: mootconfig.gog
 	--no-handle-version \
 	--no-handle-rcfile \
 	--no-handle-error \
-	--notimestamp \
 	-F $* $<
 
 .gog.pod:
-	$(OPTGEN_PERL) $(OPTGENFLAGS) --nocfile --nohfile --notimestamp -F $* $<
+	$(OPTGEN_PERL) $(OPTGENFLAGS) --nocfile --nohfile -F $* $<
 endif
 
 ##-----------------------------------------------------------------------
@@ -189,8 +188,7 @@ OPTGEN_SKELFLAGS = \
 	--no-handle-help \
 	--no-handle-version \
 	--no-handle-rcfile \
-	--no-handle-error \
-	--notimestamp
+	--no-handle-error
 
 if HAVE_OPTGEN
 .skel.pod:
