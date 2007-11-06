@@ -59,6 +59,7 @@ using namespace mootio;
 /*--------------------------------------------------------------------------
  * Constructor
  *--------------------------------------------------------------------------*/
+#if 0
 mootHMM::mootHMM(void)
   : verbose(1),
     ndots(0),
@@ -108,7 +109,7 @@ mootHMM::mootHMM(void)
   unknown_tag_name("UNKNOWN");
   uclass = LexClass();
 };
-
+#endif
 
 /*--------------------------------------------------------------------------
  * clear, freeing dynamic data

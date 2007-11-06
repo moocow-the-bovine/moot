@@ -590,10 +590,60 @@ public:
   /** \name Constructor / Destructor */
   //@{
   /** Default constructor */
-  mootHMM(void);
+  mootHMM(void)
+    : verbose(1),
+      ndots(0),
+      save_ambiguities(false),
+      save_flavors(false),
+      save_mark_unknown(false),
+      save_dump_trellis(false),
+      use_lex_classes(true),
+      start_tagid(0),
+      unknown_lex_threshhold(1.0),
+      unknown_class_threshhold(1.0),
+      nglambda1(mootProbEpsilon),
+      nglambda2(1.0 - mootProbEpsilon),
+      wlambda0(mootProbEpsilon),
+      wlambda1(1.0 - mootProbEpsilon),
+      clambda0(mootProbEpsilon),
+      clambda1(1.0 - mootProbEpsilon),
+      beamwd(1000),
+      n_tags(0),
+      n_toks(0),
+      n_classes(0),
+#if !defined(MOOT_USE_TRIGRAMS)
+      ngprobs2(NULL),
+#elif !defined(MOOT_HASH_TRIGRAMS)
+      ngprobs3(NULL),
+#endif
+      vtable(NULL),
+      nsents(0),
+      ntokens(0),
+      nnewtokens(0),
+      nunclassed(0),
+      nnewclasses(0),
+      nunknown(0),
+      nfallbacks(0),
+      trash_nodes(NULL),
+#ifdef MOOT_USE_TRIGRAMS
+      trash_rows(NULL),
+#endif
+      trash_columns(NULL), 
+      trash_pathnodes(NULL),
+      vbestpn(NULL),
+      vbestpath(NULL)
+  {
+    //-- create special token entries
+    for (TokID i = 0; i < NTokFlavors; i++) { flavids[i] = 0; }
+    unknown_token_name("@UNKNOWN");
+    unknown_tag_name("UNKNOWN");
+    uclass = LexClass();
+  };
+
 
   /** Destructor */
-  ~mootHMM(void) { clear(true,false); };
+  //~mootHMM(void) { clear(true,false); };
+  ~mootHMM(void) { clear(false,false); };
   //@}
 
   /*------------------------------------------------------------*/

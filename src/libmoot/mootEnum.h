@@ -77,25 +77,26 @@ public:
   /** Default constructor */
   mootEnum(void)
   {
-    ids2names.push_back(NameType());
+    //ids2names.push_back(NameType());
   };
   
   /** Default constructor */
   mootEnum(const NameType &unknownName)
   {
-    ids2names.push_back(unknownName);
+    //ids2names.push_back(unknownName);
   };
 
   /** Default destructor */
   ~mootEnum(void)
   {
-    clear();
+    /*clear();*/
   };
 
   //------ access
   /** Set the 'unknown' name */
   inline void unknown_name(const NameType &name)
   {
+    if (ids2names.empty()) ids2names.resize(1);
     names2ids[name] = 0;
     ids2names[0] = name;
   };
@@ -157,7 +158,9 @@ public:
   inline void clear(void)
   {
     names2ids.clear();
-    ids2names.resize(1);  // keep "unknown" name
+    //--
+    //ids2names.resize(1); //-- keep "unknown" name
+    ids2names.clear();     //-- clear *everything*
   };
 };
 
