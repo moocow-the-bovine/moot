@@ -8,9 +8,9 @@
 
 MY_ALDIRS="."
 MY_AHDIRS="."
+MY_LTDIRS="."
 MY_AMDIRS="."
 MY_ACDIRS="."
-MY_LTDIRS="."
 
 test -z "$ACLOCAL" && ACLOCAL="aclocal -I m4"
 test -z "$AUTOHEADER" && AUTOHEADER=autoheader
@@ -32,6 +32,12 @@ if test -n "$MY_AHDIRS"; then
  done
 fi
 
+if test -n "$MY_LTDIRS"; then
+ for d in $MY_LTDIRS ; do
+    echo "(cd $d ; $LIBTOOLIZE)"
+    (cd $d ; $LIBTOOLIZE)
+ done
+
 if test -n "$MY_AMDIRS"; then
  for d in $MY_AMDIRS ; do
     echo "(cd $d ; $AUTOMAKE -a)"
@@ -46,11 +52,6 @@ if test -n "$MY_ACDIRS"; then
  done
 fi
 
-if test -n "$MY_LTDIRS"; then
- for d in $MY_LTDIRS ; do
-    echo "(cd $d ; $LIBTOOLIZE)"
-    (cd $d ; $LIBTOOLIZE)
- done
 fi
 
 #echo "(./configure)"

@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -59,6 +59,7 @@ using namespace mootio;
 /*--------------------------------------------------------------------------
  * Constructor
  *--------------------------------------------------------------------------*/
+#if 0
 mootHMM::mootHMM(void)
   : verbose(1),
     ndots(0),
@@ -77,6 +78,11 @@ mootHMM::mootHMM(void)
     clambda0(mootProbEpsilon),
     clambda1(1.0 - mootProbEpsilon),
     beamwd(1000),
+    /*
+    tokids(),
+    tagids(),
+    classids(),
+    */
     n_tags(0),
     n_toks(0),
     n_classes(0),
@@ -104,11 +110,16 @@ mootHMM::mootHMM(void)
 {
   //-- create special token entries
   for (TokID i = 0; i < NTokFlavors; i++) { flavids[i] = 0; }
+
+  /*
   unknown_token_name("@UNKNOWN");
   unknown_tag_name("UNKNOWN");
-  uclass = LexClass();
+  //uclass = LexClass();
+  classids.unknown_name(uclass);
+  */
+  tokids.unknown_name(std::string("@UNKNOWN",8));
 };
-
+#endif
 
 /*--------------------------------------------------------------------------
  * clear, freeing dynamic data
@@ -371,6 +382,7 @@ bool mootHMM::load_model(const string &modelname,
       else if (verbose >= vlProgress) carp(" done.\n");
     }
 
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
     //-- build suffix trie
     if (do_build_suffix_trie && suftrie.maxlen() != 0) {
       if (verbose >= vlProgress)
@@ -383,6 +395,7 @@ bool mootHMM::load_model(const string &modelname,
       else if (verbose >= vlProgress)
 	carp(": built.\n");
     }
+#endif //--MOOT_ENABLE_SUFFIX_TRIE
 
     //-- compute log-probabilities
     if (do_compute_logprobs) {
@@ -1201,16 +1214,18 @@ bool mootHMM::compute_logprobs(void)
 #endif
   }
 
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
   //-- suffix-trie probabilities
   for (SuffixTrie::iterator sti = suftrie.begin(); sti != suftrie.end(); sti++) {
     for (SuffixTrieDataT::iterator stdi = sti->data.begin(); stdi != sti->data.end(); stdi++) {
       stdi->second = log(stdi->second);
     }
-#ifdef LEX_SORT_BYVALUE
+# ifdef LEX_SORT_BYVALUE
     //-- sort it
     sti->data.sort_byvalue();
-#endif
+# endif //-- LEX_SORT_BY_VALUE
   }
+#endif //-- MOOT_ENABLE_SUFFIX_TRIE
 
   //-- smoothing constants
   nglambda1 = log(nglambda1);
@@ -1319,16 +1334,20 @@ void mootHMM::viterbi_step(TokID tokid, const mootTokString &toktext)
   //bbestpr = MOOT_PROB_NEG;
 
   //-- get map of possible tags
+#ifndef MOOT_ENABLE_SUFFIX_TRIE
+  const LexProbSubTable *lps = &(lexprobs[tokid]);
+#else
   const LexProbSubTable *lps;
   if (tokid != 0) {
     lps = &(lexprobs[tokid]);
   } else {
     size_t matchlen;
     lps = &(suftrie.sufprobs(toktext,&matchlen));
-#ifdef NO_SUFFIX_USE_HAPAX
+# ifdef NO_SUFFIX_USE_HAPAX
     if (!matchlen) lps = &lexprobs[tokid];
-#endif
+# endif //-- NO_SUFFIX_USE_HAPAX
   }
+#endif //-- MOOT_ENABLE_SUFFIX_TRIE
 
   //-- for each possible destination tag 'vtagid'
   for (LexProbSubTable::const_iterator lpsi = lps->begin(); lpsi != lps->end(); lpsi++) {
@@ -1383,22 +1402,30 @@ void mootHMM::viterbi_step(TokID tokid,
   }
   else if (use_lex_classes) {
     wclambda0 = wlambda0;
+#ifndef MOOT_ENABLE_SUFFIX_TRIE
+    lps = &(lcprobs[classid]);
+#else
     if (classid != 0) {
       lps   = &(lcprobs[classid]);
     } else {
       size_t matchlen;
       lps = &(suftrie.sufprobs(toktext,&matchlen));
-#ifdef NO_SUFFIX_USE_HAPAX
+# ifdef NO_SUFFIX_USE_HAPAX
       if (!matchlen) lps = &(lcprobs[classid]);
-#endif
+# endif //-- NO_SUFFIX_USE_HAPAX
     }
+#endif //-- MOOT_ENABLE_SUFFIX_TRIE
   }
   else {
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
     size_t matchlen;
     lps = &(suftrie.sufprobs(toktext,&matchlen));
-#ifdef NO_SUFFIX_USE_HAPAX
+# ifdef NO_SUFFIX_USE_HAPAX
     if (!matchlen) lps = &(lexprobs[0]);
-#endif
+# endif
+#else //-- NO_SUFFIX_USE_HAPAX
+    lps = &(lexprobs[0]);
+#endif //-- MOOT_ENABLE_SUFFIX_TRIE
     wclambda0 = wlambda0;
   }
 
@@ -1801,6 +1828,7 @@ void mootHMM::txtdump(FILE *file)
   }
 #endif // MOOT_USE_TRIGRAMS
 
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
   fprintf(file, "\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   fprintf(file, "%%%% Suffix Trie\n");
@@ -1819,6 +1847,7 @@ void mootHMM::txtdump(FILE *file)
 		exp(stdi->second));
       }
   }
+#endif //-- MOOT_ENABLE_SUFFIX_TRIE
 
   fprintf(file, "\n");
 }
@@ -2000,7 +2029,11 @@ bool mootHMM::save(mootio::mostream *obs, const char *filename)
 #endif
 
   //-- get checksum
-  size_t crc = start_tagid + n_tags + n_toks + n_classes + suftrie.size();
+  size_t crc = start_tagid + n_tags + n_toks + n_classes
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
+    + suftrie.size()
+#endif //-- MOOT_ENABLE_SUFFIX_TRIE
+    ;
   if (! (hi_item.save(obs, hi)
 	 && size_item.save(obs, crc)
 	 && bool_item.save(obs, using_trigrams)
@@ -2033,7 +2066,9 @@ bool mootHMM::_bindump(mootio::mostream *obs, const char *filename)
 #if defined(MOOT_USE_TRIGRAMS) && defined(MOOT_HASH_TRIGRAMS)
   Item<TrigramProbTable> trigrams_item;
 #endif
+#ifdef MOOT_ENABLE_SUFFIX_TRUE
   Item<SuffixTrie> trie_item;
+#endif
 
   if (! (tagid_item.save(obs, start_tagid)
 	 && probt_item.save(obs, unknown_lex_threshhold)
@@ -2076,12 +2111,14 @@ bool mootHMM::_bindump(mootio::mostream *obs, const char *filename)
       return false;
     }
 
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
   if (!trie_item.save(obs, suftrie))
     {
       carp("mootHMM::save(): could not save suffix trie%s%s\n",
 	   (filename ? " to file " : ""), (filename ? filename : ""));
       return false;
     }
+#endif //--MOOT_ENABLE_SUFFIX_TRIE
 
   int i;
   for (i = 0; i < NTokFlavors; i++) {
@@ -2192,10 +2229,15 @@ bool mootHMM::load(mootio::mistream *ibs, const char *filename)
   if(!_binload(ibs, filename))
     return false;
 
-  if (crc != (start_tagid + n_tags + n_toks + n_classes + suftrie.size())) {
-    carp("mootHMM::load(): checksum failed%s%s\n",
-	 (filename ? " for file " : ""), (filename ? filename : ""));
-  }
+  if (crc != (start_tagid + n_tags + n_toks + n_classes
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
+	      + suftrie.size()
+#endif
+	      ))
+    {
+      carp("mootHMM::load(): checksum failed%s%s\n",
+	   (filename ? " for file " : ""), (filename ? filename : ""));
+    }
 
   viterbi_clear(); //-- (re-)initialize Viterbi table
   return true;
@@ -2226,7 +2268,9 @@ bool mootHMM::_binload(mootio::mistream *ibs, const char *filename)
 #else
   size_t ngprobs2_size  = 0;
 #endif
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
   Item<SuffixTrie> trie_item;
+#endif
 
 
   if (! (tagid_item.load(ibs, start_tagid)
@@ -2288,12 +2332,14 @@ bool mootHMM::_binload(mootio::mistream *ibs, const char *filename)
       return false;
     }
 
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
   if (!trie_item.load(ibs, suftrie))
     {
       carp("mootHMM::load(): could not load trie data%s%s\n",
 	   (filename ? " from file " : ""), (filename ? filename : ""));
       return false;
     }
+#endif
 
   int i;
   for (i = 0; i < NTokFlavors; i++) {

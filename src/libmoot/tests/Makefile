@@ -2,18 +2,28 @@
 
 CXX ?= g++
 
-CFLAGS   ?= -I.. -DHAVE_CONFIG_H -ftemplate-depth-24 -g
-CXXFLAGS ?= $(CFLAGS)
+OFLAGS   ?= -g
+IFLAGS   ?= -I..
+DEFS     ?= -DHAVE_CONFIG_H
+CFLAGS   ?= $(IFLAGS) $(DEFS) $(OFLAGS)
+CXXFLAGS ?= $(CFLAGS) -ftemplate-depth-24
 
-LD         ?= $(CXX)
-LDFLAGS    ?= -g -L..
+LD          = $(CXX)
+LDFLAGS    ?= $(OFLAGS) -L..
 STATICLIBS ?= ../.libs/libmoot.a
 LIBS       ?= -lz -lrecode -lexpat
 
-KNOWN_TARGETS = toklex tokio
-TARGETS = tokio
+KNOWN_TARGETS = toklex tokio tokio hmm+exit dummyhmm
+TARGETS = dummyhmm
 
 all: $(TARGETS)
+
+##-- config
+config:
+	@echo "OFLAGS=$(OFLAGS)"
+	@echo "CXXFLAGS=$(CXXFLAGS)"
+	@echo "LIBS=$(LIBS)"
+	@echo "STATICLIBS=$(STATICLIBS)"
 
 ##-- clean
 clean:
@@ -27,12 +37,21 @@ libs: $(STATICLIBS)
 ../libmoot.la:
 	$(MAKE) -C .. libmoot.la
 
+##-- linking
+hmm+exit: hmm+exit.o $(STATICLIBS)
+dummyhmm: dummyhmm.o $(STATICLIBS)
 
 ##-- patterns: .o
 %.o: %.cc
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o "$@" "$<"
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
+
+##-- literals: linking
+hmm+exit: hmm+exit.o $(STATICLIBS)
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 ##-- patterns: default
 .DEFAULT:
+	$(LD) $(LDFLAGS) -o $@ $^ $(STATIC_LIBS) $(LIBS)
+
 %: %.o $(STATICLIBS)
-	$(LD) $(LDFLAGS) -o "$@" $^ $(LIBS)
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)

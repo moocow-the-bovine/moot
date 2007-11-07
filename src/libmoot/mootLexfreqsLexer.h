@@ -87,8 +87,8 @@ using namespace moot;
     /** virtual destructor to shut up gcc */\
     virtual ~mootLexfreqsLexer(void) {};\
   /* moot::GenericLexer helpers */ \
-  virtual void **mgl_yy_current_buffer_p(void) \
-                 {return (void**)(&yy_current_buffer);};\
+  virtual void  *mgl_yy_current_buffer_p(void) \
+                 {return (&yy_current_buffer);};\
   virtual void  *mgl_yy_create_buffer(int size, FILE *unused=stdin) \
                  {return (void*)(yy_create_buffer(unused,size));};\
   virtual void   mgl_yy_init_buffer(void *buf, FILE *unused=stdin) \

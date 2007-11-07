@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -318,7 +318,7 @@ void TokenReader::carp(const char *fmt, ...)
   va_start(ap, fmt);
   vfprintf(stderr, fmt, ap);
   va_end(ap);
-  fprintf(stderr, " in \"%s\" at byte %u: line %u, column %u\n",
+  fprintf(stderr, " in \"%s\" at byte %d: line %d, column %d\n",
 	  ((tr_istream
 	    && tr_istream->valid()
 	    && !tr_istream->name.empty()) ? tr_istream->name.c_str() : "(unknown)"),
