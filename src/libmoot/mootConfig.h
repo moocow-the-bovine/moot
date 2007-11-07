@@ -35,12 +35,20 @@
  * \brief autoheader-generated preprocessor defines
  */
 
+/* 
+ * Define a sentinel preprocessor symbol _MOOT_CONFIG_H, just
+ * in case someone wants to check whether we've already
+ * (#include)d this file ....
+ */
 #ifndef _MOOT_CONFIG_H
 #define _MOOT_CONFIG_H
-
-#ifdef HAVE_CONFIG_H
-# include <mootNoConfig.h>
-# include <mootAutoConfig.h>
-#endif
-
 #endif /* _MOOT_CONFIG_H */
+
+/* 
+ * Putting autoheader files within the above #ifndef/#endif idiom
+ * is potentially a BAD IDEA, since we might need to (re-)define
+ * moot's autoheader-generated preprocessor symbols (e.g. after
+ * (#include)ing in some config.h from another autoheader package
+ */
+#include <mootNoConfig.h>
+#include <mootAutoConfig.h>
