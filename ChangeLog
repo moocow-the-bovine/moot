@@ -3,7 +3,11 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
-v2.0.6 Mon, 12 Feb 2007 09:47:01 +0100
+v2.0.6 Wed, 07 Nov 2007 16:51:11 +0100
+        + fixed mootConfig.h to allow "safe" inclusion from header files
+	  - autoheader file is now "mootAutoConfig.h"
+	  - fixes segfaults in ~mootHMM() when <mootConfig.h> was not included
+	    (due to conditionally defined fields of mootHMM)
 	+ build system updated to build more cleanly on non-development systems
 	  - i.e. missing Getopt::Gen, pod2x, flex++, bison++, etc.
 	+ fixed mootSTLHacks.h to correctly recognize g++-v4.0.x

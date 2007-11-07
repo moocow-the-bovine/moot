@@ -193,6 +193,7 @@ dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AC_ARG_VAR(DISTCHECK,
 	[(Maintainer): set to nonempty value to simulate missing development packages])
 if test -n "$DISTCHECK" ; then
+   test -z "$DOXY_FILTER" && DOXY_FILTER=no
    test -z "$OPTGEN_PERL" && OPTGEN_PERL=no
    test -z "$DOXYGEN" && DOXYGEN=no
    test -z "$POD2X" && POD2TEXT=no

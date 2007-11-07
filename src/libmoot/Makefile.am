@@ -370,6 +370,7 @@ MAINTAINERCLEANFILES = \
 
 ## --- extra distribution files
 EXTRA_DIST = \
+	mootNoConfig.h \
 	mootPPLexer.ll \
 	mootTokenLexer.ll \
 	mootNgramsLexer.ll \
