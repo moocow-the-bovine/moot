@@ -72,14 +72,16 @@ namespace mootio {
      * to this constructor.
      */
     micbuffer(const void *data, size_t len)
-      : cb_rdata(reinterpret_cast<const char*>(data)),
+      : mistream(),
+	cb_rdata(reinterpret_cast<const char*>(data)),
 	cb_offset(0),
 	cb_used(len)
     {};
 
     /** Copy constructor */
     micbuffer(const micbuffer &cb)
-      : cb_rdata(cb.cb_rdata),
+      : mistream(),
+	cb_rdata(cb.cb_rdata),
 	cb_offset(cb.cb_offset),
 	cb_used(cb.cb_used)
     {};

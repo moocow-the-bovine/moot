@@ -311,7 +311,7 @@ anlchar    [^ \t\n\r]
 
 <SEPARATORS>{tab}({space}*) {
   //-- SEPARATORS: Separator character(s): increment column nicely
-  theColumn = ((static_cast<int>(theColumn)/8)+1)*8;
+  theColumn = (static_cast<int>(theColumn/8)+1)*8;
   lasttyp = LexTypeEOA;
 }
 <SEPARATORS>""/{wordchar} {

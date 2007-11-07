@@ -1,4 +1,4 @@
-/* src/libmoot/mootConfig.h.in.  Generated from configure.in by autoheader.  */
+/* src/libmoot/mootAutoConfig.h.in.  Generated from configure.in by autoheader.  */
 
 /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
    systems. This function is required for `alloca.c' support on those systems.
@@ -120,6 +120,9 @@
 
 /* Define this to enable debugging code */
 #undef MOOT_DEBUG_ENABLED
+
+/* Define this to enable support for suffix tries */
+#undef MOOT_ENABLE_SUFFIX_TRIE
 
 /* Define this to enable experimental expat XML support */
 #undef MOOT_EXPAT_ENABLED

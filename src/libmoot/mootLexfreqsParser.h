@@ -70,6 +70,7 @@ typedef struct {
    /* private instance members go here */ \
   public: \
    /* public methods */ \
+   virtual ~mootLexfreqsParser(void) {}; \
    /* report warnings */\
    virtual void yywarn(const char *msg) { \
       yycarp("mootLexfreqsParser: Warning: %s", msg);\
@@ -78,13 +79,13 @@ typedef struct {
    virtual void yycarp(char *fmt, ...);
 #define YY_mootLexfreqsParser_CONSTRUCTOR_INIT  : lexfreqs(NULL), alltags(NULL)
 
-#line 126 "mootLexfreqsParser.yy"
+#line 127 "mootLexfreqsParser.yy"
 typedef union {
   moot::mootTokString *tokstr;         ///< for single tokens or tags (strings)
   moot::CountT           count;         ///< for tag-list counts
 } yy_mootLexfreqsParser_stype;
 #define YY_mootLexfreqsParser_STYPE yy_mootLexfreqsParser_stype
-#line 131 "mootLexfreqsParser.yy"
+#line 132 "mootLexfreqsParser.yy"
 
 /**
  * \typedef yy_mootLexfreqsParser_stype

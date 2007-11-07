@@ -182,31 +182,32 @@ See 'HMM MODEL FILE FORMATS' in L<mootfiles> for details
 on model file formats.
 "
 
-#int "trie-depth"  a "Maximum depth of suffix trie." \
-#    arg="LEN" \
-#    default="0" \
-#    details="
-#Use suffixes of up to LEN characters to estimate probabilities
-#of unknown words.
-#
-#B<Warning>: this feature is B<EXPERIMENTAL>!  Use at your own risk.
-#"
-#
-#int "trie-threshhold" A "Frequency upper bound for trie inclusion." \
-#    arg="FREQ" \
-#    default="10" \
-#    details="
-#Use words of at most frequency FREQ to construct the suffix trie.
-#"
-#
-#float "trie-theta" - "Suffix backoff coefficient." \
-#    arg="THETA" \
-#    default="0" \
-#    details="
-#Specify suffix-trie backoff coefficient for smoothing.
-#Specifying a value of zero (the default) causes the
-#smoothing coefficient to be estimated.
-#"
+int "trie-depth"  a "Maximum depth of suffix trie." \
+    arg="LEN" \
+    default="0" \
+    details="
+Use suffixes of up to LEN characters to estimate probabilities
+of unknown words.
+
+B<Warning>: this feature is B<EXPERIMENTAL>!  Use at your own risk.
+"
+
+int "trie-threshhold" A "Frequency upper bound for trie inclusion." \
+    arg="FREQ" \
+    default="10" \
+    details="
+Use words of at most frequency FREQ to construct the suffix trie.
+"
+
+float "trie-theta" - "Suffix backoff coefficient." \
+    arg="THETA" \
+    default="0" \
+    details="
+Specify suffix-trie backoff coefficient for smoothing.
+Specifying a value of zero (the default) causes the
+smoothing coefficient to be estimated.
+"
+
 
 int "use-classes" L "Whether to use lexical class-probabilities." \
     arg="BOOL" \

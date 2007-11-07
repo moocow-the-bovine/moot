@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2006 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2002-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -59,7 +59,7 @@ using namespace mootio;
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-char *PROGNAME = "mootrain";
+const char *PROGNAME = "mootrain";
 
 // options & file-churning
 gengetopt_args_info  args;
@@ -196,7 +196,7 @@ void GetMyOptions(int argc, char **argv)
 #ifdef MOOT_EXPAT_ENABLED
   //-- io: encoding: reader
   if (ifmt&tiofXML && args.input_encoding_given) {
-    ((TokenReaderExpat *)reader)->setEncoding(string(args.input_encoding_arg));
+    reinterpret_cast<TokenReaderExpat *>(reader)->setEncoding(static_cast<std::string>(args.input_encoding_arg));
   }
 #endif
 

@@ -59,7 +59,6 @@ using namespace mootio;
 /*--------------------------------------------------------------------------
  * Constructor
  *--------------------------------------------------------------------------*/
-#if 0
 mootHMM::mootHMM(void)
   : verbose(1),
     ndots(0),
@@ -78,11 +77,6 @@ mootHMM::mootHMM(void)
     clambda0(mootProbEpsilon),
     clambda1(1.0 - mootProbEpsilon),
     beamwd(1000),
-    /*
-    tokids(),
-    tagids(),
-    classids(),
-    */
     n_tags(0),
     n_toks(0),
     n_classes(0),
@@ -110,16 +104,11 @@ mootHMM::mootHMM(void)
 {
   //-- create special token entries
   for (TokID i = 0; i < NTokFlavors; i++) { flavids[i] = 0; }
-
-  /*
   unknown_token_name("@UNKNOWN");
   unknown_tag_name("UNKNOWN");
   //uclass = LexClass();
-  classids.unknown_name(uclass);
-  */
-  tokids.unknown_name(std::string("@UNKNOWN",8));
 };
-#endif
+
 
 /*--------------------------------------------------------------------------
  * clear, freeing dynamic data
@@ -2066,7 +2055,7 @@ bool mootHMM::_bindump(mootio::mostream *obs, const char *filename)
 #if defined(MOOT_USE_TRIGRAMS) && defined(MOOT_HASH_TRIGRAMS)
   Item<TrigramProbTable> trigrams_item;
 #endif
-#ifdef MOOT_ENABLE_SUFFIX_TRUE
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
   Item<SuffixTrie> trie_item;
 #endif
 

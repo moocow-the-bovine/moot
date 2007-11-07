@@ -2,7 +2,7 @@
 #include <stdio.h>
 using namespace moot;
 
-#define PTR 1
+//#define PTR 1
 
 #if !defined(PTR)
 mootHMM hmm;

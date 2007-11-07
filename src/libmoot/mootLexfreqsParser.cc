@@ -143,6 +143,7 @@ typedef struct {
    /* private instance members go here */ \
   public: \
    /* public methods */ \
+   virtual ~mootLexfreqsParser(void) {}; \
    /* report warnings */\
    virtual void yywarn(const char *msg) { \
       yycarp("mootLexfreqsParser: Warning: %s", msg);\
@@ -151,13 +152,13 @@ typedef struct {
    virtual void yycarp(char *fmt, ...);
 #define YY_mootLexfreqsParser_CONSTRUCTOR_INIT  : lexfreqs(NULL), alltags(NULL)
 
-#line 126 "mootLexfreqsParser.yy"
+#line 127 "mootLexfreqsParser.yy"
 typedef union {
   moot::mootTokString *tokstr;         ///< for single tokens or tags (strings)
   moot::CountT           count;         ///< for tag-list counts
 } yy_mootLexfreqsParser_stype;
 #define YY_mootLexfreqsParser_STYPE yy_mootLexfreqsParser_stype
-#line 131 "mootLexfreqsParser.yy"
+#line 132 "mootLexfreqsParser.yy"
 
 /**
  * \typedef yy_mootLexfreqsParser_stype
@@ -481,8 +482,8 @@ static const short yyrhs[] = {    -1,
 
 #if YY_mootLexfreqsParser_DEBUG != 0
 static const short yyrline[] = { 0,
-   152,   153,   154,   157,   164,   165,   166,   174,   178,   184,
-   191,   192,   199,   202,   203,   210,   211,   212
+   153,   154,   155,   158,   165,   166,   167,   175,   179,   185,
+   192,   193,   200,   203,   204,   211,   212,   213
 };
 
 static const char * const yytname[] = {   "$","error","$illegal.","TOKEN","COUNT",
@@ -955,34 +956,34 @@ yyreduce:
   switch (yyn) {
 
 case 1:
-#line 152 "mootLexfreqsParser.yy"
-{ yyval.count = 0; ;
-    break;}
-case 2:
 #line 153 "mootLexfreqsParser.yy"
 { yyval.count = 0; ;
     break;}
-case 3:
+case 2:
 #line 154 "mootLexfreqsParser.yy"
 { yyval.count = 0; ;
     break;}
+case 3:
+#line 155 "mootLexfreqsParser.yy"
+{ yyval.count = 0; ;
+    break;}
 case 4:
-#line 158 "mootLexfreqsParser.yy"
+#line 159 "mootLexfreqsParser.yy"
 {
 		  delete yyvsp[-1].tokstr;
                   yyval.count = 0;
 		;
     break;}
 case 5:
-#line 164 "mootLexfreqsParser.yy"
+#line 165 "mootLexfreqsParser.yy"
 { yyval.tokstr = yyvsp[0].tokstr; ;
     break;}
 case 6:
-#line 165 "mootLexfreqsParser.yy"
+#line 166 "mootLexfreqsParser.yy"
 { yyval.tokstr = yyvsp[-2].tokstr; /* total is optional (not really) */ ;
     break;}
 case 7:
-#line 167 "mootLexfreqsParser.yy"
+#line 168 "mootLexfreqsParser.yy"
 {
 		  lexfreqs->add_count(*yyvsp[-4].tokstr, *yyvsp[-2].tokstr, yyvsp[0].count);
                   delete yyvsp[-2].tokstr;
@@ -990,56 +991,56 @@ case 7:
 		;
     break;}
 case 8:
-#line 175 "mootLexfreqsParser.yy"
+#line 176 "mootLexfreqsParser.yy"
 {
 		  yyval.tokstr = yyvsp[0].tokstr;
 		;
     break;}
 case 9:
-#line 179 "mootLexfreqsParser.yy"
+#line 180 "mootLexfreqsParser.yy"
 {
 		  yyval.tokstr = new moot::mootTokString(reinterpret_cast<const char *>(yylloc.text));
 		;
     break;}
 case 10:
-#line 185 "mootLexfreqsParser.yy"
+#line 186 "mootLexfreqsParser.yy"
 {
 		  if (alltags) alltags->insert(*yyvsp[0].tokstr);
 		  yyval.tokstr = yyvsp[0].tokstr;
 		;
     break;}
 case 11:
-#line 191 "mootLexfreqsParser.yy"
+#line 192 "mootLexfreqsParser.yy"
 { yyval.count = yyvsp[0].count; ;
     break;}
 case 12:
-#line 193 "mootLexfreqsParser.yy"
+#line 194 "mootLexfreqsParser.yy"
 {
 		    yyerror("expected a COUNT.");
                     YYABORT;
 		;
     break;}
 case 13:
-#line 199 "mootLexfreqsParser.yy"
+#line 200 "mootLexfreqsParser.yy"
 { yyval.count = yyvsp[0].count; ;
     break;}
 case 14:
-#line 202 "mootLexfreqsParser.yy"
+#line 203 "mootLexfreqsParser.yy"
 { yyval.count=0; ;
     break;}
 case 15:
-#line 204 "mootLexfreqsParser.yy"
+#line 205 "mootLexfreqsParser.yy"
 {
 		    yyerror("expected a TAB.");
                     YYABORT;
                 ;
     break;}
 case 16:
-#line 210 "mootLexfreqsParser.yy"
+#line 211 "mootLexfreqsParser.yy"
 { yyval.count=0; ;
     break;}
 case 18:
-#line 213 "mootLexfreqsParser.yy"
+#line 214 "mootLexfreqsParser.yy"
 {
 		    yyerror("expected a NEWLINE.");
                     YYABORT;
@@ -1247,7 +1248,7 @@ yyerrhandle:
 /* END */
 
 /* #line 909 "/usr/local/share/flex++bison++/bison.cc" */
-#line 219 "mootLexfreqsParser.yy"
+#line 220 "mootLexfreqsParser.yy"
 
 /* -------------- body section -------------- */
 

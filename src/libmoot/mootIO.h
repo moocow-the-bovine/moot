@@ -33,6 +33,8 @@
 #ifndef _MOOT_IO_H
 #define _MOOT_IO_H
 
+#include <mootConfig.h>
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -130,7 +132,7 @@ namespace mootio {
     ///\name Constructors etc.
     //@{
     /** Default constructor */
-    mistream(void) {};
+    mistream(void) : mstream() {};
 
     /** Destructor */
     virtual ~mistream(void) {};
@@ -187,7 +189,7 @@ namespace mootio {
     ///\name Constructors etc.
     //@{
     /** Default constructor */
-    mostream(void) {};
+    mostream(void) : mstream() {};
 
     /** Destructor */
     virtual ~mostream(void) {};

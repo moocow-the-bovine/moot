@@ -29,6 +29,8 @@
 #ifndef MOOT_TRIE_VECTOR_H
 #define MOOT_TRIE_VECTOR_H
 
+#include <mootConfig.h>
+
 #undef MOOT_TRIE_VECTOR_DEBUG
 
 #ifdef MOOT_TRIE_VECTOR_DEBUG

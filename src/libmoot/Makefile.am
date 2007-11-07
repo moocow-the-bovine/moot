@@ -174,6 +174,7 @@ mootNoConfig.h: mootAutoConfig.h.in
 #pkginclude_HEADERS = ${hfile_1} ... ${hfile_N}
 pkginclude_HEADERS = \
 	\
+	moot.h \
 	mootConfig.h \
 	mootNoConfig.h \
 	mootAutoConfig.h \

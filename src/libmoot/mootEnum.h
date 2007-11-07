@@ -77,19 +77,19 @@ public:
   /** Default constructor */
   mootEnum(void)
   {
-    //ids2names.push_back(NameType()); //-- SEGFAULTS?
+    unknown_name(NameType());
   };
   
   /** Default constructor */
   mootEnum(const NameType &unknownName)
   {
-    //ids2names.push_back(unknownName); //-- SEGFAULTS?
+    unknown_name(unknownName);
   };
 
   /** Default destructor */
   ~mootEnum(void)
   {
-    /*clear();*/ //-- SEGFAULTS?
+    clear();
   };
 
   //------ access
@@ -154,13 +154,14 @@ public:
     return id;
   };
 
-  /** Clears all mappings, but retains "unknown" name. */
+  /** Clears all mappings, but retains "unknown" name */
   inline void clear(void)
   {
     names2ids.clear();
     //--
-    //ids2names.resize(1); //-- keep "unknown" name
-    ids2names.clear();     //-- clear *everything*
+    ids2names.resize(1); //-- keep "unknown" name
+    //--
+    //ids2names.clear();     //-- clear *everything*
   };
 };
 

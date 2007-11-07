@@ -808,7 +808,7 @@ case 7:
 #line 312 "mootTokenLexer.ll"
 {
   //-- SEPARATORS: Separator character(s): increment column nicely
-  theColumn = ((static_cast<int>(theColumn)/8)+1)*8;
+  theColumn = (static_cast<int>(theColumn/8)+1)*8;
   lasttyp = LexTypeEOA;
 }
 	YY_BREAK

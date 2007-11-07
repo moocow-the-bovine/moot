@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2006 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2002-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -68,7 +68,7 @@ typedef enum {
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-char *PROGNAME = "moot";
+const char *PROGNAME = "moot";
 
 // options & file-churning
 gengetopt_args_info  args;
@@ -154,11 +154,11 @@ void GetMyOptions(int argc, char **argv)
 #ifdef MOOT_EXPAT_ENABLED
   //-- io: encoding: reader
   if (ifmt&tiofXML && args.input_encoding_given) {
-    ((TokenReaderExpat *)reader)->setEncoding(string(args.input_encoding_arg));
+    reinterpret_cast<TokenReaderExpat *>(reader)->setEncoding(static_cast<std::string>(args.input_encoding_arg));
   }
   //-- io: encoding: writer
   if (ofmt&tiofXML && args.output_encoding_given) {
-    ((TokenWriterExpat *)writer)->setEncoding(string(args.output_encoding_arg));
+    reinterpret_cast<TokenWriterExpat *>(writer)->setEncoding(static_cast<std::string>(args.output_encoding_arg));
   }
 #endif
 
@@ -175,6 +175,10 @@ void GetMyOptions(int argc, char **argv)
   hmm.suftrie.maxlen() = args.trie_depth_arg;
   hmm.suftrie.maxcount = args.trie_threshhold_arg;
   hmm.suftrie.theta    = args.trie_theta_arg;
+#else
+  if (args.trie_depth_given || args.trie_threshhold_given || args.trie_theta_given) {
+    fprintf(stderr, "%s: suffix trie support disabled: ignoring trie-related options\n", PROGNAME);
+  }
 #endif
   hmm.save_ambiguities = args.save_ambiguities_given;
   hmm.save_mark_unknown = args.mark_unknown_given;
@@ -301,6 +305,9 @@ void GetMyOptions(int argc, char **argv)
 #ifdef MOOT_ENABLE_SUFFIX_TRIE
     writer->printf_raw("   Suffix theta      : %g\n", hmm.suftrie.theta);
     writer->printf_raw("   Suffix trie size  : %u\n", hmm.suftrie.size());
+#else
+    writer->printf_raw("   Suffix theta      : (DISABLED)\n");
+    writer->printf_raw("   Suffix trie size  : (DISABLED)\n");
 #endif
     writer->printf_raw("\n");
     writer->put_comment_block_end();
@@ -327,31 +334,31 @@ void print_summary(TokenWriter *tw)
   tw->printf_raw("  + Analysis\n");
   tw->printf_raw("    - Token Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  hmm.ntokens-hmm.nnewtokens,
-	  100.0*((double)hmm.ntokens-(double)hmm.nnewtokens)/(double)hmm.ntokens,
+	  100.0*(static_cast<double>(hmm.ntokens)-static_cast<double>(hmm.nnewtokens))/static_cast<double>(hmm.ntokens),
 	  hmm.nnewtokens,
-	  100.0*(double)hmm.nnewtokens/(double)hmm.ntokens);
+	  100.0*static_cast<double>(hmm.nnewtokens)/static_cast<double>(hmm.ntokens));
   tw->printf_raw("    - Class Given (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  hmm.ntokens-hmm.nunclassed,
-	  100.0*((double)hmm.ntokens-(double)hmm.nunclassed)/(double)hmm.ntokens,
+	  100.0*(static_cast<double>(hmm.ntokens)-static_cast<double>(hmm.nunclassed))/static_cast<double>(hmm.ntokens),
 	  hmm.nunclassed,
-	  100.0*(double)hmm.nunclassed/(double)hmm.ntokens);
+	  100.0*static_cast<double>(hmm.nunclassed)/static_cast<double>(hmm.ntokens));
   tw->printf_raw("    - Class Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  hmm.ntokens-hmm.nnewclasses,
-	  100.0*((double)hmm.ntokens-(double)hmm.nnewclasses)/(double)hmm.ntokens,
+	  100.0*(static_cast<double>(hmm.ntokens)-static_cast<double>(hmm.nnewclasses))/static_cast<double>(hmm.ntokens),
 	  hmm.nnewclasses,
-	  100.0*(double)hmm.nnewclasses/(double)hmm.ntokens);
+	  100.0*static_cast<double>(hmm.nnewclasses)/static_cast<double>(hmm.ntokens));
   tw->printf_raw("    - Total Known (+/-)   : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
 	  hmm.ntokens-hmm.nunknown,
-	  100.0*((double)hmm.ntokens-(double)hmm.nunknown)/(double)hmm.ntokens,
+	  100.0*(static_cast<double>(hmm.ntokens)-static_cast<double>(hmm.nunknown))/static_cast<double>(hmm.ntokens),
 	  hmm.nunknown,
-	  100.0*(double)hmm.nunknown/(double)hmm.ntokens);
+	  100.0*static_cast<double>(hmm.nunknown)/static_cast<double>(hmm.ntokens));
   tw->printf_raw("    - Fallbacks           : %9u (%6.2f%%)\n",
 	  hmm.nfallbacks,
-	  100.0*(double)hmm.nfallbacks/(double)hmm.ntokens);
+	  100.0*static_cast<double>(hmm.nfallbacks)/static_cast<double>(hmm.ntokens));
   tw->printf_raw("  + Performance\n");
   tw->printf_raw("    - Initialize Time     : %12.2f sec\n", ielapsed);
   tw->printf_raw("    - Analysis Time       : %12.2f sec\n", aelapsed);
-  tw->printf_raw("    - Throughput Rate     : %12.2f tok/sec\n", (double)hmm.ntokens/aelapsed);
+  tw->printf_raw("    - Throughput Rate     : %12.2f tok/sec\n", static_cast<double>(hmm.ntokens)/aelapsed);
   tw->printf_raw("=====================================================================\n");
   tw->put_comment_block_end();
 }
@@ -374,7 +381,7 @@ int main (int argc, char **argv)
 
   // -- get init-stop time = analysis-start time
   if (args.verbose_arg >= vlSummary) {
-    ielapsed = ((double)clock()) / CLOCKS_PER_SEC;
+    ielapsed = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
   }
 
   // -- the guts
@@ -402,11 +409,11 @@ int main (int argc, char **argv)
 
   // -- summary
   if (args.verbose_arg >= vlSummary) {
-      // -- timing
-      aelapsed  = ((double)clock()) / CLOCKS_PER_SEC - ielapsed;
+    // -- timing
+    aelapsed  = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC) - ielapsed; 
 
-      if (out.file != stdout) print_summary(writer);
-      print_summary_to_file(stderr);
+    if (out.file != stdout) print_summary(writer);
+    print_summary_to_file(stderr);
   }
   writer->close();
   out.close();
