@@ -18,6 +18,13 @@ TARGETS = dummyhmm
 
 all: $(TARGETS)
 
+##-- config
+config:
+	@echo "OFLAGS=$(OFLAGS)"
+	@echo "CXXFLAGS=$(CXXFLAGS)"
+	@echo "LIBS=$(LIBS)"
+	@echo "STATICLIBS=$(STATICLIBS)"
+
 ##-- clean
 clean:
 	rm -f *.o $(KNOWN_TARGETS)
@@ -37,6 +44,10 @@ dummyhmm: dummyhmm.o $(STATICLIBS)
 ##-- patterns: .o
 %.o: %.cc
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
+
+##-- literals: linking
+hmm+exit: hmm+exit.o $(STATICLIBS)
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 ##-- patterns: default
 .DEFAULT:

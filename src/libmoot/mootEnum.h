@@ -77,7 +77,7 @@ public:
   /** Default constructor */
   mootEnum(void)
   {
-    //ids2names.push_back(NameType());
+    //ids2names.push_back(NameType()); //-- SEGFAULTS?
   };
   
   /** Default constructor */
@@ -97,8 +97,8 @@ public:
   inline void unknown_name(const NameType &name)
   {
     if (ids2names.empty()) ids2names.resize(1);
+    ids2names[0]    = name;
     names2ids[name] = 0;
-    ids2names[0] = name;
   };
 
   //------ sanity checking

@@ -140,7 +140,7 @@ textorsp   [^\n\r\t]
 . {
   // -- huh? -- just ignore it!
   theColumn += yyleng;
-  fprintf(stderr,"mootLexfreqsLexer warning: unrecognized character '%c' (ignored) at line %ld, column %ld, near `%s'.\n",
+  fprintf(stderr,"mootLexfreqsLexer warning: unrecognized character '%c' (ignored) at line %d, column %d, near `%s'.\n",
           yytext[YY_MORE_ADJ], theLine, theColumn, yytext);
 }
 

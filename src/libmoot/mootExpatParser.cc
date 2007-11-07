@@ -322,7 +322,7 @@ void mootExpatParser::xpcarp(char *fmt, ...)
   va_start(ap, fmt);
   vfprintf(stderr, fmt, ap);
   va_end(ap);
-  fprintf(stderr, " in `%s' at line %ld, column %ld: %s\n",
+  fprintf(stderr, " in `%s' at line %d, column %d: %s\n",
 	  (xp_istream && !xp_istream->name.empty()
 	   ? xp_istream->name.c_str() : "(unknown)"),
 	  XML_GetCurrentLineNumber(parser),

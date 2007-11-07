@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -47,7 +47,10 @@
 #include <mootNgrams.h>
 #include <mootEnum.h>
 #include <mootAssocVector.h>
+
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
 #include <mootSuffixTrie.h>
+#endif
 
 /**
  * \def MOOT_USE_TRIGRAMS
@@ -537,7 +540,9 @@ public:
   BigramProbTable   ngprobs2;   /**< N-gram (log-)probability lookup table: bigrams */
 #endif
 
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
   SuffixTrie        suftrie;    /**< string-suffix (log-)probability trie */
+#endif
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -765,7 +770,13 @@ public:
   bool build_suffix_trie(const mootLexfreqs &lf,
 			 const mootNgrams   &ng,
 			 bool  verbose=false)
-  { return suftrie.build(lf,ng,tagids,start_tagid,verbose); };
+  {
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
+    return suftrie.build(lf,ng,tagids,start_tagid,verbose);
+#else
+    return false;
+#endif
+  };
 
   /** Pre-compute runtime log-probability tables: NOT called by compile(). */
   bool compute_logprobs(void);

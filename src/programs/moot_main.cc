@@ -171,9 +171,11 @@ void GetMyOptions(int argc, char **argv)
   hmm.unknown_tag_name(args.unknown_tag_arg);
   hmm.unknown_lex_threshhold = args.unknown_threshhold_arg;
   hmm.unknown_class_threshhold = args.class_threshhold_arg;
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
   hmm.suftrie.maxlen() = args.trie_depth_arg;
   hmm.suftrie.maxcount = args.trie_threshhold_arg;
   hmm.suftrie.theta    = args.trie_theta_arg;
+#endif
   hmm.save_ambiguities = args.save_ambiguities_given;
   hmm.save_mark_unknown = args.mark_unknown_given;
 #ifdef MOOT_DEBUG_ENABLED
@@ -296,8 +298,10 @@ void GetMyOptions(int argc, char **argv)
     writer->printf_raw("   Class lambdas     : lambdac0=%g, lambdac1=%g\n",
 		       exp(hmm.clambda0), exp(hmm.clambda1));
     writer->printf_raw("   Beam Width        : %g\n", exp(hmm.beamwd));
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
     writer->printf_raw("   Suffix theta      : %g\n", hmm.suftrie.theta);
     writer->printf_raw("   Suffix trie size  : %u\n", hmm.suftrie.size());
+#endif
     writer->printf_raw("\n");
     writer->put_comment_block_end();
   }

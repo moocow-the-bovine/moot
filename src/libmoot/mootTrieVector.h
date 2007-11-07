@@ -196,7 +196,10 @@ public:
   //@{
   /** Default constructor */
   TrieVector(size_t max_len=NoMaxLen, bool use_case=false)
-    : TrieVectorBase(max_len,use_case)
+    : TrieVectorBase(max_len,use_case),
+      vector_type(),
+      trie_pending(map_type()),
+      trie_default_data(data_type())
   {};
 
   /** Destructor */

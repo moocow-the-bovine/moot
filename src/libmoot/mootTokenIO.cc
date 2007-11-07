@@ -318,7 +318,7 @@ void TokenReader::carp(const char *fmt, ...)
   va_start(ap, fmt);
   vfprintf(stderr, fmt, ap);
   va_end(ap);
-  fprintf(stderr, " in \"%s\" at byte %ld: line %ld, column %ld\n",
+  fprintf(stderr, " in \"%s\" at byte %d: line %d, column %d\n",
 	  ((tr_istream
 	    && tr_istream->valid()
 	    && !tr_istream->name.empty()) ? tr_istream->name.c_str() : "(unknown)"),

@@ -60,7 +60,9 @@ namespace moot {
     /// \name Constructors etc.
     //@{
     /** Default constructor */
-    inline AssocVectorNode(void) {};
+    inline AssocVectorNode(void)
+      : PairT()
+    {};
 
     /** Constructor given key only */
     inline AssocVectorNode(const KeyT &key)
@@ -78,7 +80,7 @@ namespace moot {
     {};
 
     /** Destructor */
-    inline ~AssocVectorNode(void) {};
+    ~AssocVectorNode(void) {};
     //@}
 
     //--------------------------------------------------
@@ -166,7 +168,9 @@ namespace moot {
     /// \name Constructors etc.
     //@{
     /** Default constructor */
-    inline AssocVector(void) {};
+    AssocVector(void) 
+      : assoc_vector_type()
+    {};
 
     /** Constructor given size */
     inline AssocVector(const size_t mysize)
@@ -175,7 +179,7 @@ namespace moot {
     };
 
     /** Destructor */
-    inline ~AssocVector(void) {};
+    ~AssocVector(void) {};
     //@}
 
     //--------------------------------------------------
