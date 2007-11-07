@@ -130,10 +130,9 @@ bool mootLexfreqs::load(const char *filename)
 bool mootLexfreqs::load(FILE *file, const char *filename)
 {
   mootLexfreqsCompiler lfcomp;
-  lfcomp.srcname = strdup(filename);
+  lfcomp.srcname = filename;
   lfcomp.lexfreqs  = this;
   bool rc = (lfcomp.parse_from_file(file) != NULL);
-  free(lfcomp.srcname);
   lfcomp.srcname = NULL;
   return rc;
 }

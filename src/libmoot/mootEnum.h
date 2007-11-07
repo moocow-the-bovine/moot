@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -83,13 +83,13 @@ public:
   /** Default constructor */
   mootEnum(const NameType &unknownName)
   {
-    //ids2names.push_back(unknownName);
+    //ids2names.push_back(unknownName); //-- SEGFAULTS?
   };
 
   /** Default destructor */
   ~mootEnum(void)
   {
-    /*clear();*/
+    /*clear();*/ //-- SEGFAULTS?
   };
 
   //------ access

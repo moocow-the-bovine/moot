@@ -177,7 +177,7 @@ token:		TOKEN
 		}
 	|	COUNT
 		{
-		  $$ = new moot::mootTokString((const char *)yylloc.text);
+		  $$ = new moot::mootTokString(reinterpret_cast<const char *>(yylloc.text));
 		}
 	;
 

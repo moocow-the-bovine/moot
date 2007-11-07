@@ -29,6 +29,8 @@
 #include <mootXmlDoc.h>
 #ifdef MOOT_LIBXML_ENABLED
 
+#warning "moot libxml2 support is and always has been broken: prefer expat"
+
 #include <mootTypes.h>
 #include <mootToken.h>
 #include <mootTokenIO.h>

@@ -58,13 +58,13 @@ namespace mootBinIO {
     /** Load a single item */
     inline bool load(mootio::mistream *is, T &x) const
     {
-      return is->read((char *)&x, sizeof(T)) == sizeof(T);
+      return is->read(reinterpret_cast<char *>(&x), sizeof(T)) == sizeof(T);
     };
 
     /** Save a single item */
     inline bool save(mootio::mostream *os, const T &x) const
     {
-      return os->write((char *)&x, sizeof(T));
+      return os->write(reinterpret_cast<const char *>(&x), sizeof(T));
     };
 
     /**
@@ -82,7 +82,7 @@ namespace mootBinIO {
       //-- re-allocate if necessary
       if (saved_size > n) {
 	if (x) free(x);
-	x = (T *)malloc(saved_size*sizeof(T));
+	x = reinterpret_cast<T*>(malloc(saved_size*sizeof(T)));
 	if (!x) {
 	  n = 0;
 	  return false;
@@ -91,7 +91,7 @@ namespace mootBinIO {
 
       //-- read in items
       ByteCount wanted = sizeof(T)*saved_size;
-      if (is->read((char *)x, wanted) != wanted) return false;
+      if (is->read(reinterpret_cast<char *>(x), wanted) != wanted) return false;
       n=saved_size;
       return true;
     };
@@ -107,7 +107,7 @@ namespace mootBinIO {
       if (!size_item.save(os, n)) return false;
 
       //-- save items
-      return os->write((char *)x, n*sizeof(T));
+      return os->write(reinterpret_cast<const char *>(x), n*sizeof(T));
     };
   };
 
@@ -586,7 +586,7 @@ namespace mootBinIO {
     {
       magic = 0;
       for (string::const_iterator si = IDstring.begin(); si != IDstring.end(); si++) {
-	magic = (magic<<5)-magic + (MagicT)*si;
+	magic = (magic<<5)-magic + static_cast<MagicT>(*si);
       }
     };
   };

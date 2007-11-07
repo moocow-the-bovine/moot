@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2004-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2004-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -72,7 +72,7 @@ namespace mootio {
      * to this constructor.
      */
     micbuffer(const void *data, size_t len)
-      : cb_rdata((const char*)data),
+      : cb_rdata(reinterpret_cast<const char*>(data)),
 	cb_offset(0),
 	cb_used(len)
     {};
@@ -103,7 +103,7 @@ namespace mootio {
 
     /** Asignment to a different data buffer */
     inline void assign(const void *data, size_t len) {
-      cb_rdata  = (const char *)data;
+      cb_rdata  = reinterpret_cast<const char *>(data);
       cb_used   = len;
       cb_offset = 0;
     };
@@ -135,12 +135,12 @@ namespace mootio {
 	//-- normal case: copy local data to buf
 	memcpy(buf, cb_rdata+cb_offset, n);
 	cb_offset += n;
-	return (ByteCount)n;
+	return static_cast<ByteCount>(n);
       }
       else {
 	//-- partial read: copy some data to buf
 	memcpy(buf, cb_rdata+cb_offset, cb_used-cb_offset);
-	ByteCount nread = (ByteCount)(cb_used-cb_offset);
+	ByteCount nread = static_cast<ByteCount>(cb_used-cb_offset);
 	cb_offset = cb_used;
 	return nread;
       }
@@ -274,8 +274,8 @@ namespace mootio {
 	    size_t used,
 	    size_t alloc=0,
 	    size_t get=CB_DEFAULT_GET)
-      : micbuffer((const char *)data,used),
-	cb_wdata((char *)data),
+      : micbuffer(reinterpret_cast<const char *>(data),used),
+	cb_wdata(reinterpret_cast<char*>(data)),
 	cb_alloc(alloc),
 	cb_get(get),
 	cb_created(false)
@@ -390,11 +390,11 @@ namespace mootio {
 	size_t newalloc = size+pad;
 	if (cb_created) {
 	  //-- local buffer: we can just realloc()
-	  if (cb_wdata) cb_wdata = (char *)realloc(cb_wdata, newalloc);
-	  else cb_wdata = (char *)malloc(newalloc);
+	  if (cb_wdata) cb_wdata = reinterpret_cast<char *>(realloc(cb_wdata, newalloc));
+	  else cb_wdata = reinterpret_cast<char *>(malloc(newalloc));
 	} else {
 	  //-- user buffer: we need to slurp it
-	  char *newdata = (char *)malloc(newalloc);
+	  char *newdata = reinterpret_cast<char *>(malloc(newalloc));
 	  memcpy(newdata, cb_wdata, cb_used);
 	  cb_wdata = newdata;
 	  cb_created = true;

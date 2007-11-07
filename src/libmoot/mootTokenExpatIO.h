@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -344,7 +344,7 @@ public:
   //@{
   /** Get current line number. */
   virtual size_t line_number(void) {
-      return parser ? ((size_t)XML_GetCurrentLineNumber(parser)) : 0;
+    return parser ? static_cast<size_t>(XML_GetCurrentLineNumber(parser)) : 0;
   };
 
   /** Set current line number -- not implemented. */
@@ -352,7 +352,7 @@ public:
 
   /** Get current column number. */
   virtual size_t column_number(void) {
-      return parser ? ((size_t)XML_GetCurrentLineNumber(parser)) : 0;
+      return parser ? static_cast<size_t>(XML_GetCurrentLineNumber(parser)) : 0;
   };
 
   /** Set current column number. */
@@ -360,7 +360,7 @@ public:
 
   /** Get current byte number. */
   virtual size_t byte_number(void) {
-      return parser ? ((size_t)XML_GetCurrentByteIndex(parser)) : 0;
+      return parser ? static_cast<size_t>(XML_GetCurrentByteIndex(parser)) : 0;
   };
 
   /** Set current byte number. */

@@ -232,7 +232,7 @@ int read();
  * Rules
  *----------------------------------------------------------------------*/
 #include "mootNgramsLexer.h"
-#line 96 "mootNgramsLexer.ll"
+#line 97 "mootNgramsLexer.ll"
 #line 196 "/usr/local/share/flex++bison++/flexskel.cc"
 
 #define yy___text YY_mootNgramsLexer_TEXT
@@ -492,7 +492,7 @@ static YY_CHAR *yy_last_accepting_cpos;
 #if YY_mootNgramsLexer_DEBUG != 0
 static const short int yy_rule_linenum[9] =
     {   0,
-       98,  103,  108,  115,  123,  130,  130,  140
+       99,  104,  109,  116,  124,  131,  131,  141
     } ;
 
 #endif
@@ -637,21 +637,21 @@ do_action:      /* this label is used only to access EOF actions */
 	    goto yy_find_action;
 
 case 1:
-#line 98 "mootNgramsLexer.ll"
+#line 99 "mootNgramsLexer.ll"
 {
   // -- ignore leading whitespace
   theColumn += yyleng;
 }
 	YY_BREAK
 case 2:
-#line 103 "mootNgramsLexer.ll"
+#line 104 "mootNgramsLexer.ll"
 {
    // -- ignore comments
    theColumn += yyleng;
 }
 	YY_BREAK
 case 3:
-#line 108 "mootNgramsLexer.ll"
+#line 109 "mootNgramsLexer.ll"
 {
   // -- tab: return the current token-buffer
   //theColumn += yyleng+7; // -- interpret tab as 8 spaces
@@ -660,26 +660,26 @@ case 3:
 }
 	YY_BREAK
 case 4:
-#line 115 "mootNgramsLexer.ll"
+#line 116 "mootNgramsLexer.ll"
 {
   // -- count : return it
   //theLine++; theColumn = 0;
   theColumn += yyleng;
-  yylval->count = atof((const char *)yytext);
+  yylval->count = atof(reinterpret_cast<const char *>(yytext));
   return mootNgramsParser::COUNT;
 }
 	YY_BREAK
 case 5:
-#line 123 "mootNgramsLexer.ll"
+#line 124 "mootNgramsLexer.ll"
 {
   // -- any other text: append to the token-buffer
   theColumn += yyleng;
-  yylval->tagstr = new moot::mootTagString((const char *)yytext);
+  yylval->tagstr = new moot::mootTagString(reinterpret_cast<const char *>(yytext));
   return mootNgramsParser::TAG;
 }
 	YY_BREAK
 case 6:
-#line 130 "mootNgramsLexer.ll"
+#line 131 "mootNgramsLexer.ll"
 {
   // -- newlines : ignore
   theLine++; theColumn = 0;
@@ -687,13 +687,13 @@ case 6:
 }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 136 "mootNgramsLexer.ll"
+#line 137 "mootNgramsLexer.ll"
 {
   return 0;
 }
 	YY_BREAK
 case 8:
-#line 140 "mootNgramsLexer.ll"
+#line 141 "mootNgramsLexer.ll"
 {
   // -- huh? -- just ignore it!
   theColumn += yyleng;
@@ -701,7 +701,7 @@ case 8:
 }
 	YY_BREAK
 case 9:
-#line 146 "mootNgramsLexer.ll"
+#line 147 "mootNgramsLexer.ll"
 ECHO;
 	YY_BREAK
 #line 463 "/usr/local/share/flex++bison++/flexskel.cc"
@@ -1296,7 +1296,7 @@ void YY_mootNgramsLexer_CLASS::YY_mootNgramsLexer_INIT_BUFFER( YY_BUFFER_STATE b
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 146 "mootNgramsLexer.ll"
+#line 147 "mootNgramsLexer.ll"
 
 
 // -- co-exist with BumbleBee 'clex.h'

@@ -108,10 +108,16 @@ bool mootClassfreqs::load(const char *filename)
 bool mootClassfreqs::load(FILE *file, const char *filename)
 {
   mootClassfreqsCompiler lccomp;
+#if 0
   lccomp.srcname  = strdup(filename);
   lccomp.cfreqs  = this;
   bool rc = (lccomp.parse_from_file(file) != NULL);
   free(lccomp.srcname);
+#else
+  lccomp.srcname  = filename;
+  lccomp.cfreqs  = this;
+  bool rc = (lccomp.parse_from_file(file) != NULL);
+#endif
   lccomp.srcname = NULL;
   return rc;
 }

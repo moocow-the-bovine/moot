@@ -56,13 +56,13 @@ class mootLexfreqsCompiler : public mootLexfreqsParser {
    * objname: name to use for object when reporting errors -- default: "mootLexfreqsCompiler"
    * \b Warning: no copying is performed on this string; you must alloc&free it yourself!
    */
-  char *objname;
+  const char *objname;
 
   /**
    * srcname: name to use for current file when reporting errors -- default: "(unknown)"
    * \b Warning: no copying is performed on this string; you must alloc&free it yourself!
    */
-  char *srcname;
+  const char *srcname;
 
  public:
   // -- public methods: CONSTRUCTORS / DESTRUCTORS
@@ -89,7 +89,7 @@ class mootLexfreqsCompiler : public mootLexfreqsParser {
   /** low-level input selection: input from a C-stream. */
   void select_streams(FILE *in, FILE *out, const char *my_srcname=NULL) {
     theLexer.select_streams(in,out);
-    srcname = (char *)my_srcname;
+    srcname = my_srcname;
   };
 
   /**
@@ -98,7 +98,7 @@ class mootLexfreqsCompiler : public mootLexfreqsParser {
    */
   void select_string(const char *in, const char *my_srcname=NULL) {
     theLexer.select_string(in);
-    srcname = (char *)my_srcname;
+    srcname = my_srcname;
   };
 
   // -- low-level public methods: PARSING

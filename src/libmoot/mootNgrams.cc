@@ -95,10 +95,9 @@ bool mootNgrams::load(const char *filename)
 bool mootNgrams::load(FILE *file, const char *filename)
 {
   mootNgramsCompiler ngcomp;
-  ngcomp.srcname = strdup(filename);
+  ngcomp.srcname = filename;
   ngcomp.ngrams  = this;
   bool rc = ngcomp.parse_from_file(file) != NULL;
-  free(ngcomp.srcname);
   ngcomp.srcname = NULL;
   return rc;
 }

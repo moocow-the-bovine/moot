@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -60,18 +60,19 @@ using namespace moot;
 
 %define MEMBERS \
   //... \
-  / *----- moot::GenericLexer helpers -----* / \
+  / *----- BEGIN moot::GenericLexer helpers -----* / \
   virtual void  *mgl_yy_current_buffer_p(void) \
-                 {return (&yy_current_buffer);};\
+                 {return reinterpret_cast<void*>(&yy_current_buffer);};\
   virtual void  *mgl_yy_create_buffer(int size, FILE *unused=stdin) \
-                 {return (void*)(yy_create_buffer(unused,size));};\
+                 {return reinterpret_cast<void*>(yy_create_buffer(unused,size));};\
   virtual void   mgl_yy_init_buffer(void *buf, FILE *unused=stdin) \
-                 {yy_init_buffer((YY_BUFFER_STATE)buf,unused);};\
+                 {yy_init_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf),unused);};\
   virtual void   mgl_yy_delete_buffer(void *buf) \
-                 {yy_delete_buffer((YY_BUFFER_STATE)buf);};\
+                 {yy_delete_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
   virtual void   mgl_yy_switch_to_buffer(void *buf) \
-                 {yy_switch_to_buffer((YY_BUFFER_STATE)buf);};\
+                 {yy_switch_to_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
   virtual void   mgl_begin(int stateno); \
+  / *----- END moot::GenericLexer helpers -----* / \
   //...
 
 %define CONSTRUCTOR_INIT : \

@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -301,13 +301,13 @@ bool SuffixTrie::_build_compute_theta(const mootLexfreqs &lf,
 
   //---------------------------------------------------------------
   // theta[Brants]: compute weighted average unigram MLEs
-  ProbT ntags    = tagids.size()-2;        //-- use HMM tag count (except UNKNOWN,EOS)
-  ProbT pavg     = 1/(ProbT)ntags;         //-- use uniform distribution over tag-probs
+  ProbT ntags    = tagids.size()-2;               //-- use HMM tag count (except UNKNOWN,EOS)
+  ProbT pavg     = 1/static_cast<ProbT>(ntags);   //-- use uniform distribution over tag-probs
   //for (SuffixTrieDataT::const_iterator tdi = begin()->data.begin(); tdi != begin()->data.end(); tdi++)
   for (TagID tagid = 1; tagid < tagids.size(); tagid++)
     {
       if (tagid == eos_tagid) continue;
-      ProbT tagp = ((ProbT)ng.lookup(tagids.id2name(tagid))) / ugtotal;
+      ProbT tagp = static_cast<ProbT>(ng.lookup(tagids.id2name(tagid))) / ugtotal;
       theta += pow(tagp-pavg, 2);
     }
   theta = sqrt(theta/(ntags-1));           //-- Var_{uniform(|Tags|)} (P_t(·)) [Brants,2000]
@@ -438,7 +438,7 @@ bool SuffixTrie::_build_compute_mles(const mootLexfreqs &lf,
 #ifdef SMOOTH_EMPTY_AS_EMPTY
 	    tdi->value() /= ticount;
 #else
-	    tdi->value() = ((ProbT)ng.lookup(tagids.id2name(tdi->key()))) / ugtotal;
+	    tdi->value() =  static_cast<ProbT>(ng.lookup(tagids.id2name(tdi->key()))) / ugtotal;
 #endif
 	  }
 	}
@@ -517,8 +517,9 @@ bool SuffixTrie::_build_invert_mles(const mootNgrams &ng,
       TagID tagid = tdi->key();
 #if defined(INVERT_ACOPOST)
       ProbT tagp  = ((ProbT)ng.lookup(tagids.id2name(tagid)));
+      ProbT tagp  = static_cast<ProbT>(ng.lookup(tagids.id2name(tagid)));
 #else
-      ProbT tagp  = ((ProbT)ng.lookup(tagids.id2name(tagid))) / ugtotal;
+      ProbT tagp  = static_cast<ProbT>(ng.lookup(tagids.id2name(tagid))) / ugtotal;
 #endif
 
       if (tagp != 0) {

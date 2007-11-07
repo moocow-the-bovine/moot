@@ -182,7 +182,7 @@ lclass:		/* empty */ { $$ = 0; }
 		}
 	|	lclass COUNT
 		{
-		  lclass.insert((const char *)yylloc.text);
+		  lclass.insert(reinterpret_cast<const char *>(yylloc.text));
 		  $$ = 0;
 		}
 	;

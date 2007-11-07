@@ -165,7 +165,7 @@ void moot_strtok(const std::string &s,
  */
 char *moot_extension(const char *filename, size_t pos)
 {
-  return (char *)memrchr(filename, '.', pos);
+  return reinterpret_cast<char *>(memrchr(filename, '.', pos));
 }
 
 

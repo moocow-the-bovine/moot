@@ -669,7 +669,7 @@ case 4:
   // -- count : return it
   //theLine++; theColumn = 0;
   theColumn += yyleng;
-  yylval->count = atof((const char *)yytext);
+  yylval->count = atof(reinterpret_cast<const char *>(yytext));
   return mootLexfreqsParser::COUNT;
 }
 	YY_BREAK
@@ -678,7 +678,7 @@ case 5:
 {
   // -- any other text: append to the token-buffer
   theColumn += yyleng;
-  yylval->tokstr = new moot::mootTokString((const char *)yytext);
+  yylval->tokstr = new moot::mootTokString(reinterpret_cast<const char *>(yytext));
   return mootLexfreqsParser::TOKEN;
 }
 	YY_BREAK

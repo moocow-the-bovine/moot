@@ -95,7 +95,7 @@ void mootExpatParser::reset(void)
 
   //-- allocate/reset parse buffer
   if (!xml_buf) {
-    xml_buf = (char *)malloc(xml_buflen*sizeof(char));
+    xml_buf = reinterpret_cast<char *>(malloc(xml_buflen*sizeof(char)));
     //xml_buf = (char *)XML_GetBuffer(parser, xml_buflen*sizeof(char));
     if (!xml_buf) {
       carp("Error: could not allocate parser buffer!\n");
@@ -110,16 +110,16 @@ void mootExpatParser::reset(void)
 
     //-- setup parser: set handlers
     XML_SetXmlDeclHandler(parser,
-			  (XML_XmlDeclHandler)_xp_XmlDeclHandler);
+			  reinterpret_cast<XML_XmlDeclHandler>(_xp_XmlDeclHandler));
     XML_SetElementHandler(parser,
-			  (XML_StartElementHandler)_xp_StartElementHandler,
-			  (XML_EndElementHandler)_xp_EndElementHandler);
+			  reinterpret_cast<XML_StartElementHandler>(_xp_StartElementHandler),
+			  reinterpret_cast<XML_EndElementHandler>(_xp_EndElementHandler));
     XML_SetCharacterDataHandler(parser,
-				(XML_CharacterDataHandler)_xp_CharacterDataHandler);
+				reinterpret_cast<XML_CharacterDataHandler>(_xp_CharacterDataHandler));
     XML_SetCommentHandler(parser,
-			  (XML_CommentHandler)_xp_CommentHandler);
+			  reinterpret_cast<XML_CommentHandler>(_xp_CommentHandler));
     XML_SetDefaultHandler(parser,
-			  (XML_DefaultHandler)_xp_DefaultHandler);
+			  reinterpret_cast<XML_DefaultHandler>(_xp_DefaultHandler));
   }
 }
 

@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2004-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2004-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -202,7 +202,7 @@ namespace mootio {
       ByteCount nchars = vsnprintf(_printf_buffer, _printf_buflen, fmt, ap);
       if (nchars >= _printf_buflen) {
 	//-- oops: reallocate!
-	_printf_buffer = (char *)realloc(_printf_buffer, nchars+1);
+	_printf_buffer = reinterpret_cast<char *>(realloc(_printf_buffer, nchars+1));
 	assert(_printf_buffer != NULL);
 	_printf_buflen = nchars+1;
 	//-- ... and try again

@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -192,10 +192,10 @@ public:
     if (rc_request)
       return recode_buffer_to_buffer(rc_request, in, in_size, out, out_used, out_alloc);
 #endif
-    if (!*out) *out = (char *)malloc(in_size);
+    if (!*out) *out = reinterpret_cast<char *>(malloc(in_size));
     else if (*out_alloc < in_size) {
       free(*out);
-      *out = (char *)malloc(in_size);
+      *out = reinterpret_cast<char *>(malloc(in_size));
     }
     assert(*out != NULL);
     *out_alloc = in_size;

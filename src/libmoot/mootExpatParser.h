@@ -20,7 +20,7 @@
 */
 
 /*--------------------------------------------------------------------------
- * File: mootXmlParser.h
+ * File: mootExpatParser.h (formerly mootXmlParser.h)
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
  *   + moocow's PoS tagger : expat wrapper

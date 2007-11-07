@@ -2,11 +2,12 @@
 
 CXX ?= g++
 
-OFLAGS   ?= -g
+OFLAGS   ?= -ggdb
 IFLAGS   ?= -I..
 DEFS     ?= -DHAVE_CONFIG_H
-CFLAGS   ?= $(IFLAGS) $(DEFS) $(OFLAGS)
-CXXFLAGS ?= $(CFLAGS) -ftemplate-depth-24
+WFLAGS   ?= -Wall -Wabi
+CFLAGS   ?= $(WFLAGS) $(IFLAGS) $(DEFS) $(OFLAGS)
+CXXFLAGS ?= $(CFLAGS)
 
 LD          = $(CXX)
 LDFLAGS    ?= $(OFLAGS) -L..

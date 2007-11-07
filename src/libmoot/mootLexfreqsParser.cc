@@ -998,7 +998,7 @@ case 8:
 case 9:
 #line 179 "mootLexfreqsParser.yy"
 {
-		  yyval.tokstr = new moot::mootTokString((const char *)yylloc.text);
+		  yyval.tokstr = new moot::mootTokString(reinterpret_cast<const char *>(yylloc.text));
 		;
     break;}
 case 10:

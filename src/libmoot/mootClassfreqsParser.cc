@@ -1006,7 +1006,7 @@ case 9:
 case 10:
 #line 184 "mootClassfreqsParser.yy"
 {
-		  lclass.insert((const char *)yylloc.text);
+		  lclass.insert(reinterpret_cast<const char *>(yylloc.text));
 		  yyval.count = 0;
 		;
     break;}

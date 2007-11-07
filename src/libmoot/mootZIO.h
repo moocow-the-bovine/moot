@@ -129,7 +129,7 @@ namespace mootio {
 
     /** Write @n bytes from @buf to the stream */
     virtual bool write(const char *buf, size_t n) {
-      return zfile ? (gzwrite(zfile,buf,n) == (int)n) : false;
+      return zfile ? (gzwrite(zfile,buf,n) == static_cast<int>(n)) : false;
     };
 
     /** Write a single byte to the stream */
@@ -143,8 +143,8 @@ namespace mootio {
     };
     /** Write a C++ string to the stream */
     virtual bool puts(const std::string &s) {
-      return (zfile
-	      ? (gzwrite(zfile,s.data(),s.size()) == (int)s.size())
+      return (zfile	
+	      ? (gzwrite(zfile,s.data(),s.size()) == static_cast<int>(s.size()))
 	      : false);
     };
 

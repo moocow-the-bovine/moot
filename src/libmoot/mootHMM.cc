@@ -467,7 +467,7 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
   memset(ngprobs2, 0, (n_tags*n_tags)*sizeof(ProbT));
 #elif !defined(MOOT_HASH_TRIGRAMS)
   //-- allocate: bigrams
-  ngprobs3 = (ProbT *)malloc((n_tags*n_tags*n_tags)*sizeof(ProbT));
+  ngprobs3 = reinterpret_cast<ProbT *>(malloc((n_tags*n_tags*n_tags)*sizeof(ProbT)));
   if (!ngprobs3) {
     carp("mootHMM::compile(): Error: could not allocate trigram table.\n");
     return false;
@@ -1020,7 +1020,7 @@ bool mootHMM::estimate_wlambdas(const mootLexfreqs &lf)
 {
   //-- estimate lexical smoothing constants
   if (lf.n_tokens > 0) {
-    wlambda0 = 0.5 / (ProbT)(lf.n_tokens);
+    wlambda0 = 0.5 / static_cast<ProbT>(lf.n_tokens);
     //wlambda0 = 1.0 / (ProbT)(lf.n_tokens);
     wlambda1 = 1.0 - wlambda0;
   } else {
@@ -1037,7 +1037,7 @@ bool mootHMM::estimate_clambdas(const mootClassfreqs &cf)
 {
   //-- estimate lexical-class smoothing constants
   if (cf.totalcount > 0) {
-    clambda0 = 0.5 / (ProbT)(cf.totalcount);
+    clambda0 = 0.5 / static_cast<ProbT>(cf.totalcount);
     //clambda0 = 1.0 / (ProbT)(cf.totalcount);
     clambda1 = 1.0 - clambda0;
   } else {

@@ -49,7 +49,7 @@ namespace moot {
    */
   GenericLexer::~GenericLexer(void)
   {
-    void **current = (void**)mgl_yy_current_buffer_p();
+    void **current = reinterpret_cast<void**>(mgl_yy_current_buffer_p());
     if (current && *current) {
       mgl_yy_delete_buffer(*current);
       *current = NULL;
@@ -114,7 +114,7 @@ namespace moot {
       mglin = in;
     }
     //-- grey magic (see flex(1))
-    void **bufp = (void **)mgl_yy_current_buffer_p();
+    void **bufp = reinterpret_cast<void **>(mgl_yy_current_buffer_p());
     if (bufp && *bufp) {
       if (*bufp) mgl_yy_delete_buffer(*bufp);
       mgl_yy_switch_to_buffer(mgl_yy_create_buffer(MGL_DEFAULT_BUFFER_SIZE));

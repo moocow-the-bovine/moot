@@ -232,7 +232,7 @@ int read();
  * Rules
  *----------------------------------------------------------------------*/
 #include "mootPPLexer.h"
-#line 125 "mootPPLexer.ll"
+#line 126 "mootPPLexer.ll"
 #line 196 "/usr/local/share/flex++bison++/flexskel.cc"
 
 #define yy___text YY_mootPPLexer_TEXT
@@ -548,8 +548,8 @@ static YY_CHAR *yy_last_accepting_cpos;
 #if YY_mootPPLexer_DEBUG != 0
 static const short int yy_rule_linenum[21] =
     {   0,
-      134,  138,  142,  147,  158,  159,  160,  161,  163,  164,
-      166,  167,  168,  170,  171,  172,  174,  175,  176,  176
+      135,  139,  143,  148,  159,  160,  161,  162,  164,  165,
+      167,  168,  169,  171,  172,  173,  175,  176,  177,  177
     } ;
 
 #endif
@@ -698,28 +698,28 @@ do_action:      /* this label is used only to access EOF actions */
 //int xml_c_tmp;
 
 case 1:
-#line 134 "mootPPLexer.ll"
+#line 135 "mootPPLexer.ll"
 {
   theColumn += yyleng;
   return EOS;
 }
 	YY_BREAK
 case 2:
-#line 138 "mootPPLexer.ll"
+#line 139 "mootPPLexer.ll"
 {
   theColumn += yyleng;
   return XML_START_TAG;
 }
 	YY_BREAK
 case 3:
-#line 142 "mootPPLexer.ll"
+#line 143 "mootPPLexer.ll"
 {
   theColumn += yyleng;
   return XML_END_TAG;
 }
 	YY_BREAK
 case 4:
-#line 147 "mootPPLexer.ll"
+#line 148 "mootPPLexer.ll"
 {
   theColumn += yyleng;
   //-- character entity: translate (weird!)
@@ -733,77 +733,77 @@ case 4:
 }
 	YY_BREAK
 case 5:
-#line 158 "mootPPLexer.ll"
-{ theColumn += yyleng; return XML_ENTITY; }
-	YY_BREAK
-case 6:
 #line 159 "mootPPLexer.ll"
 { theColumn += yyleng; return XML_ENTITY; }
 	YY_BREAK
-case 7:
+case 6:
 #line 160 "mootPPLexer.ll"
 { theColumn += yyleng; return XML_ENTITY; }
 	YY_BREAK
-case 8:
+case 7:
 #line 161 "mootPPLexer.ll"
 { theColumn += yyleng; return XML_ENTITY; }
 	YY_BREAK
+case 8:
+#line 162 "mootPPLexer.ll"
+{ theColumn += yyleng; return XML_ENTITY; }
+	YY_BREAK
 case 9:
-#line 163 "mootPPLexer.ll"
+#line 164 "mootPPLexer.ll"
 { theColumn += yyleng; return INTEGER; }
 	YY_BREAK
 case 10:
-#line 164 "mootPPLexer.ll"
+#line 165 "mootPPLexer.ll"
 { theColumn += yyleng; return FLOAT; }
 	YY_BREAK
 case 11:
-#line 166 "mootPPLexer.ll"
-{ theColumn += yyleng; return WORD; }
-	YY_BREAK
-case 12:
 #line 167 "mootPPLexer.ll"
 { theColumn += yyleng; return WORD; }
 	YY_BREAK
-case 13:
+case 12:
 #line 168 "mootPPLexer.ll"
+{ theColumn += yyleng; return WORD; }
+	YY_BREAK
+case 13:
+#line 169 "mootPPLexer.ll"
 { theColumn += yyleng; return WORD; }
 	YY_BREAK
 case 14:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 170 "mootPPLexer.ll"
+#line 171 "mootPPLexer.ll"
 { theColumn++; return EOS; }
 	YY_BREAK
 case 15:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 171 "mootPPLexer.ll"
+#line 172 "mootPPLexer.ll"
 { theColumn++; return EOS; }
 	YY_BREAK
 case 16:
-#line 172 "mootPPLexer.ll"
+#line 173 "mootPPLexer.ll"
 { theColumn+=yyleng; return PUNCT; }
 	YY_BREAK
 case 17:
-#line 174 "mootPPLexer.ll"
+#line 175 "mootPPLexer.ll"
 { theColumn+=yyleng; /* do nothing */ }
 	YY_BREAK
 case 18:
-#line 175 "mootPPLexer.ll"
+#line 176 "mootPPLexer.ll"
 { theLine++; theColumn=0; }
 	YY_BREAK
 case 19:
-#line 176 "mootPPLexer.ll"
+#line 177 "mootPPLexer.ll"
 { theColumn++; return UNKNOWN; }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 178 "mootPPLexer.ll"
+#line 179 "mootPPLexer.ll"
 { return PPEOF; }
 	YY_BREAK
 case 21:
-#line 180 "mootPPLexer.ll"
+#line 181 "mootPPLexer.ll"
 ECHO;
 	YY_BREAK
 #line 463 "/usr/local/share/flex++bison++/flexskel.cc"
@@ -1394,7 +1394,7 @@ void YY_mootPPLexer_CLASS::YY_mootPPLexer_INIT_BUFFER( YY_BUFFER_STATE b, FILE *
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 180 "mootPPLexer.ll"
+#line 181 "mootPPLexer.ll"
 
 /*----------------------------------------------------------------------
  * moot::GenericLexer requirements
