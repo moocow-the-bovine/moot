@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -77,13 +77,13 @@ public:
   /** Default constructor */
   mootEnum(void)
   {
-    //ids2names.push_back(NameType()); //-- SEGFAULTS?
+    unknown_name(NameType());
   };
   
   /** Default constructor */
   mootEnum(const NameType &unknownName)
   {
-    //ids2names.push_back(unknownName);
+    unknown_name(unknownName);
   };
 
   /** Default destructor */
@@ -154,13 +154,14 @@ public:
     return id;
   };
 
-  /** Clears all mappings, but retains "unknown" name. */
+  /** Clears all mappings, but retains "unknown" name */
   inline void clear(void)
   {
     names2ids.clear();
     //--
-    //ids2names.resize(1); //-- keep "unknown" name
-    ids2names.clear();     //-- clear *everything*
+    ids2names.resize(1); //-- keep "unknown" name
+    //--
+    //ids2names.clear();     //-- clear *everything*
   };
 };
 

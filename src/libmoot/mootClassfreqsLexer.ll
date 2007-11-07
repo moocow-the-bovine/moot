@@ -63,18 +63,19 @@ using namespace moot;
   public: \
     /** virtual destructor to shut up gcc */\
     virtual ~mootClassfreqsLexer(void) {};\
-  /* moot::GenericLexer helpers */ \
+  /*----- BEGIN moot::GenericLexer helpers -----*/ \
   virtual void  *mgl_yy_current_buffer_p(void) \
-                 {return (&yy_current_buffer);};\
+                 {return reinterpret_cast<void*>(&yy_current_buffer);};\
   virtual void  *mgl_yy_create_buffer(int size, FILE *unused=stdin) \
-                 {return (void*)(yy_create_buffer(unused,size));};\
+                 {return reinterpret_cast<void*>(yy_create_buffer(unused,size));};\
   virtual void   mgl_yy_init_buffer(void *buf, FILE *unused=stdin) \
-                 {yy_init_buffer((YY_BUFFER_STATE)buf,unused);};\
+                 {yy_init_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf),unused);};\
   virtual void   mgl_yy_delete_buffer(void *buf) \
-                 {yy_delete_buffer((YY_BUFFER_STATE)buf);};\
+                 {yy_delete_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
   virtual void   mgl_yy_switch_to_buffer(void *buf) \
-                 {yy_switch_to_buffer((YY_BUFFER_STATE)buf);};\
-  virtual void   mgl_begin(int stateno);
+                 {yy_switch_to_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
+  virtual void   mgl_begin(int stateno); \
+  /*----- END moot::GenericLexer helpers -----*/
 
 %define CONSTRUCTOR_INIT :\
   GenericLexer("mootClassfreqsLexer")
@@ -107,7 +108,7 @@ textorsp   [^\n\r\t]
 
 ({whitespace}*)"\t"({whitespace}*) {
   // -- tab: return the current token-buffer
-  theColumn += (((int)theColumn/8)+1)*8 + (yyleng ? yyleng-1 : 0);
+  theColumn += (static_cast<int>(theColumn/8)+1)*8 + (yyleng ? yyleng-1 : 0);
   return '\t';
 }
 
@@ -115,14 +116,14 @@ textorsp   [^\n\r\t]
   // -- count : return it
   //theLine++; theColumn = 0;
   theColumn += yyleng;
-  yylval->count = atof((const char *)yytext);
+  yylval->count = atof(reinterpret_cast<const char *>(yytext));
   return mootClassfreqsParser::COUNT;
 }
 
 {textchar}+ {
   // -- text characters: just return
   theColumn += yyleng;
-  yylval->tagstr = new moot::mootTagString((const char *)yytext);
+  yylval->tagstr = new moot::mootTagString(reinterpret_cast<const char *>(yytext));
   return mootClassfreqsParser::TAG;
 }
 

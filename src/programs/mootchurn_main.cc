@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2004-2006 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2004-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -56,7 +56,7 @@ using namespace mootio;
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-char *PROGNAME = "mootchurn";
+const char *PROGNAME = "mootchurn";
 
 // files
 mifstream in;
@@ -149,11 +149,11 @@ void GetMyOptions(int argc, char **argv)
 #ifdef MOOT_EXPAT_ENABLED
   //-- io: encoding: reader
   if (ifmt&tiofXML && args.input_encoding_given) {
-    ((TokenReaderExpat *)reader)->setEncoding(string(args.input_encoding_arg));
+    reinterpret_cast<TokenReaderExpat *>(reader)->setEncoding(args.input_encoding_arg);
   }
   //-- io: encoding: writer
   if (ofmt&tiofXML && args.output_encoding_given) {
-    ((TokenWriterExpat *)writer)->setEncoding(string(args.output_encoding_arg));
+    reinterpret_cast<TokenWriterExpat *>(writer)->setEncoding(args.input_encoding_arg);
   }
 #endif // MOOT_EXPAT_ENABLED
 
@@ -179,12 +179,12 @@ void print_summary(FILE *file)
   fprintf(file, "%%%%    - Output Format       : \"%s\"\n",
 	  TokenIO::format_canonical_string(ofmt).c_str());
   fprintf(file, "%%%%  + General\n");
-  fprintf(file, "%%%%    - Files Processed     : %9ld file(s)\n", nfiles);
-  fprintf(file, "%%%%    - Sentences Processed : %9ld sent\n", nsents);
-  fprintf(file, "%%%%    - Tokens Processed    : %9ld tok\n", ntokens);
+  fprintf(file, "%%%%    - Files Processed     : %9u file(s)\n", static_cast<unsigned int>(nfiles));
+  fprintf(file, "%%%%    - Sentences Processed : %9u sent\n",    static_cast<unsigned int>(nsents));
+  fprintf(file, "%%%%    - Tokens Processed    : %9u tok\n",     static_cast<unsigned int>(ntokens));
   fprintf(file, "%%%%  + Performance\n");
   fprintf(file, "%%%%    - Processing Time     : %12.2f sec\n", elapsed);
-  fprintf(file, "%%%%    - Throughput Rate     : %12.2f tok/sec\n", (double)ntokens/elapsed);
+  fprintf(file, "%%%%    - Throughput Rate     : %12.2f tok/sec\n", static_cast<double>(ntokens)/elapsed);
   fprintf(file,
 	  "%%%%---------------------------------------------------------------------\n");
 }
@@ -267,7 +267,7 @@ int main (int argc, char **argv)
 
   //-- report summary
   if (args.verbose_arg >= vlSummary) {
-    elapsed = ((double)clock()) / CLOCKS_PER_SEC;
+    elapsed = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
     print_summary(stderr);
   }
 

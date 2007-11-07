@@ -159,6 +159,13 @@ mootEventLexer.o: mootEventLexer.h mootEvent.h
 #mootAlphabetParser.h: $(BISONXX_DEPS)
 #mootAlphabetParser.cc: $(BISONXX_DEPS)
 
+##----------------------------------------------------
+## Additional rules
+
+mootNoConfig.h: mootAutoConfig.h.in
+	rm -f "$@"
+	cp "$<" "$@"
+
 ##-----------------------------------------------------------------------
 ## headers
 ##-----------------------------------------------------------------------
@@ -167,7 +174,10 @@ mootEventLexer.o: mootEventLexer.h mootEvent.h
 #pkginclude_HEADERS = ${hfile_1} ... ${hfile_N}
 pkginclude_HEADERS = \
 	\
+	moot.h \
 	mootConfig.h \
+	mootNoConfig.h \
+	mootAutoConfig.h \
 	\
 	mootAssocVector.h \
 	mootTrieVector.h \

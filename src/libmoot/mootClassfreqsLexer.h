@@ -86,22 +86,23 @@ using namespace moot;
   public: \
     /** virtual destructor to shut up gcc */\
     virtual ~mootClassfreqsLexer(void) {};\
-  /* moot::GenericLexer helpers */ \
+  /*----- BEGIN moot::GenericLexer helpers -----*/ \
   virtual void  *mgl_yy_current_buffer_p(void) \
-                 {return (&yy_current_buffer);};\
+                 {return reinterpret_cast<void*>(&yy_current_buffer);};\
   virtual void  *mgl_yy_create_buffer(int size, FILE *unused=stdin) \
-                 {return (void*)(yy_create_buffer(unused,size));};\
+                 {return reinterpret_cast<void*>(yy_create_buffer(unused,size));};\
   virtual void   mgl_yy_init_buffer(void *buf, FILE *unused=stdin) \
-                 {yy_init_buffer((YY_BUFFER_STATE)buf,unused);};\
+                 {yy_init_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf),unused);};\
   virtual void   mgl_yy_delete_buffer(void *buf) \
-                 {yy_delete_buffer((YY_BUFFER_STATE)buf);};\
+                 {yy_delete_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
   virtual void   mgl_yy_switch_to_buffer(void *buf) \
-                 {yy_switch_to_buffer((YY_BUFFER_STATE)buf);};\
-  virtual void   mgl_begin(int stateno);
-#line 79 "mootClassfreqsLexer.ll"
+                 {yy_switch_to_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
+  virtual void   mgl_begin(int stateno); \
+  /*----- END moot::GenericLexer helpers -----*/
+#line 80 "mootClassfreqsLexer.ll"
 #define YY_mootClassfreqsLexer_CONSTRUCTOR_INIT  :\
   GenericLexer("mootClassfreqsLexer")
-#line 96 "mootClassfreqsLexer.ll"
+#line 97 "mootClassfreqsLexer.ll"
 #line 52 "/usr/local/share/flex++bison++/flexskel.h"
 
 
@@ -353,7 +354,7 @@ class YY_mootClassfreqsLexer_CLASS YY_mootClassfreqsLexer_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 151 "mootClassfreqsLexer.ll"
+#line 152 "mootClassfreqsLexer.ll"
 #endif
 #line 302 "/usr/local/share/flex++bison++/flexskel.h"
 

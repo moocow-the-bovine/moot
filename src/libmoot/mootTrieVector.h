@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,8 @@
 
 #ifndef MOOT_TRIE_VECTOR_H
 #define MOOT_TRIE_VECTOR_H
+
+#include <mootConfig.h>
 
 #undef MOOT_TRIE_VECTOR_DEBUG
 
@@ -111,10 +113,10 @@ public:
 
 public:
   /** Failure flag for node searches */
-  static const NodeId NoNode   = (size_t)-1;
+  static const NodeId NoNode   = static_cast<size_t>(-1);
 
   /** Default maximum trie depth */
-  static const size_t NoMaxLen = (size_t)-1;
+  static const size_t NoMaxLen = static_cast<size_t>(-1);
 
 public:
   size_t   trie_maxlen;        ///< maximum trie depth

@@ -305,7 +305,7 @@ mootTokenType TokenReader::get_sentence(void)
   }
 
   tr_token = tr_token_old;
-  return (mootTokenType)lxtyp;  
+  return static_cast<mootTokenType>(lxtyp);
 }
 
 /*------------------------------------------------------------
@@ -353,7 +353,7 @@ void TokenReaderNative::from_mstream(mootio::mistream *mis)
 mootTokenType TokenReaderNative::get_token(void)
 {
   tr_token = lexer.mtoken = &(lexer.mtoken_default); //-- grab to lexer-internal token
-  return (mootTokenType)(lexer.yylex());
+  return static_cast<mootTokenType>(lexer.yylex());
 };
 
 /*------------------------------------------------------------
@@ -371,7 +371,7 @@ mootTokenType TokenReaderNative::get_sentence(void)
     lxtyp = lexer.yylex();
   }
   tr_sentence->pop_back();
-  return (mootTokenType)lxtyp;
+  return static_cast<mootTokenType>(lxtyp);
 };
 
 
@@ -400,7 +400,7 @@ void TokenWriter::printf_comment(const char *fmt, ...)
   len = vasprintf(&buf, fmt, ap);
   va_end(ap);
   if (len>=0 && buf) {
-    put_comment_buffer(buf,(size_t)len);
+    put_comment_buffer(buf,static_cast<size_t>(len));
     free(buf);
   }
 }

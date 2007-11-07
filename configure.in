@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.6-pre2])
+define([THE_PACKAGE_VERSION], [2.0.6-pre3])
 define([THE_PACKAGE_MAINTAINER],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -19,7 +19,7 @@ dnl use automake
 AM_INIT_AUTOMAKE(THE_PACKAGE_NAME, THE_PACKAGE_VERSION)
 
 dnl use autoheader
-AM_CONFIG_HEADER([src/libmoot/mootConfig.h])
+AM_CONFIG_HEADER([src/libmoot/mootAutoConfig.h])
 
 dnl default prefix
 AC_PREFIX_DEFAULT(/usr/local)
@@ -515,6 +515,25 @@ fi
 ## /libxml2
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## suffix tries?
+##
+AC_ARG_ENABLE(suffix-trie,
+	AC_HELP_STRING([--disable-suffix-trie],
+	               [Disable all support for (buggy) suffix tries]),
+	[ac_cv_enable_suffix_trie="$enableval"],
+	[ac_cv_enable_suffix_trie="yes"])
+
+if test "$ac_cv_enable_suffix_trie" != "no" ; then
+  AC_DEFINE(MOOT_ENABLE_SUFFIX_TRIE,1,[Define this to enable support for suffix tries])
+  CONFIG_OPTIONS="$CONFIG_OPTIONS SUFFIX_TRIE=1"
+else
+  CONFIG_OPTIONS="$CONFIG_OPTIONS SUFFIX_TRIE=0"
+fi
+##
+## /suffix tries
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 ##------------------------------------------------------------
 ## check for perl
@@ -628,7 +647,7 @@ if test "$moot_doc_formats" != "none" ; then
   AC_ARG_VAR(DOXY_FILTER,[doxygen input filter; "no" to disable])
   AC_MSG_CHECKING([for doxygen input filter])
   if test -z "$DOXY_FILTER"; then
-    DOXY_SRCDIR="`find ${srcdir}/doc/ -name 'lib*' -print | head -n1`"
+    DOXY_SRCDIR="`find ${srcdir}/doc/ -name 'libmoot*' -print | head -n1`"
     if test -d "$DOXY_SRCDIR"; then
       DOXY_SRCDIR=`cd "$DOXY_SRCDIR"; pwd`
       DOXY_FILTER="$PERL $DOXY_SRCDIR/doxy-filter.perl"
@@ -861,7 +880,7 @@ AC_SUBST(BINDIST_OS)
 dnl ---------------------------------------------------------------
 dnl cxxflags: template depth
 dnl
-CXXFLAGS="$CXXFLAGS -ftemplate-depth-24"
+#CXXFLAGS="$CXXFLAGS -ftemplate-depth-24"
 dnl
 dnl cxxflags: template depth
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

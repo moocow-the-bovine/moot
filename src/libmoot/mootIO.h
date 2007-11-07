@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,8 @@
 
 #ifndef _MOOT_IO_H
 #define _MOOT_IO_H
+
+#include <mootConfig.h>
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -130,7 +132,7 @@ namespace mootio {
     ///\name Constructors etc.
     //@{
     /** Default constructor */
-    mistream(void) {};
+    mistream(void) : mstream() {};
 
     /** Destructor */
     virtual ~mistream(void) {};
@@ -153,7 +155,7 @@ namespace mootio {
       for (c = this->getbyte(); nread < n && c != EOF; nread++, c = this->getbyte()) {
 	*buf++ = c;
       }
-      return (ByteCount)nread;
+      return static_cast<ByteCount>(nread);
     };
 
     /** Read a single line of data into @s, using delimiters from @delim.
@@ -166,7 +168,7 @@ namespace mootio {
       int c;
       s.clear();
       for (c = this->getbyte(); c != EOF; nread++, c = this->getbyte()) {
-	s.push_back((char)c);
+	s.push_back(static_cast<char>(c));
 	if (delim.find(c) != delim.npos) break;
       }
       return nread ? nread : EOF;
@@ -187,7 +189,7 @@ namespace mootio {
     ///\name Constructors etc.
     //@{
     /** Default constructor */
-    mostream(void) {};
+    mostream(void) : mstream() {};
 
     /** Destructor */
     virtual ~mostream(void) {};

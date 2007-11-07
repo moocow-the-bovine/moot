@@ -29,6 +29,8 @@
 #ifndef _moot_UTILS_H
 #define _moot_UTILS_H
 
+#include <mootConfig.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <string>
@@ -269,9 +271,9 @@ namespace moot {
   class cmdutil_file_churner {
   public:
     // -- command-line data
-    char  *progname;  /**< Name of the running program (for error reporting) */
-    char **inputs;    /**< Input files/file-lists to be chruned (i.e. argv) */
-    int    ninputs;   /**< Number of inputs given (i.e. argc) */
+    const char   *progname;  /**< Name of the running program (for error reporting) */
+    char        **inputs;    /**< Input files/file-lists to be chruned (i.e. argv) */
+    int           ninputs;   /**< Number of inputs given (i.e. argc) */
 
     // -- operation flags
     bool use_list;        /**< Whether inputs are filenames or list-filenames */
@@ -289,9 +291,9 @@ namespace moot {
 
   public:
     /** Constructor */
-    cmdutil_file_churner(char *my_progname=NULL,
+    cmdutil_file_churner(const char *my_progname=NULL,
 			 char **my_inputs=NULL,
-			 int my_ninputs=0,
+			 int  my_ninputs=0,
 			 bool my_use_list=false,
 			 bool my_paranoid=true)
       : progname(my_progname),

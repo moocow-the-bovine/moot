@@ -107,6 +107,7 @@ typedef struct {
    /* private instance members go here */ \
   public: \
    /* public methods */ \
+   virtual ~mootLexfreqsParser(void) {}; \
    /* report warnings */\
    virtual void yywarn(const char *msg) { \
       yycarp("mootLexfreqsParser: Warning: %s", msg);\
@@ -177,7 +178,7 @@ token:		TOKEN
 		}
 	|	COUNT
 		{
-		  $$ = new moot::mootTokString((const char *)yylloc.text);
+		  $$ = new moot::mootTokString(reinterpret_cast<const char *>(yylloc.text));
 		}
 	;
 

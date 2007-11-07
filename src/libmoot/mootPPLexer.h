@@ -107,25 +107,26 @@ using namespace moot;
     /** make g++ happy */\
     virtual ~mootPPLexer(void) {}; \
     \
-  /** mootGenericLexer requirements */ \
+  /*----- BEGIN moot::GenericLexer helpers -----*/ \
   virtual void  *mgl_yy_current_buffer_p(void) \
-                 {return (&yy_current_buffer);};\
+                 {return reinterpret_cast<void*>(&yy_current_buffer);};\
   virtual void  *mgl_yy_create_buffer(int size, FILE *unused=stdin) \
-                 {return (void*)(yy_create_buffer(unused,size));};\
+                 {return reinterpret_cast<void*>(yy_create_buffer(unused,size));};\
   virtual void   mgl_yy_init_buffer(void *buf, FILE *unused=stdin) \
-                 {yy_init_buffer((YY_BUFFER_STATE)buf,unused);};\
+                 {yy_init_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf),unused);};\
   virtual void   mgl_yy_delete_buffer(void *buf) \
-                 {yy_delete_buffer((YY_BUFFER_STATE)buf);};\
+                 {yy_delete_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
   virtual void   mgl_yy_switch_to_buffer(void *buf) \
-                 {yy_switch_to_buffer((YY_BUFFER_STATE)buf);};\
-  virtual void   mgl_begin(int stateno);
-#line 100 "mootPPLexer.ll"
+                 {yy_switch_to_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
+  virtual void   mgl_begin(int stateno); \
+  /*----- END moot::GenericLexer helpers -----*/
+#line 101 "mootPPLexer.ll"
 #define YY_mootPPLexer_CONSTRUCTOR_INIT  : \
   GenericLexer("mootPPLexer"), \
   ntokens(0), \
   output_sentence_separator("\n\n"), \
   output_token_separator("\n")
-#line 125 "mootPPLexer.ll"
+#line 126 "mootPPLexer.ll"
 #line 52 "/usr/local/share/flex++bison++/flexskel.h"
 
 
@@ -377,7 +378,7 @@ class YY_mootPPLexer_CLASS YY_mootPPLexer_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 180 "mootPPLexer.ll"
+#line 181 "mootPPLexer.ll"
 #endif
 #line 302 "/usr/local/share/flex++bison++/flexskel.h"
 

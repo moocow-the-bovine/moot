@@ -32,6 +32,8 @@
 #ifndef _moot_TYPES_H
 #define _moot_TYPES_H
 
+#include <mootConfig.h>
+
 #include <string>
 #include <map>
 #include <set>

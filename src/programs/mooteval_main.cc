@@ -50,7 +50,7 @@ using namespace mootio;
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-char *PROGNAME = "mooteval";
+const char *PROGNAME = "mooteval";
 
 // files
 mifstream file1;
@@ -178,8 +178,8 @@ void GetMyOptions(int argc, char **argv)
 #ifdef MOOT_EXPAT_ENABLED
   //-- i/o format: input: xml: encoding
   if (ifmt&tiofXML && args.input_encoding_given) {
-    ((TokenReaderExpat*)treader1)->setEncoding(args.input_encoding_arg);
-    ((TokenReaderExpat*)treader2)->setEncoding(args.input_encoding_arg);
+    reinterpret_cast<TokenReaderExpat *>(treader1)->setEncoding(args.input_encoding_arg);
+    reinterpret_cast<TokenReaderExpat *>(treader2)->setEncoding(args.input_encoding_arg);
   }
 #endif
 
@@ -264,8 +264,10 @@ int main (int argc, char **argv)
 
 	//-- check for too many 'hard' errors
 	if (nharderrors > nharderrors_max) {
-	  fprintf(stderr, "%s: too many hard errors (%ld > %ld) -- bailing out!\n",
-		  PROGNAME, nharderrors, nharderrors_max);
+	  fprintf(stderr, "%s: too many hard errors (%u > %u) -- bailing out!\n",
+		  PROGNAME,
+		  static_cast<unsigned int>(nharderrors),
+		  static_cast<unsigned int>(nharderrors_max));
 	  break;
 	}
 
@@ -319,8 +321,10 @@ int main (int argc, char **argv)
 	    continue;
 	  }
 	  //-- report real eos mismatch
-	  fprintf(stderr, "%s: sentence lengths differ at lines %ld/%ld!\n",
-		  PROGNAME, treader1->line_number(), treader2->line_number());
+	  fprintf(stderr, "%s: sentence lengths differ at lines %u/%u!\n",
+		  PROGNAME,
+		  static_cast<unsigned int>(treader1->line_number()),
+		  static_cast<unsigned int>(treader2->line_number()));
 	  nharderrors++;
 
 	  if (tt1 == TokTypeEOS) {
@@ -352,8 +356,10 @@ int main (int argc, char **argv)
 	  }
 
 	  //-- report real eof mismatch
-	  fprintf(stderr, "%s: file lengths differ at lines %ld/%ld!\n",
-		  PROGNAME, treader1->line_number(), treader2->line_number());
+	  fprintf(stderr, "%s: file lengths differ at lines %u/%u!\n",
+		  PROGNAME,
+		  static_cast<unsigned int>(treader1->line_number()),
+		  static_cast<unsigned int>(treader2->line_number()));
 	  nharderrors++;
 	  continue;
 	}
@@ -475,12 +481,12 @@ void print_summary(TokenWriter *tw)
   //----------------------------------------------------
   // Accuracy
   tw->printf_raw("  + Tokens Equal  (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  ntokens-ntokmisses, 100.0*(double)(ntokens-ntokmisses)/(double)ntokens,
-	  ntokmisses, 100.0*(double)(ntokmisses)/(double)ntokens);
+		 ntokens-ntokmisses, 100.0*static_cast<double>(ntokens-ntokmisses)/static_cast<double>(ntokens),
+		 ntokmisses, 100.0*static_cast<double>(ntokmisses)/static_cast<double>(ntokens));
 
   tw->printf_raw("  + Tags Equal    (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  ntokens-nbestmisses, 100.0*(double)(ntokens-nbestmisses)/(double)ntokens,
-	  nbestmisses, 100.0*(double)(nbestmisses)/(double)ntokens);
+		 ntokens-nbestmisses, 100.0*static_cast<double>(ntokens-nbestmisses)/static_cast<double>(ntokens),
+		 nbestmisses, 100.0*static_cast<double>(nbestmisses)/static_cast<double>(ntokens));
 
   tw->printf_raw("===================================================================\n");
   tw->put_comment_block_end();
@@ -504,28 +510,30 @@ void print_summary_for_file(TokenWriter *tw,
   //----------------------------------------------------
   // File-N
   tw->printf_raw("    - Avg. Class Size   : %39.2f\n",
-	  (double)nanls/(double)(ntokens-nempties)
-	  );
+		 static_cast<double>(nanls)/static_cast<double>(ntokens-nempties)
+		 );
   tw->printf_raw("    - Class Given (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  ntokens-nempties, 100.0*(double)(ntokens-nempties)/(double)ntokens,
-	  nempties, 100.0*(double)nempties/(double)ntokens
-	  );
+		 ntokens-nempties, 100.0*static_cast<double>(ntokens-nempties)/static_cast<double>(ntokens),
+		 nempties, 100.0*static_cast<double>(nempties)/static_cast<double>(ntokens)
+		 );
   tw->printf_raw("    - Saves       (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  nsaves, 100.0*(double)nsaves/(double)nempties,
-	  nempties-nsaves, 100.0*(double)(nempties-nsaves)/(double)nempties
-	  );
+		 nsaves, 100.0*static_cast<double>(nsaves)/static_cast<double>(nempties),
+		 nempties-nsaves, 100.0*static_cast<double>(nempties-nsaves)/static_cast<double>(nempties)
+		 );
   tw->printf_raw("    - Int. Cover  (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  ntokens-nimps, 100.0*(double)(ntokens-nimps)/(double)ntokens,
-	  nimps, 100.0*(double)nimps/(double)ntokens
-	  );
+		 ntokens-nimps, 100.0*static_cast<double>(ntokens-nimps)/static_cast<double>(ntokens),
+		 nimps, 100.0*static_cast<double>(nimps)/static_cast<double>(ntokens)
+		 );
   tw->printf_raw("    - Ext. Cover  (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  ntokens-nximps, 100.0*(double)(ntokens-nximps)/(double)ntokens,
-	  nximps, 100.0*(double)nximps/(double)ntokens
-	  );
+		 ntokens-nximps, 100.0*static_cast<double>(ntokens-nximps)/static_cast<double>(ntokens),
+		 nximps, 100.0*static_cast<double>(nximps)/static_cast<double>(ntokens)
+		 );
   tw->printf_raw("    - Disambig.   (+/-) : %9u (%6.2f%%) / %9u (%6.2f%%)\n",
-	  (ntokens-nximps-nfumbles),100.0*(double)(ntokens-nximps-nfumbles)/(double)(ntokens-nximps),
-	  nfumbles, 100.0*(double)(nfumbles)/(double)(ntokens-nximps)
-	  );
+		 (ntokens-nximps-nfumbles),
+		 100.0*static_cast<double>(ntokens-nximps-nfumbles)/static_cast<double>(ntokens-nximps),
+		 nfumbles,
+		 100.0*static_cast<double>(nfumbles)/static_cast<double>(ntokens-nximps)
+		 );
 }
 
 

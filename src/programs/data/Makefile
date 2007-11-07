@@ -19,7 +19,7 @@ SHARE_MOOT ?= $(shell cd share-moot ; pwd -P)
 
 MOOTM_BINDIR ?= $(shell cd $(SHARE_MOOT)/../../bin ; pwd -P)
 MOOTM ?= $(MOOTM_BINDIR)/mootm
-MOOTM_FLAGS ?= -a -m $(SHARE_MOOT)/moot-stts-nofeatures.fst -d1024
+MOOTM_FLAGS ?= -a -m $(SHARE_MOOT)/mootm-stts-nofeatures.gfst -s $(SHARE_MOOT)/mootm-stts.lab -d1024 -e"%"
 
 ##-- Morph: MorphConsole
 MORPHC_BINDIR ?= $(MOOTM_BINDIR)
@@ -30,7 +30,10 @@ MORPHC_FLAGS ?= \
 	-p -f
 
 ##-- Morph: Hack
-MORPHHACK ?= ./morphhack.perl
+#MORPHHACK_BEST   ?= ./morphhack.perl --best
+#MORPHHACK_NOBEST ?= ./morphhack.perl --nobest
+MORPHHACK_BEST   ?= cat
+MORPHHACK_NOBEST ?= cat
 
 ##-- convert: hack
 XMLIFY ?= ./xmlify.perl
@@ -53,8 +56,9 @@ MOOT_BINDIR   ?= $(shell cd .. ; pwd -P)
 MOOTRAIN      ?= $(MOOT_BINDIR)/mootrain
 MOOTHMM       ?= $(MOOT_BINDIR)/moot
 MOOTHMM_FLAGS ?= \
-	-a$(SUFFIX_TRIE_LEN) -A$(SUFFIX_TRIE_THRESH) --trie-theta=$(SUFFIX_THETA) \
 	-Z$(BEAM_CUTOFF)
+
+#	-a$(SUFFIX_TRIE_LEN) -A$(SUFFIX_TRIE_THRESH) --trie-theta=$(SUFFIX_THETA)
 #-d1024
 
 MOOTEVAL      ?= $(MOOT_BINDIR)/mooteval
@@ -99,13 +103,13 @@ mt: $(TEST).mt
 	$(MOOTM) -12 $(MOOTM_FLAGS) $< -o $@
 
 %.mttt: %.m0ttt $(MORPHHACK)
-	$(MORPHHACK) --best $< > $@
+	$(MORPHHACK_BEST) $< > $@
 
 %.m0t: %.t $(MOOTM)
 	$(MOOTM) $(MOOTM_FLAGS) $< -o $@
 
 %.mt: %.m0t $(MORPHHACK)
-	$(MORPHHACK) --nobest $< > $@
+	$(MORPHHACK_NOBEST) $< > $@
 
 ##-- analysis: MorphConsole
 #%.m0t: %.t $(MORPHC)

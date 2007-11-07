@@ -1,5 +1,4 @@
 /* -*- Mode: C++ -*- */
-
 /*
    libmoot : moocow's part-of-speech tagging library
    Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
@@ -28,6 +27,8 @@
 
 #ifndef _MOOT_HMM_H
 #define _MOOT_HMM_H
+
+#include <mootConfig.h>
 
 #ifdef HAVE_FLOAT_H
 # include <float.h>
@@ -1407,7 +1408,7 @@ public:
 	LexClassProbSubTable &lcps = lcprobs[cid];
 	if (!lclass.empty()) {
 	  //-- non-empty class: restrict population to class-members
-	  ProbT lcprob = log(1.0/((ProbT)lclass.size()));
+	  ProbT lcprob = log(1.0/static_cast<ProbT>(lclass.size()));
 
 	  for (LexClass::const_iterator lci = lclass.begin(); lci != lclass.end(); lci++) {
 	    lcps[*lci] = lcprob;
@@ -1415,7 +1416,7 @@ public:
 	} else {
 	  //-- empty class: use class for "unknown" token instead [HACK!]
 	  const LexProbSubTable &lps = lexprobs[0];
-	  ProbT lpprob = log(1.0/((ProbT)lps.size()));
+	  ProbT lpprob = log(1.0/static_cast<ProbT>(lps.size()));
 
 	  for (LexProbSubTable::const_iterator lpsi = lps.begin(); lpsi != lps.end(); lpsi++) {
 	    lcps[lpsi->key()] = lpprob;

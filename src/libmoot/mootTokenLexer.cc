@@ -717,7 +717,7 @@ case 2:
   if (!ignore_comments) {
     mtoken->clear();
     mtoken->toktype(TokTypeComment);
-    mtoken->textAppend((const char *)yytext+2, yyleng-3);
+    mtoken->textAppend(reinterpret_cast<const char *>(yytext)+2, yyleng-3);
     return TokTypeComment;
   }
 }
@@ -729,7 +729,7 @@ case 3:
   theColumn += yyleng;
   mtoken->clear();
   mtoken->toktype(TokTypeVanilla);
-  mtoken->text((const char *)yytext, yyleng);
+  mtoken->text(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeText;
 }
 	YY_BREAK
@@ -779,8 +779,8 @@ case YY_STATE_EOF(TOKEN):
      lasttyp = TokTypeEOS;
      break;
   }
-  mtoken->toktype((mootTokenType)lasttyp);
-  return lasttyp;;
+  mtoken->toktype(static_cast<mootTokenType>(lasttyp));
+  return lasttyp;
 }
 	YY_BREAK
 case 6:
@@ -808,7 +808,7 @@ case 7:
 #line 312 "mootTokenLexer.ll"
 {
   //-- SEPARATORS: Separator character(s): increment column nicely
-  theColumn = (((int)theColumn/8)+1)*8 + (yyleng ? yyleng-1 : 0);
+  theColumn = (static_cast<int>(theColumn/8)+1)*8;
   lasttyp = LexTypeEOA;
 }
 	YY_BREAK
@@ -851,7 +851,7 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
 {
   //-- DETAILS: looks like a tag
   theColumn += yyleng;
-  manalysis->details.append((const char*)yytext, yyleng);
+  manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeDetails;
   BEGIN(TAG);
 }
@@ -861,7 +861,7 @@ case 11:
 {
   //-- DETAILS: detail text
   theColumn += yyleng;
-  manalysis->details.append((const char *)yytext, yyleng);
+  manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeDetails;
 }
 	YY_BREAK
@@ -873,7 +873,7 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
 {
   //-- DETAILS: internal whitespace: keep it
   theColumn += yyleng;
-  manalysis->details.append((const char *)yytext, yyleng);
+  manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeDetails;
 }
 	YY_BREAK
@@ -898,8 +898,8 @@ case 14:
 {
   //-- TAG: tag text
   theColumn += yyleng;
-  manalysis->details.append((const char *)yytext, yyleng);
-  if (manalysis->tag.empty()) manalysis->tag.assign((const char *)yytext, yyleng);
+  manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
+  if (manalysis->tag.empty()) manalysis->tag.assign(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeTag;
   BEGIN(DETAILS);
 }

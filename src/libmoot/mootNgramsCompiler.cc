@@ -54,7 +54,7 @@ int mootNgramsCompiler::yylex()
   int token=theLexer.yylex(&yylval,&yylloc);
   yylloc.last_line=theLexer.theLine;
   yylloc.last_column=theLexer.theColumn;
-  yylloc.text=(char *)theLexer.yytext;
+  yylloc.text=reinterpret_cast<char *>(theLexer.yytext);
   return token;
 }
 

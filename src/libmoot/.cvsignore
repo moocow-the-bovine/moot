@@ -13,8 +13,9 @@ dummyhmm
 *.fst
 *.tfst
 *.lab
-mootConfig.h
-mootConfig.h.in
+
+mootAutoConfig.h
+mootAutoConfig.h.in
 
 #mootPPLexer.cc
 #mootPPLexer.h

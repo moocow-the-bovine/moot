@@ -151,15 +151,15 @@ using namespace moot;
     }; \
   /*-- moot::GenericLexer helpers */ \
   virtual void  *mgl_yy_current_buffer_p(void) \
-                 {return (&yy_current_buffer);}; \
+                 {return reinterpret_cast<void*>(&yy_current_buffer);}; \
   virtual void  *mgl_yy_create_buffer(int size, FILE *unused=stdin) \
-                 {return (void*)(yy_create_buffer(unused,size));};\
+                 {return reinterpret_cast<void*>(yy_create_buffer(unused,size));};\
   virtual void   mgl_yy_init_buffer(void *buf, FILE *unused=stdin) \
-                 {yy_init_buffer((YY_BUFFER_STATE)buf,unused);};\
+                 {yy_init_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf),unused);};\
   virtual void   mgl_yy_delete_buffer(void *buf) \
-                 {yy_delete_buffer((YY_BUFFER_STATE)buf);};\
+                 {yy_delete_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
   virtual void   mgl_yy_switch_to_buffer(void *buf) \
-                 {yy_switch_to_buffer((YY_BUFFER_STATE)buf);};\
+                 {yy_switch_to_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
   virtual void   mgl_begin(int stateno);
 
 
@@ -235,7 +235,7 @@ anlchar    [^ \t\n\r]
   if (!ignore_comments) {
     mtoken->clear();
     mtoken->toktype(TokTypeComment);
-    mtoken->textAppend((const char *)yytext+2, yyleng-3);
+    mtoken->textAppend(reinterpret_cast<const char *>(yytext)+2, yyleng-3);
     return TokTypeComment;
   }
 }
@@ -245,7 +245,7 @@ anlchar    [^ \t\n\r]
   theColumn += yyleng;
   mtoken->clear();
   mtoken->toktype(TokTypeVanilla);
-  mtoken->text((const char *)yytext, yyleng);
+  mtoken->text(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeText;
 }
 
@@ -287,8 +287,8 @@ anlchar    [^ \t\n\r]
      lasttyp = TokTypeEOS;
      break;
   }
-  mtoken->toktype((mootTokenType)lasttyp);
-  return lasttyp;;
+  mtoken->toktype(static_cast<mootTokenType>(lasttyp));
+  return lasttyp;
 }
 
 <TOKEN>{space}*/{eoachar} {
@@ -311,7 +311,7 @@ anlchar    [^ \t\n\r]
 
 <SEPARATORS>{tab}({space}*) {
   //-- SEPARATORS: Separator character(s): increment column nicely
-  theColumn = (((int)theColumn/8)+1)*8 + (yyleng ? yyleng-1 : 0);
+  theColumn = (static_cast<int>(theColumn/8)+1)*8;
   lasttyp = LexTypeEOA;
 }
 <SEPARATORS>""/{wordchar} {
@@ -339,7 +339,7 @@ anlchar    [^ \t\n\r]
 <DETAILS>"["_?/{tagchar} {
   //-- DETAILS: looks like a tag
   theColumn += yyleng;
-  manalysis->details.append((const char*)yytext, yyleng);
+  manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeDetails;
   BEGIN(TAG);
 }
@@ -347,14 +347,14 @@ anlchar    [^ \t\n\r]
 <DETAILS>{detchar}+ {
   //-- DETAILS: detail text
   theColumn += yyleng;
-  manalysis->details.append((const char *)yytext, yyleng);
+  manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeDetails;
 }
 
 <DETAILS>{space}+/{wordchar} {
   //-- DETAILS: internal whitespace: keep it
   theColumn += yyleng;
-  manalysis->details.append((const char *)yytext, yyleng);
+  manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeDetails;
 }
 
@@ -373,8 +373,8 @@ anlchar    [^ \t\n\r]
 <TAG>{tagchar}+ {
   //-- TAG: tag text
   theColumn += yyleng;
-  manalysis->details.append((const char *)yytext, yyleng);
-  if (manalysis->tag.empty()) manalysis->tag.assign((const char *)yytext, yyleng);
+  manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
+  if (manalysis->tag.empty()) manalysis->tag.assign(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeTag;
   BEGIN(DETAILS);
 }

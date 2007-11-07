@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2002-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -54,7 +54,7 @@ using namespace mootio;
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-char *PROGNAME = "mootpp";
+const char *PROGNAME = "mootpp";
 
 //-- files
 mofstream out;
@@ -143,7 +143,7 @@ int main (int argc, char **argv)
       switch (lxtok) { 
       case mootPPLexer::EOS:
 	if (lexer->yytext[0] != '<') {  //-- hack: check for xml markup
-	  sent.push_back(mootToken((const char *)lexer->yytext));
+	  sent.push_back(mootToken(reinterpret_cast<const char*>(lexer->yytext)));
 	  writer->put_sentence(sent);
 	  sent.clear();
 	}
@@ -156,7 +156,7 @@ int main (int argc, char **argv)
 
       default:
 	//-- write it as its own token
-	sent.push_back(mootToken((const char *)lexer->yytext));
+	sent.push_back(mootToken(reinterpret_cast<const char *>(lexer->yytext)));
 	break;
       }
     }
@@ -172,7 +172,7 @@ int main (int argc, char **argv)
 
   // -- summary
   if (args.verbose_arg > 0) {
-    double elapsed = ((double)clock()) / CLOCKS_PER_SEC;
+    double elapsed = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
 
     // -- print summary
     fprintf(stderr, "\n-----------------------------------------------------\n");
@@ -180,7 +180,7 @@ int main (int argc, char **argv)
     fprintf(stderr, "  + Files processed : %d\n", nfiles);
     fprintf(stderr, "  + Tokens found    : %d\n", lexer->ntokens);
     fprintf(stderr, "  + Time Elsapsed   : %.2f sec\n", elapsed);
-    fprintf(stderr, "  + Throughput      : %.2f toks/sec\n", (float)lexer->ntokens/elapsed);
+    fprintf(stderr, "  + Throughput      : %.2f toks/sec\n", static_cast<double>(lexer->ntokens)/elapsed);
     fprintf(stderr, "-----------------------------------------------------\n");
   }
   

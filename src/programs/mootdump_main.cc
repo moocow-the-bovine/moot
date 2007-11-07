@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2002-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -51,7 +51,7 @@ using namespace mootio;
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-char *PROGNAME = "mootdump";
+const char *PROGNAME = "mootdump";
 
 // options & file-churning
 gengetopt_args_info  args;

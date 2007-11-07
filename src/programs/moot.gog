@@ -208,6 +208,10 @@ on model file formats.
 #smoothing coefficient to be estimated.
 #"
 
+
+
+
+
 int "use-classes" L "Whether to use lexical class-probabilities." \
     arg="BOOL" \
     default="1" \
