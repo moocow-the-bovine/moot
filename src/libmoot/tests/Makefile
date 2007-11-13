@@ -5,7 +5,7 @@ CXX ?= g++
 OFLAGS   ?= -ggdb
 IFLAGS   ?= -I..
 DEFS     ?= -DHAVE_CONFIG_H
-WFLAGS   ?= -Wall -Wabi
+WFLAGS   ?= -Wall
 CFLAGS   ?= $(WFLAGS) $(IFLAGS) $(DEFS) $(OFLAGS)
 CXXFLAGS ?= $(CFLAGS)
 
@@ -14,8 +14,8 @@ LDFLAGS    ?= $(OFLAGS) -L..
 STATICLIBS ?= ../.libs/libmoot.a
 LIBS       ?= -lz -lrecode -lexpat
 
-KNOWN_TARGETS = toklex tokio tokio hmm+exit dummyhmm
-TARGETS = dummyhmm
+KNOWN_TARGETS = toklex tokio tokio hmm+exit dummyhmm kmwio dummyhmm
+TARGETS = kmwio
 
 all: $(TARGETS)
 
@@ -41,6 +41,8 @@ libs: $(STATICLIBS)
 ##-- linking
 hmm+exit: hmm+exit.o $(STATICLIBS)
 dummyhmm: dummyhmm.o $(STATICLIBS)
+
+kmwio: kmwio.o $(STATICLIBS)
 
 ##-- patterns: .o
 %.o: %.cc
