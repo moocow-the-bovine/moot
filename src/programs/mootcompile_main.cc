@@ -101,9 +101,11 @@ void GetMyOptions(int argc, char **argv)
   hmm.unknown_tag_name(args.unknown_tag_arg);
   hmm.unknown_lex_threshhold = args.unknown_threshhold_arg;
   hmm.unknown_class_threshhold = args.class_threshhold_arg;
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
   hmm.suftrie.maxlen() = args.trie_depth_arg;
   hmm.suftrie.maxcount = args.trie_threshhold_arg;
   hmm.suftrie.theta = args.trie_theta_arg;
+#endif
 }
 
 /*--------------------------------------------------------------------------
@@ -302,6 +304,7 @@ int main (int argc, char **argv)
   //-- assign beam-width
   hmm.beamwd = args.beam_width_arg;
 
+#ifdef MOOT_SUFFIX_TRIE_ENABLED
   //-- build suffix trie
   if (args.trie_depth_arg > 0) {
     if (args.verbose_arg > 1) fprintf(stderr, "%s: Building suffix trie ", PROGNAME);
@@ -313,6 +316,11 @@ int main (int argc, char **argv)
       fprintf(stderr, ": built.\n");
     }
   }
+#else
+  if (args.trie_depth_given || args.trie_threshhold_given || args.trie_theta_given) {
+    fprintf(stderr, "%s: suffix trie support disabled: ignoring trie-related options\n", PROGNAME);
+  }
+#endif
 
   //-- compute logprobs
   if (args.verbose_arg > 1)
