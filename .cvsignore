@@ -26,7 +26,7 @@ autom4te.cache
 Makefile
 Makefile.in
 
-README.txt
+#README.txt
 README.html
 configure
 config.log
