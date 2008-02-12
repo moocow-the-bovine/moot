@@ -3,7 +3,9 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
-v2.0.6 Wed, 07 Nov 2007 16:51:11 +0100
+v2.0.6 Tue, 12 Feb 2008 23:39:34 +0100
+	+ fixed buglet in deleted interpolation sanity checks in mootHMM.cc
+	  method estimate_lambdas()
         + fixed mootConfig.h to allow "safe" inclusion from header files
 	  - autoheader file is now "mootAutoConfig.h"
 	  - fixes segfaults in ~mootHMM() when <mootConfig.h> was not included
