@@ -88,28 +88,28 @@ endif
 ##--- selected: manpages (section 1: always)
 if DOC_WANT_MAN
 if HAVE_POD2MAN
-BUILD_MAN1_MANS += $(DYNAMIC_MAN1_PODS:.pod=.1)
-BUILD_MAN5_MANS += $(DYNAMIC_MAN5_PODS:.pod=.5)
+BUILD_MAN1_MANS += $(DOC_MAN1_PODS:.pod=.1)
+BUILD_MAN5_MANS += $(DOC_MAN5_PODS:.pod=.5)
 else
-STATIC_MAN1_MANS += $(DYNAMIC_MAN1_PODS:.pod=.1)
-STATIC_MAN5_MANS += $(DYNAMIC_MAN5_PODS:.pod=.5)
+STATIC_MAN1_MANS += $(DOC_MAN1_PODS:.pod=.1)
+STATIC_MAN5_MANS += $(DOC_MAN5_PODS:.pod=.5)
 endif
 endif
 
 ##-- selected: text
 if DOC_WANT_TXT
 if HAVE_POD2TEXT
-BUILD_DOCS += $(DYNAMIC_PODS:.pod=.txt)
+BUILD_DOCS += $(DOC_PODS:.pod=.txt)
 endif
 endif
 
 ##-- selected: html
 if DOC_WANT_HTML
 if HAVE_POD2HTML
-BUILD_DOCS  += $(DYNAMIC_PODS:.pod=.html)
+BUILD_DOCS  += $(DOC_PODS:.pod=.html)
 STATIC_DOCS += $(DOC_HTML_STATIC)
 else
-STATIC_DOCS += $(DYNAMIC_PODS:.pod=.html) $(DOC_HTML_STATIC)
+STATIC_DOCS += $(DOC_PODS:.pod=.html) $(DOC_HTML_STATIC)
 endif
 endif
 
@@ -117,15 +117,15 @@ endif
 if HAVE_POD2LATEX
 
 if DOC_WANT_DVI
-BUILD_DOCS += $(DYNAMIC_PODS:.pod=.dvi)
+BUILD_DOCS += $(DOC_PODS:.pod=.dvi)
 endif
 
 if DOC_WANT_PS
-BUILD_DOCS += $(DYNAMIC_PODS:.pod=.ps)
+BUILD_DOCS += $(DOC_PODS:.pod=.ps)
 endif
 
 if DOC_WANT_PDF
-BUILD_DOCS += $(DYNAMIC_PODS:.pod=.pdf)
+BUILD_DOCS += $(DOC_PODS:.pod=.pdf)
 endif
 
 endif
