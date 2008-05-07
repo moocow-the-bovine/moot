@@ -57,7 +57,7 @@ enum TokenIOFormatE {
   tiofXML       = 0x00000010,  ///< XML format
   tiofConserve  = 0x00000020,  ///< Conserve raw XML
   tiofPretty    = 0x00000040,  ///< Pretty-print (XML only)
-  tiofText      = 0x00000080,  ///< Pretty-print (XML only)
+  tiofText      = 0x00000080,  ///< literal token text included
   tiofAnalyzed  = 0x00000100,  ///< input is pre-analyzed (>= "medium rare")
   tiofTagged    = 0x00000200,  ///< input is tagged ("medium" or "well done")
   tiofPruned    = 0x00000400,  ///< pruned output
