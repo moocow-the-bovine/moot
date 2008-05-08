@@ -90,3 +90,7 @@ configure
 *.clx
 *.log
 speednotes.new
+
+tmp
+share-moot
+pre-svn
