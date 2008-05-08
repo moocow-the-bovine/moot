@@ -84,7 +84,7 @@ Makefile
 Makefile.in
 README.txt
 configure
-data
+#data
 *.123
 *.lex
 *.clx

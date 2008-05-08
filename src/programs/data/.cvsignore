@@ -55,7 +55,10 @@ share-dwdst
 hack
 tmp
 *.dat
-get*.perl
+#get*.perl
 argh.out
 savemore
 conflicts
+mootchurn
+utest.*
+utrain.*
