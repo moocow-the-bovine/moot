@@ -32,6 +32,7 @@
 #include <stdio.h>   // for EOF
 #include <string.h>  // for memcpy() and friends
 #include <assert.h>  // for sanity checks
+#include <stdlib.h>  // for memoty functions
 
 #include <mootUtils.h> // for trimming
 #include <mootIO.h>    // for everything else

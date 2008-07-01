@@ -26,6 +26,8 @@
  *   + moocow's PoS tagger : low-level I/O abstractions
  *--------------------------------------------------------------------------*/
 
+#include <stdlib.h> // for free ()
+
 #include <mootIO.h>
 #include <mootConfig.h>
 
