@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2008 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -114,7 +114,7 @@ typedef struct {
       yycarp("mootClassfreqsParser: Warning: %s", msg);\
    }; \
    /** report anything */\
-   virtual void yycarp(char *fmt, ...);
+   virtual void yycarp(const char *fmt, ...);
    
 
 %define CONSTRUCTOR_INIT : cfreqs(NULL)
@@ -228,12 +228,12 @@ newline:	'\n' { $$=0; }
  * Error Methods
  *----------------------------------------------------------------*/
 
-void mootClassfreqsParser::yyerror(char *msg)
+void mootClassfreqsParser::yyerror(const char *msg)
 {
     yycarp("mootClassfreqsParser: Error: %s\n", msg);
 }
 
-void mootClassfreqsParser::yycarp(char *fmt, ...)
+void mootClassfreqsParser::yycarp(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);

@@ -1,7 +1,7 @@
 #ifndef YY_mootLexfreqsParser_h_included
 #define YY_mootLexfreqsParser_h_included
 
-#line 1 "/usr/local/share/flex++bison++/bison.h"
+#line 1 "./bison.h"
 /* before anything */
 #ifdef c_plusplus
 #ifndef __cplusplus
@@ -16,7 +16,7 @@
 #endif
 #include <stdio.h>
 
-/* #line 14 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 14 "./bison.h" */
 #define YY_mootLexfreqsParser_LSP_NEEDED 
 #define YY_mootLexfreqsParser_LTYPE  mootLexfreqsParserLType
 #define YY_mootLexfreqsParser_DEBUG  1
@@ -76,7 +76,7 @@ typedef struct {
       yycarp("mootLexfreqsParser: Warning: %s", msg);\
    }; \
    /** report anything */\
-   virtual void yycarp(char *fmt, ...);
+   virtual void yycarp(const char *fmt, ...);
 #define YY_mootLexfreqsParser_CONSTRUCTOR_INIT  : lexfreqs(NULL), alltags(NULL)
 
 #line 127 "mootLexfreqsParser.yy"
@@ -92,7 +92,7 @@ typedef union {
  * \brief Bison++ semantic value typedef for moot-pargen parameter-file parser.
  */
 
-#line 14 "/usr/local/share/flex++bison++/bison.h"
+#line 14 "./bison.h"
  /* %{ and %header{ and %union, during decl */
 #ifndef YY_mootLexfreqsParser_COMPATIBILITY
 #ifndef YY_USE_CLASS
@@ -134,28 +134,28 @@ typedef union {
 
 #ifndef YY_mootLexfreqsParser_PURE
 
-/* #line 54 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 54 "./bison.h" */
 
-#line 54 "/usr/local/share/flex++bison++/bison.h"
+#line 54 "./bison.h"
 /* YY_mootLexfreqsParser_PURE */
 #endif
 
-/* #line 56 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 56 "./bison.h" */
 
-#line 56 "/usr/local/share/flex++bison++/bison.h"
+#line 56 "./bison.h"
 /* prefix */
 #ifndef YY_mootLexfreqsParser_DEBUG
 
-/* #line 58 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 58 "./bison.h" */
 
-#line 58 "/usr/local/share/flex++bison++/bison.h"
+#line 58 "./bison.h"
 /* YY_mootLexfreqsParser_DEBUG */
 #endif
 #ifndef YY_mootLexfreqsParser_LSP_NEEDED
 
-/* #line 61 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 61 "./bison.h" */
 
-#line 61 "/usr/local/share/flex++bison++/bison.h"
+#line 61 "./bison.h"
  /* YY_mootLexfreqsParser_LSP_NEEDED*/
 #endif
 /* DEFAULT LTYPE*/
@@ -230,12 +230,12 @@ extern YY_mootLexfreqsParser_STYPE YY_mootLexfreqsParser_LVAL;
 #endif
 
 
-/* #line 134 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 134 "./bison.h" */
 #define	TOKEN	258
 #define	COUNT	259
 
 
-#line 134 "/usr/local/share/flex++bison++/bison.h"
+#line 134 "./bison.h"
  /* #defines token */
 /* after #define tokens, before const tokens S5*/
 #else
@@ -263,16 +263,16 @@ class YY_mootLexfreqsParser_CLASS YY_mootLexfreqsParser_INHERIT
 {
 public: /* static const int token ... */
 
-/* #line 160 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 160 "./bison.h" */
 static const int TOKEN;
 static const int COUNT;
 
 
-#line 160 "/usr/local/share/flex++bison++/bison.h"
+#line 160 "./bison.h"
  /* decl const */
 public:
  int YY_mootLexfreqsParser_PARSE(YY_mootLexfreqsParser_PARSE_PARAM);
- virtual void YY_mootLexfreqsParser_ERROR(char *) YY_mootLexfreqsParser_ERROR_BODY;
+ virtual void YY_mootLexfreqsParser_ERROR(const char *) YY_mootLexfreqsParser_ERROR_BODY;
 #ifdef YY_mootLexfreqsParser_PURE
 #ifdef YY_mootLexfreqsParser_LSP_NEEDED
  virtual int  YY_mootLexfreqsParser_LEX(YY_mootLexfreqsParser_STYPE *YY_mootLexfreqsParser_LVAL,YY_mootLexfreqsParser_LTYPE *YY_mootLexfreqsParser_LLOC) YY_mootLexfreqsParser_LEX_BODY;
@@ -319,5 +319,5 @@ public:
 #endif
 /* END */
 
-/* #line 209 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 209 "./bison.h" */
 #endif

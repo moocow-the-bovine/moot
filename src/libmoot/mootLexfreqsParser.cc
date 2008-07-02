@@ -6,7 +6,7 @@
   */
 
 
-#line 1 "/usr/local/share/flex++bison++/bison.cc"
+#line 1 "./bison.cc"
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
 /* Skeleton output parser for bison,
    Copyright (C) 1984, 1989, 1990 Bob Corbett and Richard Stallman
@@ -84,7 +84,7 @@ void *alloca ();
 #include <stdio.h>
 #define YYBISON 1  
 
-/* #line 77 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 77 "./bison.cc" */
 #define YY_mootLexfreqsParser_LSP_NEEDED 
 #define YY_mootLexfreqsParser_LTYPE  mootLexfreqsParserLType
 #define YY_mootLexfreqsParser_DEBUG  1
@@ -149,7 +149,7 @@ typedef struct {
       yycarp("mootLexfreqsParser: Warning: %s", msg);\
    }; \
    /** report anything */\
-   virtual void yycarp(char *fmt, ...);
+   virtual void yycarp(const char *fmt, ...);
 #define YY_mootLexfreqsParser_CONSTRUCTOR_INIT  : lexfreqs(NULL), alltags(NULL)
 
 #line 127 "mootLexfreqsParser.yy"
@@ -165,7 +165,7 @@ typedef union {
  * \brief Bison++ semantic value typedef for moot-pargen parameter-file parser.
  */
 
-#line 77 "/usr/local/share/flex++bison++/bison.cc"
+#line 77 "./bison.cc"
 /* %{ and %header{ and %union, during decl */
 #define YY_mootLexfreqsParser_BISON 1
 #ifndef YY_mootLexfreqsParser_COMPATIBILITY
@@ -202,32 +202,32 @@ typedef union {
 
 #ifndef YY_mootLexfreqsParser_PURE
 
-/* #line 112 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 112 "./bison.cc" */
 
-#line 112 "/usr/local/share/flex++bison++/bison.cc"
+#line 112 "./bison.cc"
 /*  YY_mootLexfreqsParser_PURE */
 #endif
 
 /* section apres lecture def, avant lecture grammaire S2 */
 
-/* #line 116 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 116 "./bison.cc" */
 
-#line 116 "/usr/local/share/flex++bison++/bison.cc"
+#line 116 "./bison.cc"
 /* prefix */
 #ifndef YY_mootLexfreqsParser_DEBUG
 
-/* #line 118 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 118 "./bison.cc" */
 
-#line 118 "/usr/local/share/flex++bison++/bison.cc"
+#line 118 "./bison.cc"
 /* YY_mootLexfreqsParser_DEBUG */
 #endif
 
 
 #ifndef YY_mootLexfreqsParser_LSP_NEEDED
 
-/* #line 123 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 123 "./bison.cc" */
 
-#line 123 "/usr/local/share/flex++bison++/bison.cc"
+#line 123 "./bison.cc"
  /* YY_mootLexfreqsParser_LSP_NEEDED*/
 #endif
 
@@ -336,12 +336,12 @@ typedef
 #endif
 
 
-/* #line 230 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 230 "./bison.cc" */
 #define	TOKEN	258
 #define	COUNT	259
 
 
-#line 230 "/usr/local/share/flex++bison++/bison.cc"
+#line 230 "./bison.cc"
  /* #defines tokens */
 #else
 /* CLASS */
@@ -374,16 +374,16 @@ class YY_mootLexfreqsParser_CLASS YY_mootLexfreqsParser_INHERIT
 {
 public: /* static const int token ... */
 
-/* #line 261 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 261 "./bison.cc" */
 static const int TOKEN;
 static const int COUNT;
 
 
-#line 261 "/usr/local/share/flex++bison++/bison.cc"
+#line 261 "./bison.cc"
  /* decl const */
 public:
  int YY_mootLexfreqsParser_PARSE (YY_mootLexfreqsParser_PARSE_PARAM);
- virtual void YY_mootLexfreqsParser_ERROR(char *msg) YY_mootLexfreqsParser_ERROR_BODY;
+ virtual void YY_mootLexfreqsParser_ERROR(const char *msg) YY_mootLexfreqsParser_ERROR_BODY;
 #ifdef YY_mootLexfreqsParser_PURE
 #ifdef YY_mootLexfreqsParser_LSP_NEEDED
  virtual int  YY_mootLexfreqsParser_LEX (YY_mootLexfreqsParser_STYPE *YY_mootLexfreqsParser_LVAL,YY_mootLexfreqsParser_LTYPE *YY_mootLexfreqsParser_LLOC) YY_mootLexfreqsParser_LEX_BODY;
@@ -409,12 +409,12 @@ public:
 };
 /* other declare folow */
 
-/* #line 289 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 289 "./bison.cc" */
 const int YY_mootLexfreqsParser_CLASS::TOKEN=258;
 const int YY_mootLexfreqsParser_CLASS::COUNT=259;
 
 
-#line 289 "/usr/local/share/flex++bison++/bison.cc"
+#line 289 "./bison.cc"
  /* const YY_mootLexfreqsParser_CLASS::token */
 /*apres const  */
 YY_mootLexfreqsParser_CLASS::YY_mootLexfreqsParser_CLASS(YY_mootLexfreqsParser_CONSTRUCTOR_PARAM) YY_mootLexfreqsParser_CONSTRUCTOR_INIT
@@ -426,7 +426,7 @@ YY_mootLexfreqsParser_CONSTRUCTOR_CODE;
 };
 #endif
 
-/* #line 299 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 299 "./bison.cc" */
 
 
 #define	YYFINAL		24
@@ -536,7 +536,7 @@ static const short yycheck[] = {     8,
      6,     3,     4,     4,     0,     3,    21,    12,     7
 };
 
-#line 299 "/usr/local/share/flex++bison++/bison.cc"
+#line 299 "./bison.cc"
  /* fattrs + tables */
 
 /* parser code folow  */
@@ -951,7 +951,7 @@ yyreduce:
 #endif
 
 
-/* #line 712 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 712 "./bison.cc" */
 
   switch (yyn) {
 
@@ -1048,7 +1048,7 @@ case 18:
     break;}
 }
 
-#line 712 "/usr/local/share/flex++bison++/bison.cc"
+#line 712 "./bison.cc"
    /* the action file gets copied in in place of this dollarsign  */
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1120,7 +1120,7 @@ yyerrlab:   /* here on detecting error */
 	  count = 0;
 	  /* Start X at -yyn if nec to avoid negative indexes in yycheck.  */
 	  for (x = (yyn < 0 ? -yyn : 0);
-	       x < (sizeof(yytname) / sizeof(char *)); x++)
+	       x < static_cast<int>(sizeof(yytname) / sizeof(char *)); x++)
 	    if (yycheck[x + yyn] == x)
 	      size += strlen(yytname[x]) + 15, count++;
 	  msg = (char *) malloc(size + 15);
@@ -1132,7 +1132,7 @@ yyerrlab:   /* here on detecting error */
 		{
 		  count = 0;
 		  for (x = (yyn < 0 ? -yyn : 0);
-		       x < (sizeof(yytname) / sizeof(char *)); x++)
+		       x < static_cast<int>(sizeof(yytname) / sizeof(char *)); x++)
 		    if (yycheck[x + yyn] == x)
 		      {
 			strcat(msg, count == 0 ? ", expecting `" : " or `");
@@ -1247,7 +1247,7 @@ yyerrhandle:
 
 /* END */
 
-/* #line 909 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 909 "./bison.cc" */
 #line 220 "mootLexfreqsParser.yy"
 
 /* -------------- body section -------------- */
@@ -1256,12 +1256,12 @@ yyerrhandle:
  * Error Methods
  *----------------------------------------------------------------*/
 
-void mootLexfreqsParser::yyerror(char *msg)
+void mootLexfreqsParser::yyerror(const char *msg)
 {
     yycarp("mootLexfreqsParser: Error: %s\n", msg);
 }
 
-void mootLexfreqsParser::yycarp(char *fmt, ...)
+void mootLexfreqsParser::yycarp(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);

@@ -6,7 +6,7 @@
   */
 
 
-#line 1 "/usr/local/share/flex++bison++/bison.cc"
+#line 1 "./bison.cc"
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
 /* Skeleton output parser for bison,
    Copyright (C) 1984, 1989, 1990 Bob Corbett and Richard Stallman
@@ -84,7 +84,7 @@ void *alloca ();
 #include <stdio.h>
 #define YYBISON 1  
 
-/* #line 77 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 77 "./bison.cc" */
 #define YY_mootNgramsParser_LSP_NEEDED 
 #define YY_mootNgramsParser_LTYPE  mootNgramsParserLType
 #define YY_mootNgramsParser_DEBUG  1
@@ -153,7 +153,7 @@ typedef struct {
       yycarp("mootNgramsParser: Warning: %s", msg);\
    }; \
    /** report anything */\
-   virtual void yycarp(char *fmt, ...);   
+   virtual void yycarp(const char *fmt, ...);   
 #define YY_mootNgramsParser_CONSTRUCTOR_INIT  : \
    ngrams(NULL), \
    alltags(NULL)
@@ -172,7 +172,7 @@ typedef union {
  * \brief Bison++ semantic value typedef for moot N-Gram parameter file parser.
  */
 
-#line 77 "/usr/local/share/flex++bison++/bison.cc"
+#line 77 "./bison.cc"
 /* %{ and %header{ and %union, during decl */
 #define YY_mootNgramsParser_BISON 1
 #ifndef YY_mootNgramsParser_COMPATIBILITY
@@ -209,32 +209,32 @@ typedef union {
 
 #ifndef YY_mootNgramsParser_PURE
 
-/* #line 112 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 112 "./bison.cc" */
 
-#line 112 "/usr/local/share/flex++bison++/bison.cc"
+#line 112 "./bison.cc"
 /*  YY_mootNgramsParser_PURE */
 #endif
 
 /* section apres lecture def, avant lecture grammaire S2 */
 
-/* #line 116 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 116 "./bison.cc" */
 
-#line 116 "/usr/local/share/flex++bison++/bison.cc"
+#line 116 "./bison.cc"
 /* prefix */
 #ifndef YY_mootNgramsParser_DEBUG
 
-/* #line 118 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 118 "./bison.cc" */
 
-#line 118 "/usr/local/share/flex++bison++/bison.cc"
+#line 118 "./bison.cc"
 /* YY_mootNgramsParser_DEBUG */
 #endif
 
 
 #ifndef YY_mootNgramsParser_LSP_NEEDED
 
-/* #line 123 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 123 "./bison.cc" */
 
-#line 123 "/usr/local/share/flex++bison++/bison.cc"
+#line 123 "./bison.cc"
  /* YY_mootNgramsParser_LSP_NEEDED*/
 #endif
 
@@ -343,14 +343,14 @@ typedef
 #endif
 
 
-/* #line 230 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 230 "./bison.cc" */
 #define	TAG	258
 #define	COUNT	259
 #define	TAB	260
 #define	NEWLINE	261
 
 
-#line 230 "/usr/local/share/flex++bison++/bison.cc"
+#line 230 "./bison.cc"
  /* #defines tokens */
 #else
 /* CLASS */
@@ -383,18 +383,18 @@ class YY_mootNgramsParser_CLASS YY_mootNgramsParser_INHERIT
 {
 public: /* static const int token ... */
 
-/* #line 261 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 261 "./bison.cc" */
 static const int TAG;
 static const int COUNT;
 static const int TAB;
 static const int NEWLINE;
 
 
-#line 261 "/usr/local/share/flex++bison++/bison.cc"
+#line 261 "./bison.cc"
  /* decl const */
 public:
  int YY_mootNgramsParser_PARSE (YY_mootNgramsParser_PARSE_PARAM);
- virtual void YY_mootNgramsParser_ERROR(char *msg) YY_mootNgramsParser_ERROR_BODY;
+ virtual void YY_mootNgramsParser_ERROR(const char *msg) YY_mootNgramsParser_ERROR_BODY;
 #ifdef YY_mootNgramsParser_PURE
 #ifdef YY_mootNgramsParser_LSP_NEEDED
  virtual int  YY_mootNgramsParser_LEX (YY_mootNgramsParser_STYPE *YY_mootNgramsParser_LVAL,YY_mootNgramsParser_LTYPE *YY_mootNgramsParser_LLOC) YY_mootNgramsParser_LEX_BODY;
@@ -420,14 +420,14 @@ public:
 };
 /* other declare folow */
 
-/* #line 289 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 289 "./bison.cc" */
 const int YY_mootNgramsParser_CLASS::TAG=258;
 const int YY_mootNgramsParser_CLASS::COUNT=259;
 const int YY_mootNgramsParser_CLASS::TAB=260;
 const int YY_mootNgramsParser_CLASS::NEWLINE=261;
 
 
-#line 289 "/usr/local/share/flex++bison++/bison.cc"
+#line 289 "./bison.cc"
  /* const YY_mootNgramsParser_CLASS::token */
 /*apres const  */
 YY_mootNgramsParser_CLASS::YY_mootNgramsParser_CLASS(YY_mootNgramsParser_CONSTRUCTOR_PARAM) YY_mootNgramsParser_CONSTRUCTOR_INIT
@@ -439,7 +439,7 @@ YY_mootNgramsParser_CONSTRUCTOR_CODE;
 };
 #endif
 
-/* #line 299 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 299 "./bison.cc" */
 
 
 #define	YYFINAL		19
@@ -547,7 +547,7 @@ static const short yycheck[] = {     0,
     -1,    -1,    -1,    12,    -1,    -1,    -1,    15
 };
 
-#line 299 "/usr/local/share/flex++bison++/bison.cc"
+#line 299 "./bison.cc"
  /* fattrs + tables */
 
 /* parser code folow  */
@@ -962,7 +962,7 @@ yyreduce:
 #endif
 
 
-/* #line 712 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 712 "./bison.cc" */
 
   switch (yyn) {
 
@@ -1070,7 +1070,7 @@ case 16:
     break;}
 }
 
-#line 712 "/usr/local/share/flex++bison++/bison.cc"
+#line 712 "./bison.cc"
    /* the action file gets copied in in place of this dollarsign  */
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1142,7 +1142,7 @@ yyerrlab:   /* here on detecting error */
 	  count = 0;
 	  /* Start X at -yyn if nec to avoid negative indexes in yycheck.  */
 	  for (x = (yyn < 0 ? -yyn : 0);
-	       x < (sizeof(yytname) / sizeof(char *)); x++)
+	       x < static_cast<int>(sizeof(yytname) / sizeof(char *)); x++)
 	    if (yycheck[x + yyn] == x)
 	      size += strlen(yytname[x]) + 15, count++;
 	  msg = (char *) malloc(size + 15);
@@ -1154,7 +1154,7 @@ yyerrlab:   /* here on detecting error */
 		{
 		  count = 0;
 		  for (x = (yyn < 0 ? -yyn : 0);
-		       x < (sizeof(yytname) / sizeof(char *)); x++)
+		       x < static_cast<int>(sizeof(yytname) / sizeof(char *)); x++)
 		    if (yycheck[x + yyn] == x)
 		      {
 			strcat(msg, count == 0 ? ", expecting `" : " or `");
@@ -1269,7 +1269,7 @@ yyerrhandle:
 
 /* END */
 
-/* #line 909 "/usr/local/share/flex++bison++/bison.cc" */
+/* #line 909 "./bison.cc" */
 #line 248 "mootNgramsParser.yy"
 
 /* -------------- body section -------------- */
@@ -1278,12 +1278,12 @@ yyerrhandle:
  * Error Methods
  *----------------------------------------------------------------*/
 
-void mootNgramsParser::yyerror(char *msg)
+void mootNgramsParser::yyerror(const char *msg)
 {
     yycarp("mootNgramsParser: Error: %s\n", msg);
 }
 
-void mootNgramsParser::yycarp(char *fmt, ...)
+void mootNgramsParser::yycarp(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);

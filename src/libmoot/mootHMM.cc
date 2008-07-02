@@ -2354,7 +2354,7 @@ bool mootHMM::_binload(mootio::mistream *ibs, const char *filename)
 /*--------------------------------------------------------------------------
  * Error reporting
  *--------------------------------------------------------------------------*/
-void mootHMM::carp(char *fmt, ...)
+void mootHMM::carp(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);

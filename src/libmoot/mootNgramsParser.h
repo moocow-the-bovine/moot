@@ -1,7 +1,7 @@
 #ifndef YY_mootNgramsParser_h_included
 #define YY_mootNgramsParser_h_included
 
-#line 1 "/usr/local/share/flex++bison++/bison.h"
+#line 1 "./bison.h"
 /* before anything */
 #ifdef c_plusplus
 #ifndef __cplusplus
@@ -16,7 +16,7 @@
 #endif
 #include <stdio.h>
 
-/* #line 14 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 14 "./bison.h" */
 #define YY_mootNgramsParser_LSP_NEEDED 
 #define YY_mootNgramsParser_LTYPE  mootNgramsParserLType
 #define YY_mootNgramsParser_DEBUG  1
@@ -80,7 +80,7 @@ typedef struct {
       yycarp("mootNgramsParser: Warning: %s", msg);\
    }; \
    /** report anything */\
-   virtual void yycarp(char *fmt, ...);   
+   virtual void yycarp(const char *fmt, ...);   
 #define YY_mootNgramsParser_CONSTRUCTOR_INIT  : \
    ngrams(NULL), \
    alltags(NULL)
@@ -99,7 +99,7 @@ typedef union {
  * \brief Bison++ semantic value typedef for moot N-Gram parameter file parser.
  */
 
-#line 14 "/usr/local/share/flex++bison++/bison.h"
+#line 14 "./bison.h"
  /* %{ and %header{ and %union, during decl */
 #ifndef YY_mootNgramsParser_COMPATIBILITY
 #ifndef YY_USE_CLASS
@@ -141,28 +141,28 @@ typedef union {
 
 #ifndef YY_mootNgramsParser_PURE
 
-/* #line 54 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 54 "./bison.h" */
 
-#line 54 "/usr/local/share/flex++bison++/bison.h"
+#line 54 "./bison.h"
 /* YY_mootNgramsParser_PURE */
 #endif
 
-/* #line 56 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 56 "./bison.h" */
 
-#line 56 "/usr/local/share/flex++bison++/bison.h"
+#line 56 "./bison.h"
 /* prefix */
 #ifndef YY_mootNgramsParser_DEBUG
 
-/* #line 58 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 58 "./bison.h" */
 
-#line 58 "/usr/local/share/flex++bison++/bison.h"
+#line 58 "./bison.h"
 /* YY_mootNgramsParser_DEBUG */
 #endif
 #ifndef YY_mootNgramsParser_LSP_NEEDED
 
-/* #line 61 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 61 "./bison.h" */
 
-#line 61 "/usr/local/share/flex++bison++/bison.h"
+#line 61 "./bison.h"
  /* YY_mootNgramsParser_LSP_NEEDED*/
 #endif
 /* DEFAULT LTYPE*/
@@ -237,14 +237,14 @@ extern YY_mootNgramsParser_STYPE YY_mootNgramsParser_LVAL;
 #endif
 
 
-/* #line 134 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 134 "./bison.h" */
 #define	TAG	258
 #define	COUNT	259
 #define	TAB	260
 #define	NEWLINE	261
 
 
-#line 134 "/usr/local/share/flex++bison++/bison.h"
+#line 134 "./bison.h"
  /* #defines token */
 /* after #define tokens, before const tokens S5*/
 #else
@@ -272,18 +272,18 @@ class YY_mootNgramsParser_CLASS YY_mootNgramsParser_INHERIT
 {
 public: /* static const int token ... */
 
-/* #line 160 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 160 "./bison.h" */
 static const int TAG;
 static const int COUNT;
 static const int TAB;
 static const int NEWLINE;
 
 
-#line 160 "/usr/local/share/flex++bison++/bison.h"
+#line 160 "./bison.h"
  /* decl const */
 public:
  int YY_mootNgramsParser_PARSE(YY_mootNgramsParser_PARSE_PARAM);
- virtual void YY_mootNgramsParser_ERROR(char *) YY_mootNgramsParser_ERROR_BODY;
+ virtual void YY_mootNgramsParser_ERROR(const char *) YY_mootNgramsParser_ERROR_BODY;
 #ifdef YY_mootNgramsParser_PURE
 #ifdef YY_mootNgramsParser_LSP_NEEDED
  virtual int  YY_mootNgramsParser_LEX(YY_mootNgramsParser_STYPE *YY_mootNgramsParser_LVAL,YY_mootNgramsParser_LTYPE *YY_mootNgramsParser_LLOC) YY_mootNgramsParser_LEX_BODY;
@@ -330,5 +330,5 @@ public:
 #endif
 /* END */
 
-/* #line 209 "/usr/local/share/flex++bison++/bison.h" */
+/* #line 209 "./bison.h" */
 #endif

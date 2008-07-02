@@ -306,7 +306,7 @@ void mootExpatParser::context_dump(FILE *tofile)
 /*----------------------------------------------------
  * mootExpatParser: Error Reporting
  */
-void mootExpatParser::carp(char *fmt, ...)
+void mootExpatParser::carp(const char *fmt, ...)
 {
   fprintf(stderr, "mootExpatParser: ");
   va_list ap;
@@ -315,14 +315,14 @@ void mootExpatParser::carp(char *fmt, ...)
   va_end(ap);
 }
 
-void mootExpatParser::xpcarp(char *fmt, ...)
+void mootExpatParser::xpcarp(const char *fmt, ...)
 {
   fprintf(stderr, "mootExpatParser: ");
   va_list ap;
   va_start(ap, fmt);
   vfprintf(stderr, fmt, ap);
   va_end(ap);
-  fprintf(stderr, " in `%s' at line %d, column %d: %s\n",
+  fprintf(stderr, " in `%s' at line %lu, column %lu: %s\n",
 	  (xp_istream && !xp_istream->name.empty()
 	   ? xp_istream->name.c_str() : "(unknown)"),
 	  XML_GetCurrentLineNumber(parser),
