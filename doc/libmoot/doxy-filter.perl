@@ -41,7 +41,7 @@ do "doxy-filter.cfg";
 $CPP = $ENV{CPP} || 'cpp';
 $CPP = $config_cpp if (defined($config_cpp));
 $CPPFLAGS = (''
-	     #.' -C '         ## -- preserve comments
+	     #.' -C '        ## -- preserve comments
 	     #.' -x c++'     ## -- parse c++ code
 	     .' '.($ENV{CPPFLAGS} || '')
 	     .' '.$config_cppflags

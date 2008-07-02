@@ -20,7 +20,9 @@ v2.0.6 Tue, 12 Feb 2008 23:39:34 +0100
 	+ changed default flex++ buffer size to 16k; jives with flex++ defaults
 	  - flex++ buffer usage & re-allocation needs an overhaul
 	  - thanks to Michael Brandt for discovering the bug
-
+	+ "fixed" a bunch of deprecated implicit string-constant->(char *) conversions
+	+ renamed "configure.in" to "configure.ac"
+	
 v2.0.5 Mon, 11 Sep 2006 15:03:16 +0200
 	+ added '--recover' flag to moot, mootpp for error recovery during
 	  automated batch processing

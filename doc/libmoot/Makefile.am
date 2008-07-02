@@ -105,7 +105,7 @@ endif
 # doxygen hack: build rules (recurse in this directory)
 #-----------------------------------------------------------------------
 doxy-filter.cfg:
-	echo '$$config_cppflags .= "-C -x c++ $(patsubst %,-I%,$(DOXY_INCLUDES))";' > $@
+	echo '$$config_cppflags .= "-w -C -x c++ $(patsubst %,-I%,$(DOXY_INCLUDES))";' > $@
 	echo '$$config_cpp    = "$(CXXCPP)";' >> $@
 	echo '$$config_tmpdir = "$(PWD)";'    >> $@
 	echo '1;' >> $@
