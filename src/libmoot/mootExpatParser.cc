@@ -325,8 +325,8 @@ void mootExpatParser::xpcarp(const char *fmt, ...)
   fprintf(stderr, " in `%s' at line %lu, column %lu: %s\n",
 	  (xp_istream && !xp_istream->name.empty()
 	   ? xp_istream->name.c_str() : "(unknown)"),
-	  XML_GetCurrentLineNumber(parser),
-	  XML_GetCurrentColumnNumber(parser),
+	  static_cast<long unsigned int>(XML_GetCurrentLineNumber(parser)),
+	  static_cast<long unsigned int>(XML_GetCurrentColumnNumber(parser)),
 	  XML_ErrorString(XML_GetErrorCode(parser)));
 }
 
