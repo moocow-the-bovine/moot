@@ -66,15 +66,15 @@ typedef set<mootTagString> mootTagSet;
  *----------------------------------------------------------------------*/
 enum mootTokenTypeE {
   /* Output token-types */
-  TokTypeUnknown,   /**< we dunno what it is -- could be anything  */
-  TokTypeVanilla,   /**< plain "vanilla" token (+/-besttag,+/-analyses) */
-  TokTypeLibXML,    /**< plain XML token; much like 'Vanilla' */
-  TokTypeXMLRaw,    /**< Raw XML text (for lossless XML I/O) */
-  TokTypeComment,   /**< a comment, should be ignored by processing routines */
-  TokTypeEOS,       /**< end-of-sentence */
-  TokTypeEOF,       /**< end-of-file */
-  TokTypeUser,      /**< user-defined token type: use in conjunction with 'user_data' */
-  NTokTypes         /**< number of token-types (not a type itself) */
+  TokTypeUnknown,    /**< we dunno what it is -- could be anything  */
+  TokTypeVanilla,    /**< plain "vanilla" token (+/-besttag,+/-analyses) */
+  TokTypeLibXML,     /**< plain XML token; much like 'Vanilla' */
+  TokTypeXMLRaw,     /**< Raw XML text (for lossless XML I/O) */
+  TokTypeComment,    /**< a comment, should be ignored by processing routines */
+  TokTypeEOS,        /**< end-of-sentence */
+  TokTypeEOF,        /**< end-of-file */
+  TokTypeUser,       /**< user-defined token type: use in conjunction with 'user_data' */
+  NTokTypes          /**< number of token-types (not a type itself) */
 };
 typedef mootTokenTypeE mootTokenType;
 
