@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2008 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -203,7 +203,7 @@ namespace moot {
     va_start(ap, fmt);
     vfprintf(stderr, fmt, ap);
     va_end(ap);
-    fprintf(stderr, "in \"%s\" at line %d, column %d.\n",
+    fprintf(stderr, "in \"%s\" at line %zd, column %zd.\n",
 	    (mglin ? mglin->name.c_str() : "(unknown)"),
 	    theLine, theColumn);
   };

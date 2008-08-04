@@ -959,7 +959,7 @@ AC_ARG_ENABLE(warnings,
 
 if test "$enable_warnings" != "no" ; then
    AC_MSG_RESULT(yes)
-   moot_WFLAGS="-Wall"
+   moot_WFLAGS="-Wall -Wno-sign-compare -Wno-deprecated"
 else
   AC_MSG_RESULT(no)
   moot_WFLAGS=""

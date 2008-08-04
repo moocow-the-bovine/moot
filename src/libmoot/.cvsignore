@@ -1,6 +1,3 @@
-hmm+exit
-dummyhmm
-
 *~
 .*~
 *.o
@@ -96,3 +93,8 @@ pre-gpl
 
 utrain.*
 utest.*
+
+hmm+exit
+dummyhmm
+
+osfcn.h

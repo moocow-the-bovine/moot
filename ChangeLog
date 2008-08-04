@@ -3,7 +3,10 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
-v2.0.6 Tue, 12 Feb 2008 23:39:34 +0100
+v2.0.6 Mon, 04 Aug 2008 11:59:38 +0200
+	+ basic tests (incl. binary models) on x86_64 (lal.bbaw.de): looks good
+	+ changed printf format from "%d" to "%zd" for size_t args
+	  - complies with ISO C99, according to GNU libc docs
 	+ fixed buglet in deleted interpolation sanity checks in mootHMM.cc
 	  method estimate_lambdas()
         + fixed mootConfig.h to allow "safe" inclusion from header files
