@@ -1,4 +1,4 @@
-# Makefile for moot data
+## Makefile for moot data
 
 include config.mak
 
@@ -7,9 +7,16 @@ TEST = utest
 TRAIN = utrain
 MODEL = $(TRAIN)
 LCMODEL = $(TRAIN).lc
-label = label
 
-EVAL = $(TEST).dmt
+##-- labelling
+label_host ?= $(shell hostname)
+label_date ?= $(shell date "+%Y-%m-%d@%H-%M-%S")
+#label = label
+label ?= $(label_date).$(label_host)
+
+eval ?=dis.wdt
+
+EVAL ?= $(TEST).$(MORPHHACK_INFIX).$(eval)
 TRUTH = $(TEST).ttt
 XML_TRUTH_PRE = $(TEST).ttt.pre-xml
 XML_TRUTH = $(TEST).ttt.xml
@@ -30,10 +37,22 @@ MORPHC_FLAGS ?= \
 	-p -f
 
 ##-- Morph: Hack
-#MORPHHACK_BEST   ?= ./morphhack.perl --best
-#MORPHHACK_NOBEST ?= ./morphhack.perl --nobest
-MORPHHACK_BEST   ?= cat
-MORPHHACK_NOBEST ?= cat
+## MORPHHACK : if "yes", morphhack.perl will not be applied; otherwise not
+MORPHHACK ?=yes
+
+ifeq "$(MORPHHACK)" "yes"
+ MORPHHACK_INFIX =morphhack
+else
+ MORPHHACK_INFIX =no-morphhack
+endif
+
+MORPHHACK_PROG   =./morphhack.perl
+
+MODEL_HACKED   =$(MODEL).$(MORPHHACK_INFIX)
+LCMODEL_HACKED =$(LCMODEL).$(MORPHHACK_INFIX)
+TEST_HACKED    =$(TEST).$(MORPHHACK_INFIX)
+TRAIN_HACKED   =$(TRAIN).$(MORPHHACK_INFIX)
+
 
 ##-- convert: hack
 XMLIFY ?= ./xmlify.perl
@@ -75,14 +94,22 @@ MOOTCHURN_FLAGS ?= -d1024
 
 all:
 	@echo "Usage: make TEST=test TRAIN=train label=label {save|test}"
+
+config:
 	@echo "MOOTM_BINDIR=$(MOOTM_BINDIR)"
 	@echo "MOOT_BINDIR=$(MOOT_BINDIR)"
+	@echo "MORPHHACK=$(MORPHHACK)"
+	@echo "MODEL=$(MODEL)"
+	@echo "MODEL_HACKED=$(MODEL_HACKED)"
+	@echo "TRUTH=$(TRUTH)"
 
 
+##----------------------------------------------------------------------
 ##-- don't delete these
 .SECONDARY:
 
-##--- untagging
+##----------------------------------------------------------------------
+##-- untagging
 
 t: $(TEST).t
 
@@ -92,103 +119,133 @@ t: $(TEST).t
 %.t: %.tt
 	cut -f 1 $< > $@
 
-%.t: %.mt
+%.t: %.mrt
 	cut -f 1 $< > $@
 
-##-- morph analysis
-mt: $(TEST).mt
+##----------------------------------------------------------------------
+##-- morph analysis (* -> .mrt, .mr.ttt)
+mrt: $(TEST_HACKED).mrt
+mrttt: mr-ttt
+mr-ttt: $(TEST_HACKED).mr.ttt
 
-##-- analysis: mootm
-%.m0ttt: %.ttt $(MOOTM)
+##-- analysis: mootm (raw)
+
+%.no-morphhack.mr.ttt: %.ttt $(MOOTM)
 	$(MOOTM) -12 $(MOOTM_FLAGS) $< -o $@
-
-%.mttt: %.m0ttt $(MORPHHACK)
-	$(MORPHHACK_BEST) $< > $@
-
-%.m0t: %.t $(MOOTM)
+%.no-morphhack.mrt: %.t $(MOOTM)
 	$(MOOTM) $(MOOTM_FLAGS) $< -o $@
 
-%.mt: %.m0t $(MORPHHACK)
-	$(MORPHHACK_NOBEST) $< > $@
+%.morphhack.mr.ttt: %.no-morphhack.mr.ttt $(MORPHHACK_PROG)
+	$(MORPHHACK_PROG) --best $< > $@ || (rm -f $@; false)
+%.morphhack.mrt: %.no-morphhack.mrt $(MORPHHACK_PROG)
+	$(MORPHHACK_PROG) --nobest $< > $@
 
-##-- analysis: MorphConsole
-#%.m0t: %.t $(MORPHC)
-#	$(MORPHC) $(MORPHC_FLAGS) $< > $@
-#
-#%.m1tt: %.m0t $(MORPHHACK)
-#	$(MORPHHACK) --nobest $< > $@
-#
-#%.mttt: %.ttt
-#	$(MAKE) $*.m1tt
-#	cut -f2- $*.m1tt | paste $< - > $@
-#
-#%.mt: %.mttt
-#	cut -f 1,3- $< > $@
-#
-#%.mt: %.m1tt
-#	ln $< $@
+%.wd.ttt: %.mr.ttt
+	rm -f $@
+	ln -s $< $@
 
-##-- tagging, lower-case
-lc-tt: $(TEST).lc.tt
 
-lc-dmt: $(TEST).lc.dmt
-
-%.lc.tt: %.lc.t $(LCMODEL).lex $(LCMODEL).123 $(MOOTHMM)
-	$(MOOTHMM) -M$(LCMODEL).lex,$(LCMODEL).123 $(MOOTHMM_FLAGS) $< -o $@
-
-%.lc.vtt: %.lc.t $(LCMODEL).lex $(LCMODEL).123 $(MOOTHMM)
-	$(MOOTHMM) -M$(LCMODEL).lex,$(LCMODEL).123 $(MOOTHMM_FLAGS) -S $< -o $@
-
-%.lc.mt: %.mt
-	tr A-ZÄÖÜ a-zäöü < $< > $@
-
-%.lc.dmt: %.lc.mt $(LCMODEL).lex $(LCMODEL).123 $(MOOTHMM)
-	$(MOOTHMM) -M$(LCMODEL).lex,$(LCMODEL).123 $(MOOTHMM_FLAGS) $< -o $@
-
-%.lc.cmt: %.lc.mt $(LCMODEL).lex $(LCMODEL).123 $(LCMODEL).clx $(MOOTHMM)
-	$(MOOTHMM) -M$(LCMODEL).lex,$(LCMODEL).123,$(LCMODEL).clx $(MOOTHMM_FLAGS) $< -o $@
-
+##----------------------------------------------------------------------
 ##-- tagging
-tt: $(TEST).tt
+##   OLD_SUFF	NEW_SUFF	FLAGS				NOTES
+##   t		t		t=text
+##   tt		tt		m=text,tagged
+##   mt		mrt		mr=text,analyzed
+##   mttt	mr.ttt		wd=text,tagged,analyzed
+##   dmt	dis.wdt		wd=text,tagged,analyzed		disambiguation only, no model .clx
+##   cmt	clx.wdt		wd=text,tagged,analyzed		disambiguation with class probs
+##   vtt	S.wdt		wd=text,tagged,analyzed		saved ambiguities?
 
-dmt: $(TEST).dmt
+dmt: dis-wdt
+cmt: clx-wdt
+vtt: S-wdt
+
+dis-tt: dis-wdt
+clx-tt: clx-wdt
+S-tt: S-wdt
+
+tt: $(TEST).$(MORPHHACK_INFIX).tt
+dis-wdt: $(TEST).$(MORPHHACK_INFIX).dis.wdt
+clx-wdt: $(TEST).$(MORPHHACK_INFIX).clx.wdt
+S-wdt: $(TEST).$(MORPHHACK_INFIX).S.wdt
 
 nott:
-	rm -f *.tt *.vtt *.dmt *.cmt *.tnt-tt *.tnt-vtt
+	rm -f *.tt *.vtt *.dmt *.cmt *.tnt-tt *.tnt-vtt *.dis.wdt *.clx.wdt *.S.wdt
 
-%.tt: %.t $(MODEL).lex $(MODEL).123 $(MOOTHMM)
-	$(MOOTHMM) -M$(MODEL).lex,$(MODEL).123 $(MOOTHMM_FLAGS) $< -o $@
+%.tt: %.t $(MODEL_HACKED).lex $(MODEL_HACKED).123 $(MOOTHMM)
+	$(MOOTHMM) -M$(MODEL_HACKED).lex,$(MODEL_HACKED).123 $(MOOTHMM_FLAGS) $< -o $@
 
-%.dmt: %.mt $(MODEL).lex $(MODEL).123 $(MOOTHMM)
-	$(MOOTHMM) -M$(MODEL).lex,$(MODEL).123 $(MOOTHMM_FLAGS) $< -o $@
+%.dis.wdt: %.mrt $(MODEL_HACKED).lex $(MODEL_HACKED).123 $(MOOTHMM)
+	$(MOOTHMM) -M$(MODEL_HACKED).lex,$(MODEL_HACKED).123 $(MOOTHMM_FLAGS) $< -o $@
 
-%.cmt: %.mt $(MODEL).lex $(MODEL).123 $(MODEL).clx $(MOOTHMM)
-	$(MOOTHMM) -M$(MODEL).lex,$(MODEL).123,$(MODEL).clx $(MOOTHMM_FLAGS) $< -o $@
+%.clx.wdt: %.mrt $(MODEL_HACKED).lex $(MODEL_HACKED).123 $(MODEL_HACKED).clx $(MOOTHMM)
+	$(MOOTHMM) -M$(MODEL_HACKED).lex,$(MODEL_HACKED).123,$(MODEL_HACKED).clx $(MOOTHMM_FLAGS) $< -o $@
 
-%.vtt: %.t $(MODEL).lex $(MODEL).123 $(MOOTHMM)
-	$(MOOTHMM) -M$(MODEL).lex,$(MODEL).123 $(MOOTHMM_FLAGS) -S $< -o $@
+%.S.wdt: %.t $(MODEL_HACKED).lex $(MODEL_HACKED).123 $(MOOTHMM)
+	$(MOOTHMM) -M$(MODEL_HACKED).lex,$(MODEL_HACKED).123 $(MOOTHMM_FLAGS) -S $< -o $@
 
+##----------------------------------------------------------------------
+##-- tagging, lower-case
+lc-dmt: lc-dis-wdt
+lc-cmt: lc-clx-wdt
+lc-vtt: lc-S-wdt
+
+lc-tt: $(TEST).lc.tt
+lc-dis-wdt: $(TEST).lc.dis.wdt
+lc-clx-wdt: $(TEST).lc.clx.wdt
+lc-S-wdt: $(TEST).lc.S.wdt
+
+
+%.lc.tt: %.lc.t $(LCMODEL_HACKED).lex $(LCMODEL_HACKED).123 $(MOOTHMM)
+	$(MOOTHMM) -M$(LCMODEL_HACKED).lex,$(LCMODEL_HACKED).123 $(MOOTHMM_FLAGS) $< -o $@
+
+%.lc.S.wdt: %.lc.t $(LCMODEL_HACKED).lex $(LCMODEL_HACKED).123 $(MOOTHMM)
+	$(MOOTHMM) -M$(LCMODEL_HACKED).lex,$(LCMODEL_HACKED).123 $(MOOTHMM_FLAGS) -S $< -o $@
+
+%.lc.mrt: %.mrt
+	tr A-ZÄÖÜ a-zäöü < $< > $@
+
+%.lc.dis.wdt: %.lc.mrt $(LCMODEL_HACKED).lex $(LCMODEL_HACKED).123 $(MOOTHMM)
+	$(MOOTHMM) -M$(LCMODEL_HACKED).lex,$(LCMODEL_HACKED).123 $(MOOTHMM_FLAGS) $< -o $@
+
+%.lc.clx.wdt: %.lc.mrt $(LCMODEL_HACKED).lex $(LCMODEL_HACKED).123 $(LCMODEL_HACKED).clx $(MOOTHMM)
+	$(MOOTHMM) -M$(LCMODEL_HACKED).lex,$(LCMODEL_HACKED).123,$(LCMODEL_HACKED).clx $(MOOTHMM_FLAGS) $< -o $@
+
+##----------------------------------------------------------------------
 ##-- eval
-eval: $(TEST).tt.eval $(TEST).dmt.eval $(TEST).cmt.eval
+dis-eval: dis-wdt-eval
+clx-eval: clx-wdt-eval
 
-noeval:
+tt-eval: $(TEST).$(MORPHHACK_INFIX).tt.eval
+dis-wdt-eval: $(TEST).$(MORPHHACK_INFIX).dis.wdt.eval
+clx-wdt-eval: $(TEST).$(MORPHHACK_INFIX).clx.wdt.eval
+mr-ttt-eval: $(TEST).$(MORPHHACK_INFIX).mr.ttt.eval
+
+eval: tt-eval dis-wdt-eval clx-wdt-eval
+
+no-eval:
 	rm -f *.eval
 
 %.tt.eval: %.tt $(TRUTH) $(MOOTEVAL)
-	$(MOOTEVAL) -v4 -2 -o $@ $*.ttt $<
+	$(MOOTEVAL) -Iwd -v4 -2 -o $@ $(TRUTH) $<
 
-%.dmt.eval: %.dmt $(TRUTH) $(MOOTEVAL)
-	$(MOOTEVAL) -v4 -2 -o $@ $*.ttt $<
+%.dis.wdt.eval: %.dis.wdt $(TRUTH) $(MOOTEVAL)
+	$(MOOTEVAL) -Iwd -v4 -2 -o $@ $(TRUTH) $<
 
-%.cmt.eval: %.cmt $(TRUTH) $(MOOTEVAL)
-	$(MOOTEVAL) -v4 -2 -o $@ $*.ttt $<
+%.clx.wdt.eval: %.clx.wdt $(TRUTH) $(MOOTEVAL)
+	$(MOOTEVAL) -Iwd -v4 -2 -o $@ $(TRUTH) $<
 
-%.mttt.eval: %.mttt $(TRUTH) $(MOOTEVAL)
-	$(MOOTEVAL) -v4 -2 -o $@ $*.ttt $<
+%.mr.ttt.eval: %.mr.ttt $(TRUTH) $(MOOTEVAL)
+	$(MOOTEVAL) -Iwd -v4 -Iwd -2 -o $@ $(TRUTH) $<
 
+
+##----------------------------------------------------------------------
 ##-- error counting
 errors: $(EVAL).errors
 cerrors: $(EVAL).cerrors
+ierrors: $(EVAL).ierrors
+icerrors: $(EVAL).icerrors
+
 
 %.tt.errors: %.tt.eval
 	grep '^.b' $< | sort | uniq -c | sort -r -n > $@
@@ -204,14 +261,16 @@ cerrors: $(EVAL).cerrors
 	| grep '^.b:' | grep -v '^..:...:---' | sort | uniq -c | sort -r -n > $@
 
 %.ierrors: %.eval
-	grep '^.' $< | grep -v '^..:...:---' $< | sort | uniq -c | sort -r -n > $@
+	grep '^..:' $< | grep -v '^..:...:---' | sort | uniq -c | sort -r -n > $@
 
 %.icerrors: %.eval classify-eval.perl
 	./classify-eval.perl $< \
-	| grep '^.' | grep -v '^..:...:---' | sort | uniq -c | sort -r -n > $@
+	| grep '^..:' | grep -v '^..:...:---' | sort | uniq -c | sort -r -n > $@
 
-##-- save
-save: save/$(label).stamp
+##----------------------------------------------------------------------
+##-- save tagging data
+save: save-stamp
+save-stamp: save/$(label).stamp
 
 unsave:
 	rm -rf save/$(label).stamp save/$(label)
@@ -219,30 +278,30 @@ unsave:
 test: save unsave
 
 save/%.stamp: \
-	$(TEST).ttt $(TEST).mt $(TRAIN).model
-	for ext in tt dmt cmt ; do \
-	  $(MAKE) $(TEST).$$ext $(TEST).$$ext.eval ;\
+	$(TEST).ttt $(TEST_HACKED).mrt $(TRAIN_HACKED).model $(MOOT_BINDIR)/mootconfig
+	for ext in tt dis.wdt clx.wdt ; do \
+	  $(MAKE) $(TEST_HACKED).$$ext $(TEST_HACKED).$$ext.eval ;\
 	done
 	mkdir -p save/$*
 	mv \
-	   $(TRAIN).lex $(TRAIN).123 $(TRAIN).clx \
-	   $(TEST).tt $(TEST).tt.eval \
-	   $(TEST).dmt $(TEST).dmt.eval \
-	   $(TEST).cmt $(TEST).cmt.eval \
+	   $(MODEL_HACKED).lex $(MODEL_HACKED).123 $(MODEL_HACKED).clx \
+	   $(TEST_HACKED).tt $(TEST_HACKED).tt.eval \
+	   $(TEST_HACKED).dis.wdt $(TEST_HACKED).dis.wdt.eval \
+	   $(TEST_HACKED).clx.wdt $(TEST_HACKED).clx.wdt.eval \
 	  save/$*
-	rm -f $(TRAIN).model
+	rm -f $(MODEL_HACKED).model
+	cp -f $(MOOT_BINDIR)/mootconfig save/$*/mootconfig
 	touch $@
 
+##----------------------------------------------------------------------
 ##-- models
-model: $(MODEL).model
+model: $(MODEL_HACKED).model
+nomodel:
+	rm -f $(MODEL_HACKED).model
 
-%.model: %.mttt $(MOOTRAIN)
+%.model: %.mr.ttt $(MOOTRAIN)
 	$(MOOTRAIN) -lnC $< -o $*
 	touch $@
-
-#%.model: %.ttt $(MOOTRAIN)
-#	$(MOOTRAIN) -lnC $< -o $*
-#	touch $@
 
 %.lex: ; $(MAKE) $*.model
 
@@ -250,11 +309,12 @@ model: $(MODEL).model
 
 %.clx: ; $(MAKE) $*.model
 
+##----------------------------------------------------------------------
 ##-- binary models
 
-hmm: $(MODEL).hmm
+hmm: $(MODEL_HACKED).hmm
 
-chmm: $(MODEL).chmm
+chmm: $(MODEL_HACKED).chmm
 
 %.hmm: %.model $(MOOTCOMPILE)
 	$(MOOTCOMPILE) $(MOOTCOMPILE_FLAGS) -o $@ "$*.lex,$*.123"
@@ -262,11 +322,11 @@ chmm: $(MODEL).chmm
 %.chmm: %.model $(MOOTDUMP)
 	$(MOOTCOMPILE) $(MOOTCOMPILE_FLAGS) -o $@ "$*.lex,$*.123,$*.clx"
 
-
+##----------------------------------------------------------------------
 ##-- dumps
 
-dump: $(MODEL).dump
-cdump: $(MODEL).cdump
+dump: $(MODEL_HACKED).dump
+cdump: $(MODEL_HACKED).cdump
 
 %.dump: %.model $(MOOTDUMP)
 	$(MOOTDUMP) -o $@ "$*.lex,$*.123"
@@ -274,8 +334,8 @@ cdump: $(MODEL).cdump
 %.cdump: %.model $(MOOTDUMP)
 	$(MOOTDUMP) -o $@ "$*.lex,$*.123,$*.clx"
 
-hmm-dump: $(MODEL).hmm-dump
-chmm-dump: $(MODEL).chmm-dump
+hmm-dump: $(MODEL_HACKED).hmm-dump
+chmm-dump: $(MODEL_HACKED).chmm-dump
 
 %.hmm-dump: %.hmm $(MOOTDUMP)
 	$(MOOTDUMP) -o $@ $<
@@ -283,6 +343,7 @@ chmm-dump: $(MODEL).chmm-dump
 %.chmm-dump: %.chmm $(MOOTDUMP)
 	$(MOOTDUMP) -o $@ $<
 
+##----------------------------------------------------------------------
 ##-- XML: conversion text->xml
 %.pre-xml: % $(XMLIFY)
 	$(XMLIFY) $< > $@
@@ -293,17 +354,18 @@ chmm-dump: $(MODEL).chmm-dump
 %.t.xml: %.t.pre-xml $(MOOTCHURN)
 	$(MOOTCHURN) $(MOOTCHURN_FLAGS) -Inative,rare -O$(OF_XML),rare -o $@ $<
 
-%.mt.xml: %.mt.pre-xml $(MOOTCHURN)
+%.mrt.xml: %.mrt.pre-xml $(MOOTCHURN)
 	$(MOOTCHURN) $(MOOTCHURN_FLAGS) -Inative,mediumrare -O$(OF_XML),mediumrare -o $@ $<
 
-%.mttt.xml: %.mttt.pre-xml $(MOOTCHURN)
+%.mr.ttt.xml: %.mr.ttt.pre-xml $(MOOTCHURN)
 	$(MOOTCHURN) $(MOOTCHURN_FLAGS) -Inative,welldone -O$(OF_XML),welldone -o $@ $<
 
+##----------------------------------------------------------------------
 ##-- XML: conversion xml->text
 %.post-xml: %.xml $(MOOTCHURN)
 	$(MOOTCHURN) $(MOOTCHURN_FLAGS) -Ixml,welldone -Onative,welldone -o $@ $<
 
-
+##----------------------------------------------------------------------
 ##-- XML: models
 xml_model: $(MODEL).xml.model
 
@@ -319,12 +381,10 @@ no_xml_model: ; rm -f $(MODEL).xml.model
 
 %.xml.clx: ; $(MAKE) $*.xml.model
 
-
-##-- XML: tagging
+##----------------------------------------------------------------------
+##-- XML: tagging :: TODO: suffix-tweaking!
 tt_xml: $(TEST).tt.xml
-
 dmt_xml: $(TEST).dmt.xml
-
 cmt_xml: $(TEST).cmt.xml
 
 %.tt.xml: %.t.xml $(MODEL).xml.lex $(MODEL).xml.123 $(MOOTHMM)
@@ -336,6 +396,7 @@ cmt_xml: $(TEST).cmt.xml
 %.cmt.xml: %.mt.xml $(MODEL).xml.lex $(MODEL).xml.123 $(MODEL).xml.clx $(MOOTHMM)
 	$(MOOTHMM) -Ixml -O$(OF_XML),welldone -M$(MODEL).xml.lex,$(MODEL).xml.123,$(MODEL).xml.clx $(MOOTHMM_FLAGS) -o $@ $<
 
+##----------------------------------------------------------------------
 ##-- XML: eval (by conversion)
 xml_eval1: $(TEST).tt.xml.eval1 $(TEST).dmt.xml.eval1 $(TEST).cmt.xml.eval1
 
@@ -351,6 +412,7 @@ xml_eval1: $(TEST).tt.xml.eval1 $(TEST).dmt.xml.eval1 $(TEST).cmt.xml.eval1
 %.mttt.xml.eval1: %.mttt.post-xml $(XML_TRUTH_PRE) $(MOOTEVAL)
 	$(MOOTEVAL) -v4 -2 -o $@ $*.ttt.pre-xml $<
 
+##----------------------------------------------------------------------
 ##-- XML: eval (direct)
 xml_eval: $(TEST).tt.xml.eval $(TEST).dmt.xml.eval $(TEST).cmt.xml.eval
 
@@ -366,6 +428,7 @@ xml_eval: $(TEST).tt.xml.eval $(TEST).dmt.xml.eval $(TEST).cmt.xml.eval
 %.mttt.xml.eval: %.mttt.xml $(XML_TRUTH) $(MOOTEVAL)
 	$(MOOTEVAL) -v4 -2 -Ixml,welldone -o $@ $*.ttt.xml $<
 
+##----------------------------------------------------------------------
 ##-- XML: check
 xml_check: $(TEST).tt.xml-check $(TEST).dmt.xml-check $(TEST).cmt.xml-check
 
@@ -378,7 +441,7 @@ xml_check: $(TEST).tt.xml-check $(TEST).dmt.xml-check $(TEST).cmt.xml-check
 %.cmt.xml-check: %.cmt.post-xml %.cmt $(MOOTEVAL)
 	$(MOOTEVAL) -v2 -2 -Iwelldone  -o $@ $*.cmt $<
 
-
+##----------------------------------------------------------------------
 ##-- XML: save
 xml_save: save/$(label).xml_stamp
 
@@ -404,6 +467,7 @@ save/%.xml_stamp: $(TEST).ttt $(TEST).mt.xml $(TRAIN).xml.model
 	rm -f $(TRAIN).xml.model
 	touch $@
 
+##----------------------------------------------------------------------
 ##-- lower-case
 
 lower: lc
@@ -429,6 +493,7 @@ lc_model: $(LCMODEL).model
 	$(MOOTRAIN) -Imedium -lnC $< -o $*.lc
 	touch $@
 
+##----------------------------------------------------------------------
 ##-- tnt-tagging
 
 TNT_AFLAGS ?= -a$(SUFFIX_TRIE_LEN)
@@ -468,6 +533,7 @@ lc-tnt-vtt: $(TEST).lc.tnt-vtt
 %.tnt-vtt.eval: %.tnt-vtt %.ttt
 	$(MOOTEVAL) -v3 -2 -Imedium $*.ttt $< -o $@
 
+##----------------------------------------------------------------------
 ##-- cleanup
 clean:
 	rm -f tmp.res *~ \
