@@ -538,7 +538,7 @@ lc-tnt-vtt: $(TEST).lc.tnt-vtt
 clean:
 	rm -f tmp.res *~ \
 	  *.xml-check \
-	  *.tt *.dmt *.cmt *.lc.* \
+	  *.tt *.dmt *.cmt *.lc.* *.wdt \
 	  *.tt.xml *.dmt.xml *.cmt.xml \
 	  *.tnt-tt \
 	  *.lex *.123 *.clx *.model \
