@@ -68,11 +68,11 @@ required for runtime tagging of tokens cooked "rare".
 =head2 Training from a Tagged and Analyzed Corpus
 
 If you have a text-format corpus in the file
-"corpus.ttt" which is pre-tagged with the "correct"
+"corpus.wdt" which is pre-tagged with the "correct"
 part-of-speech tags as well as lexical classes,
 then the incantation:
 
- mootrain --lex --ngrams --classes corpus.mttt
+ mootrain --lex --ngrams --classes corpus.wdt
 
 will produce the model files "corpus.lex", "corpus.123",
 and "corpus.clx" required for runtime tagging of
@@ -194,7 +194,7 @@ and if you have a trained model in the files "corpus.lex",
 "corpus.123", and "corpus.clx", as well as a medium rare cooked file "test.mt"
 to be tagged, then:
 
- moot --model=corpus --use-classes=1 -o test.cmt test.t
+ moot --model=corpus --use-classes=1 -o test.cmt test.mt
 
 will produce a "well done" (+tagged,+analyzed) output file
 "test.cmt".
