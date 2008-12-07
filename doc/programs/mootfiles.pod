@@ -115,7 +115,7 @@ identified by the filename infix ".moot".
 
 =item (-tagged, -analyzed)
 
-=item *.t
+=item Files: *.t, *.r, *.rt
 
 The most basic level of "cookedness", a "rare" text file encodes
 only token- and sentence-boundaries.
@@ -159,7 +159,7 @@ thus impossible to declare an "empty" token.  An example
 
 =item (-tagged, +analyzed)
 
-=item *.mr
+=item Files: *.mr, *.mrt
 
 A "medium rare" file is at least as informative as a "rare"
 file -- that is, it encodes everything that a "rare" file
@@ -222,7 +222,7 @@ are called "unrecognized" tokens.
 
 =item (+tagged, -analyzed)
 
-=item *.tt , *.ttt
+=item Files: *.tt, *.ttt, *.m, *.mt
 
 A "medium" file can be understood as a "medium rare" file which
 associates exactly one analysis with each token.  The tag for this
@@ -263,7 +263,7 @@ An example "medium" file is:
 
 =item (+tagged, +analyzed)
 
-=item *.wd, *.wdt
+=item Files: *.wd, *.wdt
 
 A "well done" file can be understood as the synthesis of
 a "medium rare" and a "medium" file: it contains a "best"
@@ -375,6 +375,23 @@ An example "refried" file is:
  --:---:-ix	too	ADV	[ADV]	[PTKA]	/	too	ADV	[CONJ]
  --:---:e--	.	$.	[$.]	/	.	$.
 
+
+Re-formatting for better human readabilty produces:
+
+ %% Example refried file for moot
+ %% FLAGS       TOK1    TOK1TAG1 ...            /       TOK2    TOK2TAG1 ...
+ %%------------------------------------------------------------------------------------
+ t-:---:---	Dis	PDAT	[PDAT]	[PDIS]	/	This	PDAT	[PDAT]	[PDIS]
+ -b:---:---	is	VAFIN	[VAFIN]	[VVFIN]	/	is	VVFIN	[VAFIN]	[VVFIN]
+ --:e--:---	a	ART			/	a	ART	[ART]	[CARD]
+ -b:-i-:---	test	NN	[VVFIN]		/	test	VVFIN	[NN]	[VVFIN]
+ --:---:---	.	$.	[$.]		/	.	$.	[$.]
+ 
+ -b:--x:---	This	PDAT	[PDAT]		/	This	PDIS	[PDAT]	[PDIS]
+ --:---:-ix	too	ADV	[ADV]	[PTKA]	/	too	ADV	[CONJ]
+ --:---:e--	.	$.	[$.]		/	.	$.
+
+
 =back
 
 =cut
@@ -408,10 +425,19 @@ This is of particular importance when converting
 from native to XML format i.e. with 'mootchurn'
 -- it is highly reccommended that you use the 'recode'
 command-line utility (distributed with 'librecode')
-to ensure that your native text data is true
-UTF-8 before passing it to 'mootchurn' for XML
-output.  Future implementations might use locale
-information to automate this process.
+to ensure that your native text data
+is true UTF-8 before passing it to 'mootchurn' for XML
+output.
+
+Similarly, HMM model data (see L<HMM MODEL FILE FORMATS>)
+B<must> be UTF-8 encoded for
+tagging in XML mode.  There is currently no way to
+directly convert the encoding of a binary model file,
+but text model files can be converted with the 'recode'
+command-line utility.
+
+Future implementations might use locale
+information to (partially) automate the recoding process.
 If all of your data (training corpus, test corpus,
 and runtime corpora) are parsed in XML mode,
 none of the above should present a problem.
@@ -475,10 +501,20 @@ the following (in a bastard notation born of BNF and XPath):
  ANALYSIS_DETAILS   ::= //token//analysis/text()         # buggy -- actually ignored!
  TOKEN_BESTTAG      ::= //token//moot.tag[last()]/text() # should be accurate
 
-TODO: pull up literal element name parameters from TokenReaderExpat
+Contact the author if you need any of the following done:
+
+=over 4
+
+=item TODO
+
+Pull up literal element name parameters from TokenReaderExpat
 to user-level.
 
-TODO: add a DTD for the default XML format to the distribution.
+=item TODO
+
+Add a DTD for the default XML format to the distribution.
+
+=back
 
 An example "cooked" XML document is the following:
 
@@ -566,7 +602,9 @@ for the particular utility in question.
 
 No flags at all.
 This should never really happen at runtime,
-and should cause a default format to be assumed.
+and should cause a default format to be assumed
+and/or an appropriate format to be guessed from
+the relevant filename(s).
 
 =item Null
 
@@ -647,7 +685,7 @@ Alias for 'Text,Tagged'.
 
 
 
-=item 'WellDone'
+=item WellDone
 
 =item WD
 
@@ -661,6 +699,7 @@ Alias for 'Text,Tagged,Analyzed'
 =over 4
 
 =item *
+
 Read input as native rare text (tokens only), write output as
 medium (best-tagged) native text:
 
@@ -679,6 +718,7 @@ Same thing, using filename conventions:
  moot input.moot.t -o output.moot.tt
 
 =item *
+
 Read medium rare (pre-analyzed) XML, write well-done native text:
 
  moot -I xml,mediumrare -O native,welldone
@@ -787,7 +827,7 @@ Declares frequency counts to be used for tokens which
 contain digits and separators.  The regex matching
 such tokens is (?):
 
- ([:digit:}+)([\.\,\-]|{:digit:})*
+ ([[:digit:]]+)([\.\,\-]|[[:digit:]])*
 
 =item * @CARDPUNCT
 
@@ -795,7 +835,7 @@ Declares frequency counts to be used for tokens which
 contain digits followed by punctuation.
 The regex matching such tokens is (?):
 
- ([:digit:}+)({:punct:})
+ ([[:digit:]]+)([[:punct:]])
 
 =item * @CARDSUFFIX
 
@@ -809,12 +849,12 @@ If C<moot_TNT_COMPAT> was defined, then the suffix
 of "@CARDSUFFIX" tokens is required to be of maximum
 length 3, thus matching the regex:
 
- ([:digit:}+)(.{1,3})
+ ([[:digit:]]+)(.{1,3})
 
 Otherwise, the suffix for "@CARDSUFFIX" tokens may
 be of arbitrary length:
 
- ([:digit:}+)(.*)
+ ([[:digit:]]+)(.*)
 
 =back
 
@@ -980,6 +1020,9 @@ When specifying an HMM model file,
 note that the existence of a file F<BINMODEL> overrides
 any text models which might exists in files
 I<BINMODEL>.lex , I<BINMODEL>.123 , I<BINMODEL>.clx.
+Use of a conventional suffix (such as ".hmm") to identify binary models
+eliminates such problems, since I<MODEL>.hmm will B<not> clash
+with a text model I<MODEL>.lex, ...
 
 =cut
 
