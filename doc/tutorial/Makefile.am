@@ -22,7 +22,7 @@ pkgdoctut_DATA = \
 	moottut.css \
 	moottut.html \
 	corpus.ttt \
-	corpus.mttt \
+	corpus.wdt \
 	test.ttt \
 	test.txt
 
@@ -31,7 +31,7 @@ pkgdoctut_DATA = \
 ##-----------------------------------------------------------------------
 
 SUFFIXES = .pod .txt .1 .html .tex .dvi .ps .pdf \
-	   .123 .lex .clx .t .tt .ttt .mt .mtt .mttt
+	   .123 .lex .clx .t .tt .ttt .mt .mtt .mttt .wd .wdt .mr .mrt
 
 ##-----------------------------------------------------------------------
 ## local hooks
@@ -109,13 +109,13 @@ endif
 .ttt.lex:
 	../../src/programs/mootrain -v0 $<
 
-.mttt.clx:
+.wdt.clx:
 	../../src/programs/mootrain -v0 $<
 
 .t.tt: corpus.123 corpus.lex
 	../../src/programs/moot -v0 -L0 -Mcorpus.lex,corpus.123 -o $@ $< 
 
-.mt.mtt: corpus.123 corpus.lex corpus.clx
+.mr.wd: corpus.123 corpus.lex corpus.clx
 	../../src/programs/moot -v0 -L1 -Mcorpus -o $@ $< 
 
 ##-----------------------------------------------------------------------
