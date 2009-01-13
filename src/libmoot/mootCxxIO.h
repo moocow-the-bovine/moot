@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2004-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2004-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -37,6 +37,7 @@
 #include <fstream>
 
 #include <mootIO.h>
+#include <mootArgs.h>
 
 #include <stdarg.h>
 #include <string.h>
@@ -199,6 +200,8 @@ namespace mootio {
      * (the real thing) */
     virtual bool vprintf(const char *fmt, va_list &ap) {
       if (!streamp) return false;
+      va_list ap_tmp;
+      moot_va_copy(ap_tmp,ap);
       ByteCount nchars = vsnprintf(_printf_buffer, _printf_buflen, fmt, ap);
       if (nchars >= _printf_buflen) {
 	//-- oops: reallocate!
@@ -206,6 +209,7 @@ namespace mootio {
 	assert(_printf_buffer != NULL);
 	_printf_buflen = nchars+1;
 	//-- ... and try again
+	moot_va_copy(ap,ap_tmp);
 	nchars = vsnprintf(_printf_buffer, _printf_buflen, fmt, ap);
       }
       //-- we now have a full string buffer: write it

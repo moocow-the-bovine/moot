@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2004-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2004-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,9 @@
 #include <stdlib.h>  // for memory allocation etc.
 
 #include <mootUtils.h> // for trimming
+#include <mootArgs.h>  // for moot_va_copy()
 #include <mootIO.h>    // for everything else
+
 
 
 namespace mootio {
@@ -372,9 +374,12 @@ namespace mootio {
     /** printf() to the buffer, va_list version */
     virtual bool vprintf(const char *fmt, va_list &ap)
     {
+      va_list ap_tmp;
+      moot_va_copy(ap_tmp,ap);
       size_t nchars = vsnprintf(cb_wdata+cb_used, cb_alloc-cb_used, fmt, ap);
       if (nchars >= cb_alloc-cb_used) {
 	if (!reserve(1+nchars+cb_used, cb_get)) return false;
+	moot_va_copy(ap,ap_tmp);
 	vsnprintf(cb_wdata+cb_used, cb_alloc-cb_used, fmt, ap);
       }
       cb_used += nchars;

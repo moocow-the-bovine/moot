@@ -183,6 +183,8 @@ pkginclude_HEADERS = \
 	mootTrieVector.h \
 	mootSuffixTrie.h \
 	\
+	mootArgs.h \
+	\
 	mootIO.h \
 	mootCIO.h \
 	mootZIO.h \
@@ -229,7 +231,6 @@ pkginclude_HEADERS = \
 	mootEval.h \
 	\
 	mootUtils.h
-
 
 #	mootCHMM.h 
 #	mootTokenParser.h
