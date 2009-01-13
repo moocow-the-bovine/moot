@@ -3,7 +3,11 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
-v2.0.6 Mon, 04 Aug 2008 11:59:38 +0200
+v2.0.6 Tue, 13 Jan 2009 13:13:47 +0100
+	+ fixed vprintf() bug in mootCxxIO.h, mootBufferIO.h causing garbage out
+	  on first printf() call (va_list was being incremented by vsnprintf() but not backed up)
+	  - solution uses macro moot_va_copy(), lifted from glibc docs: use __va_copy if present,
+	    otherwise simple assignment
 	+ basic tests (incl. binary models) on x86_64 (lal.bbaw.de): looks good
 	+ changed printf format from "%d" to "%zd" for size_t args
 	  - complies with ISO C99, according to GNU libc docs

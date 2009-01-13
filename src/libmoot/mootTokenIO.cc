@@ -480,7 +480,7 @@ void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
 	    os->puts(ai->details.empty() ? ai->tag : ai->details);
 	  }
 	  if (ai->prob != 0) {
-	    os->printf(" <%g>", ai->prob);
+	    os->printf(" <%g>", static_cast<double>(ai->prob));
 	  }
 	}
     }
