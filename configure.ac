@@ -46,55 +46,15 @@ AC_LANG(C++)
 dnl for gnulib
 gl_INIT
 
-##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-## debug ?
-##
-CONFIG_OPTIONS=""
-AC_MSG_CHECKING([whether to build debug version])
-AC_ARG_ENABLE(debug,
-	AC_HELP_STRING([--enable-debug], [build debug version (default=no)]))
-
-if test "$enable_debug" != "yes" ; then
-  AC_MSG_RESULT(no)
-
-   if test "$enable_shared" = "" ; then
-     ##-- we have to include this call explicitly before AC_DISABLE_SHARED,
-     ##   otherwise autoconf gets confused
-     AC_ENABLE_SHARED
-   fi
-
-   #moot_OFLAGS="-O2"
-   #moot_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
-   moot_OFLAGS="-O3 -funroll-loops" #-- "-O,-O2,-O3,-Os" all imply -fomit-frame-pointer
-   #CONFIG_OPTIONS="$CONFIG_OPTIONS DEBUG=0"
-   CONFIG_OPTIONS="DEBUG=0"
-else
-   AC_MSG_RESULT(yes)
-
-   if test "$enable_shared" = "" ; then
-     AC_DISABLE_SHARED
-   fi
-
-   moot_OFLAGS="-g"
-
-   AC_DEFINE(MOOT_DEBUG_ENABLED,1,
-	     [Define this to enable debugging code])
-   DOXY_DEFINES="$DOXY_DEFINES MOOT_DEBUG_ENABLED=1"
-   #CONFIG_OPTIONS="$CONFIG_OPTIONS DEBUG=1"
-   CONFIG_OPTIONS="DEBUG=1"
-fi
-
-AC_SUBST(moot_OFLAGS)
-##
-## /debug ?
-##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
 dnl v--- for static-only libraries (non-libtool)
 dnl AC_PROG_RANLIB
 
 dnl v--- needed if Makefile.am uses lex sources
 dnl AM_PROG_LEX
+
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## restore user CFLAGS
+##
 
 ### --- unmangle user's CFLAGS
 if test "$CFLAGS" != "$USER_CFLAGS" ; then
@@ -109,6 +69,68 @@ if test "$CXXFLAGS" != "$USER_CXXFLAGS" ; then
   AC_MSG_NOTICE([Restoring user's original CXXFLAGS value])
   CXXFLAGS="$USER_CXXFLAGS"
 fi
+##
+## /restore user CFLAGS
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## debug ?
+##
+CONFIG_OPTIONS=""
+AC_MSG_CHECKING([whether to build debug version])
+AC_ARG_ENABLE(debug,
+	AC_HELP_STRING([--enable-debug], [build debug version (default=no)]))
+
+if test "$enable_debug" = "yes" ; then
+   AC_MSG_RESULT(yes)
+
+   if test "$GCC" == "yes" ; then
+     AC_MSG_NOTICE([GNU C compiler detected: setting appropriate debug flags])
+     moot_OFLAGS="-g"
+   else
+     AC_MSG_WARN([GNU C compiler not detected: you must use CFLAGS, CXXFLAGS, LDFLAGS to set debugging flags])
+     moot_OFLAGS=""
+   fi
+
+   moot_OFLAGS="-g"
+
+   AC_DEFINE(MOOT_DEBUG_ENABLED,1,
+	     [Define this to enable debugging code])
+   DOXY_DEFINES="$DOXY_DEFINES MOOT_DEBUG_ENABLED=1"
+   #CONFIG_OPTIONS="$CONFIG_OPTIONS DEBUG=1"
+   CONFIG_OPTIONS="DEBUG=1"
+else
+  AC_MSG_RESULT(no)
+
+  if test "$GCC" == "yes"; then
+   case "$CFLAGS" in
+    *-O* | *-g* )
+      AC_MSG_NOTICE([CFLAGS appears already to contain optimization flags - skipping])
+      moot_OFLAGS=""
+      ;;
+    *)
+     AC_MSG_NOTICE([GNU C compiler detected: setting appropriate optimization flags])
+     #moot_OFLAGS="-O2"
+     #moot_OFLAGS="-O3 -fomit-frame-pointer -funroll-loops -finline-limit-100000"
+     moot_OFLAGS="-O3 -funroll-loops" #-- "-O,-O2,-O3,-Os" all imply -fomit-frame-pointer
+     ;;
+   esac
+  else
+    AC_MSG_WARN([GNU C compiler not detected: you must use CFLAGS, CXXFLAGS, LDFLAGS to set optimization flags])
+    moot_OFLAGS=""
+  fi
+
+  #CONFIG_OPTIONS="$CONFIG_OPTIONS DEBUG=0"
+  CONFIG_OPTIONS="DEBUG=0"
+fi
+
+AC_SUBST(moot_OFLAGS)
+##
+## /debug ?
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
 
 #---------------------------------------------------------------
 # short package includes
