@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -433,7 +433,7 @@ std::string moot_banner(void)
 {
   string s = ("  libmoot version "
 	      PACKAGE_VERSION
-	      " (c) 2006 Bryan Jurish.\n");
+	      " (c) 2003-2009 Bryan Jurish.\n");
   //--
 
 #ifdef MOOT_EXPAT_ENABLED
