@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -111,9 +111,9 @@ public:
   /*------------------------------------------------------------*/
   /** \name Positional Parameters */
   //@{
-  size_t theLine;    ///< Current line number
-  size_t theColumn;  ///< Current column number
-  size_t theByte;    ///< Current byte number
+  size_t theLine;               ///< Current line number
+  size_t theColumn;             ///< Current column number
+  mootio::ByteOffset theByte;   ///< Current byte number
   //@}
 
   /*------------------------------------------------------------*/
@@ -139,7 +139,7 @@ public:
   //@{
   /** Default constructor */
   GenericLexer(const std::string &myname="moot::GenericLexer",
-	       size_t line=0, size_t column=0, size_t byte=0)
+	       size_t line=0, size_t column=0, mootio::ByteOffset byte=0)
     : mglin(NULL),
       mglout(NULL),
       mgl_in_created(false),

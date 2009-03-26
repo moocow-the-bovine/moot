@@ -3,7 +3,10 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
-v2.0.6 Tue, 13 Jan 2009 13:13:47 +0100
+v2.0.6 Thu, 26 Mar 2009 21:52:06 +0100
+	+ added byte_number() methods to TokenReaderNative
+	+ fixed double line-counting bug in mootTokenLexer.ll in presence of tags
+	+ added byte-counting code to mootTokenLexer.ll (the template really ought to do this for us)
 	+ fixed vprintf() bug in mootCxxIO.h, mootBufferIO.h causing garbage out
 	  on first printf() call (va_list was being incremented by vsnprintf() but not backed up)
 	  - solution uses macro moot_va_copy(), lifted from glibc docs: use __va_copy if present,
