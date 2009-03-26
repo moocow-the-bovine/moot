@@ -14,8 +14,8 @@ LDFLAGS    ?= $(OFLAGS) -L..
 STATICLIBS ?= ../.libs/libmoot.a
 LIBS       ?= -lz -lrecode -lexpat
 
-KNOWN_TARGETS = toklex tokio tokio hmm+exit dummyhmm kmwio dummyhmm
-TARGETS = kmwio
+KNOWN_TARGETS = toklex tokio tokio hmm+exit dummyhmm kmwio dummyhmm linetag
+TARGETS = linetag
 
 all: $(TARGETS)
 
@@ -43,6 +43,8 @@ hmm+exit: hmm+exit.o $(STATICLIBS)
 dummyhmm: dummyhmm.o $(STATICLIBS)
 
 kmwio: kmwio.o $(STATICLIBS)
+
+linetag: linetag.o $(STATICLIBS)
 
 ##-- patterns: .o
 %.o: %.cc

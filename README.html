@@ -1,0 +1,296 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>DESCRIPTION</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#requirements">REQUIREMENTS</a></li>
+	<li><a href="#installation">INSTALLATION</a></li>
+	<li><a href="#build_from_cvs">BUILD FROM CVS</a></li>
+	<li><a href="#systems_on_which_moot_has_successfully_compiled">SYSTEMS ON WHICH MOOT HAS SUCCESSFULLY COMPILED</a></li>
+	<li><a href="#known_issues">KNOWN ISSUES</a></li>
+	<ul>
+
+		<li><a href="#common_warnings">Common Warnings</a></li>
+		<li><a href="#known_bugs">Known Bugs</a></li>
+	</ul>
+
+	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>README for package 'moot'</p>
+<p>Last updated for moot version 2.0.6-pre1</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>moot - moocow's part-of-speech tagger and utilities.</p>
+<p>
+</p>
+<hr />
+<h1><a name="requirements">REQUIREMENTS</a></h1>
+<dl>
+<dt><strong><a name="item_config">pkg-config (Required)</a></strong></dt>
+
+<dd>
+<p>Available from:
+<a href="http://www.freedesktop.org/software/pkgconfig/">http://www.freedesktop.org/software/pkgconfig/</a></p>
+<p>To build from cvs, you will also need the pkg-config
+autoconf macros which come with the source distribution
+of pkg-config.</p>
+</dd>
+<dt><strong><a name="item_headers">STL headers (Required)</a></strong></dt>
+
+<dd>
+<p>If your C++ compiler does not have the STL
+headers already installed, you will need
+to get them from somewhere.
+For gcc-2.x, I recommend STLport &gt;= 4.5.3,
+available from <a href="http://www.stlport.org">http://www.stlport.org</a>
+You will have to set the environment variables
+CPPFLAGS, LDFLAGS, and LIBS according to
+your installation before building.  Newer gcc versions (3.x,4.x)
+have native STL support.</p>
+</dd>
+<dt><strong><a name="item_flex_2b_2b__2c_bison_2b_2b__28optional_29">flex++ , bison++ (Optional)</a></strong></dt>
+
+<dd>
+<p>Alain Coetmeur's C++ ports of the famous lexer/parser
+generator pair, available from:
+<a href="ftp://iecc.com/pub/file/bison++flex++">ftp://iecc.com/pub/file/bison++flex++</a>
+or
+from the official distribution site of this package.</p>
+<p>Tested with flex++-v2.3.8-4 and bison++-v1.21-5.</p>
+<p>Should only be required if you want/need to mess with
+the native I/O formats.  If the build fails during 'make',
+just run:</p>
+<pre>
+ touch src/libmoot/*Lexer.*[ch] src/libmoot/*Parser.*[ch]</pre>
+<p>from the distribution root directory, and call make again.
+Better yet, calling ./configure with:</p>
+<pre>
+ ./configure FLEXXX=no BISONXX=no</pre>
+<p>ought to do the trick too.</p>
+</dd>
+<dt><strong><a name="item_expat">expat (Optional)</a></strong></dt>
+
+<dd>
+<p>XML parser toolkit library by James Clark, required for XML input,
+available from
+<a href="http://expat.sourceforge.net">http://expat.sourceforge.net</a></p>
+<p>Tested version 1.95.6.</p>
+</dd>
+<dt><strong><a name="item_librecode">librecode (Optional)</a></strong></dt>
+
+<dd>
+<p>Character-set recoding library by François Pinard, useful for XML output,
+available from
+<a href="http://www.gnu.org/directory/recode.html">http://www.gnu.org/directory/recode.html</a></p>
+<p>Tested version 3.6.</p>
+</dd>
+<dt><strong><a name="item_zlib">zlib (Optional)</a></strong></dt>
+
+<dd>
+<p>Compression library by Jean-loup Gailly and Mark Adler,
+useful for compressed binary HMM files. 
+Available from:
+<a href="http://www.gzip.org/zlib">http://www.gzip.org/zlib</a></p>
+<p>Tested version 1.2.1.</p>
+</dd>
+<dt><strong><a name="item_doxygen">doxygen (Optional)</a></strong></dt>
+
+<dd>
+<p>Required for building library documentation.
+Available from:
+<a href="http://www.doxygen.org">http://www.doxygen.org</a></p>
+<p>Tested version 1.2.15.</p>
+</dd>
+<dt><strong><a name="item_perl">Perl (Optional)</a></strong></dt>
+
+<dd>
+<p>Get it from <a href="http://www.cpan.org">http://www.cpan.org</a> or <a href="http://www.perl.com">http://www.perl.com</a>
+Required for building command-line parsers, utility
+documentation, library documentation, etc.</p>
+</dd>
+<dt><strong><a name="item_gen">Getopt::Gen (Optional)</a></strong></dt>
+
+<dd>
+<p>A Perl module used to generate command-line option parsers.
+Available from:
+<a href="http://www.ling.uni-potsdam.de/~moocow/projects/perl/index.html#gog">http://www.ling.uni-potsdam.de/~moocow/projects/perl/index.html#gog</a></p>
+<p>If make fails due to lacking optgen.perl, either get &amp; install this
+module, or run:</p>
+<pre>
+ touch src/programs/*_cmdparser.*[ch]</pre>
+<p>from the distribution root directory, and call make again.</p>
+</dd>
+<dt><strong><a name="item_pod2man_2c_pod2text_2c_pod2html_2c__2e_2e_2e__28op">pod2man, pod2text, pod2html, ... (Optional)</a></strong></dt>
+
+<dd>
+<p>The Perl documentation converstion utilities, required
+for (re-)building the correspdonding program documentation
+formats.  These should have come with your Perl.  On Debian
+derivates, they live in the ``perl-doc'' package.  They should be
+automatically detected by ./configure if they are installed in your
+PATH.  Otherwise, you can use the variables POD2MAN, POD2TEXT;
+POD2HTML, and/or POD2LATEX to specify their locations.</p>
+<p>Manpages and HTML documentation are distributed with the ``official'' source
+distribution, so you should only need the ``pod2xyz'' programs if you're
+building from CVS, or if you want to generate one or more additional
+documentation formats (e.g. text, DVI, PostScript, or PDF).</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="installation">INSTALLATION</a></h1>
+<p>Issue the following commands to the shell:</p>
+<pre>
+ sh ./configure
+ make
+ make install</pre>
+<p>See the file INSTALL in the top-level distribution
+directory for details.</p>
+<p>
+</p>
+<hr />
+<h1><a name="build_from_cvs">BUILD FROM CVS</a></h1>
+<p>To build from CVS, you need the GNU utilities
+aclocal, automake, autoconf, and libtool.  If
+you have these, you can just run the top-level
+script:</p>
+<pre>
+ sh ./autogen.sh</pre>
+<p>This will create the 'configure' script and other
+necessary build files.</p>
+<p>You will also need Perl and the Getopt::Gen Perl module,
+which should be available from wherever you acquired
+these sources.</p>
+<p>
+</p>
+<hr />
+<h1><a name="systems_on_which_moot_has_successfully_compiled">SYSTEMS ON WHICH MOOT HAS SUCCESSFULLY COMPILED</a></h1>
+<dl>
+<dt><strong><a name="item_linux__2f_gcc">linux / gcc</a></strong></dt>
+
+<dt><strong><a name="item_macos_2dx__2f_gcc">MacOS-X / gcc</a></strong></dt>
+
+<dt><strong><a name="item_win32__2f_mingw32">win32 / mingw32</a></strong></dt>
+
+<dt><strong><a name="item__2e_2e_2e_more_to_come_2c_maybe_2e_2e_2e">... more to come, maybe...</a></strong></dt>
+
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="known_issues">KNOWN ISSUES</a></h1>
+<p>
+</p>
+<h2><a name="common_warnings">Common Warnings</a></h2>
+<dl>
+<dt><strong><a name="item__22warning_3a__2e_2e_2e_22_from_configure">``WARNING: ...'' from configure</a></strong></dt>
+
+<dd>
+<p>This is a warning.
+This is only a warning.
+It may be responsible for fatal errors from 'make' <strong>if and only if</strong>
+you are building from CVS.  Otherwise, you can safely ignore it (probably).</p>
+</dd>
+<dt><strong><a name="item__22flex_2b_2bbison_2b_2b_2epc_not_found_22">``flex++bison++.pc not found''</a></strong></dt>
+
+<dd>
+<p>If you want this to go away, install my (old, unmaintained)
+flex++bison++ package from:</p>
+<pre>
+ <a href="http://www.ling.uni-potsdam.de/~moocow/projects/moot/flex++bison++-0.0.5.tar.gz">http://www.ling.uni-potsdam.de/~moocow/projects/moot/flex++bison++-0.0.5.tar.gz</a></pre>
+<p>Otherwise, keep your distro's versions and
+ignore the warning.</p>
+</dd>
+<dt><strong><a name="item__22cannot_find_optgen_2epl_program_22">``cannot find optgen.pl program''</a></strong></dt>
+
+<dd>
+<p>If you're building from CVS, this will be fatal. Get my Getopt::Gen
+perl module (and perl, if you haven't already), build it,
+install it, then run moot's ./configure again.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="known_bugs">Known Bugs</a></h2>
+<dl>
+<dt><strong><a name="item_tag">``Unknown 'strict' <code>tag(s)</code> '1' at ... Parse/Template.pm line 2''</a></strong></dt>
+
+<dd>
+<p>Your Parse::Lex module is broken.
+It turns out that Parse::Lex v2.15 is Just Plain Broken, and it appears to be
+unmaintained.
+Get the sources from CPAN, and comment out all of the offending 'use strict ...' lines,
+or just install the hacked version from:</p>
+<pre>
+ <a href="http://www.ling.uni-potsdam.de/~moocow/projects/perl/ParseLex-2.15-hacked.tar.gz">http://www.ling.uni-potsdam.de/~moocow/projects/perl/ParseLex-2.15-hacked.tar.gz</a></pre>
+</dd>
+<dt><strong><a name="item__22osfcn_2eh_no_such_file_or_directory_22">``osfcn.h No such file or directory''</a></strong></dt>
+
+<dd>
+<p>osfcn.h appears to be a relic of my antiquated flex++bison++
+package; you may attempt to use and/or modify the file
+'src/libmoot/myosfcn.h' that comes with the distribution as a
+workaround. Otherwise, you should try to rebuild the lexer/parser
+.cc and .h files by hand:</p>
+<pre>
+  bash$ cd moot-XX.YY
+  bash$ touch ./src/libmoot/*.ll ./src/libmoot/*.yy
+  bash$ make</pre>
+<p>... ought to do the trick, assuming you have Coetmeur's flex++ and bison++
+installed.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
+<p>Development of this package was supported by the project
+'Kollokationen im Wörterbuch'
+(``collocations in the dictionary'', <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
+in association with the project
+'Digitales Wörterbuch deutscher Sprache des 20. Jahrhunderts (DWDS)'
+(``digital dictionary of the German language of the 20th century'', <a href="http://www.dwds.de">http://www.dwds.de</a> )
+at the Berlin-Brandenburgische Akademie der Wissenschaften ( <a href="http://www.bbaw.de">http://www.bbaw.de</a> )
+with funding from
+the Alexander von Humboldt Stiftung ( <a href="http://www.avh.de">http://www.avh.de</a> )
+and from the Zukunftsinvestitionsprogramm of the
+German federal government.</p>
+<p>I am grateful to Christiane Fellbaum, Alexander Geyken,
+Thomas Hanneforth, Gerald Neumann, Edmund Pohl, Alexey Sokirko,
+and others for offering useful insights in the course of development
+of this package.</p>
+<p>Thomas Hanneforth wrote and maintains the libFSM C++ library
+for finite-state device operations
+used in the development of the HMM tagger / disambiguator.</p>
+<p>Alexander Geyken and Thomas Hanneforth developed the
+rule-based morphological analysis system for German
+which was used in the development and testing of the
+class-based HMM tagger / disambiguator.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Bryan Jurish &lt;<a href="mailto:moocow@ling.uni-potsdam.de">moocow@ling.uni-potsdam.de</a>&gt;</p>
+
+</body>
+
+</html>

@@ -359,12 +359,12 @@ public:
   virtual size_t column_number(size_t n) { return column_number(); };
 
   /** Get current byte number. */
-  virtual size_t byte_number(void) {
-      return parser ? static_cast<size_t>(XML_GetCurrentByteIndex(parser)) : 0;
+  virtual mootio::ByteOffset byte_number(void) {
+      return parser ? static_cast<mootio::ByteOffset>(XML_GetCurrentByteIndex(parser)) : 0;
   };
 
   /** Set current byte number. */
-  virtual size_t byte_number(size_t n) { return byte_number(); };
+  virtual mootio::ByteOffset byte_number(mootio::ByteOffset n) { return byte_number(); };
 
   /** complain */
   virtual void carp(char *fmt, ...);

@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -189,12 +189,12 @@ using namespace moot;
 /*----------------------------------------------------------------------
  * Definitions
  *----------------------------------------------------------------------*/
-space      [ ]
+space      [ \r]
 wordchar   [^ \t\n\r]
 tab        [\t]
 eoachar    [\t\n\r]
 eotchar    [\n\r]
-newline    [\n\r]
+newline    [\n]
 tokchar    [^\t\n\r]
 /*detchar    [^ \t\n\r\<\>\[]*/
 detchar    [^ \t\n\r\[]
@@ -220,9 +220,10 @@ anlchar    [^ \t\n\r]
 
 <TOKEN>^([ \t]*){newline} {
   //-- EOS: blank line: maybe return eos (ignore empty sentences)
-  theLine++; theColumn=0;
+  theLine++; theColumn=0; theByte += yyleng;
   if (mtoken->tok_type != TokTypeEOS) {
     mtoken->tok_type=TokTypeEOS;
+    mtoken->tok_text="\n";
     return TokTypeEOS;
   }
 }
@@ -231,6 +232,7 @@ anlchar    [^ \t\n\r]
   //-- COMMENT: return comments as special tokens
   theLine++;
   theColumn = 0;
+  theByte += yyleng;
   lasttyp = TokTypeComment;
   if (!ignore_comments) {
     mtoken->clear();
@@ -243,6 +245,7 @@ anlchar    [^ \t\n\r]
 <TOKEN>^({tokchar}*){wordchar} {
   //-- TOKEN-TEXT: keep only internal whitespace
   theColumn += yyleng;
+  theByte += yyleng;
   mtoken->clear();
   mtoken->toktype(TokTypeVanilla);
   mtoken->text(reinterpret_cast<const char *>(yytext), yyleng);
@@ -253,6 +256,7 @@ anlchar    [^ \t\n\r]
   //-- TOKEN: end-of-token
   theLine++;
   theColumn = 0;
+  theByte += yyleng;
   mtoken->toktype(TokTypeVanilla);
   lasttyp = TokTypeVanilla;
   return TokTypeVanilla;
@@ -260,6 +264,7 @@ anlchar    [^ \t\n\r]
 
 <<EOF>> {
   //-- EOF: should only happen in TOKEN mode
+  mtoken->tok_text="";
   switch (lasttyp) {
    case LexTypeText:
    case LexTypeTag:
@@ -294,6 +299,7 @@ anlchar    [^ \t\n\r]
 <TOKEN>{space}*/{eoachar} {
   //-- TOKEN: end-of-token
   theColumn += yyleng;
+  theByte += yyleng;
 
   if (first_analysis_is_best) current_analysis_is_best = true;
   if (ignore_first_analysis)  ignore_current_analysis = true;
@@ -312,11 +318,13 @@ anlchar    [^ \t\n\r]
 <SEPARATORS>{tab}({space}*) {
   //-- SEPARATORS: Separator character(s): increment column nicely
   theColumn = (static_cast<int>(theColumn/8)+1)*8;
+  theByte += yyleng;
   lasttyp = LexTypeEOA;
 }
 <SEPARATORS>""/{wordchar} {
   //-- SEPARATORS: end of separators
   theColumn += yyleng;
+  theByte += yyleng;
   BEGIN(DETAILS);
   //-- allocate new analysis
   mtoken->insert(mootToken::Analysis());
@@ -324,8 +332,9 @@ anlchar    [^ \t\n\r]
 }
 <SEPARATORS>""/{eotchar} {
   //-- SEPARATORS/EOT: reset to initial state
-  theLine++;
+  //theLine++;
   theColumn = 0;
+  theByte += yyleng;
   BEGIN(TOKEN);
 }
 
@@ -339,6 +348,7 @@ anlchar    [^ \t\n\r]
 <DETAILS>"["_?/{tagchar} {
   //-- DETAILS: looks like a tag
   theColumn += yyleng;
+  theByte += yyleng;
   manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeDetails;
   BEGIN(TAG);
@@ -347,6 +357,7 @@ anlchar    [^ \t\n\r]
 <DETAILS>{detchar}+ {
   //-- DETAILS: detail text
   theColumn += yyleng;
+  theByte += yyleng;
   manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeDetails;
 }
@@ -354,12 +365,14 @@ anlchar    [^ \t\n\r]
 <DETAILS>{space}+/{wordchar} {
   //-- DETAILS: internal whitespace: keep it
   theColumn += yyleng;
+  theByte += yyleng;
   manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeDetails;
 }
 
 <DETAILS>{space}*/{eoachar} {
   //-- DETAILS/EOA: add & clear current analysis, if any
+  theByte += yyleng;
   on_EOA();
   BEGIN(SEPARATORS);
 }
@@ -373,6 +386,7 @@ anlchar    [^ \t\n\r]
 <TAG>{tagchar}+ {
   //-- TAG: tag text
   theColumn += yyleng;
+  theByte += yyleng;
   manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   if (manalysis->tag.empty()) manalysis->tag.assign(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeTag;
@@ -388,21 +402,25 @@ anlchar    [^ \t\n\r]
 {space}+ {
   /* mostly ignore spaces */
   theColumn += yyleng;
+  theByte += yyleng;
   //lasttyp = LexTypeIgnore;
 }
 
 . {
   theColumn += yyleng;
+  theByte += yyleng;
   yycarp("Unrecognized TOKEN character '%c'", *yytext);
 }
 
 <DETAILS>. {
   theColumn += yyleng;
+  theByte += yyleng;
   yycarp("Unrecognized DETAIL character '%c'", *yytext);
 }
 
 <TAG>. {
   theColumn += yyleng;
+  theByte += yyleng;
   yycarp("Unrecognized TAG character '%c'", *yytext);
 }
 
@@ -418,6 +436,9 @@ void mootTokenLexer::mgl_begin(int stateno) {BEGIN(stateno);}
  *----------------------------------------------------------------------*/
 void mootTokenLexer::reset(void)
 {
+  theLine = 0;
+  theColumn = 0;
+  theByte = 0;
   current_analysis_is_best = false;
   manalysis = NULL;
   mtoken_default.clear();

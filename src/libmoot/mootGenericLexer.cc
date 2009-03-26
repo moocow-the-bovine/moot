@@ -64,6 +64,9 @@ namespace moot {
   void GenericLexer::reset(void)
   {
     mgl_begin(0);
+    theLine = 0;
+    theColumn = 0;
+    theByte = 0;
   };
 
   /*----------------------------------------------------------------------

@@ -129,7 +129,9 @@ endif
 CLEANFILES = \
 	*.dvi *.ps *.pdf \
 	*.log *.aux *.toc *.idx *~~ *.tmp \
-	*.lex *.123 test.mtt test.tt test.t
+	*.lex *.123
+
+#test.mtt test.tt test.t
 
 if HAVE_POD2MAN
 CLEANFILES += *.man *.1 *.5

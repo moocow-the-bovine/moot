@@ -52,6 +52,9 @@ namespace mootio {
   /// typedef for byte counts (should be signed, for compatibility)
   typedef int ByteCount;
 
+  /// typedef for (byte) offsets (may be unsigned)
+  typedef long unsigned int ByteOffset;
+
   /*====================================================================
    * mstream: base class
    *====================================================================*/

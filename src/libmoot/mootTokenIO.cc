@@ -322,7 +322,7 @@ void TokenReader::carp(const char *fmt, ...)
 	  ((tr_istream
 	    && tr_istream->valid()
 	    && !tr_istream->name.empty()) ? tr_istream->name.c_str() : "(unknown)"),
-	  byte_number(),
+	  static_cast<ssize_t>(byte_number()),
 	  line_number(),
 	  column_number());
 }

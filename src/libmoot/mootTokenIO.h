@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2008 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -435,10 +435,10 @@ public:
   virtual size_t column_number(size_t n) { return n; };
 
   /** Get current byte number. Descendants may override this method. */
-  virtual size_t byte_number(void) { return 0; };
+  virtual mootio::ByteOffset byte_number(void) { return 0; };
 
   /** Get current byte number. Descendants may override this method. */
-  virtual size_t byte_number(size_t n) { return n; };
+  virtual mootio::ByteOffset byte_number(size_t n) { return n; };
 
   /** Complain, giving verbose information */
   virtual void carp(const char *fmt, ...);
@@ -530,6 +530,12 @@ public:
 
   /** Set current column number. */
   virtual size_t column_number(size_t n) { return lexer.theColumn = n; };
+
+  /** Get current byte offset. */
+  virtual mootio::ByteOffset byte_number(void) { return lexer.theByte; };
+
+  /** Set current byte offset. */
+  virtual mootio::ByteOffset byte_number(mootio::ByteOffset n) { return lexer.theByte = n; };
   //@}
 
 
