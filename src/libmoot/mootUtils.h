@@ -75,13 +75,13 @@ namespace moot {
 
   /**
    * Append a whitespace-normalized C++ string to another C++ string.
-   * All whitespace substrings in @in are replaced with a
-   * single space in @out.  @out is not cleared.
+   * All whitespace substrings in \p in are replaced with a
+   * single space in \p out.  \p out is not cleared.
    *
-   * \@param in source string
-   * \@param out destination string
-   * \@param trim_left whether to trim all leading whitespace
-   * \@param trim_right whether to trim all trailing whitespace
+   * @param in source string
+   * @param out destination string
+   * @param trim_left whether to trim all leading whitespace
+   * @param trim_right whether to trim all trailing whitespace
    */
   void moot_normalize_ws(const std::string &in,
 			 std::string &out,
@@ -92,10 +92,10 @@ namespace moot {
    * Append a whitespace-normalized NUL-terminated C string
    * to an STL string.
    *
-   * \@param s source string
-   * \@param out destination STL string
-   * \@param trim_left whether to trim all leading whitespace
-   * \@param trim_right whether to trim all trailing whitespace
+   * @param s source string
+   * @param out destination STL string
+   * @param trim_left whether to trim all leading whitespace
+   * @param trim_right whether to trim all trailing whitespace
    */
   inline void moot_normalize_ws(const char *s,
 				std::string &out,
@@ -109,10 +109,10 @@ namespace moot {
    * Create and return a whitespace-normalized STL string
    * from a C memory buffer.
    *
-   * \@param buf source buffer
-   * \@param len length of source buffer, in bytes
-   * \@param trim_left whether to trim all leading whitespace
-   * \@param trim_right whether to trim all trailing whitespace
+   * @param buf source buffer
+   * @param len length of source buffer, in bytes
+   * @param trim_left whether to trim all leading whitespace
+   * @param trim_right whether to trim all trailing whitespace
    */
   inline std::string moot_normalize_ws(const char *buf,
 				       size_t len,
@@ -129,9 +129,9 @@ namespace moot {
    * Create and return a whitespace-normalized STL string
    * from a NUL-terminated C string.
    *
-   * \@param s source string
-   * \@param trim_left whether to trim all leading whitespace
-   * \@param trim_right whether to trim all trailing whitespace
+   * @param s source string
+   * @param trim_left whether to trim all leading whitespace
+   * @param trim_right whether to trim all trailing whitespace
    */
   inline std::string moot_normalize_ws(const char *s,
 				       bool trim_left=true,
@@ -144,9 +144,9 @@ namespace moot {
    * Create and return a whitespace-normalized STL string
    * from a different STL string.
    *
-   * \@param s source string
-   * \@param trim_left whether to trim all leading whitespace
-   * \@param trim_right whether to trim all trailing whitespace
+   * @param s source string
+   * @param trim_left whether to trim all leading whitespace
+   * @param trim_right whether to trim all trailing whitespace
    */
   inline std::string moot_normalize_ws(const std::string &s,
 				       bool trim_left=true,
@@ -162,8 +162,8 @@ namespace moot {
    * Remove all newlines from a C buffer.
    * Every newline is replaced with a single space.
    *
-   * \@param s target string
-   * \@param len length of target buffer in bytes
+   * @param buf target buffer
+   * @param len length of target buffer in bytes
    */
   inline void moot_remove_newlines(char *buf, size_t len)
   {
@@ -188,9 +188,9 @@ namespace moot {
 
   /** Tokenize an STL string to an existing list.
    *
-   * \@param s source string
-   * \@param delim string of delimiter characters
-   * \@param out destination string list
+   * @param s source string
+   * @param delim string of delimiter characters
+   * @param out destination string list
    */
   void moot_strtok(const std::string &s,
 		   const std::string &delim,
@@ -198,8 +198,8 @@ namespace moot {
 
   /** Tokenize an STL string to a new list.
    *
-   * \@param s source string
-   * \@param delim string of delimiter characters
+   * @param s source string
+   * @param delim string of delimiter characters
    */
   inline std::list<std::string> moot_strtok(const std::string &s,
 					    const std::string &delim)

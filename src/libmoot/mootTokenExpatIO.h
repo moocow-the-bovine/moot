@@ -117,6 +117,8 @@ public:
   std::string postag_attr;   ///< Name of 'pos tag' attribute (of 'analysis' elt) Default="pos".
   std::string besttag_elt;   ///< Name of 'best tag' element (descendant of 'token'). Default="moot.tag"
   std::string location_elt;  ///< Name of 'location' element (descendant of 'token'). Default="moot.loc"
+  std::string offset_attr;   ///< Name of 'location' element 'offset' attribute. Default="offset"
+  std::string length_attr;   ///< Name of 'location' element 'length' attribute. Default="length"
   //@}
 
   //----------------------------
@@ -143,8 +145,10 @@ public:
   //@{
 
   /** Default constructor:
-   * \bufsize: length of parse buffer for expat
-   * \encoding: override document encoding (broken?)
+   * @param fmt bitmask of moot::TokenIOFormatE flags
+   * @param buflen length of parse buffer for expat
+   * @param encoding override document encoding (broken?)
+   * @param name symbolic name for this reader used for error reporting, etc.
    */
   TokenReaderExpat(int                fmt      =tiofXML,
 		   size_t             buflen   =MOOT_DEFAULT_EXPAT_BUFLEN,
@@ -162,6 +166,8 @@ public:
       postag_attr("pos"),
       besttag_elt("moot.tag"),
       location_elt("moot.loc"),
+      offset_attr("length"),
+      length_attr("length"),
       done(1)
   {
     //-- TokenReader pointers
@@ -432,9 +438,10 @@ public:
   std::string text_elt;      ///< Default name of 'text' element. Default="text"
   std::string analysis_elt;  ///< Default name of 'analysis' element. Default="analysis"
   std::string postag_attr;   ///< Default name of 'pos' attribute (of 'analysis' elt) Default="pos".
-
   std::string besttag_elt;   ///< Name of 'best tag' element. Default="moot.tag"
   std::string location_elt;   ///< Name of 'best tag' element. Default="moot.loc"
+  std::string offset_attr;   ///< Name of 'location' element 'offset' attribute. Default="offset"
+  std::string length_attr;   ///< Name of 'location' element 'length' attribute. Default="length"
   //@}
 
   //----------------------------
@@ -459,11 +466,10 @@ public:
 
   /**
    * Default constructor:
-   * \fmt: output format, a bitmask of TokenIOFormat flags
-   * \got_raw_xml: whether this object is part of a lossless
-   *               XML I/O chain: useful but cryptic --
-   *               see \c use_raw_xml for details.
-   * \encoding: destination encoding.  still somewhat buggy.
+   * \param fmt output format, a bitmask of TokenIOFormat flags
+   * \param got_raw_xml whether this object is part of a lossless
+   *   XML I/O chain: useful but cryptic -- see \c use_raw_xml for details.
+   * \param encoding destination encoding.  still somewhat buggy.
    */
   TokenWriterExpat(int                   fmt         =tiofXML
 		   , bool                got_raw_xml =false

@@ -151,7 +151,7 @@ namespace mootio {
     /** Read a single byte of data.  Returns EOF on eof. */
     virtual int getbyte(void) { return EOF; }
 
-    /** Read up to @n bytes of data into @buf,
+    /** Read up to \p n bytes of data into \p buf,
      *  returns number of bytes actually read. */
     virtual ByteCount read(char *buf, size_t n) {
       size_t nread = 0;
@@ -162,10 +162,10 @@ namespace mootio {
       return static_cast<ByteCount>(nread);
     };
 
-    /** Read a single line of data into @s, using delimiters from @delim.
-     *  Returns the number of bytes read, or EOF on eof
+    /** Read a single line of data into \p s, using delimiters from \p delim.
+     *  Returns the number of bytes read, or \c EOF on eof
      *  The default implementation is quite inefficient.
-     *  Implicitly clears @s.
+     *  Implicitly clears \p s.
      */
     virtual ByteCount getline(std::string &s, const std::string &delim="\n\r") {
       ByteCount nread = 0;
@@ -208,7 +208,7 @@ namespace mootio {
     /** Flush all pending writes. */
     virtual bool flush(void) { return false; };
 
-    /** Write @n bytes from @buf to the stream */
+    /** Write \p n bytes from \p buf to the stream */
     virtual bool write(const char *buf, size_t n) { return false; };
 
     /** Write a single byte to the stream */

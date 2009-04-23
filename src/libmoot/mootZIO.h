@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2004-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -104,7 +104,7 @@ namespace mootio {
      */
     ///\name Input Methods
     //@{
-    /** Read up to @n bytes of data into @buf,
+    /** Read up to \p n bytes of data into \p buf,
      *  returns number of bytes actually read. */
     virtual ByteCount read(char *buf, size_t n) {
       return zfile ? gzread(zfile, buf, n) : 0;
@@ -127,7 +127,7 @@ namespace mootio {
       return zfile && gzflush(zfile, Z_SYNC_FLUSH) == Z_OK;
     };
 
-    /** Write @n bytes from @buf to the stream */
+    /** Write \p n bytes from \p buf to the stream */
     virtual bool write(const char *buf, size_t n) {
       return zfile ? (gzwrite(zfile,buf,n) == static_cast<int>(n)) : false;
     };
@@ -207,14 +207,14 @@ namespace mootio {
       return reopen();
     };
     /** Open a named file, fopen() style.
-     *  "-" may be use to specify stdin or stdout, depending on @mode */
+     *  "-" may be use to specify stdin or stdout, depending on \p open_mode */
     inline bool open(const std::string &filename, const std::string &open_mode="") {
       mode = open_mode;
       name = filename;
       return reopen();
     };
 
-    /** (Re-)open file @name with mode @mode */
+    /** (Re-)open file \a name with mode \a mode */
     virtual bool reopen(void) {
       close();
       if (mode.empty()) mode = default_mode;

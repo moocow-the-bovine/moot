@@ -269,9 +269,19 @@ void TokenReaderExpat::StartElementHandler(const char *el, const char **attr)
 	cb_nxttok->tok_besttag.clear();
 	info |= (TRX_IsBestTagE|TRX_IsBestTagD);
       }
+      else if (location_elt == el) {
+	for (int i=0; attr[i]; i += 2) {
+	  if (attr[i] == offset_attr) {
+	    cb_nxttok->loc_offset(strtoul(reinterpret_cast<const char *>(attr[i+1]),NULL,0));
+	  }
+	  else if (attr[i] == length_attr) {
+	    cb_nxttok->loc_length(strtoul(reinterpret_cast<const char *>(attr[i+1]),NULL,0));
+	  }
+	}
+      }
       /*
       else {
-	//-- //body//token//
+	//-- //body//token//?
 	//info &= ~(TRX_IsTokenE|TRX_IsTokTextE|TRX_IsAnalysisE|TRX_IsBestTagE);
       }
       */
@@ -451,6 +461,8 @@ TokenWriterExpat::TokenWriterExpat(int                fmt
     postag_attr("pos"),
     besttag_elt("moot.tag"),
     location_elt("moot.loc"),
+    offset_attr("offset"),
+    length_attr("length"),
     lastc(' ')
 {
   //-- TokenWriter flags
@@ -541,11 +553,11 @@ void TokenWriterExpat::_put_token_raw(const mootToken &token, mootio::mostream *
 		 (tw_format&tiofPretty ? "\n    " : ""));
     }
     if (tw_format&tiofLocation) {
-      os->printf("%s<%s offset=\"%lu\" length=\"%lu\"/>",
+      os->printf("%s<%s %s=\"%lu\" %s=\"%lu\"/>",
 		 (tw_format&tiofPretty ? "  " : ""),
 		 location_elt.c_str(),
-		 token.loc_offset(),
-		 token.loc_length());
+		 offset_attr.c_str(), token.loc_offset(),
+		 length_attr.c_str(), token.loc_length());
     }
     break;
     
@@ -649,11 +661,11 @@ void TokenWriterExpat::_put_token_gen(const mootToken &token, mootio::mostream *
 
     //-- gen mode: location
     if (tw_format & tiofLocation) {
-      os->printf("%s<%s offset=\"%lu\" length=\"%lu\"/>",
+      os->printf("%s<%s %s=\"%lu\" %s=\"%lu\"/>",
 		 (tw_format&tiofPretty ? "\n    " : ""),
 		 location_elt.c_str(),
-		 token.loc_offset(),
-		 token.loc_length());
+		 offset_attr.c_str(), token.loc_offset(),
+		 length_attr.c_str(), token.loc_length());
     }
 
     //-- gen mode: end-token

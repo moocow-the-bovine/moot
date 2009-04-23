@@ -4,7 +4,7 @@
 
 \author Bryan Jurish <moocow@ling.uni-potsdam.de>
 
-\version 2.0.0
+\version 2.0.6-pre9
 
 
 \section Intro Introduction
@@ -42,11 +42,11 @@ tags your input tokens might in fact happen to carry.
 
 \section Eval Tagger Evaluation
 
-The \link mootEval mootEval\endlink class provides
+The \link moot::mootEval mootEval\endlink class provides
 an API for (cross-)evaluation of parallel tagged files,
 optionally extended by prior analyses. 
 
-\see \link mootEval mootEval\endlink
+\see \link moot::mootEval mootEval\endlink
 \see <A HREF="../../programs/mooteval.html">mooteval(1)</A>
 
 
@@ -55,8 +55,8 @@ optionally extended by prior analyses.
 The high-level
 \link mootTokenIO.h mootTokenIO\endlink
 layer
-comprises the \link TokenReader TokenReader\endlink 
-and \link TokenWriter TokenWriter\endlink
+comprises the \link moot::TokenReader TokenReader\endlink 
+and \link moot::TokenWriter TokenWriter\endlink
 classes, which provide an abstract API specification for
 definition of user-defined I/O protocols using
 the C++ virtual method convention.  Builtin
@@ -81,10 +81,10 @@ file streams (gzFile).
 \section Ack Acknowledgements
 
 Development of this package was supported by the project
-<A HREF="http://www.bbaw.de/forschung/kollokationen">Kollokationen im Wörterbuch</A>
+<A HREF="http://www.bbaw.de/forschung/kollokationen">Kollokationen im W&ouml;rterbuch</A>
 ("collocations in the dictionary")
 in association with the project
-<A HREF="http://www.dwds.de">Digitales Wörterbuch der deutschen Sprache des 20. Jahrhunderts(DWDS)</A>
+<A HREF="http://www.dwds.de">Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts(DWDS)</A>
 ("digital dictionary of the German language")
 at the
 <A HREF="http://www.bbaw.de">Berlin-Brandenburgische Akademie der Wissenschaften</A>

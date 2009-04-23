@@ -128,7 +128,7 @@ KNOWN ISSUES
   Common Warnings
     "WARNING: ..." from configure
         This is a warning. This is only a warning. It may be responsible for
-        fatal errors from 'make' if and only if you are building from CVS.
+        fatal errors from 'make' if and only if you are building from SVN.
         Otherwise, you can safely ignore it (probably).
 
     "flex++bison++.pc not found"

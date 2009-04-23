@@ -165,13 +165,13 @@ GENERATE_AUTOGEN_DEF   = NO
 #---------------------------------------------------------------------------
 # Configuration options related to the preprocessor   
 #---------------------------------------------------------------------------
-#ENABLE_PREPROCESSING   = YES
+ENABLE_PREPROCESSING   = YES
 #MACRO_EXPANSION        = YES
-ENABLE_PREPROCESSING   = NO
+#ENABLE_PREPROCESSING   = NO
 MACRO_EXPANSION        = NO
 EXPAND_ONLY_PREDEF     = NO
 SEARCH_INCLUDES        = YES
-INCLUDE_PATH           = @top_srcdir@/src/libmoot @top_builddir@src/libmoot
+INCLUDE_PATH           = @top_srcdir@/src/libmoot @top_builddir@/src/libmoot
 INCLUDE_FILE_PATTERNS  = 
 PREDEFINED             = __cplusplus @DOXY_DEFINES@
 EXPAND_AS_DEFINED      = 

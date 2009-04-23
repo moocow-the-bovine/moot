@@ -71,7 +71,7 @@ namespace mootio {
     /** Constructor from a user-specified buffer
      * Read operations will be performed on the
      * buffer specified.  User is responsible
-     * for freeing memory associated with @data passed
+     * for freeing memory associated with \p data passed
      * to this constructor.
      */
     micbuffer(const void *data, size_t len)
@@ -132,7 +132,7 @@ namespace mootio {
     /// \name Input Methods
     //@{
 
-    /** Read up to @n bytes of data into @buf,
+    /** Read up to \p n bytes of data into \p buf,
      *  returns number of bytes actually read. */
     virtual ByteCount read(char *buf, size_t n) {
       if (n==0 || cb_offset >= cb_used) return 0;
@@ -178,10 +178,10 @@ namespace mootio {
 
     /**
      * Return the unread portion of the buffer as a new STL string.
-     * \@param normalize_ws Whether to normalize whitespace
+     * @param normalize_ws Whether to normalize whitespace
      *         (replace all whitespace substrings with a single space).
-     * \@param trim_left whether to trim all leading whitespace
-     * \@param trim_right whether to trim all trailing whitespace
+     * @param trim_left whether to trim all leading whitespace
+     * @param trim_right whether to trim all trailing whitespace
      */
     inline std::string as_string(bool normalize_ws=false,
 				 bool trim_left=false,
@@ -196,11 +196,11 @@ namespace mootio {
 
     /**
      * Append the unread portion of the buffer to an existing STL string.
-     * \@param str destination string
-     * \@param normalize_ws Whether to normalize whitespace
+     * @param str destination string
+     * @param normalize_ws Whether to normalize whitespace
      *         (replace all whitespace substrings with a single space).
-     * \@param trim_left whether to trim all leading whitespace
-     * \@param trim_right whether to trim all trailing whitespace
+     * @param trim_left whether to trim all leading whitespace
+     * @param trim_right whether to trim all trailing whitespace
      */
     inline void to_string(std::string &str,
 			  bool normalize_ws =false,
@@ -248,7 +248,7 @@ namespace mootio {
     char   *cb_wdata;   ///< underlying character data buffer (write)
     size_t  cb_alloc;   ///< allocated size of buffer (in bytes)
     size_t  cb_get;     ///< number of extra bytes to get on internal reserve() calls
-    bool    cb_created; ///< whether we allocated the @cb_wdata buffer ourself
+    bool    cb_created; ///< whether we allocated the \a cb_wdata buffer ourself
 
   public:
     /*----------------------------------------------------------
@@ -272,7 +272,7 @@ namespace mootio {
      * buffer as long as possible.  On write overflow,
      * a new local buffer will be allocated (which will
      * be freed on release()).  User is responsible
-     * for freeing memory associated with @data passed
+     * for freeing memory associated with \p data passed
      * to this constructor.
      */
     mcbuffer(void *data,
@@ -347,7 +347,7 @@ namespace mootio {
       return true;
     };
 
-    /** Write @n bytes from @buf to the buffer */
+    /** Write \p n bytes from \p buf to the buffer */
     virtual bool write(const char *buf, size_t n) {
       if (!reserve(n+cb_used, cb_get)) return false;
       memcpy(cb_wdata+cb_used, buf, n);
@@ -392,7 +392,7 @@ namespace mootio {
      */
     /// \name Utilities
     //@{
-    /** Grow the buffer to fit at least @size + @pad bytes in it */
+    /** Grow the buffer to fit at least <code>size + pad</code> bytes in it */
     inline bool reserve(size_t size, size_t pad=0) {
       if (size > cb_alloc) {
 	size_t newalloc = size+pad;

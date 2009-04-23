@@ -103,7 +103,7 @@ public:
   //@{
   /**
    * Parse a format string, which should be a comma-separated
-   * list of TokenIOFormat flag-names (without the 'tiof' prefix,
+   * list of moot::TokenIOFormat flag-names (without the 'tiof' prefix,
    * matching is case-insensitive).
    * A prefix of '!' indicates negation of the given flag.
    * Returns the corresponding bitmask.
@@ -154,18 +154,16 @@ public:
   ///\name Format-Based Reader/Writer Creation
   //@{
   /**
-   * Create a new TokenReader object suitable for reading
-   * the format @fmt.
-   * \fmt should be a bitmask composed of TokenIOFormat flags.
-   * Caller is responsible for deleting the object returned.
+   * Create a new TokenReader object suitable for reading the format \p fmt.
+   * @param fmt a bitmask composed of moot::TokenIOFormat flags.
+   * @warning Caller is responsible for deleting the object returned.
    */
   static class TokenReader *new_reader(int fmt);
 
   /**
-   * Create a new TokenReader object suitable for reading
-   * the format @fmt.
-   * @fmt should be a bitmask composed of TokenIOFormat flags.
-   * Caller is responsible for delting the object returned.
+   * Create a new moot::TokenWriter object suitable for writing the format \p fmt.
+   * @param fmt a bitmask composed of moot::TokenIOFormat flags.
+   * @warning caller is responsible for delting the object returned.
    */
   static class TokenWriter *new_writer(int fmt);
   //@}
@@ -182,7 +180,7 @@ public:
   static const size_t TR_DEFAULT_BUFSIZE = 256;
 
 public:
-  /** Format flags: bitmask of TokenIO::TokenIOFormat flags */
+  /** Format flags: bitmask of moot::TokenIOFormat flags */
   int tr_format;
 
   /** Name of TokenReader subtype. */
@@ -222,9 +220,8 @@ public:
   //@{
   /**
    * Default constructor
-   * \fmt: bitmask of TokenIO::TokenIOFormat flags
-   * \mode: default input mode
-   * \name: name of current input source
+   * @param fmt bitmask of moot::TokenIOFormat flags
+   * @param name name of current input source
    */
   TokenReader(int                fmt  =tiofUnknown,
 	      const std::string &name ="TokenReader")
@@ -471,8 +468,8 @@ public:
   /** \name Constructors etc. */
   //@{
   /** Default constructor
-   * \fmt: bitmask of TokenIOFormat flags.
-   * \name: name of input source, for diagnostics.
+   * @param fmt bitmask of moot::TokenIOFormat flags.
+   * @param name name of input source, for diagnostics.
    */
   TokenReaderNative(int                fmt  =tiofWellDone,
 		    const std::string &name ="TokenReaderNative")
@@ -613,7 +610,7 @@ public:
 /** \brief Abstract class for token output */
 class TokenWriter : public TokenIO {
 public:
-  /** Format flags: bitmask of TokenIO::TokenIOFormat flags */
+  /** Format flags: bitmask of moot::TokenIOFormat flags */
   int tw_format;
 
   /** Name of TokenWriter subtype for diagnostics */
@@ -622,7 +619,7 @@ public:
   /** Pointer to underlying mootio::mostream used for output */
   mootio::mostream *tw_ostream;
 
-  /** Whether we created @tw_ostream ourselves */
+  /** Whether we created @p tw_ostream ourselves */
   bool tw_ostream_created;
 
   /** Whether we're in a comment-block */
@@ -636,7 +633,7 @@ public:
   //@{
   /**
    * Default constructor
-   * @param fmt output format: should be a bitmask of TokenIO::TokenIOFormat flags 
+   * @param fmt output format: should be a bitmask of TokenIOFormatE flags 
    * @param name name of TokenWriter subtype for diagnostics
    */
   TokenWriter(int fmt=tiofWellDone,
@@ -953,7 +950,7 @@ public:
   /** Write a raw comment to a mootio::mostream */
   void _put_comment(const char *buf, size_t len, mootio::mostream *os);
 
-  /** Write some raw data to a mootio::mostream, respecinting @tw_is_comment_block */
+  /** Write some raw data to a mootio::mostream, respecting \a tw_is_comment_block */
   void _put_raw_buffer(const char *buf, size_t len, mootio::mostream *os);
 
   /** Clear internal buffer and stringify sentence into it,

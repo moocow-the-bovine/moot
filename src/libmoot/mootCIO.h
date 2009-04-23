@@ -95,7 +95,7 @@ namespace mootio {
      */
     ///\name Input Methods
     //@{
-    /** Read up to @n bytes of data into @buf,
+    /** Read up to \p n bytes of data into \p buf,
      *  returns number of bytes actually read. */
     virtual ByteCount read(char *buf, size_t n) {
       return file ? fread(buf, 1, n, file) : 0;
@@ -115,7 +115,7 @@ namespace mootio {
     /** Flush all pending writes. */
     virtual bool flush(void) { return file && fflush(file) != EOF; };
 
-    /** Write @n bytes from @buf to the stream */
+    /** Write \p n bytes from \p buf to the stream */
     virtual bool write(const char *buf, size_t n) {
       return file ? (fwrite(buf,1,n,file) == n) : false;
     };
@@ -191,14 +191,14 @@ namespace mootio {
       return reopen();
     };
     /** Open a named file, fopen() style.
-     *  "-" may be use to specify stdin or stdout, depending on @mode */
+     *  "-" may be use to specify stdin or stdout, depending on \p open_mode */
     inline bool open(const std::string &filename, const std::string &open_mode="") {
       mode = open_mode;
       name = filename;
       return reopen();
     };
 
-    /** (Re-)open file @name with mode @mode */
+    /** (Re-)open file \a name with mode \a mode */
     virtual bool reopen(void) {
       close();
       if (mode.empty()) mode = default_mode;

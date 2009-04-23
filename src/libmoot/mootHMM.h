@@ -424,12 +424,12 @@ public:
   size_t ndots;
 
   /**
-   * Add contents of Viterbi trellis to @analyses members of mootToken elements on tag_mark_best()
+   * Add contents of Viterbi trellis to \a analyses members of mootToken elements on tag_mark_best()
    */
   bool save_ambiguities;
 
   /**
-   * Add flavor names to @analyses members of mootToken elements on tag_mark_best()
+   * Add flavor names to \a analyses members of mootToken elements on tag_mark_best()
    */
   bool save_flavors;
 
@@ -721,11 +721,16 @@ public:
    * @param modelname is a model name following the conventions in mootfiles(5)
    * @param start_tag_str is the string form of the boundary tag.
    * @param myname name to use for warnings/errors/info
+   * @param do_estimate_nglambdas whether to estimate n-gram smoothing constants here
+   * @param do_estimate_wlambdas whether to estimate lexical smoothing constants here
+   * @param do_estimate_clambdas whether to estimate lexical class smoothing constants here
+   * @param do_build_suffix_trie whether to build a suffix trie here
+   * @param do_compute_logprobs whether to compute log-probabilities here
    *
    * If you want to load multiple models, you will need to first
-   * load the raw-freqency objects, then call the compile(),
-   * estimate_*(), build_suffix_trie(), and compute_logprobs()
-   * methods yourself.
+   * load the raw-freqency objects, then call the \c compile(),
+   * \c estimate_*(), \c build_suffix_trie(), and \c compute_logprobs()
+   * methods yourself (e.g. set all of the \p do_* parameters to \c false).
    */
   bool load_model(const string &modelname,
 		  const mootTagString &start_tag_str="__$",
@@ -914,7 +919,7 @@ public:
   //------------------------------------------------------------
   // Viterbi: single iteration: (TokString)
   /**
-   * \bold DEPRECATED in favor of \c viterbi_step(mootToken)
+   * \deprecated{prefer \c viterbi_step(mootToken)}
    *
    * Step a single Viterbi iteration, string version.
    * Really just a wrapper for \c viterbi_step(TokID tokid).
@@ -926,9 +931,9 @@ public:
   //------------------------------------------------------------
   // Viterbi: single iteration: (TokString,set<TagString>)
   /**
-   * \bold DEPRECATED
+   * \deprecated{prefer \c viterbi_step(mootToken)}
    *
-   * Step a single Viterbi iteration, considering only the tags in \c tags.
+   *  Step a single Viterbi iteration, considering only the tags in \c tags.
    */
   inline void viterbi_step(const mootTokString &token_text, const set<mootTagString> &tags)
   {
@@ -940,6 +945,8 @@ public:
   //------------------------------------------------------------
   // Viterbi: single iteration: (TokID,TagID,col=NULL)
   /**
+   * \deprecated{prefer \c viterbi_step(mootToken)}
+   *
    * Step a single Viterbi iteration, considering only the tag \c tagid.
    */
   void viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col=NULL);
@@ -947,7 +954,7 @@ public:
   //------------------------------------------------------------
   // Viterbi: single iteration: (TokString,TagString)
   /**
-   * \bold DEPRECATED
+   * \deprecated{prefer \c viterbi_step(mootToken)}
    *
    * Step a single Viterbi iteration, considering only the tag \c tag : string version.
    */
@@ -1106,7 +1113,7 @@ public:
   /** \name Low-level Viterbi iteration utilities */
   //{@
 
-  /** Returns true iff @col is a valid (non-empty) Viterbi trellis column */
+  /** Returns true iff \p col is a valid (non-empty) Viterbi trellis column */
   inline bool viterbi_column_ok(const ViterbiColumn *col) const {
     return (col
 	    && col->rows 
@@ -1117,12 +1124,12 @@ public:
   };
 
   /**
-   * Get and populate a new Viterbi-trellis row in column @col for destination Tag-ID
-   * @curtagid with lexical (log-)probability @wordpr.
-   * If @col is NULL (the default), a new column will be allocated.
-   * Returns a pointer to the trellis column, or NULL on failure.
+   * Get and populate a new Viterbi-trellis row in column \p col for destination Tag-ID
+   * \p curtagid with lexical (log-)probability \p wordpr.
+   * If \p col is NULL (the default), a new column will be allocated.
+   * \returns a pointer to the trellis column, or \c NULL on failure.
    *
-   * If specified, @probmin can be used to override beam-pruning
+   * If specified, \p probmin can be used to override beam-pruning
    * for non-NULL columns.
    */
   inline ViterbiColumn *viterbi_populate_row(TagID curtagid,
@@ -1245,7 +1252,7 @@ public:
 
   //------------------------------------------------------------
   // Viterbi: Low-level: clear best-path
-  /** Clear internal @vbestpath temporary */
+  /** Clear internal \a vbestpath temporary */
   inline void viterbi_clear_bestpath(void)
   {
     //-- move to trash: path-nodes
@@ -1383,6 +1390,7 @@ public:
 
   /**
    * Lookup the ClassID for the lexical-class \c lclass.
+   * @param lclass lexical class whose ID is to be looked up
    * @param autopopulate if true, new classes will be autopopulated with uniform distributions (implies \c autocreate).
    * @param autocreate if true, new classes will be created and assigned class-ids.
    */
@@ -1487,7 +1495,7 @@ public:
   };
 
   /**
-   * \bold DEPRECATED
+   * \deprecated{prefer direct lookup}
    *
    * Looks up and returns lexical probability: p(token|tag)
    * given token, tag.
@@ -1512,7 +1520,7 @@ public:
   };
 
   /**
-   * \bold DEPRECATED
+   * \deprecated{prefer direct lookup}
    *
    * Looks up and returns lexical-class probability: p(class|tag)
    * given class, tag -- no id auto-generation is performed!
@@ -1541,8 +1549,6 @@ public:
   };
 
   /**
-   * \bold DEPRECATED
-   *
    * Looks up and returns unigram (log-)probability: log(p(tag)), string-version.
    */
   inline const ProbT tagp(const mootTagString &tag) const
@@ -1570,8 +1576,6 @@ public:
   };
 
   /**
-   * \bold DEPRECATED
-   *
    * Looks up and returns bigram probability: log(p(tag|prevtag)), string-version.
    */
   inline const ProbT tagp(const mootTagString &prevtag, const mootTagString &tag) const
@@ -1586,8 +1590,6 @@ public:
   /**
    * Looks up and returns trigram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
    * given Trigram(prevtagid2,prevtagid1,tagid)
-   *
-   * \bold WORK IN PROGRESS
    */
 #ifdef MOOT_HASH_TRIGRAMS
   inline const ProbT tagp(const Trigram &trigram, ProbT ProbZero=MOOT_PROB_ZERO) const
@@ -1600,8 +1602,6 @@ public:
   /**
    * Looks up and returns trigram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
    * given prevtagid2, prevtagid1, tagid.
-   *
-   * \bold WORK IN PROGRESS
    */
   inline const ProbT tagp(const TagID prevtagid2, const TagID prevtagid1, const TagID tagid) const
   {
@@ -1617,11 +1617,9 @@ public:
   };
 
   /**
-   * \bold DEPRECATED
+   * \deprecated{prefer direct lookup}
    *
    * Looks up and returns trigram (log-)probability: log(p(tag|prevtag1,prevtag2)), string-version.
-   *
-   * \bold WORK IN PROGRESS
    */
   inline const ProbT tagp(const mootTagString &prevtag2,
 			  const mootTagString &prevtag1,

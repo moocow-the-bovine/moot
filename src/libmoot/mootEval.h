@@ -52,10 +52,10 @@ public:
     MEF_BestMismatch   = 0x0004, /**< best-tag mismatch */
     MEF_EmptyClass1    = 0x0008, /**< empty class in 1st token */
     MEF_EmptyClass2    = 0x0010, /**< empty class in 2nd token */
-    MEF_ImpClass1      = 0x0020, /**< Impossible class in 1st token (besttag1 \not\in class1) */
-    MEF_ImpClass2      = 0x0040, /**< Impossible class in 2nd token (besttag2 \not\in class2) */
-    MEF_XImpClass1     = 0x0080, /**< X-Impossible class in 2nd token (besttag1 \not\in class2) */
-    MEF_XImpClass2     = 0x0100  /**< X-Impossible class in 2nd token (besttag2 \not\in class1) */
+    MEF_ImpClass1      = 0x0020, /**< Impossible class in 1st token (\f$ besttag1 \not\in class1 \f$) */
+    MEF_ImpClass2      = 0x0040, /**< Impossible class in 2nd token (\f$ besttag2 \not\in  class2 \f$) */
+    MEF_XImpClass1     = 0x0080, /**< X-Impossible class in 1st token (\f$ besttag1 \not\in class2 \f$) */
+    MEF_XImpClass2     = 0x0100  /**< X-Impossible class in 2nd token (\f$ besttag2 \not\in  class1 \f$) */
   } evalStatus;
 
 public:
@@ -88,7 +88,7 @@ public:
 
   /**
    * True after compareTokens(tok1,tok2) iff tok1 had empty analyses:
-   * iff \f$ tok1.analyses() = \emptyset \f$
+   * iff \f$ tok1.analyses() = \emptyset\f$
    */
   inline bool isEmptyClass1(void) { return status&MEF_EmptyClass1; };
 
@@ -100,25 +100,25 @@ public:
 
   /**
    * True after \c compareTokens(tok1,tok2) iff tok1 had impossible non-empty analysis-set:
-   * iff \f$ (tok1.besttag() \not\in tok1.analyses()) \f$
+   * iff \f$(tok1.besttag() \not\in tok1.analyses())\f$
    */
   inline bool isImpClass1(void) { return status&MEF_ImpClass1; };
 
   /**
    * True after \c compareTokens(tok1,tok2) iff tok2 had impossible non-empty analysis-set:
-   * iff \f$ (tok2.besttag() \not\in tok2.analyses()) \$
+   * iff  \f$(tok2.besttag() \not\in tok2.analyses())\f$
    */
   inline bool isImpClass2(void) { return status&MEF_ImpClass2; };
 
   /**
    * True after \c compareTokens(tok1,tok2) iff tok1 had cross-impossible non-empty analysis-set:
-   * iff \f$ (tok2.besttag() \not\in tok1.analyses()) \f$
+   * iff \f$(tok2.besttag() \not\in tok1.analyses())\f$
    */
   inline bool isXImpClass1(void) { return status&MEF_XImpClass1; };
 
   /**
    * True after \c compareTokens(tok1,tok2) iff tok2 had cross-impossible non-empty analysis-set:
-   * iff \f$ (tok1.besttag() \not\in tok2.analyses()) \$
+   * iff \f$(tok1.besttag() \not\in tok2.analyses())\f$
    */
   inline bool isXImpClass2(void) { return status&MEF_XImpClass2; };
 

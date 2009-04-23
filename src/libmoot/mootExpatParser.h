@@ -105,14 +105,14 @@ namespace moot {
     //@{
     //-- i/o streams
     mootio::mistream *xp_istream;         ///< Current input stream
-    bool              xp_istream_created; ///< whether @mis was created locally
+    bool              xp_istream_created; ///< whether input stream \p mis was created locally
     //@}
 
     /** \name Internal Data */
     //@{
     //-- expat stuff
     char              *xml_buf;      ///< Parse buffer for expat parser
-    size_t             xml_buflen;   ///< Allocated size of @xml_buf
+    size_t             xml_buflen;   ///< Allocated size of \p xml_buf
     std::string        xml_encoding; ///< Input encoding override (goofy)
     //int                xml_done;     ///< whether we're done parsing yet
     XML_Parser         parser;       ///< The underlying expat parser object
@@ -253,21 +253,19 @@ namespace moot {
      * so the stack is cleared before parsing the buffer.
      * If you want to parse incrementally, use parse_chunk()
      *
-     * \buf: buffer to parse
-     * \buflen: number of bytes to parse from the buffer
-     * \in_name: input-name to use for errors/warnings
-     * \is_last_chunk: whether this is the final bit of the document
+     * \param buf buffer to parse
+     * \param buflen number of bytes to parse from the buffer
      */
     bool parse_buffer(const char *buf, size_t buflen);
 
-    /** Parse the entirety of the stream @in, which
+    /** Parse the entirety of the stream \p in, which
      * defaults to the currently selected input stream.
      * Only minimal sanity checks are performed.
      */
     bool parse_all(mootio::mistream *in=NULL);
 
     /**
-     * Read in and parse the next chunk from input source @xp_istream
+     * Read in and parse the next chunk from input source \p in
      * using an internal buffer.  Returns true on success,
      * false on failure.
      *

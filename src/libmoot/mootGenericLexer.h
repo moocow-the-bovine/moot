@@ -45,7 +45,9 @@ namespace moot {
  * \brief Abstract base class for Flex++ lexers.
  *
  * Descendant lexer specifications should include the following:
-<pre>
+
+\verbatim
+
 %header{
 #include <mootGenericLexer.h>
 using namespace moot;
@@ -59,8 +61,8 @@ using namespace moot;
   return moot::GenericLexer::yyinput(buffer,result,max_size);
 
 %define MEMBERS \
-  //... \
-  / *----- moot::GenericLexer helpers -----* / \
+  / * ... local members ... * / \
+  / *----- moot::GenericLexer helpers ----- * / \
   virtual void  *mgl_yy_current_buffer_p(void) \
                  {return (&yy_current_buffer);};\
   virtual void  *mgl_yy_create_buffer(int size, FILE *unused=stdin) \
@@ -84,7 +86,8 @@ using namespace moot;
 %}
 %%
 void myLexer::mgl_begin(int stateno) {BEGIN(stateno);}
-</pre>
+
+\endverbatim
 */
 class GenericLexer {
 public:
@@ -101,33 +104,33 @@ public:
   /*------------------------------------------------------------*/
   /** \name Stream Parameters */
   //@{
-  mootio::mistream        *mglin; ///< input stream wrapper
-  mootio::mostream       *mglout; ///< output stream wrapper
+  mootio::mistream        *mglin; /**< input stream wrapper */
+  mootio::mostream       *mglout; /**< output stream wrapper */
 
-  bool mgl_in_created;   ///< whether we created mglin
-  bool mgl_out_created;  ///< whether we created mglout
+  bool mgl_in_created;   /**< whether we created mglin */
+  bool mgl_out_created;  /**< whether we created mglout */
   //@}
 
   /*------------------------------------------------------------*/
   /** \name Positional Parameters */
   //@{
-  size_t theLine;               ///< Current line number
-  size_t theColumn;             ///< Current column number
-  mootio::ByteOffset theByte;   ///< Current byte number
+  size_t theLine;               /**< Current line number */
+  size_t theColumn;             /**< Current column number */
+  mootio::ByteOffset theByte;   /**< Current byte number */
   //@}
 
   /*------------------------------------------------------------*/
   /** \name Diagnostic Data */
   //@{
-  std::string  lexname; ///< symbolic name of lexer (or program)
+  std::string  lexname; /**< symbolic name of lexer (or program) */
   //@}
 
 
   /*------------------------------------------------------------*/
   /** \name Low-level data */
   //@{
-  std::string tokbuf;               ///< used for token-buffering
-  bool        tokbuf_clear;         ///< whether to clear tokbuf on next 'tokbuf_append()'
+  std::string tokbuf;               /**< used for token-buffering */
+  bool        tokbuf_clear;         /**< whether to clear tokbuf on next \c tokbuf_append() */
   //@}
 
 public:

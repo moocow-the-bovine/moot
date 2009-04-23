@@ -528,12 +528,12 @@ typedef list<mootToken> mootSentence;
 /** Enum for TnT-style token typification */
 typedef enum {
   TokFlavorAlpha,      /**< (Mostly) alphabetic token: "foo", "bar", "foo2bar" */
-  TokFlavorCard,       /**< @CARD: Digits-only: "42" */
-  TokFlavorCardPunct,  /**< @CARDPUNCT: Digits single-char punctuation suffix: "42." */
-  TokFlavorCardSuffix, /**< @CARDSUFFIX: Digits with (almost any) suffix: "42nd" */
-  TokFlavorCardSeps,   /**< @CARDEPS: Digits with interpunctuation: "420.24/7" */
-  TokFlavorUnknown,    /**< @UNKNOWN: Special "Unknown" token-type */
-  //TokFlavorSpecial,    /* A literal '@CARD', '@CARDPUNCT', etc. */
+  TokFlavorCard,       /**< \p \@CARD: Digits-only: "42" */
+  TokFlavorCardPunct,  /**< \p \@CARDPUNCT: Digits single-char punctuation suffix: "42." */
+  TokFlavorCardSuffix, /**< \p \@CARDSUFFIX: Digits with (almost any) suffix: "42nd" */
+  TokFlavorCardSeps,   /**< \p \@CARDSEPS: Digits with interpunctuation: "420.24/7" */
+  TokFlavorUnknown,    /**< \p \@UNKNOWN: Special "Unknown" token-type */
+  //TokFlavorSpecial,    /* A literal "\@CARD", "\@CARDPUNCT", etc. */
   NTokFlavors          /**< Not really a token-type */
 } mootTokenFlavor;
 
@@ -622,7 +622,7 @@ inline mootTokenFlavor tokenFlavor(const mootTokString &token)
   return TokFlavorAlpha;
 };
 
-/** Returns true iff @tokstr is a pseudo-identifier for a non-alpha type
+/** Returns true iff \a tokstr is a pseudo-identifier for a non-alpha type
  *  Used during HMM and trie compilation */
 inline bool isTokFlavorName(const mootTokString &tokstr)
 {

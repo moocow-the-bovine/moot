@@ -166,7 +166,7 @@ public:
   size_t n_trigrams(void);
 
   /**
-   * Add \c count to the current count for unigram <tag>.
+   * Add \c count to the current count for unigram \<\a tag\>.
    */
   inline void add_count(const mootTagString &tag, const NgramCount count)
   {
@@ -175,7 +175,7 @@ public:
   };
 
   /**
-   * Add \c count to the current count for bigram <tag1,tag2>
+   * Add \c count to the current count for bigram \<\a tag1, \a tag2\>
    * Does NOT add any unigram counts.
    */
   inline void add_count(const mootTagString &tag1,
@@ -186,7 +186,7 @@ public:
   };
 
   /**
-   * Add \c count to the current count for trigram <tag1,tag2,tag3>
+   * Add \c count to the current count for trigram \<\a tag1, \a tag2, \a tag3\>
    * Does NOT add any bigram or unigram counts.
    */
   inline void add_count(const mootTagString &tag1,
@@ -223,7 +223,7 @@ public:
 
   /**
    * Add \c count to the current count for
-   * <tag1>, <tag1,tag2>, and <tag1,tag2,tag3>
+   * \<tag1\>, \<tag1,tag2\>, and \<tag1,tag2,tag3\>
    * in \c ngram.... \c ngram may be shorter than
    * 3 tags, in which case counts are only
    * added for the elements present.

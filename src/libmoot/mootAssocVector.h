@@ -185,7 +185,7 @@ namespace moot {
     //--------------------------------------------------
     /// \name Iterator Utilities
     //@{
-    /** Return a read/write iterator pointing to the node for @key,
+    /** Return a read/write iterator pointing to the node for \p key,
      *  or end() if no such node exists */
     inline iterator find(const KeyT &key)
     {
@@ -194,8 +194,8 @@ namespace moot {
       return i;
     };
 
-    /** Return a read-only iterator pointing to the node for @key,
-     *  or end() if no such node exists */
+    /** Return a read-only iterator pointing to the node for \p key,
+     *  or \c end() if no such node exists */
     inline const_iterator find(const KeyT &key) const
     {
       const_iterator i;
@@ -204,7 +204,7 @@ namespace moot {
     };
 
     /** Return a read/write iterator pointing a
-     *  node for @key, adding such a node if not already present */
+     *  node for \p key, adding such a node if not already present */
     inline iterator get(const KeyT &key)
     {
       iterator i = find(key);
@@ -212,7 +212,7 @@ namespace moot {
     };
 
     /**
-     * Insert association @key => @value into the list.
+     * Insert association \p key => \p value into the list.
      * Returns an iterator pointing to the (possibly new)
      * association.
      */
@@ -228,7 +228,7 @@ namespace moot {
     /// \name Get/Insert
     //@{
     /**
-     * Get assocation for @key , possibly creating a new one.
+     * Get assocation for \p key , possibly creating a new one.
      * Returns a reference to the (new) node.
      */
     inline assoc_node_type &get_node(const KeyT &key)
@@ -238,7 +238,7 @@ namespace moot {
     inline assoc_value_type &get_value(const KeyT &key)
     { return get_node(key).second; };
 
-    /** Get/insert the @n th node */
+    /** Get/insert the \p n th node */
     inline assoc_node_type &nth(const size_t n)
     { return assoc_vector_type::operator[](n); };
     //@}
