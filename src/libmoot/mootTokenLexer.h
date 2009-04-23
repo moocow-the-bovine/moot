@@ -108,6 +108,8 @@ using namespace moot;
   public: \
    /** last token type */ \
    int lasttyp; \
+   /** next lexer state */ \
+   int nextstate; \
    \
    /* -- pre-allocated construction buffers */ \
    /* current token (default) */ \
@@ -120,7 +122,7 @@ using namespace moot;
    \
    /** whether to ignore comments (default=false) */ \
    bool ignore_comments; \
-   /** whether first non-location analysis parsed should be considered 'best' (default=true) */ \
+   /** whether first analysis parsed should be considered 'best' (default=true) */ \
    bool first_analysis_is_best; \
    /** whether we're parsing a 'best' analysis */\
    bool current_analysis_is_best; \
@@ -128,6 +130,8 @@ using namespace moot;
    bool ignore_first_analysis; \
    /** whether to ignore current analysis */\
    bool ignore_current_analysis; \
+   /** whether first non-tag analysis should be considered 'location' (default=false) */ \
+   bool first_nontag_is_location; \
    \
   public: \
     /* -- local methods */ \
@@ -136,26 +140,8 @@ using namespace moot;
     /** reset to initial state */ \
     virtual void reset(void); \
     /** actions to perform on end-of-analysis */ \
-    inline void on_EOA(void) \
-    { \
-      /*-- EOA: add & clear current analysis, if any */ \
-      /*-- add & clear current analysis, if any */ \
-      if (lasttyp != LexTypeEOA) { \
-        /*-- set default tag */\
-        if (manalysis->tag.empty()) { \
-          manalysis->tag.swap(manalysis->details); \
-        }  \
-        /* set best tag if applicable */\
-        if (current_analysis_is_best) { \
-          mtoken->besttag(manalysis->tag); \
-          current_analysis_is_best = false; \
-        } \
-        if (ignore_current_analysis) { \
-          ignore_current_analysis=false; \
-          mtoken->tok_analyses.pop_back(); \
-        } \
-      } \
-    }; \
+    void on_EOA(void); \
+    \
   /*-- moot::GenericLexer helpers */ \
   virtual void  *mgl_yy_current_buffer_p(void) \
                  {return reinterpret_cast<void*>(&yy_current_buffer);}; \
@@ -168,21 +154,23 @@ using namespace moot;
   virtual void   mgl_yy_switch_to_buffer(void *buf) \
                  {yy_switch_to_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
   virtual void   mgl_begin(int stateno);
-#line 166 "mootTokenLexer.ll"
+#line 152 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CONSTRUCTOR_INIT  :\
   GenericLexer("mootTokenLexer"), \
   yyin(NULL), \
   lasttyp(moot::TokTypeEOS), \
+  nextstate(-1), \
   manalysis(NULL), \
   ignore_comments(false), \
   first_analysis_is_best(true), \
   current_analysis_is_best(false), \
   ignore_first_analysis(false), \
-  ignore_current_analysis(false)
-#line 177 "mootTokenLexer.ll"
+  ignore_current_analysis(false), \
+  first_nontag_is_location(false)
+#line 166 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CONSTRUCTOR_CODE  \
   mtoken = &mtoken_default;
-#line 208 "mootTokenLexer.ll"
+#line 201 "mootTokenLexer.ll"
 #line 52 "./flexskel.h"
 
 
@@ -434,7 +422,7 @@ class YY_mootTokenLexer_CLASS YY_mootTokenLexer_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 427 "mootTokenLexer.ll"
+#line 452 "mootTokenLexer.ll"
 #endif
 #line 302 "./flexskel.h"
 

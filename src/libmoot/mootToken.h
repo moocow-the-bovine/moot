@@ -430,14 +430,31 @@ public:
   };
 
   /** Get token location */
-  inline const Location &location(void) const { return tok_location; }
+  inline const Location &location(void) const
+  { return tok_location; }
 
   /** Set token location */
   inline const Location &location(const Location &loc)
-  {
-    tok_location = loc;
-    return tok_location;
-  }
+  { tok_location=loc; return location(); }
+
+  /** Set token location directly from member variables */
+  inline const Location &location(const OffsetT offset, const OffsetT length=0)
+  { return location(Location(offset,length)); };
+
+  /** Get token location offset */
+  inline OffsetT loc_offset(void) const { return tok_location.offset; };
+
+  /** Set token location offset */
+  inline OffsetT loc_offset(const OffsetT off)
+  { tok_location.offset=off; return loc_offset(); };
+
+  /** Get token location length */
+  inline OffsetT loc_length(void) const { return tok_location.length; };
+
+  /** Set token location length */
+  inline OffsetT loc_length(const OffsetT len)
+  { tok_location.length=len; return loc_length(); };
+
 
   /*------------------------------------------------------------
    * Compatibility

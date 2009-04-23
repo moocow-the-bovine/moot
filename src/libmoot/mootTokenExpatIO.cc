@@ -450,6 +450,7 @@ TokenWriterExpat::TokenWriterExpat(int                fmt
     analysis_elt("analysis"),
     postag_attr("pos"),
     besttag_elt("moot.tag"),
+    location_elt("moot.loc"),
     lastc(' ')
 {
   //-- TokenWriter flags
@@ -540,10 +541,11 @@ void TokenWriterExpat::_put_token_raw(const mootToken &token, mootio::mostream *
 		 (tw_format&tiofPretty ? "\n    " : ""));
     }
     if (tw_format&tiofLocation) {
-      mootToken::Location loc = token.location();
       os->printf("%s<%s offset=\"%lu\" length=\"%lu\"/>",
 		 (tw_format&tiofPretty ? "  " : ""),
-		 location_elt.c_str(), loc.offset, loc.length);
+		 location_elt.c_str(),
+		 token.loc_offset(),
+		 token.loc_length());
     }
     break;
     
@@ -647,12 +649,11 @@ void TokenWriterExpat::_put_token_gen(const mootToken &token, mootio::mostream *
 
     //-- gen mode: location
     if (tw_format & tiofLocation) {
-      mootToken::Location loc = token.location();
-      os->printf("%s<%s offset=\"offset\" length=\"length\"/>",
+      os->printf("%s<%s offset=\"%lu\" length=\"%lu\"/>",
 		 (tw_format&tiofPretty ? "\n    " : ""),
 		 location_elt.c_str(),
-		 loc.offset,
-		 loc.length);
+		 token.loc_offset(),
+		 token.loc_length());
     }
 
     //-- gen mode: end-token
