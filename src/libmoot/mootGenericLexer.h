@@ -134,6 +134,7 @@ public:
   /*--------------------------------------------------------------------
    * mootGenericLexer: Methods
    */
+
   /*------------------------------------------------------------*/
   /** \name Constructors etc. */
   //@{
@@ -268,6 +269,26 @@ public:
     }
   };
   //@}
+
+  /*------------------------------------------------------------*/
+  /** \name Location-tracking */
+  //@{
+  /** Increment both 'theColumn' and 'theByte' by len */
+  inline void add_columns(ByteOffset len)
+  {
+    theColumn += len;
+    theByte   += len;
+  };
+
+  /** Increment both 'theLine' and 'theByte' by len, set theColumn=0 */
+  inline void add_lines(ByteOffset len=1)
+  {
+    theLine += len;
+    theByte += len;
+    theColumn = 0;
+  };
+  //@}
+
 
   /*------------------------------------------------------------*/
   /** \name Diagnostics */

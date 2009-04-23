@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2002-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -144,6 +144,7 @@ int main (int argc, char **argv)
       case mootPPLexer::EOS:
 	if (lexer->yytext[0] != '<') {  //-- hack: check for xml markup
 	  sent.push_back(mootToken(reinterpret_cast<const char*>(lexer->yytext)));
+	  sent.back().location(mootToken::Location(lexer->theByte-lexer->yyleng,lexer->yyleng));
 	  writer->put_sentence(sent);
 	  sent.clear();
 	}
@@ -157,6 +158,7 @@ int main (int argc, char **argv)
       default:
 	//-- write it as its own token
 	sent.push_back(mootToken(reinterpret_cast<const char *>(lexer->yytext)));
+	sent.back().location(mootToken::Location(lexer->theByte-lexer->yyleng,lexer->yyleng));
 	break;
       }
     }

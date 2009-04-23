@@ -121,6 +121,10 @@ using namespace moot;
    bool ignore_first_analysis; \
    /** whether to ignore current analysis */\
    bool ignore_current_analysis; \
+   /** whether first non-tag analysis should be considered 'location' (default=false) */ \
+   bool first_nontag_is_location; \
+   /** whether we're parsing a 'location' analysis */\
+   bool current_analysis_is_location; \
    \
   public: \
     /* -- local methods */ \
@@ -172,7 +176,8 @@ using namespace moot;
   first_analysis_is_best(true), \
   current_analysis_is_best(false), \
   ignore_first_analysis(false), \
-  ignore_current_analysis(false)
+  ignore_current_analysis(false), \
+
 
 %define CONSTRUCTOR_CODE \
   mtoken = &mtoken_default;

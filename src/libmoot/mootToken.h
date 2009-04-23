@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -182,6 +182,25 @@ public:
   //typedef vector<Analysis> Analyses;
   typedef list<Analysis> Analyses;
 
+  /** Type for token locations (in input stream) */
+  class Location {
+  public:
+    OffsetT offset;  ///< (byte) offset in input stream (default=0)
+    OffsetT length;  ///< (byte) length in input stream (default=0)
+  public:
+    /** Default constructor */
+    inline Location(const OffsetT my_offset=0, const OffsetT my_length=0)
+      : offset(my_offset),
+	length(my_length)
+    {};
+    /** Clear this object (reset to defaults) */
+    inline void clear(void)
+    {
+      offset = 0;
+      length = 0;
+    };
+  }; //-- /mootToken::Location
+
 public:
   /*---------------------------------------------------------------------*
    * Data Members
@@ -206,6 +225,11 @@ public:
    * Set of possible analyses as a mootToken::AnalysisSet
    */
   Analyses       tok_analyses;
+
+  /**
+   * Token location in input stream, for backtraces (optional)
+   */
+  Location       tok_location;
 
 public:
   /*------------------------------------------------------------
@@ -283,6 +307,7 @@ public:
     tok_text.clear();
     tok_besttag.clear();
     tok_analyses.clear();
+    tok_location.clear();
   };
 
   /*------------------------------------------------------------
@@ -403,6 +428,16 @@ public:
 	else asi++;
       }
   };
+
+  /** Get token location */
+  inline const Location &location(void) const { return tok_location; }
+
+  /** Set token location */
+  inline const Location &location(const Location &loc)
+  {
+    tok_location = loc;
+    return tok_location;
+  }
 
   /*------------------------------------------------------------
    * Compatibility

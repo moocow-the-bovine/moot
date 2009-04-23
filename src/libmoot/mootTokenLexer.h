@@ -120,7 +120,7 @@ using namespace moot;
    \
    /** whether to ignore comments (default=false) */ \
    bool ignore_comments; \
-   /** whether first analysis parsed should be considered 'best' (default=true) */ \
+   /** whether first non-location analysis parsed should be considered 'best' (default=true) */ \
    bool first_analysis_is_best; \
    /** whether we're parsing a 'best' analysis */\
    bool current_analysis_is_best; \

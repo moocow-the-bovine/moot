@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2008 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -92,6 +92,7 @@ int TokenIO::parse_format_string(const std::string &fmtString)
       else if (s=="tagged") flag = tiofTagged;
       else if (s=="user") flag = tiofUser;
       else if (s=="pruned") flag = tiofPruned;
+      else if (s=="location" || s=="loc") flag =tiofLocation;
       //-- aliases
       else if (s=="rare" || s=="r") flag = tiofRare;
       else if (s=="mediumrare" || s=="mr") flag = tiofMediumRare;
@@ -215,6 +216,7 @@ std::string TokenIO::format_canonical_string(int fmt)
   if (fmt & tiofText) s.append("Text,");
   if (fmt & tiofAnalyzed) s.append("Analyzed,");
   if (fmt & tiofTagged) s.append("Tagged,");
+  if (fmt & tiofLocation) s.append("Location,");
   if (fmt & tiofPruned) s.append("Pruned,");
   if (fmt & tiofUser) s.append("User,");
 
@@ -465,6 +467,14 @@ void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
       os->putc('\t');
       os->puts(token.besttag());
     }
+
+    if (tw_format & tiofLocation) {
+      //-- location might be first non-tag 'analysis'
+      const mootToken::Location loc = token.location();
+      os->putc('\t');
+      os->printf("%lu %lu", loc.offset, loc.length);
+    }
+
 
     if (tw_format & tiofAnalyzed) {
       for (mootToken::Analyses::const_iterator ai = token.analyses().begin();

@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -516,7 +516,7 @@ void TokenWriterExpat::close(void)
  *--------------------------------------------------------------------------*/
 
 /*--------------------------------------------------------------------------
- * TokenWriterExpat: Utilities: put_token_file_raw()
+ * TokenWriterExpat: Utilities: _put_token_raw()
  */
 void TokenWriterExpat::_put_token_raw(const mootToken &token, mootio::mostream *os)
 {
@@ -538,6 +538,12 @@ void TokenWriterExpat::_put_token_raw(const mootToken &token, mootio::mostream *
       os->printf("</%s>%s",
 		 besttag_elt.c_str(),
 		 (tw_format&tiofPretty ? "\n    " : ""));
+    }
+    if (tw_format&tiofLocation) {
+      mootToken::Location loc = token.location();
+      os->printf("%s<%s offset=\"%lu\" length=\"%lu\"/>",
+		 (tw_format&tiofPretty ? "  " : ""),
+		 location_elt.c_str(), loc.offset, loc.length);
     }
     break;
     
@@ -637,6 +643,16 @@ void TokenWriterExpat::_put_token_gen(const mootToken &token, mootio::mostream *
 		 besttag_elt.c_str(),
 		 token.besttag().c_str(),
 		 besttag_elt.c_str());
+    }
+
+    //-- gen mode: location
+    if (tw_format & tiofLocation) {
+      mootToken::Location loc = token.location();
+      os->printf("%s<%s offset=\"offset\" length=\"length\"/>",
+		 (tw_format&tiofPretty ? "\n    " : ""),
+		 location_elt.c_str(),
+		 loc.offset,
+		 loc.length);
     }
 
     //-- gen mode: end-token

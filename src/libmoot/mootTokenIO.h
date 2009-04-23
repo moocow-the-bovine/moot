@@ -61,6 +61,7 @@ enum TokenIOFormatE {
   tiofAnalyzed  = 0x00000100,  ///< input is pre-analyzed (>= "medium rare")
   tiofTagged    = 0x00000200,  ///< input is tagged ("medium" or "well done")
   tiofPruned    = 0x00000400,  ///< pruned output
+  tiofLocation  = 0x00000800   ///< locations appear first non-tag analysis
 };
 typedef TokenIOFormatE TokenIOFormat;
 
