@@ -3,7 +3,7 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
-v2.0.6 Thu, 26 Mar 2009 21:52:06 +0100
+v2.0.6 Thu, 23 Apr 2009 17:39:13 +0200
         + added mootToken::Location (token.tok_location) nested class for input stream back-tracing
 	  - now working in mootPPLexer, mootpp, Token(Reader|Write)Native, TokenWriterExpat
 	  - todo: TokenReaderExpat, parameterize XML attribute names, etc. etc.
