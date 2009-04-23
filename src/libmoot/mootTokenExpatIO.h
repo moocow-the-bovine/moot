@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -116,6 +116,7 @@ public:
   std::string analysis_elt;  ///< Name of 'analysis' element (descendant of 'token'). Default="analysis"
   std::string postag_attr;   ///< Name of 'pos tag' attribute (of 'analysis' elt) Default="pos".
   std::string besttag_elt;   ///< Name of 'best tag' element (descendant of 'token'). Default="moot.tag"
+  std::string location_elt;  ///< Name of 'location' element (descendant of 'token'). Default="moot.loc"
   //@}
 
   //----------------------------
@@ -160,6 +161,7 @@ public:
       analysis_elt("analysis"),
       postag_attr("pos"),
       besttag_elt("moot.tag"),
+      location_elt("moot.loc"),
       done(1)
   {
     //-- TokenReader pointers
@@ -432,6 +434,7 @@ public:
   std::string postag_attr;   ///< Default name of 'pos' attribute (of 'analysis' elt) Default="pos".
 
   std::string besttag_elt;   ///< Name of 'best tag' element. Default="moot.tag"
+  std::string location_elt;   ///< Name of 'best tag' element. Default="moot.loc"
   //@}
 
   //----------------------------

@@ -61,6 +61,7 @@ enum TokenIOFormatE {
   tiofAnalyzed  = 0x00000100,  ///< input is pre-analyzed (>= "medium rare")
   tiofTagged    = 0x00000200,  ///< input is tagged ("medium" or "well done")
   tiofPruned    = 0x00000400,  ///< pruned output
+  tiofLocation  = 0x00000800   ///< locations appear first non-tag analysis
 };
 typedef TokenIOFormatE TokenIOFormat;
 
@@ -479,6 +480,7 @@ public:
   {
     tr_format |= tiofNative;
     input_is_tagged(tr_format&tiofTagged);
+    input_has_locations(tr_format&tiofLocation);
 
     tr_sentence = &trn_sentence;
     tr_token    = &lexer.mtoken_default;
@@ -571,6 +573,31 @@ public:
       lexer.ignore_first_analysis = false;
     }
     return is_tagged;
+  };
+
+  /**
+   * Get value of the 'locations' flag : whether we
+   * think the input has been marked with 'offset length' pairs.
+   */
+  inline bool input_has_locations(void)
+  {
+    return lexer.first_nontag_is_location;
+  };
+
+  /**
+   * Set value of the 'locations' flag: whether we
+   * think the input has been marked with 'offset length' pairs.
+   */
+  inline bool input_has_locations(bool has_locs)
+  {
+    if (has_locs) {
+      tr_format |= tiofLocation;
+      lexer.first_nontag_is_location = true;
+    } else {
+      tr_format &= ~tiofLocation;
+      lexer.first_nontag_is_location = false;
+    }
+    return has_locs;
   };
   //@}
 };

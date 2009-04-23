@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -77,6 +77,8 @@ typedef float ProbT;
 /** Count types (for raw frequencies) */
 typedef ProbT CountT;
 
+/** Offset type (for byte offsets) */
+typedef long unsigned int OffsetT;
 
 /**
  * \def mootProbEpsilon

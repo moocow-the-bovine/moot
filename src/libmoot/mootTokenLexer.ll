@@ -101,6 +101,8 @@ using namespace moot;
   public: \
    /** last token type */ \
    int lasttyp; \
+   /** next lexer state */ \
+   int nextstate; \
    \
    /* -- pre-allocated construction buffers */ \
    /* current token (default) */ \
@@ -121,6 +123,8 @@ using namespace moot;
    bool ignore_first_analysis; \
    /** whether to ignore current analysis */\
    bool ignore_current_analysis; \
+   /** whether first non-tag analysis should be considered 'location' (default=false) */ \
+   bool first_nontag_is_location; \
    \
   public: \
     /* -- local methods */ \
@@ -129,26 +133,8 @@ using namespace moot;
     /** reset to initial state */ \
     virtual void reset(void); \
     /** actions to perform on end-of-analysis */ \
-    inline void on_EOA(void) \
-    { \
-      /*-- EOA: add & clear current analysis, if any */ \
-      /*-- add & clear current analysis, if any */ \
-      if (lasttyp != LexTypeEOA) { \
-        /*-- set default tag */\
-        if (manalysis->tag.empty()) { \
-          manalysis->tag.swap(manalysis->details); \
-        }  \
-        /* set best tag if applicable */\
-        if (current_analysis_is_best) { \
-          mtoken->besttag(manalysis->tag); \
-          current_analysis_is_best = false; \
-        } \
-        if (ignore_current_analysis) { \
-          ignore_current_analysis=false; \
-          mtoken->tok_analyses.pop_back(); \
-        } \
-      } \
-    }; \
+    void on_EOA(void); \
+    \
   /*-- moot::GenericLexer helpers */ \
   virtual void  *mgl_yy_current_buffer_p(void) \
                  {return reinterpret_cast<void*>(&yy_current_buffer);}; \
@@ -167,13 +153,16 @@ using namespace moot;
   GenericLexer("mootTokenLexer"), \
   yyin(NULL), \
   lasttyp(moot::TokTypeEOS), \
+  nextstate(-1), \
   manalysis(NULL), \
   ignore_comments(false), \
   first_analysis_is_best(true), \
   current_analysis_is_best(false), \
   ignore_first_analysis(false), \
-  ignore_current_analysis(false)
+  ignore_current_analysis(false), \
+  first_nontag_is_location(false)
 
+  
 %define CONSTRUCTOR_CODE \
   mtoken = &mtoken_default;
 
@@ -181,6 +170,8 @@ using namespace moot;
 /*----------------------------------------------------------------------
  * Start States
  *----------------------------------------------------------------------*/
+%x LOC_OFFSET
+%x LOC_LENGTH
 %x TAG
 %x DETAILS
 %x SEPARATORS
@@ -201,6 +192,8 @@ detchar    [^ \t\n\r\[]
 tagchar    [^ \t\n\r\]]
 anlchar    [^ \t\n\r]
 /*bestchar   [\/]*/
+
+locsep     [ \r\+]
 
 /*----------------------------------------------------------------------
  * Rules
@@ -224,28 +217,27 @@ anlchar    [^ \t\n\r]
   if (mtoken->tok_type != TokTypeEOS) {
     mtoken->tok_type=TokTypeEOS;
     mtoken->tok_text="\n";
+    //mtoken->location(theByte-yyleng, yyleng);
     return TokTypeEOS;
   }
 }
 
 <TOKEN>^"%%"([^\r\n]*){newline} {
   //-- COMMENT: return comments as special tokens
-  theLine++;
-  theColumn = 0;
-  theByte += yyleng;
+  theLine++; theColumn = 0; theByte += yyleng;
   lasttyp = TokTypeComment;
   if (!ignore_comments) {
     mtoken->clear();
     mtoken->toktype(TokTypeComment);
     mtoken->textAppend(reinterpret_cast<const char *>(yytext)+2, yyleng-3);
+    //mtoken->location(theByte-yyleng, yyleng);
     return TokTypeComment;
   }
 }
 
 <TOKEN>^({tokchar}*){wordchar} {
   //-- TOKEN-TEXT: keep only internal whitespace
-  theColumn += yyleng;
-  theByte += yyleng;
+  add_columns(yyleng);
   mtoken->clear();
   mtoken->toktype(TokTypeVanilla);
   mtoken->text(reinterpret_cast<const char *>(yytext), yyleng);
@@ -298,11 +290,11 @@ anlchar    [^ \t\n\r]
 
 <TOKEN>{space}*/{eoachar} {
   //-- TOKEN: end-of-token
-  theColumn += yyleng;
-  theByte += yyleng;
+  add_columns(yyleng);
 
-  if (first_analysis_is_best) current_analysis_is_best = true;
-  if (ignore_first_analysis)  ignore_current_analysis = true;
+  if      (first_analysis_is_best) current_analysis_is_best = true;
+  else if (first_nontag_is_location) nextstate = LOC_OFFSET;
+  if (ignore_first_analysis) ignore_current_analysis = true;
 
   lasttyp = LexTypeText;
   BEGIN(SEPARATORS);
@@ -325,16 +317,23 @@ anlchar    [^ \t\n\r]
   //-- SEPARATORS: end of separators
   theColumn += yyleng;
   theByte += yyleng;
-  BEGIN(DETAILS);
-  //-- allocate new analysis
-  mtoken->insert(mootToken::Analysis());
-  manalysis = &(mtoken->tok_analyses.back());
+  //-- maybe switch to new start-state
+  if (nextstate >= 0) {
+    BEGIN(nextstate); //-- be sure to re-set nextstate=-1 in nextstate!
+  } 
+  else {
+    //-- allocate new analysis
+    mtoken->insert(mootToken::Analysis());
+    manalysis = &(mtoken->tok_analyses.back());
+    BEGIN(DETAILS); 
+  }
 }
 <SEPARATORS>""/{eotchar} {
   //-- SEPARATORS/EOT: reset to initial state
   //theLine++;
   theColumn = 0;
   theByte += yyleng;
+  nextstate = -1;
   BEGIN(TOKEN);
 }
 
@@ -395,6 +394,32 @@ anlchar    [^ \t\n\r]
 
 %{
 /*--------------------------------------------------------------------
+ * LOCATION
+ */
+%}
+
+<LOC_OFFSET>[0-9]+ {
+  //-- LOCATION: offset
+  add_columns(yyleng);
+  mtoken->loc_offset(strtoul(reinterpret_cast<const char *>(yytext),NULL,0));
+  BEGIN(LOC_LENGTH);
+}
+
+<LOC_LENGTH>[0-9]+ {
+  //-- LOCATION: length
+  add_columns(yyleng);
+  mtoken->loc_length(strtoul(reinterpret_cast<const char *>(yytext),NULL,0));
+}
+
+<LOC_OFFSET,LOC_LENGTH>{space}+ { add_columns(yyleng); }
+<LOC_OFFSET,LOC_LENGTH>""/{tab} { nextstate=-1; BEGIN(SEPARATORS); }
+<LOC_OFFSET,LOC_LENGTH>""/{eotchar} { nextstate=-1; BEGIN(TOKEN); }
+<LOC_OFFSET,LOC_LENGTH>""/. { nextstate=-1; BEGIN(SEPARATORS); }
+
+
+
+%{
+/*--------------------------------------------------------------------
  * UNKNOWN
  */
 %}
@@ -445,3 +470,26 @@ void mootTokenLexer::reset(void)
   lasttyp = moot::TokTypeEOS;
   BEGIN(TOKEN);
 }
+
+void mootTokenLexer::on_EOA(void)
+{
+  /*-- EOA: add & clear current analysis, if any */ 
+  /*-- add & clear current analysis, if any */ 
+  if (lasttyp != LexTypeEOA) { 
+    /*-- set default tag */
+    if (manalysis->tag.empty()) { 
+      manalysis->tag.swap(manalysis->details); 
+    }  
+    /* set best tag if applicable */
+    if (current_analysis_is_best) { 
+      mtoken->besttag(manalysis->tag); 
+      current_analysis_is_best = false; 
+      if (first_nontag_is_location) { nextstate=LOC_OFFSET; }
+    }
+    /* maybe ignore this analysis */ 
+    if (ignore_current_analysis) { 
+      ignore_current_analysis=false; 
+      mtoken->tok_analyses.pop_back(); 
+    } 
+  } 
+}; 

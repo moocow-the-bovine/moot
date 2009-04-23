@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -133,20 +133,20 @@ latin1_word    ([A-ZÀ-Þa-zß-ÿ]+)
 %}
 
 \<(\/?)(eos)\> {
-  theColumn += yyleng;
+  add_columns(yyleng);
   return EOS;
 }
 \<([\?\!]?){latin1_letter}+[^\>]*\> {
-  theColumn += yyleng;
+  add_columns(yyleng);
   return XML_START_TAG;
 }
 \<\/{latin1_letter}+([0-9\.\_\-]*)\> {
-  theColumn += yyleng;
+  add_columns(yyleng);
   return XML_END_TAG;
 }
 
 "&#"[0-9]+";" {
-  theColumn += yyleng;
+  add_columns(yyleng);
   //-- character entity: translate (weird!)
   /*
   theColumn += yyleng;
@@ -156,25 +156,26 @@ latin1_word    ([A-ZÀ-Þa-zß-ÿ]+)
   */
   return XML_ENTITY;
 }
-"&dash;" { theColumn += yyleng; return XML_ENTITY; }
-"&quot;" { theColumn += yyleng; return XML_ENTITY; }
-"&lt;"   { theColumn += yyleng; return XML_ENTITY; }
-"&gt;"   { theColumn += yyleng; return XML_ENTITY; }
+"&dash;" { add_columns(yyleng); return XML_ENTITY; }
+"&quot;" { add_columns(yyleng); return XML_ENTITY; }
+"&lt;"   { add_columns(yyleng); return XML_ENTITY; }
+"&gt;"   { add_columns(yyleng); return XML_ENTITY; }
 
-[\+\-]?([0-9]+)						{ theColumn += yyleng; return INTEGER; }
-[\+\-]?[0-9]*[\.,]([0-9]+)				{ theColumn += yyleng; return FLOAT; }
+[\+\-]?([0-9]+)						{ add_columns(yyleng); return INTEGER; }
+[\+\-]?[0-9]*[\.,]([0-9]+)				{ add_columns(yyleng); return FLOAT; }
 
-{latin1_word}-{latin1_word}-{latin1_word}		{ theColumn += yyleng; return WORD; }
-{latin1_word}-{latin1_word}				{ theColumn += yyleng; return WORD; }
-{latin1_word}						{ theColumn += yyleng; return WORD; }
+{latin1_word}-{latin1_word}-{latin1_word}		{ add_columns(yyleng); return WORD; }
+{latin1_word}-{latin1_word}				{ add_columns(yyleng); return WORD; }
+{latin1_word}						{ add_columns(yyleng); return WORD; }
 
-{eos_punct}/({space}+)					{ theColumn++; return EOS; }
-{eos_punct}/([\n\r])                                    { theColumn++; return EOS; }
-{latin1_punct}+                                         { theColumn+=yyleng; return PUNCT; }
+{eos_punct}/({space}+)					{ add_columns(1); return EOS; }
+{eos_punct}/([\n\r])                                    { add_columns(1); return EOS; }
+{latin1_punct}+                                         { add_columns(yyleng); return PUNCT; }
 
-{space}+						{ theColumn+=yyleng; /* do nothing */ }
-[\n\r]							{ theLine++; theColumn=0; }
-.							{ theColumn++; return UNKNOWN; }
+{space}+						{ add_columns(yyleng); /* do nothing */ }
+\r                                                      { add_columns(1); /* do nothing; */ }
+\n							{ add_lines(1); /* do nothing; */ }
+.							{ add_columns(1); return UNKNOWN; }
 
 <<EOF>>                                                 { return PPEOF; }
 
