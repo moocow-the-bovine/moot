@@ -26,6 +26,10 @@
  *   + moot PoS tagger : variable-argument macros
  *--------------------------------------------------------------------------*/
 
+/** \file mootArgs.h
+ *  \brief utilities for functions taking variable number of arguments
+ */
+
 #ifndef _MOOT_ARGS_H
 #define _MOOT_ARGS_H
 

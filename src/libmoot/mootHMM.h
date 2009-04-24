@@ -1,7 +1,7 @@
 /* -*- Mode: C++ -*- */
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2008 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -25,32 +25,29 @@
  *   + moot PoS tagger : Hidden Markov Model (Disambiguator): headers
  *--------------------------------------------------------------------------*/
 
+/**
+\file mootHMM.h
+\brief Hidden Markov Model tagger/disambiguator
+*/
+
 #ifndef _MOOT_HMM_H
 #define _MOOT_HMM_H
 
-#include <mootConfig.h>
-
-#ifdef HAVE_FLOAT_H
-# include <float.h>
-#endif /* HAVE_FLOAT_H */
-
-#include <string.h>
-#include <ctype.h>
 #include <math.h>
 
-#include <mootTypes.h>
-#include <mootIO.h>
-#include <mootZIO.h>
-#include <mootToken.h>
 #include <mootTokenIO.h>
-#include <mootLexfreqs.h>
+#include <mootZIO.h>
+
 #include <mootClassfreqs.h>
-#include <mootNgrams.h>
-#include <mootEnum.h>
-#include <mootAssocVector.h>
+//#include <mootLexfreqs.h> //-- included by mootClassfreqs.h
 
 #ifdef MOOT_ENABLE_SUFFIX_TRIE
-#include <mootSuffixTrie.h>
+# include <mootSuffixTrie.h>
+#else
+# include <mootEnum.h>
+# include <mootAssocVector.h>
+# include <mootTrieVector.h>
+# include <mootNgrams.h>
 #endif
 
 /**

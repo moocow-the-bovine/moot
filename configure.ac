@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.6-pre9])
+define([THE_PACKAGE_VERSION], [2.0.6])
 define([THE_PACKAGE_MAINTAINER],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -549,6 +549,7 @@ AC_ARG_ENABLE(suffix-trie,
 
 if test "$ac_cv_enable_suffix_trie" != "no" ; then
   AC_DEFINE(MOOT_ENABLE_SUFFIX_TRIE,1,[Define this to enable support for suffix tries])
+  DOXY_DEFINES="$DOXY_DEFINES MOOT_ENABLE_SUFFIX_TRIE=1"
   CONFIG_OPTIONS="$CONFIG_OPTIONS SUFFIX_TRIE=1"
 else
   CONFIG_OPTIONS="$CONFIG_OPTIONS SUFFIX_TRIE=0"

@@ -25,6 +25,10 @@
  * Description: C++ wrapper for libxml2 tree-mode XML documents
  *--------------------------------------------------------------------------*/
 
+/** \file mootXmlDoc.h
+ *  \brief C++ wrapper class for libxml2 tree-mode XML documents (optional)
+ */
+
 #ifndef _MOOT_XML_DOC_H
 #define _MOOT_XML_DOC_H
 

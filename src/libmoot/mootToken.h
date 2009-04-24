@@ -26,6 +26,11 @@
  *   + moocow's PoS tagger : token information
  *--------------------------------------------------------------------------*/
 
+/**
+\file mootToken.h
+\brief classes and utilities for tokens and associated analyses
+*/
+
 #ifndef _moot_TOKEN_H
 #define _moot_TOKEN_H
 
@@ -33,8 +38,6 @@
 
 #include <list>
 #include <vector>
-#include <set>
-#include <string>
 #include <mootTypes.h>
 
 /**

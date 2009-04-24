@@ -26,6 +26,11 @@
  *   + moocow's PoS tagger : tries
  *--------------------------------------------------------------------------*/
 
+/**
+\file mootTrieVector.h
+\brief trie implementation using std::vector<> for underlying storage
+*/
+
 #ifndef MOOT_TRIE_VECTOR_H
 #define MOOT_TRIE_VECTOR_H
 

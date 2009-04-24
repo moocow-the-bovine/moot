@@ -26,19 +26,17 @@
  *   + moocow's PoS tagger : token I/O
  *--------------------------------------------------------------------------*/
 
+/**
+\file mootTokenIO.h
+\brief Abstract and native classes for I/O of moot::mootToken objects
+*/
+
 #ifndef _moot_TOKEN_IO_H
 #define _moot_TOKEN_IO_H
 
-#include <mootToken.h>
-#include <mootTokenLexer.h>
-
-#include <mootIO.h>
-#include <mootCIO.h>
+#include <mootTokenLexer.h> //-- includes GenericLexer -> BufferIO -> Utils -> CIO -> IO
 #include <mootCxxIO.h>
-#include <mootBufferIO.h>
 
-#include <stdio.h>
-#include <stdarg.h>
 #include <stdexcept>
 
 /*moot_BEGIN_NAMESPACE*/
@@ -578,7 +576,7 @@ public:
    */
   inline bool input_has_locations(void)
   {
-    return lexer.first_nontag_is_location;
+    return lexer.parse_location;
   };
 
   /**
@@ -589,10 +587,10 @@ public:
   {
     if (has_locs) {
       tr_format |= tiofLocation;
-      lexer.first_nontag_is_location = true;
+      lexer.parse_location = true;
     } else {
       tr_format &= ~tiofLocation;
-      lexer.first_nontag_is_location = false;
+      lexer.parse_location = false;
     }
     return has_locs;
   };

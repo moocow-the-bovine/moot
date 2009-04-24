@@ -26,6 +26,11 @@
  *   + moocow's PoS tagger : token I/O : XML: Expat
  *--------------------------------------------------------------------------*/
 
+/**
+\file mootTokenExpatIO.h
+\brief moot::TokenIO abstraction layer for XML I/O via \c expat (optional)
+*/
+
 #ifndef _MOOT_TOKEN_EXPAT_IO_H
 #define _MOOT_TOKEN_EXPAT_IO_H
 
@@ -33,10 +38,6 @@
 
 #ifdef MOOT_EXPAT_ENABLED
 
-#include <assert.h>
-
-#include <mootTypes.h>
-#include <mootToken.h>
 #include <mootTokenIO.h>
 #include <mootExpatParser.h>
 #include <mootRecode.h>
@@ -46,8 +47,6 @@
 #else
 # include <slist>
 #endif
-
-#include <list>
 
 /*#define MOOT_DEBUG_EXPAT*/
 
@@ -166,7 +165,7 @@ public:
       postag_attr("pos"),
       besttag_elt("moot.tag"),
       location_elt("moot.loc"),
-      offset_attr("length"),
+      offset_attr("offset"),
       length_attr("length"),
       done(1)
   {

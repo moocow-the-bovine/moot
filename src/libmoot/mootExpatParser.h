@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2008 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -26,6 +26,11 @@
  *   + moocow's PoS tagger : expat wrapper
  *--------------------------------------------------------------------------*/
 
+/**
+\file mootExpatParser.h
+\brief C++ wrapper class for generic \c expat XML parsers (optional)
+*/
+
 #ifndef _MOOT_EXPAT_PARSER_H
 #define _MOOT_EXPAT_PARSER_H
 
@@ -33,19 +38,10 @@
 
 #ifdef MOOT_EXPAT_ENABLED
 
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <stdarg.h>
-#include <assert.h>
-
 #include <expat.h>
 
-#include <string>
 #include <stdexcept>
 
-#include <mootUtils.h>
-#include <mootIO.h>
 #include <mootCIO.h>
 #include <mootCxxIO.h>
 #include <mootBufferIO.h>
@@ -303,6 +299,22 @@ namespace moot {
 
     /** Complain initiated by expat */
     virtual void xpcarp(const char *fmt, ...);
+
+    /** Get current line number of expat parser */
+    inline long int line_number(void)
+    { return XML_GetCurrentLineNumber(parser); }
+
+    /** Get current column number of expat parser */
+    inline int column_number(void)
+    { return XML_GetCurrentColumnNumber(parser); }
+
+    /** Get current byte offset of expat parser */
+    inline long byte_offset(void)
+    { return XML_GetCurrentByteIndex(parser); }
+
+    /** Get byte-count for current event of expat parser*/
+    inline int byte_count(void)
+    { return XML_GetCurrentByteCount(parser); }
     //@}
 
     /** \name Handlers */
