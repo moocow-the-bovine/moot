@@ -36,7 +36,7 @@ endif
 
 if HAVE_POD2HTML
 .pod.html:
-	pod2html --outfile $@ $<
+	pod2html --css=programs/mootprogs.css --outfile=$@ $<
 endif
 
 #-----------------------------------------------------------------------
