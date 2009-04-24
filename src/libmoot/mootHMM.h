@@ -41,6 +41,8 @@
 #include <mootClassfreqs.h>
 //#include <mootLexfreqs.h> //-- included by mootClassfreqs.h
 
+#include <mootSuffixTrie.h>
+/*
 #ifdef MOOT_ENABLE_SUFFIX_TRIE
 # include <mootSuffixTrie.h>
 #else
@@ -49,6 +51,7 @@
 # include <mootTrieVector.h>
 # include <mootNgrams.h>
 #endif
+*/
 
 /**
  * \def MOOT_USE_TRIGRAMS
