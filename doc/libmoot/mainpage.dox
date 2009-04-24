@@ -4,7 +4,7 @@
 
 \author Bryan Jurish <moocow@ling.uni-potsdam.de>
 
-\version 2.0.6-pre9
+\version 2.0.6
 
 
 \section Intro Introduction
@@ -110,13 +110,9 @@ class-based HMM tagger / disambiguator.
 
 \section SeeAlso More Information
 
-\see libmootm extension library \link moot::mootMorph mootMorph\endlink
-\see <A HREF="../../programs/mootpp.html">mootpp(1)</A>
-\see <A HREF="../../../mootm/programs/mootm.html">mootm(1)</A>
-\see <A HREF="../../programs/mootrain.html">mootrain(1)</A>
-\see <A HREF="../../programs/mootcompile.html">mootcompile(1)</A>
-\see <A HREF="../../programs/mootdump.html">moodump(1)</A>
-\see <A HREF="../../programs/moot.html">moot(1)</A>
-\see <A HREF="../../programs/mooteval.html">mooteval(1)</A>
+\see \link moot::mootMorph mootMorph\endlink: libmootm extension library
+\see <A HREF="../../tutorial/moottut.html">moottut(1)</A>: moot user tutorial
+\see <A HREF="../../programs/mootutils.html">mootutils(1)</A>: moot command-line utilities summary
+\see <A HREF="../../programs/mootfiles.html">mootfiles(5)</A>: moot file formats
 
 */
