@@ -1,6 +1,6 @@
     README for package 'moot'
 
-    Last updated for moot version 2.0.6-pre1
+    Last updated for moot version 2.0.6
 
 DESCRIPTION
     moot - moocow's part-of-speech tagger and utilities.
@@ -43,26 +43,26 @@ REQUIREMENTS
         XML parser toolkit library by James Clark, required for XML input,
         available from http://expat.sourceforge.net
 
-        Tested version 1.95.6.
+        Tested version(s): 1.95.6, 1.95.8.
 
     librecode (Optional)
         Character-set recoding library by François Pinard, useful for XML
         output, available from http://www.gnu.org/directory/recode.html
 
-        Tested version 3.6.
+        Tested version(s): 3.6.
 
     zlib (Optional)
         Compression library by Jean-loup Gailly and Mark Adler, useful for
         compressed binary HMM files. Available from:
         http://www.gzip.org/zlib
 
-        Tested version 1.2.1.
+        Tested version(s): 1.2.1., 1.2.3.3
 
     doxygen (Optional)
         Required for building library documentation. Available from:
         http://www.doxygen.org
 
-        Tested version 1.2.15.
+        Tested version(s): 1.2.15, 1.5.4
 
     Perl (Optional)
         Get it from http://www.cpan.org or http://www.perl.com Required for
@@ -81,6 +81,8 @@ REQUIREMENTS
 
         from the distribution root directory, and call make again.
 
+        Tested version(s): 0.13
+
     pod2man, pod2text, pod2html, ... (Optional)
         The Perl documentation converstion utilities, required for
         (re-)building the correspdonding program documentation formats.
@@ -92,9 +94,9 @@ REQUIREMENTS
 
         Manpages and HTML documentation are distributed with the "official"
         source distribution, so you should only need the "pod2xyz" programs
-        if you're building from CVS, or if you want to generate one or more
-        additional documentation formats (e.g. text, DVI, PostScript, or
-        PDF).
+        if you're building from CVS/SVN, or if you want to generate one or
+        more additional documentation formats (e.g. text, DVI, PostScript,
+        or PDF).
 
 INSTALLATION
     Issue the following commands to the shell:
@@ -106,17 +108,17 @@ INSTALLATION
     See the file INSTALL in the top-level distribution directory for
     details.
 
-BUILD FROM CVS
-    To build from CVS, you need the GNU utilities aclocal, automake,
-    autoconf, and libtool. If you have these, you can just run the top-level
-    script:
+BUILD FROM CVS/SVN
+    To build from CVS or SVN sources, you need the GNU utilities aclocal,
+    automake, autoconf, and libtool. If you have these, you can just run the
+    top-level script:
 
-     sh ./autogen.sh
+     sh ./autoreconf.sh
 
     This will create the 'configure' script and other necessary build files.
 
-    You will also need Perl and the Getopt::Gen Perl module, which should be
-    available from wherever you acquired these sources.
+    You might also need Perl and the Getopt::Gen Perl module, which should
+    be available from wherever you acquired these sources.
 
 SYSTEMS ON WHICH MOOT HAS SUCCESSFULLY COMPILED
     linux / gcc
@@ -140,9 +142,9 @@ KNOWN ISSUES
         Otherwise, keep your distro's versions and ignore the warning.
 
     "cannot find optgen.pl program"
-        If you're building from CVS, this will be fatal. Get my Getopt::Gen
-        perl module (and perl, if you haven't already), build it, install
-        it, then run moot's ./configure again.
+        If you're building from CVS/SVN, this will be fatal. Get my
+        Getopt::Gen perl module (and perl, if you haven't already), build
+        it, install it, then run moot's ./configure again.
 
   Known Bugs
     "Unknown 'strict' tag(s) '1' at ... Parse/Template.pm line 2"

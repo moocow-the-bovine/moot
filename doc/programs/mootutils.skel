@@ -26,12 +26,16 @@ See the individual manpages for details.
     $OUT .= ("=item $subog->{USER}{program}\n"
 	     ."\n"
 	     ."$subog->{purpose}\n"
-	     ."\n"
-	     ."See L<$subog->{USER}{program}> for details.\n"
-	     ."\n"
-	     ."\n"
+	     ."(L<$subog->{USER}{program}>)\n"
+	     ."\n\n"
 	    );
   }
+  $OUT .= ("=item mootfiles\n"
+	   ."\n"
+	   ."moot file formats\n"
+	   ."(L<mootfiles>)\n"
+	   ."\n\n"
+	   );
 @]
 
 =back

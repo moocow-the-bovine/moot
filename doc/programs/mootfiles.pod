@@ -412,7 +412,7 @@ processing of XML documents, (a previous implementation
 used libxml2 (also extremely cool but not quite as amazingly fast as expat),
 but the moot libxml2 support is no longer maintained, and is disabled
 by default), as well as output recoding
-using librecode by François Pinard.  Both expat and
+using librecode by FranE<231>ois Pinard.  Both expat and
 librecode support are compile-time options -- check
 the contents of 'mootConfig.h' to see whether they
 are enabled on your system.
@@ -650,6 +650,12 @@ Read/write token analyses ('medium rare' or 'well done' formats only).
 =item Tagged
 
 Read/write 'best tags' ('medium' or 'well done' formats only).
+
+=item Location
+
+Read/write token locations as logical pairs (BYTE_OFFSET,BYTE_LENGTH)
+from/to the input stream as the first non-tag analysis.
+Useful if you need to refer back to earlier stages of a token processing pipeline.
 
 =item Pruned
 
@@ -1050,10 +1056,10 @@ solely for purposes of debugging.
 
 
 Development of this package was supported by the project
-'Kollokationen im Wörterbuch'
+'Kollokationen im WE<ouml>rterbuch'
 ( "collocations in the dictionary", http://www.bbaw.de/forschung/kollokationen )
 in association with the project
-'Digitales Wörterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
+'Digitales WE<ouml>rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
 ( "digital dictionary of the German language of the 20th century", http://www.dwds.de )
 at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de )
 with funding from

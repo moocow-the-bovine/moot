@@ -2,7 +2,7 @@
 
 README for package 'moot'
 
-Last updated for moot version 2.0.6-pre1
+Last updated for moot version 2.0.6
 
 =head1 DESCRIPTION
 
@@ -65,7 +65,7 @@ XML parser toolkit library by James Clark, required for XML input,
 available from
 http://expat.sourceforge.net
 
-Tested version 1.95.6.
+Tested version(s): 1.95.6, 1.95.8.
 
 
 =item librecode (Optional)
@@ -74,7 +74,7 @@ Character-set recoding library by François Pinard, useful for XML output,
 available from
 http://www.gnu.org/directory/recode.html
 
-Tested version 3.6.
+Tested version(s): 3.6.
 
 
 =item zlib (Optional)
@@ -84,7 +84,7 @@ useful for compressed binary HMM files.
 Available from:
 http://www.gzip.org/zlib
 
-Tested version 1.2.1.
+Tested version(s): 1.2.1., 1.2.3.3
 
 
 =item doxygen (Optional)
@@ -93,7 +93,7 @@ Required for building library documentation.
 Available from:
 http://www.doxygen.org
 
-Tested version 1.2.15.
+Tested version(s): 1.2.15, 1.5.4
 
 
 =item Perl (Optional)
@@ -116,6 +116,7 @@ module, or run:
 
 from the distribution root directory, and call make again.
 
+Tested version(s): 0.13
 
 =item pod2man, pod2text, pod2html, ... (Optional)
 
@@ -129,7 +130,7 @@ POD2HTML, and/or POD2LATEX to specify their locations.
 
 Manpages and HTML documentation are distributed with the "official" source
 distribution, so you should only need the "pod2xyz" programs if you're
-building from CVS, or if you want to generate one or more additional
+building from CVS/SVN, or if you want to generate one or more additional
 documentation formats (e.g. text, DVI, PostScript, or PDF).
 
 =back
@@ -147,19 +148,19 @@ Issue the following commands to the shell:
 See the file INSTALL in the top-level distribution
 directory for details.
 
-=head1 BUILD FROM CVS
+=head1 BUILD FROM CVS/SVN
 
-To build from CVS, you need the GNU utilities
-aclocal, automake, autoconf, and libtool.  If
-you have these, you can just run the top-level
+To build from CVS or SVN sources, you need the GNU
+utilities aclocal, automake, autoconf, and libtool.
+If you have these, you can just run the top-level
 script:
 
- sh ./autogen.sh
+ sh ./autoreconf.sh
 
 This will create the 'configure' script and other
 necessary build files.
 
-You will also need Perl and the Getopt::Gen Perl module,
+You might also need Perl and the Getopt::Gen Perl module,
 which should be available from wherever you acquired
 these sources.
 
@@ -206,7 +207,7 @@ ignore the warning.
 
 =item "cannot find optgen.pl program"
 
-If you're building from CVS, this will be fatal. Get my Getopt::Gen
+If you're building from CVS/SVN, this will be fatal. Get my Getopt::Gen
 perl module (and perl, if you haven't already), build it,
 install it, then run moot's ./configure again.
 
@@ -249,10 +250,10 @@ installed.
 =head1 ACKNOWLEDGEMENTS
 
 Development of this package was supported by the project
-'Kollokationen im Wörterbuch'
+'Kollokationen im WE<ouml>rterbuch'
 ("collocations in the dictionary", http://www.bbaw.de/forschung/kollokationen )
 in association with the project
-'Digitales Wörterbuch deutscher Sprache des 20. Jahrhunderts (DWDS)'
+'Digitales WE<ouml>rterbuch deutscher Sprache des 20. Jahrhunderts (DWDS)'
 ("digital dictionary of the German language of the 20th century", http://www.dwds.de )
 at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de )
 with funding from
