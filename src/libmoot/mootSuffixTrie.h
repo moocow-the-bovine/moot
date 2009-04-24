@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -26,14 +26,17 @@
  *   + moocow's PoS tagger : suffix trie
  *--------------------------------------------------------------------------*/
 
+/**
+\file mootSuffixTrie.h
+\brief suffix tries (\b experimental, optional)
+*/
+
 #ifndef _MOOT_SUFFIX_TRIE_H
 #define _MOOT_SUFFIX_TRIE_H
 
-#include <mootTypes.h>
-#include <mootToken.h>
+#include <mootEnum.h>
 #include <mootLexfreqs.h>
 #include <mootNgrams.h>
-#include <mootEnum.h>
 #include <mootAssocVector.h>
 #include <mootTrieVector.h>
 

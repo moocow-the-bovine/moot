@@ -26,17 +26,15 @@
  *   + moocow's PoS tagger : generic lexer routines
  *--------------------------------------------------------------------------*/
 
+/**
+\file mootGenericLexer.h
+\brief common utilities for \c flex++ lexers
+*/
+
 #ifndef _MOOT_GENERIC_LEXER_H
 #define _MOOT_GENERIC_LEXER_H
 
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-#include <string>
-
-#include <mootIO.h>
-#include <mootCIO.h>
-#include <mootBufferIO.h>
+#include <mootBufferIO.h> //-- (indirectly) includes mootCIO.h
 
 namespace moot {
   using namespace std;

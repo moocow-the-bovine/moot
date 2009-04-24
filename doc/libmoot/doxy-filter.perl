@@ -61,9 +61,9 @@ $TMPDIR = $config_tmpdir if (defined($config_tmpdir));
 #-----------------------------------------------------------------------
 # DEBUG
 #-----------------------------------------------------------------------
-#$DEBUG = 2;
+$DEBUG = 0;
 #$DEBUG = 1;
-$DEBUG=0;
+#$DEBUG = 2;
 sub logopen {
   $logfile = 'doxy-filter.log' if (!defined($logfile));
   if ($logfile ne '-') {

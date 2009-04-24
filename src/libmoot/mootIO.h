@@ -30,10 +30,14 @@
  *     like printf() and friends...
  *--------------------------------------------------------------------------*/
 
+/**
+\file mootIO.h
+\brief generic I/O abstraction layer
+*/
+
 #ifndef _MOOT_IO_H
 #define _MOOT_IO_H
 
-#include <mootConfig.h>
 #include <mootTypes.h>
 
 #include <stdio.h>
@@ -41,8 +45,6 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-
-#include <string>
 
 /** \brief Namespace for I/O stream wrappers */
 namespace mootio {

@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -26,13 +26,15 @@
  *   + moot PoS tagger : evaluator
  *--------------------------------------------------------------------------*/
 
+/**
+\file mootEval.h
+\brief routines for tagger evaluation with respect to a test set
+*/
+
 #ifndef _moot_EVAL_H
 #define _moot_EVAL_H
 
-#include <mootTypes.h>
 #include <mootToken.h>
-#include <string>
-
 
 moot_BEGIN_NAMESPACE
 

@@ -30,11 +30,20 @@
  *     like printf() and friends...
  *--------------------------------------------------------------------------*/
 
+/** \file mootCIO.h
+ *  \brief ::mootio abstraction layer for C \c FILE*s
+ *  \details
+ *     these are ugly, but there appears to be no better
+ *     (read "faster in the general case") way to get
+ *     C \c FILE*s to jive with C++ streams, and I \b REALLY
+ *     like printf() and friends...
+ */
+
 #ifndef _MOOT_CIO_H
 #define _MOOT_CIO_H
 
 #include <mootIO.h>
-#include <stdio.h>
+/*#include <stdio.h>*/ //-- included by mootIO.h
 
 namespace mootio {
 

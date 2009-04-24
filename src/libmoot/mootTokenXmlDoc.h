@@ -24,9 +24,13 @@
  * Description: libxml2 TokenIO layer
  */
 
+/**
+ * \file mootTokenXmlDoc.h
+ * \brief \b broken libxml2 support for mootToken I/O
+ */
+
 #ifndef MOOT_TOKEN_XML_DOC_IO_H
 
-#include <mootConfig.h>
 #include <mootXmlDoc.h>
 #ifdef MOOT_LIBXML_ENABLED
 

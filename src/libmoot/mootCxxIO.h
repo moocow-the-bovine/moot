@@ -30,6 +30,11 @@
  *     like printf() and friends...
  *--------------------------------------------------------------------------*/
 
+/**
+\file mootCxxIO.h
+\brief ::mootio abstraction layer for C++ streams
+*/
+
 #ifndef _MOOT_CXXIO_H
 #define _MOOT_CXXIO_H
 
@@ -38,10 +43,6 @@
 
 #include <mootIO.h>
 #include <mootArgs.h>
-
-#include <stdarg.h>
-#include <string.h>
-#include <assert.h>
 
 namespace mootio {
   using namespace std;
