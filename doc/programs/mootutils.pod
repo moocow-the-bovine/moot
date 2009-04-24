@@ -16,64 +16,61 @@ See the individual manpages for details.
 =item moot
 
 moocow's HMM part-of-speech tagger/disambiguator.
-
-See L<moot> for details.
+(L<moot>)
 
 
 =item mootchurn
 
 File format converter for moocow's PoS tagger.
-
-See L<mootchurn> for details.
+(L<mootchurn>)
 
 
 =item mootcompile
 
 moocow's HMM part-of-speech tagger/disambiguator: model compiler.
-
-See L<mootcompile> for details.
+(L<mootcompile>)
 
 
 =item mootconfig
 
 moocow's part-of-speech tagger: report configuration
-
-See L<mootconfig> for details.
+(L<mootconfig>)
 
 
 =item mootdump
 
 moocow's HMM part-of-speech tagger/disambiguator: model dumper.
-
-See L<mootdump> for details.
+(L<mootdump>)
 
 
 =item mooteval
 
 Output evaluator for moocow's PoS tagger.
-
-See L<mooteval> for details.
+(L<mooteval>)
 
 
 =item mootpp
 
 Tokenizer for moocow's part-of-speech tagger.
-
-See L<mootpp> for details.
+(L<mootpp>)
 
 
 =item mootrain
 
 moocow's part-of-speech tagger : HMM trainer
-
-See L<mootrain> for details.
+(L<mootrain>)
 
 
 =item moottype
 
 moocow's HMM part-of-speech tagger: token type classifier.
+(L<moottype>)
 
-See L<moottype> for details.
+
+=item mootfiles
+
+moot file formats
+(L<mootfiles>)
 
 
 
@@ -127,10 +124,10 @@ Translation was initiated as:
 
 
 Development of this package was supported by the project
-'Kollokationen im Wörterbuch'
+'Kollokationen im WE<ouml>rterbuch'
 ( "collocations in the dictionary", http://www.bbaw.de/forschung/kollokationen )
 in association with the project
-'Digitales Wörterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
+'Digitales WE<ouml>rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
 ( "digital dictionary of the German language of the 20th century", http://www.dwds.de )
 at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de )
 with funding from
