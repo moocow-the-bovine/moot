@@ -26,6 +26,10 @@
  *   + moot PoS tagger : low-level I/O abstractions for libz gzFile
  *--------------------------------------------------------------------------*/
 
+/** \file mootZIO.h
+ *  \brief ::mootio I/O abstraction layer for zlib \a gzFile
+ */
+
 #ifndef _MOOT_ZIO_H
 #define _MOOT_ZIO_H
 

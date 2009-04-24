@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -10,6 +10,7 @@
    version 2.1 of the License, or (at your option) any later version.
    
    This library is distributed in the hope that it will be useful,
+
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Lesser General Public License for more details.
@@ -26,20 +27,21 @@
  *   + moocow's PoS tagger : librecode interface
  *--------------------------------------------------------------------------*/
 
+/**
+\file mootRecode.h
+\brief interface to \c librecode (optional)
+*/
+
 #ifndef _MOOT_RECODE_H
 #define _MOOT_RECODE_H
 
-#include <mootConfig.h>
+#include <mootIO.h>
 
 #ifdef MOOT_RECODE_ENABLED
 #include <stdbool.h>
 #include <recodext.h>
 #endif // MOOT_RECODE_ENABLED
 
-#include <assert.h>
-#include <string>
-
-#include <mootIO.h>
 
 namespace moot {
 

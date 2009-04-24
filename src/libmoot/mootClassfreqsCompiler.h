@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -26,16 +26,15 @@
  *    Compiler for lexical-class-frequency parameter files for moot tagger
  *============================================================================*/
 
+/** \file mootClassfreqsCompiler.h
+ *  \brief Compiler for lexical-class-frequency parameter files
+ */
+
 #ifndef _moot_CLASSFREQS_COMPILER_H
 #define _moot_CLASSFREQS_COMPILER_H
 
-#include <stdio.h>
-#include <string.h>
-
-//#include <FSM.h>
-
 #include "mootClassfreqsLexer.h"
-#include "mootClassfreqsParser.h"
+//#include "mootClassfreqsParser.h" //-- used by mootClassFreqsLexer.h
 
 moot_BEGIN_NAMESPACE
 

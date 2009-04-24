@@ -26,17 +26,21 @@
  *   + moot PoS tagger : low-level I/O routines: C buffer I/O
  *--------------------------------------------------------------------------*/
 
+/** \file mootBufferIO.h
+ *  \brief ::mootio abstraction layer for C \c char* buffers
+ */
+
 #ifndef _MOOT_BUFFERIO_H
 #define _MOOT_BUFFERIO_H
 
-#include <stdio.h>   // for EOF
-#include <string.h>  // for memcpy() and friends
-#include <assert.h>  // for sanity checks
+//#include <stdio.h>   // for EOF (via mooIO.h)
+//#include <string.h>  // for memcpy() and friends (via mootIO.h)
+//#include <assert.h>  // for sanity checks
 #include <stdlib.h>  // for memory allocation etc.
 
 #include <mootUtils.h> // for trimming
 #include <mootArgs.h>  // for moot_va_copy()
-#include <mootIO.h>    // for everything else
+//#include <mootIO.h>    // for everything else (via mootUtils.h)
 
 
 

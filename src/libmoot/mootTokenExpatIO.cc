@@ -243,16 +243,17 @@ void TokenReaderExpat::StartElementHandler(const char *el, const char **attr)
       info |= (TRX_IsTokenE|TRX_IsTokenD);
       cb_nxtsent.push_back(mootToken(TokTypeVanilla));
       cb_nxttok = &(cb_nxtsent.back());
+      if ( !(tr_format & tiofLocation) ) cb_nxttok->loc_offset(byte_offset());
     }
     else if (info & TRX_IsTokenD) {
       //-- //body//token//
-      if (text_elt == el) {
+      if ((tr_format & tiofText) && text_elt == el) {
 	//-- //body//token//text
 	//   : clear token-text
 	info |= (TRX_IsTokTextE|TRX_IsTokTextD);
 	cb_nxttok->tok_text.clear();
       }
-      else if (analysis_elt == el) {
+      else if ((tr_format & tiofAnalyzed) && analysis_elt == el) {
 	//-- //body//token//analysis
 	//   : add tag-only analysis
 	info |= (TRX_IsAnalysisE|TRX_IsAnalysisD);
@@ -263,13 +264,13 @@ void TokenReaderExpat::StartElementHandler(const char *el, const char **attr)
 	  }
 	}
       }
-      else if (besttag_elt == el) {
+      else if ((tr_format & tiofTagged) && besttag_elt == el) {
 	//-- //body//token//besttag
 	//   : clear 'besttag' text
 	cb_nxttok->tok_besttag.clear();
 	info |= (TRX_IsBestTagE|TRX_IsBestTagD);
       }
-      else if (location_elt == el) {
+      else if ((tr_format & tiofLocation) && location_elt == el) {
 	for (int i=0; attr[i]; i += 2) {
 	  if (attr[i] == offset_attr) {
 	    cb_nxttok->loc_offset(strtoul(reinterpret_cast<const char *>(attr[i+1]),NULL,0));
@@ -327,6 +328,7 @@ void TokenReaderExpat::EndElementHandler(const char *el)
     //-- EOT
     //       : HACK : we want end-element pushed AFTER the vanilla token
     info &= ~TRX_IsTokenD;
+    if ( !(tr_format&tiofLocation) ) cb_nxttok->loc_length( byte_offset() + byte_count() - cb_nxttok->loc_offset() );
   }
   /*
   else if (info & TRX_IsAnalysisE) {
@@ -466,7 +468,7 @@ TokenWriterExpat::TokenWriterExpat(int                fmt
     lastc(' ')
 {
   //-- TokenWriter flags
-  if (! tw_format&tiofXML ) tw_format |= tiofXML;
+  if ( !(tw_format&tiofXML) ) tw_format |= tiofXML;
 
   //-- encoding
   setEncoding(encoding);

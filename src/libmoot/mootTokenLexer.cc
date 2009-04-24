@@ -258,7 +258,7 @@ int read();
  * Rules
  *----------------------------------------------------------------------*/
 #include "mootTokenLexer.h"
-#line 201 "mootTokenLexer.ll"
+#line 214 "mootTokenLexer.ll"
 #line 197 "./flexskel.cc"
 
 #define yy___text YY_mootTokenLexer_TEXT
@@ -559,9 +559,9 @@ static YY_CHAR *yy_last_accepting_cpos;
 #if YY_mootTokenLexer_DEBUG != 0
 static const short int yy_rule_linenum[25] =
     {   0,
-      214,  225,  238,  247,  247,  291,  310,  316,  331,  347,
-      356,  364,  372,  385,  401,  408,  414,  415,  416,  417,
-      427,  434,  440,  446
+      227,  238,  251,  261,  261,  304,  328,  335,  350,  366,
+      375,  383,  391,  405,  421,  428,  434,  435,  436,  437,
+      447,  454,  460,  466
     } ;
 
 #endif
@@ -715,20 +715,20 @@ do_action:      /* this label is used only to access EOF actions */
  */
 
 case 1:
-#line 214 "mootTokenLexer.ll"
+#line 227 "mootTokenLexer.ll"
 {
   //-- EOS: blank line: maybe return eos (ignore empty sentences)
   theLine++; theColumn=0; theByte += yyleng;
   if (mtoken->tok_type != TokTypeEOS) {
     mtoken->tok_type=TokTypeEOS;
     mtoken->tok_text="\n";
-    //mtoken->location(theByte-yyleng, yyleng);
+    if (!parse_location) loc_set(theByte-yyleng, yyleng);
     return TokTypeEOS;
   }
 }
 	YY_BREAK
 case 2:
-#line 225 "mootTokenLexer.ll"
+#line 238 "mootTokenLexer.ll"
 {
   //-- COMMENT: return comments as special tokens
   theLine++; theColumn = 0; theByte += yyleng;
@@ -737,30 +737,30 @@ case 2:
     mtoken->clear();
     mtoken->toktype(TokTypeComment);
     mtoken->textAppend(reinterpret_cast<const char *>(yytext)+2, yyleng-3);
-    //mtoken->location(theByte-yyleng, yyleng);
+    if (!parse_location) loc_set(theByte-yyleng, yyleng);
     return TokTypeComment;
   }
 }
 	YY_BREAK
 case 3:
-#line 238 "mootTokenLexer.ll"
+#line 251 "mootTokenLexer.ll"
 {
   //-- TOKEN-TEXT: keep only internal whitespace
   add_columns(yyleng);
   mtoken->clear();
   mtoken->toktype(TokTypeVanilla);
   mtoken->text(reinterpret_cast<const char *>(yytext), yyleng);
+  if (!parse_location) loc_set(theByte-yyleng, yyleng);
   lasttyp = LexTypeText;
 }
 	YY_BREAK
 case 4:
-#line 247 "mootTokenLexer.ll"
+#line 261 "mootTokenLexer.ll"
 {
   //-- TOKEN: end-of-token
-  theLine++;
-  theColumn = 0;
-  theByte += yyleng;
+  add_lines(1);
   mtoken->toktype(TokTypeVanilla);
+  loc_add(yyleng); //-- include terminating newline as part of token location
   lasttyp = TokTypeVanilla;
   return TokTypeVanilla;
 }
@@ -772,7 +772,7 @@ case YY_STATE_EOF(TAG):
 case YY_STATE_EOF(DETAILS):
 case YY_STATE_EOF(SEPARATORS):
 case YY_STATE_EOF(TOKEN):
-#line 257 "mootTokenLexer.ll"
+#line 270 "mootTokenLexer.ll"
 {
   //-- EOF: should only happen in TOKEN mode
   mtoken->tok_text="";
@@ -811,13 +811,18 @@ case 6:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 291 "mootTokenLexer.ll"
+#line 304 "mootTokenLexer.ll"
 {
   //-- TOKEN: end-of-token
   add_columns(yyleng);
 
-  if      (first_analysis_is_best) current_analysis_is_best = true;
-  else if (first_nontag_is_location) nextstate = LOC_OFFSET;
+  if (first_analysis_is_best) {
+    current_analysis_is_best = true;
+  } else if (parse_location) {
+    nextstate = LOC_OFFSET;
+  } else {
+    loc_add(yyleng);
+  }
   if (ignore_first_analysis) ignore_current_analysis = true;
 
   lasttyp = LexTypeText;
@@ -830,11 +835,12 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
  */
 
 case 7:
-#line 310 "mootTokenLexer.ll"
+#line 328 "mootTokenLexer.ll"
 {
   //-- SEPARATORS: Separator character(s): increment column nicely
   theColumn = (static_cast<int>(theColumn/8)+1)*8;
   theByte += yyleng;
+  loc_add(yyleng);
   lasttyp = LexTypeEOA;
 }
 	YY_BREAK
@@ -842,7 +848,7 @@ case 8:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 316 "mootTokenLexer.ll"
+#line 335 "mootTokenLexer.ll"
 {
   //-- SEPARATORS: end of separators
   theColumn += yyleng;
@@ -863,12 +869,12 @@ case 9:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 331 "mootTokenLexer.ll"
+#line 350 "mootTokenLexer.ll"
 {
   //-- SEPARATORS/EOT: reset to initial state
   //theLine++;
-  theColumn = 0;
-  theByte += yyleng;
+  //theColumn = 0;
+  //theByte += yyleng;
   nextstate = -1;
   BEGIN(TOKEN);
 }
@@ -882,22 +888,22 @@ case 10:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 347 "mootTokenLexer.ll"
+#line 366 "mootTokenLexer.ll"
 {
   //-- DETAILS: looks like a tag
-  theColumn += yyleng;
-  theByte += yyleng;
+  add_columns(yyleng);
+  loc_add(yyleng);
   manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeDetails;
   BEGIN(TAG);
 }
 	YY_BREAK
 case 11:
-#line 356 "mootTokenLexer.ll"
+#line 375 "mootTokenLexer.ll"
 {
   //-- DETAILS: detail text
-  theColumn += yyleng;
-  theByte += yyleng;
+  add_columns(yyleng);
+  loc_add(yyleng);
   manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeDetails;
 }
@@ -906,11 +912,11 @@ case 12:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 364 "mootTokenLexer.ll"
+#line 383 "mootTokenLexer.ll"
 {
   //-- DETAILS: internal whitespace: keep it
-  theColumn += yyleng;
-  theByte += yyleng;
+  add_columns(yyleng);
+  loc_add(yyleng);
   manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeDetails;
 }
@@ -919,10 +925,11 @@ case 13:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 372 "mootTokenLexer.ll"
+#line 391 "mootTokenLexer.ll"
 {
   //-- DETAILS/EOA: add & clear current analysis, if any
-  theByte += yyleng;
+  add_columns(yyleng);
+  loc_add(yyleng);
   on_EOA();
   BEGIN(SEPARATORS);
 }
@@ -933,11 +940,11 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
  */
 
 case 14:
-#line 385 "mootTokenLexer.ll"
+#line 405 "mootTokenLexer.ll"
 {
   //-- TAG: tag text
-  theColumn += yyleng;
-  theByte += yyleng;
+  add_columns(yyleng);
+  loc_add(yyleng);
   manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   if (manalysis->tag.empty()) manalysis->tag.assign(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeTag;
@@ -950,7 +957,7 @@ case 14:
  */
 
 case 15:
-#line 401 "mootTokenLexer.ll"
+#line 421 "mootTokenLexer.ll"
 {
   //-- LOCATION: offset
   add_columns(yyleng);
@@ -959,7 +966,7 @@ case 15:
 }
 	YY_BREAK
 case 16:
-#line 408 "mootTokenLexer.ll"
+#line 428 "mootTokenLexer.ll"
 {
   //-- LOCATION: length
   add_columns(yyleng);
@@ -967,28 +974,28 @@ case 16:
 }
 	YY_BREAK
 case 17:
-#line 414 "mootTokenLexer.ll"
+#line 434 "mootTokenLexer.ll"
 { add_columns(yyleng); }
 	YY_BREAK
 case 18:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 415 "mootTokenLexer.ll"
+#line 435 "mootTokenLexer.ll"
 { nextstate=-1; BEGIN(SEPARATORS); }
 	YY_BREAK
 case 19:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 416 "mootTokenLexer.ll"
+#line 436 "mootTokenLexer.ll"
 { nextstate=-1; BEGIN(TOKEN); }
 	YY_BREAK
 case 20:
 *yy_cp = yy_hold_char; /* undo effects of setting up yytext */
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
-#line 417 "mootTokenLexer.ll"
+#line 437 "mootTokenLexer.ll"
 { nextstate=-1; BEGIN(SEPARATORS); }
 	YY_BREAK
 
@@ -997,40 +1004,40 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
  */
 
 case 21:
-#line 427 "mootTokenLexer.ll"
+#line 447 "mootTokenLexer.ll"
 {
   /* mostly ignore spaces */
-  theColumn += yyleng;
-  theByte += yyleng;
+  add_columns(yyleng);
+  loc_add(yyleng);
   //lasttyp = LexTypeIgnore;
 }
 	YY_BREAK
 case 22:
-#line 434 "mootTokenLexer.ll"
+#line 454 "mootTokenLexer.ll"
 {
-  theColumn += yyleng;
-  theByte += yyleng;
+  add_columns(yyleng);
+  loc_add(yyleng);
   yycarp("Unrecognized TOKEN character '%c'", *yytext);
 }
 	YY_BREAK
 case 23:
-#line 440 "mootTokenLexer.ll"
+#line 460 "mootTokenLexer.ll"
 {
-  theColumn += yyleng;
-  theByte += yyleng;
+  add_columns(yyleng);
+  loc_add(yyleng);
   yycarp("Unrecognized DETAIL character '%c'", *yytext);
 }
 	YY_BREAK
 case 24:
-#line 446 "mootTokenLexer.ll"
+#line 466 "mootTokenLexer.ll"
 {
-  theColumn += yyleng;
-  theByte += yyleng;
+  add_columns(yyleng);
+  loc_add(yyleng);
   yycarp("Unrecognized TAG character '%c'", *yytext);
 }
 	YY_BREAK
 case 25:
-#line 452 "mootTokenLexer.ll"
+#line 472 "mootTokenLexer.ll"
 ECHO;
 	YY_BREAK
 #line 464 "./flexskel.cc"
@@ -1625,7 +1632,7 @@ void YY_mootTokenLexer_CLASS::YY_mootTokenLexer_INIT_BUFFER( YY_BUFFER_STATE b, 
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 452 "mootTokenLexer.ll"
+#line 472 "mootTokenLexer.ll"
 
 
 /*----------------------------------------------------------------------
@@ -1661,7 +1668,7 @@ void mootTokenLexer::on_EOA(void)
     if (current_analysis_is_best) { 
       mtoken->besttag(manalysis->tag); 
       current_analysis_is_best = false; 
-      if (first_nontag_is_location) { nextstate=LOC_OFFSET; }
+      if (parse_location) { nextstate=LOC_OFFSET; }
     }
     /* maybe ignore this analysis */ 
     if (ignore_current_analysis) { 

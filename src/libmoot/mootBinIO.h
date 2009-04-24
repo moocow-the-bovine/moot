@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -26,22 +26,16 @@
  *   + moot PoS tagger : abstract templates for binary librarians
  *--------------------------------------------------------------------------*/
 
+/** \file mootBinIO.h
+ *  \brief abstract templates for binary I/O
+ */
+
 #ifndef _MOOT_BINIO_H
 #define _MOOT_BINIO_H
 
-#include <stdlib.h>
+//#include <stdlib.h> //-- via mootHMM -> mootTokenIO -> mootTokenLexer -> mootGenericLexer -> mootBufferIO
 
-#include <vector>
-#include <string>
-#include <map>
-#include <set>
-
-#include <mootTypes.h>
-#include <mootEnum.h>
-#include <mootIO.h>
 #include <mootHMM.h>
-#include <mootAssocVector.h>
-#include <mootSuffixTrie.h>
 
 /** \brief Namespace for structured binary stream I/O */
 namespace mootBinIO {

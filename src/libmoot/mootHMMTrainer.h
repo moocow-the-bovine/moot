@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2008 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -26,20 +26,18 @@
  *   + Trainer for moocow's PoS-tagger: shared headers
  *--------------------------------------------------------------------------*/
 
+/**
+\file mootHMMTrainer.h
+\brief Hidden Markov Model tagger/disambiguator: training routines
+*/
+
 #ifndef _moot_HMM_TRAINER_H_
 #define _moot_HMM_TRAINER_H_
 
-#include <stdio.h>
-
-#include <set>
-#include <deque>
-
-#include "mootTypes.h"
-#include "mootToken.h"
-#include "mootTokenIO.h"
-#include "mootNgrams.h"
-#include "mootLexfreqs.h"
-#include "mootClassfreqs.h"
+#include <mootTokenIO.h>
+#include <mootNgrams.h>
+//#include <mootLexfreqs.h> //-- included by mootClassfreqs.h
+#include <mootClassfreqs.h>
 
 moot_BEGIN_NAMESPACE
 

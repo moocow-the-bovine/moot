@@ -26,18 +26,16 @@
  *   + moocow's PoS tagger : useful utilities
  *--------------------------------------------------------------------------*/
 
+/** @file mootUtils.h
+ *  @brief useful utilities, especially for command-line programs
+ */
+
 #ifndef _moot_UTILS_H
 #define _moot_UTILS_H
 
-#include <mootConfig.h>
-
-#include <stdio.h>
-#include <string.h>
-#include <string>
-#include <list>
-
-#include <mootIO.h>
 #include <mootCIO.h>
+
+#include <list>
 
 namespace moot {
   using namespace std;

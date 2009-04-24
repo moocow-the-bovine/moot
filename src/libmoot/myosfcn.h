@@ -1,3 +1,6 @@
+/** \file myosfcn.h
+ *  \brief drop-in replacement \b hack for missing flex++bison++ \c osfcn.h
+ */
 
 #ifndef OSFCN_H
 #define OSFCN_H 1

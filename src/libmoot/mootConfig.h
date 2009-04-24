@@ -1,7 +1,7 @@
 /* -*- Mode: C++ -*- */
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -26,13 +26,19 @@
 
 /**
  * \file mootConfig.h
- * \brief safely include autoheader preprocessor defines
+ * \brief safely includes autoheader preprocessor macros
  *
  * \file mootNoConfig.h
- * \brief Undefine any autoheader preprocessor defines
+ * \brief undefines any autoheader preprocessor macros
+ * \details
+ *  This is a hack to avoid preprocessor "multiply defined" warnings 
+ *  when using this package with another autoheader package.
+ *  The "right" way to do this would be to relegate all autoheader-sensitive
+ *  code to .cc source files, but this is not practical when templates and
+ *  inlining come into play, hence mootNoConfig.h.
  *
  * \file mootAutoConfig.h
- * \brief autoheader-generated preprocessor defines
+ * \brief autoheader-generated preprocessor macros
  */
 
 /* 

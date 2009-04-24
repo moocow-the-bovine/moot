@@ -201,7 +201,7 @@ int read();
 /*-*- Mode: Flex++ -*-*/
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -233,7 +233,7 @@ int read();
  * Rules
  *----------------------------------------------------------------------*/
 #include "mootNgramsLexer.h"
-#line 97 "mootNgramsLexer.ll"
+#line 101 "mootNgramsLexer.ll"
 #line 197 "./flexskel.cc"
 
 #define yy___text YY_mootNgramsLexer_TEXT
@@ -493,7 +493,7 @@ static YY_CHAR *yy_last_accepting_cpos;
 #if YY_mootNgramsLexer_DEBUG != 0
 static const short int yy_rule_linenum[9] =
     {   0,
-       99,  104,  109,  116,  124,  131,  131,  141
+      103,  108,  113,  120,  128,  135,  135,  145
     } ;
 
 #endif
@@ -638,21 +638,21 @@ do_action:      /* this label is used only to access EOF actions */
 	    goto yy_find_action;
 
 case 1:
-#line 99 "mootNgramsLexer.ll"
+#line 103 "mootNgramsLexer.ll"
 {
   // -- ignore leading whitespace
   theColumn += yyleng;
 }
 	YY_BREAK
 case 2:
-#line 104 "mootNgramsLexer.ll"
+#line 108 "mootNgramsLexer.ll"
 {
    // -- ignore comments
    theColumn += yyleng;
 }
 	YY_BREAK
 case 3:
-#line 109 "mootNgramsLexer.ll"
+#line 113 "mootNgramsLexer.ll"
 {
   // -- tab: return the current token-buffer
   //theColumn += yyleng+7; // -- interpret tab as 8 spaces
@@ -661,7 +661,7 @@ case 3:
 }
 	YY_BREAK
 case 4:
-#line 116 "mootNgramsLexer.ll"
+#line 120 "mootNgramsLexer.ll"
 {
   // -- count : return it
   //theLine++; theColumn = 0;
@@ -671,7 +671,7 @@ case 4:
 }
 	YY_BREAK
 case 5:
-#line 124 "mootNgramsLexer.ll"
+#line 128 "mootNgramsLexer.ll"
 {
   // -- any other text: append to the token-buffer
   theColumn += yyleng;
@@ -680,7 +680,7 @@ case 5:
 }
 	YY_BREAK
 case 6:
-#line 131 "mootNgramsLexer.ll"
+#line 135 "mootNgramsLexer.ll"
 {
   // -- newlines : ignore
   theLine++; theColumn = 0;
@@ -688,13 +688,13 @@ case 6:
 }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 137 "mootNgramsLexer.ll"
+#line 141 "mootNgramsLexer.ll"
 {
   return 0;
 }
 	YY_BREAK
 case 8:
-#line 141 "mootNgramsLexer.ll"
+#line 145 "mootNgramsLexer.ll"
 {
   // -- huh? -- just ignore it!
   theColumn += yyleng;
@@ -702,7 +702,7 @@ case 8:
 }
 	YY_BREAK
 case 9:
-#line 147 "mootNgramsLexer.ll"
+#line 151 "mootNgramsLexer.ll"
 ECHO;
 	YY_BREAK
 #line 464 "./flexskel.cc"
@@ -1297,7 +1297,7 @@ void YY_mootNgramsLexer_CLASS::YY_mootNgramsLexer_INIT_BUFFER( YY_BUFFER_STATE b
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 147 "mootNgramsLexer.ll"
+#line 151 "mootNgramsLexer.ll"
 
 
 // -- co-exist with BumbleBee 'clex.h'
