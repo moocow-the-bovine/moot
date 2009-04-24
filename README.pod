@@ -70,7 +70,7 @@ Tested version(s): 1.95.6, 1.95.8.
 
 =item librecode (Optional)
 
-Character-set recoding library by François Pinard, useful for XML output,
+Character-set recoding library by FranE<231>ois Pinard, useful for XML output,
 available from
 http://www.gnu.org/directory/recode.html
 
