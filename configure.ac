@@ -224,6 +224,7 @@ if test -n "$DISTCHECK" ; then
    test -z "$POD2X" && POD2LATEX=no
    test -z "$FLEXXX" && FLEXXX=no
    test -z "$BISONXX" && BISONXX=no
+   test -z "$OSFCN_H" && OSFCN_H=no
 fi
 ## /DISTCHECK
 ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -377,6 +378,26 @@ AM_CONDITIONAL(HAVE_BISONXX,[test "$BISONXX" != "no"])
 YACC="$BISONXX"
 AC_SUBST(YACC)
 AC_SUBST(BISONXX)
+
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## check for osfcn.h (for flex++/bison++)
+##
+if test -z "$OSFCN_H"; then
+ AC_CHECK_HEADER([osfcn.h], [OSFCN_H=yes], [OSFCN_H=no])
+fi
+
+AC_MSG_CHECKING([whether to install local osfcn.h])
+if test "$OSFCN_H" != "yes"; then
+  AC_MSG_RESULT([yes])
+  INSTALL_OSFCN_H=osfcn.h
+else
+  AC_MSG_RESULT([no])
+  INSTALL_OSFCN_H=""
+fi
+AM_CONDITIONAL(HAVE_OSFCN_H, [test "$OSFCN_H" = "yes"])
+AC_SUBST(INSTALL_OSFCN_H)
+## /osfcn.h
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 dnl check for recode

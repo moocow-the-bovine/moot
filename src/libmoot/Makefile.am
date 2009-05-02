@@ -97,52 +97,60 @@ libmoot_la_SOURCES = \
 #EXTRA_${prog_i}_SOURCES = 
 #EXTRA_${lib_i}_la_SOURCES = 
 
+fxx_cc_deps =
+if !HAVE_OSFCN_H
+fxx_cc_deps += osfcn.h
+endif
+
 ## --- Additional dependencies
 mootNgrams.lo: mootNgramsLexer.h mootNgramsParser.h 
 mootNgrams.o: mootNgramsLexer.h mootNgramsParser.h
 mootNgramsCompiler.lo: mootNgramsLexer.h mootNgramsParser.h 
 mootNgramsCompiler.o: mootNgramsLexer.h mootNgramsParser.h
-mootNgramsLexer.lo: mootNgramsLexer.h mootNgramsParser.h
-mootNgramsLexer.o: mootNgramsLexer.h mootNgramsParser.h
+mootNgramsLexer.lo: mootNgramsLexer.h mootNgramsParser.h $(fxx_cc_deps)
+mootNgramsLexer.o: mootNgramsLexer.h mootNgramsParser.h $(fxx_cc_deps)
 mootNgramsLexer.h: $(FLEXXX_DEPS)
 mootNgramsLexer.cc: $(FLEXXX_DEPS)
 mootNgramsParser.h: $(BISONXX_DEPS)
 mootNgramsParser.cc: $(BISONXX_DEPS)
 
-mootLexfreqs.lo: mootLexfreqsLexer.h mootLexfreqsParser.h 
-mootLexfreqs.o: mootLexfreqsLexer.h mootLexfreqsParser.h
-mootLexfreqsCompiler.lo: mootLexfreqsLexer.h mootLexfreqsParser.h 
-mootLexfreqsCompiler.o: mootLexfreqsLexer.h mootLexfreqsParser.h
-mootLexfreqsLexer.lo: mootLexfreqsLexer.h mootLexfreqsParser.h
-mootLexfreqsLexer.o: mootLexfreqsLexer.h mootLexfreqsParser.h
+mootLexfreqs.lo: mootLexfreqsLexer.h mootLexfreqsParser.h $(fxx_cc_deps)
+mootLexfreqs.o: mootLexfreqsLexer.h mootLexfreqsParser.h $(fxx_cc_deps)
+mootLexfreqsCompiler.lo: mootLexfreqsLexer.h mootLexfreqsParser.h $(fxx_cc_deps)
+mootLexfreqsCompiler.o: mootLexfreqsLexer.h mootLexfreqsParser.h $(fxx_cc_deps)
+mootLexfreqsLexer.lo: mootLexfreqsLexer.h mootLexfreqsParser.h $(fxx_cc_deps)
+mootLexfreqsLexer.o: mootLexfreqsLexer.h mootLexfreqsParser.h $(fxx_cc_deps)
 mootLexfreqsLexer.h: $(FLEXXX_DEPS)
 mootLexfreqsLexer.cc: $(FLEXXX_DEPS)
 mootLexfreqsParser.h: $(BISONXX_DEPS)
 mootLexfreqsParser.cc: $(BISONXX_DEPS)
 
-mootClassfreqs.lo: mootClassfreqsLexer.h mootClassfreqsParser.h 
-mootClassfreqs.o: mootClassfreqsLexer.h mootClassfreqsParser.h
+mootClassfreqs.lo: mootClassfreqsLexer.h mootClassfreqsParser.h $(fxx_cc_deps)
+mootClassfreqs.o: mootClassfreqsLexer.h mootClassfreqsParser.h $(fxx_cc_deps)
 mootClassfreqsCompiler.lo: mootClassfreqsLexer.h mootClassfreqsParser.h 
 mootClassfreqsCompiler.o: mootClassfreqsLexer.h mootClassfreqsParser.h
-mootClassfreqsLexer.lo: mootClassfreqsLexer.h mootClassfreqsParser.h
-mootClassfreqsLexer.o: mootClassfreqsLexer.h mootClassfreqsParser.h
+mootClassfreqsLexer.lo: mootClassfreqsLexer.h mootClassfreqsParser.h $(fxx_cc_deps)
+mootClassfreqsLexer.o: mootClassfreqsLexer.h mootClassfreqsParser.h $(fxx_cc_deps)
 mootClassfreqsLexer.h: $(FLEXXX_DEPS)
 mootClassfreqsLexer.cc: $(FLEXXX_DEPS)
 mootClassfreqsParser.h: $(BISONXX_DEPS)
 mootClassfreqsParser.cc: $(BISONXX_DEPS)
 
-mootTokenLexer.lo: mootTokenLexer.h mootToken.h
-mootTokenLexer.o: mootTokenLexer.h mootToken.h
+mootTokenLexer.lo: mootTokenLexer.h mootToken.h $(fxx_cc_deps)
+mootTokenLexer.o: mootTokenLexer.h mootToken.h $(fxx_cc_deps)
 mootTokenIO.lo: mootTokenLexer.h
 mootTokenIO.o: mootTokenLexer.h
 
-mootEventLexer.lo: mootEventLexer.h mootEvent.h
-mootEventLexer.o: mootEventLexer.h mootEvent.h
+mootPPLexer.lo: mootPPLexer.h $(fxx_cc_deps)
+mootPPLexer.o: mootPPLexer.h $(fxx_cc_deps)
+
+mootEventLexer.lo: mootEventLexer.h mootEvent.h $(fxx_cc_deps)
+mootEventLexer.o: mootEventLexer.h mootEvent.h $(fxx_cc_deps)
 #mootEventIO.lo: mootEventIO.h mootEventLexer.h
 #mootEventIO.o: mootEventIO.h mootEventLexer.h
 
-#mootEventLexer.lo: mootEventLexer.h mootTokenParser.h
-#mootEventLexer.o: mootEventLexer.h mootTokenParser.h
+#mootEventLexer.lo: mootEventLexer.h mootTokenParser.h $(fxx_cc_deps)
+#mootEventLexer.o: mootEventLexer.h mootTokenParser.h $(fxx_cc_deps)
 #mootEventLexer.h: $(FLEXXX_DEPS)
 #mootEventLexer.cc: $(FLEXXX_DEPS)
 #mootTokenParser.h: $(BISONXX_DEPS)
@@ -152,8 +160,8 @@ mootEventLexer.o: mootEventLexer.h mootEvent.h
 #mootDisambiguator.lo: mootAlphabetCompiler.h
 #mootAlphabetCompiler.lo: mootAlphabetLexer.h mootAlphabetParser.h 
 #mootAlphabetCompiler.o: mootAlphabetLexer.h mootAlphabetParser.h
-#mootAlphabetLexer.lo: mootAlphabetLexer.h mootAlphabetParser.h
-#mootAlphabetLexer.o: mootAlphabetLexer.h mootAlphabetParser.h
+#mootAlphabetLexer.lo: mootAlphabetLexer.h mootAlphabetParser.h $(fxx_cc_deps)
+#mootAlphabetLexer.o: mootAlphabetLexer.h mootAlphabetParser.h $(fxx_cc_deps)
 #mootAlphabetLexer.h: $(FLEXXX_DEPS)
 #mootAlphabetLexer.cc: $(FLEXXX_DEPS)
 #mootAlphabetParser.h: $(BISONXX_DEPS)
@@ -165,6 +173,9 @@ mootEventLexer.o: mootEventLexer.h mootEvent.h
 mootNoConfig.h: mootAutoConfig.h.in
 	rm -f "$@"
 	cp "$<" "$@"
+
+osfcn.h: myosfcn.h
+	cp $< $@
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -230,10 +241,14 @@ pkginclude_HEADERS = \
 	mootHMMTrainer.h \
 	mootEval.h \
 	\
-	mootUtils.h
+	mootUtils.h \
+	\
+	@INSTALL_OSFCN_H@
 
 #	mootCHMM.h 
 #	mootTokenParser.h
+
+EXTRA_HEADERS = osfcn.h
 
 ## --- no-install headers
 #noinst_HEADERS = nopackage.h
@@ -332,7 +347,7 @@ libmoot_la_LIBADD = gnulib/libgnu.la
 #MOSTLYCLEANFILES =
 
 ## --- clean:  built by 'make'
-#CLEANFILES =
+CLEANFILES = osfcn.h
 
 ## --- distclean: built by 'configure'
 #DISTCLEANFILES =
