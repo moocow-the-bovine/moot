@@ -1,0 +1,285 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>mootrain - moocow's part-of-speech tagger : HMM trainer</title>
+<link rel="stylesheet" href="mootprogs.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#arguments">ARGUMENTS</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<ul>
+
+		<li><a href="#basic_options">Basic Options</a></li>
+		<li><a href="#model_format_options">Model Format Options</a></li>
+	</ul>
+
+	<li><a href="#configuration_files">CONFIGURATION FILES</a></li>
+	<li><a href="#addenda">ADDENDA</a></li>
+	<ul>
+
+		<li><a href="#about_this_document">About this Document</a></li>
+	</ul>
+
+	<li><a href="#bugs_and_limitations">BUGS AND LIMITATIONS</a></li>
+	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>mootrain - moocow's part-of-speech tagger : HMM trainer</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>mootrain [OPTIONS] <a href="#item_input"><code>INPUT(s)</code></a></p>
+<pre>
+ Arguments:
+    INPUT(s)  Tagged input corpus file(s).</pre>
+<pre>
+ Options
+    -h          --help                     Print help and exit.
+    -V          --version                  Print version and exit.
+    -cFILE      --rcfile=FILE              Read an alternate configuration file.</pre>
+<pre>
+ Basic Options
+    -vLEVEL     --verbose=LEVEL            Verbosity level.
+    -oSTRING    --output=STRING            Specify basename for output files (default=INPUT)
+    -IFORMAT    --input-format=FORMAT      Specify input file(s) format(s).
+                --input-encoding=ENCODING  Override document encoding for XML input.</pre>
+<pre>
+ Model Format Options
+    -l          --lex                      Generate only lexical frequency file.
+    -n          --ngrams                   Generate only n-gram frequency file.
+    -C          --classes                  Generate only lexical-class frequency file.
+    -eTAG       --eos-tag=TAG              Specify boundary tag (default=__$)
+    -N          --verbose-ngrams           Generate long-form ngrams (default=no)</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>moocow's part-of-speech tagger : HMM trainer</p>
+<p>'mootrain' gathers training data for the HMM part-of-speech tagger
+used by the 'moot' program  from a tagged training corpus.
+The training
+corpus should be in 'medium' (+tagged,-analyzed) or 'well done'
+(+tagged,+analyzed) format.  The output <code>file(s)</code> are text-format
+raw frequency models.</p>
+<p>See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot file formats.</p>
+<p>
+</p>
+<hr />
+<h1><a name="arguments">ARGUMENTS</a></h1>
+<dl>
+<dt><strong><a name="item_input"><code>INPUT(s)</code></a></strong></dt>
+
+<dd>
+<p>Tagged input corpus file(s).</p>
+<p>Input files should be 'medium' (+tagged,-analyzed)
+or 'well done' (+tagged,-analyzed).</p>
+<p>See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot file formats.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="item__2d_2dhelp__2c__2dh"><code>--help</code> , <code>-h</code></a></strong></dt>
+
+<dd>
+<p>Print help and exit.</p>
+<p>Default: '0'</p>
+</dd>
+<dt><strong><a name="item__2d_2dversion__2c__2dv"><code>--version</code> , <code>-V</code></a></strong></dt>
+
+<dd>
+<p>Print version and exit.</p>
+<p>Default: '0'</p>
+</dd>
+<dt><strong><a name="item__2d_2drcfile_3dfile__2c__2dcfile"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
+
+<dd>
+<p>Read an alternate configuration file.</p>
+<p>Default: 'NULL'</p>
+<p>See also: <a href="#configuration_files">CONFIGURATION FILES</a>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="basic_options">Basic Options</a></h2>
+<dl>
+<dt><strong><a name="item__2d_2dverbose_3dlevel__2c__2dvlevel"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
+
+<dd>
+<p>Verbosity level.</p>
+<p>Default: '2'</p>
+<p>Be more or less verbose.  Recognized values are in the range 0..3.</p>
+</dd>
+<dt><strong><a name="item__2d_2doutput_3dstring__2c__2dostring"><code>--output=STRING</code> , <code>-oSTRING</code></a></strong></dt>
+
+<dd>
+<p>Specify basename for output files (default=INPUT)</p>
+<p>Default: 'NULL'</p>
+</dd>
+<dt><strong><a name="item__2d_2dinput_2dformat_3dformat__2c__2diformat"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></a></strong></dt>
+
+<dd>
+<p>Specify input <code>file(s)</code> format(s).</p>
+<p>Default: 'NULL'</p>
+<p>Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.</p>
+<p>Default='WellDone'</p>
+<p>Implied='Tagged'</p>
+<p>See 'I/O Format Flags' in <a href="././mootfiles.html">the mootfiles manpage</a> for details.</p>
+</dd>
+<dt><strong><a name="item__2d_2dinput_2dencoding_3dencoding"><code>--input-encoding=ENCODING</code></a></strong></dt>
+
+<dd>
+<p>Override document encoding for XML input.</p>
+<p>Default: 'NULL'</p>
+<p>Potentially useful for XML documents without encoding declarations.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="model_format_options">Model Format Options</a></h2>
+<dl>
+<dt><strong><a name="item__2d_2dlex__2c__2dl"><code>--lex</code> , <code>-l</code></a></strong></dt>
+
+<dd>
+<p>Generate only lexical frequency file.</p>
+<p>Default: '0'</p>
+</dd>
+<dt><strong><a name="item__2d_2dngrams__2c__2dn"><code>--ngrams</code> , <code>-n</code></a></strong></dt>
+
+<dd>
+<p>Generate only n-gram frequency file.</p>
+<p>Default: '0'</p>
+</dd>
+<dt><strong><a name="item__2d_2dclasses__2c__2dc"><code>--classes</code> , <code>-C</code></a></strong></dt>
+
+<dd>
+<p>Generate only lexical-class frequency file.</p>
+<p>Default: '0'</p>
+</dd>
+<dt><strong><a name="item__2d_2deos_2dtag_3dtag__2c__2detag"><code>--eos-tag=TAG</code> , <code>-eTAG</code></a></strong></dt>
+
+<dd>
+<p>Specify boundary tag (default=__$)</p>
+<p>Default: '__$'</p>
+<p>This is the pseudo-tag used in the n-gram model file to represent
+sentence boundaries, both beginning- and end-of-sentence.  It should
+not be an element of the actual tag-set -- that is, it should not
+be a valid analysis for any token.</p>
+</dd>
+<dt><strong><a name="item__2d_2dverbose_2dngrams__2c__2dn"><code>--verbose-ngrams</code> , <code>-N</code></a></strong></dt>
+
+<dd>
+<p>Generate long-form ngrams (default=no)</p>
+<p>Default: '0'</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="configuration_files">CONFIGURATION FILES</a></h1>
+<p>Configuration files are expected to contain lines of the form:</p>
+<pre>
+    LONG_OPTION_NAME    OPTION_VALUE</pre>
+<p>where LONG_OPTION_NAME is the long name of some option,
+without the leading '--', and OPTION_VALUE is the value for
+that option, if any.  Fields are whitespace-separated.
+Blank lines and comments (lines beginning with '#')
+are ignored.</p>
+<p>The following configuration files are read by default:</p>
+<ul>
+<li><strong><a name="item__2fetc_2fmootrainrc">/etc/mootrainrc</a></strong>
+
+</li>
+<li><strong><a name="item__7e_2f_2emootrainrc">~/.mootrainrc</a></strong>
+
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="addenda">ADDENDA</a></h1>
+<p>
+</p>
+<h2><a name="about_this_document">About this Document</a></h2>
+<p>Documentation file auto-generated by optgen.perl version 0.06
+using Getopt::Gen version 0.13.
+Translation was initiated
+as:</p>
+<pre>
+   optgen.perl -l --nocfile --nohfile --notimestamp -F mootrain mootrain.gog</pre>
+<p>
+</p>
+<hr />
+<h1><a name="bugs_and_limitations">BUGS AND LIMITATIONS</a></h1>
+<p>Only ca. 99.998% compatible with tnt-para(1), due to token-typification
+strangeness.</p>
+<p>
+</p>
+<hr />
+<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
+<p>Development of this package was supported by the project
+'Kollokationen im W&ouml;rterbuch'
+( ``collocations in the dictionary'', <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
+in association with the project
+'Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
+( ``digital dictionary of the German language of the 20th century'', <a href="http://www.dwds.de">http://www.dwds.de</a> )
+at the Berlin-Brandenburgische Akademie der Wissenschaften ( <a href="http://www.bbaw.de">http://www.bbaw.de</a> )
+with funding from
+the Alexander von Humboldt Stiftung ( <a href="http://www.avh.de">http://www.avh.de</a> )
+and from the Zukunftsinvestitionsprogramm of the
+German federal government.</p>
+<p>I am grateful to Christiane Fellbaum, Alexander Geyken,
+Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
+for offering useful insights in the course of development
+of this package.</p>
+<p>Thomas Hanneforth wrote and maintains the libFSM C++ library
+for finite-state device operations used by the
+class-based HMM tagger / disambiguator, without which
+this package could not have been built.</p>
+<p>Alexander Geyken and Thomas Hanneforth developed the
+rule-based morphological analysis system for German
+which was used in the development and testing of the
+class-based HMM tagger / disambiguator.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Bryan Jurish &lt;<a href="mailto:moocow@ling.uni-potsdam.de">moocow@ling.uni-potsdam.de</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="././mootfiles.html">the mootfiles manpage</a>,
+mootm(1),
+<a href="././mootcompile.html">the mootcompile manpage</a>,
+<a href="././moot.html">the moot manpage</a></p>
+
+</body>
+
+</html>
