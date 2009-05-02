@@ -258,6 +258,12 @@ if test "$ac_cv_enable_zlib" != "no" ; then
  done
 fi
 
+##-- zlib: distcheck
+if test -n "$DISTCHECK"; then
+  AC_MSG_WARN([DISTCHECK set: disabling zlib support])
+  ac_cv_enable_zlib="no"
+fi
+
 if test "$ac_cv_enable_zlib" != "no" ; then
  ##-- zlib: library: compile
  AC_CHECK_LIB(z,deflate,[ac_cv_have_libz="yes"])
@@ -427,6 +433,13 @@ if test "$ac_cv_enable_recode" != "no" ; then
  done
 fi ;##-- /ac_cv_enable_recode != no
 
+##-- recode: distcheck
+if test -n "$DISTCHECK"; then
+  AC_MSG_WARN([DISTCHECK set: disabling librecode support])
+  ac_cv_enable_recode="no"
+fi
+
+
 dnl recode: library: compile
 if test "$ac_cv_enable_recode" != "no" ; then
 
@@ -490,6 +503,12 @@ if test "$ac_cv_enable_expat" != "no" ; then
  done
 fi ;##-- /ac_cv_enable_expat != no
 
+##-- expat: distcheck
+if test -n "$DISTCHECK"; then
+  AC_MSG_WARN([DISTCHECK set: disabling expat support])
+  ac_cv_enable_expat="no"
+fi
+
 dnl expat: library: compile
 if test "$ac_cv_enable_expat" != "no" ; then
 
@@ -539,6 +558,12 @@ if test "$ac_cv_enable_libxml" != "no" ; then
   PKG_CHECK_MODULES(LIBXML2, libxml-2.0 >= 2.6.7,
 	[ac_cv_enable_libxml="yes"],
 	[ac_cv_enable_libxml="no"])
+fi
+
+##-- libxml2: distcheck
+if test -n "$DISTCHECK"; then
+  AC_MSG_WARN([DISTCHECK set: disabling libxml2 support])
+  ac_cv_enable_libxml="no"
 fi
 
 dnl libxml: config.h flag
