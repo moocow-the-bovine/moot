@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.6])
+define([THE_PACKAGE_VERSION], [2.0.6-1])
 define([THE_PACKAGE_MAINTAINER],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -224,6 +224,7 @@ if test -n "$DISTCHECK" ; then
    test -z "$POD2X" && POD2LATEX=no
    test -z "$FLEXXX" && FLEXXX=no
    test -z "$BISONXX" && BISONXX=no
+   test -z "$OSFCN_H" && OSFCN_H=no
 fi
 ## /DISTCHECK
 ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -377,6 +378,26 @@ AM_CONDITIONAL(HAVE_BISONXX,[test "$BISONXX" != "no"])
 YACC="$BISONXX"
 AC_SUBST(YACC)
 AC_SUBST(BISONXX)
+
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## check for osfcn.h (for flex++/bison++)
+##
+if test -z "$OSFCN_H"; then
+ AC_CHECK_HEADER([osfcn.h], [OSFCN_H=yes], [OSFCN_H=no])
+fi
+
+AC_MSG_CHECKING([whether to install local osfcn.h])
+if test "$OSFCN_H" != "yes"; then
+  AC_MSG_RESULT([yes])
+  INSTALL_OSFCN_H=osfcn.h
+else
+  AC_MSG_RESULT([no])
+  INSTALL_OSFCN_H=""
+fi
+AM_CONDITIONAL(HAVE_OSFCN_H, [test "$OSFCN_H" = "yes"])
+AC_SUBST(INSTALL_OSFCN_H)
+## /osfcn.h
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 dnl check for recode
@@ -958,7 +979,10 @@ fi
 AC_MSG_CHECKING([whether to relax])
 AC_ARG_ENABLE(relax,
 	AC_HELP_STRING([--enable-relax], [Enable relaxed interpretation of pre-analyses (default=no)]),
-	[ac_cv_enable_relax="$enableval"],[ac_cv_enable_relax="no"])
+	[ac_cv_enable_relax="$enableval"],
+	dnl [ac_cv_enable_relax="no"]      dnl -- disable relax by default
+	[ac_cv_enable_relax=""]            dnl -- enable relax by default
+	)
 
 if test "$ac_cv_enable_relax" != "no" ; then
   AC_MSG_RESULT(yes)

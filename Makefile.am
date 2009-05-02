@@ -24,6 +24,13 @@ SUFFIXES = .pod .txt .deb .rpm .spec .ifiles
 ##-- for gnulib
 ACLOCAL_AMFLAGS = -I m4
 
+##-- distcheck stuff
+DISTCHECK_CONFIGURE_FLAGS = DISTCHECK=1 CFLAGS="-g -O0 -pipe" CXXFLAGS="-g -O0 -pipe" --disable-shared
+
+## --- ignore 'uninstall' for 'make distcheck' (perl modules don't like it)
+#distuninstallcheck:
+#	@:
+
 #-----------------------------------------------------------------------
 # Additional Variables & Rules: PODS
 #-----------------------------------------------------------------------
