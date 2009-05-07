@@ -52,10 +52,6 @@
 # include <getopt.h>
 #endif
 
-#if !defined(HAVE_STRDUP) && !defined(strdup)
-# define strdup gengetopt_strdup
-#endif /* HAVE_STRDUP */
-
 #include "mootchurn_cmdparser.h"
 
 
@@ -105,11 +101,13 @@ cmdline_parser_print_help (void)
   printf("             --output-encoding=ENCODING  Set default XML output encoding\n");
 }
 
-#if !defined(HAVE_STRDUP) && !defined(strdup)
-/* gengetopt_strdup(): automatically generated from strdup.c. */
+#if defined(HAVE_STRDUP) || defined(strdup)
+# define gog_strdup strdup
+#else
+/* gog_strdup(): automatically generated from strdup.c. */
 /* strdup.c replacement of strdup, which is not standard */
 static char *
-gengetopt_strdup (const char *s)
+gog_strdup (const char *s)
 {
   char *result = (char*)malloc(strlen(s) + 1);
   if (result == (char*)0)
@@ -127,7 +125,7 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->verbose_arg = 5; 
   args_info->dots_arg = 0; 
   args_info->list_flag = 0; 
-  args_info->output_arg = strdup("-"); 
+  args_info->output_arg = gog_strdup("-"); 
   args_info->tokens_flag = 0; 
   args_info->input_format_arg = NULL; 
   args_info->output_format_arg = NULL; 
@@ -219,7 +217,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
       args_info->inputs_num = argc - optind ;
       args_info->inputs = (char **)(malloc ((args_info->inputs_num)*sizeof(char *))) ;
       while (optind < argc)
-        args_info->inputs[ i++ ] = strdup (argv[optind++]) ; 
+        args_info->inputs[ i++ ] = gog_strdup (argv[optind++]) ; 
   }
 
   return 0;
@@ -297,7 +295,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->output_given++;
           if (args_info->output_arg) free(args_info->output_arg);
-          args_info->output_arg = strdup(val);
+          args_info->output_arg = gog_strdup(val);
           break;
         
         case 't':	 /* Read input token-wise. */
@@ -315,7 +313,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->input_format_given++;
           if (args_info->input_format_arg) free(args_info->input_format_arg);
-          args_info->input_format_arg = strdup(val);
+          args_info->input_format_arg = gog_strdup(val);
           break;
         
         case 'O':	 /* Specify output file format. */
@@ -324,7 +322,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->output_format_given++;
           if (args_info->output_format_arg) free(args_info->output_format_arg);
-          args_info->output_format_arg = strdup(val);
+          args_info->output_format_arg = gog_strdup(val);
           break;
         
         case 0:	 /* Long option(s) with no short form */
@@ -393,7 +391,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->output_given++;
             if (args_info->output_arg) free(args_info->output_arg);
-            args_info->output_arg = strdup(val);
+            args_info->output_arg = gog_strdup(val);
           }
           
           /* Read input token-wise. */
@@ -413,7 +411,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->input_format_given++;
             if (args_info->input_format_arg) free(args_info->input_format_arg);
-            args_info->input_format_arg = strdup(val);
+            args_info->input_format_arg = gog_strdup(val);
           }
           
           /* Specify output file format. */
@@ -423,7 +421,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->output_format_given++;
             if (args_info->output_format_arg) free(args_info->output_format_arg);
-            args_info->output_format_arg = strdup(val);
+            args_info->output_format_arg = gog_strdup(val);
           }
           
           /* Override XML document input encoding */
@@ -433,7 +431,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->input_encoding_given++;
             if (args_info->input_encoding_arg) free(args_info->input_encoding_arg);
-            args_info->input_encoding_arg = strdup(val);
+            args_info->input_encoding_arg = gog_strdup(val);
           }
           
           /* Set default XML output encoding */
@@ -443,7 +441,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->output_encoding_given++;
             if (args_info->output_encoding_arg) free(args_info->output_encoding_arg);
-            args_info->output_encoding_arg = strdup(val);
+            args_info->output_encoding_arg = gog_strdup(val);
           }
           
           else {
@@ -502,10 +500,10 @@ cmdline_parser_read_rcfile(const char *filename,
     strcpy(fullname, pwent->pw_dir);
     strcat(fullname, filename+1);
   } else {
-    fullname = strdup(filename);
+    fullname = gog_strdup(filename);
   }
 #else /* !(defined(HAVE_GETUID) && defined(HAVE_GETPWUID)) */
-  fullname = strdup(filename);
+  fullname = gog_strdup(filename);
 #endif /* defined(HAVE_GETUID) && defined(HAVE_GETPWUID) */
 
   /* try to open */

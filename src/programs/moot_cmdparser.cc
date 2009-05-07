@@ -52,10 +52,6 @@
 # include <getopt.h>
 #endif
 
-#if !defined(HAVE_STRDUP) && !defined(strdup)
-# define strdup gengetopt_strdup
-#endif /* HAVE_STRDUP */
-
 #include "moot_cmdparser.h"
 
 
@@ -122,11 +118,13 @@ cmdline_parser_print_help (void)
   printf("   -m        --mark-unknown               Mark unknown tokens.\n");
 }
 
-#if !defined(HAVE_STRDUP) && !defined(strdup)
-/* gengetopt_strdup(): automatically generated from strdup.c. */
+#if defined(HAVE_STRDUP) || defined(strdup)
+# define gog_strdup strdup
+#else
+/* gog_strdup(): automatically generated from strdup.c. */
 /* strdup.c replacement of strdup, which is not standard */
 static char *
-gengetopt_strdup (const char *s)
+gog_strdup (const char *s)
 {
   char *result = (char*)malloc(strlen(s) + 1);
   if (result == (char*)0)
@@ -146,12 +144,12 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->dots_arg = 0; 
   args_info->list_flag = 0; 
   args_info->recover_flag = 0; 
-  args_info->output_arg = strdup("-"); 
+  args_info->output_arg = gog_strdup("-"); 
   args_info->input_format_arg = NULL; 
   args_info->output_format_arg = NULL; 
   args_info->input_encoding_arg = NULL; 
   args_info->output_encoding_arg = NULL; 
-  args_info->model_arg = strdup("moothmm"); 
+  args_info->model_arg = gog_strdup("moothmm"); 
   args_info->trie_depth_arg = 0; 
   args_info->trie_threshhold_arg = 10; 
   args_info->trie_theta_arg = 0; 
@@ -161,9 +159,9 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->clambdas_arg = NULL; 
   args_info->unknown_threshhold_arg = 1.0; 
   args_info->class_threshhold_arg = 1.0; 
-  args_info->unknown_token_arg = strdup("@UNKNOWN"); 
-  args_info->unknown_tag_arg = strdup("UNKNOWN"); 
-  args_info->eos_tag_arg = strdup("__$"); 
+  args_info->unknown_token_arg = gog_strdup("@UNKNOWN"); 
+  args_info->unknown_tag_arg = gog_strdup("UNKNOWN"); 
+  args_info->eos_tag_arg = gog_strdup("__$"); 
   args_info->beam_width_arg = 1000; 
   args_info->save_ambiguities_flag = 0; 
   args_info->mark_unknown_flag = 0; 
@@ -303,7 +301,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
       args_info->inputs_num = argc - optind ;
       args_info->inputs = (char **)(malloc ((args_info->inputs_num)*sizeof(char *))) ;
       while (optind < argc)
-        args_info->inputs[ i++ ] = strdup (argv[optind++]) ; 
+        args_info->inputs[ i++ ] = gog_strdup (argv[optind++]) ; 
   }
 
   return 0;
@@ -399,7 +397,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->output_given++;
           if (args_info->output_arg) free(args_info->output_arg);
-          args_info->output_arg = strdup(val);
+          args_info->output_arg = gog_strdup(val);
           break;
         
         case 'I':	 /* Specify input file(s) format(s). */
@@ -408,7 +406,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->input_format_given++;
           if (args_info->input_format_arg) free(args_info->input_format_arg);
-          args_info->input_format_arg = strdup(val);
+          args_info->input_format_arg = gog_strdup(val);
           break;
         
         case 'O':	 /* Specify output file format. */
@@ -417,7 +415,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->output_format_given++;
           if (args_info->output_format_arg) free(args_info->output_format_arg);
-          args_info->output_format_arg = strdup(val);
+          args_info->output_format_arg = gog_strdup(val);
           break;
         
         case 'M':	 /* Use HMM model file(s) MODEL. */
@@ -426,7 +424,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->model_given++;
           if (args_info->model_arg) free(args_info->model_arg);
-          args_info->model_arg = strdup(val);
+          args_info->model_arg = gog_strdup(val);
           break;
         
         case 'a':	 /* Maximum depth of suffix trie. */
@@ -459,7 +457,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->nlambdas_given++;
           if (args_info->nlambdas_arg) free(args_info->nlambdas_arg);
-          args_info->nlambdas_arg = strdup(val);
+          args_info->nlambdas_arg = gog_strdup(val);
           break;
         
         case 'W':	 /* Lexical smoothing constants (default=estimate) */
@@ -468,7 +466,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->wlambdas_given++;
           if (args_info->wlambdas_arg) free(args_info->wlambdas_arg);
-          args_info->wlambdas_arg = strdup(val);
+          args_info->wlambdas_arg = gog_strdup(val);
           break;
         
         case 'C':	 /* Lexical-class smoothing constants (default=estimate) */
@@ -477,7 +475,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->clambdas_given++;
           if (args_info->clambdas_arg) free(args_info->clambdas_arg);
-          args_info->clambdas_arg = strdup(val);
+          args_info->clambdas_arg = gog_strdup(val);
           break;
         
         case 't':	 /* Freq. threshhold for 'unknown' lexical probabilities */
@@ -502,7 +500,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->unknown_token_given++;
           if (args_info->unknown_token_arg) free(args_info->unknown_token_arg);
-          args_info->unknown_token_arg = strdup(val);
+          args_info->unknown_token_arg = gog_strdup(val);
           break;
         
         case 'U':	 /* Symbolic name of the 'unknown' tag */
@@ -511,7 +509,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->unknown_tag_given++;
           if (args_info->unknown_tag_arg) free(args_info->unknown_tag_arg);
-          args_info->unknown_tag_arg = strdup(val);
+          args_info->unknown_tag_arg = gog_strdup(val);
           break;
         
         case 'e':	 /* Specify boundary tag (default=__$) */
@@ -520,7 +518,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->eos_tag_given++;
           if (args_info->eos_tag_arg) free(args_info->eos_tag_arg);
-          args_info->eos_tag_arg = strdup(val);
+          args_info->eos_tag_arg = gog_strdup(val);
           break;
         
         case 'Z':	 /* Specify cutoff factor for beam pruning */
@@ -635,7 +633,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->output_given++;
             if (args_info->output_arg) free(args_info->output_arg);
-            args_info->output_arg = strdup(val);
+            args_info->output_arg = gog_strdup(val);
           }
           
           /* Specify input file(s) format(s). */
@@ -645,7 +643,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->input_format_given++;
             if (args_info->input_format_arg) free(args_info->input_format_arg);
-            args_info->input_format_arg = strdup(val);
+            args_info->input_format_arg = gog_strdup(val);
           }
           
           /* Specify output file format. */
@@ -655,7 +653,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->output_format_given++;
             if (args_info->output_format_arg) free(args_info->output_format_arg);
-            args_info->output_format_arg = strdup(val);
+            args_info->output_format_arg = gog_strdup(val);
           }
           
           /* Override XML document input encoding. */
@@ -665,7 +663,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->input_encoding_given++;
             if (args_info->input_encoding_arg) free(args_info->input_encoding_arg);
-            args_info->input_encoding_arg = strdup(val);
+            args_info->input_encoding_arg = gog_strdup(val);
           }
           
           /* Set default XML output encoding. */
@@ -675,7 +673,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->output_encoding_given++;
             if (args_info->output_encoding_arg) free(args_info->output_encoding_arg);
-            args_info->output_encoding_arg = strdup(val);
+            args_info->output_encoding_arg = gog_strdup(val);
           }
           
           /* Use HMM model file(s) MODEL. */
@@ -685,7 +683,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->model_given++;
             if (args_info->model_arg) free(args_info->model_arg);
-            args_info->model_arg = strdup(val);
+            args_info->model_arg = gog_strdup(val);
           }
           
           /* Maximum depth of suffix trie. */
@@ -731,7 +729,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->nlambdas_given++;
             if (args_info->nlambdas_arg) free(args_info->nlambdas_arg);
-            args_info->nlambdas_arg = strdup(val);
+            args_info->nlambdas_arg = gog_strdup(val);
           }
           
           /* Lexical smoothing constants (default=estimate) */
@@ -741,7 +739,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->wlambdas_given++;
             if (args_info->wlambdas_arg) free(args_info->wlambdas_arg);
-            args_info->wlambdas_arg = strdup(val);
+            args_info->wlambdas_arg = gog_strdup(val);
           }
           
           /* Lexical-class smoothing constants (default=estimate) */
@@ -751,7 +749,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->clambdas_given++;
             if (args_info->clambdas_arg) free(args_info->clambdas_arg);
-            args_info->clambdas_arg = strdup(val);
+            args_info->clambdas_arg = gog_strdup(val);
           }
           
           /* Freq. threshhold for 'unknown' lexical probabilities */
@@ -779,7 +777,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->unknown_token_given++;
             if (args_info->unknown_token_arg) free(args_info->unknown_token_arg);
-            args_info->unknown_token_arg = strdup(val);
+            args_info->unknown_token_arg = gog_strdup(val);
           }
           
           /* Symbolic name of the 'unknown' tag */
@@ -789,7 +787,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->unknown_tag_given++;
             if (args_info->unknown_tag_arg) free(args_info->unknown_tag_arg);
-            args_info->unknown_tag_arg = strdup(val);
+            args_info->unknown_tag_arg = gog_strdup(val);
           }
           
           /* Specify boundary tag (default=__$) */
@@ -799,7 +797,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->eos_tag_given++;
             if (args_info->eos_tag_arg) free(args_info->eos_tag_arg);
-            args_info->eos_tag_arg = strdup(val);
+            args_info->eos_tag_arg = gog_strdup(val);
           }
           
           /* Specify cutoff factor for beam pruning */
@@ -887,10 +885,10 @@ cmdline_parser_read_rcfile(const char *filename,
     strcpy(fullname, pwent->pw_dir);
     strcat(fullname, filename+1);
   } else {
-    fullname = strdup(filename);
+    fullname = gog_strdup(filename);
   }
 #else /* !(defined(HAVE_GETUID) && defined(HAVE_GETPWUID)) */
-  fullname = strdup(filename);
+  fullname = gog_strdup(filename);
 #endif /* defined(HAVE_GETUID) && defined(HAVE_GETPWUID) */
 
   /* try to open */
