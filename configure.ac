@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.6-1])
+define([THE_PACKAGE_VERSION], [2.0.6-2])
 define([THE_PACKAGE_MAINTAINER],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -1003,10 +1003,12 @@ fi
 ##
 AC_MSG_CHECKING([whether to relax])
 AC_ARG_ENABLE(relax,
-	AC_HELP_STRING([--enable-relax], [Enable relaxed interpretation of pre-analyses (default=no)]),
-	[ac_cv_enable_relax="$enableval"],
-	dnl [ac_cv_enable_relax="no"]      dnl -- disable relax by default
-	[ac_cv_enable_relax=""]            dnl -- enable relax by default
+	dnl --
+	AC_HELP_STRING([--enable-relax],  [Enable "relaxed" interpretation of pre-analyses  (default=disabled)]),
+	[ac_cv_enable_relax="$enableval"], [ac_cv_enable_relax="no"] dnl -- (default=disabled)
+	dnl --
+	dnl AC_HELP_STRING([--disable-relax], [Disable "relaxed" interpretation of pre-analyses (default=enabled)]),
+	dnl [ac_cv_enable_relax="$enableval"], [ac_cv_enable_relax=""]   dnl -- (default=disabled)
 	)
 
 if test "$ac_cv_enable_relax" != "no" ; then
