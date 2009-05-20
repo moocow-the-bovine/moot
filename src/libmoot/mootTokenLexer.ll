@@ -495,7 +495,7 @@ void mootTokenLexer::on_EOA(void)
 {
   /*-- EOA: add & clear current analysis, if any */ 
   /*-- add & clear current analysis, if any */ 
-  if (lasttyp != LexTypeEOA) { 
+  if (manalysis && lasttyp != LexTypeEOA) { 
     /*-- set default tag */
     if (manalysis->tag.empty()) { 
       manalysis->tag.swap(manalysis->details); 
