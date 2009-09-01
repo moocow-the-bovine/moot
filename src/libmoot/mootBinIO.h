@@ -406,9 +406,28 @@ namespace mootBinIO {
   };
 
   /*------------------------------------------------------------
+   * moot types: Bigram
+   */
+  template <>
+  class Item<mootHMM::Bigram> {
+  public:
+    Item<mootHMM::TagID> tagid_item;
+  public:
+    inline bool load(mootio::mistream *is, mootHMM::Bigram &x) const
+    {
+      return (tagid_item.load(is, x.tag1)
+	      && tagid_item.load(is, x.tag2));
+    };
+    inline bool save(mootio::mostream *os, const mootHMM::Bigram &x) const
+    {
+      return (tagid_item.save(os, x.tag1)
+	      && tagid_item.save(os, x.tag2));
+    };
+  };
+
+  /*------------------------------------------------------------
    * moot types: Trigram
    */
-#if defined(MOOT_USE_TRIGRAMS) && defined(MOOT_HASH_NGRAMS)
   template <>
   class Item<mootHMM::Trigram> {
   public:
@@ -420,7 +439,6 @@ namespace mootBinIO {
 	      && tagid_item.load(is, x.tag2)
 	      && tagid_item.load(is, x.tag3));
     };
-
     inline bool save(mootio::mostream *os, const mootHMM::Trigram &x) const
     {
       return (tagid_item.save(os, x.tag1)
@@ -428,7 +446,6 @@ namespace mootBinIO {
 	      && tagid_item.save(os, x.tag3));
     };
   };
-#endif // MOOT_USE_TRIGRAMS && MOOT_HASH_NGRAMS
 
   /*------------------------------------------------------------
    * moot types: mootEnum
