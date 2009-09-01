@@ -408,7 +408,7 @@ namespace mootBinIO {
   /*------------------------------------------------------------
    * moot types: Trigram
    */
-#if defined(MOOT_USE_TRIGRAMS) && defined(MOOT_HASH_TRIGRAMS)
+#if defined(MOOT_USE_TRIGRAMS) && defined(MOOT_HASH_NGRAMS)
   template <>
   class Item<mootHMM::Trigram> {
   public:
@@ -428,7 +428,7 @@ namespace mootBinIO {
 	      && tagid_item.save(os, x.tag3));
     };
   };
-#endif // MOOT_USE_TRIGRAMS && MOOT_HASH_TRIGRAMS
+#endif // MOOT_USE_TRIGRAMS && MOOT_HASH_NGRAMS
 
   /*------------------------------------------------------------
    * moot types: mootEnum

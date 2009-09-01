@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2008 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -88,7 +88,7 @@ mootHMM::mootHMM(void)
     n_classes(0),
 #if !defined(MOOT_USE_TRIGRAMS)
     ngprobs2(NULL),
-#elif !defined(MOOT_HASH_TRIGRAMS)
+#elif !defined(MOOT_HASH_NGRAMS)
     ngprobs3(NULL),
 #endif
     vtable(NULL),
@@ -193,7 +193,7 @@ void mootHMM::clear(bool wipe_everything, bool unlogify)
 
   //-- free n-gram probabilitiy table(s)
 #ifdef MOOT_USE_TRIGRAMS
-# ifdef MOOT_HASH_TRIGRAMS
+# ifdef MOOT_HASH_NGRAMS
   ngprobs3.clear();
 # else
   if (ngprobs3) {
@@ -461,7 +461,7 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
     return false;
   }
   memset(ngprobs2, 0, (n_tags*n_tags)*sizeof(ProbT));
-#elif !defined(MOOT_HASH_TRIGRAMS)
+#elif !defined(MOOT_HASH_NGRAMS)
   //-- allocate: bigrams
   ngprobs3 = reinterpret_cast<ProbT *>(malloc((n_tags*n_tags*n_tags)*sizeof(ProbT)));
   if (!ngprobs3) {
@@ -638,11 +638,11 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
       //-- compute unigram probability
 #ifdef MOOT_USE_TRIGRAMS
       //   : store as bigram 'UNKNOWN $tagid'
-# ifdef MOOT_HASH_TRIGRAMS
+# ifdef MOOT_HASH_NGRAMS
       ngprobs3[Trigram(0,0,tagid)] = ngi1->second.count / ugtotal;
-# else //!MOOT_HASH_TRIGRAMS
+# else //!MOOT_HASH_NGRAMS
       ngprobs3[tagid] = ngi1->second.count / ugtotal;
-# endif //MOOT_HASH_TRIGRAMS
+# endif //MOOT_HASH_NGRAMS
 #else // !MOOT_USE_TRIGRAMS
       //   : store as bigram 'UNKNOWN $tagid'
       //ngprobs1[tagid] = ngi1->second.count / ugtotal;
@@ -664,11 +664,11 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	  //-- compute bigram probability
 #ifdef MOOT_USE_TRIGRAMS
 	  //   : store as trigram(0,tagid1,tagid2)
-# ifdef MOOT_HASH_TRIGRAMS
+# ifdef MOOT_HASH_NGRAMS
 	  ngprobs3[Trigram(0,tagid,tagid2)] = ngi2->second.count / ngi1->second.count;
-# else // !MOOT_HASH_TRIGRAMS
+# else // !MOOT_HASH_NGRAMS
 	  ngprobs3[(n_tags*tagid)+tagid2] = ngi2->second.count / ngi1->second.count;
-# endif // MOOT_HASH_TRIGRAMS
+# endif // MOOT_HASH_NGRAMS
 #else // !MOOT_USE_TRIGRAMS
 	  //   : store as bigram[tagid1][tagid2]
 	  ngprobs2[(n_tags*tagid)+tagid2] = ngi2->second.count / ngi1->second.count;
@@ -685,11 +685,11 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	      tagid3 = tagids.name2id(ngi3->first);
 
 	      //-- compute trigram probability
-# ifdef MOOT_HASH_TRIGRAMS
+# ifdef MOOT_HASH_NGRAMS
 	      ngprobs3[Trigram(tagid,tagid2,tagid3)] = ngi3->second / ngi2->second.count;
-# else // !MOOT_HASH_TRIGRAMS
+# else // !MOOT_HASH_NGRAMS
 	      ngprobs3[(n_tags*((n_tags*tagid)+tagid2))+tagid3] = ngi3->second / ngi2->second.count;
-# endif // MOOT_HASH_TRIGRAMS
+# endif // MOOT_HASH_NGRAMS
 	    }
 #endif // MOOT_USE_TRIGRAMS
 	}
@@ -1050,7 +1050,7 @@ bool mootHMM::compute_logprobs(void)
 {
 
 #ifdef MOOT_USE_TRIGRAMS
-# ifdef MOOT_HASH_TRIGRAMS
+# ifdef MOOT_HASH_NGRAMS
   ProbT   t3p = 0, t23p = 0, t123p = 0;
   Trigram tg3(0,0,0), tg23(0,0,0), tg123(0,0,0);
 
@@ -1095,7 +1095,7 @@ bool mootHMM::compute_logprobs(void)
     if (t3p != 0.0) ngprobs3[tg3] = log(t3p);
   }
 
-# else //-- !MOOT_HASH_TRIGRAMS
+# else //-- !MOOT_HASH_NGRAMS
 
   ProbT   t3p = 0, t23p = 0, t123p = 0;
   TagID   tag1 = 0, tag2 = 0, tag3 = 0;
@@ -1147,7 +1147,7 @@ bool mootHMM::compute_logprobs(void)
       ngprobs3[tag3] = MOOT_PROB_ZERO;
   }
 
-# endif //-- MOOT_HASH_TRIGRAMS
+# endif //-- MOOT_HASH_NGRAMS
 
 #else //-- !MOOT_USE_TRIGRAMS
 
@@ -1773,7 +1773,7 @@ void mootHMM::txtdump(FILE *file)
   fprintf(file, "%%%% PrevPrevPrevTagID(\"PrevPrevTagStr\")\tPrevTagID(\"PrevTagStr\")\tTagID(\"TagStr\")\tlog(p(TagID|PrevPrevTagID,PrevTagID))\tp\n");
   fprintf(file, "%%%%-----------------------------------------------------\n");
   TagID pptagid;
-# ifdef MOOT_HASH_TRIGRAMS
+# ifdef MOOT_HASH_NGRAMS
   if (!ngprobs3.empty())
 # else
   if (ngprobs3 != NULL)
@@ -2014,7 +2014,7 @@ bool mootHMM::save(mootio::mostream *obs, const char *filename)
 
 #ifdef MOOT_USE_TRIGRAMS
   bool using_trigrams = true;
-# ifdef MOOT_HASH_TRIGRAMS
+# ifdef MOOT_HASH_NGRAMS
   bool using_hash = true;
 # else
   bool using_hash = false;
@@ -2059,7 +2059,7 @@ bool mootHMM::_bindump(mootio::mostream *obs, const char *filename)
   Item<ClassIDTable> classids_item;
   Item<LexProbTable> lexprobs_item;
   Item<LexClassProbTable> lcprobs_item;
-#if defined(MOOT_USE_TRIGRAMS) && defined(MOOT_HASH_TRIGRAMS)
+#if defined(MOOT_USE_TRIGRAMS) && defined(MOOT_HASH_NGRAMS)
   Item<TrigramProbTable> trigrams_item;
 #endif
 
@@ -2093,7 +2093,7 @@ bool mootHMM::_bindump(mootio::mostream *obs, const char *filename)
 	 && lexprobs_item.save(obs, lexprobs)
 	 && lcprobs_item.save(obs, lcprobs)
 #ifdef MOOT_USE_TRIGRAMS
-# ifdef MOOT_HASH_TRIGRAMS
+# ifdef MOOT_HASH_NGRAMS
 	 && trigrams_item.save(obs, ngprobs3)
 # else
 	 && probt_item.save_n(obs, ngprobs3, n_tags*n_tags*n_tags)
@@ -2165,7 +2165,7 @@ bool mootHMM::load(mootio::mistream *ibs, const char *filename)
   bool       saved_hashes_trigrams;
 #ifdef MOOT_USE_TRIGRAMS
   bool       i_use_trigrams = true;
-# ifdef MOOT_HASH_TRIGRAMS
+# ifdef MOOT_HASH_NGRAMS
   bool       i_hash_trigrams = true;
 # else
   bool       i_hash_trigrams = false;
@@ -2257,7 +2257,7 @@ bool mootHMM::_binload(mootio::mistream *ibs, const char *filename)
   Item<LexClassProbTable> lcprobs_item;
   //Item<mootTokString>  tokstr_item;
 #ifdef MOOT_USE_TRIGRAMS
-# ifdef MOOT_HASH_TRIGRAMS
+# ifdef MOOT_HASH_NGRAMS
   Item<TrigramProbTable> trigrams_item;
 # else
   size_t ngprobs3_size = 0;
@@ -2314,7 +2314,7 @@ bool mootHMM::_binload(mootio::mistream *ibs, const char *filename)
   if (! (lexprobs_item.load(ibs, lexprobs)
 	 && lcprobs_item.load(ibs, lcprobs)
 #ifdef MOOT_USE_TRIGRAMS
-# ifdef MOOT_HASH_TRIGRAMS
+# ifdef MOOT_HASH_NGRAMS
 	 && trigrams_item.load(ibs, ngprobs3)
 # else
 	 && probt_item.load_n(ibs, ngprobs3, ngprobs3_size)

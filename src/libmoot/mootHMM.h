@@ -69,10 +69,10 @@
  */
 
 /**
- * \def MOOT_HASH_TRIGRAMS
- * If defined (and if MOOT_USE_TRIGRAMS is defined), then
- * trigrams will be stored in a hash table.
- * Otherwise, trigrams will be stored in a sparse and
+ * \def MOOT_HASH_NGRAMS
+ * If defined, then tag
+ * n-grams will be stored in hash tables.
+ * Otherwise, tag n-grams will be stored in a sparse and
  * memory-hogging (but fast) C array
  *
  * \see mootConfig.h
@@ -251,7 +251,7 @@ public:
   typedef ProbT *BigramProbTable;
 
 #if defined(MOOT_USE_TRIGRAMS)
-# if defined(MOOT_HASH_TRIGRAMS)
+# if defined(MOOT_HASH_NGRAMS)
   /// \brief Key type for a uni-, bi-, or trigram
   class Trigram {
   public:
@@ -300,7 +300,7 @@ public:
 	     Trigram::EqualFcn>
     TrigramProbTable;
 
-# else //! MOOT_HASH_TRIGRAMS
+# else //! MOOT_HASH_NGRAMS
 
   /**
    * \brief Type for uni-, bi- and trigram probability lookup table.
@@ -321,7 +321,7 @@ public:
    * and lookup is Just Plain Quick.
    */
   typedef ProbT* TrigramProbTable;
-# endif // MOOT_HASH_TRIGRAMS
+# endif // MOOT_HASH_NGRAMS
 
 #endif // MOOT_USE_TRIGRAMS
   //@}
@@ -619,7 +619,7 @@ public:
       n_classes(0),
 #if !defined(MOOT_USE_TRIGRAMS)
       ngprobs2(NULL),
-#elif !defined(MOOT_HASH_TRIGRAMS)
+#elif !defined(MOOT_HASH_NGRAMS)
       ngprobs3(NULL),
 #endif
       vtable(NULL),
@@ -1591,13 +1591,13 @@ public:
    * Looks up and returns trigram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
    * given Trigram(prevtagid2,prevtagid1,tagid)
    */
-#ifdef MOOT_HASH_TRIGRAMS
+#ifdef MOOT_HASH_NGRAMS
   inline const ProbT tagp(const Trigram &trigram, ProbT ProbZero=MOOT_PROB_ZERO) const
   {
     TrigramProbTable::const_iterator tgti = ngprobs3.find(trigram);
     return tgti != ngprobs3.end() ? tgti->second : ProbZero;
   };
-#endif //MOOT_HASH_TRIGRAMS
+#endif //MOOT_HASH_NGRAMS
 
   /**
    * Looks up and returns trigram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
@@ -1606,7 +1606,7 @@ public:
   inline const ProbT tagp(const TagID prevtagid2, const TagID prevtagid1, const TagID tagid) const
   {
     return
-#ifdef MOOT_HASH_TRIGRAMS
+#ifdef MOOT_HASH_NGRAMS
       tagp(Trigram(prevtagid2,prevtagid1,tagid))
 #else
       ngprobs3 && prevtagid2 < n_tags && prevtagid1 < n_tags && tagid < n_tags

@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.6-2])
+define([THE_PACKAGE_VERSION], [2.0.6-3])
 define([THE_PACKAGE_MAINTAINER],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -977,25 +977,30 @@ fi
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-## trigram-hash ?
+## ngram-hash ?
 ##
-AC_MSG_CHECKING([whether to hash trigrams])
+AC_MSG_CHECKING([whether to hash n-grams])
+AC_ARG_ENABLE(ngram-hash,
+	AC_HELP_STRING([--enable-ngram-hash],
+	               [Save space but lose speed by hashing all n-grams (default=no)]),
+	[ac_cv_enable_ngram_hash="$enableval"],[ac_cv_enable_ngram_hash="no"])
 AC_ARG_ENABLE(trigram-hash,
 	AC_HELP_STRING([--enable-trigram-hash],
-	               [Save space but lose speed by hashing trigram (default=no)]),
-	[ac_cv_enable_trigram_hash="$enableval"],[ac_cv_enable_trigram_hash="no"])
+	               [Alias for --enable-ngram-hash]),
+	[ac_cv_enable_ngram_hash="$enableval"],[ac_cv_enable_ngeam_hash="no"])
 
-if test "$ac_cv_enable_trigrams" != "no" -a "$ac_cv_enable_trigram_hash" != "no" ; then
+
+if test "$ac_cv_enable_ngram_hash" != "no" ; then
    AC_MSG_RESULT(yes)
-   AC_DEFINE(MOOT_HASH_TRIGRAMS,1,
- 	    [Define this to enable slow but memory-friendly trigram hash])
-   CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_TRIGRAMS=1"
+   AC_DEFINE(MOOT_HASH_NGRAMS,1,
+ 	    [Define this to enable slow but memory-friendly n-gram hash storage])
+   CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_NGRAMS=1"
 else
    AC_MSG_RESULT(no)
-   CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_TRIGRAMS=0"
+   CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_NGRAMS=0"
 fi
 ##
-## /trigram-hash ?
+## /ngram-hash ?
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
