@@ -3,8 +3,10 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
-v2.0.6 Fri, 24 Apr 2009 11:04:05 +0200
-	+ 'relax' mode is now default
+v2.0.6 Thu, 03 Sep 2009 16:35:38 +0200
+	+ re-implemented MOOT_HASH_TRIGRAMS compile-time option as runtime (bool mootHMM::hash_ngrams)
+	  - now applies to all n-grams (uni-, bi-, and trigrams), not just trigrams
+	  - reduces throughput by ca. 50%, but results seem compatible
 	+ added checking for system 'osfcn.h' (flex++/bison++ hack)
         + added mootToken::Location (token.tok_location) nested class for input stream back-tracing
 	  - pass-through now working in mootPPLexer, mootpp, Token(Reader|Writer)(Native|Expat)

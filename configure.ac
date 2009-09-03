@@ -978,27 +978,27 @@ fi
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## ngram-hash ?
+##  + v2.0.6-3 : moved to run-time option
 ##
-AC_MSG_CHECKING([whether to hash n-grams])
-AC_ARG_ENABLE(ngram-hash,
-	AC_HELP_STRING([--enable-ngram-hash],
-	               [Save space but lose speed by hashing all n-grams (default=no)]),
-	[ac_cv_enable_ngram_hash="$enableval"],[ac_cv_enable_ngram_hash="no"])
-AC_ARG_ENABLE(trigram-hash,
-	AC_HELP_STRING([--enable-trigram-hash],
-	               [Alias for --enable-ngram-hash]),
-	[ac_cv_enable_ngram_hash="$enableval"],[ac_cv_enable_ngeam_hash="no"])
-
-
-if test "$ac_cv_enable_ngram_hash" != "no" ; then
-   AC_MSG_RESULT(yes)
-   AC_DEFINE(MOOT_HASH_NGRAMS,1,
- 	    [Define this to enable slow but memory-friendly n-gram hash storage])
-   CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_NGRAMS=1"
-else
-   AC_MSG_RESULT(no)
-   CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_NGRAMS=0"
-fi
+dnl AC_MSG_CHECKING([whether to hash n-grams])
+dnl AC_ARG_ENABLE(ngram-hash,
+dnl 	AC_HELP_STRING([--enable-ngram-hash],
+dnl 	               [Save space but lose speed by hashing all n-grams (default=no)]),
+dnl 	[ac_cv_enable_ngram_hash="$enableval"],[ac_cv_enable_ngram_hash="no"])
+dnl AC_ARG_ENABLE(trigram-hash,
+dnl 	AC_HELP_STRING([--enable-trigram-hash],
+dnl 	               [Alias for --enable-ngram-hash]),
+dnl 	[ac_cv_enable_ngram_hash="$enableval"],[ac_cv_enable_ngeam_hash="no"])
+dnl 
+dnl if test "$ac_cv_enable_ngram_hash" != "no" ; then
+dnl    AC_MSG_RESULT(yes)
+dnl    AC_DEFINE(MOOT_HASH_NGRAMS,1,
+dnl  	    [Define this to enable slow but memory-friendly n-gram hash storage])
+dnl    CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_NGRAMS=1"
+dnl else
+dnl    AC_MSG_RESULT(no)
+dnl    CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_NGRAMS=0"
+dnl fi
 ##
 ## /ngram-hash ?
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

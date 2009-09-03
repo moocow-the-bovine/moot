@@ -183,6 +183,17 @@ on model file formats.
 "
 
 #-----------------------------------------------------------------------------
+# HMM Options: Storage mode
+
+int "hash-ngrams" g "Whether to hash stored n-grams (default=no)" \
+    arg="BOOL" \
+    default="0" \
+    details="
+If specified and true, tag n-grams will be stored in a slow but memory-friendly
+hash.  Otherwise, a fast but large array will be used.
+"
+
+#-----------------------------------------------------------------------------
 # HMM Options: Suffix Trie stuff
 int "trie-depth"  a "Maximum depth of suffix trie." \
     arg="LEN" \

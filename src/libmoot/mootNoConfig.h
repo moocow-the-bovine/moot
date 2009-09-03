@@ -127,9 +127,6 @@
 /* Define this to enable experimental expat XML support */
 #undef MOOT_EXPAT_ENABLED
 
-/* Define this to enable slow but memory-friendly n-gram hash storage */
-#undef MOOT_HASH_NGRAMS
-
 /* Define this to enable experimental libxml2 XML support */
 #undef MOOT_LIBXML_ENABLED
 
