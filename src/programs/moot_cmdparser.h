@@ -31,6 +31,7 @@ struct gengetopt_args_info {
   char * input_encoding_arg;	 /* Override XML document input encoding. (default=NULL). */
   char * output_encoding_arg;	 /* Set default XML output encoding. (default=NULL). */
   char * model_arg;	 /* Use HMM model file(s) MODEL. (default=moothmm). */
+  int hash_ngrams_arg;	 /* Whether to hash stored n-grams (default=no) (default=0). */
   int trie_depth_arg;	 /* Maximum depth of suffix trie. (default=0). */
   int trie_threshhold_arg;	 /* Frequency upper bound for trie inclusion. (default=10). */
   float trie_theta_arg;	 /* Suffix backoff coefficient. (default=0). */
@@ -61,6 +62,7 @@ struct gengetopt_args_info {
   int input_encoding_given;	 /* Whether input-encoding was given */
   int output_encoding_given;	 /* Whether output-encoding was given */
   int model_given;	 /* Whether model was given */
+  int hash_ngrams_given;	 /* Whether hash-ngrams was given */
   int trie_depth_given;	 /* Whether trie-depth was given */
   int trie_threshhold_given;	 /* Whether trie-threshhold was given */
   int trie_theta_given;	 /* Whether trie-theta was given */

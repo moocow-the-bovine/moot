@@ -23,6 +23,7 @@ struct gengetopt_args_info {
   int verbose_arg;	 /* Verbosity level. (default=2). */
   char * output_arg;	 /* Specify output file (default=stdout). (default=-). */
   int compress_arg;	 /* Compression level for output file. (default=-1). */
+  int hash_ngrams_arg;	 /* Whether to hash stored n-grams (default=no) (default=0). */
   int trie_depth_arg;	 /* Maximum depth of suffix trie. (default=0). */
   int trie_threshhold_arg;	 /* Frequency upper bound for trie inclusion. (default=10). */
   float trie_theta_arg;	 /* Suffix backoff coefficient. (default=0). */
@@ -43,6 +44,7 @@ struct gengetopt_args_info {
   int verbose_given;	 /* Whether verbose was given */
   int output_given;	 /* Whether output was given */
   int compress_given;	 /* Whether compress was given */
+  int hash_ngrams_given;	 /* Whether hash-ngrams was given */
   int trie_depth_given;	 /* Whether trie-depth was given */
   int trie_threshhold_given;	 /* Whether trie-threshhold was given */
   int trie_theta_given;	 /* Whether trie-theta was given */

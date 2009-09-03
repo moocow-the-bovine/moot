@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2002-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -96,6 +96,7 @@ void GetMyOptions(int argc, char **argv)
   out.close(); //-- close again: HMM will write it itself
 
   // -- assign "unknown" ids & other flags
+  hmm.hash_ngrams = args.hash_ngrams_arg;
   hmm.use_lex_classes = args.use_classes_arg;
   hmm.unknown_token_name(args.unknown_token_arg);
   hmm.unknown_tag_name(args.unknown_tag_arg);
@@ -357,6 +358,7 @@ int main (int argc, char **argv)
     fprintf(stderr, " lambda3=%g", hmm.nglambda3);
 #endif
     fprintf(stderr, "\n");
+    fprintf(stderr, "%s   Hash n-grams?     : %s\n", cmts, (hmm.hash_ngrams ? "yes" : "no"));
     fprintf(stderr, "%s   Lex. Threshhold   : %g\n", cmts, hmm.unknown_lex_threshhold);
     fprintf(stderr, "%s   Lexical lambdas   : lambdaw0=%g, lambdaw1=%g\n",
 	    cmts, hmm.wlambda0, hmm.wlambda0);

@@ -69,16 +69,6 @@
  */
 
 /**
- * \def MOOT_HASH_TRIGRAMS
- * If defined (and if MOOT_USE_TRIGRAMS is defined), then
- * trigrams will be stored in a hash table.
- * Otherwise, trigrams will be stored in a sparse and
- * memory-hogging (but fast) C array
- *
- * \see mootConfig.h
- */
-
-/**
  * \def MOOT_LEX_UNKNOWN_TOKENS
  * Define this to include real lexical entries for tokens with counts
  * <= UnknownLexThreshhold.  Not entirely correct, but it actually
@@ -238,7 +228,62 @@ public:
   typedef LexProbTable LexClassProbTable;
 
   /**
-   * Type for uni- and bigram probability lookup table:
+   * Type for unigram probability lookup table:
+   * c-style 1d array:
+   * unigram probabilities \c log(p(tagid)) indexed by \c tagid .
+   *
+   * Not currently used.
+   */
+  typedef ProbT* UnigramProbTable;
+
+  /// Tag-bigram key type for HMM probability lookup hash (only used if hash_ngrams is true)
+  class Bigram {
+  public:
+    TagID tag1;  ///< previous-previous tag_{i-1}
+    TagID tag2;  ///< current tag: tag_i
+    //
+  public:
+    /// Utility struct for hash_map
+    struct HashFcn {
+    public:
+      inline size_t operator()(const Bigram &x) const {
+	return ((0xdeece66d * x.tag1) + x.tag2);
+      };
+    };
+    //
+    /// Utility struct for hash_map
+    struct EqualFcn {
+    public:
+      inline size_t operator()(const Bigram &x, const Bigram &y) const {
+	return  x.tag1==y.tag1 && x.tag2==y.tag2;
+      };
+    };
+    //
+  public:
+    /// Bigram constructor
+    Bigram(TagID t1=0, TagID t2=0)
+      : tag1(t1), tag2(t2)
+    {};
+    /// Bigram constructor, Trigram-compatible 
+    Bigram(TagID t1=0, TagID t2=0, TagID t3=0)
+      : tag1(t2), tag2(t3)
+    {};
+    //
+    /// Bigram destructor
+    ~Bigram(void) {};
+  };
+
+  /// Type for hashed uni- and bigram probability lookup table
+  /// : bigram(t1,t2) -> log(p(t2|t1))
+  /// : bigram(0 ,t2) ~  unigram(t2) -> log(p(t2))
+  typedef
+    hash_map<Bigram,ProbT,
+	     Bigram::HashFcn,
+	     Bigram::EqualFcn>
+    BigramProbHash;
+
+  /**
+   * Type for dense uni- and bigram probability lookup table:
    * c-style 2d array: bigram probabilites \c log(p(tagid|ptagid))
    * indexed by \c ((ntags*ptagid)+tagid) , and
    * unigram probabilities \c log(p(tagid)) indexed by \c tagid .
@@ -248,59 +293,51 @@ public:
    * (~= 2K tags) tagsets on contemporary machines,
    * and lookup is Just Plain Quick.
    */
-  typedef ProbT *BigramProbTable;
+  typedef ProbT *BigramProbArray;
 
-#if defined(MOOT_USE_TRIGRAMS)
-# if defined(MOOT_HASH_TRIGRAMS)
-  /// \brief Key type for a uni-, bi-, or trigram
+  /// Tag-trigram key type for HMM probability lookup table (only used if hash_ngrams is true)
   class Trigram {
-  public:
-
-    /// Utility struct for hash_map
-    struct HashFcn {
-    public:
-      inline size_t operator()(const Trigram &x) const
-      {
-	return
-	  (0xdeece66d * ((0xdeece66d * x.tag1) + x.tag2)) + x.tag3;
-      };
-    };
-
-    /// Utility struct for hash_map
-    struct EqualFcn {
-    public:
-      inline size_t operator()(const Trigram &x, const Trigram &y) const
-      {
-	return 
-	  x.tag1==y.tag1 && x.tag2==y.tag2 && x.tag3==y.tag3;
-	//x==y;
-      };
-    };
-
   public:
     TagID tag1;  ///< previous-previous tag_{i-2} or 0
     TagID tag2;  ///< previous tag: tag_{i-1} or 0
     TagID tag3;  ///< current tag: tag_i
-
+    //
+  public:
+    /// Utility struct for hash_map
+    struct HashFcn {
+    public:
+      inline size_t operator()(const Trigram &x) const {
+	return (0xdeece66d * ((0xdeece66d * x.tag1) + x.tag2)) + x.tag3;
+      };
+    };
+    //
+    /// Utility struct for hash_map
+    struct EqualFcn {
+    public:
+      inline size_t operator()(const Trigram &x, const Trigram &y) const {
+	return 
+	  x.tag1==y.tag1 && x.tag2==y.tag2 && x.tag3==y.tag3;
+      };
+    };
+    //
   public:
     /// Trigram constructor
     Trigram(TagID t1=0, TagID t2=0, TagID t3=0)
       : tag1(t1), tag2(t2), tag3(t3)
     {};
-
+    //
     /// Trigram destructor
     ~Trigram(void) {};
   };
 
   /// Type for a trigram probability lookup table
-  /// : trigram(t1,t2,t3)->log(p(t3|<t1,t2>))
+  /// : trigram(t1,t2,t3) -> log(p(t3|<t1,t2>))
+  /// : trigram(0 ,t2,t3) ~  bigram(t2,t3)
   typedef
     hash_map<Trigram,ProbT,
 	     Trigram::HashFcn,
 	     Trigram::EqualFcn>
-    TrigramProbTable;
-
-# else //! MOOT_HASH_TRIGRAMS
+    TrigramProbHash;
 
   /**
    * \brief Type for uni-, bi- and trigram probability lookup table.
@@ -320,9 +357,16 @@ public:
    * (~= 200 tags) tagsets on contemporary machines,
    * and lookup is Just Plain Quick.
    */
-  typedef ProbT* TrigramProbTable;
-# endif // MOOT_HASH_TRIGRAMS
+  typedef ProbT* TrigramProbArray;
 
+#ifdef MOOT_USE_TRIGRAMS
+  typedef Trigram          NgramProbKey;    ///< Generic n-gram key: trigrams
+  typedef TrigramProbHash  NgramProbHash;   ///< Generic n-gram probabilities: trigrams, hashed
+  typedef TrigramProbArray NgramProbArray;  ///< Generic n-gram probabilities: trigrams, dense
+#else
+  typedef Bigram           NgramProbKey;    ///< Generic n-gram key: bigrams
+  typedef BigramProbHash   NgramProbHash;   ///< Generic n-gram probabilities: bigrams, hashed
+  typedef BigramProbArray  NgramProbArray;  ///< Generic n-gram probabilities: bigrams, dense
 #endif // MOOT_USE_TRIGRAMS
   //@}
 
@@ -449,6 +493,14 @@ public:
   //@{
 
   /**
+   * Whether to store tag n-gram probabilities in a slow
+   * but memory-friendly hash, as opposed to a dense array.
+   * \warning Using the default (false) requires O(n_tags^3)
+   * memory space for the tag n-gram probability table.
+   */
+  bool      hash_ngrams;
+
+  /**
    * Whether to use class probabilities (Default=true)
    * \warning Don't set this to true unless your input
    * files actually contain a priori analyses generated
@@ -535,11 +587,9 @@ public:
 
   LexProbTable      lexprobs;   /**< Lexical probability lookup table */
   LexClassProbTable lcprobs;    /**< Lexical-class probability lookup table */
-#ifdef MOOT_USE_TRIGRAMS
-  TrigramProbTable  ngprobs3;   /**< N-gram (log-)probability lookup table: trigrams */
-#else
-  BigramProbTable   ngprobs2;   /**< N-gram (log-)probability lookup table: bigrams */
-#endif
+
+  NgramProbHash     ngprobsh;   /**< N-gram (log-)probability lookup table: hashed */
+  NgramProbArray    ngprobsa;   /**< N-gram (log-)probability lookup table: dense */
 
 #ifdef MOOT_ENABLE_SUFFIX_TRIE
   SuffixTrie        suftrie;    /**< string-suffix (log-)probability trie */
@@ -603,6 +653,7 @@ public:
       save_flavors(false),
       save_mark_unknown(false),
       save_dump_trellis(false),
+      hash_ngrams(false),
       use_lex_classes(true),
       start_tagid(0),
       unknown_lex_threshhold(1.0),
@@ -617,11 +668,7 @@ public:
       n_tags(0),
       n_toks(0),
       n_classes(0),
-#if !defined(MOOT_USE_TRIGRAMS)
-      ngprobs2(NULL),
-#elif !defined(MOOT_HASH_TRIGRAMS)
-      ngprobs3(NULL),
-#endif
+      ngprobsa(NULL),
       vtable(NULL),
       nsents(0),
       ntokens(0),
@@ -700,7 +747,7 @@ public:
     tagids.unknown_name(name);
   };
 
-  /*
+  /**
    * Set lexical class to use for tokens without user-specified analyses.
    * Really just an alias for 'uclass' datum.
    */
@@ -786,6 +833,24 @@ public:
 
   /** Pre-compute runtime log-probability tables: NOT called by compile(). */
   bool compute_logprobs(void);
+
+  /** Low-level utility: set a (raw) n-gram probability.  Used by compile() */
+  inline void set_ngram_prob(ProbT p, TagID t1=0, TagID t2=0, TagID t3=0)
+  {
+    if (hash_ngrams) {   // +hash
+#ifdef MOOT_USE_TRIGRAMS // +hash, +trigrams
+      ngprobsh[Trigram(t1,t2,t3)] = p; 
+#else                    // +hash, -trigrams
+      ngprobsh[Bigram(t2,t3)] = p;
+#endif
+    } else {             // -hash
+#ifdef MOOT_USE_TRIGRAMS // -hash, +trigrams
+      ngprobsa[(n_tags*((n_tags*t1)+t2))+t3] = p;
+#else                    // -hash, -trigrams
+      ngprobsa[(n_tags*t2)+t3] = p;
+#endif // MOOT_USE_TRIGRAMS
+    }
+  };
   //@}
 
   //------------------------------------------------------------
@@ -1444,43 +1509,6 @@ public:
   /*------------------------------------------------------------
    * Lexical Probability Lookup
    */
-  /** Get primary and secondary lexical-probability maps */
-  /*
-  inline void get_wordp_maps(TokID   tokid,
-			     ClassID classid,
-			     const mootTokString &toktext,
-			     LexProbSubTable* const* primary,
-			     LexProbSubTable* const* secondary)
-    const
-  {
-    if (tokid != 0 || !use_lex_classes) {
-      if (primary)   *primary   = &lexprobs[tokid];
-      if (secondary) *secondary = NULL;
-    }
-    else if (use_lex_classes) {
-      if (primary)   *primary   = &lcprobs[classid];
-      if (secondary) {
-	size_t matchlen;
-	*secondary = &(suftrie.sufprobs(toktext,&matchlen));
-	if (matchlen == 0) *secondary = NULL;
-      }
-    }
-    else { //-- tokid==0 && !use_lex_classes
-      if (primary) {
-	size_t matchlen;
-	*primary = &(suftrie.sufprobs(toktext,&matchlen));
-	if (matchlen == 0) {
-	  *primary = &lexprobs[tokid];
-	  *secondary = NULL;
-	}
-	else if (secondary) {
-	  *secondary = &lexprobs[tokid];
-	}
-      }
-    }
-  };
-  */
-
 
   /**
    * Looks up and returns lexical probability: p(tokid|tagid)
@@ -1538,14 +1566,7 @@ public:
    */
   inline const ProbT tagp(const TagID tagid) const
   {
-    return
-#ifdef MOOT_USE_TRIGRAMS
-      tagp(0,0,tagid);
-#else
-      ngprobs2 && tagid < n_tags
-      ? ngprobs2[tagid]
-      : MOOT_PROB_ZERO;
-#endif // MOOT_USE_TRIGRAMS
+    return tagp(0,0,tagid);
   };
 
   /**
@@ -1565,14 +1586,7 @@ public:
    */
   inline const ProbT tagp(const TagID prevtagid, const TagID tagid) const
   {
-    return
-#ifdef MOOT_USE_TRIGRAMS
-      tagp(0,prevtagid,tagid);
-#else
-      ngprobs2 && prevtagid < n_tags && tagid < n_tags
-      ? ngprobs2[(n_tags*prevtagid)+tagid]
-      : MOOT_PROB_ZERO;
-#endif
+    return tagp(0,prevtagid,tagid);
   };
 
   /**
@@ -1584,36 +1598,62 @@ public:
   };
 
   /*------------------------------------------------------------
-   * Trigram probability lookup
+   * Trigram probability lookup (only useful if MOOT_USE_TRIGRAMS is defined)
    */
-#ifdef MOOT_USE_TRIGRAMS
   /**
-   * Looks up and returns trigram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
-   * given Trigram(prevtagid2,prevtagid1,tagid)
+   * Looks up and returns raw trigram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
+   * given Trigram(prevtagid2,prevtagid1,tagid), no fallback.
    */
-#ifdef MOOT_HASH_TRIGRAMS
   inline const ProbT tagp(const Trigram &trigram, ProbT ProbZero=MOOT_PROB_ZERO) const
   {
-    TrigramProbTable::const_iterator tgti = ngprobs3.find(trigram);
-    return tgti != ngprobs3.end() ? tgti->second : ProbZero;
+    if (!hash_ngrams) return tagp(trigram.tag1, trigram.tag2, trigram.tag3);
+    NgramProbHash::const_iterator ngpi = ngprobsh.find(
+#ifdef MOOT_USE_TRIGRAMS
+						       trigram
+#else
+						       Bigram(trigram.tag2,trigram.tag3)
+#endif
+						       );
+    return ngpi != ngprobsh.end() ? ngpi->second : ProbZero;
   };
-#endif //MOOT_HASH_TRIGRAMS
 
   /**
    * Looks up and returns trigram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
    * given prevtagid2, prevtagid1, tagid.
+   * Falls back to (interpolated) (<n)-gram values if required.
    */
   inline const ProbT tagp(const TagID prevtagid2, const TagID prevtagid1, const TagID tagid) const
   {
-    return
-#ifdef MOOT_HASH_TRIGRAMS
-      tagp(Trigram(prevtagid2,prevtagid1,tagid))
+    if (!hash_ngrams) { //-- -hash
+#ifdef MOOT_USE_TRIGRAMS
+      return
+	ngprobsa && prevtagid2 < n_tags && prevtagid1 < n_tags && tagid < n_tags
+	? ngprobsa[(n_tags*((n_tags*prevtagid2)+prevtagid1))+tagid]
+	: MOOT_PROB_ZERO;
 #else
-      ngprobs3 && prevtagid2 < n_tags && prevtagid1 < n_tags && tagid < n_tags
-      ? ngprobs3[(n_tags*((n_tags*prevtagid2)+prevtagid1))+tagid]
-      : MOOT_PROB_ZERO;
-#endif
-      ;
+      return
+	ngprobsa && prevtagid1 < n_tags && tagid < n_tags
+	? ngprobsa[(n_tags*prevtagid1)+tagid]
+	: MOOT_PROB_ZERO;
+#endif // MOOT_USE_TRIGRAMS
+
+    } else {            //-- +hash
+      //-- trigram as stored (pre-smoothed)
+      Trigram ng(prevtagid2,prevtagid1,tagid);
+      ProbT p = tagp(ng, 1);
+      if (p != 1) return p;
+      //-- fallback: bigram as stored (pre-smoothed)
+      ng.tag1 = 0;
+      p = tagp(ng, 1);
+      if (p != 1) return p;
+      //-- fallback: unigram as stored (pre-smoothed)
+      ng.tag2 = 0;
+      p = tagp(ng, 1);
+      if (p != 1) return p;
+      //-- fallback: "unknown" unigram (pre-smoothed)
+      ng.tag3 = 0;
+      return tagp(ng, MOOT_PROB_ZERO);
+    }
   };
 
   /**
@@ -1628,7 +1668,6 @@ public:
   {
     return tagp(tagids.name2id(prevtag2), tagids.name2id(prevtag1), tagids.name2id(tag));
   };
-#endif // MOOT_USE_TRIGRAMS
   //@}
 
 

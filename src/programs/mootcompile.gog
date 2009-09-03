@@ -61,6 +61,20 @@ int "compress" z "Compression level for output file." \
 
 group "HMM Options"
 
+#-----------------------------------------------------------------------------
+# HMM Options: Storage mode
+
+int "hash-ngrams" g "Whether to hash stored n-grams (default=no)" \
+    arg="BOOL" \
+    default="0" \
+    details="
+If specified and true, tag n-grams will be stored in a slow but memory-friendly
+hash.  Otherwise, a fast but large array will be used.
+"
+
+#-----------------------------------------------------------------------------
+# HMM Options: Suffix Trie stuff
+
 int "trie-depth"  a "Maximum depth of suffix trie." \
     arg="LEN" \
     default="0" \
@@ -85,6 +99,9 @@ Specify suffix-trie backoff coefficient for smoothing.
 Specifying a value of zero (the default) causes the
 smoothing coefficient to be estimated.
 "
+
+#-----------------------------------------------------------------------------
+# HMM Options: lexical class stuff
 
 int "use-classes" L "Whether to use lexical class-probabilities." \
     arg="BOOL" \

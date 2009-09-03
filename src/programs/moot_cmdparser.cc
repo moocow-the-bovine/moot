@@ -101,6 +101,7 @@ cmdline_parser_print_help (void)
   printf("\n");
   printf(" HMM Options:\n");
   printf("   -MMODEL   --model=MODEL                Use HMM model file(s) MODEL.\n");
+  printf("   -gBOOL    --hash-ngrams=BOOL           Whether to hash stored n-grams (default=no)\n");
   printf("   -aLEN     --trie-depth=LEN             Maximum depth of suffix trie.\n");
   printf("   -AFREQ    --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.\n");
   printf("             --trie-theta=FLOAT           Suffix backoff coefficient.\n");
@@ -150,6 +151,7 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->input_encoding_arg = NULL; 
   args_info->output_encoding_arg = NULL; 
   args_info->model_arg = gog_strdup("moothmm"); 
+  args_info->hash_ngrams_arg = 0; 
   args_info->trie_depth_arg = 0; 
   args_info->trie_threshhold_arg = 10; 
   args_info->trie_theta_arg = 0; 
@@ -188,6 +190,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->input_encoding_given = 0;
   args_info->output_encoding_given = 0;
   args_info->model_given = 0;
+  args_info->hash_ngrams_given = 0;
   args_info->trie_depth_given = 0;
   args_info->trie_threshhold_given = 0;
   args_info->trie_theta_given = 0;
@@ -234,6 +237,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "input-encoding", 1, NULL, 0 },
 	{ "output-encoding", 1, NULL, 0 },
 	{ "model", 1, NULL, 'M' },
+	{ "hash-ngrams", 1, NULL, 'g' },
 	{ "trie-depth", 1, NULL, 'a' },
 	{ "trie-threshhold", 1, NULL, 'A' },
 	{ "trie-theta", 1, NULL, 0 },
@@ -264,6 +268,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'I', ':',
 	'O', ':',
 	'M', ':',
+	'g', ':',
 	'a', ':',
 	'A', ':',
 	'L', ':',
@@ -425,6 +430,14 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->model_given++;
           if (args_info->model_arg) free(args_info->model_arg);
           args_info->model_arg = gog_strdup(val);
+          break;
+        
+        case 'g':	 /* Whether to hash stored n-grams (default=no) */
+          if (args_info->hash_ngrams_given) {
+            fprintf(stderr, "%s: `--hash-ngrams' (`-g') option given more than once\n", PROGRAM);
+          }
+          args_info->hash_ngrams_given++;
+          args_info->hash_ngrams_arg = (int)atoi(val);
           break;
         
         case 'a':	 /* Maximum depth of suffix trie. */
@@ -684,6 +697,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->model_given++;
             if (args_info->model_arg) free(args_info->model_arg);
             args_info->model_arg = gog_strdup(val);
+          }
+          
+          /* Whether to hash stored n-grams (default=no) */
+          else if (strcmp(olong, "hash-ngrams") == 0) {
+            if (args_info->hash_ngrams_given) {
+              fprintf(stderr, "%s: `--hash-ngrams' (`-g') option given more than once\n", PROGRAM);
+            }
+            args_info->hash_ngrams_given++;
+            args_info->hash_ngrams_arg = (int)atoi(val);
           }
           
           /* Maximum depth of suffix trie. */
