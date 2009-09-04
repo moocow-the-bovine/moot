@@ -33,6 +33,7 @@ moot [OPTIONS] INPUT(s)
 
  HMM Options
     -MMODEL     --model=MODEL                Use HMM model file(s) MODEL.
+    -gBOOL      --hash-ngrams=BOOL           Whether to hash stored n-grams (default=no)
     -aLEN       --trie-depth=LEN             Maximum depth of suffix trie.
     -AFREQ      --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.
                 --trie-theta=FLOAT           Suffix backoff coefficient.
@@ -348,6 +349,20 @@ Default: 'moothmm'
 
 See 'HMM MODEL FILE FORMATS' in L<mootfiles> for details
 on model file formats.
+
+
+
+
+
+=item C<--hash-ngrams=BOOL> , C<-gBOOL>
+
+Whether to hash stored n-grams (default=no)
+
+Default: '0'
+
+
+If specified and true, tag n-grams will be stored in a slow but memory-friendly
+hash.  Otherwise, a fast but large array will be used.
 
 
 
