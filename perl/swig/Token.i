@@ -32,7 +32,10 @@ typedef enum {
   NTokTypes = moot::NTokTypes         /**< number of token-types (not a type itself) */
 } mootTokenType;
 
-extern const char* mootTokenTypeNames[NTokTypes];
+//extern const char* const mootTokenTypeNames[NTokTypes]; //-- BROKEN: swig hates arrays
+%inline %{
+  const char* const TokenTypeName(mootTokenType typ) { return mootTokenTypeNames[typ]; };
+%}
 
 typedef enum {
   TokFlavorAlpha,      /**< (Mostly) alphabetic token: "foo", "bar", "foo2bar" */
@@ -45,7 +48,11 @@ typedef enum {
   NTokFlavors          /**< Not really a token-type */
 } mootTokenFlavor;
 
-extern const char *mootTokenFlavorNames[NTokFlavors];
+//extern const char* const mootTokenFlavorNames[NTokFlavors];  //-- BROKEN: swig hates arrays
+%inline %{
+  const char* const TokenFlavorName(mootTokenFlavor flav) { return mootTokenFlavorNames[flav]; };
+%}
+
 
 /*----------------------------------------------------------------------
  * Class TokenAnalysis
@@ -87,10 +94,15 @@ public:
   size_t size(void);
   bool empty(void);
   //
-  TokenAnalysis &front(void);
-  TokenAnalysis &back(void);
+  TokenAnalysis &front(void); //-- breaks if $self->empty()
+  TokenAnalysis &back (void); //-- breaks if $self->empty()
   %extend {
+    /*-- ... no better ...
+    TokenAnalysis *front(void) { return $self->empty() ? NULL : &($self->front()); };
+    TokenAnalysis *back (void) { return $self->empty() ? NULL : &($self->back ()); };
+    */
     TokenAnalyses *rotate(int n=1) {
+      if ($self->empty()) return $self;
       for (; n>0; n--) {
 	$self->push_back($self->front());
 	$self->pop_front();
