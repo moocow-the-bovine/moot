@@ -90,17 +90,16 @@ public:
   TokenAnalysis &front(void);
   TokenAnalysis &back(void);
   %extend {
-    TokenAnalysis *nth(int n) { //-- BROKEN!
-      if (n<0) {
-	++n;
-	TokenAnalyses::reverse_iterator ai = $self->rbegin();
-	for (; ai != $self->rend(); ai++) ;
-	return &(*ai);
-      } else {
-	TokenAnalyses::iterator ai = $self->begin();
-	for (; ai != $self->end(); ai++) ;
-	return &(*ai);
+    TokenAnalyses *rotate(int n=1) {
+      for (; n>0; n--) {
+	$self->push_back($self->front());
+	$self->pop_front();
       }
+      for (; n<0; n++) {
+	$self->push_front($self->back());
+	$self->pop_back();
+      }
+      return $self;
     };
   }
   //
@@ -162,3 +161,41 @@ public:
 };
 
 mootTokenFlavor tokenFlavor(const mootTokString &token_text);
+
+/*----------------------------------------------------------------------
+ * Class Sentence
+ */
+%{
+typedef mootSentence Sentence;
+%}
+
+class Sentence {
+public:
+  Sentence(void);
+  ~Sentence(void);
+  void clear(void);
+  //
+  size_t size(void);
+  bool empty(void);
+  //
+  Token &front(void);
+  Token &back(void);
+  %extend {
+    Sentence *rotate(int n=1) {
+      for (; n>0; n--) {
+	$self->push_back($self->front());
+	$self->pop_front();
+      }
+      for (; n<0; n++) {
+	$self->push_front($self->back());
+	$self->pop_back();
+      }
+      return $self;
+    };
+  }
+  //
+  void push_front(const Token &t);
+  void push_back(const Token &t);
+  void pop_front(void);
+  void pop_back(void);
+};
