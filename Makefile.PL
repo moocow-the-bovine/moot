@@ -29,7 +29,7 @@ WriteMakefile
 
 
    ##-- user variables
-   #CC           => 'c++',   ##-- your c++ compiler
+   CC           => 'g++',   ##-- your c++ compiler
    LIBS         => "$MOOT_LDFLAGS $MOOT_LIBS",      ##-- additional libraries
    DEFINE       => '-DHAVE_CONFIG_H',   ##-- additional defines
    INC          => $MOOT_IFLAGS,        ##-- additional includes

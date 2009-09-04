@@ -40,9 +40,29 @@ sub test_token {
   $t->insert(moot::TokenAnalysis->new('tag3','details3',3.14195));
   $t->{tok_besttag} = 'tag42';
 
+  my $s = moot::Sentence->new();
+  $s->push_back(moot::Token->new('foo'));
+  $s->push_back(moot::Token->new('bar'));
+
   print STDERR "$0: test_token(): done\n";
 }
-test_token();
+#test_token();
+
+##----------------------------------------------------------------------
+## test: HMM
+
+sub test_hmm {
+  my $hmm = moot::HMM->new();
+  my $model = '../src/programs/data/utrain';
+  $hmm->load_model($model) or warn("$0: load_model($model) failed: $!");
+
+  my $s = moot::Sentence->new();
+  $s->push_back(moot::Token->new($_)) foreach (qw(Dies ist ein Test .));
+  $hmm->tag_sentence($s);
+
+  print STDERR "$0: test_hmm(): done\n";
+}
+test_hmm();
 
 
 ##----------------------------------------------------------------------
