@@ -26,6 +26,7 @@ sub test_token_analysis {
   my $a2 = moot::TokenAnalysis->new('mytag2','mydetails2',24.0);
 
   my $as = moot::TokenAnalyses->new();
+  my $a0 = $as->front(); ##-- should puke, since $as is empty
   print STDERR "$0: test_token_analysis(): done\n";
 }
 #test_token_analysis();
@@ -35,6 +36,7 @@ sub test_token_analysis {
 
 sub test_token {
   my $t = moot::Token->new("foo", $moot::TokTypeVanilla);
+  my $as = moot::TokenAnalyses->new();
   $t->insert(moot::TokenAnalysis->new('tag1','details1',1));
   $t->insert(moot::TokenAnalysis->new('tag2','details2',2));
   $t->insert(moot::TokenAnalysis->new('tag3','details3',3.14195));
@@ -49,12 +51,27 @@ sub test_token {
 #test_token();
 
 ##----------------------------------------------------------------------
+## test: AssocVector
+
+sub test_assoc_vector {
+  my $av = moot::IdProbAssocVector->new();
+  $av->insert(420,24.7);
+  $av->insert(24, 48.96);
+
+  print STDERR "$0: test_assoc_vector(): done\n";
+}
+#test_assoc_vector();
+
+
+##----------------------------------------------------------------------
 ## test: HMM
 
 sub test_hmm {
   my $hmm = moot::HMM->new();
-  my $model = '../src/programs/data/utrain';
+  #my $model = '../src/programs/data/utrain';
+  my $model = 'dummy';
   $hmm->load_model($model) or warn("$0: load_model($model) failed: $!");
+  #$hmm->txtdump('test.dump');
 
   my $s = moot::Sentence->new();
   $s->push_back(moot::Token->new($_)) foreach (qw(Dies ist ein Test .));

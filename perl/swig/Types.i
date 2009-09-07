@@ -10,7 +10,8 @@ using namespace moot;
 %}
 
 //-- mootTypes.h
-typedef double ProbT;
+//typedef double ProbT;  //-- only if moot defines MOOT_USE_DOUBLE (not by default)
+typedef float  ProbT;
 typedef ProbT  CountT;
 
 extern const ProbT mootProbEpsilon;

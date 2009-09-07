@@ -23,6 +23,8 @@ extern const char * const PACKAGE_VERSION;
 
 /*-- wrappers --*/
 %include "Types.i"
+%include "Templates.i"
 %include "Token.i"
 %include "Enum.i"
+%include "AssocVector.i"
 %include "HMM.i"

@@ -78,48 +78,14 @@ public:
 };
 
 /*----------------------------------------------------------------------
- * Class TokenAnalyses
+ * Class TokenAnalyses (-> std::list<mootToken::Analysis -> TokenAnalysis>)
  */
-%{
-//typedef std::list<mootToken::Analysis> TokenAnalyses;
-typedef mootToken::Analyses TokenAnalyses;
+%template(TokenAnalyses)     std::list<TokenAnalysis>;
+%inline %{
+  //typedef mootToken::Analyses TokenAnalyses;
+  typedef std::list<TokenAnalysis> TokenAnalyses;
 %}
 
-class TokenAnalyses {
-public:
-  TokenAnalyses(void);
-  ~TokenAnalyses(void);
-  void clear(void);
-  //
-  size_t size(void);
-  bool empty(void);
-  //
-  TokenAnalysis &front(void); //-- breaks if $self->empty()
-  TokenAnalysis &back (void); //-- breaks if $self->empty()
-  %extend {
-    /*-- ... no better ...
-    TokenAnalysis *front(void) { return $self->empty() ? NULL : &($self->front()); };
-    TokenAnalysis *back (void) { return $self->empty() ? NULL : &($self->back ()); };
-    */
-    TokenAnalyses *rotate(int n=1) {
-      if ($self->empty()) return $self;
-      for (; n>0; n--) {
-	$self->push_back($self->front());
-	$self->pop_front();
-      }
-      for (; n<0; n++) {
-	$self->push_front($self->back());
-	$self->pop_back();
-      }
-      return $self;
-    };
-  }
-  //
-  void push_front(const TokenAnalysis &a);
-  void push_back(const TokenAnalysis &a);
-  void pop_front(void);
-  void pop_back(void);
-};
 
 /*----------------------------------------------------------------------
  * Class TokenLocation
@@ -147,6 +113,12 @@ public:
 typedef mootToken Token;
 %}
 
+%rename(type)     Token::tok_type;
+%rename(text)     Token::tok_text;
+%rename(tag)      Token::tok_besttag;
+%rename(analyses) Token::tok_analyses;
+%rename(location) Token::tok_location;
+
 class Token {
 public:
   mootTokenType tok_type;
@@ -166,6 +138,7 @@ public:
   //-- analysis manipulation
   void insert(const TokenAnalysis &analysis);
   void insert(const char *tag, const char *details);
+  void erase(const TokenAnalysis &analysis);
   void prune(void);
   %extend {
     mootTokenFlavor flavor(void) { return tokenFlavor($self->tok_text); };
@@ -175,39 +148,10 @@ public:
 mootTokenFlavor tokenFlavor(const mootTokString &token_text);
 
 /*----------------------------------------------------------------------
- * Class Sentence
+ * Class Sentence (-> std::list<mootToken -> Token>)
  */
-%{
-typedef mootSentence Sentence;
+%template(Sentence) std::list<Token>;
+%inline %{
+  //typedef mootSentence Sentence;
+  typedef std::list<Token> Sentence;
 %}
-
-class Sentence {
-public:
-  Sentence(void);
-  ~Sentence(void);
-  void clear(void);
-  //
-  size_t size(void);
-  bool empty(void);
-  //
-  Token &front(void);
-  Token &back(void);
-  %extend {
-    Sentence *rotate(int n=1) {
-      for (; n>0; n--) {
-	$self->push_back($self->front());
-	$self->pop_front();
-      }
-      for (; n<0; n++) {
-	$self->push_front($self->back());
-	$self->pop_back();
-      }
-      return $self;
-    };
-  }
-  //
-  void push_front(const Token &t);
-  void push_back(const Token &t);
-  void pop_front(void);
-  void pop_back(void);
-};
