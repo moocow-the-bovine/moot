@@ -8,7 +8,8 @@ if (system("pkg-config --atleast-version=$moot_min_version moot") != 0) {
   die("Required module moot >= v$moot_min_version not found!\n");
 }
 
-$MOOT_CFLAGS = join(' ', map { $s=`pkg-config --cflags $_`; chomp($s); $s } qw(moot));
+#$MOOT_CFLAGS = join(' ', map { $s=`pkg-config --cflags $_`; chomp($s); $s } qw(moot));
+$MOOT_CFLAGS = join(' ', '-pipe -Wno-deprecated', grep {0} map { $s=`pkg-config --cflags $_`; chomp($s); $s } qw(moot));
 $MOOT_IFLAGS = join(' ', map { $s=`pkg-config --cflags-only-I $_`; chomp($s); $s } qw(moot));
 $MOOT_LDFLAGS= join(' ', map { $s=`pkg-config --libs-only-L $_`; chomp($s); $s } qw(moot));
 $MOOT_LIBS   = join(' ', map { $s=`pkg-config --libs-only-l $_`; chomp($s); $s } qw(moot));
