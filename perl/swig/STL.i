@@ -171,3 +171,31 @@ public:
   pair(std::pair<T1,T2> p1);
   ~pair(void);
 };
+
+/*----------------------------------------------------------------------
+ * (?namespace)::hash_map<T>
+ */
+template<class KeyT, class ValT, class HashFcn=hash<KeyT>, class EqualFcn=equal_to<KeyT> >
+class hash_map {
+public:
+  hash_map(void);
+  hash_map(size_t n); ///< Creates an empty hash_map with at least n buckets. 
+  ~hash_map(void);
+  //
+  void clear(void);
+  size_t size(void) const;
+  size_t bucket_count(void) const; ///< Returns the number of buckets used by the hash_map. 
+  bool empty(void) const;
+  //
+  void resize(size_t n);     ///< Increases the bucket count to at least n. 
+  void erase(const KeyT &k); ///< Erases the element whose key is k.
+  //
+  %extend {
+    bool keyExists(const KeyT &k) {
+      hash_map<KeyT,ValT,HashFcn,EqualFcn>::const_iterator ci = $self->find(k);
+      return (ci != $self->end());
+    };
+    ValT &get(const KeyT &k) { return (*$self)[k]; };
+    void  set(const KeyT &k, const ValT &v) { (*$self)[k] = v; };
+  }
+};
