@@ -41,21 +41,47 @@ typedef mootEnum<mootTagString> TagIDEnum;
 //class ClassIDEnum : public LexClassEnum;
 
 /*----------------------------------------------------------------------
- * Class: mootHMM::LexProbTable
- *  + ARGH!
+ * Class: mootHMM::LexProbTable ~ HMMLexProbTable
  */
+
+//-- HMMLexProbSubTable
 %inline %{
   //typedef mootHMM::LexProbSubTable HMMLexProbSubTable;
   typedef AssocVector<mootEnumID,ProbT> HMMLexProbSubTableT;
 %}
 
-//-- HMMLexProbTable: busted, complaining about assignment operator 'operator=()' in swig-generated code ... grr...
+//-- HMMLexProbTable
 %template(HMMLexProbTable) std::vector<HMMLexProbSubTableT>;
 %inline %{
   //typedef mootHMM::LexProbTable    HMMLexProbTable;
   typedef std::vector<HMMLexProbSubTableT >  HMMLexProbTableT;
 %}
 
+/*----------------------------------------------------------------------
+ * Class: mootHMM::Trigram -> Trigram
+ */
+%inline %{ typedef mootHMM::Trigram Trigram; %}
+class Trigram {
+public:
+  TagID tag1;  ///< previous-previous tag_{i-2} or 0
+  TagID tag2;  ///< previous tag: tag_{i-1} or 0
+  TagID tag3;  ///< current tag: tag_i
+public:
+  Trigram(TagID t1=0, TagID t2=0, TagID t3=0);
+  ~Trigram(void);
+  %extend {
+    size_t hash(void) { return Trigram::HashFcn().operator()(*$self); };
+  };
+};
+
+/*----------------------------------------------------------------------
+ * Class: mootHMM::TrigramProbHash TrigramProbHash
+ */
+%template(TrigramProbHash) hash_map<Trigram,ProbT,Trigram::HashFcn,Trigram::EqualFcn>;
+%{
+  //typedef mootHMM::NgramProbHash NgramProbHash;
+  typedef hash_map<Trigram,ProbT,Trigram::HashFcn,Trigram::EqualFcn> NgramProbHash;
+%}
 
 /*----------------------------------------------------------------------
  * Class: mootHMM
@@ -200,6 +226,13 @@ public:
 
   HMMLexProbTableT  lexprobs;   /**< Lexical probability lookup table */
   //LexClassProbTable lcprobs;    /**< Lexical-class probability lookup table */
+
+  NgramProbHash     ngprobsh;   /**< N-gram (log-)probability lookup table: hashed */
+  //NgramProbArray    ngprobsa;   /**< N-gram (log-)probability lookup table: dense */
+
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
+  //SuffixTrie        suftrie;    /**< string-suffix (log-)probability trie */
+#endif
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -237,7 +270,9 @@ public:
    * smoothing constants.  Returns true on success, false on failure.
    */
   bool load_model(const std::string &modelname, const mootTagString &start_tag_str="__$");
-  //...
+
+  /** Low-level utility: set a (raw,smoothed,log-) n-gram probability */
+  void set_ngram_prob(ProbT p, TagID t1=0, TagID t2=0, TagID t3=0);
   //@}
 
   //------------------------------------------------------------
@@ -260,8 +295,39 @@ public:
   //@}
 
   //------------------------------------------------------------
-  // Error Reporting
+  /** \name Probability Lookup */
+  //@{
+  ProbT wordp(TokID tokid, TagID tagid) const;
+  ProbT wordp(const mootTokString &tokstr, const mootTagString &tagstr) const;
 
+  //ProbT classp(const ClassID classid, const TagID tagid) const;
+  //ProbT classp(const LexClass &lclass, const mootTagString tag) const;
+
+  /** unigram (log-)probability (smoothed) */
+  ProbT tagp(const TagID tagid) const;
+  ProbT tagp(const mootTagString &tagstr) const;
+
+  /** bigram (log-)probability (smoothed) */
+  ProbT tagp(const TagID tag1id, const TagID tag2id) const;
+  ProbT tagp(const mootTagString &tag1str, const mootTagString &tag2str) const;
+
+  /** trigram (log-)probability (smoothed) */
+  ProbT tagp(const TagID tag1id, const TagID tag2id, const TagID tag3id) const;
+  ProbT tagp(const mootTagString &tag1str, const mootTagString &tag2str, const mootTagString &tag3str) const;
+
+  /**
+   * Generic n-gram (log-)probability (smoothed)
+   *
+   * Looks up and returns raw n-gram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
+   * given Trigram(prevtagid2,prevtagid1,tagid), no fallback.
+   *
+   * (Smoothed) unigrams are keyed as Trigram(0,0,tagid), bigrams as Trigram(0,tag1id,tag2id).
+   */
+  const ProbT tagp(const Trigram &trigram, ProbT ProbZero=MOOT_PROB_ZERO) const;
+  //@}
+
+  //------------------------------------------------------------
+  // Error Reporting
   /** \name Error reporting */
   //@{
   /** Error reporting */
@@ -284,7 +350,7 @@ public:
   //@}
 
   //------------------------------------------------------------
-  // Extensions: lexical stuff
+  // Extensions: lexprobs
   //@{
   %extend {
     //-- lexSize() : like lexprobs.size()
@@ -293,7 +359,7 @@ public:
     //-- lexEntry(n) : like lexprobs.nth(n)
     HMMLexProbSubTableT &lexEntry(size_t n) { return $self->lexprobs[n]; };
 
-    //-- lexClear()
+    //-- lexClear() : clear lexprobs, leaves 'UNKNOWN' entry present but empty
     void lexClear(void) {
       $self->lexprobs.clear();
       $self->tokids.clear();      //-- ... leaves 'UNKNOWN' entry
@@ -322,4 +388,30 @@ public:
   };
   //@}
 
+  //------------------------------------------------------------
+  // Extensions: ngrprobsh
+  //  + only works if hash_ngrams==true
+  //@{
+  %extend {
+    //-- nghSize()
+    size_t nghSize(void) { return $self->ngprobsh.size(); };
+
+    //-- nghClear() : clears ngprobsh
+    void nghClear(void) { $self->ngprobsh.clear(); };
+
+    //-- nghInsert(tagid1,tagid2,tagid3,logp(tag3|tag1,tag2))
+    void nghInsert(TagID tagid1, TagID tagid2, TagID tagid3, ProbT logp)
+    {
+      $self->set_ngram_prob(logp,tagid1,tagid2,tagid3);
+    };
+
+    //-- nghInsert(tagstr1,tagstr2,tagstr3,logp(tag3|tag1,tag2))
+    // + creates tag-ids if not already defined
+    void nghInsert(const mootTagString &tagstr1, const mootTagString &tagstr2, const mootTagString &tagstr3, ProbT logp)
+    {
+      mootHMM::TagIDTable &tagids = $self->tagids;
+      $self->set_ngram_prob(logp, tagids.get_id(tagstr1), tagids.get_id(tagstr2), tagids.get_id(tagstr3));
+    };
+  };
+  //@}
 };
