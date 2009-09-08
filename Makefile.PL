@@ -8,9 +8,19 @@ if (system("pkg-config --atleast-version=$moot_min_version moot") != 0) {
   die("Required module moot >= v$moot_min_version not found!\n");
 }
 
-#$MOOT_CFLAGS = join(' ', map { $s=`pkg-config --cflags $_`; chomp($s); $s } qw(moot));
-$MOOT_CFLAGS = join(' ', '-pipe -Wno-deprecated', grep {0} map { $s=`pkg-config --cflags $_`; chomp($s); $s } qw(moot));
+our $use_moot_oflags = 1;
+$MOOT_OFLAGS = '-O0 -pipe' if (!$use_moot_oflags);
+
+@MOOT_ALL_CFLAGS = map { $s=`pkg-config --cflags $_`; chomp($s); split(/\s+/,$s) } qw(moot);
 $MOOT_IFLAGS = join(' ', map { $s=`pkg-config --cflags-only-I $_`; chomp($s); $s } qw(moot));
+foreach (@MOOT_ALL_CFLAGS) {
+  next if ($MOOT_IFLAGS =~ m/\b$_\b/);
+  if (/^\-[fpmO]/) {
+    $MOOT_OFLAGS .= " $_" if ($use_moot_oflags);
+    next;
+  }
+  $MOOT_CFLAGS .= " $_";
+}
 $MOOT_LDFLAGS= join(' ', map { $s=`pkg-config --libs-only-L $_`; chomp($s); $s } qw(moot));
 $MOOT_LIBS   = join(' ', map { $s=`pkg-config --libs-only-l $_`; chomp($s); $s } qw(moot));
 
@@ -35,6 +45,7 @@ WriteMakefile
    DEFINE       => '-DHAVE_CONFIG_H',   ##-- additional defines
    INC          => $MOOT_IFLAGS,        ##-- additional includes
    CCFLAGS      => $MOOT_CFLAGS,        ##-- additional flags
+   OPTIMIZE     => $MOOT_OFLAGS,        ##-- optimization flags
    OBJECT       => 'moot_wrap.o',
 
    ##-- DEBUG
@@ -64,6 +75,7 @@ sub MY::macro {
 		 ##-- useful macros
 		 ."MOOT_CFLAGS = $::MOOT_CFLAGS\n"
 		 ."MOOT_IFLAGS = $::MOOT_IFLAGS\n"
+		 ."MOOT_OFLAGS = $::MOOT_OFLAGS\n"
 		 ."MOOT_LDFLAGS = $::MOOT_LDFLAGS\n"
 		 ."MOOT_LIBS = $::MOOT_LIBS\n"
 		 ."SWIG_DEPS = ".join(' ', @::SWIG_DEPS)."\n"
@@ -82,10 +94,11 @@ sub MY::depend {
 		 ."moot_wrap.cxx: swig.stamp\n\n"
 		 ."moot.pm: swig.stamp\n\n"
 
-		 ."clean_subdirs: clean_swig\n\n"
+		 #."clean_subdirs: clean_swig\n\n"
+		 ."realclean_subdirs: clean_swig\n\n"
 		 ."\n\n"
 		 ##-- c->o dependencies
-		 ."moot_wrap.o: moot_wrap.cxx\n\n"
+		 ."moot_wrap.o: swig.stamp moot_wrap.cxx\n\n"
 		 ## -- more here
 		 ."\n"
 		);
@@ -101,6 +114,7 @@ sub MY::special_targets {
 		 ##-- swig call
 		 ."swig.stamp: \$(SWIG_DEPS)\n"
 		 ."\tswig -c++ -perl -outdir . -o moot_wrap.cxx \$(MOOT_IFLAGS) swig/moot.i\n"
+		 ."\ttouch \$@\n"
 		 ."\n"
 		 ##-- c->o dependencies
 		 ."moot_wrap.o: moot_wrap.cxx\n\n"

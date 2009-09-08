@@ -68,14 +68,24 @@ sub test_assoc_vector {
 
 sub test_hmm {
   my $hmm = moot::HMM->new();
+  $hmm->{hash_ngrams} = 1;
   #my $model = '../src/programs/data/utrain';
-  my $model = 'dummy';
+  my $model = '../src/programs/data/utrain-yy.hmm';
+  #my $model = 'dummy';
   $hmm->load_model($model) or warn("$0: load_model($model) failed: $!");
   #$hmm->txtdump('test.dump');
 
   my $s = moot::Sentence->new();
   $s->push_back(moot::Token->new($_)) foreach (qw(Dies ist ein Test .));
   $hmm->tag_sentence($s);
+
+  ##-- test lexprobs
+  my $lp = $hmm->{lexprobs};
+  print "lp.size = ", $lp->size, "\n";
+
+  ##-- test n-grams
+  my $ngh = $hmm->{ngprobsh};
+  print "ngh.size = ", $ngh->size, "\n";
 
   print STDERR "$0: test_hmm(): done\n";
 }

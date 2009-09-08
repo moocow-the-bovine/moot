@@ -60,7 +60,7 @@ typedef mootEnum<mootTagString> TagIDEnum;
 /*----------------------------------------------------------------------
  * Class: mootHMM::Trigram -> Trigram
  */
-%inline %{ typedef mootHMM::Trigram Trigram; %}
+%{ typedef mootHMM::Trigram Trigram; %}
 class Trigram {
 public:
   TagID tag1;  ///< previous-previous tag_{i-2} or 0
@@ -77,10 +77,10 @@ public:
 /*----------------------------------------------------------------------
  * Class: mootHMM::TrigramProbHash TrigramProbHash
  */
-%template(TrigramProbHash) hash_map<Trigram,ProbT,Trigram::HashFcn,Trigram::EqualFcn>;
-%{
-  //typedef mootHMM::NgramProbHash NgramProbHash;
-  typedef hash_map<Trigram,ProbT,Trigram::HashFcn,Trigram::EqualFcn> NgramProbHash;
+%template(HMMNgramProbHash) hash_map<Trigram,ProbT,Trigram::HashFcn,Trigram::EqualFcn>;
+%inline %{
+  //typedef mootHMM::NgramProbHash HMMNgramProbHash;
+  typedef hash_map<Trigram,ProbT,Trigram::HashFcn,Trigram::EqualFcn> HMMNgramProbHash;
 %}
 
 /*----------------------------------------------------------------------
@@ -227,7 +227,7 @@ public:
   HMMLexProbTableT  lexprobs;   /**< Lexical probability lookup table */
   //LexClassProbTable lcprobs;    /**< Lexical-class probability lookup table */
 
-  NgramProbHash     ngprobsh;   /**< N-gram (log-)probability lookup table: hashed */
+  HMMNgramProbHash     ngprobsh;   /**< N-gram (log-)probability lookup table: hashed */
   //NgramProbArray    ngprobsa;   /**< N-gram (log-)probability lookup table: dense */
 
 #ifdef MOOT_ENABLE_SUFFIX_TRIE
@@ -400,17 +400,25 @@ public:
     void nghClear(void) { $self->ngprobsh.clear(); };
 
     //-- nghInsert(tagid1,tagid2,tagid3,logp(tag3|tag1,tag2))
-    void nghInsert(TagID tagid1, TagID tagid2, TagID tagid3, ProbT logp)
-    {
+    void nghInsert(TagID tagid1, TagID tagid2, TagID tagid3, ProbT logp) {
       $self->set_ngram_prob(logp,tagid1,tagid2,tagid3);
     };
 
     //-- nghInsert(tagstr1,tagstr2,tagstr3,logp(tag3|tag1,tag2))
     // + creates tag-ids if not already defined
-    void nghInsert(const mootTagString &tagstr1, const mootTagString &tagstr2, const mootTagString &tagstr3, ProbT logp)
-    {
+    void nghInsert(const mootTagString &tagstr1, const mootTagString &tagstr2, const mootTagString &tagstr3, ProbT logp) {
       mootHMM::TagIDTable &tagids = $self->tagids;
       $self->set_ngram_prob(logp, tagids.get_id(tagstr1), tagids.get_id(tagstr2), tagids.get_id(tagstr3));
+    };
+
+    //-- nghErase(tagid1,tagid2,tagid3)
+    void nghErase(TagID tagid1, TagID tagid2, TagID tagid3) {
+      $self->ngprobsh.erase(mootHMM::Trigram(tagid1,tagid2,tagid3));
+    };
+    //-- nghErase(tagstr1,tagstr2,tagstr3)
+    void nghErase(const mootTagString &tagstr1, const mootTagString &tagstr2, const mootTagString &tagstr3, ProbT logp) {
+      mootHMM::TagIDTable &tagids = $self->tagids;
+      $self->ngprobsh.erase(mootHMM::Trigram(tagids.get_id(tagstr1), tagids.get_id(tagstr2), tagids.get_id(tagstr3)));
     };
   };
   //@}
