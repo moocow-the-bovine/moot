@@ -28,3 +28,8 @@ extern const char * const PACKAGE_VERSION;
 %include "Enum.i"
 %include "AssocVector.i"
 %include "HMM.i"
+
+/*--- additions --*/
+%perlcode %{
+sub library_version { return $moot::PACKAGE_VERSION; }
+%}

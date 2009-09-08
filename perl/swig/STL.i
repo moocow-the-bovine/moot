@@ -195,7 +195,8 @@ public:
       hash_map<KeyT,ValT,HashFcn,EqualFcn>::const_iterator ci = $self->find(k);
       return (ci != $self->end());
     };
-    ValT &get(const KeyT &k) { return (*$self)[k]; };
+    ValT &get   (const KeyT &k) { return (*$self)[k]; };
+    ValT  getval(const KeyT &k) { return (*$self)[k]; };
     void  set(const KeyT &k, const ValT &v) { (*$self)[k] = v; };
   }
 };
