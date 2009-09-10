@@ -1,0 +1,217 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>mootngsmooth - moocow's HMM part-of-speech tagger/disambiguator: n-gram smoother.</title>
+<link rel="stylesheet" href="mootprogs.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#arguments">ARGUMENTS</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#configuration_files">CONFIGURATION FILES</a></li>
+	<li><a href="#addenda">ADDENDA</a></li>
+	<ul>
+
+		<li><a href="#about_this_document">About this Document</a></li>
+	</ul>
+
+	<li><a href="#bugs_and_limitations">BUGS AND LIMITATIONS</a></li>
+	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>mootngsmooth - moocow's HMM part-of-speech tagger/disambiguator: n-gram smoother.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>mootngsmooth [OPTIONS] MODEL.123</p>
+<pre>
+ Arguments:
+    MODEL.123  Input n-gram model file</pre>
+<pre>
+ Options
+    -h       --help            Print help and exit.
+    -V       --version         Print version and exit.
+    -cFILE   --rcfile=FILE     Read an alternate configuration file.
+    -vLEVEL  --verbose=LEVEL   Verbosity level.
+    -oFILE   --output=FILE     Specify output n-gram model file (default=stdout).
+    -wTAG    --newtag=TAG      Specify new-tag string (default=@NEW)
+    -N       --verbose-ngrams  Generate long-form ngrams (default=no)</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>moocow's HMM part-of-speech tagger/disambiguator: n-gram smoother.</p>
+<p>'mootngsmooth' adds pseudo-elements to a moot n-gram model file.</p>
+<p>See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot model file formats.</p>
+<p>
+</p>
+<hr />
+<h1><a name="arguments">ARGUMENTS</a></h1>
+<dl>
+<dt><strong><a name="model_123" class="item"><code>MODEL.123</code></a></strong></dt>
+
+<dd>
+<p>Input n-gram model file</p>
+<p>MODEL should text n-gram model.</p>
+<p>For details on moot file formats, see <a href="././mootfiles.html">the mootfiles manpage</a>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="help_h" class="item"><code>--help</code> , <code>-h</code></a></strong></dt>
+
+<dd>
+<p>Print help and exit.</p>
+<p>Default: '0'</p>
+</dd>
+<dt><strong><a name="version_v" class="item"><code>--version</code> , <code>-V</code></a></strong></dt>
+
+<dd>
+<p>Print version and exit.</p>
+<p>Default: '0'</p>
+</dd>
+<dt><strong><a name="rcfile_file_cfile" class="item"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
+
+<dd>
+<p>Read an alternate configuration file.</p>
+<p>Default: 'NULL'</p>
+<p>See also: <a href="#configuration_files">CONFIGURATION FILES</a>.</p>
+</dd>
+<dt><strong><a name="verbose_level_vlevel" class="item"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
+
+<dd>
+<p>Verbosity level.</p>
+<p>Default: '3'</p>
+<p>Be more or less verbose.  Recognized values are in the range 0..3.</p>
+</dd>
+<dt><strong><a name="output_file_ofile" class="item"><code>--output=FILE</code> , <code>-oFILE</code></a></strong></dt>
+
+<dd>
+<p>Specify output n-gram model file (default=stdout).</p>
+<p>Default: '-'</p>
+<p>Smoothed n-grams will be written to FILE.</p>
+</dd>
+<dt><strong><a name="newtag_tag_wtag" class="item"><code>--newtag=TAG</code> , <code>-wTAG</code></a></strong></dt>
+
+<dd>
+<p>Specify new-tag string (default=@NEW)</p>
+<p>Default: '@NEW'</p>
+</dd>
+<dt><strong><a name="verbose_ngrams_n" class="item"><code>--verbose-ngrams</code> , <code>-N</code></a></strong></dt>
+
+<dd>
+<p>Generate long-form ngrams (default=no)</p>
+<p>Default: '0'</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="configuration_files">CONFIGURATION FILES</a></h1>
+<p>Configuration files are expected to contain lines of the form:</p>
+<pre>
+    LONG_OPTION_NAME    OPTION_VALUE</pre>
+<p>where LONG_OPTION_NAME is the long name of some option,
+without the leading '--', and OPTION_VALUE is the value for
+that option, if any.  Fields are whitespace-separated.
+Blank lines and comments (lines beginning with '#')
+are ignored.</p>
+<p>The following configuration files are read by default:</p>
+<ul>
+<li><strong><a name="etc_mootngsmoothrc" class="item">/etc/mootngsmoothrc</a></strong>
+
+</li>
+<li><strong><a name="mootngsmoothrc" class="item">~/.mootngsmoothrc</a></strong>
+
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="addenda">ADDENDA</a></h1>
+<p>
+</p>
+<h2><a name="about_this_document">About this Document</a></h2>
+<p>Documentation file auto-generated by optgen.perl version 0.06
+using Getopt::Gen version 0.13.
+Translation was initiated
+as:</p>
+<pre>
+   optgen.perl -l --nocfile --nohfile --notimestamp -F mootngsmooth mootngsmooth.gog</pre>
+<p>
+</p>
+<hr />
+<h1><a name="bugs_and_limitations">BUGS AND LIMITATIONS</a></h1>
+<p>None known.</p>
+<p>
+</p>
+<hr />
+<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
+<p>Development of this package was supported by the project
+'Kollokationen im W&ouml;rterbuch'
+( &quot;collocations in the dictionary&quot;, <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
+in association with the project
+'Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
+( &quot;digital dictionary of the German language of the 20th century&quot;, <a href="http://www.dwds.de">http://www.dwds.de</a> )
+at the Berlin-Brandenburgische Akademie der Wissenschaften ( <a href="http://www.bbaw.de">http://www.bbaw.de</a> )
+with funding from
+the Alexander von Humboldt Stiftung ( <a href="http://www.avh.de">http://www.avh.de</a> )
+and from the Zukunftsinvestitionsprogramm of the
+German federal government.</p>
+<p>I am grateful to Christiane Fellbaum, Alexander Geyken,
+Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
+for offering useful insights in the course of development
+of this package.</p>
+<p>Thomas Hanneforth wrote and maintains the libFSM C++ library
+for finite-state device operations used by the
+class-based HMM tagger / disambiguator, without which
+this package could not have been built.</p>
+<p>Alexander Geyken and Thomas Hanneforth developed the
+rule-based morphological analysis system for German
+which was used in the development and testing of the
+class-based HMM tagger / disambiguator.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Bryan Jurish &lt;<a href="mailto:moocow@ling.uni-potsdam.de">moocow@ling.uni-potsdam.de</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="././mootfiles.html">the mootfiles manpage</a>,
+<a href="././mootrain.html">the mootrain manpage</a>,
+<a href="././mootcompile.html">the mootcompile manpage</a>,
+<a href="././moot.html">the moot manpage</a></p>
+
+</body>
+
+</html>

@@ -91,9 +91,7 @@ public:
       push_back(tag2);
     };
     /** Trigram constructor */
-    Ngram(const mootTagString &tag1,
-	  const mootTagString &tag2,
-	  const mootTagString &tag3) {
+    Ngram(const mootTagString &tag1, const mootTagString &tag2, const mootTagString &tag3) {
       push_back(tag1);
       push_back(tag2);
       push_back(tag3);
@@ -145,7 +143,7 @@ public:
   NgramCount  ugtotal;  /**< total number of unigrams */
 
 public:
-  //------ public methods
+  //------ public methods: constructurs etc.
   /** Default constructor */
   mootNgrams(void) : ugtotal(0) {};
 
@@ -163,12 +161,23 @@ public:
   };
 
   //------ public methods: information
+
+  /** Return the number of distinct stored unigrams */
+  inline size_t n_unigrams(void) const
+  { return ngtable.size(); };
+
   /** Return the number of distinct stored bigrams */
   size_t n_bigrams(void);
 
   /** Return the number of distinct stored trigrams */
   size_t n_trigrams(void);
 
+
+  //------ public methods: smoothing
+  void smooth_add_newtag(const mootTagString &newtag="@NEW");
+
+
+  //------ public methods: counting
   /**
    * Add \c count to the current count for unigram \<\a tag\>.
    */
@@ -182,9 +191,7 @@ public:
    * Add \c count to the current count for bigram \<\a tag1, \a tag2\>
    * Does NOT add any unigram counts.
    */
-  inline void add_count(const mootTagString &tag1,
-			const mootTagString &tag2,
-			const NgramCount count)
+  inline void add_count(const mootTagString &tag1, const mootTagString &tag2, const NgramCount count)
   {
     ngtable[tag1].freqs[tag2].count += count;
   };
@@ -193,10 +200,7 @@ public:
    * Add \c count to the current count for trigram \<\a tag1, \a tag2, \a tag3\>
    * Does NOT add any bigram or unigram counts.
    */
-  inline void add_count(const mootTagString &tag1,
-			const mootTagString &tag2,
-			const mootTagString &tag3,
-			const NgramCount count)
+  inline void add_count(const mootTagString &tag1, const mootTagString &tag2, const mootTagString &tag3, const NgramCount count)
   {
     ngtable[tag1].freqs[tag2].freqs[tag3] += count;
   };
@@ -220,6 +224,8 @@ public:
       add_count(ngram[0],ngram[1],ngram[2],count);
       break;
     default:
+      //-- max: bash to trigrams
+      add_count(ngram[ngram.size()-3],ngram[ngram.size()-2],ngram[ngram.size()-1],count);
       break;
     }
   };
@@ -280,10 +286,7 @@ public:
   };
 
   /** Returns current count for trigram <tag1,tag2,tag3>, returns 0 if unknown */
-  inline const NgramCount lookup(const mootTagString &tag1,
-				 const mootTagString &tag2,
-				 const mootTagString &tag3)
-    const
+  inline const NgramCount lookup(const mootTagString &tag1, const mootTagString &tag2, const mootTagString &tag3) const
   {
     NgramTable::const_iterator ugi = ngtable.find(tag1);
     if (ugi == ngtable.end()) return 0;
