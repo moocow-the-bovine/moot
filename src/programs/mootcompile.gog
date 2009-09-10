@@ -62,7 +62,7 @@ int "compress" z "Compression level for output file." \
 group "HMM Options"
 
 #-----------------------------------------------------------------------------
-# HMM Options: Boolean flags
+# HMM Options: Storage
 
 int "hash-ngrams" g "Whether to hash stored n-grams (default=no)" \
     arg="BOOL" \
@@ -70,20 +70,6 @@ int "hash-ngrams" g "Whether to hash stored n-grams (default=no)" \
     details="
 If nonzero, tag n-grams will be stored in a slow but memory-friendly
 hash.  Otherwise, a fast but large array will be used.
-"
-
-int "relax" r "Whether to relax token-tag associability (default=no)" \
-  arg="BOOL" \
-  default="0" \
-  details="
-If nonzero, 'tag' fields of token analyses will be used only as a potential
-estimator of lexical probability, if at all.
-Otherwise (regardless of whether lexical classes are are being used as a
-probability estimator), 'tag' fields of token analyses will be interpreted
-as imposing 'hard' restrictions on which tags may occur with the token in question.
-
-See the C<--use-classes=BOOL> option and/or L<mootfiles> for more details on the
-use of lexical classes.
 "
 
 #-----------------------------------------------------------------------------
@@ -125,6 +111,23 @@ Only useful if your file contains a priori analyses.
 Default behavior is to try and use classes if you specify
 a non-empty class-frequency file.
 "
+
+int "relax" R "Whether to relax token-tag associability (default=no)" \
+  arg="BOOL" \
+  default="0" \
+  details="
+If nonzero, 'tag' fields of token analyses will be used only as a potential
+estimator of lexical probability, if at all.
+Otherwise (regardless of whether lexical classes are are being used as a
+probability estimator), 'tag' fields of token analyses will be interpreted
+as imposing 'hard' restrictions on which tags may occur with the token in question.
+
+See the C<--use-classes=BOOL> option and/or L<mootfiles> for more details on the
+use of lexical classes.
+"
+
+#-----------------------------------------------------------------------------
+# HMM Options: Smoothing
 
 string "nlambdas" N "N-Gram smoothing constants (default=estimate)" \
   arg="FLOATS" \
@@ -221,6 +224,9 @@ Class probabilities for unrecognized tokens  in the input are estimated
 from classes which occur at most FLOAT times in the model
 and/or from the empty class.
 "
+
+#-----------------------------------------------------------------------------
+# HMM Options: Misc
 
 string "unknown-token" u "Symbolic name of the 'unknown' token" \
   arg="NAME" \

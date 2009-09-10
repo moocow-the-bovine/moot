@@ -24,11 +24,11 @@ struct gengetopt_args_info {
   char * output_arg;	 /* Specify output file (default=stdout). (default=-). */
   int compress_arg;	 /* Compression level for output file. (default=-1). */
   int hash_ngrams_arg;	 /* Whether to hash stored n-grams (default=no) (default=0). */
-  int relax_arg;	 /* Whether to relax token-tag associability (default=no) (default=0). */
   int trie_depth_arg;	 /* Maximum depth of suffix trie. (default=0). */
   int trie_threshhold_arg;	 /* Frequency upper bound for trie inclusion. (default=10). */
   float trie_theta_arg;	 /* Suffix backoff coefficient. (default=0). */
   int use_classes_arg;	 /* Whether to use lexical class-probabilities. (default=1). */
+  int relax_arg;	 /* Whether to relax token-tag associability (default=no) (default=0). */
   char * nlambdas_arg;	 /* N-Gram smoothing constants (default=estimate) (default=NULL). */
   char * wlambdas_arg;	 /* Lexical smoothing constants (default=estimate) (default=NULL). */
   char * clambdas_arg;	 /* Lexical-class smoothing constants (default=estimate) (default=NULL). */
@@ -46,11 +46,11 @@ struct gengetopt_args_info {
   int output_given;	 /* Whether output was given */
   int compress_given;	 /* Whether compress was given */
   int hash_ngrams_given;	 /* Whether hash-ngrams was given */
-  int relax_given;	 /* Whether relax was given */
   int trie_depth_given;	 /* Whether trie-depth was given */
   int trie_threshhold_given;	 /* Whether trie-threshhold was given */
   int trie_theta_given;	 /* Whether trie-theta was given */
   int use_classes_given;	 /* Whether use-classes was given */
+  int relax_given;	 /* Whether relax was given */
   int nlambdas_given;	 /* Whether nlambdas was given */
   int wlambdas_given;	 /* Whether wlambdas was given */
   int clambdas_given;	 /* Whether clambdas was given */
