@@ -84,7 +84,7 @@ class mootNgramsCompiler : public mootNgramsParser {
     select_string(string,srcname);
     return parse_ngrams();
   };
-
+    
   // -- low-level public methods: INPUT SELECTION
   /** low-level input selection: input from a C-stream. */
   void select_streams(FILE *in, FILE *out, const char *my_srcname=NULL) {

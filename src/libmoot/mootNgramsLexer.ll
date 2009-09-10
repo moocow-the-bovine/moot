@@ -117,7 +117,7 @@ textorsp   [^\n\r\t]
   return '\t';
 }
 
-([\-\+]?)([0-9]*)(\.?)([0-9]+) {
+([\-\+]?)([0-9]*)(\.?)([0-9]+)/{newline} {
   // -- count : return it
   //theLine++; theColumn = 0;
   theColumn += yyleng;

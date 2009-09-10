@@ -159,6 +159,15 @@ public:
     return id;
   };
 
+  /**
+   * Get ID for name, creating one if it doesn't already exist.
+   */
+  inline mootEnumID get_id(const NameType &name)
+  {
+    typename Name2IdMap::const_iterator i = names2ids.find(name);
+    return i == names2ids.end() ? insert(name,0) : i->second;
+  };
+
   /** Clears all mappings, but retains "unknown" name */
   inline void clear(void)
   {

@@ -3,7 +3,14 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
-v2.0.6 Thu, 03 Sep 2009 16:35:38 +0200
+v2.0.6 Mon, 07 Sep 2009 16:18:54 +0200
+	+ changed signature mootHMM::wordp(tokstr,tagstr)
+	  - WAS: mootHMM::wordp(const mootTokString  tokstr, const mootTagString  tagstr)
+	  -  IS: mootHMM::wordp(const mootTokString &tokstr, const mootTagString &tagstr)
+	+ ditto for mootHMM::classp(lclass,tagstr)
+	+ added /{newline} suffix check in mootNgramsLexer
+	  - otherwise all-numeric "tags" are interpreted as COUNTs, breaking mootHMM::compile()
+	+ added mootEnum::get_id()
 	+ re-implemented MOOT_HASH_TRIGRAMS compile-time option as runtime (bool mootHMM::hash_ngrams)
 	  - now applies to all n-grams (uni-, bi-, and trigrams), not just trigrams
 	  - reduces throughput by ca. 50%, but results seem compatible

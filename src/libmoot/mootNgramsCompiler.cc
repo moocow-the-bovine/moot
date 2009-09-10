@@ -72,6 +72,7 @@ mootNgrams *mootNgramsCompiler::parse_ngrams()
   curngram.clear();
 
   // actual parsing
+  //yydebug = 0xff; //-- DEBUG
   if (yyparse() != 0) return NULL;
   return ngrams;
 }

@@ -411,11 +411,11 @@ YY_mootNgramsLexer_CLASS::YY_mootNgramsLexer_CLASS(YY_mootNgramsLexer_CONSTRUCTO
 /* % data tables for the DFA go here */ 
 #define YY_END_OF_BUFFER 10
 typedef int yy_state_type;
-static const short int yy_accept[28] =
+static const short int yy_accept[29] =
     {   0,
         0,    0,   10,    5,    3,    6,    6,    8,    5,    5,
-        5,    4,    1,    5,    0,    3,    3,    0,    2,    5,
-        4,    4,    1,    2,    2,    2,    0
+        5,    5,    1,    5,    0,    3,    3,    0,    2,    5,
+        5,    5,    4,    1,    2,    2,    2,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -455,36 +455,40 @@ static const YY_CHAR yy_meta[10] =
         1,    2,    3,    3,    1,    1,    1,    1,    1
     } ;
 
-static const short int yy_base[31] =
+static const short int yy_base[32] =
     {   0,
-        0,   26,   28,   22,   19,   38,   38,    8,    9,   11,
-       16,    0,   18,   17,   13,   12,    7,    0,   24,    0,
-        0,    0,    0,   28,    0,    0,   38,   10,   33,   35
+        0,   30,   30,   24,   19,   42,   42,    8,    9,   11,
+       16,   23,   18,   17,   13,   12,    7,    0,   26,    0,
+        0,   24,   42,    0,   32,    0,    0,   42,   10,   37,
+       39
     } ;
 
-static const short int yy_def[31] =
+static const short int yy_def[32] =
     {   0,
-       27,    1,   27,   28,   27,   27,   27,   27,   28,   28,
-       28,   10,    8,   28,   28,   27,   27,    8,   29,   11,
-       10,   11,   13,   29,   30,   24,    0,   27,   27,   27
+       28,    1,   28,   29,   28,   28,   28,   28,   29,   29,
+       29,   10,    8,   29,   29,   28,   28,    8,   30,   11,
+       12,   12,   28,   13,   30,   31,   25,    0,   28,   28,
+       28
     } ;
 
-static const short int yy_nxt[48] =
+static const short int yy_nxt[52] =
     {   0,
         4,    5,    6,    7,    8,    9,   10,   11,   12,   17,
        14,   16,   18,   15,   19,   15,   16,   15,   20,   21,
-       15,   15,   23,   16,   22,   25,   15,   27,   26,   25,
-       13,   27,   26,   24,   24,   25,   25,    3,   27,   27,
-       27,   27,   27,   27,   27,   27,   27
+       15,   15,   24,   16,   22,   23,   23,   26,   15,   28,
+       27,   14,   22,   26,   13,   28,   27,   25,   25,   26,
+       26,    3,   28,   28,   28,   28,   28,   28,   28,   28,
+       28
     } ;
 
-static const short int yy_chk[48] =
+static const short int yy_chk[52] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    8,
-       28,   17,    8,    9,    9,   10,   16,   15,   10,   10,
-       11,   14,   13,    5,   11,   19,    4,    3,   19,   24,
-        2,    0,   24,   29,   29,   30,   30,   27,   27,   27,
-       27,   27,   27,   27,   27,   27,   27
+       29,   17,    8,    9,    9,   10,   16,   15,   10,   10,
+       11,   14,   13,    5,   11,   12,   12,   19,    4,    3,
+       19,   22,   22,   25,    2,    0,   25,   30,   30,   31,
+       31,   28,   28,   28,   28,   28,   28,   28,   28,   28,
+       28
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -588,13 +592,13 @@ yy_match:
 	    while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = yy_def[yy_current_state];
-		if ( yy_current_state >= 28 )
+		if ( yy_current_state >= 29 )
 		    yy_c = yy_meta[yy_c];
 		}
 	    yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 	    ++yy_cp;
 	    }
-	while ( yy_current_state != 27 );
+	while ( yy_current_state != 28 );
 	yy_cp = yy_last_accepting_cpos;
 	yy_current_state = yy_last_accepting_state;
 #line 434 "./flexskel.cc"
@@ -661,6 +665,9 @@ case 3:
 }
 	YY_BREAK
 case 4:
+*yy_cp = yy_hold_char; /* undo effects of setting up yytext */
+yy_c_buf_p = yy_cp -= 1;
+YY_DO_BEFORE_ACTION; /* set up yytext again */
 #line 120 "mootNgramsLexer.ll"
 {
   // -- count : return it
@@ -948,7 +955,7 @@ long YY_mootNgramsLexer_CLASS::yy_get_previous_state_()
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 	    {
 	    yy_current_state = yy_def[yy_current_state];
-	    if ( yy_current_state >= 28 )
+	    if ( yy_current_state >= 29 )
 		yy_c = yy_meta[yy_c];
 	    }
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -998,11 +1005,11 @@ long YY_mootNgramsLexer_CLASS::yy_try_NUL_trans_(long yy_current_state_)
     while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 	{
 	yy_current_state = yy_def[yy_current_state];
-	if ( yy_current_state >= 28 )
+	if ( yy_current_state >= 29 )
 	    yy_c = yy_meta[yy_c];
 	}
     yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-    yy_is_jam = (yy_current_state == 27);
+    yy_is_jam = (yy_current_state == 28);
 #line 722 "./flexskel.cc"
 
 #ifndef YY_USE_CLASS

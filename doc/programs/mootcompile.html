@@ -67,6 +67,7 @@
     -zLEVEL   --compress=LEVEL             Compression level for output file.</pre>
 <pre>
  HMM Options
+    -gBOOL    --hash-ngrams=BOOL           Whether to hash stored n-grams (default=no)
     -aLEN     --trie-depth=LEN             Maximum depth of suffix trie.
     -AFREQ    --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.
               --trie-theta=FLOAT           Suffix backoff coefficient.
@@ -150,6 +151,14 @@ from one or more text model files.</p>
 </p>
 <h2><a name="hmm_options">HMM Options</a></h2>
 <dl>
+<dt><strong><a name="hash_ngrams_bool_gbool" class="item"><code>--hash-ngrams=BOOL</code> , <code>-gBOOL</code></a></strong></dt>
+
+<dd>
+<p>Whether to hash stored n-grams (default=no)</p>
+<p>Default: '0'</p>
+<p>If specified and true, tag n-grams will be stored in a slow but memory-friendly
+hash.  Otherwise, a fast but large array will be used.</p>
+</dd>
 <dt><strong><a name="trie_depth_len_alen" class="item"><code>--trie-depth=LEN</code> , <code>-aLEN</code></a></strong></dt>
 
 <dd>

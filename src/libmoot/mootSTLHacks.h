@@ -71,5 +71,4 @@ namespace moot_STL_NAMESPACE {
 #define moot_BEGIN_NAMESPACE namespace moot {
 #define moot_END_NAMESPACE };
 
-
 #endif // _MOOT_STL_HACKS_H

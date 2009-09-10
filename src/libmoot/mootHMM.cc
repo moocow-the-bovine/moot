@@ -1639,19 +1639,40 @@ void mootHMM::txtdump(FILE *file)
   fprintf(file, "%%%%-----------------------------------------------------\n");
   TagID pptagid;
   if ( (hash_ngrams && !ngprobsh.empty()) || (!hash_ngrams && ngprobsa!=NULL) ) {
-    for (pptagid = 0; pptagid < n_tags; pptagid++) {
-      for (ptagid = 0; ptagid < n_tags; ptagid++) {
-	for (tagid = 0; tagid < n_tags; tagid++) {
-	  prob = tagp(pptagid, ptagid, tagid);
-	  if (prob != MOOT_PROB_ZERO) {
-	    fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%u(\"%s\")\t%e\t%e\n",
-		    pptagid,  tagids.id2name(pptagid).c_str(),
-		    ptagid,  tagids.id2name(ptagid).c_str(),
-		    tagid, tagids.id2name(tagid).c_str(),
-		    prob,
-		    exp(prob));
+    if (!hash_ngrams) {
+      for (pptagid = 0; pptagid < n_tags; pptagid++) {
+	for (ptagid = 0; ptagid < n_tags; ptagid++) {
+	  for (tagid = 0; tagid < n_tags; tagid++) {
+	    prob = tagp(pptagid, ptagid, tagid);
+	    if (prob != MOOT_PROB_ZERO) {
+	      fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%u(\"%s\")\t%e\t%e\n",
+		      pptagid,  tagids.id2name(pptagid).c_str(),
+		      ptagid,  tagids.id2name(ptagid).c_str(),
+		      tagid, tagids.id2name(tagid).c_str(),
+		      prob,
+		      exp(prob));
+	    }
 	  }
 	}
+      }
+    } else { //-- if (hash_ngrams)
+      for (NgramProbHash::const_iterator ngi = ngprobsh.begin(); ngi != ngprobsh.end(); ngi++) {
+	prob    = ngi->second;
+#ifdef MOOT_USE_TRIGRAMS
+	pptagid = ngi->first.tag1;
+	ptagid  = ngi->first.tag2;
+	tagid   = ngi->first.tag3;
+#else
+	pptagid = 0
+	ptagid  = ngi->first.tag1;
+	tagid   = ngi->first.tag2;
+#endif
+	fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%u(\"%s\")\t%e\t%e\n",
+		pptagid,  tagids.id2name(pptagid).c_str(),
+		ptagid,  tagids.id2name(ptagid).c_str(),
+		tagid, tagids.id2name(tagid).c_str(),
+		prob,
+		exp(prob));
       }
     }
   } else {

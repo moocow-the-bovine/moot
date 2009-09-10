@@ -1525,12 +1525,12 @@ public:
   /**
    * \deprecated{prefer direct lookup}
    *
-   * Looks up and returns lexical probability: p(token|tag)
+   * Looks up and returns lexical probability: p(tokstr|tagstr)
    * given token, tag.
    */
-  inline const ProbT wordp(const mootTokString token, const mootTagString tag) const
+  inline const ProbT wordp(const mootTokString &tokstr, const mootTagString &tagstr) const
   {
-    return wordp(token2id(token), tagids.name2id(tag));
+    return wordp(token2id(tokstr), tagids.name2id(tagstr));
   };
 
   /*------------------------------------------------------------
@@ -1553,9 +1553,9 @@ public:
    * Looks up and returns lexical-class probability: p(class|tag)
    * given class, tag -- no id auto-generation is performed!
    */
-  inline const ProbT classp(const LexClass &lclass, const mootTagString tag) const
+  inline const ProbT classp(const LexClass &lclass, const mootTagString &tagstr) const
   {
-    return classp(classids.name2id(lclass), tagids.name2id(tag));
+    return classp(classids.name2id(lclass), tagids.name2id(tagstr));
   };
 
   /*------------------------------------------------------------

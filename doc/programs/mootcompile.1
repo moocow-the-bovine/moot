@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "MOOTCOMPILE 1"
-.TH MOOTCOMPILE 1 "2009-05-06" "moot v2.0.6-1" "moot PoS Tagger"
+.TH MOOTCOMPILE 1 "2009-09-03" "moot v2.0.6-3" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -148,6 +148,7 @@ mootcompile [\s-1OPTIONS\s0] \s-1MODEL\s0(s)
 \&    \-zLEVEL   \-\-compress=LEVEL             Compression level for output file.
 \&
 \& HMM Options
+\&    \-gBOOL    \-\-hash\-ngrams=BOOL           Whether to hash stored n\-grams (default=no)
 \&    \-aLEN     \-\-trie\-depth=LEN             Maximum depth of suffix trie.
 \&    \-AFREQ    \-\-trie\-threshhold=FREQ       Frequency upper bound for trie inclusion.
 \&              \-\-trie\-theta=FLOAT           Suffix backoff coefficient.
@@ -225,6 +226,15 @@ Compression level for output file.
 Default: '\-1'
 .SS "\s-1HMM\s0 Options"
 .IX Subsection "HMM Options"
+.ie n .IP """\-\-hash\-ngrams=BOOL"" , ""\-gBOOL""" 4
+.el .IP "\f(CW\-\-hash\-ngrams=BOOL\fR , \f(CW\-gBOOL\fR" 4
+.IX Item "--hash-ngrams=BOOL , -gBOOL"
+Whether to hash stored n\-grams (default=no)
+.Sp
+Default: '0'
+.Sp
+If specified and true, tag n\-grams will be stored in a slow but memory-friendly
+hash.  Otherwise, a fast but large array will be used.
 .ie n .IP """\-\-trie\-depth=LEN"" , ""\-aLEN""" 4
 .el .IP "\f(CW\-\-trie\-depth=LEN\fR , \f(CW\-aLEN\fR" 4
 .IX Item "--trie-depth=LEN , -aLEN"
