@@ -97,6 +97,7 @@ void GetMyOptions(int argc, char **argv)
 
   // -- assign "unknown" ids & other flags
   hmm.hash_ngrams = args.hash_ngrams_arg;
+  hmm.relax = args.relax_arg;
   hmm.use_lex_classes = args.use_classes_arg;
   hmm.unknown_token_name(args.unknown_token_arg);
   hmm.unknown_tag_name(args.unknown_tag_arg);
