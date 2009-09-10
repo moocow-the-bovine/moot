@@ -84,7 +84,7 @@ void mootNgrams::smooth_add_newtag(const mootTagString &newtag)
   //-- just add a single new unigram, & hope that deleted interpolation smoothing
   //   catches the rest...
   NgramCount f_new = static_cast<NgramCount>(n_unigrams());
-  add_count(newtag, f_new);
+  add_count(newtag, f_new * ugtotal/(f_new+ugtotal));
 #if 0
   //-- ARGH: this needs a re-think, esp. what to do about n-grams like (tag1,NEW,tag3)
   NgramCount  ugtotal_old = ugtotal;

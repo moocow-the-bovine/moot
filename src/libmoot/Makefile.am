@@ -69,6 +69,7 @@ libmoot_la_SOURCES = \
 	mootClassfreqsCompiler.cc \
 	\
 	mootHMM.cc \
+	mootDynHMM.cc \
 	mootHMMTrainer.cc \
 	mootEval.cc \
 	\
@@ -239,6 +240,7 @@ pkginclude_HEADERS = \
 	mootClassfreqsCompiler.h \
 	\
 	mootHMM.h \
+	mootDynHMM.h \
 	mootHMMTrainer.h \
 	mootEval.h \
 	\

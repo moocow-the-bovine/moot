@@ -805,9 +805,6 @@ public:
     }
   };
 
-  /** Top-level tagging interface: string input, file output */
-  //void tag_strings(int argc, char **argv, FILE *out=stdout);
-
   /**
    * Top-level tagging interface: mootSentence input & output (destructive).
    * Calling this method will (re-)populate the \c besttag
@@ -849,12 +846,7 @@ public:
     if (token.toktype() != TokTypeVanilla) return; //-- ignore non-vanilla tokens
     ntokens++;
     LexClass tok_class;
-    for (mootToken::Analyses::const_iterator ani = token.analyses().begin();
-	 ani != token.analyses().end();
-	 ani++)
-      {
-	tok_class.insert(tagids.name2id(ani->tag));
-      }
+    token2lexclass(token, tok_class);
     viterbi_step(token2id(token.text()), tok_class, token.text());
   };
 
@@ -1276,6 +1268,14 @@ public:
     mootTokenFlavor flav = tokenFlavor(token);
     return flavids[flav]==0 ? tokids.name2id(token) : flavids[flav];
 #endif
+  };
+
+  /** Add \c tag fields of mootToken::analyses to \c tok_class */
+  inline void token2lexclass(const mootToken &token, LexClass &tok_class)
+  {
+    for (mootToken::Analyses::const_iterator ani = token.analyses().begin(); ani != token.analyses().end(); ani++) {
+      tok_class.insert(tagids.name2id(ani->tag));
+    }
   };
 
   /**

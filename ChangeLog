@@ -12,6 +12,8 @@ v2.0.7 Thu, 10 Sep 2009 11:30:35 +0200
 	+ removed MOOT_RELAX macro sensitivity
 	  - the macro remains defined for now, for compatibility
 	  - relaxation behavior is now controlled by mootHMM::relax flag
+	+ added stupid n-gram disambiguation model-tweaking utility 'mootngsmooth'
+	  - really just adds a new pseudo-tag '@NEW' with unigram f=|Tags|/N * N/(|Tags|+N)
 
 v2.0.6 Mon, 07 Sep 2009 16:18:54 +0200
 	+ changed signature mootHMM::wordp(tokstr,tagstr)
