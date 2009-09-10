@@ -139,7 +139,7 @@ public:
   void insert(const TokenAnalysis &analysis);
   void insert(const char *tag, const char *details);
   void erase(const TokenAnalysis &analysis);
-  void prune(void);
+  //void prune(void); //-- Tue, 08 Sep 2009 16:49:17 +0200: BROKEN: *** glibc detected *** /usr/bin/perl: double free or corruption (fasttop): 0x09f74300 ***
   %extend {
     mootTokenFlavor flavor(void) { return tokenFlavor($self->tok_text); };
   }
