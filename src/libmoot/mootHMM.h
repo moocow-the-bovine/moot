@@ -37,6 +37,7 @@
 
 #include <mootTokenIO.h>
 #include <mootZIO.h>
+#include <mootBinHeader.h>
 
 #include <mootClassfreqs.h>
 //#include <mootLexfreqs.h> //-- included by mootClassfreqs.h
@@ -50,22 +51,30 @@
 # include <mootAssocVector.h>
 # include <mootTrieVector.h>
 # include <mootNgrams.h>
-#endif
+#endif //--MOOT_ENABLE_SUFFIX_TRUE
 */
 
 /**
  * \def MOOT_USE_TRIGRAMS
- * If defined, trigrams will be used in addition to uni- and bi-grams.
+ * \deprecated{Trigrams are always the base n-gram type}
  *
- * \see mootConfig.h
+ * Formerly: if defined, trigrams will be used in addition to uni- and bi-grams.
+ *
+ * This macro should always be defined for moot >= v2.0.7-0, for backwards-compatibility.
+ * Old behavior (<tt>!defined(MOOT_USE_TRIGRAMS)</tt>) can be simulated by model tweaking.
+ * Newer code should not use this macro, as it may disappear in future versions.
  */
 
 /**
  * \def MOOT_RELAX
- * If defined, pre-analyses will be used only as "hints" ; otherwise,
+ * \deprecated{Use mootHMM::relax instead}
+ *
+ * Formerly: If defined, pre-analyses will be used only as "hints" ; otherwise,
  * they are considered hard restrictions.
  *
- * \see mootConfig.h
+ * As of moot v2.0.7-0, this macro should always be defined, for backwards-compatibility.
+ * Interpretation of pre-analyses is now controlled by the mootHMM::relax field.
+ * Newer code should not use this macro, as it may disappear in future versions.
  */
 
 /**
@@ -236,65 +245,6 @@ public:
    */
   typedef ProbT* UnigramProbTable;
 
-  /// Tag-bigram key type for HMM probability lookup hash (only used if hash_ngrams is true)
-  class Bigram {
-  public:
-    TagID tag1;  ///< previous-previous tag_{i-1}
-    TagID tag2;  ///< current tag: tag_i
-    //
-  public:
-    /// Utility struct for hash_map
-    struct HashFcn {
-    public:
-      inline size_t operator()(const Bigram &x) const {
-	return ((0xdeece66d * x.tag1) + x.tag2);
-      };
-    };
-    //
-    /// Utility struct for hash_map
-    struct EqualFcn {
-    public:
-      inline size_t operator()(const Bigram &x, const Bigram &y) const {
-	return  x.tag1==y.tag1 && x.tag2==y.tag2;
-      };
-    };
-    //
-  public:
-    /// Bigram constructor
-    Bigram(TagID t1=0, TagID t2=0)
-      : tag1(t1), tag2(t2)
-    {};
-    /// Bigram constructor, Trigram-compatible 
-    Bigram(TagID t1=0, TagID t2=0, TagID t3=0)
-      : tag1(t2), tag2(t3)
-    {};
-    //
-    /// Bigram destructor
-    ~Bigram(void) {};
-  };
-
-  /// Type for hashed uni- and bigram probability lookup table
-  /// : bigram(t1,t2) -> log(p(t2|t1))
-  /// : bigram(0 ,t2) ~  unigram(t2) -> log(p(t2))
-  typedef
-    hash_map<Bigram,ProbT,
-	     Bigram::HashFcn,
-	     Bigram::EqualFcn>
-    BigramProbHash;
-
-  /**
-   * Type for dense uni- and bigram probability lookup table:
-   * c-style 2d array: bigram probabilites \c log(p(tagid|ptagid))
-   * indexed by \c ((ntags*ptagid)+tagid) , and
-   * unigram probabilities \c log(p(tagid)) indexed by \c tagid .
-   *
-   * This winds up being a rather sparse table,
-   * but it should fit well in memory even for large
-   * (~= 2K tags) tagsets on contemporary machines,
-   * and lookup is Just Plain Quick.
-   */
-  typedef ProbT *BigramProbArray;
-
   /// Tag-trigram key type for HMM probability lookup table (only used if hash_ngrams is true)
   class Trigram {
   public:
@@ -359,15 +309,9 @@ public:
    */
   typedef ProbT* TrigramProbArray;
 
-#ifdef MOOT_USE_TRIGRAMS
   typedef Trigram          NgramProbKey;    ///< Generic n-gram key: trigrams
   typedef TrigramProbHash  NgramProbHash;   ///< Generic n-gram probabilities: trigrams, hashed
   typedef TrigramProbArray NgramProbArray;  ///< Generic n-gram probabilities: trigrams, dense
-#else
-  typedef Bigram           NgramProbKey;    ///< Generic n-gram key: bigrams
-  typedef BigramProbHash   NgramProbHash;   ///< Generic n-gram probabilities: bigrams, hashed
-  typedef BigramProbArray  NgramProbArray;  ///< Generic n-gram probabilities: bigrams, dense
-#endif // MOOT_USE_TRIGRAMS
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -384,18 +328,13 @@ public:
   class ViterbiNode {
   public:
     TagID tagid;                  ///< Current Tag-ID for this node
-#ifdef MOOT_USE_TRIGRAMS
     TagID ptagid;                 ///< Previous Tag-ID for this node
-#else
-    ProbT wprob;                  ///< (log-)lexical probability p(word|tag)
-#endif
     ProbT lprob;                  ///< log-Probability of best path to this node
 
     class ViterbiNode *pth_prev;  ///< Previous node in best path to this node
     class ViterbiNode *nod_next;  ///< Next previous-tag-node in current pillar
   };
 
-#ifdef MOOT_USE_TRIGRAMS
   /** \brief Type for a Viterbi trellis row ("current tag") node
    *
    * A Viterbi trellis row is completely specified by its Tag-ID
@@ -408,10 +347,6 @@ public:
     class ViterbiNode *nodes;     ///< Trellis "pillar" node(s) for this row
     class ViterbiRow  *row_next;  ///< Next row
   };
-#else
-  typedef ViterbiNode ViterbiRow; ///< Alias for a Viterbi trellis row ("current tag") node
-#endif
-
 
   /**
    * \brief Type for a Viterbi trellis column.
@@ -501,6 +436,13 @@ public:
   bool      hash_ngrams;
 
   /**
+   * Whether to interpret token pre-analyses as "hints"
+   * (relax==true) or hard restrictions (relax==false).
+   *  Default: false.
+   */
+  bool      relax;
+
+  /**
    * Whether to use class probabilities (Default=true)
    * \warning Don't set this to true unless your input
    * files actually contain a priori analyses generated
@@ -550,9 +492,7 @@ public:
   //@{
   ProbT             nglambda1;    /**< (log) Smoothing constant for unigrams */
   ProbT             nglambda2;    /**< (log) Smoothing constant for bigrams */
-#ifdef MOOT_USE_TRIGRAMS
   ProbT             nglambda3;    /**< (log) Smoothing constant for trigrams */
-#endif
   ProbT             wlambda0;     /**< (log) Smoothing constant for lexical probabilities */
   ProbT             wlambda1;     /**< (log) Smoothing constant for lexical probabilities */
 
@@ -619,9 +559,7 @@ protected:
   /** \name Low-level data: trash stacks */
   //@{
   ViterbiNode     *trash_nodes;     /**< Recycling bin for Viterbi trellis nodes */
-#ifdef MOOT_USE_TRIGRAMS
   ViterbiRow      *trash_rows;      /**< Recycling bin for Viterbi trellis rows */
-#endif
   ViterbiColumn   *trash_columns;   /**< Recycling bin for Viterbi trellis columns */
   ViterbiPathNode *trash_pathnodes; /**< Recycling bin for Viterbi path-nodes */
   //@}
@@ -654,6 +592,7 @@ public:
       save_mark_unknown(false),
       save_dump_trellis(false),
       hash_ngrams(false),
+      relax(false),
       use_lex_classes(true),
       start_tagid(0),
       unknown_lex_threshhold(1.0),
@@ -678,9 +617,7 @@ public:
       nunknown(0),
       nfallbacks(0),
       trash_nodes(NULL),
-#ifdef MOOT_USE_TRIGRAMS
       trash_rows(NULL),
-#endif
       trash_columns(NULL), 
       trash_pathnodes(NULL),
       vbestpn(NULL),
@@ -720,7 +657,7 @@ public:
   bool save(mootio::mostream *obs, const char *filename=NULL);
 
   /** Low-level: save guts to a binary stream */
-  bool _bindump(mootio::mostream *obs, const char *filename=NULL);
+  bool _bindump(mootio::mostream *obs, const mootBinIO::HeaderInfo &hdr, const char *filename=NULL);
 
   /** Load from a binary file */
   bool load(const char *filename=NULL);
@@ -729,7 +666,7 @@ public:
   bool load(mootio::mistream *ibs, const char *filename=NULL);
 
   /** Low-level: load guts from a binary stream */
-  bool _binload(mootio::mistream *ibs, const char *filename=NULL);
+  bool _binload(mootio::mistream *ibs, const mootBinIO::HeaderInfo &hdr, const char *filename=NULL);
   //@}
 
   /*------------------------------------------------------------*/
@@ -838,17 +775,9 @@ public:
   inline void set_ngram_prob(ProbT p, TagID t1=0, TagID t2=0, TagID t3=0)
   {
     if (hash_ngrams) {   // +hash
-#ifdef MOOT_USE_TRIGRAMS // +hash, +trigrams
       ngprobsh[Trigram(t1,t2,t3)] = p; 
-#else                    // +hash, -trigrams
-      ngprobsh[Bigram(t2,t3)] = p;
-#endif
     } else {             // -hash
-#ifdef MOOT_USE_TRIGRAMS // -hash, +trigrams
       ngprobsa[(n_tags*((n_tags*t1)+t2))+t3] = p;
-#else                    // -hash, -trigrams
-      ngprobsa[(n_tags*t2)+t3] = p;
-#endif // MOOT_USE_TRIGRAMS
     }
   };
   //@}
@@ -1096,7 +1025,6 @@ public:
     vbestpr = MOOT_PROB_NEG;
     vbestpn = NULL;
 
-#ifdef MOOT_USE_TRIGRAMS
     ViterbiRow  *prow;
     for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
       for (pnod = prow->nodes; pnod != NULL; pnod = pnod->nod_next) {
@@ -1106,14 +1034,6 @@ public:
 	}
       }
     }
-#else // !MOOT_USE_TRIGRAMS
-    for (pnod = vtable->rows; pnod != NULL; pnod = pnod->nod_next) {
-      if (pnod->lprob > vbestpr) {
-	vbestpr = pnod->lprob;
-	vbestpn = pnod;
-      }
-    }
-#endif // MOOT_USE_TRIGRAMS
     return vbestpn;
   };
 
@@ -1127,7 +1047,6 @@ public:
   {
     ViterbiNode *pnod;
     vbestpr = MOOT_PROB_NEG;
-#ifdef MOOT_USE_TRIGRAMS
     ViterbiRow  *prow;
     vbestpn = NULL;
     for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
@@ -1141,11 +1060,6 @@ public:
 	return vbestpn;
       }
     }
-#else // !MOOT_USE_TRIGRAMS
-    for (pnod = vtable->rows; pnod != NULL; pnod = pnod->nod_next) {
-      if (pnod->tagid == tagid) return pnod;
-    }
-#endif // MOOT_USE_TRIGRAMS
     return NULL;
   };
  
@@ -1182,9 +1096,7 @@ public:
   inline bool viterbi_column_ok(const ViterbiColumn *col) const {
     return (col
 	    && col->rows 
-#ifdef MOOT_USE_TRIGRAMS
 	    && col->rows->nodes
-#endif
 	    );
   };
 
@@ -1202,7 +1114,6 @@ public:
 					     ViterbiColumn *col=NULL,
 					     ProbT probmin=MOOT_PROB_NONE)
   {
-#ifdef MOOT_USE_TRIGRAMS
     ViterbiRow  *prow, *row = viterbi_get_row();
     ViterbiNode *pnod, *nod = NULL;
 
@@ -1260,57 +1171,6 @@ public:
     row->row_next = col->rows;
     col->rows     = row;
 
-#else //! MOOT_USE_TRIGRAMS
-
-    ViterbiNode *pnod, *nod = NULL;
-
-    if (!col) {
-      col           = viterbi_get_column();
-      col->rows     = NULL;
-      col->bbestpr  = MOOT_PROB_NEG;
-      if (vtable) col->bpprmin = vtable->bbestpr - beamwd;
-      else        col->bpprmin = MOOT_PROB_NEG;
-    }
-    if (probmin != MOOT_PROB_NONE) col->bpprmin = probmin;
-    col->col_prev = vtable;
-
-    vbestpr = MOOT_PROB_NEG;
-    vbestpn = NULL;
-
-    for (pnod = vtable->rows; pnod != NULL; pnod = pnod->nod_next) {
-      //-- beam pruning
-      if (beamwd && pnod->lprob < col->bpprmin) continue;
-
-      //-- probability lookup
-      vtagpr = pnod->lprob + tagp(pnod->tagid, curtagid);
-      if (vtagpr > vbestpr
-# ifdef MOOT_LEX_IS_TIEBREAKER
-	  || (vtagpr == vbestpr && wordpr > pnod->wprob)
-# endif
-	  )
-	{
-	  vbestpr = vtagpr;
-	  vbestpn = pnod;
-	}
-    }
-
-    //-- set node/row information
-    nod           = viterbi_get_node();
-    nod->tagid    = curtagid;
-    nod->wprob    = wordpr;
-    nod->lprob    = vbestpr + wordpr;
-    nod->pth_prev = vbestpn;
-    nod->nod_next = col->rows;
-
-    //-- set row/col information
-    nod->nod_next = col->rows;
-    col->rows     = nod;
-
-    //-- save beam information
-    if (nod->lprob > col->bbestpr) col->bbestpr = nod->lprob;
-
-#endif // MOOT_USE_TRIGRAMS
-
     return col;
   };
 
@@ -1361,7 +1221,6 @@ public:
   // Viterbi: trash utilities: Rows
   /** Returns a pointer to an unused ViterbiRow, possibly allocating a new one. */
   inline ViterbiRow *viterbi_get_row(void) {
-#ifdef MOOT_USE_TRIGRAMS
     ViterbiRow *row;
     if (trash_rows != NULL) {
       row        = trash_rows;
@@ -1370,9 +1229,6 @@ public:
       row = new ViterbiRow();
     }
     return row;
-#else
-    return viterbi_get_node();
-#endif //MOOT_USE_TRIGRAMS
   };
 
   //------------------------------------------------------------
@@ -1598,7 +1454,7 @@ public:
   };
 
   /*------------------------------------------------------------
-   * Trigram probability lookup (only useful if MOOT_USE_TRIGRAMS is defined)
+   * Trigram probability lookup
    */
   /**
    * Looks up and returns raw trigram (log-)probability: log(p(tagid|prevtagid2,prevtagid1)),
@@ -1607,13 +1463,7 @@ public:
   inline const ProbT tagp(const Trigram &trigram, ProbT ProbZero=MOOT_PROB_ZERO) const
   {
     if (!hash_ngrams) return tagp(trigram.tag1, trigram.tag2, trigram.tag3);
-    NgramProbHash::const_iterator ngpi = ngprobsh.find(
-#ifdef MOOT_USE_TRIGRAMS
-						       trigram
-#else
-						       Bigram(trigram.tag2,trigram.tag3)
-#endif
-						       );
+    NgramProbHash::const_iterator ngpi = ngprobsh.find(trigram);
     return ngpi != ngprobsh.end() ? ngpi->second : ProbZero;
   };
 
@@ -1625,18 +1475,10 @@ public:
   inline const ProbT tagp(const TagID prevtagid2, const TagID prevtagid1, const TagID tagid) const
   {
     if (!hash_ngrams) { //-- -hash
-#ifdef MOOT_USE_TRIGRAMS
       return
 	ngprobsa && prevtagid2 < n_tags && prevtagid1 < n_tags && tagid < n_tags
 	? ngprobsa[(n_tags*((n_tags*prevtagid2)+prevtagid1))+tagid]
 	: MOOT_PROB_ZERO;
-#else
-      return
-	ngprobsa && prevtagid1 < n_tags && tagid < n_tags
-	? ngprobsa[(n_tags*prevtagid1)+tagid]
-	: MOOT_PROB_ZERO;
-#endif // MOOT_USE_TRIGRAMS
-
     } else {            //-- +hash
       //-- trigram as stored (pre-smoothed)
       Trigram ng(prevtagid2,prevtagid1,tagid);
@@ -1686,7 +1528,7 @@ public:
   /** \name Debugging */
   //@{
   /** Debugging method: dump basic HMM contents to a text file. */
-  void txtdump(FILE *file);
+  void txtdump(FILE *file, bool dump_constants=true, bool dump_lexprobs=true, bool dump_classprobs=true, bool dump_suftrie=true, bool dump_ngprobs=true);
 
   /** Debugging method: dump entire Viterbi trellis to a text file */
   void viterbi_txtdump(TokenWriter *w, int ncols=0);

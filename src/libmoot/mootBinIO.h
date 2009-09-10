@@ -406,26 +406,6 @@ namespace mootBinIO {
   };
 
   /*------------------------------------------------------------
-   * moot types: Bigram
-   */
-  template <>
-  class Item<mootHMM::Bigram> {
-  public:
-    Item<mootHMM::TagID> tagid_item;
-  public:
-    inline bool load(mootio::mistream *is, mootHMM::Bigram &x) const
-    {
-      return (tagid_item.load(is, x.tag1)
-	      && tagid_item.load(is, x.tag2));
-    };
-    inline bool save(mootio::mostream *os, const mootHMM::Bigram &x) const
-    {
-      return (tagid_item.save(os, x.tag1)
-	      && tagid_item.save(os, x.tag2));
-    };
-  };
-
-  /*------------------------------------------------------------
    * moot types: Trigram
    */
   template <>
@@ -546,59 +526,6 @@ namespace mootBinIO {
       return (maxcount_item.save(os, x.maxcount)
 	      && theta_item.save(os, x.theta)
 	      && vec_item.save(os, x));
-    };
-  };
-
-  /*------------------------------------------------------------
-   * public typedefs: Generic header information
-   */
-  /** \brief Header information structure, used for binary HMM model files */
-  class HeaderInfo {
-  public:
-    /** Typedef for a version component */
-    typedef unsigned int VersionT;
-    
-    /** Typedef for a "magic number" component */
-    typedef unsigned int MagicT;
-    
-    /** Typedef for a generic "flags" component */
-    typedef unsigned long int FlagsT;
-  public:
-    MagicT    magic;      /**< Magic number */
-    VersionT  version;    /**< Major version */
-    VersionT  revision;   /**< Minor version */
-    VersionT  minver;     /**< Minimum compatible version */
-    VersionT  minrev;     /**< Minimum compatible revision */
-    FlagsT    flags;      /**< Some user flags (unused) */
-  public:
-    /** Default constructor */
-    HeaderInfo(MagicT mag=0,
-	       VersionT ver=0, VersionT rev=0,
-	       VersionT mver=0, VersionT mrev=0,
-	       FlagsT f=0)
-      : magic(mag),
-	version(ver),
-	revision(rev),
-	minver(mver),
-	minrev(mrev),
-	flags(f)
-    {};
-
-    /** Useful constructor: generate "magic" from IDstring by hashing */
-    HeaderInfo(const string &IDstring,
-	       VersionT ver=0, VersionT rev=0,
-	       VersionT mver=0, VersionT mrev=0,
-	       FlagsT f=0)
-      : version(ver),
-	revision(rev),
-	minver(mver),
-	minrev(mrev),
-	flags(f)
-    {
-      magic = 0;
-      for (string::const_iterator si = IDstring.begin(); si != IDstring.end(); si++) {
-	magic = (magic<<5)-magic + static_cast<MagicT>(*si);
-      }
     };
   };
 

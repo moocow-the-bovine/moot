@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "MOOTDUMP 1"
-.TH MOOTDUMP 1 "2009-09-03" "moot v2.0.6-3" "moot PoS Tagger"
+.TH MOOTDUMP 1 "2009-09-10" "moot v2.0.7-0" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -140,11 +140,17 @@ mootdump [\s-1OPTIONS\s0] \s-1MODEL\s0
 \&    MODEL  Input model.
 \&
 \& Options
-\&    \-h       \-\-help           Print help and exit.
-\&    \-V       \-\-version        Print version and exit.
-\&    \-cFILE   \-\-rcfile=FILE    Read an alternate configuration file.
-\&    \-vLEVEL  \-\-verbose=LEVEL  Verbosity level.
-\&    \-oFILE   \-\-output=FILE    Specify output file (default=stdout).
+\&    \-h       \-\-help              Print help and exit.
+\&    \-V       \-\-version           Print version and exit.
+\&    \-cFILE   \-\-rcfile=FILE       Read an alternate configuration file.
+\&    \-vLEVEL  \-\-verbose=LEVEL     Verbosity level.
+\&    \-gBOOL   \-\-hash\-ngrams=BOOL  Whether to hash stored n\-grams (default=yes)
+\&    \-k       \-\-const             Enable dump of scalar model constants
+\&    \-l       \-\-lex               Enable lexical probability dump
+\&    \-C       \-\-class             Enable lexical\-class probability dump
+\&    \-s       \-\-suffix            Enable suffix\-trie dump
+\&    \-n       \-\-ngrams            Enable tag n\-gram probability dump
+\&    \-oFILE   \-\-output=FILE       Specify output file (default=stdout).
 .Ve
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
@@ -193,6 +199,58 @@ Verbosity level.
 Default: '3'
 .Sp
 Be more or less verbose.  Recognized values are in the range 0..3.
+.ie n .IP """\-\-hash\-ngrams=BOOL"" , ""\-gBOOL""" 4
+.el .IP "\f(CW\-\-hash\-ngrams=BOOL\fR , \f(CW\-gBOOL\fR" 4
+.IX Item "--hash-ngrams=BOOL , -gBOOL"
+Whether to hash stored n\-grams (default=yes)
+.Sp
+Default: '1'
+.Sp
+If specified and true, tag n\-grams will be stored in a slow but memory-friendly
+hash.  Otherwise, a fast but large array will be used (only useful for implicit compilation).
+.ie n .IP """\-\-const"" , ""\-k""" 4
+.el .IP "\f(CW\-\-const\fR , \f(CW\-k\fR" 4
+.IX Item "--const , -k"
+Enable dump of scalar model constants
+.Sp
+Default: '0'
+.Sp
+If none of the \-\-(const|lex|class|suffix|ngrams) options are specified, a full dump is
+produced (as if all of the above options had been specified).  If any of these
+options \fBare\fR specified, only the model properties indicated by the specified
+flag(s) are dumped.
+.ie n .IP """\-\-lex"" , ""\-l""" 4
+.el .IP "\f(CW\-\-lex\fR , \f(CW\-l\fR" 4
+.IX Item "--lex , -l"
+Enable lexical probability dump
+.Sp
+Default: '0'
+.Sp
+See \*(L"\-\-const , \-k\*(R"
+.ie n .IP """\-\-class"" , ""\-C""" 4
+.el .IP "\f(CW\-\-class\fR , \f(CW\-C\fR" 4
+.IX Item "--class , -C"
+Enable lexical-class probability dump
+.Sp
+Default: '0'
+.Sp
+See \*(L"\-\-const , \-k\*(R"
+.ie n .IP """\-\-suffix"" , ""\-s""" 4
+.el .IP "\f(CW\-\-suffix\fR , \f(CW\-s\fR" 4
+.IX Item "--suffix , -s"
+Enable suffix-trie dump
+.Sp
+Default: '0'
+.Sp
+See \*(L"\-\-const , \-k\*(R"
+.ie n .IP """\-\-ngrams"" , ""\-n""" 4
+.el .IP "\f(CW\-\-ngrams\fR , \f(CW\-n\fR" 4
+.IX Item "--ngrams , -n"
+Enable tag n\-gram probability dump
+.Sp
+Default: '0'
+.Sp
+See \*(L"\-\-const , \-k\*(R"
 .ie n .IP """\-\-output=FILE"" , ""\-oFILE""" 4
 .el .IP "\f(CW\-\-output=FILE\fR , \f(CW\-oFILE\fR" 4
 .IX Item "--output=FILE , -oFILE"

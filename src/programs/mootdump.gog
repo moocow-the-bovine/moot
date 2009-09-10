@@ -44,6 +44,34 @@ int "verbose" v "Verbosity level." \
     default="3" \
     details="Be more or less verbose.  Recognized values are in the range 0..3."
 
+int "hash-ngrams" g "Whether to hash stored n-grams (default=yes)" \
+    arg="BOOL" \
+    default="1" \
+    details="
+If specified and true, tag n-grams will be stored in a slow but memory-friendly
+hash.  Otherwise, a fast but large array will be used (only useful for implicit compilation).
+"
+
+flag "const" k "Enable dump of scalar model constants" \
+  details="
+If none of the --(const|lex|class|suffix|ngrams) options are specified, a full dump is
+produced (as if all of the above options had been specified).  If any of these
+options B<are> specified, only the model properties indicated by the specified
+flag(s) are dumped.
+"
+
+flag "lex" l "Enable lexical probability dump" \
+  details="See L<--const , -k>"
+
+flag "class" C "Enable lexical-class probability dump" \
+  details="See L<--const , -k>"
+
+flag "suffix" s "Enable suffix-trie dump" \
+  details="See L<--const , -k>"
+
+flag "ngrams" n "Enable tag n-gram probability dump" \
+  details="See L<--const , -k>"
+
 string "output"	o "Specify output file (default=stdout)." \
     arg="FILE" \
     default="-" \

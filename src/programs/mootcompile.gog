@@ -62,14 +62,28 @@ int "compress" z "Compression level for output file." \
 group "HMM Options"
 
 #-----------------------------------------------------------------------------
-# HMM Options: Storage mode
+# HMM Options: Boolean flags
 
 int "hash-ngrams" g "Whether to hash stored n-grams (default=no)" \
     arg="BOOL" \
     default="0" \
     details="
-If specified and true, tag n-grams will be stored in a slow but memory-friendly
+If nonzero, tag n-grams will be stored in a slow but memory-friendly
 hash.  Otherwise, a fast but large array will be used.
+"
+
+int "relax" r "Whether to relax token-tag associability (default=no)" \
+  arg="BOOL" \
+  default="0" \
+  details="
+If nonzero, 'tag' fields of token analyses will be used only as a potential
+estimator of lexical probability, if at all.
+Otherwise (regardless of whether lexical classes are are being used as a
+probability estimator), 'tag' fields of token analyses will be interpreted
+as imposing 'hard' restrictions on which tags may occur with the token in question.
+
+See the C<--use-classes=BOOL> option and/or L<mootfiles> for more details on the
+use of lexical classes.
 "
 
 #-----------------------------------------------------------------------------
@@ -80,7 +94,7 @@ int "trie-depth"  a "Maximum depth of suffix trie." \
     default="0" \
     details="
 Use suffixes of up to LEN characters to estimate probabilities
-of unknown words.
+of unknown words.  A value of 0 (zero) disables use of a suffix trie.
 
 EXPERIMENTAL.
 "

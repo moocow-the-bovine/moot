@@ -202,6 +202,7 @@ pkginclude_HEADERS = \
 	mootBufferIO.h \
 	mootCxxIO.h \
 	mootBinIO.h \
+	mootBinHeader.h \
 	\
 	mootToken.h \
 	\

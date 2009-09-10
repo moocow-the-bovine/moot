@@ -15,11 +15,17 @@ mootdump [OPTIONS] MODEL
     MODEL  Input model.
 
  Options
-    -h       --help           Print help and exit.
-    -V       --version        Print version and exit.
-    -cFILE   --rcfile=FILE    Read an alternate configuration file.
-    -vLEVEL  --verbose=LEVEL  Verbosity level.
-    -oFILE   --output=FILE    Specify output file (default=stdout).
+    -h       --help              Print help and exit.
+    -V       --version           Print version and exit.
+    -cFILE   --rcfile=FILE       Read an alternate configuration file.
+    -vLEVEL  --verbose=LEVEL     Verbosity level.
+    -gBOOL   --hash-ngrams=BOOL  Whether to hash stored n-grams (default=yes)
+    -k       --const             Enable dump of scalar model constants
+    -l       --lex               Enable lexical probability dump
+    -C       --class             Enable lexical-class probability dump
+    -s       --suffix            Enable suffix-trie dump
+    -n       --ngrams            Enable tag n-gram probability dump
+    -oFILE   --output=FILE       Specify output file (default=stdout).
 
 =cut
 
@@ -111,6 +117,80 @@ Verbosity level.
 Default: '3'
 
 Be more or less verbose.  Recognized values are in the range 0..3.
+
+
+
+
+=item C<--hash-ngrams=BOOL> , C<-gBOOL>
+
+Whether to hash stored n-grams (default=yes)
+
+Default: '1'
+
+
+If specified and true, tag n-grams will be stored in a slow but memory-friendly
+hash.  Otherwise, a fast but large array will be used (only useful for implicit compilation).
+
+
+
+
+
+=item C<--const> , C<-k>
+
+Enable dump of scalar model constants
+
+Default: '0'
+
+
+If none of the --(const|lex|class|suffix|ngrams) options are specified, a full dump is
+produced (as if all of the above options had been specified).  If any of these
+options B<are> specified, only the model properties indicated by the specified
+flag(s) are dumped.
+
+
+
+
+
+=item C<--lex> , C<-l>
+
+Enable lexical probability dump
+
+Default: '0'
+
+See L<--const , -k>
+
+
+
+
+=item C<--class> , C<-C>
+
+Enable lexical-class probability dump
+
+Default: '0'
+
+See L<--const , -k>
+
+
+
+
+=item C<--suffix> , C<-s>
+
+Enable suffix-trie dump
+
+Default: '0'
+
+See L<--const , -k>
+
+
+
+
+=item C<--ngrams> , C<-n>
+
+Enable tag n-gram probability dump
+
+Default: '0'
+
+See L<--const , -k>
 
 
 

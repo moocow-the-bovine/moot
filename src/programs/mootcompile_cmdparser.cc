@@ -92,6 +92,7 @@ cmdline_parser_print_help (void)
   printf("\n");
   printf(" HMM Options:\n");
   printf("   -gBOOL    --hash-ngrams=BOOL           Whether to hash stored n-grams (default=no)\n");
+  printf("   -rBOOL    --relax=BOOL                 Whether to relax token-tag associability (default=no)\n");
   printf("   -aLEN     --trie-depth=LEN             Maximum depth of suffix trie.\n");
   printf("   -AFREQ    --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.\n");
   printf("             --trie-theta=FLOAT           Suffix backoff coefficient.\n");
@@ -132,6 +133,7 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->output_arg = gog_strdup("-"); 
   args_info->compress_arg = -1; 
   args_info->hash_ngrams_arg = 0; 
+  args_info->relax_arg = 0; 
   args_info->trie_depth_arg = 0; 
   args_info->trie_threshhold_arg = 10; 
   args_info->trie_theta_arg = 0; 
@@ -161,6 +163,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->output_given = 0;
   args_info->compress_given = 0;
   args_info->hash_ngrams_given = 0;
+  args_info->relax_given = 0;
   args_info->trie_depth_given = 0;
   args_info->trie_threshhold_given = 0;
   args_info->trie_theta_given = 0;
@@ -198,6 +201,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "output", 1, NULL, 'o' },
 	{ "compress", 1, NULL, 'z' },
 	{ "hash-ngrams", 1, NULL, 'g' },
+	{ "relax", 1, NULL, 'r' },
 	{ "trie-depth", 1, NULL, 'a' },
 	{ "trie-threshhold", 1, NULL, 'A' },
 	{ "trie-theta", 1, NULL, 0 },
@@ -221,6 +225,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'o', ':',
 	'z', ':',
 	'g', ':',
+	'r', ':',
 	'a', ':',
 	'A', ':',
 	'L', ':',
@@ -334,6 +339,14 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->hash_ngrams_given++;
           args_info->hash_ngrams_arg = (int)atoi(val);
+          break;
+        
+        case 'r':	 /* Whether to relax token-tag associability (default=no) */
+          if (args_info->relax_given) {
+            fprintf(stderr, "%s: `--relax' (`-r') option given more than once\n", PROGRAM);
+          }
+          args_info->relax_given++;
+          args_info->relax_arg = (int)atoi(val);
           break;
         
         case 'a':	 /* Maximum depth of suffix trie. */
@@ -504,6 +517,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->hash_ngrams_given++;
             args_info->hash_ngrams_arg = (int)atoi(val);
+          }
+          
+          /* Whether to relax token-tag associability (default=no) */
+          else if (strcmp(olong, "relax") == 0) {
+            if (args_info->relax_given) {
+              fprintf(stderr, "%s: `--relax' (`-r') option given more than once\n", PROGRAM);
+            }
+            args_info->relax_given++;
+            args_info->relax_arg = (int)atoi(val);
           }
           
           /* Maximum depth of suffix trie. */

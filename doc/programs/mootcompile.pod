@@ -24,6 +24,7 @@ mootcompile [OPTIONS] MODEL(s)
 
  HMM Options
     -gBOOL    --hash-ngrams=BOOL           Whether to hash stored n-grams (default=no)
+    -rBOOL    --relax=BOOL                 Whether to relax token-tag associability (default=no)
     -aLEN     --trie-depth=LEN             Maximum depth of suffix trie.
     -AFREQ    --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.
               --trie-theta=FLOAT           Suffix backoff coefficient.
@@ -174,8 +175,28 @@ Whether to hash stored n-grams (default=no)
 Default: '0'
 
 
-If specified and true, tag n-grams will be stored in a slow but memory-friendly
+If nonzero, tag n-grams will be stored in a slow but memory-friendly
 hash.  Otherwise, a fast but large array will be used.
+
+
+
+
+
+=item C<--relax=BOOL> , C<-rBOOL>
+
+Whether to relax token-tag associability (default=no)
+
+Default: '0'
+
+
+If nonzero, 'tag' fields of token analyses will be used only as a potential
+estimator of lexical probability, if at all.
+Otherwise (regardless of whether lexical classes are are being used as a
+probability estimator), 'tag' fields of token analyses will be interpreted
+as imposing 'hard' restrictions on which tags may occur with the token in question.
+
+See the C<--use-classes=BOOL> option and/or L<mootfiles> for more details on the
+use of lexical classes.
 
 
 
@@ -189,7 +210,7 @@ Default: '0'
 
 
 Use suffixes of up to LEN characters to estimate probabilities
-of unknown words.
+of unknown words.  A value of 0 (zero) disables use of a suffix trie.
 
 EXPERIMENTAL.
 

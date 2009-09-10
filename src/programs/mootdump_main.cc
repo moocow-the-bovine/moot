@@ -62,6 +62,13 @@ mofstream out;
 // -- global classes/structs
 mootHMM        hmm;
 
+//-- dump options
+bool dump_constants = true;
+bool dump_lexprobs = true;
+bool dump_classprobs = true;
+bool dump_suftrie = true;
+bool dump_ngprobs = true;
+
 /*--------------------------------------------------------------------------
  * Option Processing
  *--------------------------------------------------------------------------*/
@@ -103,6 +110,23 @@ void GetMyOptions(int argc, char **argv)
   else if (args.verbose_arg <= 2) hmm.verbose = mootHMM::vlWarnings;
   else if (args.verbose_arg <= 3) hmm.verbose = mootHMM::vlProgress;
   else hmm.verbose = mootHMM::vlEverything;
+
+  //-- assign dump options
+  if (args.const_given || args.lex_given || args.class_given || args.suffix_given || args.ngrams_given) {
+    dump_constants = args.const_flag;
+    dump_lexprobs = args.lex_flag;
+    dump_classprobs = args.class_flag;
+    dump_suftrie = args.suffix_flag;
+    dump_ngprobs = args.ngrams_flag;
+  } else {
+    dump_constants = true;
+    dump_lexprobs = true;
+    dump_classprobs = true;
+    dump_suftrie = true;
+    dump_ngprobs = true;
+  }
+
+  hmm.hash_ngrams = args.hash_ngrams_arg;
 }
 
 /*--------------------------------------------------------------------------
@@ -124,7 +148,7 @@ int main (int argc, char **argv)
     fprintf(stderr, "%s: writing HMM text dump to '%s' ...",
 	    PROGNAME, out.name.c_str());
 
-  hmm.txtdump(out.file);
+  hmm.txtdump(out.file, dump_constants, dump_lexprobs, dump_classprobs, dump_suftrie, dump_ngprobs);
 
   if (args.verbose_arg > 1)
     fprintf(stderr," dumped.\n");

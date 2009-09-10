@@ -54,11 +54,17 @@
     MODEL  Input model.</pre>
 <pre>
  Options
-    -h       --help           Print help and exit.
-    -V       --version        Print version and exit.
-    -cFILE   --rcfile=FILE    Read an alternate configuration file.
-    -vLEVEL  --verbose=LEVEL  Verbosity level.
-    -oFILE   --output=FILE    Specify output file (default=stdout).</pre>
+    -h       --help              Print help and exit.
+    -V       --version           Print version and exit.
+    -cFILE   --rcfile=FILE       Read an alternate configuration file.
+    -vLEVEL  --verbose=LEVEL     Verbosity level.
+    -gBOOL   --hash-ngrams=BOOL  Whether to hash stored n-grams (default=yes)
+    -k       --const             Enable dump of scalar model constants
+    -l       --lex               Enable lexical probability dump
+    -C       --class             Enable lexical-class probability dump
+    -s       --suffix            Enable suffix-trie dump
+    -n       --ngrams            Enable tag n-gram probability dump
+    -oFILE   --output=FILE       Specify output file (default=stdout).</pre>
 <p>
 </p>
 <hr />
@@ -109,6 +115,52 @@
 <p>Verbosity level.</p>
 <p>Default: '3'</p>
 <p>Be more or less verbose.  Recognized values are in the range 0..3.</p>
+</dd>
+<dt><strong><a name="hash_ngrams_bool_gbool" class="item"><code>--hash-ngrams=BOOL</code> , <code>-gBOOL</code></a></strong></dt>
+
+<dd>
+<p>Whether to hash stored n-grams (default=yes)</p>
+<p>Default: '1'</p>
+<p>If specified and true, tag n-grams will be stored in a slow but memory-friendly
+hash.  Otherwise, a fast but large array will be used (only useful for implicit compilation).</p>
+</dd>
+<dt><strong><a name="const_k" class="item"><code>--const</code> , <code>-k</code></a></strong></dt>
+
+<dd>
+<p>Enable dump of scalar model constants</p>
+<p>Default: '0'</p>
+<p>If none of the --(const|lex|class|suffix|ngrams) options are specified, a full dump is
+produced (as if all of the above options had been specified).  If any of these
+options <strong>are</strong> specified, only the model properties indicated by the specified
+flag(s) are dumped.</p>
+</dd>
+<dt><strong><a name="lex_l" class="item"><code>--lex</code> , <code>-l</code></a></strong></dt>
+
+<dd>
+<p>Enable lexical probability dump</p>
+<p>Default: '0'</p>
+<p>See <a href="#__const____k">--const , -k</a></p>
+</dd>
+<dt><strong><a name="class_c" class="item"><code>--class</code> , <code>-C</code></a></strong></dt>
+
+<dd>
+<p>Enable lexical-class probability dump</p>
+<p>Default: '0'</p>
+<p>See <a href="#__const____k">--const , -k</a></p>
+</dd>
+<dt><strong><a name="suffix_s" class="item"><code>--suffix</code> , <code>-s</code></a></strong></dt>
+
+<dd>
+<p>Enable suffix-trie dump</p>
+<p>Default: '0'</p>
+<p>See <a href="#__const____k">--const , -k</a></p>
+</dd>
+<dt><strong><a name="ngrams_n" class="item"><code>--ngrams</code> , <code>-n</code></a></strong></dt>
+
+<dd>
+<p>Enable tag n-gram probability dump</p>
+<p>Default: '0'</p>
+<p>See <a href="#__const____k">--const , -k</a></p>
 </dd>
 <dt><strong><a name="output_file_ofile" class="item"><code>--output=FILE</code> , <code>-oFILE</code></a></strong></dt>
 

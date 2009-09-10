@@ -68,6 +68,7 @@
 <pre>
  HMM Options
     -gBOOL    --hash-ngrams=BOOL           Whether to hash stored n-grams (default=no)
+    -rBOOL    --relax=BOOL                 Whether to relax token-tag associability (default=no)
     -aLEN     --trie-depth=LEN             Maximum depth of suffix trie.
     -AFREQ    --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.
               --trie-theta=FLOAT           Suffix backoff coefficient.
@@ -156,8 +157,21 @@ from one or more text model files.</p>
 <dd>
 <p>Whether to hash stored n-grams (default=no)</p>
 <p>Default: '0'</p>
-<p>If specified and true, tag n-grams will be stored in a slow but memory-friendly
+<p>If nonzero, tag n-grams will be stored in a slow but memory-friendly
 hash.  Otherwise, a fast but large array will be used.</p>
+</dd>
+<dt><strong><a name="relax_bool_rbool" class="item"><code>--relax=BOOL</code> , <code>-rBOOL</code></a></strong></dt>
+
+<dd>
+<p>Whether to relax token-tag associability (default=no)</p>
+<p>Default: '0'</p>
+<p>If nonzero, 'tag' fields of token analyses will be used only as a potential
+estimator of lexical probability, if at all.
+Otherwise (regardless of whether lexical classes are are being used as a
+probability estimator), 'tag' fields of token analyses will be interpreted
+as imposing 'hard' restrictions on which tags may occur with the token in question.</p>
+<p>See the <code>--use-classes=BOOL</code> option and/or <a href="././mootfiles.html">the mootfiles manpage</a> for more details on the
+use of lexical classes.</p>
 </dd>
 <dt><strong><a name="trie_depth_len_alen" class="item"><code>--trie-depth=LEN</code> , <code>-aLEN</code></a></strong></dt>
 
@@ -165,7 +179,7 @@ hash.  Otherwise, a fast but large array will be used.</p>
 <p>Maximum depth of suffix trie.</p>
 <p>Default: '0'</p>
 <p>Use suffixes of up to LEN characters to estimate probabilities
-of unknown words.</p>
+of unknown words.  A value of 0 (zero) disables use of a suffix trie.</p>
 <p>EXPERIMENTAL.</p>
 </dd>
 <dt><strong><a name="trie_threshhold_freq_afreq" class="item"><code>--trie-threshhold=FREQ</code> , <code>-AFREQ</code></a></strong></dt>

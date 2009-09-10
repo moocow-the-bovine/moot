@@ -3,6 +3,16 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
+v2.0.7 Thu, 10 Sep 2009 11:30:35 +0200
+	+ fixed version-checking bug in mootHMM::load()
+	+ updated BINCOMPAT HMM file version to 3.0 (min-compat = 2.5)
+	+ removed MOOT_USE_TRIGRAMS macro sensitivity
+	  - the macro remains defined for now, for compatibility
+	  - old !defined(MOOT_USE_TRIGRAMS) behavior now requires just a model tweak
+	+ removed MOOT_RELAX macro sensitivity
+	  - the macro remains defined for now, for compatibility
+	  - relaxation behavior is now controlled by mootHMM::relax flag
+
 v2.0.6 Mon, 07 Sep 2009 16:18:54 +0200
 	+ changed signature mootHMM::wordp(tokstr,tagstr)
 	  - WAS: mootHMM::wordp(const mootTokString  tokstr, const mootTagString  tagstr)

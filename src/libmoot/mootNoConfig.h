@@ -127,16 +127,22 @@
 /* Define this to enable experimental expat XML support */
 #undef MOOT_EXPAT_ENABLED
 
+/* Define this to enable sparse n-gram hash (should always be defined for moot
+   >=v2.0.6-3) */
+#undef MOOT_HASH_NGRAMS
+
 /* Define this to enable experimental libxml2 XML support */
 #undef MOOT_LIBXML_ENABLED
 
 /* Define this to enable librecode support (useful for XML) */
 #undef MOOT_RECODE_ENABLED
 
-/* Define this to enable relaxed interpretation of pre-analyses */
+/* Define this to enable relaxed interpretation of pre-analyses (should always
+   be defined for moot >=v2.0.7-0) */
 #undef MOOT_RELAX
 
-/* Define this to enable use of trigrams */
+/* Define this to enable use of trigrams (should always be defined for moot
+   >=v2.0.7-0) */
 #undef MOOT_USE_TRIGRAMS
 
 /* Define this to enable zlib compression support */

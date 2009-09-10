@@ -21,12 +21,24 @@ extern "C" {
 struct gengetopt_args_info {
   char * rcfile_arg;	 /* Read an alternate configuration file. (default=NULL). */
   int verbose_arg;	 /* Verbosity level. (default=3). */
+  int hash_ngrams_arg;	 /* Whether to hash stored n-grams (default=yes) (default=1). */
+  int const_flag;	 /* Enable dump of scalar model constants (default=0). */
+  int lex_flag;	 /* Enable lexical probability dump (default=0). */
+  int class_flag;	 /* Enable lexical-class probability dump (default=0). */
+  int suffix_flag;	 /* Enable suffix-trie dump (default=0). */
+  int ngrams_flag;	 /* Enable tag n-gram probability dump (default=0). */
   char * output_arg;	 /* Specify output file (default=stdout). (default=-). */
 
   int help_given;	 /* Whether help was given */
   int version_given;	 /* Whether version was given */
   int rcfile_given;	 /* Whether rcfile was given */
   int verbose_given;	 /* Whether verbose was given */
+  int hash_ngrams_given;	 /* Whether hash-ngrams was given */
+  int const_given;	 /* Whether const was given */
+  int lex_given;	 /* Whether lex was given */
+  int class_given;	 /* Whether class was given */
+  int suffix_given;	 /* Whether suffix was given */
+  int ngrams_given;	 /* Whether ngrams was given */
   int output_given;	 /* Whether output was given */
   
   char **inputs;         /* unnamed arguments */

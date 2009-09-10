@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.6-3])
+define([THE_PACKAGE_VERSION], [2.0.7-0])
 define([THE_PACKAGE_MAINTAINER],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -957,77 +957,22 @@ dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## trigrams ?
-##
-AC_MSG_CHECKING([whether to use trigrams])
-AC_ARG_ENABLE(trigrams,
-	AC_HELP_STRING([--disable-trigrams], [Use trigrams (default=yes)]),
-	[ac_cv_enable_trigrams="$enableval"],[ac_cv_enable_trigrams="yes"])
-
-if test "$ac_cv_enable_trigrams" = "yes" ; then
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(MOOT_USE_TRIGRAMS,1,
-	    [Define this to enable use of trigrams])
-  CONFIG_OPTIONS="$CONFIG_OPTIONS USE_TRIGRAMS=1"
-else
-  AC_MSG_RESULT(no)
-  CONFIG_OPTIONS="$CONFIG_OPTIONS USE_TRIGRAMS=0"
-fi
-##
-## /trigrams ?
-##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+## + v2.0.7 (Thu, 10 Sep 2009 10:12:54 +0200): eliminated
+##   - old --disable-trigrams behavior can be simulated by model tweaking
+AC_DEFINE(MOOT_USE_TRIGRAMS,1,[Define this to enable use of trigrams (should always be defined for moot >=v2.0.7-0)])
+CONFIG_OPTIONS="$CONFIG_OPTIONS USE_TRIGRAMS=2"
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## ngram-hash ?
-##  + v2.0.6-3 : moved to run-time option
-##
-dnl AC_MSG_CHECKING([whether to hash n-grams])
-dnl AC_ARG_ENABLE(ngram-hash,
-dnl 	AC_HELP_STRING([--enable-ngram-hash],
-dnl 	               [Save space but lose speed by hashing all n-grams (default=no)]),
-dnl 	[ac_cv_enable_ngram_hash="$enableval"],[ac_cv_enable_ngram_hash="no"])
-dnl AC_ARG_ENABLE(trigram-hash,
-dnl 	AC_HELP_STRING([--enable-trigram-hash],
-dnl 	               [Alias for --enable-ngram-hash]),
-dnl 	[ac_cv_enable_ngram_hash="$enableval"],[ac_cv_enable_ngeam_hash="no"])
-dnl 
-dnl if test "$ac_cv_enable_ngram_hash" != "no" ; then
-dnl    AC_MSG_RESULT(yes)
-dnl    AC_DEFINE(MOOT_HASH_NGRAMS,1,
-dnl  	    [Define this to enable slow but memory-friendly n-gram hash storage])
-dnl    CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_NGRAMS=1"
-dnl else
-dnl    AC_MSG_RESULT(no)
-dnl    CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_NGRAMS=0"
-dnl fi
-##
-## /ngram-hash ?
-##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+##  + v2.0.6-3 : moved to runtime option
+AC_DEFINE(MOOT_HASH_NGRAMS,1,[Define this to enable sparse n-gram hash (should always be defined for moot >=v2.0.6-3)])
+CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_NGRAMS=2"
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## relax ?
-##
-AC_MSG_CHECKING([whether to relax])
-AC_ARG_ENABLE(relax,
-	dnl --
-	AC_HELP_STRING([--enable-relax],  [Enable "relaxed" interpretation of pre-analyses  (default=disabled)]),
-	[ac_cv_enable_relax="$enableval"], [ac_cv_enable_relax="no"] dnl -- (default=disabled)
-	dnl --
-	dnl AC_HELP_STRING([--disable-relax], [Disable "relaxed" interpretation of pre-analyses (default=enabled)]),
-	dnl [ac_cv_enable_relax="$enableval"], [ac_cv_enable_relax=""]   dnl -- (default=disabled)
-	)
-
-if test "$ac_cv_enable_relax" != "no" ; then
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(MOOT_RELAX,1, [Define this to enable relaxed interpretation of pre-analyses])
-  CONFIG_OPTIONS="$CONFIG_OPTIONS RELAX=1"
-else
-  AC_MSG_RESULT(no)
-  CONFIG_OPTIONS="$CONFIG_OPTIONS RELAX=0"
-fi
-##
-## /relax ?
-##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+## + v2.0.7 (Thu, 10 Sep 2009 10:12:54 +0200): moved to runtime option
+AC_DEFINE(MOOT_RELAX,1,[Define this to enable relaxed interpretation of pre-analyses (should always be defined for moot >=v2.0.7-0)])
+CONFIG_OPTIONS="$CONFIG_OPTIONS RELAX=2"
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## warnings ?

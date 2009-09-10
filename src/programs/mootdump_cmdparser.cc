@@ -83,11 +83,17 @@ cmdline_parser_print_help (void)
   
   printf("\n");
   printf(" Options:\n");
-  printf("   -h       --help           Print help and exit.\n");
-  printf("   -V       --version        Print version and exit.\n");
-  printf("   -cFILE   --rcfile=FILE    Read an alternate configuration file.\n");
-  printf("   -vLEVEL  --verbose=LEVEL  Verbosity level.\n");
-  printf("   -oFILE   --output=FILE    Specify output file (default=stdout).\n");
+  printf("   -h       --help              Print help and exit.\n");
+  printf("   -V       --version           Print version and exit.\n");
+  printf("   -cFILE   --rcfile=FILE       Read an alternate configuration file.\n");
+  printf("   -vLEVEL  --verbose=LEVEL     Verbosity level.\n");
+  printf("   -gBOOL   --hash-ngrams=BOOL  Whether to hash stored n-grams (default=yes)\n");
+  printf("   -k       --const             Enable dump of scalar model constants\n");
+  printf("   -l       --lex               Enable lexical probability dump\n");
+  printf("   -C       --class             Enable lexical-class probability dump\n");
+  printf("   -s       --suffix            Enable suffix-trie dump\n");
+  printf("   -n       --ngrams            Enable tag n-gram probability dump\n");
+  printf("   -oFILE   --output=FILE       Specify output file (default=stdout).\n");
 }
 
 #if defined(HAVE_STRDUP) || defined(strdup)
@@ -112,6 +118,12 @@ clear_args(struct gengetopt_args_info *args_info)
 {
   args_info->rcfile_arg = NULL; 
   args_info->verbose_arg = 3; 
+  args_info->hash_ngrams_arg = 1; 
+  args_info->const_flag = 0; 
+  args_info->lex_flag = 0; 
+  args_info->class_flag = 0; 
+  args_info->suffix_flag = 0; 
+  args_info->ngrams_flag = 0; 
   args_info->output_arg = gog_strdup("-"); 
 }
 
@@ -126,6 +138,12 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->version_given = 0;
   args_info->rcfile_given = 0;
   args_info->verbose_given = 0;
+  args_info->hash_ngrams_given = 0;
+  args_info->const_given = 0;
+  args_info->lex_given = 0;
+  args_info->class_given = 0;
+  args_info->suffix_given = 0;
+  args_info->ngrams_given = 0;
   args_info->output_given = 0;
 
   clear_args(args_info);
@@ -148,6 +166,12 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "version", 0, NULL, 'V' },
 	{ "rcfile", 1, NULL, 'c' },
 	{ "verbose", 1, NULL, 'v' },
+	{ "hash-ngrams", 1, NULL, 'g' },
+	{ "const", 0, NULL, 'k' },
+	{ "lex", 0, NULL, 'l' },
+	{ "class", 0, NULL, 'C' },
+	{ "suffix", 0, NULL, 's' },
+	{ "ngrams", 0, NULL, 'n' },
 	{ "output", 1, NULL, 'o' },
         { NULL,	0, NULL, 0 }
       };
@@ -156,6 +180,12 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'V',
 	'c', ':',
 	'v', ':',
+	'g', ':',
+	'k',
+	'l',
+	'C',
+	's',
+	'n',
 	'o', ':',
 	'\0'
       };
@@ -235,6 +265,59 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->verbose_arg = (int)atoi(val);
           break;
         
+        case 'g':	 /* Whether to hash stored n-grams (default=yes) */
+          if (args_info->hash_ngrams_given) {
+            fprintf(stderr, "%s: `--hash-ngrams' (`-g') option given more than once\n", PROGRAM);
+          }
+          args_info->hash_ngrams_given++;
+          args_info->hash_ngrams_arg = (int)atoi(val);
+          break;
+        
+        case 'k':	 /* Enable dump of scalar model constants */
+          if (args_info->const_given) {
+            fprintf(stderr, "%s: `--const' (`-k') option given more than once\n", PROGRAM);
+          }
+          args_info->const_given++;
+         if (args_info->const_given <= 1)
+           args_info->const_flag = !(args_info->const_flag);
+          break;
+        
+        case 'l':	 /* Enable lexical probability dump */
+          if (args_info->lex_given) {
+            fprintf(stderr, "%s: `--lex' (`-l') option given more than once\n", PROGRAM);
+          }
+          args_info->lex_given++;
+         if (args_info->lex_given <= 1)
+           args_info->lex_flag = !(args_info->lex_flag);
+          break;
+        
+        case 'C':	 /* Enable lexical-class probability dump */
+          if (args_info->class_given) {
+            fprintf(stderr, "%s: `--class' (`-C') option given more than once\n", PROGRAM);
+          }
+          args_info->class_given++;
+         if (args_info->class_given <= 1)
+           args_info->class_flag = !(args_info->class_flag);
+          break;
+        
+        case 's':	 /* Enable suffix-trie dump */
+          if (args_info->suffix_given) {
+            fprintf(stderr, "%s: `--suffix' (`-s') option given more than once\n", PROGRAM);
+          }
+          args_info->suffix_given++;
+         if (args_info->suffix_given <= 1)
+           args_info->suffix_flag = !(args_info->suffix_flag);
+          break;
+        
+        case 'n':	 /* Enable tag n-gram probability dump */
+          if (args_info->ngrams_given) {
+            fprintf(stderr, "%s: `--ngrams' (`-n') option given more than once\n", PROGRAM);
+          }
+          args_info->ngrams_given++;
+         if (args_info->ngrams_given <= 1)
+           args_info->ngrams_flag = !(args_info->ngrams_flag);
+          break;
+        
         case 'o':	 /* Specify output file (default=stdout). */
           if (args_info->output_given) {
             fprintf(stderr, "%s: `--output' (`-o') option given more than once\n", PROGRAM);
@@ -282,6 +365,65 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->verbose_given++;
             args_info->verbose_arg = (int)atoi(val);
+          }
+          
+          /* Whether to hash stored n-grams (default=yes) */
+          else if (strcmp(olong, "hash-ngrams") == 0) {
+            if (args_info->hash_ngrams_given) {
+              fprintf(stderr, "%s: `--hash-ngrams' (`-g') option given more than once\n", PROGRAM);
+            }
+            args_info->hash_ngrams_given++;
+            args_info->hash_ngrams_arg = (int)atoi(val);
+          }
+          
+          /* Enable dump of scalar model constants */
+          else if (strcmp(olong, "const") == 0) {
+            if (args_info->const_given) {
+              fprintf(stderr, "%s: `--const' (`-k') option given more than once\n", PROGRAM);
+            }
+            args_info->const_given++;
+           if (args_info->const_given <= 1)
+             args_info->const_flag = !(args_info->const_flag);
+          }
+          
+          /* Enable lexical probability dump */
+          else if (strcmp(olong, "lex") == 0) {
+            if (args_info->lex_given) {
+              fprintf(stderr, "%s: `--lex' (`-l') option given more than once\n", PROGRAM);
+            }
+            args_info->lex_given++;
+           if (args_info->lex_given <= 1)
+             args_info->lex_flag = !(args_info->lex_flag);
+          }
+          
+          /* Enable lexical-class probability dump */
+          else if (strcmp(olong, "class") == 0) {
+            if (args_info->class_given) {
+              fprintf(stderr, "%s: `--class' (`-C') option given more than once\n", PROGRAM);
+            }
+            args_info->class_given++;
+           if (args_info->class_given <= 1)
+             args_info->class_flag = !(args_info->class_flag);
+          }
+          
+          /* Enable suffix-trie dump */
+          else if (strcmp(olong, "suffix") == 0) {
+            if (args_info->suffix_given) {
+              fprintf(stderr, "%s: `--suffix' (`-s') option given more than once\n", PROGRAM);
+            }
+            args_info->suffix_given++;
+           if (args_info->suffix_given <= 1)
+             args_info->suffix_flag = !(args_info->suffix_flag);
+          }
+          
+          /* Enable tag n-gram probability dump */
+          else if (strcmp(olong, "ngrams") == 0) {
+            if (args_info->ngrams_given) {
+              fprintf(stderr, "%s: `--ngrams' (`-n') option given more than once\n", PROGRAM);
+            }
+            args_info->ngrams_given++;
+           if (args_info->ngrams_given <= 1)
+             args_info->ngrams_flag = !(args_info->ngrams_flag);
           }
           
           /* Specify output file (default=stdout). */
