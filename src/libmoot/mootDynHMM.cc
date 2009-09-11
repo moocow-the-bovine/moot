@@ -92,19 +92,19 @@ void mootDynLexHMM::tag_hook_pre(mootSentence &sent)
 
   //-- populate HMM::lexprobs
   this->dynlex_populate_lexprobs();
-
-#if 1
-  //-- DEBUG dump
-  FILE *txtout = fopen("mootdyn.txtdump","wb");
-  assert(txtout != NULL);
-  txtdump(txtout, true, true, false, false, true);
-  fclose(txtout);
-#endif
 }
 
 //--------------------------------------------------------------
 void mootDynLexHMM::tag_hook_post(mootSentence &sent)
 {
+#if 0
+  //-- DEBUG: dump model
+  FILE *txtout = fopen("mootdyn.txtdump","wb");
+  assert(txtout != NULL);
+  txtdump(txtout, true, true, false, false, true);
+  fclose(txtout);
+#endif
+
   //-- clear: lex
   lex_clear();
   dynlex.clear();
@@ -120,13 +120,14 @@ void mootDynLexHMM::tag_hook_post(mootSentence &sent)
 }
 
 //--------------------------------------------------------------
+#define LOGP_NEW_MIN -100
 void mootDynLexHMM::dynlex_populate_lexprobs(void)
 {
   TagID tagid_new  = tagids.name2id(tagstr_new);
   ProbT  logp_new  = tagp(tagid_new);
   ProbT  logp_zero = MOOT_PROB_ZERO;
   if (static_cast<double>(logp_new)==static_cast<double>(logp_zero)) {
-    logp_new = log(1e-12); //-- HACK
+    logp_new = LOGP_NEW_MIN;
   }
 
   //-- populate lexicon from pseudo-frequencies in dynlex
@@ -142,7 +143,7 @@ void mootDynLexHMM::dynlex_populate_lexprobs(void)
     //-- get f_t ~= f(tag) = \sum_{w} f(w,tag)
     ProbT f_t = 0;
     for (TokProbMap::const_iterator wpi=twpi->second.begin(); wpi!=twpi->second.end(); wpi++) {
-      f_t += wpi->second + wtflambda0;
+      f_t += (wpi->second + wtflambda0);
     }
 
     //-- populate HMM::lexprobs as log(wlambda1_p*(f_wt/f_t))
@@ -152,18 +153,94 @@ void mootDynLexHMM::dynlex_populate_lexprobs(void)
       const TokStr &tokstr = wpi->first;
       const TokID    tokid = lex_get_tokid(tokstr);
       ProbT           f_wt = wpi->second + wtflambda0;
-      ProbT          p_wgt = f_wt > 0 ? (wlambda1 + log(f_wt / f_t)) : MOOT_PROB_ZERO;
-      lexprobs[tokid][tagid] = p_wgt;
+      ProbT          p_wgt = f_wt / f_t;
+      ProbT       logp_wgt = wlambda1 + log(p_wgt);
+      lexprobs[tokid][tagid] = logp_wgt;
+#if 0 //-- DEBUG
+      fprintf(stderr,"log p(W=%u[\"%s\"] | T=%u[\"%s\"]) := %g, logp = %g; f_wt=%g, f_t=%g\n",
+	      tokid, tokstr.c_str(), tagid, tagstr.c_str(), p_wgt, logp_wgt, f_wt, f_t);
+#endif
     }
   }
 }
 
 /*======================================================================
- * test
+ * mootDynILexHMM
  */
-/*
-void __testme__(void) {
-  mootDynHMM<LPFUniform> hmmu;
-  }*/
+//--------------------------------------------------------------
+void mootDynILexHMM::dynlex_populate_lexprobs(void)
+{
+  TagID tagid_new  = tagids.name2id(tagstr_new);
+  ProbT  logp_new  = tagp(tagid_new);
+  ProbT  logp_zero = MOOT_PROB_ZERO;
+  if (static_cast<double>(logp_new)==static_cast<double>(logp_zero)) {
+    logp_new = LOGP_NEW_MIN;
+  }
+
+  //-- populate fw_map: w->f(w)
+  TokProbMap fw_map;
+  for (TagTokProbMap::const_iterator twpi=dynlex.begin(); twpi!=dynlex.end(); twpi++) {
+    for (TokProbMap::const_iterator wpi=twpi->second.begin(); wpi!=twpi->second.end(); wpi++) {
+      const TokStr &tokstr = wpi->first;
+      ProbT           f_tw = wpi->second;
+      fw_map[tokstr] += wtflambda0 + f_tw;
+    }
+  }
+
+  //-- populate lexicon from pseudo-frequencies in dynlex
+  for (TagTokProbMap::const_iterator twpi=dynlex.begin(); twpi!=dynlex.end(); twpi++) {
+    const TagStr &tagstr = twpi->first;
+    TagID          tagid = get_tagid(tagstr);
+
+    //-- copy 'newtagstr' unigram tag probability for new tags
+    if (tagid >= tagids_size_orig) {
+      set_ngram_prob(logp_new, 0,0,tagid);
+    }
+
+    //-- (incorrectly) populate HMM::lexprobs as log(wlambda1_p*(f_tw/f_w)) ~= log(p(t|w))
+    for (TokProbMap::const_iterator wpi=twpi->second.begin(); wpi!=twpi->second.end(); wpi++) {
+      const TokStr &tokstr = wpi->first;
+      const TokID    tokid = lex_get_tokid(tokstr);
+      ProbT           f_w  = fw_map[tokstr];
+      ProbT           f_wt = wpi->second + wtflambda0;
+      ProbT          p_tgw = f_wt / f_w;
+      ProbT       logp_tgw = wlambda1 + log(p_tgw);
+      lexprobs[tokid][tagid] = logp_tgw;
+#if 0 //-- DEBUG
+      fprintf(stderr,"log p(T=%u[\"%s\"] | W=%u[\"%s\"]) := %g, logp = %g; f_wt=%g, f_w=%g\n",
+	      tagid, tagstr.c_str(), tokid, tokstr.c_str(), p_tgw, logp_tgw, f_wt, f_w);
+#endif
+    }
+  }
+}
+
+
+/*======================================================================
+ * Utilities
+ */
+const char *DynHMMEstimatorNames[dheN] = {
+  "Unknown",
+  "Freq",
+  "IFreq"
+};
+
+mootDynHMM *newDynHMM(DynHMMEstimator which)
+{
+  switch (which) {
+  case dheFreq: return new mootDynLexHMM();
+  case dheIFreq: return new mootDynILexHMM();
+  default:
+    return NULL;
+  }
+}
+
+mootDynHMM *newDynHMM(const std::string &which)
+{
+  DynHMMEstimator ewhich = dheUnknown;
+  if      (which == "Freq") ewhich = dheFreq;
+  else if (which == "IFreq") ewhich  = dheIFreq;
+  return newDynHMM(ewhich);
+}
+
 
 moot_END_NAMESPACE

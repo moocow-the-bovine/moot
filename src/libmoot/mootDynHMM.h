@@ -171,9 +171,7 @@ public:
   typedef std::map<TokStr,ProbT>      TokProbMap;     /**< lexical string submap:  w -> p(w|t) */
   typedef std::map<TagStr,ProbT>      TagProbMap;     /**< lexical string map:     t -> p(tag) */
   typedef std::map<TagStr,TokProbMap> TagTokProbMap;  /**< lexical string map:     t -> (w -> p(w|t)) */
-
-  typedef std::set<TokStr> TokStrSet; /**< Set of tokens */
-  typedef std::set<TagStr> TagStrSet; /**< Set of tags */
+  typedef std::map<TagStr,TokProbMap> TokTagProbMap;  /**< lexical string map:     w -> (t -> p(w|t)) */
 
 public:
   //---------------------------------------------------------------------
@@ -223,12 +221,50 @@ public:
 
   /** Converts pseudo-frequency \a dynlex to mootHMM::lexprobs.
    *  Sets
-   *  <code>lexprobs[w][t] = wlambda1 * log( (wtflambda0+dynlex(w,t)) / (\sum_w wtflambda0+dynlex(w,t)) )</code>
+   *  <code>lexprobs[w][t] = wlambda1 * log( (wtflambda0+dynlex(w,t)) / \sum_w(wtflambda0+dynlex(w,t)) )</code>
    */
   virtual void dynlex_populate_lexprobs(void);
   //@}
 };
 
+/*======================================================================
+ * class mootDynLexHMM
+ */
+/** \brief mootDynHMM subclass for dynamic lexical probabilities using inverted p(tag|word) instead of p(word|tag) */
+class mootDynILexHMM : public mootDynLexHMM {
+public:
+  /*---------------------------------------------------------------------*/
+  ///\name Tagging: Hooks: Low-level Utilities
+  //@{
+
+  /** Converts pseudo-frequency \a dynlex to mootHMM::lexprobs.
+   *  Sets
+   *  <code>lexprobs[w][t] = wlambda1 * log( (wtflambda0+dynlex(w,t)) / \sum_t(wtflambda0+dynlex(w,t)) )</code>
+   *
+   *  Note that this is theoretically incorrect.
+   */
+  virtual void dynlex_populate_lexprobs(void);
+  //@}
+
+};
+
+/*======================================================================
+ * Utilities
+ */
+
+/** \brief Enum for built-in mootDynHMM estimator modes (subclasses) */
+typedef enum {
+  dheUnknown,  ///< unknown
+  dheFreq,     ///< ~= "Freq" ~= mootDynLexHMM
+  dheIFreq,    ///< ~= "IFreq" ~= mootDynILexHMM
+  dheN         ///< placeholder
+} DynHMMEstimator;
+
+/** Generic constructor for built-in mootDynHMM subclasses */
+mootDynHMM *newDynHMM(DynHMMEstimator which=dheFreq);
+
+/** Generic constructor for built-in mootDynHMM subclasses, given estimator name */
+mootDynHMM *newDynHMM(const std::string &which="Freq");
 
 moot_END_NAMESPACE
 

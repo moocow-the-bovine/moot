@@ -179,7 +179,6 @@ using namespace moot;
 %define CONSTRUCTOR_CODE \
   mtoken = &mtoken_default;
 
-
 /*----------------------------------------------------------------------
  * Start States
  *----------------------------------------------------------------------*/
@@ -205,6 +204,7 @@ detchar    [^ \t\n\r\[]
 tagchar    [^ \t\n\r\]]
 anlchar    [^ \t\n\r]
 /*bestchar   [\/]*/
+costre     (([\+\-]?)([0-9]*)(\.?)([0-9]+)(([eE]([+\-]?)[0-9]+)?))
 
 locsep     [ \r\+]
 
@@ -372,6 +372,14 @@ locsep     [ \r\+]
   BEGIN(TAG);
 }
 
+<DETAILS>"<"{costre}">" {
+  add_columns(yyleng);
+  loc_add(yyleng);
+  manalysis->prob = strtof (reinterpret_cast<const char *>(yytext)+1, NULL);
+  manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
+  lasttyp = LexTypeDetails;
+}
+
 <DETAILS>{detchar}+ {
   //-- DETAILS: detail text
   add_columns(yyleng);
@@ -498,7 +506,9 @@ void mootTokenLexer::on_EOA(void)
   if (manalysis && lasttyp != LexTypeEOA) { 
     /*-- set default tag */
     if (manalysis->tag.empty()) { 
-      manalysis->tag.swap(manalysis->details); 
+      size_t tag_begin = manalysis->details.find_first_not_of(" []<>\n\r",0);
+      size_t tag_end   = manalysis->details.find_first_of(" []<>\n\r",tag_begin);
+      manalysis->tag.assign(manalysis->details,tag_begin,tag_end);
     }  
     /* set best tag if applicable */
     if (current_analysis_is_best) { 

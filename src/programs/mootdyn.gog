@@ -389,6 +389,27 @@ Useful for debugging.
 
 group "Dynamic HMM Options"
 
+string "dyn-class" D "Specify built-in dynamic estimator (default='Freq')" \
+  arg="WHICH" \
+  default="Freq" \
+  details="
+Accepted values include:
+
+=over 4
+
+=item Freq
+
+Analysis 'costs' are interpreted as pseudo-frequencies f(w,t)
+lexical probabilities are instantiated as p(w|t)~=f(w,t)/f(t).
+
+=item IFreq
+
+Analysis 'costs' are interpreted as pseudo-frequencies f(w,t)
+lexical probabilities are instantiated (incorrectly) as p(t|w)~=f(w,t)/f(w).
+
+=back
+"
+
 string "dyn-new-tag" w "Specify pseudo-tag for new analyses (default='@NEW')" \
   arg="TAG" \
   default="@NEW" \
@@ -396,6 +417,7 @@ string "dyn-new-tag" w "Specify pseudo-tag for new analyses (default='@NEW')" \
 This is the pseudo-tag used in the n-gram model file to represent
 previously unseen tags (if any).
 "
+
 float "dyn-flambda" F "Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)" \
   arg="FLOAT" \
   default="0.1"

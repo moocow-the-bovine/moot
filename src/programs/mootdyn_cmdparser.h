@@ -48,6 +48,7 @@ struct gengetopt_args_info {
   double beam_width_arg;	 /* Specify cutoff factor for beam pruning (default=1000). */
   int save_ambiguities_flag;	 /* Annotate tagged tokens with lexical ambiguities (default=0). */
   int mark_unknown_flag;	 /* Mark unknown tokens. (default=0). */
+  char * dyn_class_arg;	 /* Specify built-in dynamic estimator (default='Freq') (default=Freq). */
   char * dyn_new_tag_arg;	 /* Specify pseudo-tag for new analyses (default='@NEW') (default=@NEW). */
   float dyn_flambda_arg;	 /* Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1) (default=0.1). */
 
@@ -82,6 +83,7 @@ struct gengetopt_args_info {
   int beam_width_given;	 /* Whether beam-width was given */
   int save_ambiguities_given;	 /* Whether save-ambiguities was given */
   int mark_unknown_given;	 /* Whether mark-unknown was given */
+  int dyn_class_given;	 /* Whether dyn-class was given */
   int dyn_new_tag_given;	 /* Whether dyn-new-tag was given */
   int dyn_flambda_given;	 /* Whether dyn-flambda was given */
   

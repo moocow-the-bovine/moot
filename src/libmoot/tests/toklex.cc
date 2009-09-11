@@ -8,6 +8,7 @@
 
 const bool checkMemory = false;
 const bool do_bench = false;
+const bool dump_analyses = true;
 
 using namespace moot;
 
@@ -15,8 +16,11 @@ void churntest(int argc, char **argv) {
   FILE *infile = stdin;
     //-- init
     mootTokenLexer lexer;
-    lexer.first_analysis_is_best = true;
-    lexer.ignore_first_analysis = true;
+    //lexer.first_analysis_is_best = true;
+    //lexer.ignore_first_analysis = true;
+    lexer.first_analysis_is_best = false;
+    lexer.ignore_first_analysis = false;
+
   for ( ; argc > 0 ; argc--, argv++) {
     //-- open
     if (*argv) {
@@ -40,8 +44,13 @@ void churntest(int argc, char **argv) {
       {
 	if (lxtyp == TokTypeVanilla) ntokens++;
 	if (!do_bench) {
-	  printf("Token typ=%s , text=`%s'\n",
-		 mootTokenTypeNames[lxtyp], lexer.mtoken->text().c_str());
+	  const mootToken &tok = *(lexer.mtoken);
+	  printf("Token typ=%s , text=`%s'\n", mootTokenTypeNames[lxtyp], tok.text().c_str());
+
+	  for (mootToken::Analyses::const_iterator ani=tok.analyses().begin(); ani!=tok.analyses().end(); ani++) {
+	    printf("\t+ Analysis: tag=`%s' , details=`%s' , prob=`%g'\n",
+		    ani->tag.c_str(), ani->details.c_str(), ani->prob);
+	  }
 	}
       }
     //printf("%%%%--EOF--\n");

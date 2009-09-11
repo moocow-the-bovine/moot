@@ -160,7 +160,12 @@ void GetMyOptions(int argc, char **argv)
   writer->to_mstream(&out);
 
   //-- create HMM (dynamic)
-  hmmp = new mootDynLexHMM();
+  hmmp = reinterpret_cast<mootDynLexHMM*>(newDynHMM(args.dyn_class_arg));
+  if (hmmp == NULL) {
+    fprintf(stderr, "%s: unknown dynamic HMM estimator class `%s'\n",
+	    PROGNAME, args.dyn_class_arg);
+    exit(1);
+  }
 
   //-- assign "unknown" ids & other flags
   hmmp->hash_ngrams = args.hash_ngrams_arg;
@@ -285,6 +290,7 @@ void GetMyOptions(int argc, char **argv)
     writer->put_comment_block_begin();
     writer->printf_raw("\n %s output file generated on %s", PROGNAME, asctime(now_tm));
     writer->printf_raw(" Configuration:\n");
+    writer->printf_raw("   DynHMM class      : %s\n", args.dyn_class_arg);
     writer->printf_raw("   Unknown Token     : %s\n", hmmp->tokids.id2name(0).c_str());
     writer->printf_raw("   Unknown Tag       : %s\n", hmmp->tagids.id2name(0).c_str());
     writer->printf_raw("   Border Tag        : %s\n", hmmp->tagids.id2name(hmmp->start_tagid).c_str());

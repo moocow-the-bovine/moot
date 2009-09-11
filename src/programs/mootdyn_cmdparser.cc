@@ -120,6 +120,7 @@ cmdline_parser_print_help (void)
   printf("   -m        --mark-unknown               Mark unknown tokens.\n");
   printf("\n");
   printf(" Dynamic HMM Options:\n");
+  printf("   -DWHICH   --dyn-class=WHICH            Specify built-in dynamic estimator (default='Freq')\n");
   printf("   -wTAG     --dyn-new-tag=TAG            Specify pseudo-tag for new analyses (default='@NEW')\n");
   printf("   -FFLOAT   --dyn-flambda=FLOAT          Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)\n");
 }
@@ -173,6 +174,7 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->beam_width_arg = 1000; 
   args_info->save_ambiguities_flag = 0; 
   args_info->mark_unknown_flag = 0; 
+  args_info->dyn_class_arg = gog_strdup("Freq"); 
   args_info->dyn_new_tag_arg = gog_strdup("@NEW"); 
   args_info->dyn_flambda_arg = 0.1; 
 }
@@ -215,6 +217,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->beam_width_given = 0;
   args_info->save_ambiguities_given = 0;
   args_info->mark_unknown_given = 0;
+  args_info->dyn_class_given = 0;
   args_info->dyn_new_tag_given = 0;
   args_info->dyn_flambda_given = 0;
 
@@ -265,6 +268,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "beam-width", 1, NULL, 'Z' },
 	{ "save-ambiguities", 0, NULL, 'S' },
 	{ "mark-unknown", 0, NULL, 'm' },
+	{ "dyn-class", 1, NULL, 'D' },
 	{ "dyn-new-tag", 1, NULL, 'w' },
 	{ "dyn-flambda", 1, NULL, 'F' },
         { NULL,	0, NULL, 0 }
@@ -298,6 +302,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'Z', ':',
 	'S',
 	'm',
+	'D', ':',
 	'w', ':',
 	'F', ':',
 	'\0'
@@ -583,6 +588,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->mark_unknown_given++;
          if (args_info->mark_unknown_given <= 1)
            args_info->mark_unknown_flag = !(args_info->mark_unknown_flag);
+          break;
+        
+        case 'D':	 /* Specify built-in dynamic estimator (default='Freq') */
+          if (args_info->dyn_class_given) {
+            fprintf(stderr, "%s: `--dyn-class' (`-D') option given more than once\n", PROGRAM);
+          }
+          args_info->dyn_class_given++;
+          if (args_info->dyn_class_arg) free(args_info->dyn_class_arg);
+          args_info->dyn_class_arg = gog_strdup(val);
           break;
         
         case 'w':	 /* Specify pseudo-tag for new analyses (default='@NEW') */
@@ -900,6 +914,16 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->mark_unknown_given++;
            if (args_info->mark_unknown_given <= 1)
              args_info->mark_unknown_flag = !(args_info->mark_unknown_flag);
+          }
+          
+          /* Specify built-in dynamic estimator (default='Freq') */
+          else if (strcmp(olong, "dyn-class") == 0) {
+            if (args_info->dyn_class_given) {
+              fprintf(stderr, "%s: `--dyn-class' (`-D') option given more than once\n", PROGRAM);
+            }
+            args_info->dyn_class_given++;
+            if (args_info->dyn_class_arg) free(args_info->dyn_class_arg);
+            args_info->dyn_class_arg = gog_strdup(val);
           }
           
           /* Specify pseudo-tag for new analyses (default='@NEW') */

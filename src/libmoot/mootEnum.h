@@ -202,11 +202,10 @@ public:
   void resize(size_t newsize)
   {
     if (newsize < 1) newsize=1;  //-- minimum size = 1 (always keep "unknown")
-    if (newsize == size()) return;
-    if (newsize < size()) { //-- grow (only ids2names)
+    if (newsize > size()) {      //-- grow (only ids2names)
       ids2names.resize(newsize);
     }
-    else { //-- shrink
+    else if (newsize < size()) { //-- shrink
       for (mootEnumID id = newsize; id < size(); id++) {
 	names2ids.erase(ids2names[id]);
       }
