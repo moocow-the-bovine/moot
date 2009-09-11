@@ -1507,6 +1507,8 @@ void mootHMM::txtdump(FILE *file, bool dump_constants, bool dump_lexprobs, bool 
     fprintf(file, "\n");
     fprintf(file, "%%%%-----------------------------------------------------\n");
     fprintf(file, "%%%% N-gram (Uni-, Bi-, and Trigram) Probabilities\n");
+    fprintf(file, "%%%%  + n_tags = %u\n", n_tags);
+    fprintf(file, "%%%%  + tagids_size = %u\n", tagids.size());
     fprintf(file, "%%%%  + hash_size = %u\n", ngprobsh.size());
     fprintf(file, "%%%%  + array_size = %u\n", (hash_ngrams ? 0 : (n_tags*n_tags*n_tags)));
     fprintf(file, "%%%% Tag1Id(\"Tag1Str\")\tTag2Id(\"Tag2Str\")\tTag3Id(\"Tag3Str\")\tlog(p(Tag3|Tag1,Tag2))\tp\n");

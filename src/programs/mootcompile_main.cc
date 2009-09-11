@@ -337,7 +337,7 @@ int main (int argc, char **argv)
 
   //-- dump binary model
   if (args.verbose_arg > 1)
-    fprintf(stderr, "%s: saving binary HMM model `%s' ...",
+    fprintf(stderr, "%s: saving binary HMM `%s' ...",
 	    PROGNAME, out.name.c_str());
   if (!hmm.save(out.name.c_str(), args.compress_arg)) {
     fprintf(stderr,"\n%s: binary HMM dump FAILED \n", PROGNAME);

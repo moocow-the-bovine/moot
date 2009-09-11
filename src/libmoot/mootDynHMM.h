@@ -34,27 +34,25 @@
 #define _MOOT_DYNHMM_H
 
 #include <mootHMM.h>
+#include <assert.h>
 
 moot_BEGIN_NAMESPACE
 
-/*--------------------------------------------------------------------------
- * mootDynHMM : HMM class
+/*======================================================================
+ * mootDynHMM : "dynamic" HMM class
  */
 
 /**
- * \brief HMM class for use with dynamic lexical probabilities.
+ * \brief abstract HMM subclass for use with dynamic lexical probabilities.
  */
-template<class LexProbFcn = class LPFUniform>
 class mootDynHMM: public mootHMM {
 public:
   /*---------------------------------------------------------------------*/
   /* Types */
-  typedef LexProbFcn LexProbFunc; /**< Useful alias */
 
 public:
   /*---------------------------------------------------------------------*/
   /* Data */
-  LexProbFunc lpf;  /**< dynamic lexical probability estimator */
 
 public:
   /*---------------------------------------------------------------------*/
@@ -62,108 +60,173 @@ public:
   //@{
   /** Default constructor sets hash_ngrams=true */
   mootDynHMM(void)
-  { hash_ngrams=true; }
+  { hash_ngrams=true; };
 
   /** Destructor */
-  ~mootDynHMM(void);
+  virtual ~mootDynHMM(void) {};
   //@}
 
   //------------------------------------------------------------
   // Utilities
   //@{
   /** clears lexprobs & tokids, leaves 'UNKNOWN' entry present but empty */
-  void lex_clear(void) {
+  inline void lex_clear(void) {
     lexprobs.clear();
-    tokids.clear();     //-- leaves '@UNKNOWN' tok entry
-    lexprobs.resize(1); //-- re-insert empty entry for '@UNKNOWN' tok
+    tokids.clear();         //-- leaves '@UNKNOWN' tok entry
+    lexprobs.resize(1);     //-- re-insert empty entry for '@UNKNOWN' tok
+    n_toks = tokids.size(); //-- sanity check
   };
+
+  /** resize lexicon to fit the id \c tokid_max */
+  inline void lex_resize(TokID tokid_max) {
+    if (n_toks <= tokid_max) {
+      tokids.resize(tokid_max+1);
+      lexprobs.resize(tokid_max+1);
+      n_toks = tokids.size();
+    }
+  };
+
+  /** Get or insert an ID for token text \c tok_text.
+   *  Implicitly resizes lexprobs, tokids, and sets n_toks */
+  inline TokID lex_get_tokid(const mootTokString &tok_text)
+  {
+    TokID tokid = tokids.get_id(tok_text);
+    lex_resize(tokid);
+    return tokid;
+  };
+
+  /** Grow tagids to fit the id \c tagid_max.
+   *  Only works if hash_ngrams==true
+   */
+  inline void tagset_resize(TagID tagid_max) {
+    assert(hash_ngrams==true);
+    if (n_tags <= tagid_max) {
+      tagids.resize(tagid_max+1);
+      n_tags = tagids.size();
+    }
+  };
+
+  /** Get or insert a tag-id for tag \c tagstr.
+   *  Implicitly resizes tagids and sets n_tags
+   */
+  inline TagID get_tagid(const mootTagString &tagstr)
+  {
+    if (tagids.nameExists(tagstr))
+      return tagids.name2id(tagstr);
+    TagID tagid = tagids.get_id(tagstr);
+    tagset_resize(tagid);
+    return tagid;
+  };
+  //@}
+
+  //------------------------------------------------------------
+  /** \name Tagging: Hooks (API) */
+  //@{
+
+  /**
+   * Prepare dynamic lexicon for tagging \c sent.
+   * Default implementation does nothing.
+   */ 
+  virtual void tag_hook_pre(mootSentence &sent)
+  {};
+
+  /**
+   * Cleanup dynamic lexicon after tagging \c sent.
+   * Default implementation does nothing.
+   */
+  virtual void tag_hook_post(mootSentence &sent)
+  {};
   //@}
 
 
   //------------------------------------------------------------
   // Tagging: Top-level
-  /** \name Top-level Tagging Interface */
+  /** \name Top-level Tagging Interface (overrides) */
   //@{
 
-  /** Top-level tagging interface: TokenIO layer */
-  void tag_io(TokenReader *reader, TokenWriter *writer)
-  {
-    int rtok;
-    mootSentence *sent;
-    while (reader && (rtok = reader->get_sentence()) != TokTypeEOF) {
-      sent = reader->sentence();
-      if (!sent) continue;
-      tag_sentence(*sent);
-      if (writer) writer->put_sentence(*sent);
-    }
-  };
+  /** Top-level tagging interface: TokenIO layer.
+   *  Really just a dup of mootHMM::tag_io which calls virtual tag_sentence()
+   */
+  void tag_io(TokenReader *reader, TokenWriter *writer);
 
   /**
-   * Top-level tagging interface: mootSentence input & output (destructive).
-   * Calling this method will (re-)populate the \c besttag
-   * datum in the \c sentence argument.
+   * Top-level tagging interface: mootSentence
+   * Just wraps mootHMM::tag_sentence() in calls to tag_hook_pre() and tag_hook_post().
    */
-  inline void tag_sentence(mootSentence &sentence) {
-    lpf.prepare(*this, sentence);
-    mootHMM::tag_sentence(sentence);
-    lpf.cleanup(*this,sentence);
-  };
+  virtual void tag_sentence(mootSentence &sentence);
   //@}
 };
 
-/*--------------------------------------------------------------------------
- * DynLexProbFcn
+/*======================================================================
+ * class mootDynLexHMM
  */
-/**
- * \brief API specification for mootDynHMM::LexProbFunc
- */
-class DynLexProbFcn {
+/** \brief mootDynHMM subclass for dynamic lexical probabilities */
+class mootDynLexHMM : public mootDynHMM {
 public:
-  DynLexProbFcn(void) {};  /**< Default constructor */
-  ~DynLexProbFcn(void) {}; /**< Default destructor */
+  //---------------------------------------------------------------------
+  // Types
+  typedef mootTokString TokStr;  /**< useful alias */
+  typedef mootTagString TagStr;  /**< useful alias */
 
-  /** Add/adjust lexical probabilities in \c hmm prior to tagging \c sent */
-  //-- TODO: break type-loops!
-  void prepare(mootDynHMM &hmm, mootSentence &sent);
+  typedef std::map<TokStr,ProbT>      TokProbMap;     /**< lexical string submap:  w -> p(w|t) */
+  typedef std::map<TagStr,ProbT>      TagProbMap;     /**< lexical string map:     t -> p(tag) */
+  typedef std::map<TagStr,TokProbMap> TagTokProbMap;  /**< lexical string map:     t -> (w -> p(w|t)) */
 
-  /** Cleanup lexical probabilities in \c hmm after tagging \c sent */
-  void cleanup(mootDynHMM &hmm, mootSentence &sent);
-};
+  typedef std::set<TokStr> TokStrSet; /**< Set of tokens */
+  typedef std::set<TagStr> TagStrSet; /**< Set of tags */
 
-/*--------------------------------------------------------------------------
- * class mootLPFUniform
- */
-/** \brief uniform p(w|tag) for mootDynHMM */
-class LPFUniform : public DynLexProbFunc {
 public:
-  LPFUniform(void) {};
-  ~LPFUNiform(void) {};
+  //---------------------------------------------------------------------
+  // Data
+  TagStr         tagstr_new;  /**< ID to use for "missing" tags (default="@NEW") */
+  TagTokProbMap  dynlex;      /**< lexical string map: tag -> (w -> p(w|tag)) */
+  ProbT          wtflambda0;  /**< Raw pseudo-frequency smoothing constant (non-log) for f(w,t) */
 
-  void prepare(mootDynHMM &hmm, mootSentence &sent) {
-    lex_clear();
-    for (mootSentence::const_iterator si = sent.begin(); si != sent.end(); si++) {
-      if (si->toktype() != TokTypeVanilla) continue; //-- ignore non-vanilla tokens
+  size_t         tagids_size_orig; /**< original size of tagids */
 
-      //-- populate LexClass lc
-      mootHMM::LexClass lc;
-      for (mootToken::Analyses::const_iterator ani = token.analyses().begin(); ani != token.analyses().end(); ani++) {
-	mootHMM::TagID tagid = hmm.tagids.name2id(ani->tag);
-	lc.insert(tagid);
-      }
+public:
+  //---------------------------------------------------------------------
+  ///\name Constructors etc.
+  //@{
+  mootDynLexHMM(void)
+    : tagstr_new("@NEW"),
+      tagids_size_orig(0)
+  {};
 
-      //-- populate tokid, lexprobs
-      mootHMM::TokID tokid = hmm.tokids.get_id(tok.text());
-      if (hmm.lexprobs.size() <= tokid) hmm.lexprobs.resize(tokid+1);
-      if (lc.size() > 0) {
-	ProbT log_pwgt = log(1.0) - log(lc.size());
-	for (mootHMM::LexClass::const_iterator lci = lc.begin(); lci != lc.end(); lci++) {
-	  hmm.lexprobs[tokid].insert(*lci, log_pwgt);
-	}
-      }
-    }
+  virtual ~mootDynLexHMM(void) {};
+  //@}
+
+  /*---------------------------------------------------------------------*/
+  ///\name Tagging: Hooks
+  //@{
+  virtual void tag_hook_pre(mootSentence &sent);
+  virtual void tag_hook_post(mootSentence &sent);
+  //@}
+
+  /*---------------------------------------------------------------------*/
+  ///\name Tagging: Hooks: Low-level Utilities
+  //@{
+  
+  /** Estimate pseudo-frequency for the tag associated with analysis \c a of token \c tok.
+   *  Should record/adjust pseudo-frequency f = f(tok.text(),a.tag) by setting dynlex[a.tag][tok.text()] = f.
+   *  May replace \c a.tag by \c tagstr_new if required.
+   *
+   *  Should be called only after dynlex_add_tokids() has been called for \c a.
+   *
+   *  Default implementation just sets \c f(w,t)=a.prob,
+   *  clobbering any old value for \c f(w,t).
+   */
+  virtual void dynlex_add_analysis(const mootToken &tok, const mootToken::Analysis &a)
+  {
+    dynlex[a.tag][tok.text()] = a.prob;
   };
 
-  void cleanup(mootDynHMM &hmm, mootSentence &sent) {};
+  /** Converts pseudo-frequency \a dynlex to mootHMM::lexprobs.
+   *  Sets
+   *  <code>lexprobs[w][t] = wlambda1 * log( (wtflambda0+dynlex(w,t)) / (\sum_w wtflambda0+dynlex(w,t)) )</code>
+   */
+  virtual void dynlex_populate_lexprobs(void);
+  //@}
 };
 
 

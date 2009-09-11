@@ -42,6 +42,7 @@
 // Top-Level includes
 #include <mootHMMTrainer.h>   /*-- tagger model training --*/
 #include <mootHMM.h>          /*-- runtime tagging --*/
+#include <mootDynHMM.h>       /*-- runtime tagging, dynamic model --*/
 #include <mootEval.h>         /*-- tagger output evaluation --*/
 
 //----------------------------------------------------------------------

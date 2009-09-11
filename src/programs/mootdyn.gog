@@ -1,0 +1,430 @@
+# -*- Mode: Shell-Script -*-
+#
+# Getopt::Gen specification for moot
+#-----------------------------------------------------------------------------
+program "moot"
+#program_version "0.01"
+
+purpose	"moocow's HMM part-of-speech tagger/disambiguator."
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details "
+'mootdyn' is a dynamic Hidden Markov Model (HMM) tagger / disambiguator
+program based on the 'libmoot' library.
+
+Calling conventions largely the same as for the L<moot> program.
+"
+
+#-----------------------------------------------------------------------------
+# Files
+#-----------------------------------------------------------------------------
+rcfile "/etc/mootdynrc"
+rcfile "~/.mootdynrc"
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+argument "INPUT(s)" "Input files / file-lists." \
+    details="
+Input files should be 'cooked' text files
+of either the 'rare' (-tagged,-analyzed) or
+'medium rare' (-tagged,+analyzed) variety.
+
+See also the '--list' option.
+
+For details on moot file formats, see L<mootfiles>.
+"
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+#group "Basic Options"
+int "verbose" v "Verbosity level." \
+    arg="LEVEL" \
+    default="4" \
+    details="
+Be more or less verbose.  Recognized values are in the range 0..5:
+
+=over 4
+
+=item 0
+
+Be silent.
+
+=item 1
+
+Print error messages to stderr.
+
+=item 2
+
+Print warnings to stderr.
+
+=item 3
+
+Print summary information to stderr.
+
+=item 4
+
+Print progress information to stderr.
+
+=item 5
+
+Print everything.
+
+=back
+"
+
+flag  "no-header" H  "Suppres leading comments in destination file." \
+    details="
+Primarily useful as a workaround for nonconformant conservative XML output.
+"
+
+int   "dots"   d  "Print a dot for every NTOKS tokens processed." \
+    arg="NTOKS" \
+    default="0" \
+    details="Zero (the default) means that no dots will be printed."
+
+#flag  "words"  w  "INPUTs are input tokens, not filenames." \
+#    details="Useful for testing."
+
+flag  "list"   l  "INPUTs are file-lists, not filenames." \
+    details="
+If this flag is given, the FILE(s) arguments should be lists
+of input filenames, one filename per line, which should be
+processed.  Otherwise, the FILE(s) arguments are interpreted
+as filenames of the input files themselves.
+
+Potentially useful for large batch-processing jobs.
+"
+
+flag  "recover"   r  "Attempt to recover from minor errors." \
+    details="
+Minor errors such as missing files, etc. cause an error message to be
+emitted but do not cause the program to abort if this option is specified.
+
+Potentially useful for large automated batch-processing jobs.
+"
+
+string "output"	o "Specify output file (default=stdout)." \
+    arg="FILE" \
+    default="-"
+
+#---------------------------------------------------
+# Format options
+#---------------------------------------------------
+group "Format Options"
+
+string "input-format" I "Specify input file(s) format(s)." \
+    arg="FORMAT" \
+    details="
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+
+Default='MediumRare'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+"
+
+string "output-format" O "Specify output file format." \
+  arg="FORMAT" \
+  details="
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+
+Default='WellDone'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+"
+
+string "input-encoding" - "Override XML document input encoding." \
+    arg="ENCODING" \
+    details="
+Potentially useful for XML documents without encoding declarations.
+"
+
+string "output-encoding" - "Set default XML output encoding." \
+    arg="ENCODING" \
+    details="
+Slower, but potentially useful for human-readable XML output.
+"
+
+#flag  "ignore-first" 2 "Ignore the first analysis for each input token." \
+#    details="Useful for re-analysis."
+#
+#flag  "best"  b "Prune non-optimal tags (analyses) from the output." \
+#     details="Only meaningful if your input file contains analysis restrictions."
+#
+##flag  "tags"  t "Output only PoS tags, not detailed analyses." \
+##     details="Useful for compatibility with older programs."
+
+#-----------------------------------------------------------------------------
+# HMM Options
+#-----------------------------------------------------------------------------
+
+group "HMM Options"
+
+string "model" M "Use HMM model file(s) MODEL." \
+  arg="MODEL" \
+  default="moothmm" \
+  details="
+See 'HMM MODEL FILE FORMATS' in L<mootfiles> for details
+on model file formats.
+"
+
+#-----------------------------------------------------------------------------
+# HMM Options: Storage
+
+int "hash-ngrams" g "Whether to hash stored n-grams (default=yes)" \
+    arg="BOOL" \
+    default="1"
+
+#-----------------------------------------------------------------------------
+# HMM Options: Suffix Trie stuff
+int "trie-depth"  a "Maximum depth of suffix trie." \
+    arg="LEN" \
+    default="0" \
+    details="
+Use suffixes of up to LEN characters to estimate probabilities
+of unknown words.
+
+B<Warning>: this feature is B<EXPERIMENTAL>!  Use at your own risk.
+"
+
+int "trie-threshhold" A "Frequency upper bound for trie inclusion." \
+    arg="FREQ" \
+    default="10" \
+    details="
+Use words of at most frequency FREQ to construct the suffix trie.
+"
+
+float "trie-theta" - "Suffix backoff coefficient." \
+    arg="THETA" \
+    default="0" \
+    details="
+Specify suffix-trie backoff coefficient for smoothing.
+Specifying a value of zero (the default) causes the
+smoothing coefficient to be estimated.
+"
+
+#-----------------------------------------------------------------------------
+# HMM Options: lexical class stuff
+
+int "use-classes" L "Whether to use lexical class-probabilities." \
+    arg="BOOL" \
+    default="1" \
+    details="
+Only useful if your file contains a priori analyses.
+Default behavior is to try and use classes if you specify
+a non-empty class-frequency file.
+"
+
+int "relax" R "Whether to relax token-tag associability (default=no)" \
+  arg="BOOL" \
+  default="0" \
+  details="
+If nonzero, 'tag' fields of token analyses will be used only as a potential
+estimator of lexical probability, if at all.
+Otherwise (regardless of whether lexical classes are are being used as a
+probability estimator), 'tag' fields of token analyses will be interpreted
+as imposing 'hard' restrictions on which tags may occur with the token in question.
+
+See the C<--use-classes=BOOL> option and/or L<mootfiles> for more details on the
+use of lexical classes.
+"
+
+#-----------------------------------------------------------------------------
+# HMM Options: Smoothing
+
+string "nlambdas" N "N-Gram smoothing constants (default=estimate)" \
+  arg="FLOATS" \
+  details="
+FLOATS should be a string of the form \"LAMBDA1,LAMBDA2,LAMBDA3\"
+(without the quotes), where each LAMBDA$i is a floating-point constant.
+
+=over 4
+
+=item LAMBDA_1
+
+is the constant smoothing coefficient for unigram probabilities,
+
+=item LAMBDA_2
+
+is the constant smoothing coefficient for bigram probabilities,
+
+=item LAMBDA_3
+
+is the constant smoothing coefficient for trigram probabilities
+(only meaningful if libmoot was built with '--enable-trigrams=yes'.
+See the output of
+
+ mootconfig --options
+
+for details.
+
+=back
+
+If you override the default values, you should choose values such that
+LAMBDA_1 + LAMBDA_2 + LAMBDA_3 == 1.0.
+"
+
+string "wlambdas" W "Lexical smoothing constants (default=estimate)" \
+  arg="FLOATS" \
+  details="
+FLOATS should be a string of the form \"LAMBDA_W0,LAMBDA_W1\"
+(without the quotes), where each LAMBDA_W$i is a floating-point
+constant.
+
+=over 4
+
+=item LAMBDA_W0
+
+is the constant minimum lexical probability,
+
+=item LAMBDA_W1
+
+is the constant smoothing coefficient for lexical probabilities.
+
+=back
+
+If you override the default values, you should choose values such that
+LAMBDA_W0 + LAMBDA_W1 == 1.0.
+"
+
+
+string "clambdas" C "Lexical-class smoothing constants (default=estimate)" \
+  arg="FLOATS" \
+  details="
+LAMBDAS should be a string of the form \"LAMBDA_C0,LAMBDA_C1\"
+(without the quotes), where each LAMBDA_C$i is a floating-point constant.
+
+=over 4
+
+=item LAMBDA_C0
+
+is the constant minimum lexical-class probability,
+
+=item LAMBDA_C1
+
+is the constant smoothing coefficient for lexical-class probabilities.
+
+=back
+
+If you override the default values, you should choose values such that
+LAMBDA_C0 + LAMBDA_C1 == 1.0.
+"
+
+double "unknown-threshhold" t "Freq. threshhold for 'unknown' lexical probabilities" \
+  arg="FLOAT" \
+  default="1.0" \
+  details="
+Lexical probabilities for unknown tokens in the input are estimated
+from tokens which occur at most FLOAT times in the model.
+"
+
+
+double "class-threshhold" T "Freq. threshhold for 'unknown' class probabilities" \
+  arg="FLOAT" \
+  default="1.0" \
+  details="
+Class probabilities for unrecognized tokens  in the input are estimated
+from classes which occur at most FLOAT times in the model
+and/or from the empty class.
+"
+
+#-----------------------------------------------------------------------------
+# HMM Options: Misc
+
+string "unknown-token" u "Symbolic name of the 'unknown' token" \
+  arg="NAME" \
+  default="@UNKNOWN" \
+  details="
+You can use this value to include lexical frequency information
+for unknown input tokens in the lexical model file.
+"
+
+string "unknown-tag" U "Symbolic name of the 'unknown' tag" \
+  arg="NAME" \
+  default="UNKNOWN" \
+  details="You should never see or need this tag."
+
+string "eos-tag" e "Specify boundary tag (default=__$)" \
+  arg="TAG" \
+  default="__$" \
+  details="
+This is the pseudo-tag used in the n-gram model file to represent
+sentence boundaries, both beginning- and end-of-sentence.  It should
+not be an element of the actual tag-set -- that is, it should not
+be a valid analysis for any token.
+"
+
+double "beam-width" Z "Specify cutoff factor for beam pruning" \
+  arg="NUM" \
+  default="1000" \
+  details="
+During Viterbi search, paths will be ignored if their probabilities
+are less than 1/NUM*p_best , where p_best is the probability of
+the current best path.  Setting this option to zero disables
+beam pruning.
+"
+
+flag "save-ambiguities" S "Annotate tagged tokens with lexical ambiguities" \
+  details="
+Useful for debugging.
+"
+
+flag "mark-unknown" m "Mark unknown tokens." \
+  details="
+Useful for debugging.
+"
+
+#-----------------------------------------------------------------------------
+# Dynamic HMM Options
+#-----------------------------------------------------------------------------
+
+group "Dynamic HMM Options"
+
+string "dyn-new-tag" w "Specify pseudo-tag for new analyses (default='@NEW')" \
+  arg="TAG" \
+  default="@NEW" \
+  details="
+This is the pseudo-tag used in the n-gram model file to represent
+previously unseen tags (if any).
+"
+float "dyn-flambda" F "Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)" \
+  arg="FLOAT" \
+  default="0.1"
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+#addenda ""
+
+#-----------------------------------------------------------------------------
+# Bugs
+#-----------------------------------------------------------------------------
+bugs "
+
+None known.
+
+"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+acknowledge `cat acknowledge.pod`
+
+seealso "
+L<mootfiles>
+L<mootpp>,
+mootm(1),
+L<mootrain>,
+L<mootcompile>,
+L<mootdump>,
+L<mooteval>,
+"

@@ -121,7 +121,7 @@ public:
 
 
   //------ access
-  /** Return maximum id */
+  /** Return maximum id +1 */
   inline mootEnumID size(void) const
   {
     return ids2names.size();
@@ -160,6 +160,24 @@ public:
   };
 
   /**
+   * Remove a name<->id mapping.
+   * Effectively re-maps \c name to mootEnumNone==0 and \c id to unknown_name()
+   * Will never shrink the object.
+   */
+  inline void remove(const NameType &name, mootEnumID id=mootEnumNone)
+  {
+    names2ids.erase(name);
+    if (id != mootEnumNone) ids2names[id] = ids2names[mootEnumNone];
+  };
+
+  /** Remove a name<->id mapping, given only id */
+  inline void remove(mootEnumID id)
+  {
+    remove(ids2names[id],id);
+  };
+
+
+  /**
    * Get ID for name, creating one if it doesn't already exist.
    */
   inline mootEnumID get_id(const NameType &name)
@@ -176,6 +194,24 @@ public:
     ids2names.resize(1); //-- keep "unknown" name
     //--
     //ids2names.clear();     //-- clear *everything*
+  };
+
+  /** Resize the object, leaving only \c newsize-1 IDs intact.
+   *  Increasing object size may leave the object in an inconsistent state.
+   */
+  void resize(size_t newsize)
+  {
+    if (newsize < 1) newsize=1;  //-- minimum size = 1 (always keep "unknown")
+    if (newsize == size()) return;
+    if (newsize < size()) { //-- grow (only ids2names)
+      ids2names.resize(newsize);
+    }
+    else { //-- shrink
+      for (mootEnumID id = newsize; id < size(); id++) {
+	names2ids.erase(ids2names[id]);
+      }
+      ids2names.resize(newsize);
+    }
   };
 };
 
