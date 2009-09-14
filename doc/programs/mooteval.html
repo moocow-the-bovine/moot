@@ -10,10 +10,8 @@
 
 <body>
 
-
-<!-- INDEX BEGIN -->
-<div name="index">
 <p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
 
 <ul>
 
@@ -36,11 +34,9 @@
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 </ul>
-
-<hr name="index" />
-</div>
 <!-- INDEX END -->
 
+<hr />
 <p>
 </p>
 <hr />
@@ -80,7 +76,7 @@ See below for more details on the summary information printed.</p>
 <hr />
 <h1><a name="arguments">ARGUMENTS</a></h1>
 <dl>
-<dt><strong><a name="file1_file2" class="item"><code>FILE1 FILE2</code></a></strong></dt>
+<dt><strong><a name="item_file1_file2"><code>FILE1 FILE2</code></a></strong></dt>
 
 <dd>
 <p>Files to compare.</p>
@@ -91,26 +87,26 @@ See below for more details on the summary information printed.</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="help_h" class="item"><code>--help</code> , <code>-h</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dhelp__2c__2dh"><code>--help</code> , <code>-h</code></a></strong></dt>
 
 <dd>
 <p>Print help and exit.</p>
 <p>Default: '0'</p>
 </dd>
-<dt><strong><a name="version_v" class="item"><code>--version</code> , <code>-V</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dversion__2c__2dv"><code>--version</code> , <code>-V</code></a></strong></dt>
 
 <dd>
 <p>Print version and exit.</p>
 <p>Default: '0'</p>
 </dd>
-<dt><strong><a name="rcfile_file_cfile" class="item"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
+<dt><strong><a name="item__2d_2drcfile_3dfile__2c__2dcfile"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
 
 <dd>
 <p>Read an alternate configuration file.</p>
 <p>Default: 'NULL'</p>
 <p>See also: <a href="#configuration_files">CONFIGURATION FILES</a>.</p>
 </dd>
-<dt><strong><a name="verbose_level_vlevel" class="item"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dverbose_3dlevel__2c__2dvlevel"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
 
 <dd>
 <p>Verbosity level.</p>
@@ -135,7 +131,7 @@ any mismatch condition.</p>
 </li>
 </ol>
 </dd>
-<dt><strong><a name="eval_first_1" class="item"><code>--eval-first</code> , <code>-1</code></a></strong></dt>
+<dt><strong><a name="item__2d_2deval_2dfirst__2c__2d1"><code>--eval-first</code> , <code>-1</code></a></strong></dt>
 
 <dd>
 <p>Evaluate FILE1 vs. baseline FILE2</p>
@@ -144,7 +140,7 @@ any mismatch condition.</p>
 <p>If neither --eval-first nor --eval-second
 is given, both input files are evaluated against one another.</p>
 </dd>
-<dt><strong><a name="eval_second_2" class="item"><code>--eval-second</code> , <code>-2</code></a></strong></dt>
+<dt><strong><a name="item__2d_2deval_2dsecond__2c__2d2"><code>--eval-second</code> , <code>-2</code></a></strong></dt>
 
 <dd>
 <p>Evaluate FILE2 vs. baseline FILE1</p>
@@ -153,14 +149,14 @@ is given, both input files are evaluated against one another.</p>
 <p>If neither --eval-first nor --eval-second
 is given, both input files are evaluated against one another.</p>
 </dd>
-<dt><strong><a name="output_file_ofile" class="item"><code>--output=FILE</code> , <code>-oFILE</code></a></strong></dt>
+<dt><strong><a name="item__2d_2doutput_3dfile__2c__2dofile"><code>--output=FILE</code> , <code>-oFILE</code></a></strong></dt>
 
 <dd>
 <p>Write output to FILE.</p>
 <p>Default: '-'</p>
 <p>If --verbose &gt;= 1, a summary will always be printed to stderr.</p>
 </dd>
-<dt><strong><a name="input_format_format_iformat" class="item"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dinput_2dformat_3dformat__2c__2diformat"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></a></strong></dt>
 
 <dd>
 <p>Specify input file formats.</p>
@@ -171,7 +167,7 @@ negation.  Both input files should have the same format.</p>
 <p>Default='WellDone'</p>
 <p>See 'I/O Format Flags' in <a href="././mootfiles.html">the mootfiles manpage</a> for details.</p>
 </dd>
-<dt><strong><a name="input_encoding_encoding" class="item"><code>--input-encoding=ENCODING</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dinput_2dencoding_3dencoding"><code>--input-encoding=ENCODING</code></a></strong></dt>
 
 <dd>
 <p>Override XML document input encoding.</p>
@@ -201,9 +197,9 @@ are ignored.</p>
 <h2><a name="summary_information">Summary Information</a></h2>
 <p>The summary data printed by mooteval for each evaluated file
 (E-file) is interpreted with respect to the other file specified
-on the command line (the &quot;truth&quot;, or T-file) as follows:</p>
+on the command line (the ``truth'', or T-file) as follows:</p>
 <dl>
-<dt><strong><a name="average_class_size" class="item">Average Class Size</a></strong></dt>
+<dt><strong><a name="item_average_class_size">Average Class Size</a></strong></dt>
 
 <dd>
 <p>The average number
@@ -215,7 +211,7 @@ Only meaningful for well-done E-files:</p>
 <pre>
  class_size(tok)  := card(class(tok,Efile))</pre>
 </dd>
-<dt><strong><a name="class_given" class="item">Class Given</a></strong></dt>
+<dt><strong><a name="item_class_given">Class Given</a></strong></dt>
 
 <dd>
 <p>The total number of
@@ -228,23 +224,23 @@ Only meaningful for well-done E-files.</p>
  class_given(tok,Efile)   = / 1 if class(tok,Efile) != {}
                             \ 0 otherwise</pre>
 </dd>
-<dt><strong><a name="saves" class="item">Saves</a></strong></dt>
+<dt><strong><a name="item_saves">Saves</a></strong></dt>
 
 <dd>
-<p>The number of unanalyzed tokens in the E-file (-&quot;Class Given&quot;)
-whose best-tag matched that of the corresponding token in the T-file (+&quot;Tags Equal&quot;).</p>
+<p>The number of unanalyzed tokens in the E-file (-``Class Given'')
+whose best-tag matched that of the corresponding token in the T-file (+``Tags Equal'').</p>
 <pre>
  saves(Toks,Efile)  := sum(save(tok,Efile)) / sum(!class_given(tok,Efile))</pre>
 <pre>
  save(tok,Efile)     = / 1 if !class_given(tok,Efile) and tag(tok,Efile)==tag(tok,Tfile)
                        \ 0 otherwise</pre>
 </dd>
-<dt><strong><a name="internal_coverage" class="item">Internal Coverage</a></strong></dt>
+<dt><strong><a name="item_internal_coverage">Internal Coverage</a></strong></dt>
 
 <dd>
-<p>The number of analyzed tokens in the E-file (+&quot;Class Given&quot;)
+<p>The number of analyzed tokens in the E-file (+``Class Given'')
 whose tag according to the <strong>E-file</strong> is associated with some analysis
-assigned to that token in the <strong>E-file</strong> (a &quot;possible&quot; or &quot;coherent&quot; analysis,tag pair
+assigned to that token in the <strong>E-file</strong> (a ``possible'' or ``coherent'' analysis,tag pair
 internal to the E-file itself):</p>
 <pre>
  internal_coverage(Toks,Efile) := sum(covers(tok,Efile,Efile)) / |Efile|</pre>
@@ -253,17 +249,17 @@ internal to the E-file itself):</p>
  covers(tok,AnFile,TagFile)    := &lt;       and tag(tok,TagFile) in class(tok,AnFile)
                                    \ 0 otherwise</pre>
 </dd>
-<dt><strong><a name="external_coverage" class="item">External Coverage</a></strong></dt>
+<dt><strong><a name="item_external_coverage">External Coverage</a></strong></dt>
 
 <dd>
-<p>The number of analyzed tokens in the E-file (+&quot;Class Given&quot;),
+<p>The number of analyzed tokens in the E-file (+``Class Given''),
 whose tag according to the <strong>T-file</strong> is associated with some analysis
-assigned to that token in the <strong>E-file</strong> (a &quot;possible&quot; or &quot;coherent&quot; analysis,tag
+assigned to that token in the <strong>E-file</strong> (a ``possible'' or ``coherent'' analysis,tag
 pair; where the analyses are drawn from the E-file and the tags from the T-file):</p>
 <pre>
  external_coverage(Toks,Efile) := sum(covers(tok,Efile,Tfile)) / |Efile|</pre>
 </dd>
-<dt><strong><a name="disambiguation_rate" class="item">Disambiguation Rate</a></strong></dt>
+<dt><strong><a name="item_disambiguation_rate">Disambiguation Rate</a></strong></dt>
 
 <dd>
 <p>The number of cross-coherent tokens in the E-file whose best tag matches that
@@ -276,14 +272,14 @@ of the corresponding token in the T-file:</p>
  disambig(tok,Efile,Tfile)         := &lt;      and tag(tok,Efile)==tag(tok,Tfile)
                                        \ 0 otherwise</pre>
 </dd>
-<dt><strong><a name="tokens_equal" class="item">Tokens Equal</a></strong></dt>
+<dt><strong><a name="item_tokens_equal">Tokens Equal</a></strong></dt>
 
 <dd>
 <p>The number of tokens in the E-file whose text matched that of
 the corresponding token in the T-file.  Any value other than 100%
 here is usually indicative of a format error.</p>
 </dd>
-<dt><strong><a name="tags_equal" class="item">Tags Equal</a></strong></dt>
+<dt><strong><a name="item_tags_equal">Tags Equal</a></strong></dt>
 
 <dd>
 <p>The number of tokens in the E-file whose best tag matched that
@@ -317,10 +313,10 @@ as:</p>
 <h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
 <p>Development of this package was supported by the project
 'Kollokationen im W&ouml;rterbuch'
-( &quot;collocations in the dictionary&quot;, <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
+( ``collocations in the dictionary'', <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
 in association with the project
 'Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
-( &quot;digital dictionary of the German language of the 20th century&quot;, <a href="http://www.dwds.de">http://www.dwds.de</a> )
+( ``digital dictionary of the German language of the 20th century'', <a href="http://www.dwds.de">http://www.dwds.de</a> )
 at the Berlin-Brandenburgische Akademie der Wissenschaften ( <a href="http://www.bbaw.de">http://www.bbaw.de</a> )
 with funding from
 the Alexander von Humboldt Stiftung ( <a href="http://www.avh.de">http://www.avh.de</a> )
@@ -348,7 +344,7 @@ class-based HMM tagger / disambiguator.</p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
 <p><a href="././mootfiles.html">the mootfiles manpage</a>,
-<code>mootm(1)</code>,
+mootm(1),
 <a href="././moot.html">the moot manpage</a></p>
 
 </body>

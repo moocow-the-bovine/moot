@@ -128,62 +128,91 @@
 .rm #[ #] #H #V #F C
 .\" ========================================================================
 .\"
-.IX Title "MOOTCOMPILE 1"
-.TH MOOTCOMPILE 1 "2009-09-14" "moot v2.0.7-0" "moot PoS Tagger"
+.IX Title "MOOTDYN 1"
+.TH MOOTDYN 1 "2009-09-14" "moot v2.0.7-0" "moot PoS Tagger"
 .SH "NAME"
-mootcompile \- moocow's HMM part\-of\-speech tagger/disambiguator: model compiler.
+moot \- moocow's HMM part\-of\-speech tagger/disambiguator.
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
-mootcompile [\s-1OPTIONS\s0] \s-1MODEL\s0(s)
+moot [\s-1OPTIONS\s0] \s-1INPUT\s0(s)
 .PP
 .Vb 2
 \& Arguments:
-\&    MODEL(s)  Text\-format input models.
+\&    INPUT(s)  Input files / file\-lists.
+.Ve
+.PP
+.Vb 10
+\& Options
+\&    \-h          \-\-help                       Print help and exit.
+\&    \-V          \-\-version                    Print version and exit.
+\&    \-cFILE      \-\-rcfile=FILE                Read an alternate configuration file.
+\&    \-vLEVEL     \-\-verbose=LEVEL              Verbosity level.
+\&    \-H          \-\-no\-header                  Suppres leading comments in destination file.
+\&    \-dNTOKS     \-\-dots=NTOKS                 Print a dot for every NTOKS tokens processed.
+\&    \-l          \-\-list                       INPUTs are file\-lists, not filenames.
+\&    \-r          \-\-recover                    Attempt to recover from minor errors.
+\&    \-oFILE      \-\-output=FILE                Specify output file (default=stdout).
+.Ve
+.PP
+.Vb 5
+\& Format Options
+\&    \-IFORMAT    \-\-input\-format=FORMAT        Specify input file(s) format(s).
+\&    \-OFORMAT    \-\-output\-format=FORMAT       Specify output file format.
+\&                \-\-input\-encoding=ENCODING    Override XML document input encoding.
+\&                \-\-output\-encoding=ENCODING   Set default XML output encoding.
+.Ve
+.PP
+.Vb 19
+\& HMM Options
+\&    \-MMODEL     \-\-model=MODEL                Use HMM model file(s) MODEL.
+\&    \-gBOOL      \-\-hash\-ngrams=BOOL           Whether to hash stored n\-grams (default=yes)
+\&    \-aLEN       \-\-trie\-depth=LEN             Maximum depth of suffix trie.
+\&    \-AFREQ      \-\-trie\-threshhold=FREQ       Frequency upper bound for trie inclusion.
+\&                \-\-trie\-theta=FLOAT           Suffix backoff coefficient.
+\&    \-LBOOL      \-\-use\-classes=BOOL           Whether to use lexical class\-probabilities.
+\&    \-RBOOL      \-\-relax=BOOL                 Whether to relax token\-tag associability (default=no)
+\&    \-NFLOATS    \-\-nlambdas=FLOATS            N\-Gram smoothing constants (default=estimate)
+\&    \-WFLOATS    \-\-wlambdas=FLOATS            Lexical smoothing constants (default=estimate)
+\&    \-CFLOATS    \-\-clambdas=FLOATS            Lexical\-class smoothing constants (default=estimate)
+\&    \-tDOUBLE    \-\-unknown\-threshhold=DOUBLE  Freq. threshhold for \(aqunknown\(aq lexical probabilities
+\&    \-TDOUBLE    \-\-class\-threshhold=DOUBLE    Freq. threshhold for \(aqunknown\(aq class probabilities
+\&    \-uNAME      \-\-unknown\-token=NAME         Symbolic name of the \(aqunknown\(aq token
+\&    \-UNAME      \-\-unknown\-tag=NAME           Symbolic name of the \(aqunknown\(aq tag
+\&    \-eTAG       \-\-eos\-tag=TAG                Specify boundary tag (default=__$)
+\&    \-ZDOUBLE    \-\-beam\-width=DOUBLE          Specify cutoff factor for beam pruning
+\&    \-S          \-\-save\-ambiguities           Annotate tagged tokens with lexical ambiguities
+\&    \-m          \-\-mark\-unknown               Mark unknown tokens.
 .Ve
 .PP
 .Vb 7
-\& Options
-\&    \-h        \-\-help                       Print help and exit.
-\&    \-V        \-\-version                    Print version and exit.
-\&    \-cFILE    \-\-rcfile=FILE                Read an alternate configuration file.
-\&    \-vLEVEL   \-\-verbose=LEVEL              Verbosity level.
-\&    \-oFILE    \-\-output=FILE                Specify output file (default=stdout).
-\&    \-zLEVEL   \-\-compress=LEVEL             Compression level for output file.
-.Ve
-.PP
-.Vb 16
-\& HMM Options
-\&    \-gBOOL    \-\-hash\-ngrams=BOOL           Whether to hash stored n\-grams (default=no)
-\&    \-aLEN     \-\-trie\-depth=LEN             Maximum depth of suffix trie.
-\&    \-AFREQ    \-\-trie\-threshhold=FREQ       Frequency upper bound for trie inclusion.
-\&              \-\-trie\-theta=FLOAT           Suffix backoff coefficient.
-\&    \-LBOOL    \-\-use\-classes=BOOL           Whether to use lexical class\-probabilities.
-\&    \-RBOOL    \-\-relax=BOOL                 Whether to relax token\-tag associability (default=no)
-\&    \-NFLOATS  \-\-nlambdas=FLOATS            N\-Gram smoothing constants (default=estimate)
-\&    \-WFLOATS  \-\-wlambdas=FLOATS            Lexical smoothing constants (default=estimate)
-\&    \-CFLOATS  \-\-clambdas=FLOATS            Lexical\-class smoothing constants (default=estimate)
-\&    \-tDOUBLE  \-\-unknown\-threshhold=DOUBLE  Freq. threshhold for \(aqunknown\(aq lexical probabilities
-\&    \-TDOUBLE  \-\-class\-threshhold=DOUBLE    Freq. threshhold for \(aqunknown\(aq class probabilities
-\&    \-uNAME    \-\-unknown\-token=NAME         Symbolic name of the \(aqunknown\(aq token
-\&    \-UNAME    \-\-unknown\-tag=NAME           Symbolic name of the \(aqunknown\(aq tag
-\&    \-eTAG     \-\-eos\-tag=TAG                Specify boundary tag (default=__$)
-\&    \-ZDOUBLE  \-\-beam\-width=DOUBLE          Specify cutoff factor for beam pruning
+\& Dynamic HMM Options
+\&    \-DCLASS     \-\-dyn\-class=CLASS            Specify built\-in dynamic estimator (default=\(aqFreq\(aq)
+\&    \-iBOOL      \-\-dyn\-invert=BOOL            Estimate p(w|t)~=p(t|w)? (default=1)
+\&    \-bFLOAT     \-\-dyn\-base=FLOAT             Base for Maxwell\-Boltzmann estimator (default=2)
+\&    \-BFLOAT     \-\-dyn\-beta=FLOAT             Temperature coefficient for Maxwell\-Boltzmann estimator (default=1)
+\&    \-wTAG       \-\-dyn\-new\-tag=TAG            Specify pseudo\-tag for new analyses (default=\(aq@NEW\(aq)
+\&    \-EFLOAT     \-\-dyn\-freq\-eps=FLOAT         Specify dynamic lexical pseudo\-frequency smoothing constant (default=0.1)
 .Ve
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-moocow's \s-1HMM\s0 part-of-speech tagger/disambiguator: model compiler.
+moocow's \s-1HMM\s0 part-of-speech tagger/disambiguator.
 .PP
-\&'mootcompile' compiles binary Hidden Markov Model parameter
-files for use with the '\fImoot\fR\|(1)' program
-from one or more text model files.
+\&'mootdyn' is a dynamic Hidden Markov Model (\s-1HMM\s0) tagger / disambiguator
+program based on the 'libmoot' library.
 .PP
-See mootfiles for details on moot model file formats.
+Calling conventions largely the same as for the moot program.
 .SH "ARGUMENTS"
 .IX Header "ARGUMENTS"
-.ie n .IP "MODEL(s)" 4
-.el .IP "\f(CWMODEL(s)\fR" 4
-.IX Item "MODEL(s)"
-Text-format input models.
+.ie n .IP "INPUT(s)" 4
+.el .IP "\f(CWINPUT(s)\fR" 4
+.IX Item "INPUT(s)"
+Input files / file\-lists.
+.Sp
+Input files should be 'cooked' text files
+of either the 'rare' (\-tagged,\-analyzed) or
+\&'medium rare' (\-tagged,+analyzed) variety.
+.Sp
+See also the '\-\-list' option.
 .Sp
 For details on moot file formats, see mootfiles.
 .SH "OPTIONS"
@@ -213,34 +242,139 @@ See also: \*(L"\s-1CONFIGURATION\s0 \s-1FILES\s0\*(R".
 .IX Item "--verbose=LEVEL , -vLEVEL"
 Verbosity level.
 .Sp
-Default: '2'
+Default: '4'
 .Sp
-Be more or less verbose.  Recognized values are in the range 0..3.
+Be more or less verbose.  Recognized values are in the range 0..5:
+.RS 4
+.IP "0" 4
+Be silent.
+.IP "1" 4
+.IX Item "1"
+Print error messages to stderr.
+.IP "2" 4
+.IX Item "2"
+Print warnings to stderr.
+.IP "3" 4
+.IX Item "3"
+Print summary information to stderr.
+.IP "4" 4
+.IX Item "4"
+Print progress information to stderr.
+.IP "5" 4
+.IX Item "5"
+Print everything.
+.RE
+.RS 4
+.RE
+.ie n .IP """\-\-no\-header""\fR , \f(CW""\-H""" 4
+.el .IP "\f(CW\-\-no\-header\fR , \f(CW\-H\fR" 4
+.IX Item "--no-header , -H"
+Suppres leading comments in destination file.
+.Sp
+Default: '0'
+.Sp
+Primarily useful as a workaround for nonconformant conservative \s-1XML\s0 output.
+.ie n .IP """\-\-dots=NTOKS""\fR , \f(CW""\-dNTOKS""" 4
+.el .IP "\f(CW\-\-dots=NTOKS\fR , \f(CW\-dNTOKS\fR" 4
+.IX Item "--dots=NTOKS , -dNTOKS"
+Print a dot for every \s-1NTOKS\s0 tokens processed.
+.Sp
+Default: '0'
+.Sp
+Zero (the default) means that no dots will be printed.
+.ie n .IP """\-\-list""\fR , \f(CW""\-l""" 4
+.el .IP "\f(CW\-\-list\fR , \f(CW\-l\fR" 4
+.IX Item "--list , -l"
+INPUTs are file\-lists, not filenames.
+.Sp
+Default: '0'
+.Sp
+If this flag is given, the \s-1FILE\s0(s) arguments should be lists
+of input filenames, one filename per line, which should be
+processed.  Otherwise, the \s-1FILE\s0(s) arguments are interpreted
+as filenames of the input files themselves.
+.Sp
+Potentially useful for large batch-processing jobs.
+.ie n .IP """\-\-recover""\fR , \f(CW""\-r""" 4
+.el .IP "\f(CW\-\-recover\fR , \f(CW\-r\fR" 4
+.IX Item "--recover , -r"
+Attempt to recover from minor errors.
+.Sp
+Default: '0'
+.Sp
+Minor errors such as missing files, etc. cause an error message to be
+emitted but do not cause the program to abort if this option is specified.
+.Sp
+Potentially useful for large automated batch-processing jobs.
 .ie n .IP """\-\-output=FILE""\fR , \f(CW""\-oFILE""" 4
 .el .IP "\f(CW\-\-output=FILE\fR , \f(CW\-oFILE\fR" 4
 .IX Item "--output=FILE , -oFILE"
 Specify output file (default=stdout).
 .Sp
 Default: '\-'
+.Sh "Format Options"
+.IX Subsection "Format Options"
+.ie n .IP """\-\-input\-format=FORMAT""\fR , \f(CW""\-IFORMAT""" 4
+.el .IP "\f(CW\-\-input\-format=FORMAT\fR , \f(CW\-IFORMAT\fR" 4
+.IX Item "--input-format=FORMAT , -IFORMAT"
+Specify input file(s) format(s).
 .Sp
-Binary model will be written to \s-1FILE\s0.
-.ie n .IP """\-\-compress=LEVEL""\fR , \f(CW""\-zLEVEL""" 4
-.el .IP "\f(CW\-\-compress=LEVEL\fR , \f(CW\-zLEVEL\fR" 4
-.IX Item "--compress=LEVEL , -zLEVEL"
-Compression level for output file.
+Default: '\s-1NULL\s0'
 .Sp
-Default: '\-1'
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+.Sp
+Default='MediumRare'
+.Sp
+See 'I/O Format Flags' in mootfiles for details.
+.ie n .IP """\-\-output\-format=FORMAT""\fR , \f(CW""\-OFORMAT""" 4
+.el .IP "\f(CW\-\-output\-format=FORMAT\fR , \f(CW\-OFORMAT\fR" 4
+.IX Item "--output-format=FORMAT , -OFORMAT"
+Specify output file format.
+.Sp
+Default: '\s-1NULL\s0'
+.Sp
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+.Sp
+Default='WellDone'
+.Sp
+See 'I/O Format Flags' in mootfiles for details.
+.ie n .IP """\-\-input\-encoding=ENCODING""" 4
+.el .IP "\f(CW\-\-input\-encoding=ENCODING\fR" 4
+.IX Item "--input-encoding=ENCODING"
+Override \s-1XML\s0 document input encoding.
+.Sp
+Default: '\s-1NULL\s0'
+.Sp
+Potentially useful for \s-1XML\s0 documents without encoding declarations.
+.ie n .IP """\-\-output\-encoding=ENCODING""" 4
+.el .IP "\f(CW\-\-output\-encoding=ENCODING\fR" 4
+.IX Item "--output-encoding=ENCODING"
+Set default \s-1XML\s0 output encoding.
+.Sp
+Default: '\s-1NULL\s0'
+.Sp
+Slower, but potentially useful for human-readable \s-1XML\s0 output.
 .Sh "\s-1HMM\s0 Options"
 .IX Subsection "HMM Options"
+.ie n .IP """\-\-model=MODEL""\fR , \f(CW""\-MMODEL""" 4
+.el .IP "\f(CW\-\-model=MODEL\fR , \f(CW\-MMODEL\fR" 4
+.IX Item "--model=MODEL , -MMODEL"
+Use \s-1HMM\s0 model file(s) \s-1MODEL\s0.
+.Sp
+Default: 'moothmm'
+.Sp
+See '\s-1HMM\s0 \s-1MODEL\s0 \s-1FILE\s0 \s-1FORMATS\s0' in mootfiles for details
+on model file formats.
 .ie n .IP """\-\-hash\-ngrams=BOOL""\fR , \f(CW""\-gBOOL""" 4
 .el .IP "\f(CW\-\-hash\-ngrams=BOOL\fR , \f(CW\-gBOOL\fR" 4
 .IX Item "--hash-ngrams=BOOL , -gBOOL"
-Whether to hash stored n\-grams (default=no)
+Whether to hash stored n\-grams (default=yes)
 .Sp
-Default: '0'
-.Sp
-If nonzero, tag n\-grams will be stored in a slow but memory-friendly
-hash.  Otherwise, a fast but large array will be used.
+Default: '1'
 .ie n .IP """\-\-trie\-depth=LEN""\fR , \f(CW""\-aLEN""" 4
 .el .IP "\f(CW\-\-trie\-depth=LEN\fR , \f(CW\-aLEN\fR" 4
 .IX Item "--trie-depth=LEN , -aLEN"
@@ -249,9 +383,9 @@ Maximum depth of suffix trie.
 Default: '0'
 .Sp
 Use suffixes of up to \s-1LEN\s0 characters to estimate probabilities
-of unknown words.  A value of 0 (zero) disables use of a suffix trie.
+of unknown words.
 .Sp
-\&\s-1EXPERIMENTAL\s0.
+\&\fBWarning\fR: this feature is \fB\s-1EXPERIMENTAL\s0\fR!  Use at your own risk.
 .ie n .IP """\-\-trie\-threshhold=FREQ""\fR , \f(CW""\-AFREQ""" 4
 .el .IP "\f(CW\-\-trie\-threshhold=FREQ\fR , \f(CW\-AFREQ\fR" 4
 .IX Item "--trie-threshhold=FREQ , -AFREQ"
@@ -431,6 +565,102 @@ During Viterbi search, paths will be ignored if their probabilities
 are less than 1/NUM*p_best , where p_best is the probability of
 the current best path.  Setting this option to zero disables
 beam pruning.
+.ie n .IP """\-\-save\-ambiguities""\fR , \f(CW""\-S""" 4
+.el .IP "\f(CW\-\-save\-ambiguities\fR , \f(CW\-S\fR" 4
+.IX Item "--save-ambiguities , -S"
+Annotate tagged tokens with lexical ambiguities
+.Sp
+Default: '0'
+.Sp
+Useful for debugging.
+.ie n .IP """\-\-mark\-unknown""\fR , \f(CW""\-m""" 4
+.el .IP "\f(CW\-\-mark\-unknown\fR , \f(CW\-m\fR" 4
+.IX Item "--mark-unknown , -m"
+Mark unknown tokens.
+.Sp
+Default: '0'
+.Sp
+Useful for debugging.
+.Sh "Dynamic \s-1HMM\s0 Options"
+.IX Subsection "Dynamic HMM Options"
+.ie n .IP """\-\-dyn\-class=CLASS""\fR , \f(CW""\-DCLASS""" 4
+.el .IP "\f(CW\-\-dyn\-class=CLASS\fR , \f(CW\-DCLASS\fR" 4
+.IX Item "--dyn-class=CLASS , -DCLASS"
+Specify built-in dynamic estimator (default='Freq')
+.Sp
+Default: 'Freq'
+.Sp
+Known values for \s-1CLASS\s0 are:
+.RS 4
+.IP "Freq" 4
+.IX Item "Freq"
+Analysis 'costs' are interpreted as pseudo-frequencies f(w,t)
+lexical probabilities are instantiated as p(w|t)~=f(w,t)/Z(w,t).
+See \f(CW\*(C`\-\-dyn\-invert\*(C'\fR for details on how \f(CW\*(C`Z(w,t)\*(C'\fR is estimated.
+.IP "Boltzmann" 4
+.IX Item "Boltzmann"
+Analysis 'costs' are interpreted as 'distances' d(w,t), and
+lexical probabilities are instantiated as a Maxwell-Boltzmann
+distribution:
+.Sp
+.Vb 2
+\& f(w,t) ~= BASE ^ (\-BETA * d(w,t))   # Maxwell\-Boltzmann estimator
+\& p(w|t) ~= f(w,t) / Z(w,t)           # ... as for the \(aqFreq\(aq class
+.Ve
+.Sp
+The Maxwell-Boltzmann estimator constants \s-1BASE\s0 and \s-1BETA\s0 are given
+by the \f(CW\*(C`\-\-dyn\-base\*(C'\fR and \f(CW\*(C`\-\-dyn\-beta\*(C'\fR args.
+.RE
+.RS 4
+.RE
+.ie n .IP """\-\-dyn\-invert=BOOL""\fR , \f(CW""\-iBOOL""" 4
+.el .IP "\f(CW\-\-dyn\-invert=BOOL\fR , \f(CW\-iBOOL\fR" 4
+.IX Item "--dyn-invert=BOOL , -iBOOL"
+Estimate p(w|t)~=p(t|w)? (default=1)
+.Sp
+Default: '1'
+.Sp
+Determines how the normalization factor Z(w,t) is estimated
+for dynamic lexical probabilities p(w|t)~=f(w,t)/Z(w,t).
+If true (the default), Z(w,t) := f(w) = Sum_t f(w,t).
+Otherwise, Z(w,t) := f(t) = Sum_w f(w,t).
+.Sp
+Note that a true value here causes a theoretically incorrect
+estimator to be used, since f(w,t)/f(w) = p(t|w) != p(w|t).
+Nonetheless, empirical tests have shown the inverted estimator
+to be more effective in many cases, and should be too harmful
+if the input analyses are a function of input token text.
+.ie n .IP """\-\-dyn\-base=FLOAT""\fR , \f(CW""\-bFLOAT""" 4
+.el .IP "\f(CW\-\-dyn\-base=FLOAT\fR , \f(CW\-bFLOAT\fR" 4
+.IX Item "--dyn-base=FLOAT , -bFLOAT"
+Base for Maxwell-Boltzmann estimator (default=2)
+.Sp
+Default: '2.0'
+.Sp
+See the 'Boltzmann' estimator under \f(CW\*(C`\-\-dyn\-class\*(C'\fR for details.
+.ie n .IP """\-\-dyn\-beta=FLOAT""\fR , \f(CW""\-BFLOAT""" 4
+.el .IP "\f(CW\-\-dyn\-beta=FLOAT\fR , \f(CW\-BFLOAT\fR" 4
+.IX Item "--dyn-beta=FLOAT , -BFLOAT"
+Temperature coefficient for Maxwell-Boltzmann estimator (default=1)
+.Sp
+Default: '1.0'
+.Sp
+See the 'Boltzmann' estimator under \f(CW\*(C`\-\-dyn\-class\*(C'\fR for details.
+.ie n .IP """\-\-dyn\-new\-tag=TAG""\fR , \f(CW""\-wTAG""" 4
+.el .IP "\f(CW\-\-dyn\-new\-tag=TAG\fR , \f(CW\-wTAG\fR" 4
+.IX Item "--dyn-new-tag=TAG , -wTAG"
+Specify pseudo-tag for new analyses (default='@NEW')
+.Sp
+Default: '@NEW'
+.Sp
+This is the pseudo-tag used in the n\-gram model file to represent
+previously unseen tags (if any).
+.ie n .IP """\-\-dyn\-freq\-eps=FLOAT""\fR , \f(CW""\-EFLOAT""" 4
+.el .IP "\f(CW\-\-dyn\-freq\-eps=FLOAT\fR , \f(CW\-EFLOAT\fR" 4
+.IX Item "--dyn-freq-eps=FLOAT , -EFLOAT"
+Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)
+.Sp
+Default: '0.1'
 .SH "CONFIGURATION FILES"
 .IX Header "CONFIGURATION FILES"
 Configuration files are expected to contain lines of the form:
@@ -446,11 +676,11 @@ Blank lines and comments (lines beginning with '#')
 are ignored.
 .PP
 The following configuration files are read by default:
-.IP "* /etc/mootcompilerc" 4
-.IX Item "/etc/mootcompilerc"
+.IP "* /etc/mootdynrc" 4
+.IX Item "/etc/mootdynrc"
 .PD 0
-.IP "* ~/.mootcompilerc" 4
-.IX Item "~/.mootcompilerc"
+.IP "* ~/.mootdynrc" 4
+.IX Item "~/.mootdynrc"
 .PD
 .SH "ADDENDA"
 .IX Header "ADDENDA"
@@ -462,7 +692,7 @@ Translation was initiated
 as:
 .PP
 .Vb 1
-\&   optgen.perl \-l \-\-nocfile \-\-nohfile \-\-notimestamp \-F mootcompile mootcompile.gog
+\&   optgen.perl \-l \-\-nocfile \-\-nohfile \-\-notimestamp \-F mootdyn mootdyn.gog
 .Ve
 .SH "BUGS AND LIMITATIONS"
 .IX Header "BUGS AND LIMITATIONS"
@@ -501,7 +731,9 @@ Bryan Jurish <moocow@ling.uni\-potsdam.de>
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
 mootfiles
+mootpp,
 \&\fImootm\fR\|(1),
 mootrain,
+mootcompile,
 mootdump,
-moot
+mooteval,

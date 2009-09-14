@@ -24,11 +24,11 @@ mootcompile [OPTIONS] MODEL(s)
 
  HMM Options
     -gBOOL    --hash-ngrams=BOOL           Whether to hash stored n-grams (default=no)
-    -rBOOL    --relax=BOOL                 Whether to relax token-tag associability (default=no)
     -aLEN     --trie-depth=LEN             Maximum depth of suffix trie.
     -AFREQ    --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.
               --trie-theta=FLOAT           Suffix backoff coefficient.
     -LBOOL    --use-classes=BOOL           Whether to use lexical class-probabilities.
+    -RBOOL    --relax=BOOL                 Whether to relax token-tag associability (default=no)
     -NFLOATS  --nlambdas=FLOATS            N-Gram smoothing constants (default=estimate)
     -WFLOATS  --wlambdas=FLOATS            Lexical smoothing constants (default=estimate)
     -CFLOATS  --clambdas=FLOATS            Lexical-class smoothing constants (default=estimate)
@@ -182,26 +182,6 @@ hash.  Otherwise, a fast but large array will be used.
 
 
 
-=item C<--relax=BOOL> , C<-rBOOL>
-
-Whether to relax token-tag associability (default=no)
-
-Default: '0'
-
-
-If nonzero, 'tag' fields of token analyses will be used only as a potential
-estimator of lexical probability, if at all.
-Otherwise (regardless of whether lexical classes are are being used as a
-probability estimator), 'tag' fields of token analyses will be interpreted
-as imposing 'hard' restrictions on which tags may occur with the token in question.
-
-See the C<--use-classes=BOOL> option and/or L<mootfiles> for more details on the
-use of lexical classes.
-
-
-
-
-
 =item C<--trie-depth=LEN> , C<-aLEN>
 
 Maximum depth of suffix trie.
@@ -256,6 +236,26 @@ Default: '1'
 Only useful if your file contains a priori analyses.
 Default behavior is to try and use classes if you specify
 a non-empty class-frequency file.
+
+
+
+
+
+=item C<--relax=BOOL> , C<-RBOOL>
+
+Whether to relax token-tag associability (default=no)
+
+Default: '0'
+
+
+If nonzero, 'tag' fields of token analyses will be used only as a potential
+estimator of lexical probability, if at all.
+Otherwise (regardless of whether lexical classes are are being used as a
+probability estimator), 'tag' fields of token analyses will be interpreted
+as imposing 'hard' restrictions on which tags may occur with the token in question.
+
+See the C<--use-classes=BOOL> option and/or L<mootfiles> for more details on the
+use of lexical classes.
 
 
 

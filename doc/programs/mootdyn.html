@@ -24,6 +24,7 @@
 
 		<li><a href="#format_options">Format Options</a></li>
 		<li><a href="#hmm_options">HMM Options</a></li>
+		<li><a href="#dynamic_hmm_options">Dynamic HMM Options</a></li>
 	</ul>
 
 	<li><a href="#configuration_files">CONFIGURATION FILES</a></li>
@@ -74,7 +75,7 @@
 <pre>
  HMM Options
     -MMODEL     --model=MODEL                Use HMM model file(s) MODEL.
-    -gBOOL      --hash-ngrams=BOOL           Whether to hash stored n-grams (default=no)
+    -gBOOL      --hash-ngrams=BOOL           Whether to hash stored n-grams (default=yes)
     -aLEN       --trie-depth=LEN             Maximum depth of suffix trie.
     -AFREQ      --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.
                 --trie-theta=FLOAT           Suffix backoff coefficient.
@@ -91,18 +92,22 @@
     -ZDOUBLE    --beam-width=DOUBLE          Specify cutoff factor for beam pruning
     -S          --save-ambiguities           Annotate tagged tokens with lexical ambiguities
     -m          --mark-unknown               Mark unknown tokens.</pre>
+<pre>
+ Dynamic HMM Options
+    -DCLASS     --dyn-class=CLASS            Specify built-in dynamic estimator (default='Freq')
+    -iBOOL      --dyn-invert=BOOL            Estimate p(w|t)~=p(t|w)? (default=1)
+    -bFLOAT     --dyn-base=FLOAT             Base for Maxwell-Boltzmann estimator (default=2)
+    -BFLOAT     --dyn-beta=FLOAT             Temperature coefficient for Maxwell-Boltzmann estimator (default=1)
+    -wTAG       --dyn-new-tag=TAG            Specify pseudo-tag for new analyses (default='@NEW')
+    -EFLOAT     --dyn-freq-eps=FLOAT         Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)</pre>
 <p>
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
 <p>moocow's HMM part-of-speech tagger/disambiguator.</p>
-<p>'moot' is a Hidden Markov Model (HMM) Part-of-Spech (PoS)
-tagger / disambiguator program based on the 'libmoot' library.</p>
-<p>It takes as its input one or more 'rare' (-tagged,-analyzed)
-or 'medium rare' (-tagged,+analyzed) files and produces a
-'medium' (+tagged,-analyzed) or 'well done' (+tagged,+analyzed)
-file, respectively.  See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot file
-formats.</p>
+<p>'mootdyn' is a dynamic Hidden Markov Model (HMM) tagger / disambiguator
+program based on the 'libmoot' library.</p>
+<p>Calling conventions largely the same as for the <a href="././moot.html">the moot manpage</a> program.</p>
 <p>
 </p>
 <hr />
@@ -147,7 +152,7 @@ of either the 'rare' (-tagged,-analyzed) or
 
 <dd>
 <p>Verbosity level.</p>
-<p>Default: '3'</p>
+<p>Default: '4'</p>
 <p>Be more or less verbose.  Recognized values are in the range 0..5:</p>
 <ol>
 <li>
@@ -267,10 +272,8 @@ on model file formats.</p>
 <dt><strong><a name="item__2d_2dhash_2dngrams_3dbool__2c__2dgbool"><code>--hash-ngrams=BOOL</code> , <code>-gBOOL</code></a></strong></dt>
 
 <dd>
-<p>Whether to hash stored n-grams (default=no)</p>
-<p>Default: '0'</p>
-<p>If specified and true, tag n-grams will be stored in a slow but memory-friendly
-hash.  Otherwise, a fast but large array will be used.</p>
+<p>Whether to hash stored n-grams (default=yes)</p>
+<p>Default: '1'</p>
 </dd>
 <dt><strong><a name="item__2d_2dtrie_2ddepth_3dlen__2c__2dalen"><code>--trie-depth=LEN</code> , <code>-aLEN</code></a></strong></dt>
 
@@ -465,6 +468,82 @@ beam pruning.</p>
 </dl>
 <p>
 </p>
+<h2><a name="dynamic_hmm_options">Dynamic HMM Options</a></h2>
+<dl>
+<dt><strong><a name="item__2d_2ddyn_2dclass_3dclass__2c__2ddclass"><code>--dyn-class=CLASS</code> , <code>-DCLASS</code></a></strong></dt>
+
+<dd>
+<p>Specify built-in dynamic estimator (default='Freq')</p>
+<p>Default: 'Freq'</p>
+<p>Known values for CLASS are:</p>
+<dl>
+<dt><strong><a name="item_freq">Freq</a></strong></dt>
+
+<dd>
+<p>Analysis 'costs' are interpreted as pseudo-frequencies <code>f(w,t)</code>
+lexical probabilities are instantiated as p(w|t)~=f(w,t)/Z(w,t).
+See <code>--dyn-invert</code> for details on how <code>Z(w,t)</code> is estimated.</p>
+</dd>
+<dt><strong><a name="item_boltzmann">Boltzmann</a></strong></dt>
+
+<dd>
+<p>Analysis 'costs' are interpreted as 'distances' d(w,t), and
+lexical probabilities are instantiated as a Maxwell-Boltzmann
+distribution:</p>
+<pre>
+ f(w,t) ~= BASE ^ (-BETA * d(w,t))   # Maxwell-Boltzmann estimator
+ p(w|t) ~= f(w,t) / Z(w,t)           # ... as for the 'Freq' class</pre>
+<p>The Maxwell-Boltzmann estimator constants BASE and BETA are given
+by the <code>--dyn-base</code> and <code>--dyn-beta</code> args.</p>
+</dd>
+</dl>
+</dd>
+<dt><strong><a name="item__2d_2ddyn_2dinvert_3dbool__2c__2dibool"><code>--dyn-invert=BOOL</code> , <code>-iBOOL</code></a></strong></dt>
+
+<dd>
+<p>Estimate p(w|t)~=p(t|w)? (default=1)</p>
+<p>Default: '1'</p>
+<p>Determines how the normalization factor <code>Z(w,t)</code> is estimated
+for dynamic lexical probabilities p(w|t)~=f(w,t)/Z(w,t).
+If true (the default), <code>Z(w,t)</code> := <code>f(w)</code> = Sum_t f(w,t).
+Otherwise, <code>Z(w,t)</code> := <code>f(t)</code> = Sum_w f(w,t).</p>
+<p>Note that a true value here causes a theoretically incorrect
+estimator to be used, since <code>f(w,t)/f(w)</code> = <code>p(t|w)</code> != p(w|t).
+Nonetheless, empirical tests have shown the inverted estimator
+to be more effective in many cases, and should be too harmful
+if the input analyses are a function of input token text.</p>
+</dd>
+<dt><strong><a name="item__2d_2ddyn_2dbase_3dfloat__2c__2dbfloat"><code>--dyn-base=FLOAT</code> , <code>-bFLOAT</code></a></strong></dt>
+
+<dd>
+<p>Base for Maxwell-Boltzmann estimator (default=2)</p>
+<p>Default: '2.0'</p>
+<p>See the 'Boltzmann' estimator under <code>--dyn-class</code> for details.</p>
+</dd>
+<dt><strong><a name="item__2d_2ddyn_2dbeta_3dfloat__2c__2dbfloat"><code>--dyn-beta=FLOAT</code> , <code>-BFLOAT</code></a></strong></dt>
+
+<dd>
+<p>Temperature coefficient for Maxwell-Boltzmann estimator (default=1)</p>
+<p>Default: '1.0'</p>
+<p>See the 'Boltzmann' estimator under <code>--dyn-class</code> for details.</p>
+</dd>
+<dt><strong><a name="item__2d_2ddyn_2dnew_2dtag_3dtag__2c__2dwtag"><code>--dyn-new-tag=TAG</code> , <code>-wTAG</code></a></strong></dt>
+
+<dd>
+<p>Specify pseudo-tag for new analyses (default='@NEW')</p>
+<p>Default: '@NEW'</p>
+<p>This is the pseudo-tag used in the n-gram model file to represent
+previously unseen tags (if any).</p>
+</dd>
+<dt><strong><a name="item__2d_2ddyn_2dfreq_2deps_3dfloat__2c__2defloat"><code>--dyn-freq-eps=FLOAT</code> , <code>-EFLOAT</code></a></strong></dt>
+
+<dd>
+<p>Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)</p>
+<p>Default: '0.1'</p>
+</dd>
+</dl>
+<p>
+</p>
 <hr />
 <h1><a name="configuration_files">CONFIGURATION FILES</a></h1>
 <p>Configuration files are expected to contain lines of the form:</p>
@@ -477,10 +556,10 @@ Blank lines and comments (lines beginning with '#')
 are ignored.</p>
 <p>The following configuration files are read by default:</p>
 <ul>
-<li><strong><a name="item__2fetc_2fmootrc">/etc/mootrc</a></strong>
+<li><strong><a name="item__2fetc_2fmootdynrc">/etc/mootdynrc</a></strong>
 
 </li>
-<li><strong><a name="item__7e_2f_2emootrc">~/.mootrc</a></strong>
+<li><strong><a name="item__7e_2f_2emootdynrc">~/.mootdynrc</a></strong>
 
 </li>
 </ul>
@@ -496,7 +575,7 @@ using Getopt::Gen version 0.13.
 Translation was initiated
 as:</p>
 <pre>
-   optgen.perl -l --nocfile --nohfile --notimestamp -F moot moot.gog</pre>
+   optgen.perl -l --nocfile --nohfile --notimestamp -F mootdyn mootdyn.gog</pre>
 <p>
 </p>
 <hr />

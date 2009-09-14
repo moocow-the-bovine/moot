@@ -10,10 +10,8 @@
 
 <body>
 
-
-<!-- INDEX BEGIN -->
-<div name="index">
 <p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
 
 <ul>
 
@@ -41,11 +39,9 @@
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 </ul>
-
-<hr name="index" />
-</div>
 <!-- INDEX END -->
 
+<hr />
 <p>
 </p>
 <hr />
@@ -55,7 +51,7 @@
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p>mootchurn [OPTIONS] INPUT(s)</p>
+<p>mootchurn [OPTIONS] <a href="#item_input"><code>INPUT(s)</code></a></p>
 <pre>
  Arguments:
     INPUT(s)  Input files / file-lists.</pre>
@@ -90,7 +86,7 @@ for details on moot file formats.</p>
 <hr />
 <h1><a name="arguments">ARGUMENTS</a></h1>
 <dl>
-<dt><strong><a name="input" class="item"><code>INPUT(s)</code></a></strong></dt>
+<dt><strong><a name="item_input"><code>INPUT(s)</code></a></strong></dt>
 
 <dd>
 <p>Input files / file-lists.</p>
@@ -105,26 +101,26 @@ known to moot.</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="help_h" class="item"><code>--help</code> , <code>-h</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dhelp__2c__2dh"><code>--help</code> , <code>-h</code></a></strong></dt>
 
 <dd>
 <p>Print help and exit.</p>
 <p>Default: '0'</p>
 </dd>
-<dt><strong><a name="version_v" class="item"><code>--version</code> , <code>-V</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dversion__2c__2dv"><code>--version</code> , <code>-V</code></a></strong></dt>
 
 <dd>
 <p>Print version and exit.</p>
 <p>Default: '0'</p>
 </dd>
-<dt><strong><a name="rcfile_file_cfile" class="item"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
+<dt><strong><a name="item__2d_2drcfile_3dfile__2c__2dcfile"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
 
 <dd>
 <p>Read an alternate configuration file.</p>
 <p>Default: 'NULL'</p>
 <p>See also: <a href="#configuration_files">CONFIGURATION FILES</a>.</p>
 </dd>
-<dt><strong><a name="verbose_level_vlevel" class="item"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dverbose_3dlevel__2c__2dvlevel"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
 
 <dd>
 <p>Verbosity level.</p>
@@ -151,21 +147,21 @@ known to moot.</p>
 </li>
 </ol>
 </dd>
-<dt><strong><a name="dots_ntoks_dntoks" class="item"><code>--dots=NTOKS</code> , <code>-dNTOKS</code></a></strong></dt>
+<dt><strong><a name="item__2d_2ddots_3dntoks__2c__2ddntoks"><code>--dots=NTOKS</code> , <code>-dNTOKS</code></a></strong></dt>
 
 <dd>
 <p>Print a dot for every NTOKS tokens processed.</p>
 <p>Default: '0'</p>
 <p>Zero (the default) means that no dots will be printed.</p>
 </dd>
-<dt><strong><a name="list_l" class="item"><code>--list</code> , <code>-l</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dlist__2c__2dl"><code>--list</code> , <code>-l</code></a></strong></dt>
 
 <dd>
 <p>INPUTs are file-lists, not filenames.</p>
 <p>Default: '0'</p>
 <p>Useful for large batch-processing jobs.</p>
 </dd>
-<dt><strong><a name="output_file_ofile" class="item"><code>--output=FILE</code> , <code>-oFILE</code></a></strong></dt>
+<dt><strong><a name="item__2d_2doutput_3dfile__2c__2dofile"><code>--output=FILE</code> , <code>-oFILE</code></a></strong></dt>
 
 <dd>
 <p>Specify output file (default=stdout).</p>
@@ -176,17 +172,17 @@ known to moot.</p>
 </p>
 <h2><a name="format_options">Format Options</a></h2>
 <dl>
-<dt><strong><a name="tokens_t" class="item"><code>--tokens</code> , <code>-t</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dtokens__2c__2dt"><code>--tokens</code> , <code>-t</code></a></strong></dt>
 
 <dd>
 <p>Read input token-wise.</p>
 <p>Default: '0'</p>
 <p>Default behavior is to read sentence-wise.</p>
 </dd>
-<dt><strong><a name="input_format_format_iformat" class="item"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dinput_2dformat_3dformat__2c__2diformat"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></a></strong></dt>
 
 <dd>
-<p>Specify input file(s) format(s).</p>
+<p>Specify input <code>file(s)</code> format(s).</p>
 <p>Default: 'NULL'</p>
 <p>Value should be a comma-separated list of format flag names,
 optionally prefixed with an exclamation point (!) to indicate
@@ -194,7 +190,7 @@ negation.</p>
 <p>Default='WellDone'</p>
 <p>See 'I/O Format Flags' in <a href="././mootfiles.html">the mootfiles manpage</a> for details.</p>
 </dd>
-<dt><strong><a name="output_format_format_oformat" class="item"><code>--output-format=FORMAT</code> , <code>-OFORMAT</code></a></strong></dt>
+<dt><strong><a name="item__2d_2doutput_2dformat_3dformat__2c__2doformat"><code>--output-format=FORMAT</code> , <code>-OFORMAT</code></a></strong></dt>
 
 <dd>
 <p>Specify output file format.</p>
@@ -210,14 +206,14 @@ negation.</p>
 </p>
 <h2><a name="xml_options">XML Options</a></h2>
 <dl>
-<dt><strong><a name="input_encoding_encoding" class="item"><code>--input-encoding=ENCODING</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dinput_2dencoding_3dencoding"><code>--input-encoding=ENCODING</code></a></strong></dt>
 
 <dd>
 <p>Override XML document input encoding</p>
 <p>Default: 'NULL'</p>
 <p>Potentially useful for XML documents without encoding declarations</p>
 </dd>
-<dt><strong><a name="output_encoding_encoding" class="item"><code>--output-encoding=ENCODING</code></a></strong></dt>
+<dt><strong><a name="item__2d_2doutput_2dencoding_3dencoding"><code>--output-encoding=ENCODING</code></a></strong></dt>
 
 <dd>
 <p>Set default XML output encoding</p>
@@ -240,10 +236,10 @@ Blank lines and comments (lines beginning with '#')
 are ignored.</p>
 <p>The following configuration files are read by default:</p>
 <ul>
-<li><strong><a name="etc_mootchurnrc" class="item">/etc/mootchurnrc</a></strong>
+<li><strong><a name="item__2fetc_2fmootchurnrc">/etc/mootchurnrc</a></strong>
 
 </li>
-<li><strong><a name="mootchurnrc" class="item">~/.mootchurnrc</a></strong>
+<li><strong><a name="item__7e_2f_2emootchurnrc">~/.mootchurnrc</a></strong>
 
 </li>
 </ul>
@@ -291,7 +287,7 @@ as:</p>
 <h1><a name="see_also">SEE ALSO</a></h1>
 <p><a href="././mootfiles.html">the mootfiles manpage</a>
 <a href="././mootpp.html">the mootpp manpage</a>,
-<code>mootm(1)</code>,
+mootm(1),
 <a href="././mootrain.html">the mootrain manpage</a>,
 <a href="././mootcompile.html">the mootcompile manpage</a>,
 <a href="././mootdump.html">the mootdump manpage</a>,

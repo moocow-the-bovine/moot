@@ -43,10 +43,22 @@ moocow's HMM part-of-speech tagger/disambiguator: model dumper.
 (L<mootdump>)
 
 
+=item moot
+
+moocow's HMM part-of-speech tagger/disambiguator.
+(L<moot>)
+
+
 =item mooteval
 
 Output evaluator for moocow's PoS tagger.
 (L<mooteval>)
+
+
+=item 
+
+
+(L<>)
 
 
 =item mootpp
@@ -158,7 +170,9 @@ mootchurn(1),
 mootcompile(1),
 mootconfig(1),
 mootdump(1),
+moot(1),
 mooteval(1),
+(1),
 mootpp(1),
 mootrain(1),
 moottype(1),

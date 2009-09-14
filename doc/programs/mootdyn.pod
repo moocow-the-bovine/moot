@@ -33,7 +33,7 @@ moot [OPTIONS] INPUT(s)
 
  HMM Options
     -MMODEL     --model=MODEL                Use HMM model file(s) MODEL.
-    -gBOOL      --hash-ngrams=BOOL           Whether to hash stored n-grams (default=no)
+    -gBOOL      --hash-ngrams=BOOL           Whether to hash stored n-grams (default=yes)
     -aLEN       --trie-depth=LEN             Maximum depth of suffix trie.
     -AFREQ      --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.
                 --trie-theta=FLOAT           Suffix backoff coefficient.
@@ -51,6 +51,14 @@ moot [OPTIONS] INPUT(s)
     -S          --save-ambiguities           Annotate tagged tokens with lexical ambiguities
     -m          --mark-unknown               Mark unknown tokens.
 
+ Dynamic HMM Options
+    -DCLASS     --dyn-class=CLASS            Specify built-in dynamic estimator (default='Freq')
+    -iBOOL      --dyn-invert=BOOL            Estimate p(w|t)~=p(t|w)? (default=1)
+    -bFLOAT     --dyn-base=FLOAT             Base for Maxwell-Boltzmann estimator (default=2)
+    -BFLOAT     --dyn-beta=FLOAT             Temperature coefficient for Maxwell-Boltzmann estimator (default=1)
+    -wTAG       --dyn-new-tag=TAG            Specify pseudo-tag for new analyses (default='@NEW')
+    -EFLOAT     --dyn-freq-eps=FLOAT         Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)
+
 =cut
 
 ###############################################################
@@ -63,14 +71,10 @@ moot [OPTIONS] INPUT(s)
 moocow's HMM part-of-speech tagger/disambiguator.
 
 
-'moot' is a Hidden Markov Model (HMM) Part-of-Spech (PoS)
-tagger / disambiguator program based on the 'libmoot' library.
+'mootdyn' is a dynamic Hidden Markov Model (HMM) tagger / disambiguator
+program based on the 'libmoot' library.
 
-It takes as its input one or more 'rare' (-tagged,-analyzed)
-or 'medium rare' (-tagged,+analyzed) files and produces a
-'medium' (+tagged,-analyzed) or 'well done' (+tagged,+analyzed)
-file, respectively.  See L<mootfiles> for details on moot file
-formats.
+Calling conventions largely the same as for the L<moot> program.
 
 
 =cut
@@ -147,7 +151,7 @@ See also: L<CONFIGURATION FILES>.
 
 Verbosity level.
 
-Default: '3'
+Default: '4'
 
 
 Be more or less verbose.  Recognized values are in the range 0..5:
@@ -357,14 +361,9 @@ on model file formats.
 
 =item C<--hash-ngrams=BOOL> , C<-gBOOL>
 
-Whether to hash stored n-grams (default=no)
+Whether to hash stored n-grams (default=yes)
 
-Default: '0'
-
-
-If specified and true, tag n-grams will be stored in a slow but memory-friendly
-hash.  Otherwise, a fast but large array will be used.
-
+Default: '1'
 
 
 
@@ -660,6 +659,122 @@ Useful for debugging.
 
 =back
 
+=cut
+
+#--------------------------------------------------------------
+# Option-Group Dynamic HMM Options
+#--------------------------------------------------------------
+=pod
+
+=head2 Dynamic HMM Options
+
+=over 4
+
+=item C<--dyn-class=CLASS> , C<-DCLASS>
+
+Specify built-in dynamic estimator (default='Freq')
+
+Default: 'Freq'
+
+
+Known values for CLASS are:
+
+=over 4
+
+=item Freq
+
+Analysis 'costs' are interpreted as pseudo-frequencies f(w,t)
+lexical probabilities are instantiated as p(w|t)~=f(w,t)/Z(w,t).
+See C<--dyn-invert> for details on how C<Z(w,t)> is estimated.
+
+=item Boltzmann
+
+Analysis 'costs' are interpreted as 'distances' d(w,t), and
+lexical probabilities are instantiated as a Maxwell-Boltzmann
+distribution:
+
+ f(w,t) ~= BASE ^ (-BETA * d(w,t))   # Maxwell-Boltzmann estimator
+ p(w|t) ~= f(w,t) / Z(w,t)           # ... as for the 'Freq' class
+
+The Maxwell-Boltzmann estimator constants BASE and BETA are given
+by the C<--dyn-base> and C<--dyn-beta> args.
+
+=back
+
+
+
+
+
+
+=item C<--dyn-invert=BOOL> , C<-iBOOL>
+
+Estimate p(w|t)~=p(t|w)? (default=1)
+
+Default: '1'
+
+
+Determines how the normalization factor Z(w,t) is estimated
+for dynamic lexical probabilities p(w|t)~=f(w,t)/Z(w,t).
+If true (the default), Z(w,t) := f(w) = Sum_t f(w,t).
+Otherwise, Z(w,t) := f(t) = Sum_w f(w,t).
+
+Note that a true value here causes a theoretically incorrect
+estimator to be used, since f(w,t)/f(w) = p(t|w) != p(w|t).
+Nonetheless, empirical tests have shown the inverted estimator
+to be more effective in many cases, and should be too harmful
+if the input analyses are a function of input token text.
+
+
+
+
+
+=item C<--dyn-base=FLOAT> , C<-bFLOAT>
+
+Base for Maxwell-Boltzmann estimator (default=2)
+
+Default: '2.0'
+
+See the 'Boltzmann' estimator under C<--dyn-class> for details.
+
+
+
+
+=item C<--dyn-beta=FLOAT> , C<-BFLOAT>
+
+Temperature coefficient for Maxwell-Boltzmann estimator (default=1)
+
+Default: '1.0'
+
+See the 'Boltzmann' estimator under C<--dyn-class> for details.
+
+
+
+
+=item C<--dyn-new-tag=TAG> , C<-wTAG>
+
+Specify pseudo-tag for new analyses (default='@NEW')
+
+Default: '@NEW'
+
+
+This is the pseudo-tag used in the n-gram model file to represent
+previously unseen tags (if any).
+
+
+
+
+
+=item C<--dyn-freq-eps=FLOAT> , C<-EFLOAT>
+
+Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)
+
+Default: '0.1'
+
+
+
+
+=back
+
 
 
 
@@ -686,9 +801,9 @@ The following configuration files are read by default:
 
 =over 4
 
-=item * /etc/mootrc
+=item * /etc/mootdynrc
 
-=item * ~/.mootrc
+=item * ~/.mootdynrc
 
 =back
 
@@ -712,7 +827,7 @@ using Getopt::Gen version 0.13.
 Translation was initiated
 as:
 
-   optgen.perl -l --nocfile --nohfile --notimestamp -F moot moot.gog
+   optgen.perl -l --nocfile --nohfile --notimestamp -F mootdyn mootdyn.gog
 
 =cut
 

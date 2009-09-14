@@ -10,10 +10,8 @@
 
 <body>
 
-
-<!-- INDEX BEGIN -->
-<div name="index">
 <p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
 
 <ul>
 
@@ -46,11 +44,9 @@
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 </ul>
-
-<hr name="index" />
-</div>
 <!-- INDEX END -->
 
+<hr />
 <p>
 </p>
 <h1><a name="moot_file_formats">moot FILE FORMATS</a></h1>
@@ -76,12 +72,12 @@ are ignored.</p>
 where ${PROGNAME} is the name of a moot utility program,
 and ${HOME} is the home directory of the current user:</p>
 <dl>
-<dt><strong><a name="etc_progname_rc" class="item">/etc/${PROGNAME}rc</a></strong></dt>
+<dt><strong><a name="item__2fetc_2f_24_7bprogname_7drc">/etc/${PROGNAME}rc</a></strong></dt>
 
 <dd>
 <p>System defaults file; read first.</p>
 </dd>
-<dt><strong><a name="__home_____progname_rc" class="item">${HOME}/.${PROGNAME}rc</a></strong></dt>
+<dt><strong><a name="item___home_____progname_rc">${HOME}/.${PROGNAME}rc</a></strong></dt>
 
 <dd>
 <p>User preferences file, can be used to override system defaults.</p>
@@ -96,43 +92,43 @@ defaults from a program configuration file.</p>
 <p>
 </p>
 <h2><a name="raw_text_files">Raw Text Files</a></h2>
-<p>A &quot;raw&quot; text file is just that: any file consiting of (8-bit)
+<p>A ``raw'' text file is just that: any file consiting of (8-bit)
 characters.  Such files may be processed by the <a href="././mootpp.html">the mootpp manpage</a>
-preprocessor to produce &quot;rare cooked&quot; (-tagged, -analyzed)
-text files.  An example &quot;raw&quot; text file is:</p>
+preprocessor to produce ``rare cooked'' (-tagged, -analyzed)
+text files.  An example ``raw'' text file is:</p>
 <pre>
  This is a test.  This too.</pre>
 <p>
 </p>
 <h2><a name="cooked_text_files">Cooked Text Files</a></h2>
-<p>A &quot;cooked&quot; text file is a text file which encodes information
+<p>A ``cooked'' text file is a text file which encodes information
 such as token boundaries, sentence boundaries, part-of-speech tag,
 and/or potential analyses.  The moot utilities distinguish between
 several different types of cooked text file: in order of ascending
 informational content, these are:
-&quot;rare&quot; (-tagged, -analyzed),
-&quot;medium rare&quot; (-tagged, +analyzed),
-&quot;medium&quot; (+tagged, -analyzed),
-&quot;well done&quot; (+tagged, +analyzed),
+``rare'' (-tagged, -analyzed),
+``medium rare'' (-tagged, +analyzed),
+``medium'' (+tagged, -analyzed),
+``well done'' (+tagged, +analyzed),
 and
-&quot;refried&quot; (+tagged, +analyzed, +evaluated).
+``refried'' (+tagged, +analyzed, +evaluated).
 Differnent moot utilities require their input files to be
-more or less &quot;cooked&quot; -- see the documentation of the individual
+more or less ``cooked'' -- see the documentation of the individual
 utilities for details.</p>
-<p>Native &quot;cooked&quot; text files are conventionally
-identified by the filename infix &quot;.moot&quot;.</p>
+<p>Native ``cooked'' text files are conventionally
+identified by the filename infix ``.moot''.</p>
 <dl>
-<dt><strong><a name="rare" class="item">Rare</a></strong></dt>
+<dt><strong><a name="item_rare">Rare</a></strong></dt>
 
-<dt><strong><a name="tagged_analyzed" class="item">(-tagged, -analyzed)</a></strong></dt>
+<dt><strong><a name="item__28_2dtagged_2c__2danalyzed_29">(-tagged, -analyzed)</a></strong></dt>
 
-<dt><strong><a name="files_t_r_rt" class="item">Files: *.t, *.r, *.rt</a></strong></dt>
+<dt><strong><a name="item_files_3a__2a_2et_2c__2a_2er_2c__2a_2ert">Files: *.t, *.r, *.rt</a></strong></dt>
 
 <dd>
-<p>The most basic level of &quot;cookedness&quot;, a &quot;rare&quot; text file encodes
+<p>The most basic level of ``cookedness'', a ``rare'' text file encodes
 only token- and sentence-boundaries.
-By convention, &quot;rare&quot;
-filenames carry the extension &quot;.t&quot;.  The syntax is:</p>
+By convention, ``rare''
+filenames carry the extension ``.t''.  The syntax is:</p>
 <pre>
  RARE_FILE  ::= {RARE_LINE}*
  RARE_LINE  ::= ({COMMENT} | {EOS} | {RARE_TOKEN}) {NEWLINE}
@@ -144,8 +140,8 @@ filenames carry the extension &quot;.t&quot;.  The syntax is:</p>
  NEWLINE    ::= &quot;\n&quot; | &quot;\r&quot;
  WORDCHAR   ::= [^{SPACE}{NEWLINE}]</pre>
 <p>Leading and trailing spaces are stripped from token text; it is
-thus impossible to declare an &quot;empty&quot; token.  An example
-&quot;rare cooked&quot; file is:</p>
+thus impossible to declare an ``empty'' token.  An example
+``rare cooked'' file is:</p>
 <pre>
  %% Example rare cooked file for moot
  %% Sentence 1
@@ -160,24 +156,24 @@ thus impossible to declare an &quot;empty&quot; token.  An example
  too
  .</pre>
 </dd>
-<dt><strong><a name="medium_rare" class="item">Medium Rare</a></strong></dt>
+<dt><strong><a name="item_medium_rare">Medium Rare</a></strong></dt>
 
-<dt><strong><a name="tagged_analyzed2" class="item">(-tagged, +analyzed)</a></strong></dt>
+<dt><strong><a name="item__28_2dtagged_2c__2banalyzed_29">(-tagged, +analyzed)</a></strong></dt>
 
-<dt><strong><a name="files_mr_mrt" class="item">Files: *.mr, *.mrt</a></strong></dt>
+<dt><strong><a name="item_files_3a__2a_2emr_2c__2a_2emrt">Files: *.mr, *.mrt</a></strong></dt>
 
 <dd>
-<p>A &quot;medium rare&quot; file is at least as informative as a &quot;rare&quot;
-file -- that is, it encodes everything that a &quot;rare&quot; file
+<p>A ``medium rare'' file is at least as informative as a ``rare''
+file -- that is, it encodes everything that a ``rare'' file
 encodes, and in exactly the same fashion.  Additionally,
-a &quot;medium rare&quot; file may contain for each token a set
+a ``medium rare'' file may contain for each token a set
 of (TAB-separated) possible <em>analyses</em> for that token, where
-an &quot;analysis&quot; contains at least a part-of-speech tag, and possibly
+an ``analysis'' contains at least a part-of-speech tag, and possibly
 also a numeric cost and arbitrary analysis details.
 Somewhat counter-intuitively,
-every &quot;rare&quot; file is also a &quot;medium rare&quot; file for which
+every ``rare'' file is also a ``medium rare'' file for which
 every token is associated with an empty set of possible analyses.
-By convention, &quot;medium rare&quot; filenames carry the extension &quot;.mrt&quot;</p>
+By convention, ``medium rare'' filenames carry the extension ``.mrt''</p>
 <pre>
  MED_RARE_FILE  ::= {MED_RARE_LINE}*
  MED_RARE_LINE  ::= ({COMMENT} | {EOS} | {MED_RARE_TOKEN}) {NEWLINE}
@@ -192,13 +188,13 @@ By convention, &quot;medium rare&quot; filenames carry the extension &quot;.mrt&
 <p>Leading and trailing spaces are stripped from token text,
 as well as from analysis-detail and -tag text.  It should
 be noted that the <em>TAG</em> component of each <em>ANALYSIS</em>
-is &quot;greedy&quot; -- if an
+is ``greedy'' -- if an
 analysis contains no left-bracket to mark the beginning
 of a tag, then the whole analysis (up to the first right-bracket
 or space) is considered the tag.  Also, if the analysis
 contains multiple left-brackets, only the <em>first</em> is
 considered to introduce the <em>TAG</em> component.
-An example &quot;medium rare&quot; file is:</p>
+An example ``medium rare'' file is:</p>
 <pre>
  %% Example medium-rare cooked file for moot
  %% Sentence 1 : possible analyses are tags only
@@ -212,22 +208,22 @@ An example &quot;medium rare&quot; file is:</p>
  This   This [NE type=&quot;name&quot;] &lt;420&gt;      &lt;24.7&gt; this [_PDAT][_sg]
  foo
  .      . [$.] &lt;-42&gt;</pre>
-<p>Tokens in &quot;medium rare&quot; files with empty analysis sets
+<p>Tokens in ``medium rare'' files with empty analysis sets
 (i.e. <em>RARE_TOKEN</em>s)
-are called &quot;unrecognized&quot; tokens.</p>
+are called ``unrecognized'' tokens.</p>
 </dd>
-<dt><strong><a name="medium" class="item">Medium</a></strong></dt>
+<dt><strong><a name="item_medium">Medium</a></strong></dt>
 
-<dt><strong><a name="tagged_analyzed3" class="item">(+tagged, -analyzed)</a></strong></dt>
+<dt><strong><a name="item__28_2btagged_2c__2danalyzed_29">(+tagged, -analyzed)</a></strong></dt>
 
-<dt><strong><a name="files_tt_ttt_m_mt" class="item">Files: *.tt, *.ttt, *.m, *.mt</a></strong></dt>
+<dt><strong><a name="item_files_3a__2a_2ett_2c__2a_2ettt_2c__2a_2em_2c__2a_2">Files: *.tt, *.ttt, *.m, *.mt</a></strong></dt>
 
 <dd>
-<p>A &quot;medium&quot; file can be understood as a &quot;medium rare&quot; file which
+<p>A ``medium'' file can be understood as a ``medium rare'' file which
 associates exactly one analysis with each token.  The tag for this
-analysis is considered the &quot;best&quot; tag for the associated token.
-By convention, &quot;medium&quot; filenames carry the extension &quot;.tt&quot;
-(tagger output) or &quot;.ttt&quot; (gold standard).</p>
+analysis is considered the ``best'' tag for the associated token.
+By convention, ``medium'' filenames carry the extension ``.tt''
+(tagger output) or ``.ttt'' (gold standard).</p>
 <pre>
  MEDIUM_FILE    ::= {MEDIUM_LINE}*
  MEDIUM_LINE    ::= ({COMMENT} | {EOS} | {MEDIUM_TOKEN}) {NEWLINE}
@@ -235,8 +231,8 @@ By convention, &quot;medium&quot; filenames carry the extension &quot;.tt&quot;
  BEST_ANALYSIS  ::= {ANALYSIS}</pre>
 <p>As before, leading and trailing spaces are stripped from
 token text and analyses, and the <em>TAG</em> component of each
-<em>ANALYSIS</em> is &quot;greedy&quot;.
-An example &quot;medium&quot; file is:</p>
+<em>ANALYSIS</em> is ``greedy''.
+An example ``medium'' file is:</p>
 <pre>
  %% Example medium cooked file for moot
  %% Sentence 1 : best analyses are tags only
@@ -251,27 +247,27 @@ An example &quot;medium&quot; file is:</p>
  too    &lt;0.0&gt; too [ADV]
  .      &lt;-42&gt; . [$.]</pre>
 </dd>
-<dt><strong><a name="well_done" class="item">Well Done</a></strong></dt>
+<dt><strong><a name="item_well_done">Well Done</a></strong></dt>
 
-<dt><strong><a name="tagged_analyzed4" class="item">(+tagged, +analyzed)</a></strong></dt>
+<dt><strong><a name="item__28_2btagged_2c__2banalyzed_29">(+tagged, +analyzed)</a></strong></dt>
 
-<dt><strong><a name="files_wd_wdt" class="item">Files: *.wd, *.wdt</a></strong></dt>
+<dt><strong><a name="item_files_3a__2a_2ewd_2c__2a_2ewdt">Files: *.wd, *.wdt</a></strong></dt>
 
 <dd>
-<p>A &quot;well done&quot; file can be understood as the synthesis of
-a &quot;medium rare&quot; and a &quot;medium&quot; file: it contains a &quot;best&quot;
+<p>A ``well done'' file can be understood as the synthesis of
+a ``medium rare'' and a ``medium'' file: it contains a ``best''
 analysis for each token (the first one), as well as a set of
 <em>a priori</em> potential analyses analyses for that token.
-By convention, &quot;well done&quot; filenames carry the extension &quot;.wd&quot;
-(tagger output) or &quot;.wdt&quot; (gold standard).</p>
+By convention, ``well done'' filenames carry the extension ``.wd''
+(tagger output) or ``.wdt'' (gold standard).</p>
 <pre>
  WELL_DONE_FILE  ::= {WELL_DONE_LINE}*
  WELL_DONE_LINE  ::= ({COMMENT} | {EOS} | {WELL_DONE_TOKEN}) {NEWLINE}
  WELL_DONE_TOKEN ::= {TOKEN_TEXT} {TAB} {BEST_ANALYSIS} ( {TAB} {ANALYSIS} )*</pre>
 <p>As before, leading and trailing spaces are stripped from
 token text and analyses, and the <em>TAG</em> component of each
-<em>ANALYSIS</em> is &quot;greedy&quot;.
-An example &quot;well done&quot; file is:</p>
+<em>ANALYSIS</em> is ``greedy''.
+An example ``well done'' file is:</p>
 <pre>
  %% Example well-done cooked file for moot
  %% Sentence 1 : analysis-set tags bracketed for clarity
@@ -286,16 +282,16 @@ An example &quot;well done&quot; file is:</p>
  too    ADV     [ADV] too &lt;0.0&gt;
  .      $.      [$.] . &lt;-42&gt;</pre>
 </dd>
-<dt><strong><a name="refried" class="item">Refried</a></strong></dt>
+<dt><strong><a name="item_refried">Refried</a></strong></dt>
 
-<dt><strong><a name="tagged_analyzed_evaluated" class="item">(+tagged, +analyzed, +evaluated)</a></strong></dt>
+<dt><strong><a name="item__28_2btagged_2c__2banalyzed_2c__2bevaluated_29">(+tagged, +analyzed, +evaluated)</a></strong></dt>
 
 <dd>
-<p>A &quot;refried&quot; file is basically the synthesis of a pair of
-&quot;medium&quot; or &quot;well done&quot; files.  &quot;Refried&quot; files can be
-created by the <em class="file">mooteval</em> program from a pair of
-parallel cooked files.  Each line of a &quot;refried&quot; file
-contains an status code, and a pair of &quot;well-done&quot; style token
+<p>A ``refried'' file is basically the synthesis of a pair of
+``medium'' or ``well done'' files.  ``Refried'' files can be
+created by the <em>mooteval</em> program from a pair of
+parallel cooked files.  Each line of a ``refried'' file
+contains an status code, and a pair of ``well-done'' style token
 analyses separated by tabs and a single slash '/'.</p>
 <pre>
  REFRIED_FILE     ::= {REFRIED_LINE}*
@@ -314,40 +310,40 @@ analyses separated by tabs and a single slash '/'.</p>
  XIMPOSSIBLE_FLAG ::= &quot;-&quot; | &quot;x&quot;</pre>
 <p>As before, leading and trailing spaces are stripped from
 token text and analyses, and the <em>TAG</em> component of each
-<em>ANALYSIS</em> is &quot;greedy&quot;.</p>
+<em>ANALYSIS</em> is ``greedy''.</p>
 <p>The STATUS_CODE component of each REFRIED_TOKEN encodes a
 number of flags concerning which part (if any) of the
 tokens compared did not match.  The general convention
 is use of a '-' character to indicate that the compared
 tokens matched (or at least were compatible).</p>
 <dl>
-<dt><strong><a name="tokmatch_flag" class="item">TOKMATCH_FLAG</a></strong></dt>
+<dt><strong><a name="item_tokmatch_flag">TOKMATCH_FLAG</a></strong></dt>
 
 <dd>
 <p>'-' if token text components matched, otherwise 't'.</p>
 </dd>
-<dt><strong><a name="bestmatch_flag" class="item">BESTMATCH_FLAG</a></strong></dt>
+<dt><strong><a name="item_bestmatch_flag">BESTMATCH_FLAG</a></strong></dt>
 
 <dd>
 <p>'-' if best-tag components matched, otherwise 'b'.</p>
 </dd>
-<dt><strong><a name="empty_flag" class="item">EMPTY_FLAG</a></strong></dt>
+<dt><strong><a name="item_empty_flag">EMPTY_FLAG</a></strong></dt>
 
 <dd>
 <p>'-' if token ANALYSES were non-empty (for the given file), otherwise 'e'.</p>
 </dd>
-<dt><strong><a name="impossible_flag" class="item">IMPOSSIBLE_FLAG</a></strong></dt>
+<dt><strong><a name="item_impossible_flag">IMPOSSIBLE_FLAG</a></strong></dt>
 
 <dd>
 <p>'-' if token ANALYSES included token BESTTAG (for the corresponding file), otherwise 'i'.</p>
 </dd>
-<dt><strong><a name="ximpossible_flag" class="item">XIMPOSSIBLE_FLAG</a></strong></dt>
+<dt><strong><a name="item_ximpossible_flag">XIMPOSSIBLE_FLAG</a></strong></dt>
 
 <dd>
 <p>'-' if token ANALYSES included token BESTTAG for the <strong>other</strong> file, otherwise 'x'.</p>
 </dd>
 </dl>
-<p>An example &quot;refried&quot; file is:</p>
+<p>An example ``refried'' file is:</p>
 <pre>
  %% Example refried file for moot
  %% FLAGS       TOK1    TOK1TAG1 ...            /       TOK2    TOK2TAG1 ...
@@ -391,7 +387,7 @@ using librecode by Fran&#231;ois Pinard.  Both expat and
 librecode support are compile-time options -- check
 the contents of 'mootConfig.h' to see whether they
 are enabled on your system.</p>
-<p>When working with &quot;cooked&quot; XML (see below), it is
+<p>When working with ``cooked'' XML (see below), it is
 critical to remember that the moot internal processing
 routines <strong>always</strong> receive token and PoS-tag text encoded
 in UTF-8, <em>regardless</em> of the document encoding.
@@ -417,20 +413,20 @@ none of the above should present a problem.</p>
 <p>
 </p>
 <h2><a name="raw_xml_files">Raw XML Files</a></h2>
-<p>A &quot;raw&quot; XML file is just like a &quot;raw&quot; text file.  The
+<p>A ``raw'' XML file is just like a ``raw'' text file.  The
 'mootpp' program supports rudimentary recognition and
 removal of (SG|HT|X)ML markup.</p>
 <p>
 </p>
 <h2><a name="cooked_xml_files">Cooked XML Files</a></h2>
 <p>As of version 2.0.0, the moot utilities
-support &quot;cooked&quot; XML files, in addition to the native
-text format(s).  See &quot;Cooked Text Files&quot; above for
+support ``cooked'' XML files, in addition to the native
+text format(s).  See ``Cooked Text Files'' above for
 more details on the native formats and the
 information content corresponding to the various
 subtypes.</p>
-<p>All &quot;cooked&quot; XML formats share the same structure (much
-as the &quot;cooked&quot; text formats are defined in terms of
+<p>All ``cooked'' XML formats share the same structure (much
+as the ``cooked'' text formats are defined in terms of
 one another).  The preliminary syntax (subject to change
 without notice) is:</p>
 <pre>
@@ -458,19 +454,19 @@ the following (in a bastard notation born of BNF and XPath):</p>
  TOKEN_BESTTAG      ::= //token//moot.tag[last()]/text() # should be accurate</pre>
 <p>Contact the author if you need any of the following done:</p>
 <dl>
-<dt><strong><a name="todo" class="item">TODO</a></strong></dt>
+<dt><strong><a name="item_todo">TODO</a></strong></dt>
 
 <dd>
 <p>Pull up literal element name parameters from TokenReaderExpat
 to user-level.</p>
 </dd>
-<dt><strong><a name="todo2" class="item">TODO</a></strong></dt>
+<dt><strong>TODO</strong></dt>
 
 <dd>
 <p>Add a DTD for the default XML format to the distribution.</p>
 </dd>
 </dl>
-<p>An example &quot;cooked&quot; XML document is the following:</p>
+<p>An example ``cooked'' XML document is the following:</p>
 <pre>
  &lt;?xml version=&quot;1.0&quot;?&gt;
  &lt;doc&gt;
@@ -527,7 +523,7 @@ by '--input-format' (-I) and '--output-format' (-O) command-line options
 The following list briefly describes the (case-insensitive)
 format flags which may occur as individual elements of the
 comma-separated list passed as an argument to these format options.
-Each format flag may be preceeded by an exclamation point &quot;!&quot; to indicate
+Each format flag may be preceeded by an exclamation point ``!'' to indicate
 the negation of the respective format property.
 Note that at the current time, not all formats support
 all available flags.</p>
@@ -536,10 +532,10 @@ moot utilities will attempt to guess an appropriate
 format based on the filename and on the requirements
 for the particular utility in question.</p>
 <dl>
-<dt><strong><a name="basic_flags" class="item">Basic Flags</a></strong></dt>
+<dt><strong><a name="item_basic_flags">Basic Flags</a></strong></dt>
 
 <dl>
-<dt><strong><a name="none" class="item">None</a></strong></dt>
+<dt><strong><a name="item_none">None</a></strong></dt>
 
 <dd>
 <p>No flags at all.
@@ -548,38 +544,38 @@ and should cause a default format to be assumed
 and/or an appropriate format to be guessed from
 the relevant filename(s).</p>
 </dd>
-<dt><strong><a name="null" class="item">Null</a></strong></dt>
+<dt><strong><a name="item_null">Null</a></strong></dt>
 
 <dd>
 <p>If you specify 'null' as an output format,
 no output will actually be written
 (useful for testing and benchmarking the input layer).</p>
 </dd>
-<dt><strong><a name="unknown" class="item">Unknown</a></strong></dt>
+<dt><strong><a name="item_unknown">Unknown</a></strong></dt>
 
 <dd>
 <p>Unknown format.
 This should never ever happen,
 and should cause a reversion to some default format.</p>
 </dd>
-<dt><strong><a name="native" class="item">Native</a></strong></dt>
+<dt><strong><a name="item_native">Native</a></strong></dt>
 
 <dd>
 <p>Specifies native text format I/O, as opposed to XML.</p>
 </dd>
-<dt><strong><a name="xml" class="item">XML</a></strong></dt>
+<dt><strong><a name="item_xml">XML</a></strong></dt>
 
 <dd>
 <p>Specifies XML format I/O, as opposed to a native text format.</p>
 </dd>
-<dt><strong><a name="pretty" class="item">Pretty</a></strong></dt>
+<dt><strong><a name="item_pretty">Pretty</a></strong></dt>
 
 <dd>
 <p>Beautified XML format.
 Useful for human-readable XML output.
 Not all XML I/O modes support cosmetic surgery.</p>
 </dd>
-<dt><strong><a name="conserve" class="item">Conserve</a></strong></dt>
+<dt><strong><a name="item_conserve">Conserve</a></strong></dt>
 
 <dd>
 <p>Conservative XML format: attempt to preserve as
@@ -587,29 +583,29 @@ much of the input document structure as possible.
 Only meaningful if both XML input and XML output
 are requested.</p>
 </dd>
-<dt><strong><a name="text" class="item">Text</a></strong></dt>
+<dt><strong><a name="item_text">Text</a></strong></dt>
 
 <dd>
 <p>Read/write token text (all formats).</p>
 </dd>
-<dt><strong><a name="analyzed" class="item">Analyzed</a></strong></dt>
+<dt><strong><a name="item_analyzed">Analyzed</a></strong></dt>
 
 <dd>
 <p>Read/write token analyses ('medium rare' or 'well done' formats only).</p>
 </dd>
-<dt><strong><a name="tagged" class="item">Tagged</a></strong></dt>
+<dt><strong><a name="item_tagged">Tagged</a></strong></dt>
 
 <dd>
 <p>Read/write 'best tags' ('medium' or 'well done' formats only).</p>
 </dd>
-<dt><strong><a name="location" class="item">Location</a></strong></dt>
+<dt><strong><a name="item_location">Location</a></strong></dt>
 
 <dd>
 <p>Read/write token locations as logical pairs (BYTE_OFFSET,BYTE_LENGTH)
 from/to the input stream as the first non-tag analysis.
 Useful if you need to refer back to earlier stages of a token processing pipeline.</p>
 </dd>
-<dt><strong><a name="pruned" class="item">Pruned</a></strong></dt>
+<dt><strong><a name="item_pruned">Pruned</a></strong></dt>
 
 <dd>
 <p>For 'well done' formats, ignore analyses which do
@@ -617,40 +613,40 @@ not correspond to the 'best' tag.</p>
 </dd>
 </dl>
 </dd>
-<dt><strong><a name="compound_flags" class="item">Compound Flags</a></strong></dt>
+<dt><strong><a name="item_compound_flags">Compound Flags</a></strong></dt>
 
 <dl>
-<dt><strong><a name="rare2" class="item">Rare</a></strong></dt>
+<dt><strong>Rare</strong></dt>
 
-<dt><strong><a name="r" class="item">R</a></strong></dt>
+<dt><strong><a name="item_r">R</a></strong></dt>
 
 <dd>
 <p>Alias for 'Text'.</p>
 </dd>
-<dt><strong><a name="mediumrare" class="item">MediumRare</a></strong></dt>
+<dt><strong><a name="item_mediumrare">MediumRare</a></strong></dt>
 
-<dt><strong><a name="mr" class="item">MR</a></strong></dt>
+<dt><strong><a name="item_mr">MR</a></strong></dt>
 
 <dd>
 <p>Alias for 'Text,Analyzed'.</p>
 </dd>
-<dt><strong><a name="medium2" class="item">Medium</a></strong></dt>
+<dt><strong>Medium</strong></dt>
 
-<dt><strong><a name="m" class="item">M</a></strong></dt>
+<dt><strong><a name="item_m">M</a></strong></dt>
 
 <dd>
 <p>Alias for 'Text,Tagged'.</p>
 </dd>
-<dt><strong><a name="welldone" class="item">WellDone</a></strong></dt>
+<dt><strong><a name="item_welldone">WellDone</a></strong></dt>
 
-<dt><strong><a name="wd" class="item">WD</a></strong></dt>
+<dt><strong><a name="item_wd">WD</a></strong></dt>
 
 <dd>
 <p>Alias for 'Text,Tagged,Analyzed'</p>
 </dd>
 </dl>
 </dd>
-<dt><strong><a name="examples" class="item">Examples</a></strong></dt>
+<dt><strong><a name="item_examples">Examples</a></strong></dt>
 
 <dd>
 <ul>
@@ -692,7 +688,7 @@ respectively.</p>
 <p>
 </p>
 <h2><a name="text_models">Text Models</a></h2>
-<p>A &quot;Text Model&quot; is completely specified by
+<p>A ``Text Model'' is completely specified by
 three files: a lexical freqency file (*.lex), an n-gram frequency
 file (*.123), and an optional lexical-class frequency file (*.clx).</p>
 <p>When specifiying a text model name to a moot utility program,
@@ -700,9 +696,9 @@ you may specify the model name as <em>TMODEL</em> in order to use the
 files <em>TMODEL</em>.lex , <em>TMODEL</em>.123 , and <em>TMODEL</em>.clx (if present).
 Otherwise, you may specifiy a composite model name as
 a comma-separated list of the individual component filenames:
-<em class="file">mylex.lex,myngrams.123,myclasses.clx</em>.</p>
+<em>mylex.lex,myngrams.123,myclasses.clx</em>.</p>
 <dl>
-<dt><strong><a name="lexical_frequency_files" class="item"><strong>Lexical Frequency Files</strong></a></strong></dt>
+<dt><strong><a name="item_lexical_frequency_files"><strong>Lexical Frequency Files</strong></a></strong></dt>
 
 <dd>
 <p>Lexical frequency files store raw frequencies for known tokens
@@ -732,20 +728,20 @@ and tag text.</p>
 <p>The special tokens whose text begins with an '@' character
 declare counts for special token types:</p>
 <ul>
-<li><strong><a name="_unknown" class="item">@UNKNOWN</a></strong>
+<li><strong><a name="item__unknown">@UNKNOWN</a></strong>
 
 <p>Declares frequency counts to be used when no other training
 data is available (i.e. for alphabetic tokens which did not occur in the
 training corpus).</p>
 </li>
-<li><strong><a name="_card" class="item">@CARD</a></strong>
+<li><strong><a name="item__card">@CARD</a></strong>
 
 <p>Declares frequency counts to be used for tokens consisting
 only of digits -- tokens which match the regex:</p>
 <pre>
  [0-9]+</pre>
 </li>
-<li><strong><a name="_cardseps" class="item">@CARDSEPS</a></strong>
+<li><strong><a name="item__cardseps">@CARDSEPS</a></strong>
 
 <p>Declares frequency counts to be used for tokens which
 contain digits and separators.  The regex matching
@@ -753,7 +749,7 @@ such tokens is (?):</p>
 <pre>
  ([[:digit:]]+)([\.\,\-]|[[:digit:]])*</pre>
 </li>
-<li><strong><a name="_cardpunct" class="item">@CARDPUNCT</a></strong>
+<li><strong><a name="item__cardpunct">@CARDPUNCT</a></strong>
 
 <p>Declares frequency counts to be used for tokens which
 contain digits followed by punctuation.
@@ -761,7 +757,7 @@ The regex matching such tokens is (?):</p>
 <pre>
  ([[:digit:]]+)([[:punct:]])</pre>
 </li>
-<li><strong><a name="_cardsuffix" class="item">@CARDSUFFIX</a></strong>
+<li><strong><a name="item__cardsuffix">@CARDSUFFIX</a></strong>
 
 <p>Declares frequency counts to be used for tokens which
 contain digits followed by some suffix.
@@ -769,11 +765,11 @@ The regex matching
 these tokens depends on whether the <code>moot_TNT_COMPAT</code> macro
 macro was defined when you compiled libmoot:</p>
 <p>If <code>moot_TNT_COMPAT</code> was defined, then the suffix
-of &quot;@CARDSUFFIX&quot; tokens is required to be of maximum
+of ``@CARDSUFFIX'' tokens is required to be of maximum
 length 3, thus matching the regex:</p>
 <pre>
  ([[:digit:]]+)(.{1,3})</pre>
-<p>Otherwise, the suffix for &quot;@CARDSUFFIX&quot; tokens may
+<p>Otherwise, the suffix for ``@CARDSUFFIX'' tokens may
 be of arbitrary length:</p>
 <pre>
  ([[:digit:]]+)(.*)</pre>
@@ -789,12 +785,12 @@ be of arbitrary length:</p>
  too    1       ADV     1
  .      42      $.      42</pre>
 </dd>
-<dt><strong><a name="ngram_frequency_files" class="item"><strong>Ngram Frequency Files</strong></a></strong></dt>
+<dt><strong><a name="item_ngram_frequency_files"><strong>Ngram Frequency Files</strong></a></strong></dt>
 
 <dd>
 <p>An n-gram frequency file stores raw frequency counts for
 uni-, bi-, and tri-grams.  An n-gram file may be in either
-&quot;long&quot; or &quot;short&quot; format, both of which are compatible
+``long'' or ``short'' format, both of which are compatible
 with the respective formats produced by the tnt-para(1)
 program:</p>
 <pre>
@@ -814,9 +810,9 @@ program:</p>
 An empty <em>TAG</em> component is populated with the tag
 in the corresponding position from the last n-gram
 parsed -- exhaustive use of this feature produces
-&quot;short&quot; format n-gram files.  Non-use of this feature
-produces &quot;long&quot; format n-gram files.</p>
-<p>An example &quot;long&quot; format n-gram file is:</p>
+``short'' format n-gram files.  Non-use of this feature
+produces ``long'' format n-gram files.</p>
+<p>An example ``long'' format n-gram file is:</p>
 <pre>
  %% Example n-gram frequency file in &quot;long&quot; format
  __$    2
@@ -840,7 +836,7 @@ produces &quot;long&quot; format n-gram files.</p>
  NN     1
  NN     $.      1
  NN     $.      __$     1</pre>
-<p>The same data in &quot;short&quot; format:</p>
+<p>The same data in ``short'' format:</p>
 <pre>
  %% Example n-gram frequency file in &quot;short&quot; format
  __$    2
@@ -865,14 +861,14 @@ produces &quot;long&quot; format n-gram files.</p>
         $.      1
                 __$     1</pre>
 </dd>
-<dt><strong><a name="lexical_class_frequency_files" class="item"><strong>Lexical-Class Frequency Files</strong></a></strong></dt>
+<dt><strong><a name="item_lexical_2dclass_frequency_files"><strong>Lexical-Class Frequency Files</strong></a></strong></dt>
 
 <dd>
 <p>Lexical-class frequency files store raw frequencies for known
-lexical classes (read &quot;sets of possible part-of-speech tags&quot;)
+lexical classes (read ``sets of possible part-of-speech tags'')
 and (class,tag) pairs.  The format is a direct extension
 of the format for lexical frequency files
-(see &quot;Lexical Frequency Files&quot;, above):</p>
+(see ``Lexical Frequency Files'', above):</p>
 <pre>
  CLASS_FILE  ::= ({COMMENT} | {BLANK_LINE} | {CLASS_ENTRY})*
  CLASS_ENTRY ::= {CLASS_ELTS} {TAB} {CLASS_TOTAL} ( {TAB} {TAG_COUNT} )*
@@ -884,9 +880,9 @@ are stripped from class and tag text.</p>
 of tags belonging to the lexical class.  All other (tab-separated)
 fields are as for a lexical frequency file.</p>
 <p>A pair (CLASS,TAG) such that TAG is not an element of CLASS
-is called an &quot;contradictory pair&quot; or an &quot;impossible pair&quot;.
+is called an ``contradictory pair'' or an ``impossible pair''.
 It is not required that the the tags in the <em>TAG_COUNT</em>
-components of a <em>CLASS_ENTRY</em> are &quot;possible&quot; in this sense,
+components of a <em>CLASS_ENTRY</em> are ``possible'' in this sense,
 although it certainly helps if this is the case.</p>
 <p>An example lexical class frequency file is:</p>
 <pre>
@@ -902,17 +898,17 @@ although it certainly helps if this is the case.</p>
 <p>
 </p>
 <h2><a name="hmm_binary_model_files">HMM Binary Model Files</a></h2>
-<p>A &quot;Binary Model&quot; <em>BINMODEL</em> is a (compressed) binary format
+<p>A ``Binary Model'' <em>BINMODEL</em> is a (compressed) binary format
 file storing a compiled Hidden Markov Model (probabilities
 and constants).  It is completely
-specified by its filename <em class="file">BINMODEL</em>.
+specified by its filename <em>BINMODEL</em>.
 By convention, HMM binary model files carry the suffix
-&quot;.hmm&quot;.</p>
+``.hmm''.</p>
 <p>When specifying an HMM model file,
-note that the existence of a file <em class="file">BINMODEL</em> overrides
+note that the existence of a file <em>BINMODEL</em> overrides
 any text models which might exists in files
 <em>BINMODEL</em>.lex , <em>BINMODEL</em>.123 , <em>BINMODEL</em>.clx.
-Use of a conventional suffix (such as &quot;.hmm&quot;) to identify binary models
+Use of a conventional suffix (such as ``.hmm'') to identify binary models
 eliminates such problems, since <em>MODEL</em>.hmm will <strong>not</strong> clash
 with a text model <em>MODEL</em>.lex, ...</p>
 <p>
@@ -927,10 +923,10 @@ solely for purposes of debugging.</p>
 <h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
 <p>Development of this package was supported by the project
 'Kollokationen im W&ouml;rterbuch'
-( &quot;collocations in the dictionary&quot;, <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
+( ``collocations in the dictionary'', <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
 in association with the project
 'Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
-( &quot;digital dictionary of the German language of the 20th century&quot;, <a href="http://www.dwds.de">http://www.dwds.de</a> )
+( ``digital dictionary of the German language of the 20th century'', <a href="http://www.dwds.de">http://www.dwds.de</a> )
 at the Berlin-Brandenburgische Akademie der Wissenschaften ( <a href="http://www.bbaw.de">http://www.bbaw.de</a> )
 with funding from
 the Alexander von Humboldt Stiftung ( <a href="http://www.avh.de">http://www.avh.de</a> )

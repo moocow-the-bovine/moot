@@ -10,10 +10,8 @@
 
 <body>
 
-
-<!-- INDEX BEGIN -->
-<div name="index">
 <p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
 
 <ul>
 
@@ -35,11 +33,9 @@
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 </ul>
-
-<hr name="index" />
-</div>
 <!-- INDEX END -->
 
+<hr />
 <p>
 </p>
 <hr />
@@ -49,7 +45,7 @@
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p>mootpp [OPTIONS] FILE(s)</p>
+<p>mootpp [OPTIONS] <a href="#item_file"><code>FILE(s)</code></a></p>
 <pre>
  Arguments:
     FILE(s)  Input files</pre>
@@ -78,7 +74,7 @@ See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot f
 <hr />
 <h1><a name="arguments">ARGUMENTS</a></h1>
 <dl>
-<dt><strong><a name="file" class="item"><code>FILE(s)</code></a></strong></dt>
+<dt><strong><a name="item_file"><code>FILE(s)</code></a></strong></dt>
 
 <dd>
 <p>Input files</p>
@@ -90,33 +86,33 @@ See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot f
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="help_h" class="item"><code>--help</code> , <code>-h</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dhelp__2c__2dh"><code>--help</code> , <code>-h</code></a></strong></dt>
 
 <dd>
 <p>Print help and exit.</p>
 <p>Default: '0'</p>
 </dd>
-<dt><strong><a name="version_v" class="item"><code>--version</code> , <code>-V</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dversion__2c__2dv"><code>--version</code> , <code>-V</code></a></strong></dt>
 
 <dd>
 <p>Print version and exit.</p>
 <p>Default: '0'</p>
 </dd>
-<dt><strong><a name="rcfile_file_cfile" class="item"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
+<dt><strong><a name="item__2d_2drcfile_3dfile__2c__2dcfile"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
 
 <dd>
 <p>Read an alternate configuration file.</p>
 <p>Default: 'NULL'</p>
 <p>See also: <a href="#configuration_files">CONFIGURATION FILES</a>.</p>
 </dd>
-<dt><strong><a name="verbose_level_vlevel" class="item"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dverbose_3dlevel__2c__2dvlevel"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
 
 <dd>
 <p>Verbosity level.</p>
 <p>Default: '1'</p>
 <p>Range: 0..1</p>
 </dd>
-<dt><strong><a name="output_file_ofile" class="item"><code>--output=FILE</code> , <code>-oFILE</code></a></strong></dt>
+<dt><strong><a name="item__2d_2doutput_3dfile__2c__2dofile"><code>--output=FILE</code> , <code>-oFILE</code></a></strong></dt>
 
 <dd>
 <p>Write output to FILE.</p>
@@ -124,17 +120,17 @@ See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot f
 <p>Output files are in 'rare' format: one token per line, a blank line
 indicates a sentence boundary.</p>
 </dd>
-<dt><strong><a name="list_l" class="item"><code>--list</code> , <code>-l</code></a></strong></dt>
+<dt><strong><a name="item__2d_2dlist__2c__2dl"><code>--list</code> , <code>-l</code></a></strong></dt>
 
 <dd>
 <p>Arguments are input-file lists.</p>
 <p>Default: '0'</p>
-<p>If this flag is given, the FILE(s) arguments should be lists
+<p>If this flag is given, the <a href="#item_file"><code>FILE(s)</code></a> arguments should be lists
 of input filenames, one filename per line, which should be
-processed.  Otherwise, the FILE(s) arguments are interpreted
+processed.  Otherwise, the <a href="#item_file"><code>FILE(s)</code></a> arguments are interpreted
 as filenames of the input files themselves.</p>
 </dd>
-<dt><strong><a name="recover_r" class="item"><code>--recover</code> , <code>-r</code></a></strong></dt>
+<dt><strong><a name="item__2d_2drecover__2c__2dr"><code>--recover</code> , <code>-r</code></a></strong></dt>
 
 <dd>
 <p>Attempt to recover from minor errors.</p>
@@ -143,7 +139,7 @@ as filenames of the input files themselves.</p>
 emitted but do not cause the program to abort if this option is specified.
 Useful for large automated batch-processing jobs.</p>
 </dd>
-<dt><strong><a name="output_format_format_oformat" class="item"><code>--output-format=FORMAT</code> , <code>-OFORMAT</code></a></strong></dt>
+<dt><strong><a name="item__2d_2doutput_2dformat_3dformat__2c__2doformat"><code>--output-format=FORMAT</code> , <code>-OFORMAT</code></a></strong></dt>
 
 <dd>
 <p>Specify output file format.</p>
@@ -197,10 +193,10 @@ as:</p>
 <h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
 <p>Development of this package was supported by the project
 'Kollokationen im W&ouml;rterbuch'
-( &quot;collocations in the dictionary&quot;, <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
+( ``collocations in the dictionary'', <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
 in association with the project
 'Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
-( &quot;digital dictionary of the German language of the 20th century&quot;, <a href="http://www.dwds.de">http://www.dwds.de</a> )
+( ``digital dictionary of the German language of the 20th century'', <a href="http://www.dwds.de">http://www.dwds.de</a> )
 at the Berlin-Brandenburgische Akademie der Wissenschaften ( <a href="http://www.bbaw.de">http://www.bbaw.de</a> )
 with funding from
 the Alexander von Humboldt Stiftung ( <a href="http://www.avh.de">http://www.avh.de</a> )
@@ -228,7 +224,7 @@ class-based HMM tagger / disambiguator.</p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
 <p><a href="././mootfiles.html">the mootfiles manpage</a>,
-<code>mootm(1)</code>,
+mootm(1),
 <a href="././moot.html">the moot manpage</a>,
 <a href="././mootchurn.html">the mootchurn manpage</a></p>
 
