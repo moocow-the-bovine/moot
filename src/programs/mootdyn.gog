@@ -390,25 +390,60 @@ Useful for debugging.
 group "Dynamic HMM Options"
 
 string "dyn-class" D "Specify built-in dynamic estimator (default='Freq')" \
-  arg="WHICH" \
+  arg="CLASS" \
   default="Freq" \
   details="
-Accepted values include:
+Known values for CLASS are:
 
 =over 4
 
 =item Freq
 
 Analysis 'costs' are interpreted as pseudo-frequencies f(w,t)
-lexical probabilities are instantiated as p(w|t)~=f(w,t)/f(t).
+lexical probabilities are instantiated as p(w|t)~=f(w,t)/Z(w,t).
+See C<--dyn-invert> for details on how C<Z(w,t)> is estimated.
 
-=item IFreq
+=item Boltzmann
 
-Analysis 'costs' are interpreted as pseudo-frequencies f(w,t)
-lexical probabilities are instantiated (incorrectly) as p(t|w)~=f(w,t)/f(w).
+Analysis 'costs' are interpreted as 'distances' d(w,t), and
+lexical probabilities are instantiated as a Maxwell-Boltzmann
+distribution:
+
+ f(w,t) ~= BASE ^ (-BETA * d(w,t))   # Maxwell-Boltzmann estimator
+ p(w|t) ~= f(w,t) / Z(w,t)           # ... as for the 'Freq' class
+
+The Maxwell-Boltzmann estimator constants BASE and BETA are given
+by the C<--dyn-base> and C<--dyn-beta> args.
 
 =back
+
 "
+
+int "dyn-invert" i "Estimate p(w|t)~=p(t|w)? (default=1)" \
+  arg="BOOL" \
+  default="1" \
+  details="
+Determines how the normalization factor Z(w,t) is estimated
+for dynamic lexical probabilities p(w|t)~=f(w,t)/Z(w,t).
+If true (the default), Z(w,t) := f(w) = Sum_t f(w,t).
+Otherwise, Z(w,t) := f(t) = Sum_w f(w,t).
+
+Note that a true value here causes a theoretically incorrect
+estimator to be used, since f(w,t)/f(w) = p(t|w) != p(w|t).
+Nonetheless, empirical tests have shown the inverted estimator
+to be more effective in many cases, and should be too harmful
+if the input analyses are a function of input token text.
+"
+
+float "dyn-base" b "Base for Maxwell-Boltzmann estimator (default=2)" \
+  arg="FLOAT" \
+  default="2.0" \
+  details="See the 'Boltzmann' estimator under C<--dyn-class> for details."
+
+float "dyn-beta" B "Temperature coefficient for Maxwell-Boltzmann estimator (default=1)" \
+  arg="FLOAT" \
+  default="1.0" \
+  details="See the 'Boltzmann' estimator under C<--dyn-class> for details."
 
 string "dyn-new-tag" w "Specify pseudo-tag for new analyses (default='@NEW')" \
   arg="TAG" \
@@ -418,7 +453,7 @@ This is the pseudo-tag used in the n-gram model file to represent
 previously unseen tags (if any).
 "
 
-float "dyn-flambda" F "Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)" \
+float "dyn-freq-eps" E "Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)" \
   arg="FLOAT" \
   default="0.1"
 

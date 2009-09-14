@@ -76,47 +76,6 @@ size_t mootNgrams::n_trigrams(void)
 }
 
 /*----------------------------------------------------------------------
- * Smoothing
- *----------------------------------------------------------------------*/
-
-void mootNgrams::smooth_add_newtag(const mootTagString &newtag)
-{
-  //-- just add a single new unigram, & hope that deleted interpolation smoothing
-  //   catches the rest...
-  NgramCount f_new = static_cast<NgramCount>(n_unigrams());
-  add_count(newtag, f_new * ugtotal/(f_new+ugtotal));
-#if 0
-  //-- ARGH: this needs a re-think, esp. what to do about n-grams like (tag1,NEW,tag3)
-  NgramCount  ugtotal_old = ugtotal;
-  NgramTagble ngtable_old;
-
-  //-- get total probability mass of 'new' unigrams: p(@NEW) ~= |Tags|/N
-  ProbT f_new = n_unigrams();  //-- ~= f(new)
-
-  //-- swap tables
-  ngtable_old.swap(ngtable);
-
-  //-- iterate
-  for (NgramTable::const_iterator ngi1 = ngtable_old.begin(); ngi1 != ngtable_old.end(); ngi1++) {
-    //-- unigrams -> bigrams
-    const mootTagString &tag1 = ngi1->first;
-    ProbT  f1 = ngi1->second.count;
-    ProbT  n1 = ngi1->second.freqs.size(); //-- ~= f(tag1,new)
-    add_count(newtag, n1);
-    ngi1->second.count += n1;
-
-    for (BigramTable::const_iterator ngi2 = ngi1->second.freqs.begin(); ngi2 != ngi1->second.freqs.end(); ngi2++) {
-      //-- bigrams -> trigrams
-      const mootTagString &tag2 = ngi2->first;
-      CountT f12  = ngi2->second.count;
-      CountT n12  = ngi2->second.freqs.size(); //-- ~= f(tag1,tag2,new)
-      ngi1->second.freqs[newtag] += n12; 
-    }
-  }
-#endif
-}
-
-/*----------------------------------------------------------------------
  * I/O
  *----------------------------------------------------------------------*/
 bool mootNgrams::load(const char *filename)

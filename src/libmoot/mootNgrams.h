@@ -173,10 +173,6 @@ public:
   size_t n_trigrams(void);
 
 
-  //------ public methods: smoothing
-  void smooth_add_newtag(const mootTagString &newtag="@NEW");
-
-
   //------ public methods: counting
   /**
    * Add \c count to the current count for unigram \<\a tag\>.

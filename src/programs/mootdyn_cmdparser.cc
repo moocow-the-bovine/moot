@@ -120,9 +120,12 @@ cmdline_parser_print_help (void)
   printf("   -m        --mark-unknown               Mark unknown tokens.\n");
   printf("\n");
   printf(" Dynamic HMM Options:\n");
-  printf("   -DWHICH   --dyn-class=WHICH            Specify built-in dynamic estimator (default='Freq')\n");
+  printf("   -DCLASS   --dyn-class=CLASS            Specify built-in dynamic estimator (default='Freq')\n");
+  printf("   -iBOOL    --dyn-invert=BOOL            Estimate p(w|t)~=p(t|w)? (default=1)\n");
+  printf("   -bFLOAT   --dyn-base=FLOAT             Base for Maxwell-Boltzmann estimator (default=2)\n");
+  printf("   -BFLOAT   --dyn-beta=FLOAT             Temperature coefficient for Maxwell-Boltzmann estimator (default=1)\n");
   printf("   -wTAG     --dyn-new-tag=TAG            Specify pseudo-tag for new analyses (default='@NEW')\n");
-  printf("   -FFLOAT   --dyn-flambda=FLOAT          Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)\n");
+  printf("   -EFLOAT   --dyn-freq-eps=FLOAT         Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)\n");
 }
 
 #if defined(HAVE_STRDUP) || defined(strdup)
@@ -175,8 +178,11 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->save_ambiguities_flag = 0; 
   args_info->mark_unknown_flag = 0; 
   args_info->dyn_class_arg = gog_strdup("Freq"); 
+  args_info->dyn_invert_arg = 1; 
+  args_info->dyn_base_arg = 2.0; 
+  args_info->dyn_beta_arg = 1.0; 
   args_info->dyn_new_tag_arg = gog_strdup("@NEW"); 
-  args_info->dyn_flambda_arg = 0.1; 
+  args_info->dyn_freq_eps_arg = 0.1; 
 }
 
 
@@ -218,8 +224,11 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->save_ambiguities_given = 0;
   args_info->mark_unknown_given = 0;
   args_info->dyn_class_given = 0;
+  args_info->dyn_invert_given = 0;
+  args_info->dyn_base_given = 0;
+  args_info->dyn_beta_given = 0;
   args_info->dyn_new_tag_given = 0;
-  args_info->dyn_flambda_given = 0;
+  args_info->dyn_freq_eps_given = 0;
 
   clear_args(args_info);
 
@@ -269,8 +278,11 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "save-ambiguities", 0, NULL, 'S' },
 	{ "mark-unknown", 0, NULL, 'm' },
 	{ "dyn-class", 1, NULL, 'D' },
+	{ "dyn-invert", 1, NULL, 'i' },
+	{ "dyn-base", 1, NULL, 'b' },
+	{ "dyn-beta", 1, NULL, 'B' },
 	{ "dyn-new-tag", 1, NULL, 'w' },
-	{ "dyn-flambda", 1, NULL, 'F' },
+	{ "dyn-freq-eps", 1, NULL, 'E' },
         { NULL,	0, NULL, 0 }
       };
       static char short_options[] = {
@@ -303,8 +315,11 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'S',
 	'm',
 	'D', ':',
+	'i', ':',
+	'b', ':',
+	'B', ':',
 	'w', ':',
-	'F', ':',
+	'E', ':',
 	'\0'
       };
 
@@ -599,6 +614,30 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->dyn_class_arg = gog_strdup(val);
           break;
         
+        case 'i':	 /* Estimate p(w|t)~=p(t|w)? (default=1) */
+          if (args_info->dyn_invert_given) {
+            fprintf(stderr, "%s: `--dyn-invert' (`-i') option given more than once\n", PROGRAM);
+          }
+          args_info->dyn_invert_given++;
+          args_info->dyn_invert_arg = (int)atoi(val);
+          break;
+        
+        case 'b':	 /* Base for Maxwell-Boltzmann estimator (default=2) */
+          if (args_info->dyn_base_given) {
+            fprintf(stderr, "%s: `--dyn-base' (`-b') option given more than once\n", PROGRAM);
+          }
+          args_info->dyn_base_given++;
+          args_info->dyn_base_arg = (float)strtod(val, NULL);
+          break;
+        
+        case 'B':	 /* Temperature coefficient for Maxwell-Boltzmann estimator (default=1) */
+          if (args_info->dyn_beta_given) {
+            fprintf(stderr, "%s: `--dyn-beta' (`-B') option given more than once\n", PROGRAM);
+          }
+          args_info->dyn_beta_given++;
+          args_info->dyn_beta_arg = (float)strtod(val, NULL);
+          break;
+        
         case 'w':	 /* Specify pseudo-tag for new analyses (default='@NEW') */
           if (args_info->dyn_new_tag_given) {
             fprintf(stderr, "%s: `--dyn-new-tag' (`-w') option given more than once\n", PROGRAM);
@@ -608,12 +647,12 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->dyn_new_tag_arg = gog_strdup(val);
           break;
         
-        case 'F':	 /* Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1) */
-          if (args_info->dyn_flambda_given) {
-            fprintf(stderr, "%s: `--dyn-flambda' (`-F') option given more than once\n", PROGRAM);
+        case 'E':	 /* Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1) */
+          if (args_info->dyn_freq_eps_given) {
+            fprintf(stderr, "%s: `--dyn-freq-eps' (`-E') option given more than once\n", PROGRAM);
           }
-          args_info->dyn_flambda_given++;
-          args_info->dyn_flambda_arg = (float)strtod(val, NULL);
+          args_info->dyn_freq_eps_given++;
+          args_info->dyn_freq_eps_arg = (float)strtod(val, NULL);
           break;
         
         case 0:	 /* Long option(s) with no short form */
@@ -926,6 +965,33 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->dyn_class_arg = gog_strdup(val);
           }
           
+          /* Estimate p(w|t)~=p(t|w)? (default=1) */
+          else if (strcmp(olong, "dyn-invert") == 0) {
+            if (args_info->dyn_invert_given) {
+              fprintf(stderr, "%s: `--dyn-invert' (`-i') option given more than once\n", PROGRAM);
+            }
+            args_info->dyn_invert_given++;
+            args_info->dyn_invert_arg = (int)atoi(val);
+          }
+          
+          /* Base for Maxwell-Boltzmann estimator (default=2) */
+          else if (strcmp(olong, "dyn-base") == 0) {
+            if (args_info->dyn_base_given) {
+              fprintf(stderr, "%s: `--dyn-base' (`-b') option given more than once\n", PROGRAM);
+            }
+            args_info->dyn_base_given++;
+            args_info->dyn_base_arg = (float)strtod(val, NULL);
+          }
+          
+          /* Temperature coefficient for Maxwell-Boltzmann estimator (default=1) */
+          else if (strcmp(olong, "dyn-beta") == 0) {
+            if (args_info->dyn_beta_given) {
+              fprintf(stderr, "%s: `--dyn-beta' (`-B') option given more than once\n", PROGRAM);
+            }
+            args_info->dyn_beta_given++;
+            args_info->dyn_beta_arg = (float)strtod(val, NULL);
+          }
+          
           /* Specify pseudo-tag for new analyses (default='@NEW') */
           else if (strcmp(olong, "dyn-new-tag") == 0) {
             if (args_info->dyn_new_tag_given) {
@@ -937,12 +1003,12 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           
           /* Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1) */
-          else if (strcmp(olong, "dyn-flambda") == 0) {
-            if (args_info->dyn_flambda_given) {
-              fprintf(stderr, "%s: `--dyn-flambda' (`-F') option given more than once\n", PROGRAM);
+          else if (strcmp(olong, "dyn-freq-eps") == 0) {
+            if (args_info->dyn_freq_eps_given) {
+              fprintf(stderr, "%s: `--dyn-freq-eps' (`-E') option given more than once\n", PROGRAM);
             }
-            args_info->dyn_flambda_given++;
-            args_info->dyn_flambda_arg = (float)strtod(val, NULL);
+            args_info->dyn_freq_eps_given++;
+            args_info->dyn_freq_eps_arg = (float)strtod(val, NULL);
           }
           
           else {

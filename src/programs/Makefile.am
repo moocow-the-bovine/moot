@@ -19,7 +19,8 @@
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
 #bin_PROGRAMS = mootpp mootm moothmm moot mootrain
 #bin_PROGRAMS = mootpp moothmm moot mootrain
-bin_PROGRAMS = mootpp mootrain mootcompile mootdump moot mooteval mootchurn moottype mootngsmooth mootdyn
+bin_PROGRAMS = mootpp mootrain mootcompile mootdump moot mooteval mootchurn moottype mootdyn
+#mootngsmooth
 #mootconfig
 
 #bin_SCRIPTS = ${script1} ... ${scriptN}
@@ -165,13 +166,13 @@ moottype_LDADD = $(LDADD_COMMON)
 EXTRA_DIST += moottype.gog
 
 #~~~~~~~~
-mootngsmooth_SOURCES = \
-	mootngsmooth_main.cc \
-	mootngsmooth_cmdparser.cc mootngsmooth_cmdparser.h
-mootngsmooth_main.o: mootngsmooth_cmdparser.h
-mootngsmooth_LDFLAGS = $(LDFLAGS_COMMON)
-mootngsmooth_LDADD = $(LDADD_COMMON)
-EXTRA_DIST += mootngsmooth.gog
+#mootngsmooth_SOURCES = \
+#	mootngsmooth_main.cc \
+#	mootngsmooth_cmdparser.cc mootngsmooth_cmdparser.h
+#mootngsmooth_main.o: mootngsmooth_cmdparser.h
+#mootngsmooth_LDFLAGS = $(LDFLAGS_COMMON)
+#mootngsmooth_LDADD = $(LDADD_COMMON)
+#EXTRA_DIST += mootngsmooth.gog
 
 #~~~~~~~~
 mootdyn_SOURCES = \

@@ -72,8 +72,8 @@ mofstream out;
 size_t nfiles = 0;
 
 // -- global classes/structs
-mootDynLexHMM *hmmp = NULL;
-
+mootDynHMM *hmmp = NULL;
+mootDynHMMOptions hmm_opts;
 
 // -- token i/o
 int ifmt         = tiofNone;
@@ -159,8 +159,15 @@ void GetMyOptions(int argc, char **argv)
   //-- io: writer: sink
   writer->to_mstream(&out);
 
+  //-- mootDynHMM generic options
+  hmm_opts.invert_lexp = args.dyn_invert_arg;
+  hmm_opts.newtag_str  = args.dyn_new_tag_arg;
+  hmm_opts.Ftw_eps     = args.dyn_freq_eps_arg;
+  hmm_opts.dynlex_base = args.dyn_base_arg;
+  hmm_opts.dynlex_beta = args.dyn_beta_arg;
+
   //-- create HMM (dynamic)
-  hmmp = reinterpret_cast<mootDynLexHMM*>(newDynHMM(args.dyn_class_arg));
+  hmmp = newDynHMM(args.dyn_class_arg, hmm_opts);
   if (hmmp == NULL) {
     fprintf(stderr, "%s: unknown dynamic HMM estimator class `%s'\n",
 	    PROGNAME, args.dyn_class_arg);
@@ -259,18 +266,14 @@ void GetMyOptions(int argc, char **argv)
 
   //-- load model spec
   if (!hmmp->load_model(args.model_arg,
-		      args.eos_tag_arg,
-		      PROGNAME,
-		      !args.nlambdas_given,
-		      !args.wlambdas_given,
-		      !args.clambdas_given))
+			args.eos_tag_arg,
+			PROGNAME,
+			!args.nlambdas_given,
+			!args.wlambdas_given,
+			!args.clambdas_given))
     {
       fprintf(stderr, "%s: could not load model `%s'\n", PROGNAME, args.model_arg);
     }
-
-  //-- set new properties
-  hmmp->tagstr_new = args.dyn_new_tag_arg;
-  hmmp->wtflambda0 = args.dyn_flambda_arg;
 
   // -- report
   if (args.verbose_arg >= vlProgress) {
@@ -288,14 +291,15 @@ void GetMyOptions(int argc, char **argv)
   //-- report to output-file
   if (!args.no_header_given) {
     writer->put_comment_block_begin();
-    writer->printf_raw("\n %s output file generated on %s", PROGNAME, asctime(now_tm));
-    writer->printf_raw(" Configuration:\n");
-    writer->printf_raw("   DynHMM class      : %s\n", args.dyn_class_arg);
+    writer->printf_raw(" %s output file generated on %s", PROGNAME, asctime(now_tm));
+    writer->printf_raw("\n");
+    writer->printf_raw(" DynHMM Configuration:\n");
+    hmmp->tw_put_info(writer);
+    writer->printf_raw("\n");
+    writer->printf_raw(" HMM Configuration:\n");
     writer->printf_raw("   Unknown Token     : %s\n", hmmp->tokids.id2name(0).c_str());
     writer->printf_raw("   Unknown Tag       : %s\n", hmmp->tagids.id2name(0).c_str());
     writer->printf_raw("   Border Tag        : %s\n", hmmp->tagids.id2name(hmmp->start_tagid).c_str());
-    writer->printf_raw("   New Tag           : %s\n", hmmp->tagstr_new.c_str());
-    writer->printf_raw("   DynLex lambdas    : lambda0=%g\n", hmmp->wtflambda0);
     writer->printf_raw("   N-Gram lambdas    : lambda1=%g, lambda2=%g, lambda3=%g\n",
 		       exp(hmmp->nglambda1), exp(hmmp->nglambda2), exp(hmmp->nglambda3));
     writer->printf_raw("\n");
@@ -395,7 +399,7 @@ int main (int argc, char **argv)
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
     if (args.verbose_arg >= vlSummary) nfiles++;
     if (args.verbose_arg >= vlProgress) {
-      writer->printf_comment("\n     File: %s\n", churner.in.name.c_str());
+      writer->printf_comment("\n File: %s\n", churner.in.name.c_str());
       fprintf(stderr,"%s: analyzing file '%s'...", PROGNAME, churner.in.name.c_str());
       fflush(stderr);
     }

@@ -258,7 +258,7 @@ bool mootHMM::load_model(const string &modelname,
     if (verbose >= vlProgress) carp("%s: compiling HMM...", myname);
 
     lexfreqs.compute_specials();
-    if (!compile(lexfreqs,ngfreqs,classfreqs,start_tag_str)) {
+    if (!this->compile(lexfreqs,ngfreqs,classfreqs,start_tag_str)) {
       carp("\n%s: HMM compilation FAILED\n", myname);
       return false;
     }

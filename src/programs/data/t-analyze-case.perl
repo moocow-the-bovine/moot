@@ -1,9 +1,22 @@
 #!/usr/bin/perl -w
 
-our $f_id    = 2;
-our $f_lc   = 1;
-our $f_uc0  = 1;
-our $f_uc   = 0.5;
+##-- for pseudo-frequencies
+our ($f_id,$f_lc,$f_uc0,$f_uc);
+
+our $costs_are_freqs = 0;
+if ($costs_are_freqs) {
+  ##-- set analysis 'costs' as pseudo-frequencies
+  $f_id   = 2;
+  $f_lc   = 1;
+  $f_uc0  = 1;
+  $f_uc   = 0.5;
+} else {
+  ##-- set analysis 'costs' as distances
+  $f_id   = 0;
+  $f_lc   = 1;
+  $f_uc0  = 1;
+  $f_uc   = 2;
+}
 
 my ($rest);
 

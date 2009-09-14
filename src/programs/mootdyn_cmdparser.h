@@ -49,8 +49,11 @@ struct gengetopt_args_info {
   int save_ambiguities_flag;	 /* Annotate tagged tokens with lexical ambiguities (default=0). */
   int mark_unknown_flag;	 /* Mark unknown tokens. (default=0). */
   char * dyn_class_arg;	 /* Specify built-in dynamic estimator (default='Freq') (default=Freq). */
+  int dyn_invert_arg;	 /* Estimate p(w|t)~=p(t|w)? (default=1) (default=1). */
+  float dyn_base_arg;	 /* Base for Maxwell-Boltzmann estimator (default=2) (default=2.0). */
+  float dyn_beta_arg;	 /* Temperature coefficient for Maxwell-Boltzmann estimator (default=1) (default=1.0). */
   char * dyn_new_tag_arg;	 /* Specify pseudo-tag for new analyses (default='@NEW') (default=@NEW). */
-  float dyn_flambda_arg;	 /* Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1) (default=0.1). */
+  float dyn_freq_eps_arg;	 /* Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1) (default=0.1). */
 
   int help_given;	 /* Whether help was given */
   int version_given;	 /* Whether version was given */
@@ -84,8 +87,11 @@ struct gengetopt_args_info {
   int save_ambiguities_given;	 /* Whether save-ambiguities was given */
   int mark_unknown_given;	 /* Whether mark-unknown was given */
   int dyn_class_given;	 /* Whether dyn-class was given */
+  int dyn_invert_given;	 /* Whether dyn-invert was given */
+  int dyn_base_given;	 /* Whether dyn-base was given */
+  int dyn_beta_given;	 /* Whether dyn-beta was given */
   int dyn_new_tag_given;	 /* Whether dyn-new-tag was given */
-  int dyn_flambda_given;	 /* Whether dyn-flambda was given */
+  int dyn_freq_eps_given;	 /* Whether dyn-freq-eps was given */
   
   char **inputs;         /* unnamed arguments */
   unsigned inputs_num;   /* number of unnamed arguments */

@@ -633,7 +633,7 @@ public:
 
   /** Destructor */
   //~mootHMM(void) { clear(true,false); };
-  ~mootHMM(void) { clear(false,false); };
+  virtual ~mootHMM(void) { clear(false,false); };
   //@}
 
   /*------------------------------------------------------------*/
@@ -714,26 +714,26 @@ public:
    * If you want to load multiple models, you will need to first
    * load the raw-freqency objects, then call the \c compile(),
    * \c estimate_*(), \c build_suffix_trie(), and \c compute_logprobs()
-   * methods yourself (e.g. set all of the \p do_* parameters to \c false).
+   * methods yourself (i.e. set all of the \p do_* parameters to \c false).
    */
-  bool load_model(const string &modelname,
-		  const mootTagString &start_tag_str="__$",
-		  const char *myname="mootHMM::load_model()",
-		  bool  do_estimate_nglambdas=true,
-		  bool  do_estimate_wlambdas=true,
-		  bool  do_estimate_clambdas=true,
-		  bool  do_build_suffix_trie=true,
-		  bool  do_compute_logprobs=true);
+  virtual bool load_model(const string &modelname,
+			  const mootTagString &start_tag_str="__$",
+			  const char *myname="mootHMM::load_model()",
+			  bool  do_estimate_nglambdas=true,
+			  bool  do_estimate_wlambdas=true,
+			  bool  do_estimate_clambdas=true,
+			  bool  do_build_suffix_trie=true,
+			  bool  do_compute_logprobs=true);
 
   /**
    * Compile
    * probabilites from raw frequency counts in 'lexfreqs' and 'ngrams'.
    * Returns false on failure.
    */
-  bool compile(const mootLexfreqs &lexfreqs,
-	       const mootNgrams &ngrams,
-	       const mootClassfreqs &classfreqs,
-	       const mootTagString &start_tag_str="__$");
+  virtual bool compile(const mootLexfreqs &lexfreqs,
+		       const mootNgrams &ngrams,
+		       const mootClassfreqs &classfreqs,
+		       const mootTagString &start_tag_str="__$");
 
   /** Assign IDs for tokens and tags from lexfreqs: called by compile() */
   void assign_ids_lf(const mootLexfreqs &lexfreqs);

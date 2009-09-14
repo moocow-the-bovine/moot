@@ -74,19 +74,77 @@ void mootDynHMM::tag_sentence(mootSentence &sentence)
  */
 
 //--------------------------------------------------------------
+bool mootDynLexHMM::load_model(const string &modelname,
+			       const mootTagString &start_tag_str,
+			       const char *myname,
+			       bool  do_estimate_nglambdas,
+			       bool  do_estimate_wlambdas,
+			       bool  do_estimate_clambdas,
+			       bool  do_build_suffix_trie,
+			       bool  do_compute_logprobs)
+{
+  //-- inherited
+  if (!mootHMM::load_model(modelname,
+			   start_tag_str,
+			   myname,
+			   do_estimate_nglambdas,
+			   do_estimate_wlambdas,
+			   do_estimate_clambdas,
+			   do_build_suffix_trie,
+			   do_compute_logprobs))
+    {
+      return false;
+    }
+
+  //-- get "new" tag ID
+  newtag_id = tagids.name2id(newtag_str);
+
+  //-- save original number of tags in model
+  tagids_size_orig = tagids.size();
+
+  return true;
+}
+
+//--------------------------------------------------------------
+bool mootDynLexHMM::compile(mootLexfreqs &lexfreqs,
+			    mootNgrams &ngrams,
+			    mootClassfreqs &classfreqs,
+			    const mootTagString &start_tag_str)
+{
+  //-- insert "new" tag
+  if (ngrams.ngtable.find(newtag_str) == ngrams.ngtable.end()) {
+    ngrams.add_count(newtag_str, newtag_f);
+  }
+
+  //-- inherited
+  return mootHMM::compile(lexfreqs,ngrams,classfreqs,start_tag_str);
+};
+
+//--------------------------------------------------------------
+void mootDynLexHMM::tw_put_info(moot::TokenWriter *tw)
+{
+  tw->printf_raw("  +DynHMM class      : %s\n", "mootDynLexHMM");
+  tw->printf_raw("   New Tag           : %s\n", newtag_str.c_str());
+  tw->printf_raw("   Ftw_eps           : %g\n", Ftw_eps);
+};
+
+//--------------------------------------------------------------
 void mootDynLexHMM::tag_hook_pre(mootSentence &sent)
 {
   //-- ensure everything is cleared
-  lex_clear();
-  dynlex.clear();
-  tagids_size_orig = n_tags;
+  dynlex_clear();
 
   //-- prepare lexmap
   for (mootSentence::const_iterator si = sent.begin(); si != sent.end(); si++) {
     if (si->toktype() != TokTypeVanilla) continue; //-- ignore non-vanilla tokens
     const mootToken &tok = *si;
     for (mootToken::Analyses::const_iterator ani=tok.analyses().begin(); ani!=tok.analyses().end(); ani++) {
-      this->dynlex_add_analysis(tok, *ani);
+      const mootToken::Analysis &a = *ani;
+      ProbT f_tw = this->dynlex_analysis_freq(tok,a);
+      if (f_tw <= 0) continue; //-- ignore
+      Ftw[a.tag][tok.text()] += f_tw;
+      Fw[tok.text()] += f_tw;
+      Ft[a.tag] += f_tw;
     }
   }
 
@@ -105,9 +163,67 @@ void mootDynLexHMM::tag_hook_post(mootSentence &sent)
   fclose(txtout);
 #endif
 
+  //-- clear
+  dynlex_clear();
+
+  return;
+}
+
+//--------------------------------------------------------------
+#define LOGP_NEW_MIN -100
+void mootDynLexHMM::dynlex_populate_lexprobs(void)
+{
+  ProbT  logp_new  = tagp(newtag_id);
+  ProbT  logp_zero = MOOT_PROB_ZERO;
+  if (static_cast<double>(logp_new)==static_cast<double>(logp_zero)) {
+    logp_new = LOGP_NEW_MIN;
+  }
+
+  //-- populate lexicon from pseudo-frequencies in dynlex
+  for (TagTokProbMap::const_iterator twpi=Ftw.begin(); twpi!=Ftw.end(); twpi++) {
+    const TagStr &tagstr = twpi->first;
+    TagID          tagid = get_tagid(tagstr);
+
+    //-- copy 'newtagstr' unigram tag probability for new tags
+    if (tagid >= tagids_size_orig) {
+      set_ngram_prob(logp_new, 0,0,tagid);
+    }
+
+    //-- get f_t ~= f(tag) = \sum_{w} f(w,tag)
+    ProbT f_t = Ft[tagstr];
+
+    //-- populate HMM::lexprobs[w][t] = logp_wt = log(wlambda1_p * (f_wt/Z_wt)), where:
+    //   + f_wt = Ftw[t][w]
+    //   + Z_wt = / Fw[w] = f_w = \sum_t f(w,t)    : if invert_lexp==true
+    //            \ Ft[t] = f_t = \sum_w f(w,t)    : otherwise
+    //   + since wlambda1_p is stored in compiled model as
+    //       log_wlambda1=mootHMM::wlambda1=log(wlambda1_p),
+    //     the formula is:
+    //       logp_wt = log_wlambda1 + log(f_wt/f_t) = log(wlambda1_p) + log(f_wt/f_t)
+    for (TokProbMap::const_iterator wpi=twpi->second.begin(); wpi!=twpi->second.end(); wpi++) {
+      const TokStr &tokstr = wpi->first;
+      const TokID    tokid = lex_get_tokid(tokstr);
+      ProbT           f_wt = wpi->second;
+      ProbT           Z_wt = invert_lexp ? Fw[tokstr] : f_t;
+      ProbT           p_wt = Z_wt > 0 ? (f_wt / Z_wt) : 0;
+      ProbT        logp_wt = wlambda1 + (p_wt > 0 ? log(p_wt) : MOOT_PROB_ZERO);
+      lexprobs[tokid][tagid] = logp_wt;
+#if 0 //-- DEBUG
+      fprintf(stderr,"log p(W=%u[\"%s\"] | T=%u[\"%s\"]):=%g, logp=%g; f_wt=%g, f_w=%g, f_t=%g\n",
+	      tokid, tokstr.c_str(), tagid, tagstr.c_str(), p_wt, logp_wgt, f_wt, f_w, f_t);
+#endif
+    }
+  }
+}
+
+//--------------------------------------------------------------
+void mootDynLexHMM::dynlex_clear(void)
+{
   //-- clear: lex
   lex_clear();
-  dynlex.clear();
+  Ftw.clear();
+  Fw.clear();
+  Ft.clear();
 
   //-- clear: n-grams
   for (TagID t=tagids_size_orig; t<n_tags; t++) {
@@ -119,101 +235,6 @@ void mootDynLexHMM::tag_hook_post(mootSentence &sent)
   n_tags = tagids_size_orig;
 }
 
-//--------------------------------------------------------------
-#define LOGP_NEW_MIN -100
-void mootDynLexHMM::dynlex_populate_lexprobs(void)
-{
-  TagID tagid_new  = tagids.name2id(tagstr_new);
-  ProbT  logp_new  = tagp(tagid_new);
-  ProbT  logp_zero = MOOT_PROB_ZERO;
-  if (static_cast<double>(logp_new)==static_cast<double>(logp_zero)) {
-    logp_new = LOGP_NEW_MIN;
-  }
-
-  //-- populate lexicon from pseudo-frequencies in dynlex
-  for (TagTokProbMap::const_iterator twpi=dynlex.begin(); twpi!=dynlex.end(); twpi++) {
-    const TagStr &tagstr = twpi->first;
-    TagID          tagid = get_tagid(tagstr);
-
-    //-- copy 'newtagstr' unigram tag probability for new tags
-    if (tagid >= tagids_size_orig) {
-      set_ngram_prob(logp_new, 0,0,tagid);
-    }
-
-    //-- get f_t ~= f(tag) = \sum_{w} f(w,tag)
-    ProbT f_t = 0;
-    for (TokProbMap::const_iterator wpi=twpi->second.begin(); wpi!=twpi->second.end(); wpi++) {
-      f_t += (wpi->second + wtflambda0);
-    }
-
-    //-- populate HMM::lexprobs as log(wlambda1_p*(f_wt/f_t))
-    //   + since wlambda1_p is stored in compiled model as logwlambda1=mootHMM::wlambda1=log(wlambda1_p),
-    //     the formula is: log_wlambda1 + log(f_wt/f_t) = log(wlambda1_p) + log(f_wt/f_t)
-    for (TokProbMap::const_iterator wpi=twpi->second.begin(); wpi!=twpi->second.end(); wpi++) {
-      const TokStr &tokstr = wpi->first;
-      const TokID    tokid = lex_get_tokid(tokstr);
-      ProbT           f_wt = wpi->second + wtflambda0;
-      ProbT          p_wgt = f_wt / f_t;
-      ProbT       logp_wgt = wlambda1 + log(p_wgt);
-      lexprobs[tokid][tagid] = logp_wgt;
-#if 0 //-- DEBUG
-      fprintf(stderr,"log p(W=%u[\"%s\"] | T=%u[\"%s\"]) := %g, logp = %g; f_wt=%g, f_t=%g\n",
-	      tokid, tokstr.c_str(), tagid, tagstr.c_str(), p_wgt, logp_wgt, f_wt, f_t);
-#endif
-    }
-  }
-}
-
-/*======================================================================
- * mootDynILexHMM
- */
-//--------------------------------------------------------------
-void mootDynILexHMM::dynlex_populate_lexprobs(void)
-{
-  TagID tagid_new  = tagids.name2id(tagstr_new);
-  ProbT  logp_new  = tagp(tagid_new);
-  ProbT  logp_zero = MOOT_PROB_ZERO;
-  if (static_cast<double>(logp_new)==static_cast<double>(logp_zero)) {
-    logp_new = LOGP_NEW_MIN;
-  }
-
-  //-- populate fw_map: w->f(w)
-  TokProbMap fw_map;
-  for (TagTokProbMap::const_iterator twpi=dynlex.begin(); twpi!=dynlex.end(); twpi++) {
-    for (TokProbMap::const_iterator wpi=twpi->second.begin(); wpi!=twpi->second.end(); wpi++) {
-      const TokStr &tokstr = wpi->first;
-      ProbT           f_tw = wpi->second;
-      fw_map[tokstr] += wtflambda0 + f_tw;
-    }
-  }
-
-  //-- populate lexicon from pseudo-frequencies in dynlex
-  for (TagTokProbMap::const_iterator twpi=dynlex.begin(); twpi!=dynlex.end(); twpi++) {
-    const TagStr &tagstr = twpi->first;
-    TagID          tagid = get_tagid(tagstr);
-
-    //-- copy 'newtagstr' unigram tag probability for new tags
-    if (tagid >= tagids_size_orig) {
-      set_ngram_prob(logp_new, 0,0,tagid);
-    }
-
-    //-- (incorrectly) populate HMM::lexprobs as log(wlambda1_p*(f_tw/f_w)) ~= log(p(t|w))
-    for (TokProbMap::const_iterator wpi=twpi->second.begin(); wpi!=twpi->second.end(); wpi++) {
-      const TokStr &tokstr = wpi->first;
-      const TokID    tokid = lex_get_tokid(tokstr);
-      ProbT           f_w  = fw_map[tokstr];
-      ProbT           f_wt = wpi->second + wtflambda0;
-      ProbT          p_tgw = f_wt / f_w;
-      ProbT       logp_tgw = wlambda1 + log(p_tgw);
-      lexprobs[tokid][tagid] = logp_tgw;
-#if 0 //-- DEBUG
-      fprintf(stderr,"log p(T=%u[\"%s\"] | W=%u[\"%s\"]) := %g, logp = %g; f_wt=%g, f_w=%g\n",
-	      tagid, tagstr.c_str(), tokid, tokstr.c_str(), p_tgw, logp_tgw, f_wt, f_w);
-#endif
-    }
-  }
-}
-
 
 /*======================================================================
  * Utilities
@@ -221,25 +242,33 @@ void mootDynILexHMM::dynlex_populate_lexprobs(void)
 const char *DynHMMEstimatorNames[dheN] = {
   "Unknown",
   "Freq",
-  "IFreq"
+  "Boltzmann"
 };
 
-mootDynHMM *newDynHMM(DynHMMEstimator which)
+mootDynHMM *newDynHMM(DynHMMEstimator which, const mootDynHMMOptions &opts)
 {
+  mootDynHMM *hmmp = NULL;
   switch (which) {
-  case dheFreq: return new mootDynLexHMM();
-  case dheIFreq: return new mootDynILexHMM();
+  case dheFreq:
+    hmmp = new mootDynLexHMM();
+    break;
+  case dheBoltzmann:
+    hmmp = new mootDynLexHMM_Boltzmann();
+    break;
   default:
     return NULL;
   }
+  if (hmmp) hmmp->set_options(opts);
+  return hmmp;
 }
 
-mootDynHMM *newDynHMM(const std::string &which)
+mootDynHMM *newDynHMM(const std::string &which, const mootDynHMMOptions &opts)
 {
-  DynHMMEstimator ewhich = dheUnknown;
-  if      (which == "Freq") ewhich = dheFreq;
-  else if (which == "IFreq") ewhich  = dheIFreq;
-  return newDynHMM(ewhich);
+  unsigned int e;
+  for (e=0; e < dheN; e++) {
+    if (which==DynHMMEstimatorNames[e]) return newDynHMM(static_cast<DynHMMEstimator>(e),opts);
+  }
+  return newDynHMM(dheUnknown, opts);
 }
 
 
