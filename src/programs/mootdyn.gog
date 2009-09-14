@@ -2,10 +2,10 @@
 #
 # Getopt::Gen specification for moot
 #-----------------------------------------------------------------------------
-program "moot"
+program "mootdyn"
 #program_version "0.01"
 
-purpose	"moocow's HMM part-of-speech tagger/disambiguator."
+purpose	"moocow's dynamic HMM part-of-speech tagger/disambiguator."
 author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
 on_reparse "warn"
 

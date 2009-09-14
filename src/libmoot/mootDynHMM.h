@@ -362,7 +362,7 @@ public:
    */
   ProbT dynlex_base;
 
-  /**<
+  /**
    * "Temperature" coefficient of Maxwell-Boltzmann estimator (>0), default=1
    * A value of 0.0 gives a uniform output distribution.
    * Greater values give lower-entropy output distributions.

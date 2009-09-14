@@ -3,13 +3,13 @@
 
 =head1 NAME
 
-moot - moocow's HMM part-of-speech tagger/disambiguator.
+mootdyn - moocow's dynamic HMM part-of-speech tagger/disambiguator.
 
 
 
 =head1 SYNOPSIS
 
-moot [OPTIONS] INPUT(s)
+mootdyn [OPTIONS] INPUT(s)
 
  Arguments:
     INPUT(s)  Input files / file-lists.
@@ -68,7 +68,7 @@ moot [OPTIONS] INPUT(s)
 
 =head1 DESCRIPTION
 
-moocow's HMM part-of-speech tagger/disambiguator.
+moocow's dynamic HMM part-of-speech tagger/disambiguator.
 
 
 'mootdyn' is a dynamic Hidden Markov Model (HMM) tagger / disambiguator
