@@ -263,10 +263,10 @@ public:
   /**\name Binary load / save */
   //@{
   /** Save to a binary file */
-  bool save(const char *filename, int compression_level=MOOT_DEFAULT_COMPRESSION);
+  virtual bool save(const char *filename, int compression_level=MOOT_DEFAULT_COMPRESSION);
 
   /** Load from a binary file */
-  bool load(const char *filename=NULL);
+  virtual bool load(const char *filename=NULL);
   //@}
 
   //------------------------------------------------------------
@@ -276,7 +276,7 @@ public:
    * Top-level: load and compile a single model, and estimate all
    * smoothing constants.  Returns true on success, false on failure.
    */
-  bool load_model(const std::string &modelname, const mootTagString &start_tag_str="__$");
+  virtual bool load_model(const std::string &modelname, const mootTagString &start_tag_str="__$");
 
   /** Low-level utility: set a (raw,smoothed,log-) n-gram probability */
   void set_ngram_prob(ProbT p, TagID t1=0, TagID t2=0, TagID t3=0);
@@ -288,8 +288,8 @@ public:
   //@{
   
   /** Top-level tagging interface: TokenIO layer */
-  void tag_io(TokenReader *reader, TokenWriter *writer);
-  void tag_sentence(Sentence &sentence);
+  virtual void tag_io(TokenReader *reader, TokenWriter *writer);
+  virtual void tag_sentence(Sentence &sentence);
   //...
   //@}
 
