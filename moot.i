@@ -1,1 +1,0 @@
-swig/moot.i

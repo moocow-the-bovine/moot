@@ -89,7 +89,73 @@ sub test_hmm {
 
   print STDERR "$0: test_hmm(): done\n";
 }
-test_hmm();
+#test_hmm();
+
+##----------------------------------------------------------------------
+## test: DynHMM
+
+sub test_dhmm {
+  my $model = '../src/programs/data/utrain-yy.hmm';
+  my $hmm  = moot::HMM->new();
+  my $dhmm = moot::DynLexHMM_Boltzmann->new();
+  $hmm->load_model($model) || die("$0: load failed for model '$model'");
+  $dhmm->load_model($model) || die("$0: load failed for model '$model'");
+
+  my $s = moot::Sentence->new();
+  $s->push_back(moot::Token->new($_)) foreach (qw(Dies ist ein Test .));
+  $hmm->tag_sentence($s);
+
+  print STDERR "$0: test_dhmm(): done\n";
+}
+#test_dhmm();
+
+##----------------------------------------------------------------------
+## test: Ngrams
+
+sub test_ngrams {
+  my $ng = moot::Ngrams->new();
+  $ng->load("test1.123");
+
+  my $ugt = $ng->{ugtotal};
+  my $n_a = $ng->lookup('a');
+  my $n_ab = $ng->lookup(qw(a b));
+
+  $ng->add_counts(qw(a b c), 1);
+  $ng->save("test1b.123");
+  $ng->save("test1b.v123",1);
+
+  $ng->clear();
+  $ng->load('test1.123');
+  $ng->load('test2.123');
+  $ng->save("test1+2.123",1);
+
+  print STDERR "$0: test_ngrams(): done\n";
+}
+#test_ngrams();
+
+##----------------------------------------------------------------------
+## test: Lexfreqs
+
+sub test_lexfreqs {
+  my $lex = moot::Lexfreqs->new();
+  $lex->load("test1.lex");
+
+  my $total = $lex->{n_tokens};
+  my $n_a = $lex->wlookup('a');
+  my $n_A = $lex->tlookup('A');
+  my $n_aA = $lex->wtlookup(qw(a A));
+
+  $lex->add_count(qw(a A),10);
+  $lex->save("test1b.lex");
+
+  $lex->clear();
+  $lex->load('test1.lex');
+  $lex->load('test2.lex');
+  $lex->save("test1+2.lex");
+
+  print STDERR "$0: test_lexfreqs(): done\n";
+}
+test_lexfreqs();
 
 
 ##----------------------------------------------------------------------

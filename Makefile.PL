@@ -3,20 +3,20 @@ use ExtUtils::MakeMaker;
 ##----------------------------------------------------------------------
 ## Configuration
 ##----------------------------------------------------------------------
-our $moot_min_version = "2.0.6";
+our $moot_min_version = "2.0.7";
 if (system("pkg-config --atleast-version=$moot_min_version moot") != 0) {
   die("Required module moot >= v$moot_min_version not found!\n");
 }
 
-our $use_moot_oflags = 1;
-$MOOT_OFLAGS = '-O0 -pipe' if (!$use_moot_oflags);
+our $USE_MOOT_OFLAGS = 0;
+$MOOT_OFLAGS = '-O0 -pipe' if (!$USE_MOOT_OFLAGS);
 
 @MOOT_ALL_CFLAGS = map { $s=`pkg-config --cflags $_`; chomp($s); split(/\s+/,$s) } qw(moot);
 $MOOT_IFLAGS = join(' ', map { $s=`pkg-config --cflags-only-I $_`; chomp($s); $s } qw(moot));
 foreach (@MOOT_ALL_CFLAGS) {
   next if ($MOOT_IFLAGS =~ m/\b$_\b/);
   if (/^\-[fpmO]/) {
-    $MOOT_OFLAGS .= " $_" if ($use_moot_oflags);
+    $MOOT_OFLAGS .= " $_" if ($USE_MOOT_OFLAGS);
     next;
   }
   $MOOT_CFLAGS .= " $_";
@@ -36,7 +36,7 @@ WriteMakefile
    AUTHOR       => 'Bryan Jurish <moocow@ling.uni-potsdam.de>',
    ABSTRACT	=> 'Perl interface to libmoot part-of-speech tagging library',
    #VERSION_FROM => 'moot.pm',
-   VERSION      => '0.01',
+   VERSION      => '0.02',
 
 
    ##-- user variables
@@ -47,6 +47,10 @@ WriteMakefile
    CCFLAGS      => $MOOT_CFLAGS,        ##-- additional flags
    OPTIMIZE     => $MOOT_OFLAGS,        ##-- optimization flags
    OBJECT       => 'moot_wrap.o',
+   EXE_FILES    => [
+		    'mootmerge-123.perl',
+		    'mootmerge-lex.perl',
+		   ],
 
    ##-- DEBUG
    #MAKEAPERL=>1,
