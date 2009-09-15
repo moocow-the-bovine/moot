@@ -26,10 +26,10 @@ public:
   virtual ~DynHMM(void);
 
 public:
-  virtual void tag_hook_pre(mootSentence &sent);
-  virtual void tag_hook_post(mootSentence &sent);
+  virtual void tag_hook_pre(Sentence &sent);
+  virtual void tag_hook_post(Sentence &sent);
   virtual void tag_io(TokenReader *reader, TokenWriter *writer);
-  virtual void tag_sentence(mootSentence &sentence);
+  virtual void tag_sentence(Sentence &sentence);
 };
 
 //==============================================================================
@@ -63,8 +63,8 @@ public:
 
   //---------------------------------------------------------------------
   ///\name Tagging: Hooks
-  virtual void tag_hook_pre(mootSentence &sent);
-  virtual void tag_hook_post(mootSentence &sent);
+  virtual void tag_hook_pre(Sentence &sent);
+  virtual void tag_hook_post(Sentence &sent);
 };
 
 
