@@ -8,7 +8,7 @@ if (system("pkg-config --atleast-version=$moot_min_version moot") != 0) {
   die("Required module moot >= v$moot_min_version not found!\n");
 }
 
-our $USE_MOOT_OFLAGS = 0;
+our $USE_MOOT_OFLAGS = 1;
 $MOOT_OFLAGS = '-O0 -pipe' if (!$USE_MOOT_OFLAGS);
 
 @MOOT_ALL_CFLAGS = map { $s=`pkg-config --cflags $_`; chomp($s); split(/\s+/,$s) } qw(moot);
