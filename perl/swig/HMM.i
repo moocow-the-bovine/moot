@@ -138,6 +138,13 @@ public:
   bool      hash_ngrams;
 
   /**
+   * Whether to interpret token pre-analyses as "hints"
+   * (relax==true) or hard restrictions (relax==false).
+   *  Default: false.
+   */
+  bool      relax;
+
+  /**
    * Whether to use class probabilities (Default=true)
    * \warning Don't set this to true unless your input
    * files actually contain a priori analyses generated
@@ -347,79 +354,5 @@ public:
       if (f != stdout) fclose(f);
     };
   }
-  //@}
-
-  //------------------------------------------------------------
-  // Extensions: lexprobs
-  //@{
-  %extend {
-    //-- lexSize() : like lexprobs.size()
-    size_t lexSize(void) { return $self->lexprobs.size(); };
-
-    //-- lexEntry(n) : like lexprobs.nth(n)
-    HMMLexProbSubTableT &lexEntry(size_t n) { return $self->lexprobs[n]; };
-
-    //-- lexClear() : clear lexprobs, leaves 'UNKNOWN' entry present but empty
-    void lexClear(void) {
-      $self->lexprobs.clear();
-      $self->tokids.clear();      //-- ... leaves 'UNKNOWN' entry
-      $self->lexprobs.resize(1);  //-- ... re-insert empty entry for 'UNKNOWN'
-    };
-
-    %define hmm_lexinsert_code(tokid,tagid)
-      if ($self->lexprobs.size() < tokid) $self->lexprobs.resize(tokid+1);
-      mootHMM::LexProbSubTable &lpsub = $self->lexprobs[tokid];
-      lpsub.insert(tagid, $self->wlambda1 + logp);
-    %enddef
-
-    //-- lexInsert(tokstr,tagstr,logp(tok|tag))
-    void lexInsert(const mootTokString &tokstr, const mootTagString &tagstr, ProbT logp)
-    {
-      mootHMM::TokID tokid = $self->tokids.get_id(tokstr);  //-- implicit insert
-      mootHMM::TagID tagid = $self->tagids.name2id(tagstr); //-- NO implicit insert
-      hmm_lexinsert_code(tokid,tagid);
-    };
-
-    //-- lexInsert(tokstr,tagstr,logp(tok|tag))
-    void lexInsert(const TokID tokid, const TagID tagid, ProbT logp)
-    {
-      hmm_lexinsert_code(tokid,tagid);
-    };
-  };
-  //@}
-
-  //------------------------------------------------------------
-  // Extensions: ngrprobsh
-  //  + only works if hash_ngrams==true
-  //@{
-  %extend {
-    //-- nghSize()
-    size_t nghSize(void) { return $self->ngprobsh.size(); };
-
-    //-- nghClear() : clears ngprobsh
-    void nghClear(void) { $self->ngprobsh.clear(); };
-
-    //-- nghInsert(tagid1,tagid2,tagid3,logp(tag3|tag1,tag2))
-    void nghInsert(TagID tagid1, TagID tagid2, TagID tagid3, ProbT logp) {
-      $self->set_ngram_prob(logp,tagid1,tagid2,tagid3);
-    };
-
-    //-- nghInsert(tagstr1,tagstr2,tagstr3,logp(tag3|tag1,tag2))
-    // + creates tag-ids if not already defined
-    void nghInsert(const mootTagString &tagstr1, const mootTagString &tagstr2, const mootTagString &tagstr3, ProbT logp) {
-      mootHMM::TagIDTable &tagids = $self->tagids;
-      $self->set_ngram_prob(logp, tagids.get_id(tagstr1), tagids.get_id(tagstr2), tagids.get_id(tagstr3));
-    };
-
-    //-- nghErase(tagid1,tagid2,tagid3)
-    void nghErase(TagID tagid1, TagID tagid2, TagID tagid3) {
-      $self->ngprobsh.erase(mootHMM::Trigram(tagid1,tagid2,tagid3));
-    };
-    //-- nghErase(tagstr1,tagstr2,tagstr3)
-    void nghErase(const mootTagString &tagstr1, const mootTagString &tagstr2, const mootTagString &tagstr3, ProbT logp) {
-      mootHMM::TagIDTable &tagids = $self->tagids;
-      $self->ngprobsh.erase(mootHMM::Trigram(tagids.get_id(tagstr1), tagids.get_id(tagstr2), tagids.get_id(tagstr3)));
-    };
-  };
   //@}
 };

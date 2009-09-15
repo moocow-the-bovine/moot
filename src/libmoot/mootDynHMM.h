@@ -205,7 +205,7 @@ public:
   /** Top-level tagging interface: TokenIO layer.
    *  Really just a dup of mootHMM::tag_io which calls virtual tag_sentence()
    */
-  void tag_io(TokenReader *reader, TokenWriter *writer);
+  virtual void tag_io(TokenReader *reader, TokenWriter *writer);
 
   /**
    * Top-level tagging interface: mootSentence
@@ -280,7 +280,7 @@ public:
   };
   //@}
 
-  /*---------------------------------------------------------------------*/
+  //---------------------------------------------------------------------
   ///\name Compilation & initialization
   //@{
   /** load a model */
@@ -300,21 +300,21 @@ public:
 		       const mootTagString &start_tag_str="__$");
   //@}
 
-  /*---------------------------------------------------------------------*/
+  //---------------------------------------------------------------------
   ///\name Tagging: Hooks
   //@{
   virtual void tag_hook_pre(mootSentence &sent);
   virtual void tag_hook_post(mootSentence &sent);
   //@}
 
-  /*---------------------------------------------------------------------*/
+  //---------------------------------------------------------------------
   ///\name User-level Niceties
   //@{
   /** Write some debugging header information to an output stream */
   virtual void tw_put_info(moot::TokenWriter *tw);
   //@}
 
-  /*---------------------------------------------------------------------*/
+  //---------------------------------------------------------------------
   ///\name Tagging: Hooks: Low-level Utilities
   //@{
   /** Clear dynamic lexica */

@@ -28,6 +28,9 @@ extern const char * const PACKAGE_VERSION;
 %include "Enum.i"
 %include "AssocVector.i"
 %include "HMM.i"
+%include "DynHMM.i"
+%include "Ngrams.i"
+%include "Lexfreqs.i"
 
 /*--- additions --*/
 %perlcode %{

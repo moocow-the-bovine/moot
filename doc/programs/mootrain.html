@@ -10,8 +10,10 @@
 
 <body>
 
-<p><a name="__index__"></a></p>
+
 <!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
 
 <ul>
 
@@ -38,9 +40,11 @@
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 </ul>
+
+<hr name="index" />
+</div>
 <!-- INDEX END -->
 
-<hr />
 <p>
 </p>
 <hr />
@@ -50,7 +54,7 @@
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p>mootrain [OPTIONS] <a href="#item_input"><code>INPUT(s)</code></a></p>
+<p>mootrain [OPTIONS] INPUT(s)</p>
 <pre>
  Arguments:
     INPUT(s)  Tagged input corpus file(s).</pre>
@@ -81,7 +85,7 @@
 used by the 'moot' program  from a tagged training corpus.
 The training
 corpus should be in 'medium' (+tagged,-analyzed) or 'well done'
-(+tagged,+analyzed) format.  The output <code>file(s)</code> are text-format
+(+tagged,+analyzed) format.  The output file(s) are text-format
 raw frequency models.</p>
 <p>See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot file formats.</p>
 <p>
@@ -89,7 +93,7 @@ raw frequency models.</p>
 <hr />
 <h1><a name="arguments">ARGUMENTS</a></h1>
 <dl>
-<dt><strong><a name="item_input"><code>INPUT(s)</code></a></strong></dt>
+<dt><strong><a name="input" class="item"><code>INPUT(s)</code></a></strong></dt>
 
 <dd>
 <p>Tagged input corpus file(s).</p>
@@ -103,19 +107,19 @@ or 'well done' (+tagged,-analyzed).</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2dhelp__2c__2dh"><code>--help</code> , <code>-h</code></a></strong></dt>
+<dt><strong><a name="help_h" class="item"><code>--help</code> , <code>-h</code></a></strong></dt>
 
 <dd>
 <p>Print help and exit.</p>
 <p>Default: '0'</p>
 </dd>
-<dt><strong><a name="item__2d_2dversion__2c__2dv"><code>--version</code> , <code>-V</code></a></strong></dt>
+<dt><strong><a name="version_v" class="item"><code>--version</code> , <code>-V</code></a></strong></dt>
 
 <dd>
 <p>Print version and exit.</p>
 <p>Default: '0'</p>
 </dd>
-<dt><strong><a name="item__2d_2drcfile_3dfile__2c__2dcfile"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
+<dt><strong><a name="rcfile_file_cfile" class="item"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
 
 <dd>
 <p>Read an alternate configuration file.</p>
@@ -127,23 +131,23 @@ or 'well done' (+tagged,-analyzed).</p>
 </p>
 <h2><a name="basic_options">Basic Options</a></h2>
 <dl>
-<dt><strong><a name="item__2d_2dverbose_3dlevel__2c__2dvlevel"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
+<dt><strong><a name="verbose_level_vlevel" class="item"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
 
 <dd>
 <p>Verbosity level.</p>
 <p>Default: '2'</p>
 <p>Be more or less verbose.  Recognized values are in the range 0..3.</p>
 </dd>
-<dt><strong><a name="item__2d_2doutput_3dstring__2c__2dostring"><code>--output=STRING</code> , <code>-oSTRING</code></a></strong></dt>
+<dt><strong><a name="output_string_ostring" class="item"><code>--output=STRING</code> , <code>-oSTRING</code></a></strong></dt>
 
 <dd>
 <p>Specify basename for output files (default=INPUT)</p>
 <p>Default: 'NULL'</p>
 </dd>
-<dt><strong><a name="item__2d_2dinput_2dformat_3dformat__2c__2diformat"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></a></strong></dt>
+<dt><strong><a name="input_format_format_iformat" class="item"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></a></strong></dt>
 
 <dd>
-<p>Specify input <code>file(s)</code> format(s).</p>
+<p>Specify input file(s) format(s).</p>
 <p>Default: 'NULL'</p>
 <p>Value should be a comma-separated list of format flag names,
 optionally prefixed with an exclamation point (!) to indicate
@@ -152,7 +156,7 @@ negation.</p>
 <p>Implied='Tagged'</p>
 <p>See 'I/O Format Flags' in <a href="././mootfiles.html">the mootfiles manpage</a> for details.</p>
 </dd>
-<dt><strong><a name="item__2d_2dinput_2dencoding_3dencoding"><code>--input-encoding=ENCODING</code></a></strong></dt>
+<dt><strong><a name="input_encoding_encoding" class="item"><code>--input-encoding=ENCODING</code></a></strong></dt>
 
 <dd>
 <p>Override document encoding for XML input.</p>
@@ -164,25 +168,25 @@ negation.</p>
 </p>
 <h2><a name="model_format_options">Model Format Options</a></h2>
 <dl>
-<dt><strong><a name="item__2d_2dlex__2c__2dl"><code>--lex</code> , <code>-l</code></a></strong></dt>
+<dt><strong><a name="lex_l" class="item"><code>--lex</code> , <code>-l</code></a></strong></dt>
 
 <dd>
 <p>Generate only lexical frequency file.</p>
 <p>Default: '0'</p>
 </dd>
-<dt><strong><a name="item__2d_2dngrams__2c__2dn"><code>--ngrams</code> , <code>-n</code></a></strong></dt>
+<dt><strong><a name="ngrams_n" class="item"><code>--ngrams</code> , <code>-n</code></a></strong></dt>
 
 <dd>
 <p>Generate only n-gram frequency file.</p>
 <p>Default: '0'</p>
 </dd>
-<dt><strong><a name="item__2d_2dclasses__2c__2dc"><code>--classes</code> , <code>-C</code></a></strong></dt>
+<dt><strong><a name="classes_c" class="item"><code>--classes</code> , <code>-C</code></a></strong></dt>
 
 <dd>
 <p>Generate only lexical-class frequency file.</p>
 <p>Default: '0'</p>
 </dd>
-<dt><strong><a name="item__2d_2deos_2dtag_3dtag__2c__2detag"><code>--eos-tag=TAG</code> , <code>-eTAG</code></a></strong></dt>
+<dt><strong><a name="eos_tag_tag_etag" class="item"><code>--eos-tag=TAG</code> , <code>-eTAG</code></a></strong></dt>
 
 <dd>
 <p>Specify boundary tag (default=__$)</p>
@@ -192,7 +196,7 @@ sentence boundaries, both beginning- and end-of-sentence.  It should
 not be an element of the actual tag-set -- that is, it should not
 be a valid analysis for any token.</p>
 </dd>
-<dt><strong><a name="item__2d_2dverbose_2dngrams__2c__2dn"><code>--verbose-ngrams</code> , <code>-N</code></a></strong></dt>
+<dt><strong><a name="verbose_ngrams_n" class="item"><code>--verbose-ngrams</code> , <code>-N</code></a></strong></dt>
 
 <dd>
 <p>Generate long-form ngrams (default=no)</p>
@@ -213,10 +217,10 @@ Blank lines and comments (lines beginning with '#')
 are ignored.</p>
 <p>The following configuration files are read by default:</p>
 <ul>
-<li><strong><a name="item__2fetc_2fmootrainrc">/etc/mootrainrc</a></strong>
+<li><strong><a name="etc_mootrainrc" class="item">/etc/mootrainrc</a></strong>
 
 </li>
-<li><strong><a name="item__7e_2f_2emootrainrc">~/.mootrainrc</a></strong>
+<li><strong><a name="mootrainrc" class="item">~/.mootrainrc</a></strong>
 
 </li>
 </ul>
@@ -245,10 +249,10 @@ strangeness.</p>
 <h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
 <p>Development of this package was supported by the project
 'Kollokationen im W&ouml;rterbuch'
-( ``collocations in the dictionary'', <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
+( &quot;collocations in the dictionary&quot;, <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
 in association with the project
 'Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
-( ``digital dictionary of the German language of the 20th century'', <a href="http://www.dwds.de">http://www.dwds.de</a> )
+( &quot;digital dictionary of the German language of the 20th century&quot;, <a href="http://www.dwds.de">http://www.dwds.de</a> )
 at the Berlin-Brandenburgische Akademie der Wissenschaften ( <a href="http://www.bbaw.de">http://www.bbaw.de</a> )
 with funding from
 the Alexander von Humboldt Stiftung ( <a href="http://www.avh.de">http://www.avh.de</a> )
@@ -276,7 +280,7 @@ class-based HMM tagger / disambiguator.</p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
 <p><a href="././mootfiles.html">the mootfiles manpage</a>,
-mootm(1),
+<code>mootm(1)</code>,
 <a href="././mootcompile.html">the mootcompile manpage</a>,
 <a href="././moot.html">the moot manpage</a></p>
 

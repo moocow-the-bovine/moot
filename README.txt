@@ -1,6 +1,6 @@
     README for package 'moot'
 
-    Last updated for moot version 2.0.6
+    Last updated for moot version 2.0.7
 
 DESCRIPTION
     moot - moocow's part-of-speech tagger and utilities.

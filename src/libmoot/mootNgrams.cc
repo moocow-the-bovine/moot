@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -80,7 +80,7 @@ size_t mootNgrams::n_trigrams(void)
  *----------------------------------------------------------------------*/
 bool mootNgrams::load(const char *filename)
 {
-  FILE *file = fopen(filename, "r");
+  FILE *file = (strcmp(filename,"-")==0 ? stdin : fopen(filename,"r"));
   if (!file) {
     fprintf(stderr, "mootNgrams::load(): open failed for file '%s': %s\n",
 	    filename,
@@ -88,7 +88,7 @@ bool mootNgrams::load(const char *filename)
     return 0;
   }
   bool rc = load(file, filename);
-  fclose(file);
+  if (file != stdin) fclose(file);
   return rc;
 }
 
@@ -104,7 +104,7 @@ bool mootNgrams::load(FILE *file, const char *filename)
 
 bool mootNgrams::save(const char *filename, bool compact)
 {
-  FILE *file = fopen(filename, "w");
+  FILE *file = (strcmp(filename,"-")==0 ? stdout : fopen(filename,"w"));
   if (!file) {
     fprintf(stderr, "mootNgrams::save(): open failed for file '%s': %s\n",
 	    filename,
@@ -112,7 +112,7 @@ bool mootNgrams::save(const char *filename, bool compact)
     return 0;
   }
   bool rc = save(file, filename, compact);
-  fclose(file);
+  if (file != stdout) fclose(file);
   return rc;
 }
 

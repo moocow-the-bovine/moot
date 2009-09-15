@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2005 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -115,7 +115,7 @@ size_t mootLexfreqs::n_pairs(void)
  *----------------------------------------------------------------------*/
 bool mootLexfreqs::load(const char *filename)
 {
-  FILE *file = fopen(filename, "r");
+  FILE *file = (strcmp(filename,"-")==0 ? stdin : fopen(filename,"r"));
   if (!file) {
     fprintf(stderr, "mootLexfreqs::load(): open failed for file '%s': %s\n",
 	    filename,
@@ -123,7 +123,7 @@ bool mootLexfreqs::load(const char *filename)
     return 0;
   }
   bool rc = load(file,filename);
-  fclose(file);
+  if (file != stdin) fclose(file);
   return rc;
 }
 
@@ -139,7 +139,7 @@ bool mootLexfreqs::load(FILE *file, const char *filename)
 
 bool mootLexfreqs::save(const char *filename)
 {
-  FILE *file = fopen(filename, "w");
+  FILE *file = (strcmp(filename,"-")==0 ? stdout : fopen(filename,"w"));
   if (!file) {
     fprintf(stderr, "mootLexfreqs::save(): open failed for file '%s': %s\n",
 	    filename,
@@ -147,7 +147,7 @@ bool mootLexfreqs::save(const char *filename)
     return 0;
   }
   bool rc = save(file);
-  fclose(file);
+  if (file != stdout) fclose(file);
   return rc;
 }
 
