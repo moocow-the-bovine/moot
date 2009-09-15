@@ -59,7 +59,7 @@ public:
 
   //---------------------------------------------------------------------
   ///\name Compilation & initialization
-  virtual bool load_model(const string &modelname, const mootTagString &start_tag_str="__$");
+  virtual bool load_model(const std::string &modelname, const mootTagString &start_tag_str="__$");
 
   //---------------------------------------------------------------------
   ///\name Tagging: Hooks

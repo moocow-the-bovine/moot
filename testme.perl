@@ -107,7 +107,7 @@ sub test_dhmm {
 
   print STDERR "$0: test_dhmm(): done\n";
 }
-#test_dhmm();
+test_dhmm();
 
 ##----------------------------------------------------------------------
 ## test: Ngrams
@@ -155,7 +155,7 @@ sub test_lexfreqs {
 
   print STDERR "$0: test_lexfreqs(): done\n";
 }
-test_lexfreqs();
+#test_lexfreqs();
 
 
 ##----------------------------------------------------------------------
