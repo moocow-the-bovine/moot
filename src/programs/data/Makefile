@@ -68,6 +68,7 @@ SUFFIX_THETA  ?= $(theta)
 
 ##-- moot: beam stuff
 Z ?= 1000
+RELAX ?= 1
 BEAM_CUTOFF ?= $(Z)
 
 ##-- Globals: programs: moot
@@ -75,6 +76,7 @@ MOOT_BINDIR   ?= $(shell cd .. ; pwd -P)
 MOOTRAIN      ?= $(MOOT_BINDIR)/mootrain
 MOOTHMM       ?= $(MOOT_BINDIR)/moot
 MOOTHMM_FLAGS ?= \
+	-R$(RELAX) \
 	-Z$(BEAM_CUTOFF)
 
 #	-a$(SUFFIX_TRIE_LEN) -A$(SUFFIX_TRIE_THRESH) --trie-theta=$(SUFFIX_THETA)
