@@ -116,8 +116,8 @@ textorsp   [^\n\r\t]
   return '\t';
 }
 
-([\-\+]?)([0-9]*)(\.?)([0-9]+) {
-  // -- count : return it
+([\-\+]?)([0-9]*)(\.?)([0-9]+)(([eE]([\+\-]?)([0-9]+))?) {
+  // -- count (float) : return it
   //theLine++; theColumn = 0;
   theColumn += yyleng;
   yylval->count = atof(reinterpret_cast<const char *>(yytext));
