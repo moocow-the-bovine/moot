@@ -112,7 +112,7 @@ public:
   /*------------------------------------------------------------*/
   /** \name Positional Parameters */
   //@{
-  size_t theLine;               /**< Current line number */
+  size_t theLine;               /**< Current line number (counting from BOF==0) */
   size_t theColumn;             /**< Current column number */
   mootio::ByteOffset theByte;   /**< Current byte number */
   //@}

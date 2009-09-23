@@ -1694,7 +1694,11 @@ void mootTokenLexer::on_EOA(void)
     if (manalysis->tag.empty()) { 
       size_t tag_begin = manalysis->details.find_first_not_of(" []<>\n\r",0);
       size_t tag_end   = manalysis->details.find_first_of(" []<>\n\r",tag_begin);
-      manalysis->tag.assign(manalysis->details,tag_begin,tag_end);
+      if (tag_begin != std::string::npos && tag_end != std::string::npos) {
+	manalysis->tag.assign(manalysis->details,tag_begin,tag_end);
+      } else {
+	manalysis->tag.assign(manalysis->details);
+      }
     }  
     /* set best tag if applicable */
     if (current_analysis_is_best) { 

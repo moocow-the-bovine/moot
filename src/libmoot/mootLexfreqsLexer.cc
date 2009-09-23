@@ -411,11 +411,12 @@ YY_mootLexfreqsLexer_CLASS::YY_mootLexfreqsLexer_CLASS(YY_mootLexfreqsLexer_CONS
 /* % data tables for the DFA go here */ 
 #define YY_END_OF_BUFFER 10
 typedef int yy_state_type;
-static const short int yy_accept[29] =
+static const short int yy_accept[32] =
     {   0,
         0,    0,   10,    5,    3,    6,    6,    8,    5,    5,
         5,    4,    1,    5,    0,    3,    3,    3,    0,    2,
-        5,    4,    4,    1,    2,    2,    2,    0
+        5,    4,    4,    5,    1,    2,    2,    2,    5,    4,
+        0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -426,12 +427,12 @@ static const YY_CHAR yy_ec[256] =
         1,    5,    1,    1,    1,    1,    6,    1,    1,    1,
         1,    1,    7,    1,    7,    8,    1,    9,    9,    9,
         9,    9,    9,    9,    9,    9,    9,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,   10,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
 
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+       10,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -450,45 +451,45 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[10] =
+static const YY_CHAR yy_meta[11] =
     {   0,
-        1,    2,    3,    3,    1,    1,    1,    1,    1
+        1,    2,    3,    3,    1,    1,    1,    1,    1,    1
     } ;
 
-static const short int yy_base[32] =
+static const short int yy_base[35] =
     {   0,
-        0,   21,   22,   16,    8,   42,   42,   12,   13,   15,
-       20,    0,   11,   10,    7,    0,    0,    0,    0,   28,
-        0,    0,    0,    0,   32,    0,    0,   42,   10,   37,
-       39
+        0,   31,   33,   27,    9,   46,   46,   13,   14,   16,
+       21,   19,   23,   22,   18,    0,    0,    0,    0,   29,
+        0,   12,    7,   28,    0,   36,    0,    0,    7,    4,
+       46,   11,   41,   43
     } ;
 
-static const short int yy_def[32] =
+static const short int yy_def[35] =
     {   0,
-       28,    1,   28,   29,   28,   28,   28,   28,   29,   29,
-       29,   10,    8,   29,   29,    5,    5,    5,    8,   30,
-       11,   10,   11,   13,   30,   31,   25,    0,   28,   28,
-       28
+       31,    1,   31,   32,   31,   31,   31,   31,   32,   32,
+       32,   10,    8,   32,   32,    5,    5,    5,    8,   33,
+       11,   10,   11,   11,   13,   33,   34,   26,   11,   11,
+        0,   31,   31,   31
     } ;
 
-static const short int yy_nxt[52] =
+static const short int yy_nxt[57] =
     {   0,
-        4,    5,    6,    7,    8,    9,   10,   11,   12,   16,
-       14,   15,   17,   18,   15,   24,   19,   15,   20,   15,
-       15,   28,   21,   22,   15,   13,   28,   28,   23,   26,
-       28,   28,   27,   26,   28,   28,   27,   25,   25,   26,
-       26,    3,   28,   28,   28,   28,   28,   28,   28,   28,
-       28
+        4,    5,    6,    7,    8,    9,   10,   11,   12,    4,
+       16,   14,   30,   17,   18,   30,   24,   19,   15,   20,
+       15,   24,   15,   21,   22,   15,   15,   25,   24,   23,
+       27,   15,   31,   28,   29,   13,   30,   27,   31,   31,
+       28,   26,   26,   27,   27,    3,   31,   31,   31,   31,
+       31,   31,   31,   31,   31,   31
     } ;
 
-static const short int yy_chk[52] =
+static const short int yy_chk[57] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    5,
-       29,   15,    5,    8,   14,   13,    8,    9,    9,   10,
-        4,    3,   10,   10,   11,    2,    0,    0,   11,   20,
-        0,    0,   20,   25,    0,    0,   25,   30,   30,   31,
-       31,   28,   28,   28,   28,   28,   28,   28,   28,   28,
-       28
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        5,   32,   30,    5,    8,   29,   23,    8,    9,    9,
+       10,   22,   15,   10,   10,   11,   14,   13,   12,   11,
+       20,    4,    3,   20,   24,    2,   24,   26,    0,    0,
+       26,   33,   33,   34,   34,   31,   31,   31,   31,   31,
+       31,   31,   31,   31,   31,   31
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -592,13 +593,13 @@ yy_match:
 	    while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = yy_def[yy_current_state];
-		if ( yy_current_state >= 29 )
+		if ( yy_current_state >= 32 )
 		    yy_c = yy_meta[yy_c];
 		}
 	    yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 	    ++yy_cp;
 	    }
-	while ( yy_current_state != 28 );
+	while ( yy_current_state != 31 );
 	yy_cp = yy_last_accepting_cpos;
 	yy_current_state = yy_last_accepting_state;
 #line 434 "./flexskel.cc"
@@ -667,7 +668,7 @@ case 3:
 case 4:
 #line 119 "mootLexfreqsLexer.ll"
 {
-  // -- count : return it
+  // -- count (float) : return it
   //theLine++; theColumn = 0;
   theColumn += yyleng;
   yylval->count = atof(reinterpret_cast<const char *>(yytext));
@@ -953,7 +954,7 @@ long YY_mootLexfreqsLexer_CLASS::yy_get_previous_state_()
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 	    {
 	    yy_current_state = yy_def[yy_current_state];
-	    if ( yy_current_state >= 29 )
+	    if ( yy_current_state >= 32 )
 		yy_c = yy_meta[yy_c];
 	    }
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1003,11 +1004,11 @@ long YY_mootLexfreqsLexer_CLASS::yy_try_NUL_trans_(long yy_current_state_)
     while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 	{
 	yy_current_state = yy_def[yy_current_state];
-	if ( yy_current_state >= 29 )
+	if ( yy_current_state >= 32 )
 	    yy_c = yy_meta[yy_c];
 	}
     yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-    yy_is_jam = (yy_current_state == 28);
+    yy_is_jam = (yy_current_state == 31);
 #line 722 "./flexskel.cc"
 
 #ifndef YY_USE_CLASS

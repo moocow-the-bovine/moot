@@ -10,7 +10,7 @@ use Pod::Usage;
 ## Constants & Globals
 ##------------------------------------------------------------------------------
 our $prog = basename($0);
-our $verbose_ngrams = 0;
+our $compact_ngrams = 1;
 our $outfile = '-';
 
 ##------------------------------------------------------------------------------
@@ -20,7 +20,8 @@ GetOptions(##-- General
 	   'help|h' => \$help,
 
 	   ##-- misc
-	   'verbose-ngrams|v|N!' => \$verbose_ngrams,
+	   'verbose-ngrams|verbose|v|N!' => sub { $compact_ngrams=!$_[1]; },
+	   'compact-ngrams|compact!' => \$compact_ngrams,
 
 	   ##-- I/O
 	   'output|o=s' => \$outfile,
@@ -35,7 +36,7 @@ our $ng = moot::Ngrams->new();
 foreach $file (@ARGV) {
   $ng->load($file) || die("$prog: load failed for file '$file': $!");
 }
-$ng->save($outfile,$verbose_ngrams);
+$ng->save($outfile,($compact_ngrams ? 1 : 0));
 
 
 __END__

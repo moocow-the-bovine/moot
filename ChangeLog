@@ -3,7 +3,8 @@ ChangeLog for package moot
 Todo:
    + write perl-XS interface & utilities
 
-v2.0.7 Thu, 10 Sep 2009 11:30:35 +0200
+v2.0.7 Wed, 23 Sep 2009 11:02:43 +0200
+	+ added parsing of scientific notation to moot(Ngrams|Lexfreqs)Lexer.ll
 	+ fixed version-checking bug in mootHMM::load()
 	+ updated BINCOMPAT HMM file version to 3.0 (min-compat = 2.5)
 	+ removed MOOT_USE_TRIGRAMS macro sensitivity
