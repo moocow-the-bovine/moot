@@ -135,12 +135,13 @@ void mootDynLexHMM::tag_hook_pre(mootSentence &sent)
   dynlex_clear();
 
   //-- prepare lexmap
-  for (mootSentence::const_iterator si = sent.begin(); si != sent.end(); si++) {
+  for (mootSentence::iterator si = sent.begin(); si != sent.end(); si++) {
     if (si->toktype() != TokTypeVanilla) continue; //-- ignore non-vanilla tokens
-    const mootToken &tok = *si;
-    for (mootToken::Analyses::const_iterator ani=tok.analyses().begin(); ani!=tok.analyses().end(); ani++) {
-      const mootToken::Analysis &a = *ani;
+    mootToken &tok = *si;
+    for (mootToken::Analyses::iterator ani=tok.tok_analyses.begin(); ani!=tok.tok_analyses.end(); ani++) {
+      mootToken::Analysis &a = *ani;
       ProbT f_tw = this->dynlex_analysis_freq(tok,a);
+      a.prob = f_tw; //-- DEBUG
       if (f_tw <= 0) continue; //-- ignore
       Ftw[a.tag][tok.text()] += f_tw;
       Fw[tok.text()] += f_tw;
