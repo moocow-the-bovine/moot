@@ -383,20 +383,22 @@ public:
     tok_analyses.push_back(analysis);
   };
   /** Insert a new analysis */
-  inline void insert(const mootTagString &tag, const mootTagString &details)
+  inline void insert(const mootTagString &tag, const mootTagString &details, ProbT p=0)
   {
     //insert(Analysis(tag,details));
     tok_analyses.push_back(Analysis());
     tok_analyses.back().tag = tag;
     tok_analyses.back().details = details;
+    tok_analyses.back().prob = p;
   };
   /** Insert a new analysis, C-style */
-  inline void insert(const char *tag, const char *details)
+  inline void insert(const char *tag, const char *details, ProbT p=0)
   {
     //insert(Analysis(tag,details));
     tok_analyses.push_back(Analysis());
     tok_analyses.back().tag = tag;
     tok_analyses.back().details = details;
+    tok_analyses.back().prob = p;
   };
   /** Test presence of an analysis for 'tag' */
   inline bool has_analysis_for_tag(const mootTagString &tag) const

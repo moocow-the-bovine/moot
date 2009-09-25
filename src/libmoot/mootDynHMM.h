@@ -48,8 +48,9 @@ typedef enum {
   dheUnknown,   ///< unknown
   dheFreq,      ///< ~= "Freq" ~= mootDynLexHMM
   dheBoltzmann, ///< ~= "Boltzmann" ~= mootDynLexHMM_Boltzmann
+  dheMIParser,  ///< ~= "MIParser" ~= mootMIParser
   dheN          ///< placeholder
-} DynHMMEstimator;
+} DynHMMClassId;
 
 /** \brief Generic user-level options structure for built-in mootDynHMM subclasses */
 class mootDynHMMOptions {
@@ -62,6 +63,9 @@ public:
   //-- mootDynLexHMM_Boltzmann
   ProbT       dynlex_base;     /**< see mootDynLexHMM_Boltzmann::dynlex_base */
   ProbT       dynlex_beta;     /**< see mootDynLexHMM_Boltzmann::dynlex_beta */
+  //
+  //-- mootMIParser
+  bool        text_tags;        /**< see mootMIParser::text_tags */
 
 public:
   mootDynHMMOptions(void)
@@ -69,16 +73,17 @@ public:
       newtag_str("@NEW"),
       Ftw_eps(0.5),
       dynlex_base(2.0),
-      dynlex_beta(1.0)
+      dynlex_beta(1.0),
+      text_tags(false)
   {};
 
   ~mootDynHMMOptions(void) {};
 };
 
 /** Generic constructor for built-in mootDynHMM subclasses */
-class mootDynHMM *newDynHMM(DynHMMEstimator which=dheFreq, const mootDynHMMOptions &opts=mootDynHMMOptions());
+class mootDynHMM *newDynHMM(DynHMMClassId which=dheFreq, const mootDynHMMOptions &opts=mootDynHMMOptions());
 
-/** Generic constructor for built-in mootDynHMM subclasses, given estimator name */
+/** Generic constructor for built-in mootDynHMM subclasses, given subclass name */
 class mootDynHMM *newDynHMM(const std::string &which="Freq", const mootDynHMMOptions &opts=mootDynHMMOptions());
 
 
@@ -283,7 +288,7 @@ public:
   //---------------------------------------------------------------------
   ///\name Compilation & initialization
   //@{
-  /** load a model */
+  /** load a binary or text mode */
   virtual bool load_model(const string &modelname,
 			  const mootTagString &start_tag_str="__$",
 			  const char *myname="mootDynLexHMM::load_model()",
@@ -293,7 +298,7 @@ public:
 			  bool  do_build_suffix_trie=true,
 			  bool  do_compute_logprobs=true);
 
-  /** compile a text model */
+  /** compile a text model; ensures newtag_id is defined */
   virtual bool compile(mootLexfreqs &lexfreqs,
 		       mootNgrams &ngrams,
 		       mootClassfreqs &classfreqs,

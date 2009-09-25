@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
  * File: mootDynHMM.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
- *   + moot PoS tagger : 1st-order HMM tagger/disambiguator : guts
+ *   + moot PoS tagger : dynamic HMM : guts
  *--------------------------------------------------------------------------*/
 
 #ifdef HAVE_CONFIG_H
@@ -31,6 +31,8 @@
 #endif
 
 #include <mootDynHMM.h>
+#include <mootMIParser.h>
+
 #include <mootTokenIO.h>
 #include <mootCIO.h>
 #include <mootZIO.h>
@@ -240,13 +242,14 @@ void mootDynLexHMM::dynlex_clear(void)
 /*======================================================================
  * Utilities
  */
-const char *DynHMMEstimatorNames[dheN] = {
+const char *DynHMMClassNames[dheN] = {
   "Unknown",
   "Freq",
-  "Boltzmann"
+  "Boltzmann",
+  "MIParser"
 };
 
-mootDynHMM *newDynHMM(DynHMMEstimator which, const mootDynHMMOptions &opts)
+mootDynHMM *newDynHMM(DynHMMClassId which, const mootDynHMMOptions &opts)
 {
   mootDynHMM *hmmp = NULL;
   switch (which) {
@@ -255,6 +258,9 @@ mootDynHMM *newDynHMM(DynHMMEstimator which, const mootDynHMMOptions &opts)
     break;
   case dheBoltzmann:
     hmmp = new mootDynLexHMM_Boltzmann();
+    break;
+  case dheMIParser:
+    hmmp = new mootMIParser();
     break;
   default:
     return NULL;
@@ -267,7 +273,7 @@ mootDynHMM *newDynHMM(const std::string &which, const mootDynHMMOptions &opts)
 {
   unsigned int e;
   for (e=0; e < dheN; e++) {
-    if (which==DynHMMEstimatorNames[e]) return newDynHMM(static_cast<DynHMMEstimator>(e),opts);
+    if (which==DynHMMClassNames[e]) return newDynHMM(static_cast<DynHMMClassId>(e),opts);
   }
   return newDynHMM(dheUnknown, opts);
 }

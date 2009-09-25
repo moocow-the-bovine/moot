@@ -415,6 +415,13 @@ distribution:
 The Maxwell-Boltzmann estimator constants BASE and BETA are given
 by the C<--dyn-base> and C<--dyn-beta> args.
 
+=item MIParser
+
+Uses n-gram model data to break input sentences into binary-branching
+trees.  If the C<--dyn-text-tags> flag is given, n-gram model is assumed
+to be for token text; otherwise, n-gram model should be for token
+tags.
+
 =back
 
 "
@@ -456,6 +463,10 @@ previously unseen tags (if any).
 float "dyn-freq-eps" E "Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)" \
   arg="FLOAT" \
   default="0.1"
+
+flag "dyn-text-tags" x "Use token text field as n-gram source for MIParser" \
+  default="0" \
+  details="See the 'MIParser' class under C<--dyn-class> for details."
 
 #-----------------------------------------------------------------------------
 # Addenda

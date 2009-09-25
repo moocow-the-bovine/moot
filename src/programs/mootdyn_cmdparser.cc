@@ -40,7 +40,7 @@
 
 
 #ifndef PROGRAM
-# define PROGRAM "moot"
+# define PROGRAM "mootdyn"
 #endif
 
 /* #define cmdline_parser_DEBUG */
@@ -63,7 +63,7 @@
 void
 cmdline_parser_print_version (void)
 {
-  printf("moot (%s %s) by Bryan Jurish <moocow@ling.uni-potsdam.de>\n", PACKAGE, VERSION);
+  printf("mootdyn (%s %s) by Bryan Jurish <moocow@ling.uni-potsdam.de>\n", PACKAGE, VERSION);
 }
 
 void
@@ -72,10 +72,10 @@ cmdline_parser_print_help (void)
   cmdline_parser_print_version ();
   printf("\n");
   printf("Purpose:\n");
-  printf("  moocow's HMM part-of-speech tagger/disambiguator.\n");
+  printf("  moocow's dynamic HMM part-of-speech tagger/disambiguator.\n");
   printf("\n");
   
-  printf("Usage: %s [OPTIONS]... INPUT(s)\n", "moot");
+  printf("Usage: %s [OPTIONS]... INPUT(s)\n", "mootdyn");
   
   printf("\n");
   printf(" Arguments:\n");
@@ -126,6 +126,7 @@ cmdline_parser_print_help (void)
   printf("   -BFLOAT   --dyn-beta=FLOAT             Temperature coefficient for Maxwell-Boltzmann estimator (default=1)\n");
   printf("   -wTAG     --dyn-new-tag=TAG            Specify pseudo-tag for new analyses (default='@NEW')\n");
   printf("   -EFLOAT   --dyn-freq-eps=FLOAT         Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)\n");
+  printf("   -x        --dyn-text-tags              Use token text field as n-gram source for MIParser\n");
 }
 
 #if defined(HAVE_STRDUP) || defined(strdup)
@@ -183,6 +184,7 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->dyn_beta_arg = 1.0; 
   args_info->dyn_new_tag_arg = gog_strdup("@NEW"); 
   args_info->dyn_freq_eps_arg = 0.1; 
+  args_info->dyn_text_tags_flag = 0; 
 }
 
 
@@ -229,6 +231,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->dyn_beta_given = 0;
   args_info->dyn_new_tag_given = 0;
   args_info->dyn_freq_eps_given = 0;
+  args_info->dyn_text_tags_given = 0;
 
   clear_args(args_info);
 
@@ -283,6 +286,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "dyn-beta", 1, NULL, 'B' },
 	{ "dyn-new-tag", 1, NULL, 'w' },
 	{ "dyn-freq-eps", 1, NULL, 'E' },
+	{ "dyn-text-tags", 0, NULL, 'x' },
         { NULL,	0, NULL, 0 }
       };
       static char short_options[] = {
@@ -320,6 +324,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'B', ':',
 	'w', ':',
 	'E', ':',
+	'x',
 	'\0'
       };
 
@@ -653,6 +658,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->dyn_freq_eps_given++;
           args_info->dyn_freq_eps_arg = (float)strtod(val, NULL);
+          break;
+        
+        case 'x':	 /* Use token text field as n-gram source for MIParser */
+          if (args_info->dyn_text_tags_given) {
+            fprintf(stderr, "%s: `--dyn-text-tags' (`-x') option given more than once\n", PROGRAM);
+          }
+          args_info->dyn_text_tags_given++;
+         if (args_info->dyn_text_tags_given <= 1)
+           args_info->dyn_text_tags_flag = !(args_info->dyn_text_tags_flag);
           break;
         
         case 0:	 /* Long option(s) with no short form */
@@ -1009,6 +1023,16 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->dyn_freq_eps_given++;
             args_info->dyn_freq_eps_arg = (float)strtod(val, NULL);
+          }
+          
+          /* Use token text field as n-gram source for MIParser */
+          else if (strcmp(olong, "dyn-text-tags") == 0) {
+            if (args_info->dyn_text_tags_given) {
+              fprintf(stderr, "%s: `--dyn-text-tags' (`-x') option given more than once\n", PROGRAM);
+            }
+            args_info->dyn_text_tags_given++;
+           if (args_info->dyn_text_tags_given <= 1)
+             args_info->dyn_text_tags_flag = !(args_info->dyn_text_tags_flag);
           }
           
           else {

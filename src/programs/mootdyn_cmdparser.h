@@ -54,6 +54,7 @@ struct gengetopt_args_info {
   float dyn_beta_arg;	 /* Temperature coefficient for Maxwell-Boltzmann estimator (default=1) (default=1.0). */
   char * dyn_new_tag_arg;	 /* Specify pseudo-tag for new analyses (default='@NEW') (default=@NEW). */
   float dyn_freq_eps_arg;	 /* Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1) (default=0.1). */
+  int dyn_text_tags_flag;	 /* Use token text field as n-gram source for MIParser (default=0). */
 
   int help_given;	 /* Whether help was given */
   int version_given;	 /* Whether version was given */
@@ -92,6 +93,7 @@ struct gengetopt_args_info {
   int dyn_beta_given;	 /* Whether dyn-beta was given */
   int dyn_new_tag_given;	 /* Whether dyn-new-tag was given */
   int dyn_freq_eps_given;	 /* Whether dyn-freq-eps was given */
+  int dyn_text_tags_given;	 /* Whether dyn-text-tags was given */
   
   char **inputs;         /* unnamed arguments */
   unsigned inputs_num;   /* number of unnamed arguments */

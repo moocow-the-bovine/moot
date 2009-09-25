@@ -165,6 +165,7 @@ void GetMyOptions(int argc, char **argv)
   hmm_opts.Ftw_eps     = args.dyn_freq_eps_arg;
   hmm_opts.dynlex_base = args.dyn_base_arg;
   hmm_opts.dynlex_beta = args.dyn_beta_arg;
+  hmm_opts.text_tags   = args.dyn_text_tags_flag;
 
   //-- create HMM (dynamic)
   hmmp = newDynHMM(args.dyn_class_arg, hmm_opts);
