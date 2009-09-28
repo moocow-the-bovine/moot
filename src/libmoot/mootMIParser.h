@@ -69,7 +69,7 @@ public:
   mootTagString newtag_str;
   TagID         newtag_id;
   ProbT         newtag_f;
-  bool          text_tags;  /**< use token text as 'tag' for n-gram computations? (default=false: use tag) */
+  bool          text_tags;     /**< use token text as 'tag' for n-gram computations? (default=false: use tag) */
   mootTagString output_tag;    /**< output analysis tag to use (default="$MIParser" */
   mootTagString output_prefix; /**< analysis prefix to use (default="[$MIParser] " */
 

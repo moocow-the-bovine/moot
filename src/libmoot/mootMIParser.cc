@@ -93,9 +93,38 @@ bool mootMIParser::compile(mootLexfreqs &lexfreqs,
 };
 
 //--------------------------------------------------------------
+void mip_dump_sentence(mootMIParser::TokenPtrVector &sentpv,
+		       std::vector<size_t> &nlpar,
+		       std::vector<size_t> &nrpar,
+		       int bi=0,
+		       int si=0,
+		       const char *label="?")
+{
+  fprintf(stderr,"%%-- DUMP: bi=%d, si=%d, label=%s\n", bi,si,label);
+  int i,j;
+  for (i=0; i < sentpv.size(); i++) {
+    if (sentpv[i] == NULL) continue;
+    fputc(' ',stderr);
+
+    //-- right parens
+    for (j=0; j<nrpar[i]; j++) { fputc(')',stderr); }
+
+    //-- left parens
+    for (j=0; j<nlpar[i]; j++) { fputc('(',stderr); }
+
+    //-- text
+    fprintf(stderr, " %s", sentpv[i]->text().c_str());
+  }
+  fputc(' ',stderr);
+  for (j=0; j<nrpar[sentpv.size()]; j++) { fputc(')',stderr); }
+
+  fputc('\n',stderr);
+}
+
+//--------------------------------------------------------------
 void mootMIParser::tag_sentence(mootSentence &sent)
 {
-  TokenPtrVector sentpv(sent.size());  //-- token pointers into sentence
+  TokenPtrVector sentpv(sent.size(),NULL);  //-- token pointers into sentence
   SentIndex sidx=0;
   for (mootSentence::iterator si=sent.begin(); si!=sent.end(); si++) {
     if (si->toktype() != TokTypeVanilla) continue; //-- ignore non-vanilla tokens
@@ -140,9 +169,51 @@ void mootMIParser::tag_sentence(mootSentence &sent)
   //-- sort the temp vector in ascending order by stored PMI
   std::sort(pmiv.begin(), pmiv.end());
 
-  //-- mark cut boundaries by adding analyses
+  //-- build bracketed analyses pvec
+  std::vector<size_t> nlpar(sent.size()  ,0); //-- nlpar[i] -> # left parens before index i
+  std::vector<size_t> nrpar(sent.size()+1,0); //-- nrpar[i] -> # right parens before index i
+  char lparen = '(';
+  char rparen = ')';
   SentIndex bidx;
-  char detailbuf[32];
+  for (bidx=0; bidx < pmiv.size(); bidx++) {
+    const ProbIndexPair &pip = pmiv[bidx];
+    sidx = pip.second;
+    int bidxL,bidxR, sidxL,sidxR;
+
+    //-- find & mark left consituent
+    if (sidx > 0) {
+      nrpar[sidx]++;
+      sidxL = 0;
+      for (sidxL=0, bidxL=bidx-1; bidxL>=0; bidxL--) {
+	if (pmiv[bidxL].second < sidx) {
+	  sidxL = pmiv[bidxL].second;
+	  break;
+	}
+      }
+      nlpar[sidxL]++;
+      mip_dump_sentence(sentpv,nlpar,nrpar,bidx,sidx,"LEFT");
+    }
+
+    //-- find & mark right constiuent
+    if (sidx < sentpv.size()-1) {
+      nlpar[sidx]++;
+      for (sidxR=sentpv.size(), bidxR=bidx-1; bidxR>=0; bidxR--) {
+	if (pmiv[bidxR].second > sidx) {
+	  sidxR = pmiv[bidxR].second;
+	  break;
+	}
+      }
+      nrpar[sidxR]++;
+      mip_dump_sentence(sentpv,nlpar,nrpar,bidx,sidx,"RIGHT");
+    }
+  }
+  //-- mark final parens
+  nlpar[0]++;
+  nrpar[sentpv.size()]++;
+  //mip_dump_sentence(sentpv,nlpar,nrpar,-1,-1,"FINAL");
+
+  //-- mark cut boundaries by adding analyses
+  char detailbuf[64];
   for (bidx=0; bidx < pmiv.size(); bidx++) {
     const ProbIndexPair &pip = pmiv[bidx];
     ProbT pmi = pip.first;
@@ -151,8 +222,10 @@ void mootMIParser::tag_sentence(mootSentence &sent)
 
     //-- build & insert new analysis
     mootTagString details = output_prefix;
-    sprintf(detailbuf, "%lu <%g>", static_cast<long unsigned int>(bidx), pmi);
+    sprintf(detailbuf, "b=%lu mi=%g p=", static_cast<long unsigned int>(bidx), pmi);
     details.append(detailbuf);
+    details.append(nrpar[sidx],rparen);
+    details.append(nlpar[sidx],lparen);
     tokp->insert(output_tag, details, pmi);
   }
 
