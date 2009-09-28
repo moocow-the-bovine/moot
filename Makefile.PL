@@ -48,8 +48,10 @@ WriteMakefile
    OPTIMIZE     => $MOOT_OFLAGS,        ##-- optimization flags
    OBJECT       => 'moot_wrap.o',
    EXE_FILES    => [
-		    'mootmerge-123.perl',
-		    'mootmerge-lex.perl',
+		    #'mootmerge-123.perl',
+		    #'mootmerge-lex.perl',
+		    #'mootlookup-123.perl',
+		    glob('moot*.perl'),
 		   ],
 
    ##-- DEBUG
