@@ -115,7 +115,7 @@ public:
     ProbT prob;
 
     /**
-     * Additional user data for this analysis.
+     * Additional user data for this analysis, defaults to NULL.
      * User is responsible for memory management.
      */
     void *data;
@@ -125,7 +125,8 @@ public:
      */
     /** Default constructor */
     Analysis(void)
-	: prob(0)
+      : prob(0),
+	data(NULL)
     {};
 
     /** Constructor given only tag: full analysis defaults to empty */
@@ -133,7 +134,8 @@ public:
 	     //, mootTokenType typ=TokTypeVanilla
 	     )
       : tag(my_tag),
-	prob(0)
+	prob(0),
+	data(NULL)
     {};
 
     /** Constructor given tag and full analysis */
@@ -141,7 +143,8 @@ public:
 	     const mootTagString &my_details)
       : tag(my_tag),
 	details(my_details),
-	prob(0)
+	prob(0),
+	data(NULL)
     {};
 
     /** Constructor given tag, full analysis, and probability */
@@ -150,10 +153,11 @@ public:
 	     const ProbT my_prob)
       : tag(my_tag),
 	details(my_details),
-	prob(my_prob)
+	prob(my_prob),
+	data(NULL)
     {};
 
-    /** Clear this object */
+    /** Clear this object (except for data) */
     inline void clear(void) {
       tag.clear();
       details.clear();
@@ -241,7 +245,7 @@ public:
   Location       tok_location;
 
   /**
-   * Additional user data for this token.
+   * Additional user data for this token, defaults to NULL.
    * User is responsible for memory management.
    */
   void *tok_data;
