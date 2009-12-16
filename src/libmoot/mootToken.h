@@ -76,7 +76,7 @@ enum mootTokenTypeE {
   TokTypeComment,    /**< a comment, should be ignored by processing routines */
   TokTypeEOS,        /**< end-of-sentence */
   TokTypeEOF,        /**< end-of-file */
-  TokTypeUser,       /**< user-defined token type: use in conjunction with 'user_data' */
+  TokTypeUser,       /**< user-defined token type: use in conjunction with 'tok_data' */
   NTokTypes          /**< number of token-types (not a type itself) */
 };
 typedef mootTokenTypeE mootTokenType;
@@ -111,8 +111,14 @@ public:
     /** Full analysis string (possibly with features) */
     mootTagString details;
 
-    /** Analysis probability */
+    /** Analysis probability (or "cost" or "weight" or ...) */
     ProbT prob;
+
+    /**
+     * Additional user data for this analysis.
+     * User is responsible for memory management.
+     */
+    void *data;
 
     /*--------------------------------------------------
      * Constructor / Destructor
@@ -234,19 +240,27 @@ public:
    */
   Location       tok_location;
 
+  /**
+   * Additional user data for this token.
+   * User is responsible for memory management.
+   */
+  void *tok_data;
+
 public:
   /*------------------------------------------------------------
    * Constructors / Destructors
    */
   /** Default constructor: empty text, no analyses */
   mootToken(mootTokenType type=TokTypeVanilla)
-    : tok_type(type)
+    : tok_type(type),
+      tok_data(NULL)
   {};
 
   /** Constructor given only token text: no analyses */
   mootToken(const mootTokString &text, mootTokenType type=TokTypeVanilla)
     : tok_type(type),
-      tok_text(text)
+      tok_text(text),
+      tok_data(NULL)
   {};
 
   /** Constructor given text & analyses */
@@ -254,7 +268,8 @@ public:
 	    const Analyses &analyses)
     : tok_type(TokTypeVanilla),
       tok_text(text),
-      tok_analyses(analyses)
+      tok_analyses(analyses),
+      tok_data(NULL)
   {};
 
   /** Constructor given text & analyses & best tag */
@@ -264,14 +279,16 @@ public:
     : tok_type(TokTypeVanilla),
       tok_text(text),
       tok_besttag(besttag),
-      tok_analyses(analyses)
+      tok_analyses(analyses),
+      tok_data(NULL)
   {};
 
   /** Constructor for text-only tokens from C buffer of known length */
   /*
   mootToken(mootTokenType type=TokTypeVanilla, const char *text, size_t len)
     : tok_type(type),
-      tok_text(text,len)
+      tok_text(text,len),
+      tok_data(NULL)
   {};
   */
 
@@ -304,7 +321,7 @@ public:
   /*------------------------------------------------------------
    * Manipulators: General
    */
-  /** Clear this object (except for user_data) */
+  /** Clear this object (except for tok_data) */
   inline void clear(void) {
     tok_type = TokTypeVanilla;
     tok_text.clear();
