@@ -3,8 +3,8 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.7-3])
-define([THE_PACKAGE_MAINTAINER],  [moocow@ling.uni-potsdam.de])
+define([THE_PACKAGE_VERSION], [2.0.8-0])
+define([THE_PACKAGE_MAINTAINER],  [jurish@uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
 dnl AC_INIT(moot, 2.0.0, moocow@ling.uni-potsdam.de)

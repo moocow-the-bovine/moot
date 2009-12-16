@@ -1,7 +1,8 @@
 ChangeLog for package moot
 
-Todo:
-   + write perl-XS interface & utilities
+v2.0.8 Wed, 16 Dec 2009 14:43:05 +0100
+	+ added void* mootToken::tok_data (fixes twiki feature request from kmw)
+	  - user is responsible for memory management
 
 v2.0.7 Wed, 23 Sep 2009 11:02:43 +0200
 	+ added parsing of scientific notation to moot(Ngrams|Lexfreqs)Lexer.ll
