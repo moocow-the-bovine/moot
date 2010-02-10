@@ -72,7 +72,7 @@
     -AFREQ    --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.
               --trie-theta=FLOAT           Suffix backoff coefficient.
     -LBOOL    --use-classes=BOOL           Whether to use lexical class-probabilities.
-    -RBOOL    --relax=BOOL                 Whether to relax token-tag associability (default=no)
+    -RBOOL    --relax=BOOL                 Whether to relax token-tag associability (default=1 (true))
     -NFLOATS  --nlambdas=FLOATS            N-Gram smoothing constants (default=estimate)
     -WFLOATS  --wlambdas=FLOATS            Lexical smoothing constants (default=estimate)
     -CFLOATS  --clambdas=FLOATS            Lexical-class smoothing constants (default=estimate)
@@ -197,8 +197,8 @@ a non-empty class-frequency file.</p>
 <dt><strong><a name="relax_bool_rbool" class="item"><code>--relax=BOOL</code> , <code>-RBOOL</code></a></strong></dt>
 
 <dd>
-<p>Whether to relax token-tag associability (default=no)</p>
-<p>Default: '0'</p>
+<p>Whether to relax token-tag associability (default=1 (true))</p>
+<p>Default: '1'</p>
 <p>If nonzero, 'tag' fields of token analyses will be used only as a potential
 estimator of lexical probability, if at all.
 Otherwise (regardless of whether lexical classes are are being used as a

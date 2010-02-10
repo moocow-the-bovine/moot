@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2010 by Bryan Jurish <jurish@uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -213,11 +213,15 @@ namespace mootio {
     /** Write \p n bytes from \p buf to the stream */
     virtual bool write(const char *buf, size_t n) { return false; };
 
-    /** Write a single byte to the stream */
-    virtual bool putc(unsigned char c) { return false; };
+    /** Write a single byte to the stream.
+     *  Formerly known as 'putc()', but conflicts with macro on gcc-4.4
+     *  (cf. http://odo.dwds.de/mantis/view.php?id=180)
+     */
+    virtual bool putbyte(unsigned char c) { return false; };
 
     /** Write a C string to the stream */
     virtual bool puts(const char *s) { return false; };
+
     /** Write a C++ string to the buffer */
     virtual bool puts(const std::string &s) { return false; };
 

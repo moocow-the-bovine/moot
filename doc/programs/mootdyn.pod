@@ -38,7 +38,7 @@ mootdyn [OPTIONS] INPUT(s)
     -AFREQ      --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.
                 --trie-theta=FLOAT           Suffix backoff coefficient.
     -LBOOL      --use-classes=BOOL           Whether to use lexical class-probabilities.
-    -RBOOL      --relax=BOOL                 Whether to relax token-tag associability (default=no)
+    -RBOOL      --relax=BOOL                 Whether to relax token-tag associability (default=1 (true))
     -NFLOATS    --nlambdas=FLOATS            N-Gram smoothing constants (default=estimate)
     -WFLOATS    --wlambdas=FLOATS            Lexical smoothing constants (default=estimate)
     -CFLOATS    --clambdas=FLOATS            Lexical-class smoothing constants (default=estimate)
@@ -58,6 +58,7 @@ mootdyn [OPTIONS] INPUT(s)
     -BFLOAT     --dyn-beta=FLOAT             Temperature coefficient for Maxwell-Boltzmann estimator (default=1)
     -wTAG       --dyn-new-tag=TAG            Specify pseudo-tag for new analyses (default='@NEW')
     -EFLOAT     --dyn-freq-eps=FLOAT         Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)
+    -x          --dyn-text-tags              Use token text field as n-gram source for MIParser
 
 =cut
 
@@ -429,9 +430,9 @@ a non-empty class-frequency file.
 
 =item C<--relax=BOOL> , C<-RBOOL>
 
-Whether to relax token-tag associability (default=no)
+Whether to relax token-tag associability (default=1 (true))
 
-Default: '0'
+Default: '1'
 
 
 If nonzero, 'tag' fields of token analyses will be used only as a potential
@@ -699,6 +700,13 @@ distribution:
 The Maxwell-Boltzmann estimator constants BASE and BETA are given
 by the C<--dyn-base> and C<--dyn-beta> args.
 
+=item MIParser
+
+Uses n-gram model data to break input sentences into binary-branching
+trees.  If the C<--dyn-text-tags> flag is given, n-gram model is assumed
+to be for token text; otherwise, n-gram model should be for token
+tags.
+
 =back
 
 
@@ -769,6 +777,17 @@ previously unseen tags (if any).
 Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)
 
 Default: '0.1'
+
+
+
+
+=item C<--dyn-text-tags> , C<-x>
+
+Use token text field as n-gram source for MIParser
+
+Default: '0'
+
+See the 'MIParser' class under C<--dyn-class> for details.
 
 
 

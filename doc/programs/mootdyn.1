@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "MOOTDYN 1"
-.TH MOOTDYN 1 "2009-09-23" "moot v2.0.7-3" "moot PoS Tagger"
+.TH MOOTDYN 1 "2010-02-10" "moot v2.0.8-1" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -163,7 +163,7 @@ mootdyn [\s-1OPTIONS\s0] \s-1INPUT\s0(s)
 \&    \-AFREQ      \-\-trie\-threshhold=FREQ       Frequency upper bound for trie inclusion.
 \&                \-\-trie\-theta=FLOAT           Suffix backoff coefficient.
 \&    \-LBOOL      \-\-use\-classes=BOOL           Whether to use lexical class\-probabilities.
-\&    \-RBOOL      \-\-relax=BOOL                 Whether to relax token\-tag associability (default=no)
+\&    \-RBOOL      \-\-relax=BOOL                 Whether to relax token\-tag associability (default=1 (true))
 \&    \-NFLOATS    \-\-nlambdas=FLOATS            N\-Gram smoothing constants (default=estimate)
 \&    \-WFLOATS    \-\-wlambdas=FLOATS            Lexical smoothing constants (default=estimate)
 \&    \-CFLOATS    \-\-clambdas=FLOATS            Lexical\-class smoothing constants (default=estimate)
@@ -183,6 +183,7 @@ mootdyn [\s-1OPTIONS\s0] \s-1INPUT\s0(s)
 \&    \-BFLOAT     \-\-dyn\-beta=FLOAT             Temperature coefficient for Maxwell\-Boltzmann estimator (default=1)
 \&    \-wTAG       \-\-dyn\-new\-tag=TAG            Specify pseudo\-tag for new analyses (default=\*(Aq@NEW\*(Aq)
 \&    \-EFLOAT     \-\-dyn\-freq\-eps=FLOAT         Specify dynamic lexical pseudo\-frequency smoothing constant (default=0.1)
+\&    \-x          \-\-dyn\-text\-tags              Use token text field as n\-gram source for MIParser
 .Ve
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
@@ -408,9 +409,9 @@ a non-empty class-frequency file.
 .ie n .IP """\-\-relax=BOOL"" , ""\-RBOOL""" 4
 .el .IP "\f(CW\-\-relax=BOOL\fR , \f(CW\-RBOOL\fR" 4
 .IX Item "--relax=BOOL , -RBOOL"
-Whether to relax token-tag associability (default=no)
+Whether to relax token-tag associability (default=1 (true))
 .Sp
-Default: '0'
+Default: '1'
 .Sp
 If nonzero, 'tag' fields of token analyses will be used only as a potential
 estimator of lexical probability, if at all.
@@ -601,6 +602,12 @@ distribution:
 .Sp
 The Maxwell-Boltzmann estimator constants \s-1BASE\s0 and \s-1BETA\s0 are given
 by the \f(CW\*(C`\-\-dyn\-base\*(C'\fR and \f(CW\*(C`\-\-dyn\-beta\*(C'\fR args.
+.IP "MIParser" 4
+.IX Item "MIParser"
+Uses n\-gram model data to break input sentences into binary-branching
+trees.  If the \f(CW\*(C`\-\-dyn\-text\-tags\*(C'\fR flag is given, n\-gram model is assumed
+to be for token text; otherwise, n\-gram model should be for token
+tags.
 .RE
 .RS 4
 .RE
@@ -652,6 +659,14 @@ previously unseen tags (if any).
 Specify dynamic lexical pseudo-frequency smoothing constant (default=0.1)
 .Sp
 Default: '0.1'
+.ie n .IP """\-\-dyn\-text\-tags"" , ""\-x""" 4
+.el .IP "\f(CW\-\-dyn\-text\-tags\fR , \f(CW\-x\fR" 4
+.IX Item "--dyn-text-tags , -x"
+Use token text field as n\-gram source for MIParser
+.Sp
+Default: '0'
+.Sp
+See the 'MIParser' class under \f(CW\*(C`\-\-dyn\-class\*(C'\fR for details.
 .SH "CONFIGURATION FILES"
 .IX Header "CONFIGURATION FILES"
 Configuration files are expected to contain lines of the form:

@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2004-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2004-2010 by Bryan Jurish <jurish@uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -360,7 +360,7 @@ namespace mootio {
     };
 
     /** Write a single byte to the buffer */
-    virtual bool putc(unsigned char c) {
+    virtual bool putbyte(unsigned char c) {
       if (!reserve(1+cb_used, cb_get)) return false;
       cb_wdata[cb_used++] = c;
       return true;

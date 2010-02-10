@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "MOOTCOMPILE 1"
-.TH MOOTCOMPILE 1 "2009-09-23" "moot v2.0.7-3" "moot PoS Tagger"
+.TH MOOTCOMPILE 1 "2010-02-10" "moot v2.0.8-1" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -153,7 +153,7 @@ mootcompile [\s-1OPTIONS\s0] \s-1MODEL\s0(s)
 \&    \-AFREQ    \-\-trie\-threshhold=FREQ       Frequency upper bound for trie inclusion.
 \&              \-\-trie\-theta=FLOAT           Suffix backoff coefficient.
 \&    \-LBOOL    \-\-use\-classes=BOOL           Whether to use lexical class\-probabilities.
-\&    \-RBOOL    \-\-relax=BOOL                 Whether to relax token\-tag associability (default=no)
+\&    \-RBOOL    \-\-relax=BOOL                 Whether to relax token\-tag associability (default=1 (true))
 \&    \-NFLOATS  \-\-nlambdas=FLOATS            N\-Gram smoothing constants (default=estimate)
 \&    \-WFLOATS  \-\-wlambdas=FLOATS            Lexical smoothing constants (default=estimate)
 \&    \-CFLOATS  \-\-clambdas=FLOATS            Lexical\-class smoothing constants (default=estimate)
@@ -278,9 +278,9 @@ a non-empty class-frequency file.
 .ie n .IP """\-\-relax=BOOL"" , ""\-RBOOL""" 4
 .el .IP "\f(CW\-\-relax=BOOL\fR , \f(CW\-RBOOL\fR" 4
 .IX Item "--relax=BOOL , -RBOOL"
-Whether to relax token-tag associability (default=no)
+Whether to relax token-tag associability (default=1 (true))
 .Sp
-Default: '0'
+Default: '1'
 .Sp
 If nonzero, 'tag' fields of token analyses will be used only as a potential
 estimator of lexical probability, if at all.

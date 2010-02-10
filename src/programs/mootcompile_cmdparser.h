@@ -28,7 +28,7 @@ struct gengetopt_args_info {
   int trie_threshhold_arg;	 /* Frequency upper bound for trie inclusion. (default=10). */
   float trie_theta_arg;	 /* Suffix backoff coefficient. (default=0). */
   int use_classes_arg;	 /* Whether to use lexical class-probabilities. (default=1). */
-  int relax_arg;	 /* Whether to relax token-tag associability (default=no) (default=0). */
+  int relax_arg;	 /* Whether to relax token-tag associability (default=1 (true)) (default=1). */
   char * nlambdas_arg;	 /* N-Gram smoothing constants (default=estimate) (default=NULL). */
   char * wlambdas_arg;	 /* Lexical smoothing constants (default=estimate) (default=NULL). */
   char * clambdas_arg;	 /* Lexical-class smoothing constants (default=estimate) (default=NULL). */
