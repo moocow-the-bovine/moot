@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2010 by Bryan Jurish <jurish@uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -464,14 +464,14 @@ void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
 
     if (tw_format & tiofTagged) {
       //-- best tag is always standalone first 'analysis'
-      os->putc('\t');
+      os->putbyte('\t');
       os->puts(token.besttag());
     }
 
     if (tw_format & tiofLocation) {
       //-- location might be first non-tag 'analysis'
       const mootToken::Location loc = token.location();
-      os->putc('\t');
+      os->putbyte('\t');
       os->printf("%lu %lu", loc.offset, loc.length);
     }
 
@@ -482,7 +482,7 @@ void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
 	   ai++)
 	{
 	  if ((tw_format & tiofPruned) && ai->tag != token.besttag()) continue;
-	  os->putc('\t');
+	  os->putbyte('\t');
 	  if (tw_format & tiofPretty) {
 	    os->puts(moot_normalize_ws((ai->details.empty() ? ai->tag : ai->details),
 				       true, true));
@@ -496,12 +496,12 @@ void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
 	  */
 	}
     }
-    os->putc('\n');
+    os->putbyte('\n');
     break;
 
   case TokTypeEOS:
     if (tw_is_comment_block) os->puts("%%\n");
-    else os->putc('\n');
+    else os->putbyte('\n');
     break;
 
   default:
@@ -523,7 +523,7 @@ void TokenWriterNative::_put_sentence(const mootSentence &sentence, mootio::most
       _put_token(*si, os);
     }
   if (!sentence.empty() || sentence.back().toktype() != TokTypeEOS) {
-    os->putc('\n');
+    os->putbyte('\n');
   }
 }
 
@@ -536,7 +536,7 @@ void TokenWriterNative::_put_comment(const char *buf, size_t len, mootio::mostre
   if (!os || !os->valid() || tw_format & tiofNull) return;
 
   if (len == 0) {
-    os->putc('\n');
+    os->putbyte('\n');
     return;
   }
 
@@ -546,7 +546,7 @@ void TokenWriterNative::_put_comment(const char *buf, size_t len, mootio::mostre
       ;
     os->puts("%%");
     os->write(buf+i, j-i);
-    os->putc('\n');
+    os->putbyte('\n');
   }
 }
 

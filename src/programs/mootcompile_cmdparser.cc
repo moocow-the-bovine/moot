@@ -96,7 +96,7 @@ cmdline_parser_print_help (void)
   printf("   -AFREQ    --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.\n");
   printf("             --trie-theta=FLOAT           Suffix backoff coefficient.\n");
   printf("   -LBOOL    --use-classes=BOOL           Whether to use lexical class-probabilities.\n");
-  printf("   -RBOOL    --relax=BOOL                 Whether to relax token-tag associability (default=no)\n");
+  printf("   -RBOOL    --relax=BOOL                 Whether to relax token-tag associability (default=1 (true))\n");
   printf("   -NFLOATS  --nlambdas=FLOATS            N-Gram smoothing constants (default=estimate)\n");
   printf("   -WFLOATS  --wlambdas=FLOATS            Lexical smoothing constants (default=estimate)\n");
   printf("   -CFLOATS  --clambdas=FLOATS            Lexical-class smoothing constants (default=estimate)\n");
@@ -137,7 +137,7 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->trie_threshhold_arg = 10; 
   args_info->trie_theta_arg = 0; 
   args_info->use_classes_arg = 1; 
-  args_info->relax_arg = 0; 
+  args_info->relax_arg = 1; 
   args_info->nlambdas_arg = NULL; 
   args_info->wlambdas_arg = NULL; 
   args_info->clambdas_arg = NULL; 
@@ -365,7 +365,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->use_classes_arg = (int)atoi(val);
           break;
         
-        case 'R':	 /* Whether to relax token-tag associability (default=no) */
+        case 'R':	 /* Whether to relax token-tag associability (default=1 (true)) */
           if (args_info->relax_given) {
             fprintf(stderr, "%s: `--relax' (`-R') option given more than once\n", PROGRAM);
           }
@@ -555,7 +555,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->use_classes_arg = (int)atoi(val);
           }
           
-          /* Whether to relax token-tag associability (default=no) */
+          /* Whether to relax token-tag associability (default=1 (true)) */
           else if (strcmp(olong, "relax") == 0) {
             if (args_info->relax_given) {
               fprintf(stderr, "%s: `--relax' (`-R') option given more than once\n", PROGRAM);

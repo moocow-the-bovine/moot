@@ -28,7 +28,7 @@ mootcompile [OPTIONS] MODEL(s)
     -AFREQ    --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.
               --trie-theta=FLOAT           Suffix backoff coefficient.
     -LBOOL    --use-classes=BOOL           Whether to use lexical class-probabilities.
-    -RBOOL    --relax=BOOL                 Whether to relax token-tag associability (default=no)
+    -RBOOL    --relax=BOOL                 Whether to relax token-tag associability (default=1 (true))
     -NFLOATS  --nlambdas=FLOATS            N-Gram smoothing constants (default=estimate)
     -WFLOATS  --wlambdas=FLOATS            Lexical smoothing constants (default=estimate)
     -CFLOATS  --clambdas=FLOATS            Lexical-class smoothing constants (default=estimate)
@@ -243,9 +243,9 @@ a non-empty class-frequency file.
 
 =item C<--relax=BOOL> , C<-RBOOL>
 
-Whether to relax token-tag associability (default=no)
+Whether to relax token-tag associability (default=1 (true))
 
-Default: '0'
+Default: '1'
 
 
 If nonzero, 'tag' fields of token analyses will be used only as a potential

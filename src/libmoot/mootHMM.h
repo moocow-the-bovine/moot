@@ -1,7 +1,7 @@
 /* -*- Mode: C++ -*- */
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2010 by Bryan Jurish <jurish@uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -438,7 +438,7 @@ public:
   /**
    * Whether to interpret token pre-analyses as "hints"
    * (relax==true) or hard restrictions (relax==false).
-   *  Default: false.
+   *  Default (as of moot version >= 2.0.8-1): true.
    */
   bool      relax;
 
@@ -592,7 +592,7 @@ public:
       save_mark_unknown(false),
       save_dump_trellis(false),
       hash_ngrams(false),
-      relax(false),
+      relax(true),
       use_lex_classes(true),
       start_tagid(0),
       unknown_lex_threshhold(1.0),

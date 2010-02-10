@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2010 by Bryan Jurish <jurish@uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -517,7 +517,7 @@ void TokenWriterExpat::close(void)
 			 (tw_format&tiofPretty ? "\n" : ""),
 			 root_elt.c_str());
     } else {
-      tw_ostream->putc('\n'); //-- always add terminating newline in raw mode
+      tw_ostream->putbyte('\n'); //-- always add terminating newline in raw mode
     }
   }
 
@@ -598,7 +598,7 @@ void TokenWriterExpat::_put_token_gen(const mootToken &token, mootio::mostream *
       twx_recoder.string2mstream(token.text(), os);
     } else {
       //-- standalone comment
-      if (tw_format&tiofPretty) os->putc('\n');
+      if (tw_format&tiofPretty) os->putbyte('\n');
       os->puts("<!--");
       twx_recoder.string2mstream(token.text(), os);
       os->puts("-->");
@@ -645,7 +645,7 @@ void TokenWriterExpat::_put_token_gen(const mootToken &token, mootio::mostream *
 
 	  if (ai->details.empty()) os->puts("/>");
 	  else {
-	    os->putc('>');
+	    os->putbyte('>');
 	    twx_recoder.string2mstream(ai->details.c_str(), os);
 	    os->printf("</%s>", analysis_elt.c_str());
 	  }
