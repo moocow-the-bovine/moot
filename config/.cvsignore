@@ -20,3 +20,4 @@ config.guess
 config.sub
 depcomp
 ltmain.sh
+link-warning.h

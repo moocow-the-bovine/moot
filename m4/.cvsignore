@@ -1,4 +1,12 @@
 *~
 .*~
 Makefile.in
-Makefile
+Makefileextensions.m4
+float_h.m4
+gnulib-common.m4
+gnulib-comp.m4
+include_next.m4
+stdint.m4
+stdio_h.m4
+string_h.m4
+wchar.m4
