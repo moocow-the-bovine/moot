@@ -24,8 +24,8 @@ AM_CONFIG_HEADER([src/libmoot/mootAutoConfig.h])
 dnl default prefix
 AC_PREFIX_DEFAULT(/usr/local)
 
-dnl for libtoolize
-AC_CONFIG_MACRO_DIR([m4])
+dnl-- makes libtoolize keep m4 macros in tree (let's rather not...)
+dnl AC_CONFIG_MACRO_DIR([m4])
 
 #-------------------------------------------------------------
 # save user's *FLAGS
@@ -43,11 +43,11 @@ AC_PROG_CC
 dnl for gnulib
 gl_EARLY
 
-AC_PROG_CXX
-AC_LANG(C++)
-
 dnl for gnulib
 gl_INIT
+
+AC_PROG_CXX
+AC_LANG([C++])
 
 dnl v--- for static-only libraries (non-libtool)
 dnl AC_PROG_RANLIB
@@ -204,6 +204,7 @@ dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 dnl mootCompat: check for some useful functions (gnulib)
 dnl AC_CHECK_FUNCS([memrchr vasprintf vprintf],[],[])
 
+dnl -- goofy memrchr stuff with gcc-4.4
 gl_FUNC_MEMRCHR
 gl_FUNC_VASPRINTF
 

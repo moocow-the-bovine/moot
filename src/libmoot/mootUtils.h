@@ -224,10 +224,10 @@ namespace moot {
    * into \c filename.
    * If no next extension is found, returns NULL.
    */
-  char *moot_extension(const char *filename, size_t pos);
+  const char *moot_extension(const char *filename, size_t pos);
 
   /** Get extension of a filename (including leading '.') */
-  inline char *moot_extension(const char *filename)
+  inline const char *moot_extension(const char *filename)
   {
     return moot_extension(filename, strlen(filename));
   };
