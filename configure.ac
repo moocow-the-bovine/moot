@@ -43,7 +43,8 @@ AC_PROG_CC
 dnl for gnulib
 gl_EARLY
 
-dnl for gnulib
+dnl-- for gnulib
+dnl + do this BEFORE AC_LANG([C++]); otherwise memrchr() check pukes)
 gl_INIT
 
 AC_PROG_CXX
