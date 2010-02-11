@@ -189,9 +189,9 @@ install-doc-sub:
 	  for d in $(DOXY_INSTALL_SUBDIRS) ; do \
 	    if test -d "$$d" ; then \
 	      $(mkinstalldirs) $(DESTDIR)$(pkgdocdir)/$(DOXYBASE)/$$d ;\
-	      (cd $$d ;\
+	      (cd "$$d" ;\
 	       for f in * ; do \
-	        $(INSTALL_DATA) $$f $(DESTDIR)$(pkgdocdir)/$(DOXYBASE)/$$d/$$f ;\
+	        $(INSTALL_DATA) "$$f" "$(DESTDIR)$(pkgdocdir)/$(DOXYBASE)/$$d/$$f" ;\
 	       done) ;\
 	    fi ;\
 	  done
