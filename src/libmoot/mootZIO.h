@@ -43,7 +43,7 @@
 namespace mootio {
 
   /*====================================================================
-   * mcstream : FILE* i/o
+   * mzstream : gzFile* i/o
    *====================================================================*/
   /** \brief Wrapper class for C FILE* streams. */
   class mzstream

@@ -402,7 +402,8 @@ EXTRA_DIST = \
 	mootClassfreqsParser.yy \
 	$(FLEXXX_DEPS) \
 	$(BISONXX_DEPS) \
-	myosfcn.h
+	myosfcn.h \
+	gnulib/config.h
 
 dist_old = \
 	mootTokenLexer.ll \
