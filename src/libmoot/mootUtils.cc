@@ -36,7 +36,7 @@
 
 /*-- gnulib stuff --*/
 extern "C" {
-#include "memrchr.h"
+  /*#include "memrchr.h"*/ //-- chokes on CentOS 5.4 ~ RHEL
 }
 
 #include <mootUtils.h>

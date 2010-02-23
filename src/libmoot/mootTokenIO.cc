@@ -41,7 +41,7 @@
 #endif /* MOOT_EXPAT_ENABLED */
 
 /*-- gnulib stuff --*/
-#include "vasprintf.h"
+/*#include "vasprintf.h"*/ //-- chokes on CentOS 5.4 (~RHEL5)
 
 
 /*moot_BEGIN_NAMESPACE*/

@@ -32,7 +32,7 @@
 
 /*-- gnulib stuff --*/
 extern "C" {
-#include "vasprintf.h"
+  /*#include "vasprintf.h"*/ //-- chokes on CentOS 5.4 ~ RHEL
 }
 
 namespace mootio {
