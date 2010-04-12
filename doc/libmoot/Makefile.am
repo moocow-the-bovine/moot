@@ -20,10 +20,14 @@ DOXY_LATEX_TARGETS=
 
 if HAVE_DOXYGEN
 
-if DOC_WANT_MAN
-DOXY_MAN3_MANS +=man/man3/*
-endif
+##-- manpages
+## + v2.0.8-3: Mon, 12 Apr 2010 09:34:50 +0200: man page install rule chokes new doxygen
+##   (debian sid / doxygen v1.6.2; fedora 11 / doxygen v1.6.1)
+#if DOC_WANT_MAN
+#DOXY_MAN3_MANS +=man/man3/*
+#endif
 
+##-- html docs
 if DOC_WANT_HTML
 DOXY_HTML_STATIC     +=libmoot.css
 DOXY_INSTALL_SUBDIRS +=html
@@ -95,7 +99,9 @@ DOXY_FILTER_DEPS += doxy-filter.cfg
 endif
 
 if HAVE_DOXYGEN
+if DOC_WANT_MAN
 $(man3_MANS): $(STAMPFILE)
+endif
 
 $(STAMPFILE): $(DOXY_INPUTS) $(DOXY_FILTER_DEPS)
 endif

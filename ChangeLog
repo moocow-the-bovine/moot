@@ -1,5 +1,10 @@
 ChangeLog for package moot
 
+v2.0.8-3 Mon, 12 Apr 2010 10:02:34 +0200
+	+ uncommented mootToken::Analysis::prob output for native i/o
+	  - fixes mantis bug http://odo.dwds.de/mantis/view.php?id=249
+	+ commented out doxygen manpage rules in doc/libmoot/Makefile.am
+	  - fixes mantis bug http://odo.dwds.de/mantis/view.php?id=181
 v2.0.8-2 Thu, 11 Feb 2010 15:13:17 +0100
 	+ updated moot_extension() in mootUtils.(h|cc):
 	  old reinterpret_cast<char *>(const char*) chokes gcc-4.4
@@ -14,7 +19,7 @@ v2.0.8-0 Wed, 16 Dec 2009 14:43:05 +0100
 	  - user is responsible for memory management
 
 v2.0.7 Wed, 23 Sep 2009 11:02:43 +0200
-	+ added parsing of scientific notation to moot(Ngrams|Lexfreqs)Lexer.ll
+	+ added parsing of scientific notation (printf formats %e,%E) to moot(Ngrams|Lexfreqs)Lexer.ll
 	+ fixed version-checking bug in mootHMM::load()
 	+ updated BINCOMPAT HMM file version to 3.0 (min-compat = 2.5)
 	+ removed MOOT_USE_TRIGRAMS macro sensitivity
