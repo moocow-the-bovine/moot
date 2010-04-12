@@ -63,7 +63,7 @@
 void
 cmdline_parser_print_version (void)
 {
-  printf("moottype (%s %s) by Bryan Jurish <moocow@ling.uni-potsdam.de>\n", PACKAGE, VERSION);
+  printf("moottype (%s %s) by Bryan Jurish <jurish@uni-potsdam.de>\n", PACKAGE, VERSION);
 }
 
 void
