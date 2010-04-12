@@ -5,7 +5,7 @@ program "mootpp"
 #program_version "0.01"
 
 purpose	"Tokenizer for moocow's part-of-speech tagger."
-author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+author  "Bryan Jurish <jurish@uni-potsdam.de>"
 on_reparse "warn"
 
 #-----------------------------------------------------------------------------

@@ -6,7 +6,7 @@ program "mootrain"
 #program_version "0.01"
 
 purpose	"moocow's part-of-speech tagger : HMM trainer"
-author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+author  "Bryan Jurish <jurish@uni-potsdam.de>"
 on_reparse "warn"
 
 #-----------------------------------------------------------------------------
