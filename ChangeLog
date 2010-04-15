@@ -3,9 +3,10 @@ ChangeLog for package moot
 v2.0.8-3 Mon, 12 Apr 2010 10:02:34 +0200
 	+ uncommented mootToken::Analysis::prob output for native i/o
 	  - fixes mantis bug http://odo.dwds.de/mantis/view.php?id=249
+	+ added TokenIOFormat flag 'tiofCost': read/write analysis 'prob' fields a la at&t fsm weight
+	  - fixes follow-up bug to mantis #249 (mootchurn should be no-op)
 	+ commented out doxygen manpage rules in doc/libmoot/Makefile.am
 	  - fixes mantis bug http://odo.dwds.de/mantis/view.php?id=181
-	+ added TokenIOFormat flag 'tiofCost': read/write analysis 'prob' fields a la at&t fsm weight
 v2.0.8-2 Thu, 11 Feb 2010 15:13:17 +0100
 	+ updated moot_extension() in mootUtils.(h|cc):
 	  old reinterpret_cast<char *>(const char*) chokes gcc-4.4
