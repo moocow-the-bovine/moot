@@ -18,8 +18,13 @@ void churntest(int argc, char **argv) {
     mootTokenLexer lexer;
     //lexer.first_analysis_is_best = true;
     //lexer.ignore_first_analysis = true;
+    //
     lexer.first_analysis_is_best = false;
     lexer.ignore_first_analysis = false;
+    //
+    lexer.parse_location = false;
+    lexer.parse_analysis_cost = true;
+    lexer.analysis_cost_details = false;
 
   for ( ; argc > 0 ; argc--, argv++) {
     //-- open

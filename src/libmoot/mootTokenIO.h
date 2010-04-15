@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2010 by Bryan Jurish <jurish@uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -59,7 +59,8 @@ enum TokenIOFormatE {
   tiofAnalyzed  = 0x00000100,  ///< input is pre-analyzed (>= "medium rare")
   tiofTagged    = 0x00000200,  ///< input is tagged ("medium" or "well done")
   tiofPruned    = 0x00000400,  ///< pruned output
-  tiofLocation  = 0x00000800   ///< locations appear first non-tag analysis
+  tiofLocation  = 0x00000800,  ///< locations appear as first non-tag analysis
+  tiofCost      = 0x00001000   ///< parse/output analysis 'prob' field
 };
 typedef TokenIOFormatE TokenIOFormat;
 
@@ -67,13 +68,13 @@ typedef TokenIOFormatE TokenIOFormat;
 static const int tiofRare = tiofText;
 
 /** Format alias for 'Cooked Medium Rare' files. */
-static const int tiofMediumRare = tiofText|tiofAnalyzed;
+static const int tiofMediumRare = tiofText|tiofAnalyzed; //|tiofCost
 
 /** Format alias for 'Cooked Medium' files. */
 static const int tiofMedium = tiofText|tiofTagged;
 
 /** Format alias for 'Cooked Well Done' files. */
-static const int tiofWellDone = tiofText|tiofAnalyzed|tiofTagged;
+static const int tiofWellDone = tiofText|tiofAnalyzed|tiofTagged; //|tiofCost
 
 /** Enum for I/O mode flags */
 /*
@@ -476,6 +477,7 @@ public:
     tr_format |= tiofNative;
     input_is_tagged(tr_format&tiofTagged);
     input_has_locations(tr_format&tiofLocation);
+    input_has_cost(tr_format&tiofCost);
 
     tr_sentence = &trn_sentence;
     tr_token    = &lexer.mtoken_default;
@@ -593,6 +595,33 @@ public:
       lexer.parse_location = false;
     }
     return has_locs;
+  };
+
+  /**
+   * Get value of the 'cost' flag : whether we
+   * want to parse analysis costs (prob field) from input stream
+   */
+  inline bool input_has_cost(void)
+  {
+    return lexer.parse_analysis_cost;
+  };
+
+  /**
+   * Set value of the 'cost' flag: whether we
+   * want to parse analysis costs (prob field) from input stream
+   */
+  inline bool input_has_cost(bool has_cost)
+  {
+    if (has_cost) {
+      tr_format |= tiofCost;
+      lexer.parse_analysis_cost = true;
+      lexer.analysis_cost_details = false;
+    } else {
+      tr_format &= ~tiofCost;
+      lexer.parse_analysis_cost = false;
+      lexer.analysis_cost_details = true;
+    }
+    return has_cost;
   };
   //@}
 };

@@ -1,0 +1,10 @@
+
+%% mootm: File: test1.t
+
+%% a comment
+Dies	[_NN] <1>	[_PDS] <2>	[_PDAT] <3>
+ist	[_VAFIN] <0>	[_VVFIN] <1>
+ein	[_ADV] <1>	[_ARTINDEF] <2>	[_VVIMP] <3>	[_PTKVZ] <4>	[_ART] <5>	[_CARD] <6>
+Test	[_NE] <123456789>	[_NN]<123456789>
+.	[_$.]<1e38>	[_$,] <1e38>
+

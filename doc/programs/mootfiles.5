@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "MOOTFILES 5"
-.TH MOOTFILES 5 "2010-04-12" "moot v2.0.8-3" "moot PoS Tagger"
+.TH MOOTFILES 5 "2010-04-15" "moot v2.0.8-3" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -682,6 +682,10 @@ Read/write 'best tags' ('medium' or 'well done' formats only).
 Read/write token locations as logical pairs (\s-1BYTE_OFFSET\s0,BYTE_LENGTH)
 from/to the input stream as the first non-tag analysis.
 Useful if you need to refer back to earlier stages of a token processing pipeline.
+.IP "Cost" 4
+.IX Item "Cost"
+Read/write analysis \*(L"costs\*(R" from/to analysis "<\fI\s-1NUMBER\s0\fR>" suffixes.
+This flag may be set by default in future versions.
 .IP "Pruned" 4
 .IX Item "Pruned"
 For 'well done' formats, ignore analyses which do
@@ -1077,6 +1081,6 @@ Hey! \fBThe above document had some coding errors, which are explained below:\fR
 .IP "Around line 106:" 4
 .IX Item "Around line 106:"
 You can't have =items (as at line 114) unless the first thing after the =over is an =item
-.IP "Around line 776:" 4
-.IX Item "Around line 776:"
-You can't have =items (as at line 784) unless the first thing after the =over is an =item
+.IP "Around line 781:" 4
+.IX Item "Around line 781:"
+You can't have =items (as at line 789) unless the first thing after the =over is an =item

@@ -93,6 +93,7 @@ int TokenIO::parse_format_string(const std::string &fmtString)
       else if (s=="user") flag = tiofUser;
       else if (s=="pruned") flag = tiofPruned;
       else if (s=="location" || s=="loc") flag =tiofLocation;
+      else if (s=="cost") flag =tiofCost;
       //-- aliases
       else if (s=="rare" || s=="r") flag = tiofRare;
       else if (s=="mediumrare" || s=="mr") flag = tiofMediumRare;
@@ -217,6 +218,7 @@ std::string TokenIO::format_canonical_string(int fmt)
   if (fmt & tiofAnalyzed) s.append("Analyzed,");
   if (fmt & tiofTagged) s.append("Tagged,");
   if (fmt & tiofLocation) s.append("Location,");
+  if (fmt & tiofCost) s.append("Cost,");
   if (fmt & tiofPruned) s.append("Pruned,");
   if (fmt & tiofUser) s.append("User,");
 
@@ -475,7 +477,6 @@ void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
       os->printf("%lu %lu", loc.offset, loc.length);
     }
 
-
     if (tw_format & tiofAnalyzed) {
       for (mootToken::Analyses::const_iterator ai = token.analyses().begin();
 	   ai != token.analyses().end();
@@ -489,7 +490,7 @@ void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
 	  } else {
 	    os->puts(ai->details.empty() ? ai->tag : ai->details);
 	  }
-	  if (ai->prob != 0) {
+	  if ((tw_format & tiofCost) && (ai->prob != 0)) {
 	    os->printf(" <%g>", static_cast<double>(ai->prob));
 	  }
 	}

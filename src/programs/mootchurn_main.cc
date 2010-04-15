@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2004-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2004-2010 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -69,7 +69,7 @@ cmdutil_file_churner churner;
 //-- token i/o
 int ifmt = tiofNone;
 int ifmt_implied = tiofNone;
-int ifmt_default = tiofWellDone|tiofConserve;
+int ifmt_default = tiofWellDone|tiofConserve|tiofCost;
 
 int  ofmt = tiofNone;
 int  ofmt_implied = tiofNone;

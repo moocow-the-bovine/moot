@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2010 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -132,6 +132,10 @@ using namespace moot;
    bool ignore_current_analysis; \
    /** whether first non-tag analysis should be considered 'location' (default=false) */ \
    bool parse_location; \
+   /** whether to parse "<NUMBER>" as analysis cost (default=true) */ \
+   bool parse_analysis_cost; \
+   /** whether to include parsed costs in analysis details string (default=false) */ \
+   bool analysis_cost_details; \
    \
   public: \
     /* -- local methods */ \
@@ -173,7 +177,9 @@ using namespace moot;
   current_analysis_is_best(false), \
   ignore_first_analysis(false), \
   ignore_current_analysis(false), \
-  parse_location(false)
+  parse_location(false), \
+  parse_analysis_cost(true), \
+  analysis_cost_details(false)
 
   
 %define CONSTRUCTOR_CODE \
@@ -200,7 +206,7 @@ eotchar    [\n\r]
 newline    [\n]
 tokchar    [^\t\n\r]
 /*detchar    [^ \t\n\r\<\>\[]*/
-detchar    [^ \t\n\r\[]
+detchar    [^ \t\n\r\[\<]
 tagchar    [^ \t\n\r\]]
 anlchar    [^ \t\n\r]
 /*bestchar   [\/]*/
@@ -372,10 +378,33 @@ locsep     [ \r\+]
   BEGIN(TAG);
 }
 
-<DETAILS>"<"{costre}">" {
+<DETAILS>{space}+/"<"{costre}">" {
+  //-- DETAILS: pre-cost space
   add_columns(yyleng);
   loc_add(yyleng);
-  manalysis->prob = strtof (reinterpret_cast<const char *>(yytext)+1, NULL);
+  if (analysis_cost_details) {
+    manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
+  }
+  lasttyp = LexTypeDetails;
+}
+
+<DETAILS>"<"{costre}">" {
+  //-- DETAILS: cost (clobber manalysis->prob)
+  add_columns(yyleng);
+  loc_add(yyleng);
+  if (parse_analysis_cost) {
+    manalysis->prob = strtof (reinterpret_cast<const char *>(yytext)+1, NULL);
+  }
+  if (analysis_cost_details) {
+    manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
+  }
+  lasttyp = LexTypeDetails;
+}
+
+<DETAILS>[\<\>] {
+  //-- allow <,> in details strings even without valid cost
+  add_columns(yyleng);
+  loc_add(yyleng);
   manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);
   lasttyp = LexTypeDetails;
 }

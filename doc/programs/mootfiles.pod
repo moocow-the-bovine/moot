@@ -657,6 +657,11 @@ Read/write token locations as logical pairs (BYTE_OFFSET,BYTE_LENGTH)
 from/to the input stream as the first non-tag analysis.
 Useful if you need to refer back to earlier stages of a token processing pipeline.
 
+=item Cost
+
+Read/write analysis "costs" from/to analysis "E<lt>I<NUMBER>E<gt>" suffixes.
+This flag may be set by default in future versions.
+
 =item Pruned
 
 For 'well done' formats, ignore analyses which do

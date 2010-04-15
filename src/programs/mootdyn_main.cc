@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2010 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -79,7 +79,7 @@ mootDynHMMOptions hmm_opts;
 int ifmt         = tiofNone;
 //int ifmt_implied = tiofNone;
 int ifmt_implied = tiofMediumRare;
-int ifmt_default = tiofMediumRare;
+int ifmt_default = tiofMediumRare|tiofCost;
 
 int  ofmt         = tiofNone;
 int  ofmt_implied = tiofTagged;

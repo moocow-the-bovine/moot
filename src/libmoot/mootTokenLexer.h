@@ -139,6 +139,10 @@ using namespace moot;
    bool ignore_current_analysis; \
    /** whether first non-tag analysis should be considered 'location' (default=false) */ \
    bool parse_location; \
+   /** whether to parse "<NUMBER>" as analysis cost (default=true) */ \
+   bool parse_analysis_cost; \
+   /** whether to include parsed costs in analysis details string (default=false) */ \
+   bool analysis_cost_details; \
    \
   public: \
     /* -- local methods */ \
@@ -167,7 +171,7 @@ using namespace moot;
   virtual void   mgl_yy_switch_to_buffer(void *buf) \
                  {yy_switch_to_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
   virtual void   mgl_begin(int stateno);
-#line 165 "mootTokenLexer.ll"
+#line 169 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CONSTRUCTOR_INIT  :\
   GenericLexer("mootTokenLexer"), \
   yyin(NULL), \
@@ -179,11 +183,13 @@ using namespace moot;
   current_analysis_is_best(false), \
   ignore_first_analysis(false), \
   ignore_current_analysis(false), \
-  parse_location(false)
-#line 179 "mootTokenLexer.ll"
+  parse_location(false), \
+  parse_analysis_cost(true), \
+  analysis_cost_details(false)
+#line 185 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CONSTRUCTOR_CODE  \
   mtoken = &mtoken_default;
-#line 214 "mootTokenLexer.ll"
+#line 220 "mootTokenLexer.ll"
 #line 52 "./flexskel.h"
 
 
@@ -435,7 +441,7 @@ class YY_mootTokenLexer_CLASS YY_mootTokenLexer_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 480 "mootTokenLexer.ll"
+#line 509 "mootTokenLexer.ll"
 #endif
 #line 302 "./flexskel.h"
 
