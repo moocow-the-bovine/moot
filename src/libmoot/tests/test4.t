@@ -3,3 +3,5 @@ Tag+Details	[TAG] details	[_TAG] details	lemma [TAG] details	lemma [_TAG] detail
 Tag+Cost	MyTag <42>	OtherTag <24>	[OtherTag1] <1>	[_OtherTag2] <2>
 Tag+Details+Cost	[TAG] details <1>	[_TAG] details <2>	TAG details <3>
 Tag	MyTag
+Tag[	[
+Tag[	[foo]

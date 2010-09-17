@@ -401,8 +401,8 @@ locsep     [ \r\+]
   lasttyp = LexTypeDetails;
 }
 
-<DETAILS>[\<\>] {
-  //-- allow <,> in details strings even without valid cost
+<DETAILS>[\<\>\[] {
+  //-- allow <,>,[ in details strings even without valid cost or tag
   add_columns(yyleng);
   loc_add(yyleng);
   manalysis->details.append(reinterpret_cast<const char *>(yytext), yyleng);

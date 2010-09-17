@@ -1,5 +1,7 @@
 ChangeLog for package moot
 
+v2.0.8-4 2010-09-14 14:20:34
+	+ mootTokenLexer.ll: allow literal '[' in analysis details (for literal-text pseudo-tags, e.g. dynhmm)
 v2.0.8-3 Mon, 12 Apr 2010 10:02:34 +0200
 	+ uncommented mootToken::Analysis::prob output for native i/o
 	  - fixes mantis bug http://odo.dwds.de/mantis/view.php?id=249
