@@ -11,6 +11,7 @@ use Pod::Usage;
 ##------------------------------------------------------------------------------
 our $prog = basename($0);
 our $compact_ngrams = 1;
+our $trace = 0;
 our $outfile = '-';
 
 ##------------------------------------------------------------------------------
@@ -18,6 +19,8 @@ our $outfile = '-';
 ##------------------------------------------------------------------------------
 GetOptions(##-- General
 	   'help|h' => \$help,
+	   'trace|t!' => \$trace,
+	   'quiet|silent|q' => sub { $trace=0; },
 
 	   ##-- misc
 	   'verbose-ngrams|verbose|v|N!' => sub { $compact_ngrams=!$_[1]; },
@@ -34,8 +37,10 @@ pod2usage({-exitval=>0, -verbose=>0}) if ($help);
 
 our $ng = moot::Ngrams->new();
 foreach $file (@ARGV) {
+  print STDERR "$0: load($file)\n" if ($trace);
   $ng->load($file) || die("$prog: load failed for file '$file': $!");
 }
+print STDERR "$0: save($outfile)\n" if ($trace);
 $ng->save($outfile,($compact_ngrams ? 1 : 0));
 
 
@@ -53,7 +58,8 @@ __END__
 
  Options:
   -help                     # this help message
-  -verbose , -noverbose     # do/don't generate verbose n-gram output (default=no)
+  -trace   , -notrace       # do/don't trace execution to STDERR (default=-notrace)
+  -compact , -nocompact     # do/don't generate compact n-gram output (default=-compact)
   -output OUTFILE           # save output to OUTFILE (default=STDOUT)
 
 =cut
@@ -88,6 +94,6 @@ not yet written.
 
 =head1 AUTHOR
 
-Bryan Jurish E<lt>moocow@bbaw.deE<gt>
+Bryan Jurish E<lt>jurish@uni-potsdam.deE<gt>
 
 =cut
