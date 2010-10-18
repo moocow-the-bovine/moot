@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "MOOTFILES 5"
-.TH MOOTFILES 5 "2010-04-15" "moot v2.0.8-3" "moot PoS Tagger"
+.TH MOOTFILES 5 "2010-10-18" "moot v2.0.8-5" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -686,6 +686,11 @@ Useful if you need to refer back to earlier stages of a token processing pipelin
 .IX Item "Cost"
 Read/write analysis \*(L"costs\*(R" from/to analysis "<\fI\s-1NUMBER\s0\fR>" suffixes.
 This flag may be set by default in future versions.
+.IP "Trace" 4
+.IX Item "Trace"
+If set as an output format flag, causes a verbose dump of the Viterbi trellis
+to be spliced into every tagged sentence as post-token comments.  Does nothing
+as an input flag (yet).
 .IP "Pruned" 4
 .IX Item "Pruned"
 For 'well done' formats, ignore analyses which do
@@ -1081,6 +1086,6 @@ Hey! \fBThe above document had some coding errors, which are explained below:\fR
 .IP "Around line 106:" 4
 .IX Item "Around line 106:"
 You can't have =items (as at line 114) unless the first thing after the =over is an =item
-.IP "Around line 781:" 4
-.IX Item "Around line 781:"
-You can't have =items (as at line 789) unless the first thing after the =over is an =item
+.IP "Around line 787:" 4
+.IX Item "Around line 787:"
+You can't have =items (as at line 795) unless the first thing after the =over is an =item
