@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2010 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -1370,6 +1370,78 @@ void mootHMM::tag_mark_best(mootSentence &sentence)
   }
 
 };
+
+/*--------------------------------------------------------------------------
+ * Trace: in-sentence Viterbi trace
+ */
+void mootHMM::tag_dump_trace(mootSentence &sentence)
+{
+  ViterbiColumn *vcol;
+  std::list<ViterbiColumn*> vcols;
+  mootSentence s; //-- output temporary
+
+  //-- get column list in sentence order
+  for (vcol = vtable; vcol != NULL; vcol=vcol->col_prev) {
+    vcols.push_front(vcol);
+  }
+  if (!vcols.empty()) vcols.pop_front();   //-- omit BOS
+  //if (!vcols.empty()) vcols.pop_back();  //-- omit EOS (no!)
+
+
+  //-- traverse trellis columns and sentence in parallel
+  mootSentence::const_iterator         si=sentence.begin();
+  std::list<ViterbiColumn*>::iterator vci=vcols.begin();
+  const mootToken *tokp;
+  mootToken eostok(tagids.id2name(start_tagid));
+
+  //-- iterate: sentence tokens ~ Viterbi columns 
+  while (vci != vcols.end()) {
+    vcol = *vci;
+    if (si != sentence.end()) {
+      s.push_back(*si);
+      if (si->toktype() != TokTypeVanilla) { //-- ignore non-vanilla tokens
+	si++;
+	continue;
+      }
+      tokp = &(*si);
+    } else {
+      tokp = &eostok;
+    }
+    TokID tokid = token2id(tokp->text());
+    mootTokenFlavor flav = tokenFlavor(tokp->text());
+ 
+    //-- comment: token
+    sentence_printf_append(s, TokTypeComment,
+			   "moot:trace\tWORD %d:%s\tflavor=(%d:%s) bpprmin=%g bbestpr=%g",
+			   tokid, (tokp==&eostok ? tokp->text().c_str() : tokids.id2name(tokid).c_str()),
+			   flav, mootTokenFlavorNames[flav],
+			   vcol->bpprmin, vcol->bbestpr);
+
+    //-- iterate: Viterbi rows (current tags)
+    for (ViterbiRow *vrow=vcol->rows; vrow != NULL; vrow=vrow->row_next) {
+
+      //-- iteratate: Viterbi nodes (previous tags)
+      for (ViterbiNode *vnod=vrow->nodes; vnod != NULL; vnod = vnod->nod_next) {
+	ViterbiNode *vpnod = vnod->pth_prev;
+	sentence_printf_append(s, TokTypeComment, "moot:trace\t%cNODE %d:%s\t%d:%s\t%d:%s\twprob=%g lprob=%g",
+			       (vnod->lprob==vcol->bbestpr ? '*' : ' '),
+			       vpnod->ptagid,  tagids.id2name(vpnod->ptagid).c_str(),
+			       vnod->ptagid, tagids.id2name(vnod->ptagid).c_str(),
+			       vrow->tagid,  tagids.id2name(vrow->tagid).c_str(),
+			       vrow->wprob, vnod->lprob
+			       );
+	;
+      }
+    }
+
+    //-- increment iterator(s)
+    si++;
+    vci++;
+  }
+
+  //-- swap input and output sentences
+  sentence.swap(s);
+}
 
 
 /*--------------------------------------------------------------------------

@@ -60,7 +60,8 @@ enum TokenIOFormatE {
   tiofTagged    = 0x00000200,  ///< input is tagged ("medium" or "well done")
   tiofPruned    = 0x00000400,  ///< pruned output
   tiofLocation  = 0x00000800,  ///< locations appear as first non-tag analysis
-  tiofCost      = 0x00001000   ///< parse/output analysis 'prob' field
+  tiofCost      = 0x00001000,  ///< parse/output analysis 'prob' field
+  tiofTrace     = 0x00002000   ///< save full Viterbi trellis trace?
 };
 typedef TokenIOFormatE TokenIOFormat;
 

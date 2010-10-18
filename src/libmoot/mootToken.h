@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2010 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -546,6 +546,9 @@ typedef list<mootToken> mootSentence;
 
 /** Sentences are just vectors of mootToken objects */
 //typedef vector<mootToken> mootSentence;
+
+/** Utilitiy method to add a printf()-formatted token at the end of \c s */
+mootToken &sentence_printf_append(mootSentence &s, mootTokenType typ, const char *fmt, ...);
 
 /*----------------------------------------------------------------------
  * Pattern-based Typification

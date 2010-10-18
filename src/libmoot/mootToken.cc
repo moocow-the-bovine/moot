@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2010 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -27,6 +27,7 @@
  *--------------------------------------------------------------------------*/
 
 #include "mootToken.h"
+#include "mootUtils.h"
 
 namespace moot {
   using namespace std;
@@ -53,5 +54,17 @@ namespace moot {
       "@UNKNOWN"
     };
 
+/*--------------------------------------------------------------------------
+ * mootSentence
+ */
+mootToken &sentence_printf_append(mootSentence &s, mootTokenType typ, const char *fmt, ...)
+{
+  va_list ap;
+  s.push_back(mootToken(typ));
+  va_start(ap,fmt);
+  std_vsprintf(s.back().tok_text, fmt, ap);
+  va_end(ap);
+  return s.back();
+};
 
 }; // moot_END_NAMESPACE

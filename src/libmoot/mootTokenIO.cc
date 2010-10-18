@@ -94,6 +94,7 @@ int TokenIO::parse_format_string(const std::string &fmtString)
       else if (s=="pruned") flag = tiofPruned;
       else if (s=="location" || s=="loc") flag =tiofLocation;
       else if (s=="cost") flag =tiofCost;
+      else if (s=="trace") flag =tiofTrace;
       //-- aliases
       else if (s=="rare" || s=="r") flag = tiofRare;
       else if (s=="mediumrare" || s=="mr") flag = tiofMediumRare;
@@ -219,6 +220,7 @@ std::string TokenIO::format_canonical_string(int fmt)
   if (fmt & tiofTagged) s.append("Tagged,");
   if (fmt & tiofLocation) s.append("Location,");
   if (fmt & tiofCost) s.append("Cost,");
+  if (fmt & tiofTrace) s.append("Trace,");
   if (fmt & tiofPruned) s.append("Pruned,");
   if (fmt & tiofUser) s.append("User,");
 

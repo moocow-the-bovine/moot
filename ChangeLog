@@ -1,5 +1,10 @@
 ChangeLog for package moot
 
+v2.0.8-5 Mon, 18 Oct 2010 15:20:29 +0200
+	+ added mootHMM::tag_dump_trace()
+	  - replaces mootHMM::viterbi_txtdump()
+	  - implicitly called by tag_io() if writer has the new 'tiofTrace' flag set
+	  - output as formatted comments
 v2.0.8-4 2010-09-14 14:20:34
 	+ mootTokenLexer.ll: allow literal '[' in analysis details (for literal-text pseudo-tags, e.g. dynhmm)
 v2.0.8-3 Mon, 12 Apr 2010 10:02:34 +0200

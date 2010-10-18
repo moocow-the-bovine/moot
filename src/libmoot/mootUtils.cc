@@ -36,7 +36,8 @@
 
 /*-- gnulib stuff --*/
 extern "C" {
-  /*#include "memrchr.h"*/ //-- chokes on CentOS 5.4 ~ RHEL
+  /*#include "memrchr.h"*/   //-- chokes on CentOS 5.4 ~ RHEL
+  /*#include "vasprintf.h"*/ //-- chokes on CentOS 5.4 ~ RHEL
 }
 
 #include <mootUtils.h>
@@ -154,6 +155,20 @@ void moot_strtok(const std::string &s,
       out.back().assign(s,beg,end-beg);
     }
 }
+
+/*----------------------------------------------------------------------
+ * String Utilities: printf
+ */
+int std_vsprintf(std::string &s, const char *fmt, va_list &ap)
+{
+  char *obuf = NULL;
+  int len = 0;
+  len = vasprintf(&obuf, fmt, ap);
+  s.append(obuf, len);
+  if (obuf) free(obuf);
+  return len;
+}
+
 
 
 /*--------------------------------------------------------------------

@@ -194,9 +194,6 @@ void GetMyOptions(int argc, char **argv)
 #endif
   hmmp->save_ambiguities = args.save_ambiguities_given;
   hmmp->save_mark_unknown = args.mark_unknown_given;
-#ifdef MOOT_DEBUG_ENABLED
-  hmmp->save_dump_trellis = args.save_ambiguities_given;
-#endif
 
   // -- assign "verbose" flag
   hmmp->ndots = args.dots_arg;

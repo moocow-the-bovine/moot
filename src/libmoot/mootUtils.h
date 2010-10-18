@@ -206,6 +206,29 @@ namespace moot {
     moot_strtok(s,delim,slist);
     return slist;
   };
+
+  /** Stupid wrapper for append+printf() onto C++ strings.
+   *
+   * @param s sink string
+   * @param fmt printf format
+   * @param ap printf args
+   */
+  int std_vsprintf(std::string &s, const char *fmt, va_list &ap);
+
+  /** Stupid wrapper for append+printf() onto C++ strings.
+   *
+   * @param s sink string
+   * @param fmt printf format
+   * @param ap printf args
+   */
+  inline int std_sprintf(std::string &s, const char *fmt, ...)
+  {
+      va_list ap;
+      va_start(ap,fmt);
+      int rc = std_vsprintf(s,fmt,ap);
+      va_end(ap);
+      return rc;
+  };
   //@}
 
   /*----------------------------------------------------------------------*/

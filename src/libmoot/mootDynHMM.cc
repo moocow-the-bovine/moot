@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2010 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -58,7 +58,10 @@ void mootDynHMM::tag_io(TokenReader *reader, TokenWriter *writer)
     sent = reader->sentence();
     if (!sent) continue;
     this->tag_sentence(*sent);
-    if (writer) writer->put_sentence(*sent);
+    if (writer) {
+      if ((writer->tw_format & tiofTrace)) this->tag_dump_trace(*sent);
+      writer->put_sentence(*sent);
+    }
   }
 }
 

@@ -359,7 +359,7 @@ public:
     ViterbiRow    *rows;     ///< Column rows
     ViterbiColumn *col_prev; ///< Previous column
     ProbT          bbestpr;  ///< Best probability in column for beam search
-    ProbT          bpprmin;  ///< Best previous probability for beam search
+    ProbT          bpprmin;  ///< Minimum previous probability for beam search
   };
 
   /**
@@ -416,11 +416,6 @@ public:
    * Mark unknown tokens with a single analysis '*' on tag_mark_best()
    */
   bool save_mark_unknown;
-
-  /**
-   * Save Viterbi trellis on tag_sentence()
-   */
-  bool save_dump_trellis;
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -590,7 +585,6 @@ public:
       save_ambiguities(false),
       save_flavors(false),
       save_mark_unknown(false),
-      save_dump_trellis(false),
       hash_ngrams(false),
       relax(true),
       use_lex_classes(true),
@@ -797,11 +791,10 @@ public:
       if (!sent) continue;
       tag_sentence(*sent);
 
-#ifdef MOOT_DEBUG_ENABLED
-      if (save_dump_trellis) viterbi_txtdump(writer, sent->size()+1);
-#endif
-
-      if (writer) writer->put_sentence(*sent);
+      if (writer) {
+	if ((writer->tw_format & tiofTrace)) tag_dump_trace(*sent);
+	writer->put_sentence(*sent);
+      }
     }
   };
 
@@ -979,6 +972,13 @@ public:
    * \li called \c viterbi_finish() to push the boundary tag onto the Viterbi trellis.
    */
   void tag_mark_best(mootSentence &sentence);
+
+  /**
+   * Mid-level tagging interface: dump verbose trace to \c sentence (destructive).
+   * Calling this method will add verbose trace information as comments to \c sentence.
+   * Same caveats as for tag_mark_best().
+   */
+  void tag_dump_trace(mootSentence &sentence);
   //@}
 
 
@@ -1530,10 +1530,14 @@ public:
   /** Debugging method: dump basic HMM contents to a text file. */
   void txtdump(FILE *file, bool dump_constants=true, bool dump_lexprobs=true, bool dump_classprobs=true, bool dump_suftrie=true, bool dump_ngprobs=true);
 
-  /** Debugging method: dump entire Viterbi trellis to a text file */
+  /** Debugging method: dump entire Viterbi trellis to a text file
+   *  \deprecated in favor of viterbi_dump_trace()
+   */
   void viterbi_txtdump(TokenWriter *w, int ncols=0);
 
-  /** Debugging method: dump single Viterbi column to a text file */
+  /** Debugging method: dump single Viterbi column to a text file
+   *  \deprecated in favor of viterbi_dump_trace()
+   */
   void viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, int colnum=0);
   //@}
 };
