@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 ##----------------------------------------------------------------------
 ## Configuration
 ##----------------------------------------------------------------------
-our $moot_min_version = "2.0.7";
+our $moot_min_version = "2.0.8";
 if (system("pkg-config --atleast-version=$moot_min_version moot") != 0) {
   die("Required module moot >= v$moot_min_version not found!\n");
 }
@@ -36,7 +36,7 @@ WriteMakefile
    AUTHOR       => 'Bryan Jurish <moocow@ling.uni-potsdam.de>',
    ABSTRACT	=> 'Perl interface to libmoot part-of-speech tagging library',
    #VERSION_FROM => 'moot.pm',
-   VERSION      => '0.02',
+   VERSION      => '0.03',
 
 
    ##-- user variables
