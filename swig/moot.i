@@ -19,7 +19,7 @@ using namespace mootio;
 extern const char * const PACKAGE_VERSION;
 %ignore VERSION;
 %rename(VERSION) mootWrapVersion;
-#define mootWrapVersion "0.02"
+#define mootWrapVersion "0.03"
 
 /*-- wrappers --*/
 %include "Types.i"

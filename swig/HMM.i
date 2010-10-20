@@ -118,11 +118,6 @@ public:
    * Mark unknown tokens with a single analysis '*' on tag_mark_best()
    */
   bool save_mark_unknown;
-
-  /**
-   * Save Viterbi trellis on tag_sentence()
-   */
-  bool save_dump_trellis;
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -291,7 +286,18 @@ public:
   virtual void tag_io(TokenReader *reader, TokenWriter *writer);
   virtual void tag_sentence(Sentence &sentence);
   //...
+
+  //------------------------------------------------------------
+  // Tagging: Mid-Level
+  /**
+   * Mid-level tagging interface: dump verbose trace to \c sentence (destructive).
+   * Calling this method will add verbose trace information as comments to \c sentence.
+   * Same caveats as for tag_mark_best().
+   */
+  void tag_dump_trace(mootSentence &sentence);
+  //...
   //@}
+
 
   //------------------------------------------------------------
   // Low-level: ID Lookup

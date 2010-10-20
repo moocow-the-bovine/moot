@@ -569,8 +569,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *swig_save_flavors_set = *mootc::HMM_save_flavors_set;
 *swig_save_mark_unknown_get = *mootc::HMM_save_mark_unknown_get;
 *swig_save_mark_unknown_set = *mootc::HMM_save_mark_unknown_set;
-*swig_save_dump_trellis_get = *mootc::HMM_save_dump_trellis_get;
-*swig_save_dump_trellis_set = *mootc::HMM_save_dump_trellis_set;
 *swig_hash_ngrams_get = *mootc::HMM_hash_ngrams_get;
 *swig_hash_ngrams_set = *mootc::HMM_hash_ngrams_set;
 *swig_relax_get = *mootc::HMM_relax_get;
@@ -652,6 +650,7 @@ sub DESTROY {
 *set_ngram_prob = *mootc::HMM_set_ngram_prob;
 *tag_io = *mootc::HMM_tag_io;
 *tag_sentence = *mootc::HMM_tag_sentence;
+*tag_dump_trace = *mootc::HMM_tag_dump_trace;
 *token2id = *mootc::HMM_token2id;
 *wordp = *mootc::HMM_wordp;
 *tagp = *mootc::HMM_tagp;

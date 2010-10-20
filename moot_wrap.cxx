@@ -1470,16 +1470,17 @@ SWIG_Perl_SetModule(swig_module_info *module) {
 #define SWIGTYPE_p_float swig_types[15]
 #define SWIGTYPE_p_hash_mapT_Trigram_float_Trigram__HashFcn_Trigram__EqualFcn_t swig_types[16]
 #define SWIGTYPE_p_mootEnumT_std__string_hashT_std__string_t_equal_toT_std__string_t_t swig_types[17]
-#define SWIGTYPE_p_mootTokenFlavor swig_types[18]
-#define SWIGTYPE_p_mootTokenType swig_types[19]
-#define SWIGTYPE_p_std__listT_TokenAnalysis_t swig_types[20]
-#define SWIGTYPE_p_std__listT_Token_t swig_types[21]
-#define SWIGTYPE_p_std__pairT_unsigned_int_float_t swig_types[22]
-#define SWIGTYPE_p_std__string swig_types[23]
-#define SWIGTYPE_p_std__vectorT_AssocVectorT_mootEnumID_ProbT_t_t swig_types[24]
-#define SWIGTYPE_p_unsigned_int swig_types[25]
-static swig_type_info *swig_types[27];
-static swig_module_info swig_module = {swig_types, 26, 0, 0, 0, 0};
+#define SWIGTYPE_p_mootSentence swig_types[18]
+#define SWIGTYPE_p_mootTokenFlavor swig_types[19]
+#define SWIGTYPE_p_mootTokenType swig_types[20]
+#define SWIGTYPE_p_std__listT_TokenAnalysis_t swig_types[21]
+#define SWIGTYPE_p_std__listT_Token_t swig_types[22]
+#define SWIGTYPE_p_std__pairT_unsigned_int_float_t swig_types[23]
+#define SWIGTYPE_p_std__string swig_types[24]
+#define SWIGTYPE_p_std__vectorT_AssocVectorT_mootEnumID_ProbT_t_t swig_types[25]
+#define SWIGTYPE_p_unsigned_int swig_types[26]
+static swig_type_info *swig_types[28];
+static swig_module_info swig_module = {swig_types, 27, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -8391,71 +8392,6 @@ XS(_wrap_HMM_save_mark_unknown_get) {
 }
 
 
-XS(_wrap_HMM_save_dump_trellis_set) {
-  {
-    HMM *arg1 = (HMM *) 0 ;
-    bool arg2 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    bool val2 ;
-    int ecode2 = 0 ;
-    int argvi = 0;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: HMM_save_dump_trellis_set(self,save_dump_trellis);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_HMM, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "HMM_save_dump_trellis_set" "', argument " "1"" of type '" "HMM *""'"); 
-    }
-    arg1 = reinterpret_cast< HMM * >(argp1);
-    ecode2 = SWIG_AsVal_bool SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
-    if (!SWIG_IsOK(ecode2)) {
-      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "HMM_save_dump_trellis_set" "', argument " "2"" of type '" "bool""'");
-    } 
-    arg2 = static_cast< bool >(val2);
-    if (arg1) (arg1)->save_dump_trellis = arg2;
-    
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
-XS(_wrap_HMM_save_dump_trellis_get) {
-  {
-    HMM *arg1 = (HMM *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    int argvi = 0;
-    bool result;
-    dXSARGS;
-    
-    if ((items < 1) || (items > 1)) {
-      SWIG_croak("Usage: HMM_save_dump_trellis_get(self);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_HMM, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "HMM_save_dump_trellis_get" "', argument " "1"" of type '" "HMM *""'"); 
-    }
-    arg1 = reinterpret_cast< HMM * >(argp1);
-    result = (bool) ((arg1)->save_dump_trellis);
-    ST(argvi) = SWIG_From_bool  SWIG_PERL_CALL_ARGS_1(static_cast< bool >(result)); argvi++ ;
-    
-    XSRETURN(argvi);
-  fail:
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_HMM_hash_ngrams_set) {
   {
     HMM *arg1 = (HMM *) 0 ;
@@ -11576,6 +11512,46 @@ XS(_wrap_HMM_tag_sentence) {
     }
     arg2 = reinterpret_cast< Sentence * >(argp2);
     (arg1)->tag_sentence(*arg2);
+    
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_HMM_tag_dump_trace) {
+  {
+    HMM *arg1 = (HMM *) 0 ;
+    mootSentence *arg2 = 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: HMM_tag_dump_trace(self,sentence);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_HMM, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "HMM_tag_dump_trace" "', argument " "1"" of type '" "HMM *""'"); 
+    }
+    arg1 = reinterpret_cast< HMM * >(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2, SWIGTYPE_p_mootSentence,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "HMM_tag_dump_trace" "', argument " "2"" of type '" "mootSentence &""'"); 
+    }
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "HMM_tag_dump_trace" "', argument " "2"" of type '" "mootSentence &""'"); 
+    }
+    arg2 = reinterpret_cast< mootSentence * >(argp2);
+    (arg1)->tag_dump_trace(*arg2);
     
     
     
@@ -15789,6 +15765,7 @@ static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_float = {"_p_float", "ProbT *|float *|NgramCount *|LexfreqCount *|CountT *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_hash_mapT_Trigram_float_Trigram__HashFcn_Trigram__EqualFcn_t = {"_p_hash_mapT_Trigram_float_Trigram__HashFcn_Trigram__EqualFcn_t", "HMMNgramProbHash *|hash_map< Trigram,float,Trigram::HashFcn,Trigram::EqualFcn > *|hash_map< Trigram,ProbT,Trigram::HashFcn,Trigram::EqualFcn > *", 0, 0, (void*)"moot::HMMNgramProbHash", 0};
 static swig_type_info _swigt__p_mootEnumT_std__string_hashT_std__string_t_equal_toT_std__string_t_t = {"_p_mootEnumT_std__string_hashT_std__string_t_equal_toT_std__string_t_t", "mootEnum< std::string,hash< std::string >,equal_to< std::string > > *|TokIDEnum *|TagIDEnum *|mootEnum< std::string > *", 0, 0, (void*)"moot::StringEnum", 0};
+static swig_type_info _swigt__p_mootSentence = {"_p_mootSentence", "mootSentence *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mootTokenFlavor = {"_p_mootTokenFlavor", "enum mootTokenFlavor *|mootTokenFlavor *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mootTokenType = {"_p_mootTokenType", "enum mootTokenType *|mootTokenType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__listT_TokenAnalysis_t = {"_p_std__listT_TokenAnalysis_t", "TokenAnalyses *|std::list< TokenAnalysis > *", 0, 0, (void*)"moot::TokenAnalyses", 0};
@@ -15817,6 +15794,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_float,
   &_swigt__p_hash_mapT_Trigram_float_Trigram__HashFcn_Trigram__EqualFcn_t,
   &_swigt__p_mootEnumT_std__string_hashT_std__string_t_equal_toT_std__string_t_t,
+  &_swigt__p_mootSentence,
   &_swigt__p_mootTokenFlavor,
   &_swigt__p_mootTokenType,
   &_swigt__p_std__listT_TokenAnalysis_t,
@@ -15845,6 +15823,7 @@ static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0,
 static swig_cast_info _swigc__p_float[] = {  {&_swigt__p_float, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_hash_mapT_Trigram_float_Trigram__HashFcn_Trigram__EqualFcn_t[] = {  {&_swigt__p_hash_mapT_Trigram_float_Trigram__HashFcn_Trigram__EqualFcn_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mootEnumT_std__string_hashT_std__string_t_equal_toT_std__string_t_t[] = {  {&_swigt__p_mootEnumT_std__string_hashT_std__string_t_equal_toT_std__string_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_mootSentence[] = {  {&_swigt__p_mootSentence, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mootTokenFlavor[] = {  {&_swigt__p_mootTokenFlavor, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mootTokenType[] = {  {&_swigt__p_mootTokenType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__listT_TokenAnalysis_t[] = {  {&_swigt__p_std__listT_TokenAnalysis_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -15873,6 +15852,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_float,
   _swigc__p_hash_mapT_Trigram_float_Trigram__HashFcn_Trigram__EqualFcn_t,
   _swigc__p_mootEnumT_std__string_hashT_std__string_t_equal_toT_std__string_t_t,
+  _swigc__p_mootSentence,
   _swigc__p_mootTokenFlavor,
   _swigc__p_mootTokenType,
   _swigc__p_std__listT_TokenAnalysis_t,
@@ -16031,8 +16011,6 @@ static swig_command_info swig_commands[] = {
 {"mootc::HMM_save_flavors_get", _wrap_HMM_save_flavors_get},
 {"mootc::HMM_save_mark_unknown_set", _wrap_HMM_save_mark_unknown_set},
 {"mootc::HMM_save_mark_unknown_get", _wrap_HMM_save_mark_unknown_get},
-{"mootc::HMM_save_dump_trellis_set", _wrap_HMM_save_dump_trellis_set},
-{"mootc::HMM_save_dump_trellis_get", _wrap_HMM_save_dump_trellis_get},
 {"mootc::HMM_hash_ngrams_set", _wrap_HMM_hash_ngrams_set},
 {"mootc::HMM_hash_ngrams_get", _wrap_HMM_hash_ngrams_get},
 {"mootc::HMM_relax_set", _wrap_HMM_relax_set},
@@ -16099,6 +16077,7 @@ static swig_command_info swig_commands[] = {
 {"mootc::HMM_set_ngram_prob", _wrap_HMM_set_ngram_prob},
 {"mootc::HMM_tag_io", _wrap_HMM_tag_io},
 {"mootc::HMM_tag_sentence", _wrap_HMM_tag_sentence},
+{"mootc::HMM_tag_dump_trace", _wrap_HMM_tag_dump_trace},
 {"mootc::HMM_token2id", _wrap_HMM_token2id},
 {"mootc::HMM_wordp", _wrap_HMM_wordp},
 {"mootc::HMM_tagp", _wrap_HMM_tagp},
@@ -16456,7 +16435,7 @@ XS(SWIG_init) {
   
   /*@SWIG:/usr/share/swig1.3/perl5/perltypemaps.swg,64,%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "VERSION", TRUE | 0x2 | GV_ADDMULTI);
-    sv_setsv(sv, SWIG_FromCharPtr("0.02"));
+    sv_setsv(sv, SWIG_FromCharPtr("0.03"));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig1.3/perl5/perltypemaps.swg,64,%set_constant@*/ do {
