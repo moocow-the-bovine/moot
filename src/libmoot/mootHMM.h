@@ -137,7 +137,6 @@ public:
     vlEverything  /**< Report everything we can */
   } VerbosityLevel;
 
-
   /** Type for a tag-identifier. Zero indicates an unknown tag. */
   typedef mootEnumID TagID;
 

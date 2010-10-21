@@ -1430,7 +1430,17 @@ void mootHMM::tag_dump_trace(mootSentence &sentence)
 			       vrow->tagid,  tagids.id2name(vrow->tagid).c_str(),
 			       vrow->wprob, vnod->lprob
 			       );
-	;
+
+	//-- iteratate: tag ids (next tags)
+	for (TagID nxtid=0; nxtid < tagids.size(); nxtid++) {
+	  ProbT vnxtpr = tagp(vnod->ptagid, vrow->tagid, nxtid);
+	  sentence_printf_append(s, TokTypeComment, "moot:trace\t  NEXT %d:%s\t%d:%s\t%d:%s\tntxtprob=%g",
+				 vnod->ptagid, tagids.id2name(vnod->ptagid).c_str(),
+				 vrow->tagid,  tagids.id2name(vrow->tagid).c_str(),
+				 nxtid,        tagids.id2name(nxtid).c_str(),
+				 vnxtpr
+				 );
+	}
       }
     }
 
