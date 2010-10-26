@@ -54,9 +54,12 @@ linetag: linetag.o $(STATICLIBS)
 hmm+exit: hmm+exit.o $(STATICLIBS)
 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 
+toklex: toklex.o $(STATICLIBS)
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+
 ##-- patterns: default
 .DEFAULT:
-	$(LD) $(LDFLAGS) -o $@ $^ $(STATIC_LIBS) $(LIBS)
+	$(LD) $(LDFLAGS) -o $@ $^ $(STATICLIBS) $(LIBS)
 
 %: %.o $(STATICLIBS)
-	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(LD) $(LDFLAGS) -o $@ $^ $(STATICLIBS) $(LIBS)

@@ -13,6 +13,7 @@ const bool dump_analyses = true;
 using namespace moot;
 
 void churntest(int argc, char **argv) {
+  int argi;
   FILE *infile = stdin;
     //-- init
     mootTokenLexer lexer;
@@ -26,12 +27,12 @@ void churntest(int argc, char **argv) {
     lexer.parse_analysis_cost = true;
     lexer.analysis_cost_details = false;
 
-  for ( ; argc > 0 ; argc--, argv++) {
+  for (argi=0 ; argi < argc ; argi++) {
     //-- open
-    if (*argv) {
-      infile = fopen(*argv, "r");
+    if (argv && argv[argi] && strcmp(argv[argi],"-") != 0) {
+      infile = fopen(argv[argi], "r");
       if (!infile) {
-	fprintf(stderr, "open failed for '%s'\n", *argv);
+	fprintf(stderr, "open failed for '%s'\n", argv[argi]);
 	exit(1);
       }
     } else {
@@ -77,6 +78,7 @@ void churntest(int argc, char **argv) {
 
 int main (int argc, char **argv)
 {
+  char *argv_null[1] = {NULL};
   fprintf(stderr, "%s (%s v%s)\n", *argv, PACKAGE_NAME, PACKAGE_VERSION);
 
   if (checkMemory) {
@@ -85,7 +87,7 @@ int main (int argc, char **argv)
   }
 
   churntest((argc > 1 ? argc-1 : 1),
-	    (argc > 1 ? argv+1 : (char**){ NULL }));
+	    (argc > 1 ? argv+1 : argv_null));
 
   return 0;
 }
