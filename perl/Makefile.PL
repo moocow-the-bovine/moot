@@ -64,12 +64,14 @@ sub MY::depend {
 		   ." Moot.xs"
 		   ." Constants.xs"
 		   ." Lexfreqs.xs"
+		   ." Ngrams.xs"
+		   ." HMM.xs"
 		  )
 		 ."\n\n"
 		 ##-- c->o dependencies
 		 ."Moot.o: Moot.c MootPerl.h\n"
 		 ."\n"
-		 ."MootPerl.o: MootPerl.h MootPerl.c\n"
+		 ."MootPerl.o: MootPerl.h MootPerl.cc\n"
 		 ."\n"
 		 ## -- more here
 		 ."\n"

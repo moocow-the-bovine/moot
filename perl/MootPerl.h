@@ -23,8 +23,20 @@ extern "C" {
  */
 //typedef moot::mootLexfreqs mootLexfreqs;
 //typedef moot::mootNgrams   mootNgrams;
+typedef moot::mootHMM::TagID   TagID;
+typedef moot::mootHMM::TagID   TokID;
+typedef moot::mootHMM::ClassID ClassID;
 
 /*======================================================================
  * Constants
  */
 extern const char *moot_version_string;
+
+/*======================================================================
+ * Conversions
+ */
+HV*           token2hv(const mootToken *tok);
+mootToken    *hv2token(HV *hv, mootToken *tok=NULL);
+
+AV*           sentence2av(const mootSentence *s);
+mootSentence *av2sentence(AV *av, mootSentence *s=NULL);

@@ -15,9 +15,9 @@ require XSLoader;
 XSLoader::load('Moot', $VERSION);
 
 # Preloaded methods go here.
-#require Moot::Alphabet;
-#require Moot::Automaton;
-#require Moot::Automaton::Indexed;
+require Moot::Lexfreqs;
+require Moot::Ngrams;
+require Moot::HMM;
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
@@ -44,8 +44,7 @@ $EXPORT_TAGS{constants} = \@EXPORT_OK;
 1;
 
 __END__
-
-# Below is stub documentation for your module. You'd better edit it!
+=pod
 
 =head1 NAME
 
@@ -64,7 +63,9 @@ for Hidden Markov Model part-of-speech tagging.
 
 =head1 SEE ALSO
 
-Moot::constants(3perl),
+Moot::Constants(3perl),
+Moot::Lexfreqs(3perl),
+Moot::Ngrams(3perl),
 moot(1),
 perl(1).
 
