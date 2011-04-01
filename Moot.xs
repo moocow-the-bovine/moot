@@ -34,4 +34,5 @@ OUTPUT:
 ## Moot: submodules
 INCLUDE: Constants.xs
 INCLUDE: Lexfreqs.xs
-## INCLUDE: Ngrams.xs
+INCLUDE: Ngrams.xs
+INCLUDE: HMM.xs

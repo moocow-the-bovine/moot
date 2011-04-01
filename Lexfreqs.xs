@@ -65,24 +65,75 @@ OUTPUT:
 ##--------------------------------------------------------------
 ## add_count
 void
-add_count(mootLexfreqs *lf, char *text, char *tag, double count)
+add_count(mootLexfreqs *lf, char *word, char *tag, double count)
 CODE:
- lf->add_count(text,tag,count);
+ lf->add_count(word,tag,count);
 
 
 ##--------------------------------------------------------------
-## I/O
+## lookup: f(tag)
+CountT
+f_tag(mootLexfreqs *lf, char *tag)
+CODE:
+ RETVAL = lf->taglookup(tag);
+OUTPUT:
+ RETVAL
+
+##--------------------------------------------------------------
+## lookup: f(word)
+CountT
+f_word(mootLexfreqs *lf, char *word)
+CODE:
+ moot::mootLexfreqs::LexfreqTokTable::const_iterator lfi = lf->lftable.find(word);
+ RETVAL = (lfi==lf->lftable.end() ? 0 : lfi->second.count);
+OUTPUT:
+ RETVAL
+
+##--------------------------------------------------------------
+## lookup: f(word,tag)
+CountT
+f_word_tag(mootLexfreqs *lf, char *word, char *tag)
+CODE:
+ RETVAL = 0;
+ moot::mootLexfreqs::LexfreqTokTable::const_iterator lfi = lf->lftable.find(word);
+ if (lfi != lf->lftable.end()) {
+   moot::mootLexfreqs::LexfreqSubtable::const_iterator lsi = lfi->second.freqs.find(tag);
+   if (lsi != lfi->second.freqs.end()) RETVAL = lsi->second;
+ }
+OUTPUT:
+ RETVAL
+
+
+##--------------------------------------------------------------
+## I/O: File
 
 bool
-load(mootLexfreqs *lf, char *filename)
+loadFile(mootLexfreqs *lf, char *filename)
 CODE:
  RETVAL = lf->load(filename);
 OUTPUT:
  RETVAL
 
 bool
-save(mootLexfreqs *lf, char *filename)
+saveFile(mootLexfreqs *lf, char *filename)
 CODE:
  RETVAL = lf->save(filename);
+OUTPUT:
+ RETVAL
+
+##--------------------------------------------------------------
+## I/O: FH
+
+bool
+loadFh(mootLexfreqs *lf, FILE *f, char *filename=NULL)
+CODE:
+ RETVAL = lf->load(f,filename);
+OUTPUT:
+ RETVAL
+
+bool
+saveFh(mootLexfreqs *lf, FILE *f, char *filename=NULL)
+CODE:
+ RETVAL = lf->save(f,filename);
 OUTPUT:
  RETVAL
