@@ -128,7 +128,17 @@ Moot::HMM - libmoot : HMM
   ##=====================================================================
   ## Tagging
 
-  $sent = $hmm->tag_sentence($sent);
+  $tagged = $hmm->tag_sentence($sent);
+
+  # $tagged has same structure as $sent, e.g.:
+  $tagged = $hmm->tag_sentence([
+                                {text=>'This'},
+                                {text=>'is',    tag=>'this_will_be_overwritten'},
+                                {text=>'a'      tag=>'this_too'},
+                                {text=>'test',  analyses=>[{tag=>'N',details=>'test/N'},
+                                                           {tag=>'V',details=>'test/V',cost=>42}] },
+                                {text=>'.'      analyses=>[{tag=>'$.'}]},
+                               ]);
 
   ##=====================================================================
   ## I/O
