@@ -8,7 +8,7 @@ $TEST_DIR = './t';
 do "$TEST_DIR/common.plt"
   or die("could not load $TEST_DIR/common.plt");
 
-@modules = qw(moot);
+@modules = qw(Moot);
 plan(test => scalar(@modules));
 
 # 1--N: load submodules (1 subtest/module)
