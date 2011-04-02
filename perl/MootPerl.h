@@ -26,6 +26,8 @@ extern "C" {
 typedef moot::mootHMM::TagID   TagID;
 typedef moot::mootHMM::TagID   TokID;
 typedef moot::mootHMM::ClassID ClassID;
+typedef moot::mootTokString    TokStr;
+typedef moot::mootTagString    TagStr;
 
 /*======================================================================
  * Constants
@@ -33,10 +35,15 @@ typedef moot::mootHMM::ClassID ClassID;
 extern const char *moot_version_string;
 
 /*======================================================================
- * Conversions
+ * Conversions: copy
  */
-HV*           token2hv(const mootToken *tok);
-mootToken    *hv2token(HV *hv, mootToken *tok=NULL);
+HV*           token2hv(const mootToken *tok);        //-- copies: type,text,tag,analyses
+mootToken    *hv2token(HV *hv, mootToken *tok=NULL); //-- copies: type,text,tag,analyses,data=hv
 
 AV*           sentence2av(const mootSentence *s);
 mootSentence *av2sentence(AV *av, mootSentence *s=NULL);
+
+/*======================================================================
+ * Conversions: in-place
+ */
+void sentence2tokdata(mootSentence *s);

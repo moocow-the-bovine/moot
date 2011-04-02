@@ -3,8 +3,13 @@
 mootLexfreqs*     O_OBJECT
 mootNgrams*       O_OBJECT
 mootHMM*          O_OBJECT
+mootDynHMM*       O_OBJECT
+mootDynLexHMM*    O_OBJECT
+mootDynLexHMM_Boltzmann*  O_OBJECT
 
-mootSentence*     T_AV
+#mootSentence*     T_AV
+
+TagStr            T_CHAR
 
 LexfreqCount      T_FLOAT
 NgramCount        T_FLOAT
@@ -15,6 +20,7 @@ size_t		  T_UV
 TagID             T_UV
 TokID             T_UV
 mootEnumID        T_UV
+mootTokenType     T_UV
 
 CountT            T_DOUBLE
 ProbT             T_DOUBLE
@@ -31,7 +37,7 @@ INPUT
 #    $var.assign(cstr, SvCUR($arg));
 #  }
 
-T_CHAR
+T_BYTE
   {
       $var = *( SvPV($arg,1) );
   }
@@ -114,7 +120,7 @@ OUTPUT
 #T_std_string
 #  $arg = newSVpvn($var.data(), $var.length());
 
-T_CHAR
+T_BYTE
   {
       sv_setpvn($arg,&$var,1);
   }

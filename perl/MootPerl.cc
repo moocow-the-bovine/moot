@@ -27,10 +27,10 @@ HV* token2hv(const mootToken *tok)
       hv_stores(anhv, "tag",     newSVpvn(ai->tag.data(), ai->tag.size()));
       hv_stores(anhv, "details", newSVpvn(ai->details.data(), ai->details.size()));
       hv_stores(anhv, "cost",    newSVnv(ai->prob));
-      sv_2mortal((SV*)anhv);
-      av_push(anav, newRV_inc((SV*)anhv));
+      //sv_2mortal((SV*)anhv); //-- combine with newRV_inc() in av_push()?
+      av_push(anav, newRV_noinc((SV*)anhv));
     }
-  //sv_2mortal((SV*)anav); //-- use in combination with newRV_inc(), below (?)
+  //sv_2mortal((SV*)anav); //-- use in combination with newRV_inc() in hv_stores()?
 
   //-- token: hash
   hv_stores(hv, "type",     newSVuv(tok->tok_type));
@@ -48,6 +48,7 @@ mootToken *hv2token(HV *hv, mootToken *tok)
 {
   SV **svpp, **avrvpp;
   if (!tok) tok = new mootToken();
+  tok->tok_data = (void*)hv;
 
   if ((svpp=hv_fetchs(hv,"type",0))) tok->tok_type=(mootTokenType)SvUV(*svpp);
   if ((svpp=hv_fetchs(hv,"text",0))) tok->tok_text=SvPV_nolen(*svpp);
@@ -97,4 +98,17 @@ mootSentence *av2sentence(AV *sav, mootSentence *s)
   }
 
   return s;
+}
+
+/*======================================================================
+ * Conversions: in-place
+ */
+
+/*--------------------------------------------------------------*/
+void sentence2tokdata(mootSentence *s)
+{
+  for (mootSentence::iterator si=s->begin(); si != s->end(); si++) {
+    HV *tokhv = (HV*)si->tok_data;
+    hv_stores(tokhv, "tag", newSVpvn(si->tok_besttag.data(), si->tok_besttag.size()));
+  }
 }
