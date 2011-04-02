@@ -66,6 +66,7 @@ sub MY::depend {
 		   ." Lexfreqs.xs"
 		   ." Ngrams.xs"
 		   ." HMM.xs"
+		   ." DynHMM.xs"
 		  )
 		 ."\n\n"
 		 ##-- c->o dependencies

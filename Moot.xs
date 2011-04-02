@@ -36,3 +36,4 @@ INCLUDE: Constants.xs
 INCLUDE: Lexfreqs.xs
 INCLUDE: Ngrams.xs
 INCLUDE: HMM.xs
+INCLUDE: DynHMM.xs

@@ -15,9 +15,13 @@ require XSLoader;
 XSLoader::load('Moot', $VERSION);
 
 # Preloaded methods go here.
+require Moot::Constants;
 require Moot::Lexfreqs;
 require Moot::Ngrams;
 require Moot::HMM;
+require Moot::HMM::Dyn;
+require Moot::HMM::DynLex;
+require Moot::HMM::Boltzmann;
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
 

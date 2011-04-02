@@ -278,18 +278,15 @@ OUTPUT:
 ##=====================================================================
 
 ##--------------------------------------------------------------
-AV*
+void
 tag_sentence(mootHMM *hmm, AV* sentav)
 PREINIT:
   mootSentence *s;
 CODE:
   s = av2sentence(sentav);
   hmm->tag_sentence(*s);
-  RETVAL = sentence2av(s);
-OUTPUT:
-  RETVAL
-CLEANUP:
- if (s) delete s;
+  sentence2tokdata(s);
+  delete s;
 
 ##=====================================================================
 ## I/O

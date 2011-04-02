@@ -125,14 +125,15 @@ sub test_hmm {
   ##-- try to tag a sentence
   my @s  = qw(Dies ist ein Test .);
   print "$0: tag_sentence(", join(' ', @s), ")\n";
-  my $s0 = [map {{text=>$_}} @s];
-  my $s1 = $hmm->tag_sentence($s0);
-  print "$0: got: (", join(' ', map {"$_->{text}/$_->{tag}"} @$s1), ")\n";
+  my $s  = [map {{text=>$_}} @s];
+  $hmm->tag_sentence($s);
+  print "$0: got: (", join(' ', map {"$_->{text}/$_->{tag}:$_->{prob}"} @$s), ")\n";
 
-  if (0) {
+
+  if (1) {
     ##-- test for memory leaks: looks good
     while (1) {
-      my $s2 = $hmm->tag_sentence([@$s0]);
+      $hmm->tag_sentence([map {{text=>$_}} @s]);
     }
   }
 }
