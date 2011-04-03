@@ -3,6 +3,7 @@
 use lib qw(./blib/lib ./blib/arch);
 use IO::Handle;
 use Data::Dumper;
+use Encode qw(encode decode encode_utf8 decode_utf8);
 use Moot;
 
 ##--------------------------------------------------------------
@@ -104,6 +105,15 @@ sub hmmstats {
     );
 }
 
+sub tagit {
+  my ($hmm,$s,$utf8) = @_;
+  $s = [map {ref($_) ? $_ : {text=>$_}} @$s];
+  print "$0: tag_sentence[utf8=", ($utf8 ? 1 : 0), "]:  IN = (", join(' ', map {$_->{text}} @$s), ")\n";
+  $hmm->tag_sentence($s,$utf8);
+  print "$0: tag_sentence[utf8=", ($utf8 ? 1 : 0), "]: OUT = (", join(' ', map {"$_->{text}/$_->{tag}"} @$s), ")\n\n";
+  return $s;
+}
+
 sub test_hmm {
   my $modelfile = shift || 'negra-train';
   my ($hmm);
@@ -127,10 +137,22 @@ sub test_hmm {
   print "$0: tag_sentence(", join(' ', @s), ")\n";
   my $s  = [map {{text=>$_}} @s];
   $hmm->tag_sentence($s);
-  print "$0: got: (", join(' ', map {"$_->{text}/$_->{tag}:$_->{prob}"} @$s), ")\n";
+  print "$0: got: (", join(' ', map {"$_->{text}/$_->{tag}"} @$s), ")\n";
 
+  ##-- try utf8
+  print "::raw\n";
+  tagit($hmm, [split(/ /,"a \x{f6}de test")], 0); ##-- bad
+  tagit($hmm, [split(/ /,"a \x{f6}de test")], 1); ##-- good
+  ##
+  print "::encode_utf8(raw)\n";
+  tagit($hmm, [split(/ /,encode_utf8("a \x{f6}de test"))], 0); ##-- good
+  tagit($hmm, [split(/ /,encode_utf8("a \x{f6}de test"))], 1); ##-- bad (double-encoded)
+  ##
+  print "::decode_utf8(encode_utf8(raw))\n";
+  tagit($hmm, [split(/ /,decode_utf8(encode_utf8("a \x{f6}de test")))], 0); ##-- good
+  tagit($hmm, [split(/ /,decode_utf8(encode_utf8("a \x{f6}de test")))], 1); ##-- good
 
-  if (1) {
+  if (0) {
     ##-- test for memory leaks: looks good
     while (1) {
       $hmm->tag_sentence([map {{text=>$_}} @s]);
@@ -138,6 +160,7 @@ sub test_hmm {
   }
 }
 test_hmm(@ARGV);
+
 
 ##--------------------------------------------------------------
 ## MAIN

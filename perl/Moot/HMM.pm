@@ -134,11 +134,11 @@ Moot::HMM - libmoot : HMM
            {text=>'is',    tag=>'this_will_be_overwritten'},
            {text=>'a'      tag=>'this_too'},
            {text=>'test',  analyses=>[{tag=>'N',details=>'test/N'},
-                                      {tag=>'V',details=>'test/V',cost=>42}] },
+                                      {tag=>'V',details=>'test/V',prob=>42}] },
            {text=>'.'      analyses=>[{tag=>'$.'}]},
           );
 
-  $hmm->tag_sentence(\@sent); ##-- clobbers 'tag' key of each token
+  $hmm->tag_sentence(\@sent,$utf8=1); ##-- clobbers 'tag' key of each token
 
 
   ##=====================================================================

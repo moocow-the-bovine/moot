@@ -37,13 +37,13 @@ extern const char *moot_version_string;
 /*======================================================================
  * Conversions: copy
  */
-HV*           token2hv(const mootToken *tok);        //-- copies: type,text,tag,analyses
-mootToken    *hv2token(HV *hv, mootToken *tok=NULL); //-- copies: type,text,tag,analyses,data=hv
+HV*           token2hv(const mootToken *tok, U32 utf8=TRUE);        //-- copies: type,text,tag,analyses
+mootToken    *hv2token(HV *hv, mootToken *tok=NULL, U32 utf8=TRUE); //-- copies: type,text,tag,analyses,data=hv
 
-AV*           sentence2av(const mootSentence *s);
-mootSentence *av2sentence(AV *av, mootSentence *s=NULL);
+AV*           sentence2av(const mootSentence *s, U32 utf8=TRUE);
+mootSentence *av2sentence(AV *av, mootSentence *s=NULL, U32 utf8=TRUE);
 
 /*======================================================================
  * Conversions: in-place
  */
-void sentence2tokdata(mootSentence *s);
+void sentence2tokdata(mootSentence *s, U32 utf8=TRUE);
