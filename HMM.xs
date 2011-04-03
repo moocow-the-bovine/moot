@@ -279,13 +279,13 @@ OUTPUT:
 
 ##--------------------------------------------------------------
 void
-tag_sentence(mootHMM *hmm, AV* sentav)
+tag_sentence(mootHMM *hmm, AV* sentav, bool utf8=TRUE)
 PREINIT:
   mootSentence *s;
 CODE:
-  s = av2sentence(sentav);
+  s = av2sentence(sentav, NULL, utf8);
   hmm->tag_sentence(*s);
-  sentence2tokdata(s);
+  sentence2tokdata(s, utf8);
   delete s;
 
 ##=====================================================================
