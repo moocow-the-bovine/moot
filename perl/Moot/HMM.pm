@@ -42,6 +42,7 @@ sub config {
 
 BEGIN {
   *loadModel = \&load;
+  *load_model = \&_load_model;
 }
 
 sub load {

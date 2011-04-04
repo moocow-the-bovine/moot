@@ -211,6 +211,30 @@ OUTPUT:
  RETVAL
 
 ##------------------------------------------------------
+size_t n_tags(mootHMM *hmm, ...)
+CODE:
+ if (items>1) hmm->n_tags=SvUV(ST(1));
+ RETVAL = hmm->n_tags;
+OUTPUT:
+ RETVAL
+
+##------------------------------------------------------
+size_t n_toks(mootHMM *hmm, ...)
+CODE:
+ if (items>1) hmm->n_toks=SvUV(ST(1));
+ RETVAL = hmm->n_toks;
+OUTPUT:
+ RETVAL
+
+##------------------------------------------------------
+size_t n_classes(mootHMM *hmm, ...)
+CODE:
+ if (items>1) hmm->n_classes=SvUV(ST(1));
+ RETVAL = hmm->n_classes;
+OUTPUT:
+ RETVAL
+
+##------------------------------------------------------
 size_t
 nsents(mootHMM *hmm, ...)
 CODE:
