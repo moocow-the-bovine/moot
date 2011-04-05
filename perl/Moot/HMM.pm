@@ -139,7 +139,7 @@ Moot::HMM - libmoot : HMM
            {text=>'.'      analyses=>[{tag=>'$.'}]},
           );
 
-  $hmm->tag_sentence(\@sent,$utf8=1); ##-- clobbers 'tag' key of each token
+  $hmm->tag(\@sent,$utf8=1);  ##-- clobbers 'tag' key of each token hash
 
 
   ##=====================================================================
