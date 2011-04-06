@@ -6,11 +6,31 @@
 /*======================================================================
  * macros
  */
-#define sv2stdstring(sv,str,utf8) \
+#if defined(SvPVutf8_nolen)
+# define sv2stdstring(sv,str,utf8) \
   str = ((utf8) ? SvPVutf8_nolen(sv) : SvPV_nolen(sv))
+#else
+  static inline
+  void sv2stdstring(SV *sv, std::string &str, U32 utf8)
+  {
+    STRLEN len;
+    char *pv = sv_2pvutf8(sv, &len);
+    str.assign(pv,len);
+  }
+#endif /* defined(SvPVutf8_nolen) */
 
-#define stdstring2sv(str,utf8) \
+#if defined(newSVpvn_utf8)
+# define stdstring2sv(str,utf8) \
   newSVpvn_utf8((str).data(), (str).size(), utf8)
+#else
+ static inline
+ SV* stdstring2sv(const std::string &str, U32 utf8)
+ {
+   SV *sv = newSVpvn(str.data(), str.size());
+   SvUTF8_on(sv);
+   return sv;
+ }
+#endif /* defined(newSVpvn_utf8) */
 
 /*======================================================================
  * Constants
