@@ -76,3 +76,44 @@ CODE:
  RETVAL=moot::TokTypeUser;
 OUTPUT:
  RETVAL
+
+
+##--------------------------------------------------------------
+## mootHMM.h : mootHMM::verbosityLevel
+
+int
+vlSilent()
+CODE:
+ RETVAL = moot::mootHMM::vlSilent;
+OUTPUT:
+ RETVAL
+
+int
+vlErrors()
+CODE:
+ RETVAL = moot::mootHMM::vlErrors;
+OUTPUT:
+ RETVAL
+
+int
+vlWarnings()
+CODE:
+ RETVAL = moot::mootHMM::vlWarnings;
+OUTPUT:
+ RETVAL
+
+int
+vlProgress()
+CODE:
+ RETVAL = moot::mootHMM::vlProgress;
+OUTPUT:
+ RETVAL
+
+int
+vlEverything()
+CODE:
+ RETVAL = moot::mootHMM::vlEverything;
+OUTPUT:
+ RETVAL
+
+

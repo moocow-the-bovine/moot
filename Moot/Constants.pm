@@ -20,6 +20,18 @@ BEGIN {
   @TokType[values %TokType] = keys %TokType;
 }
 
+our (%vlevel,@vlevel);
+BEGIN {
+  %vlevel = (
+	     'silent' => vlSilent(),
+	     'errors' => vlErrors(),
+	     'warnings'  => vlWarnings(),
+	     'progress'  => vlProgress(),
+	     'everything' => vlEverything(),
+	    );
+  @vlevel[values %vlevel] = keys %vlevel;
+}
+
 
 
 1; ##-- be happy
@@ -53,6 +65,17 @@ Moot::Constants - libmoot : constants
 
   ##-- Token Types: names by index
   $name = $Moot::TokType[$i];
+
+  ##-- verbosity levels: indices by name
+  $i = Moot::vlSilent();        ##-- alias: $Moot::vlevel{silent}
+  $i = Moot::vlErrors();        ##-- alias: $Moot::vlevel{errors}
+  $i = Moot::vlWarnings();      ##-- alias: $Moot::vlevel{warnings}
+  $i = Moot::vlProgress();      ##-- alias: $Moot::vlevel{progress}
+  $i = Moot::vlEverything();    ##-- alias: $Moot::vlevel{everything}
+
+  ##-- verbosity levels: names by index
+  $name = $Moot::vlevel[$i];
+
 
 =head1 DESCRIPTION
 
