@@ -1,0 +1,10 @@
+footer.rpod
+MANIFEST.SKIP
+testme.perl
+\.123$
+\.lex$
+\.clx$
+~$
+\.svn
+\.old
+Makefile
