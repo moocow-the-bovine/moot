@@ -835,6 +835,10 @@ bool mootHMM::estimate_lambdas(const mootNgrams &ngrams)
   nglambda2 /= nglambda_total;
   nglambda1 /= nglambda_total;
 
+  //-- sanity check
+  if (nglambda3==0 && nglambda2==0 && nglambda1==0)
+    nglambda1 = 1.0;
+
   return true;
 }
 
