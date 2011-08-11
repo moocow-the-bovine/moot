@@ -50,7 +50,7 @@ moot_BEGIN_NAMESPACE
 /*----------------------------------------------------------------------
  * Information
  *----------------------------------------------------------------------*/
-size_t mootNgrams::n_bigrams(void)
+size_t mootNgrams::n_bigrams(void) const
 {
   size_t n = 0;
   for (NgramTable::const_iterator ngi1 = ngtable.begin(); ngi1 != ngtable.end(); ngi1++)
@@ -60,7 +60,7 @@ size_t mootNgrams::n_bigrams(void)
   return n;
 }
 
-size_t mootNgrams::n_trigrams(void)
+size_t mootNgrams::n_trigrams(void) const
 {
   size_t n = 0;
   for (NgramTable::const_iterator ngi1 = ngtable.begin(); ngi1 != ngtable.end(); ngi1++)

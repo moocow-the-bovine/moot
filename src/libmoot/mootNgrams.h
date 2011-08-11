@@ -167,10 +167,10 @@ public:
   { return ngtable.size(); };
 
   /** Return the number of distinct stored bigrams */
-  size_t n_bigrams(void);
+  size_t n_bigrams(void) const;
 
   /** Return the number of distinct stored trigrams */
-  size_t n_trigrams(void);
+  size_t n_trigrams(void) const;
 
 
   //------ public methods: counting

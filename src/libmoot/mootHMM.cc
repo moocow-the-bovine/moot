@@ -771,73 +771,104 @@ bool mootHMM::estimate_lambdas(const mootNgrams &ngrams)
   ProbT   f_t12;                      //-- previous bigram   count: f(t1,t2)
   ProbT   f_t3;                       //-- current  unigram  count: f(t3)
   ProbT   f_t2;                       //-- previous unigram  count: f(t2)
+  ProbT   f_t1;                       //-- pprevious unigram count: f(t1)
   ProbT   f_N;                        //-- corpus size (unigram total)
 
-  ProbT ngp123;  //-- adjusted trigram probability : (f(t1,t2,t3) - 1) / (f(t1,t2)    - 1)
-  ProbT ngp23;   //-- adjusted bigram probability  : (f(t2,t3)    - 1) / (f(t2)       - 1)
-  ProbT ngp3;    //-- adjusted unigram probability : (f(t3)       - 1) / (corpus_size - 1)
+  ProbT ngp123;  //-- 3grams: adjusted trigram probability : (f(t1,t2,t3) - 1) / (f(t1,t2)    - 1)
+  ProbT ngp23;   //-- 3grams: adjusted bigram probability  : (f(t2,t3)    - 1) / (f(t2)       - 1)
+  ProbT ngp3;    //-- 3grams: adjusted unigram probability : (f(t3)       - 1) / (corpus_size - 1)
+
+  ProbT ngp12;   //-- 2grams: adjusted bigram probability  : (f(t1,t2)    - 1) / (f(t1)       - 1)
+  ProbT ngp2;    //-- 2grams: adjusted unigram probability : (f(t2)       - 1) / (corpus_size - 1)
 
   //-- initialize
   //f_N       = ngrams.ugtotal;
   f_N       = ngrams.ugtotal - ngrams.lookup(tagids.id2name(start_tagid));
-
+  if (f_N <= 0) f_N = 1.0; //-- sanitize
   nglambda1 = 0.0;
   nglambda2 = 0.0;
   nglambda3 = 0.0;
 
-  //-- adjust lambdas
+  //---- get best-guess counts: (n>=1)-grams
   for (mootNgrams::NgramTable::const_iterator ngi1 = ngrams.ngtable.begin();
        ngi1 != ngrams.ngtable.end();
        ngi1++)
     {
-      for (mootNgrams::BigramTable::const_iterator ngi2 = ngi1->second.freqs.begin();
-	   ngi2 != ngi1->second.freqs.end();
-	   ngi2++)
-	{
-	  //-- previous bigram count: f(t1,t2)
-	  f_t12 = ngi2->second.count;
+      f_t1 = ngi1->second.count;
 
-	  //-- previous unigram count : f(t2)
-	  f_t2 = ngrams.lookup(ngi2->first);
+      if (ngi1->second.freqs.empty()) {
+	//---- best-guess counts: 1-gram only
+	nglambda1 += f_t1;
+      }
+      else {
+	//---- get best-guess counts: (n>=2)-grams
+	for (mootNgrams::BigramTable::const_iterator ngi2 = ngi1->second.freqs.begin();
+	     ngi2 != ngi1->second.freqs.end();
+	     ngi2++)
+	  {
+	    //-- previous bigram count: f(t1,t2)
+	    f_t12 = ngi2->second.count;
 
-	  for (mootNgrams::TrigramTable::const_iterator ngi3 = ngi2->second.freqs.begin();
-	       ngi3 != ngi2->second.freqs.end();
-	       ngi3++)
-	    {
-	      //-- current trigram count : f(t1,t2,t3)
-	      f_t123 = ngi3->second;
+	    //-- previous unigram count : f(t2)
+	    f_t2 = ngrams.lookup(ngi2->first);
 
-	      //-- current bigram count : f(t2,t3)
-	      f_t23 = ngrams.lookup(ngi2->first,ngi3->first);
-
-	      //-- current unigram count : f(t3)
-	      f_t3 = ngrams.lookup(ngi3->first);
+	    if (ngi2->second.freqs.empty()) {
+	      //---- best-guess counts: 1- and 2-grams only
 
 	      //-- compute adjusted probabilities
-	      ngp123 =  f_t12 == 1  ?  0  : (f_t123 - 1.0) / (f_t12 - 1.0);
-	      ngp23  =  f_t2  == 1  ?  0  : (f_t23  - 1.0) / (f_t2  - 1.0);
-	      ngp3   =  f_N   == 1  ?  0  : (f_t3   - 1.0) / (f_N   - 1.0);
+	      ngp12  =  f_t1  == 1  ?  0  : (f_t12  - 1.0) / (f_t1  - 1.0);
+	      ngp2   =  f_N   == 1  ?  0  : (f_t2   - 1.0) / (f_N   - 1.0);
 
 	      //-- adjust lambdas
-	      if (ngp123 >= ngp23  && ngp123 >= ngp3)
-		nglambda3 += f_t123;
-	      else if (ngp23  >= ngp123 && ngp23  >= ngp3)
-		nglambda2 += f_t123;
+	      if (ngp12 >= ngp2)
+		nglambda2 += f_t12;
 	      else
-		nglambda1 += f_t123;
+		nglambda1 += f_t12;
 	    }
-	}
+	    else {
+	      //---- best-guess counts: 1-, 2-, and 3-grams
+	      for (mootNgrams::TrigramTable::const_iterator ngi3 = ngi2->second.freqs.begin();
+		   ngi3 != ngi2->second.freqs.end();
+		   ngi3++)
+		{
+		  //-- current trigram count : f(t1,t2,t3)
+		  f_t123 = ngi3->second;
+
+		  //-- current bigram count : f(t2,t3)
+		  f_t23 = ngrams.lookup(ngi2->first,ngi3->first);
+
+		  //-- current unigram count : f(t3)
+		  f_t3 = ngrams.lookup(ngi3->first);
+
+		  //-- compute adjusted probabilities
+		  ngp123 =  f_t12 == 1  ?  0  : (f_t123 - 1.0) / (f_t12 - 1.0);
+		  ngp23  =  f_t2  == 1  ?  0  : (f_t23  - 1.0) / (f_t2  - 1.0);
+		  ngp3   =  f_N   == 1  ?  0  : (f_t3   - 1.0) / (f_N   - 1.0);
+
+		  //-- adjust lambdas
+		  if (ngp123 >= ngp23  && ngp123 >= ngp3)
+		    nglambda3 += f_t123;
+		  else if (ngp23  >= ngp123 && ngp23  >= ngp3)
+		    nglambda2 += f_t123;
+		  else
+		    nglambda1 += f_t123;
+		}
+	    }
+	  }
+      }
     }
+
+  //-- sanity check
+  if (nglambda3==0 && nglambda2==0 && nglambda1==0) {
+    carp("mootHMM::estimate_lambdas(): WARNING: all pre-normalization smoothing counts are zero; using uniform distribution.\n");
+    nglambda1 = nglambda2 = nglambda3 = 1.0;
+  }
 
   //-- normalize lambdas
   ProbT nglambda_total = nglambda1 + nglambda2 + nglambda3;
   nglambda3 /= nglambda_total;
   nglambda2 /= nglambda_total;
   nglambda1 /= nglambda_total;
-
-  //-- sanity check
-  if (nglambda3==0 && nglambda2==0 && nglambda1==0)
-    nglambda1 = 1.0;
 
   return true;
 }
