@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2011 by Bryan Jurish <jurish@uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -42,13 +42,13 @@ namespace mootBinIO {
   class HeaderInfo {
   public:
     /** Typedef for a version component */
-    typedef unsigned int VersionT;
+    typedef BinUInt VersionT;
     
     /** Typedef for a "magic number" component */
-    typedef unsigned int MagicT;
+    typedef BinUInt MagicT;
     
     /** Typedef for a generic "flags" component */
-    typedef unsigned long int FlagsT;
+    typedef BinULong FlagsT;
 
   public:
     MagicT    magic;      /**< Magic number */

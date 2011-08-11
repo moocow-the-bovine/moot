@@ -860,8 +860,10 @@ bool mootHMM::estimate_lambdas(const mootNgrams &ngrams)
 
   //-- sanity check
   if (nglambda3==0 && nglambda2==0 && nglambda1==0) {
-    carp("mootHMM::estimate_lambdas(): WARNING: all pre-normalization smoothing counts are zero; using uniform distribution.\n");
-    nglambda1 = nglambda2 = nglambda3 = 1.0;
+    carp("mootHMM::estimate_lambdas(): WARNING: all pre-normalization smoothing counts are zero; using n-gram length\n");
+    nglambda1 = 1.0;
+    nglambda2 = 2.0;
+    nglambda3 = 3.0;
   }
 
   //-- normalize lambdas
@@ -1761,13 +1763,28 @@ const HeaderInfo::VersionT BINCOMPAT_MIN_REV = 5;
 const HeaderInfo::VersionT BINCOMPAT_VER = 2;
 const HeaderInfo::VersionT BINCOMPAT_REV = 5;
 */
-/* v2.0.7-0 .. CURRENT */
+/* v2.0.7-0 .. 2.0.8-5
 const HeaderInfo::VersionT BINCOMPAT_VER = 3;          //-- we save files as BINCOMPAT_$(VER.REV)
 const HeaderInfo::VersionT BINCOMPAT_REV = 0;
 const HeaderInfo::VersionT BINCOMPAT_MIN_VER_SAVE = 3; //-- our files can be loaded by libs >= BINCOMPAT_MIN_VER_SAVE_$(VER.REV)
 const HeaderInfo::VersionT BINCOMPAT_MIN_REV_SAVE = 0;
 const HeaderInfo::VersionT BINCOMPAT_MIN_VER_LOAD = 2; //-- we can load files >= BINCOMPAT_MIN_VER_LOAD_$(VER.REV)
 const HeaderInfo::VersionT BINCOMPAT_MIN_REV_LOAD = 5;
+*/
+/* v2.0.9-0 .. CURRENT */
+const HeaderInfo::VersionT BINCOMPAT_VER = 3;          //-- we save files as BINCOMPAT_$(VER.REV)
+const HeaderInfo::VersionT BINCOMPAT_REV = 1;
+#if MOOT_32BIT_INTS
+const HeaderInfo::VersionT BINCOMPAT_MIN_VER_SAVE = 3; //-- 32bit: our files can be loaded by libs >= BINCOMPAT_MIN_VER_SAVE_$(VER.REV)
+const HeaderInfo::VersionT BINCOMPAT_MIN_REV_SAVE = 1;
+const HeaderInfo::VersionT BINCOMPAT_MIN_VER_LOAD = 3; //-- 32bit: we can load files >= BINCOMPAT_MIN_VER_LOAD_$(VER.REV)
+const HeaderInfo::VersionT BINCOMPAT_MIN_REV_LOAD = 1;
+#else
+const HeaderInfo::VersionT BINCOMPAT_MIN_VER_SAVE = 3; //-- native: our files can be loaded by libs >= BINCOMPAT_MIN_VER_SAVE_$(VER.REV)
+const HeaderInfo::VersionT BINCOMPAT_MIN_REV_SAVE = 0;
+const HeaderInfo::VersionT BINCOMPAT_MIN_VER_LOAD = 2; //-- native: we can load files >= BINCOMPAT_MIN_VER_LOAD_$(VER.REV)
+const HeaderInfo::VersionT BINCOMPAT_MIN_REV_LOAD = 5;
+#endif
 
 
 bool mootHMM::save(const char *filename, int compression_level)

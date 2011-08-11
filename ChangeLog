@@ -1,5 +1,12 @@
 ChangeLog for package moot
 
+v2.0.9 Thu, 11 Aug 2011 15:04:19 +0200
+	+ fixed mootHMM::estimate_lambdas() bug resulting in nan smoothing constants
+	  if no trigrams were present in the training data
+	+ added configure option --disable-32bit-ints (--> AC_DEFINE(MOOT_32BIT_INTS))
+	  * by default, binary I/O should now be independent of machine-word-length (but not of endian-ness)
+	  * updated binary file version to 3.1 to reflect new incompatibility
+
 v2.0.8-5 Mon, 18 Oct 2010 15:20:29 +0200
 	+ added mootHMM::tag_dump_trace()
 	  - replaces mootHMM::viterbi_txtdump()

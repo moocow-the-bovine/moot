@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2011 by Bryan Jurish <jurish@uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -39,6 +39,8 @@
 #include <set>
 #include <deque>
 #include <mootSTLHacks.h>
+
+#include <stdint.h>
 
 /* Maximum weight */
 #if !defined(MAXFLOAT)
@@ -79,6 +81,36 @@ typedef ProbT CountT;
 
 /** Offset type (for byte offsets) */
 typedef long unsigned int OffsetT;
+
+
+#ifdef MOOT_32BIT_INTS
+ /** Fixed-width signed integer type for binary I/O (32-bit) */
+ typedef int32_t  BinInt;
+ /** Fixed-width signed integer type for binary I/O (32-bit) */
+ typedef int32_t  BinLong;
+ /** Fixed-width unsigned integer type for binary I/O (32-bit) */
+ typedef uint32_t BinUInt;
+ /** Fixed-width unsigned integer type for binary I/O (32-bit) */
+ typedef uint32_t BinULong;
+#else
+ /** Fixed-width signed integer type for binary I/O (native) */
+ typedef int               BinInt;
+ /** Fixed-width integer type for binary I/O (native) */
+ typedef long int          BinLong;
+ /** Fixed-width unsigned integer type for binary I/O (native) */
+ typedef unsigned int      BinUInt;
+ /** Fixed-width unsigned integer type for binary I/O (native) */
+ typedef unsigned long int BinULong;
+#endif
+
+/** alias (fixed-width) */
+typedef BinInt   Int;
+
+/** alias (fixed-width) */
+typedef BinUInt  UInt;
+
+/** alias (fixed-width) */
+typedef BinUInt  Size;
 
 /**
  * \def mootProbEpsilon

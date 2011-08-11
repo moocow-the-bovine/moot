@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.8-5])
+define([THE_PACKAGE_VERSION], [2.0.9])
 define([THE_PACKAGE_MAINTAINER],  [jurish@uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -202,7 +202,7 @@ dnl time headers
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-dnl mootCompat: check for some useful functions (gnulib)
+dnl gnulib: useful functions
 dnl AC_CHECK_FUNCS([memrchr vasprintf vprintf],[],[])
 
 dnl -- goofy memrchr stuff with gcc-4.4
@@ -486,7 +486,7 @@ dnl
 dnl expat: user-request
 AC_ARG_ENABLE(expat,
 	AC_HELP_STRING([--disable-expat],
-	               [Disable experimental expat XML support]),
+	               [Disable expat XML support]),
 	[ac_cv_enable_expat="$enableval"],[ac_cv_enable_expat="yes"])
 
 dnl expat: headers
@@ -979,6 +979,22 @@ CONFIG_OPTIONS="$CONFIG_OPTIONS HASH_NGRAMS=2"
 ## + v2.0.7 (Thu, 10 Sep 2009 10:12:54 +0200): moved to runtime option
 AC_DEFINE(MOOT_RELAX,1,[Define this to enable relaxed interpretation of pre-analyses (should always be defined for moot >=v2.0.7-0)])
 CONFIG_OPTIONS="$CONFIG_OPTIONS RELAX=2"
+
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## 32-bit ints?
+AC_MSG_CHECKING([whether to use 32-bit integers])
+AC_ARG_ENABLE([32bit-ints],
+	AC_HELP_STRING([--disable-32bit-ints],[use native machine words instead of 32-bit integers (default=no)])
+	[ac_cv_enable_32bit_ints="$enableval"],[ac_cv_enable_32bit_ints="yes"])
+
+if test "$enable_32bit_ints" != "no" ; then
+   AC_MSG_RESULT(yes)
+   AC_DEFINE(MOOT_32BIT_INTS,1,[Define this to use 32-bit integers for binary I/O])
+else
+  AC_MSG_RESULT(no)
+fi
+## /32-bit ints
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## warnings ?

@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2011 by Bryan Jurish <jurish@uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -44,6 +44,23 @@ namespace mootBinIO {
   using namespace mootio;
 
   /*------------------------------------------------------------
+   * Generic functions
+   */
+  /** Load a single binary item using its native size */
+  template<class T>
+  inline bool loadItem(mootio::mistream *is, T &x)
+  {
+      return is->read(reinterpret_cast<char *>(&x), sizeof(T)) == sizeof(T);
+  };
+
+  /** Save a single binary item using its native size */
+  template<class T>
+  inline bool saveItem(mootio::mostream *os, const T &x)
+  {
+    return os->write(reinterpret_cast<const char *>(&x), sizeof(T));
+  };
+
+  /*------------------------------------------------------------
    * Generic items
    */
   /** \brief Binary item I/O template class, used for binary HMM model files */
@@ -52,13 +69,13 @@ namespace mootBinIO {
     /** Load a single item */
     inline bool load(mootio::mistream *is, T &x) const
     {
-      return is->read(reinterpret_cast<char *>(&x), sizeof(T)) == sizeof(T);
+      return loadItem<T>(is,x);
     };
 
     /** Save a single item */
     inline bool save(mootio::mostream *os, const T &x) const
     {
-      return os->write(reinterpret_cast<const char *>(&x), sizeof(T));
+      return saveItem<T>(os,x);
     };
 
     /**
@@ -69,9 +86,8 @@ namespace mootBinIO {
      */
     inline bool load_n(mootio::mistream *is, T *&x, size_t &n) const {
       //-- get saved size
-      Item<size_t> size_item;
-      size_t saved_size;
-      if (!size_item.load(is, saved_size)) return false;
+      Size saved_size;
+      if (!loadItem<Size>(is,saved_size)) return false;
 
       //-- re-allocate if necessary
       if (saved_size > n) {
@@ -97,13 +113,50 @@ namespace mootBinIO {
      */
     inline bool save_n(mootio::mostream *os, const T *x, size_t n) const {
       //-- get saved size
-      Item<size_t> size_item;
-      if (!size_item.save(os, n)) return false;
+      Size tmp = n;
+      if (!saveItem<Size>(os,tmp)) return false;
 
       //-- save items
       return os->write(reinterpret_cast<const char *>(x), n*sizeof(T));
     };
   };
+
+#ifdef MOOT_32BIT_INTS
+  /*------------------------------------------------------------
+   * size_t : special case bashes to 32-bits
+   */
+  /** \brief Binary I/O template instantiation for signed integers
+   *
+   * Uses global typedef BinInt, i.e. may bash value to 32-bits
+   */
+  template<> class Item<size_t> {
+  public:
+
+  public:
+    inline bool load(mootio::mistream *is, size_t &x) const
+    {
+      if (sizeof(size_t)==sizeof(Size)) {
+	//-- 32-bit native sizes: just load raw data
+	return loadItem<size_t>(is,x);
+      }
+      Size tmp;
+      bool rc = loadItem<Size>(is,tmp);
+      x = tmp;
+      return rc;
+    };
+ 
+    inline bool save(mootio::mostream *os, const size_t &x) const
+    {
+      if (sizeof(size_t)==sizeof(Size)) {
+	//-- 32-bit native sizes: just load raw data
+	return saveItem<size_t>(os,x);
+      }
+      Size tmp = x;
+      return saveItem<Size>(os, tmp);
+    };
+  };
+#endif /* MOOT_32BIT_INTS */
+
 
   /*------------------------------------------------------------
    * C-strings

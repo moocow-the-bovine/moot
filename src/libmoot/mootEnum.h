@@ -42,7 +42,7 @@ using namespace moot_STL_NAMESPACE;
 /**
  * Value type for runtime enumerations.  The value '0' (zero) is reserved.
  */
-typedef unsigned int mootEnumID;
+typedef moot::UInt mootEnumID;
 
 /**
  * Constant indicating failed ID lookup.
