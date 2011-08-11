@@ -984,10 +984,10 @@ CONFIG_OPTIONS="$CONFIG_OPTIONS RELAX=2"
 ## 32-bit ints?
 AC_MSG_CHECKING([whether to use 32-bit integers])
 AC_ARG_ENABLE([32bit-ints],
-	AC_HELP_STRING([--disable-32bit-ints],[use native machine words instead of 32-bit integers (default=no)])
+	AC_HELP_STRING([--disable-32bit-ints],[use native machine words instead of 32-bit integers (default=no)]),
 	[ac_cv_enable_32bit_ints="$enableval"],[ac_cv_enable_32bit_ints="yes"])
 
-if test "$enable_32bit_ints" != "no" ; then
+if test "$ac_cv_enable_32bit_ints" != "no" ; then
    AC_MSG_RESULT(yes)
    AC_DEFINE(MOOT_32BIT_INTS,1,[Define this to use 32-bit integers for binary I/O])
 else
