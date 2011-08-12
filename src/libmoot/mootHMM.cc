@@ -1774,7 +1774,7 @@ const HeaderInfo::VersionT BINCOMPAT_MIN_REV_LOAD = 5;
 /* v2.0.9-0 .. CURRENT */
 const HeaderInfo::VersionT BINCOMPAT_VER = 3;          //-- we save files as BINCOMPAT_$(VER.REV)
 const HeaderInfo::VersionT BINCOMPAT_REV = 1;
-#if MOOT_32BIT_INTS
+#if MOOT_32BIT_FORCE
 const HeaderInfo::VersionT BINCOMPAT_MIN_VER_SAVE = 3; //-- 32bit: our files can be loaded by libs >= BINCOMPAT_MIN_VER_SAVE_$(VER.REV)
 const HeaderInfo::VersionT BINCOMPAT_MIN_REV_SAVE = 1;
 const HeaderInfo::VersionT BINCOMPAT_MIN_VER_LOAD = 3; //-- 32bit: we can load files >= BINCOMPAT_MIN_VER_LOAD_$(VER.REV)

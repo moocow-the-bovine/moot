@@ -162,8 +162,11 @@
    */
 #undef LT_OBJDIR
 
-/* Define this to use 32-bit integers for binary I/O */
-#undef MOOT_32BIT_INTS
+/* Define this to force use of 32-bit integers for binary I/O */
+#undef MOOT_32BIT_FORCE
+
+/* Define this if your system uses native 32-bit integers */
+#undef MOOT_32BIT_NATIVE
 
 /* Define this to enable debugging code */
 #undef MOOT_DEBUG_ENABLED

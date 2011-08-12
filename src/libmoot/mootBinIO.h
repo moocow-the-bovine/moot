@@ -121,7 +121,7 @@ namespace mootBinIO {
     };
   };
 
-#ifdef MOOT_32BIT_INTS
+#ifdef MOOT_32BIT_FORCE
   /*------------------------------------------------------------
    * size_t : special case bashes to 32-bits
    */
@@ -155,7 +155,7 @@ namespace mootBinIO {
       return saveItem<Size>(os, tmp);
     };
   };
-#endif /* MOOT_32BIT_INTS */
+#endif /* MOOT_32BIT_FORCE */
 
 
   /*------------------------------------------------------------

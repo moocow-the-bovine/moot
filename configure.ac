@@ -24,8 +24,8 @@ AM_CONFIG_HEADER([src/libmoot/mootAutoConfig.h])
 dnl default prefix
 AC_PREFIX_DEFAULT(/usr/local)
 
-dnl-- makes libtoolize keep m4 macros in tree (let's rather not...)
-dnl AC_CONFIG_MACRO_DIR([m4])
+dnl-- makes libtoolize keep m4 macros in tree
+AC_CONFIG_MACRO_DIR([m4])
 
 #-------------------------------------------------------------
 # save user's *FLAGS
@@ -982,14 +982,38 @@ CONFIG_OPTIONS="$CONFIG_OPTIONS RELAX=2"
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## 32-bit ints?
-AC_MSG_CHECKING([whether to use 32-bit integers])
 AC_ARG_ENABLE([32bit-ints],
 	AC_HELP_STRING([--disable-32bit-ints],[use native machine words instead of 32-bit integers (default=no)]),
-	[ac_cv_enable_32bit_ints="$enableval"],[ac_cv_enable_32bit_ints="yes"])
+	[],
+	[enable_32bit_ints=auto])
 
-if test "$ac_cv_enable_32bit_ints" != "no" ; then
+
+AX_RUN_SIZEOF([int],[-1])
+AX_RUN_SIZEOF([long int],[-1])
+AX_RUN_SIZEOF([size_t],[-1])
+if test "$SIZEOF_int" = 4 -a "$SIZEOF_long_int" = 4 -a "$SIZEOF_size_t" = 4 ; then
+  native_32bit_ints=yes
+  AC_DEFINE(MOOT_32BIT_NATIVE,1,[Define this if your system uses native 32-bit integers])
+else
+  native_32bit_ints=no
+fi
+
+AC_DEFINE(MOOT_32BIT_NATIVE,1,[Define this if your system uses native 32-bit integers])
+
+AC_MSG_CHECKING([whether to force use of 32-bit integers])
+if test "$enable_32bit_ints" != "no" ; then
    AC_MSG_RESULT(yes)
-   AC_DEFINE(MOOT_32BIT_INTS,1,[Define this to use 32-bit integers for binary I/O])
+
+   ##-- check for specific types & sizes (breaks NoConfig.h)
+   dnl AC_TYPE_INT32_T
+   dnl AC_TYPE_UINT32_T
+
+   if test "$enable_32bit_ints" = "yes" -o "$native_32bit_ints" != "yes" ; then
+     AC_MSG_NOTICE([attempting to force use of 32-bit integers via preprocessor kludge])
+     AC_DEFINE(MOOT_32BIT_FORCE,1,[Define this to force use of 32-bit integers for binary I/O])
+   else
+     AC_MSG_NOTICE([native word length is already 32-bits; no action required])
+   fi
 else
   AC_MSG_RESULT(no)
 fi

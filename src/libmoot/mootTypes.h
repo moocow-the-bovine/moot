@@ -83,7 +83,7 @@ typedef ProbT CountT;
 typedef long unsigned int OffsetT;
 
 
-#ifdef MOOT_32BIT_INTS
+#ifdef MOOT_32BIT_FORCE
  /** Fixed-width signed integer type for binary I/O (32-bit) */
  typedef int32_t  BinInt;
  /** Fixed-width signed integer type for binary I/O (32-bit) */
