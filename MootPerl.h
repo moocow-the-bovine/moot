@@ -43,6 +43,8 @@ mootToken    *hv2token(HV *hv, mootToken *tok=NULL, U32 utf8=TRUE); //-- copies:
 AV*           sentence2av(const mootSentence *s, U32 utf8=TRUE);
 mootSentence *av2sentence(AV *av, mootSentence *s=NULL, U32 utf8=TRUE);
 
+mootTagSet *av2tagset(AV *tsav, mootTagSet *tagset, U32 utf8=TRUE);
+
 /*======================================================================
  * Conversions: in-place
  */

@@ -9,7 +9,7 @@ MODULE = Moot		PACKAGE = Moot::HMM
 ##-- disable perl prototypes
 PROTOTYPES: DISABLE
 
-##--------------------------------------------------------------
+##------------------------------------------------------
 ## Constructor: new()
 mootHMM*
 _new(char *CLASS)
@@ -18,14 +18,14 @@ CODE:
 OUTPUT:
  RETVAL
 
-##--------------------------------------------------------------
+##------------------------------------------------------
 ## clear
 void
 clear(mootHMM* hmm, bool wipe_everything=true, bool unlogify=false)
 CODE:
  hmm->clear(wipe_everything,unlogify);
 
-##--------------------------------------------------------------
+##------------------------------------------------------
 ## Destructor: DESTROY()
 void
 DESTROY(mootHMM* hmm)
@@ -298,17 +298,73 @@ OUTPUT:
  RETVAL
 
 ##=====================================================================
+## Lookup
+##=====================================================================
+
+##------------------------------------------------------
+ProbT
+wordp(mootHMM *hmm, char *tokstr, char *tagstr)
+CODE:
+   RETVAL = hmm->wordp(tokstr, tagstr);
+OUTPUT:
+ RETVAL
+
+##------------------------------------------------------
+ProbT
+classp(mootHMM *hmm, AV *tagsetav, char *tagstr, U32 utf8=TRUE)
+PREINIT:
+  mootTagSet *tagset;
+  mootHMM::LexClass *lclass;
+CODE:
+  tagset = av2tagset(tagsetav, NULL, utf8);
+  lclass = hmm->tagset2lexclass(*tagset, NULL, false);
+  RETVAL = hmm->classp(*lclass, tagstr);
+  delete lclass;
+  delete tagset;
+OUTPUT:
+ RETVAL
+
+##------------------------------------------------------
+ProbT
+tagp(mootHMM *hmm, ...)
+PREINIT:
+  mootHMM::Trigram tg;
+CODE:
+ if (items < 2) {
+   Perl_croak(aTHX_ "Usage: Moot::HMM::tagp(hmm, tag1 [,tag2 [,tag3]])");
+ } else if (items==2) {
+   char *tag1 = SvPV_nolen(ST(1));
+   tg.tag3 = hmm->tagids.name2id(tag1);
+ } else if (items==3) {
+   char *tag1 = SvPV_nolen(ST(1));
+   char *tag2 = SvPV_nolen(ST(2));
+   tg.tag2 = hmm->tagids.name2id(tag1);
+   tg.tag3 = hmm->tagids.name2id(tag2);
+ } else if (items==4) {
+   char *tag1 = SvPV_nolen(ST(1));
+   char *tag2 = SvPV_nolen(ST(2));
+   char *tag3 = SvPV_nolen(ST(3));
+   tg.tag1 = hmm->tagids.name2id(tag1);
+   tg.tag2 = hmm->tagids.name2id(tag2);
+   tg.tag3 = hmm->tagids.name2id(tag3);
+ }
+ RETVAL = hmm->tagp(tg);
+OUTPUT:
+ RETVAL
+
+##=====================================================================
 ## Tagging
 ##=====================================================================
 
-##--------------------------------------------------------------
+##------------------------------------------------------
 void
-tag_sentence(mootHMM *hmm, AV* sentav, bool utf8=TRUE)
+tag_sentence(mootHMM *hmm, AV* sentav, bool utf8=TRUE, bool trace=FALSE)
 PREINIT:
   mootSentence *s;
 CODE:
   s = av2sentence(sentav, NULL, utf8);
   hmm->tag_sentence(*s);
+  if (trace) hmm->tag_dump_trace(*s);
   sentence2tokdata(s, utf8);
   delete s;
 
@@ -316,7 +372,7 @@ CODE:
 ## I/O
 ##=====================================================================
 
-##--------------------------------------------------------------
+##------------------------------------------------------
 ## I/O: Text Model
 
 bool
@@ -326,7 +382,7 @@ CODE:
 OUTPUT:
  RETVAL
 
-##--------------------------------------------------------------
+##------------------------------------------------------
 ## I/O: Binary
 
 bool
@@ -343,7 +399,7 @@ CODE:
 OUTPUT:
  RETVAL
 
-##--------------------------------------------------------------
+##------------------------------------------------------
 ## I/O: dump
 
 void
