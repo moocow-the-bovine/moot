@@ -127,6 +127,17 @@ Moot::HMM - libmoot : HMM
   $nfallbacks = $hmm->nfallbacks();
 
   ##=====================================================================
+  ## Low-Level Lookup
+
+  $logp = $hmm->wordp($word, $tag);          ##-- log p($word|$tag)
+
+  $logp = $hmm->classp(\@tagset, $tag);      ##-- log p(\@tagset|$tag)
+
+  $logp = $hmm->tagp($tag1);                 ##-- log p($tag1)              : raw
+  $logp = $hmm->tagp($tag1,$tag2);           ##-- log p($tag2|$tag1)        : raw
+  $logp = $hmm->tagp($tag1,$tag2,$tag3);     ##-- log p($tag3|$tag1,$tag2)  : raw?
+
+  ##=====================================================================
   ## Tagging
 
   ## sentences are tagged in-place; structure:
@@ -139,7 +150,7 @@ Moot::HMM - libmoot : HMM
            {text=>'.'      analyses=>[{tag=>'$.'}]},
           );
 
-  $hmm->tag_sentence(\@sent,$utf8=1);  ##-- clobbers 'tag' key of each token hash
+  $hmm->tag_sentence(\@sent,$utf8=1,$trace=0);  ##-- clobbers 'tag' key of each token hash
 
 
   ##=====================================================================

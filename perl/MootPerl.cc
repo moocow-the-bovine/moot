@@ -129,6 +129,23 @@ mootSentence *av2sentence(AV *sav, mootSentence *s, U32 utf8)
   return s;
 }
 
+/*--------------------------------------------------------------*/
+mootTagSet *av2tagset(AV *tsav, mootTagSet *tagset, U32 utf8)
+{
+  if (!tagset) tagset = new mootTagSet();
+
+  I32 tslen = av_len(tsav);
+  for (I32 si=0; si <= tslen; si++) {
+    SV **svpp = av_fetch(tsav,si,0);
+    if (!svpp || !*svpp) continue;
+    std::string tagstr;
+    sv2stdstring(*svpp, tagstr, utf8);
+    tagset->insert(tagstr);
+  }
+
+  return tagset;
+}
+
 /*======================================================================
  * Conversions: in-place
  */
