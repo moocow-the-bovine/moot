@@ -14,8 +14,8 @@ LDFLAGS    ?= $(OFLAGS) -L..
 STATICLIBS ?= ../.libs/libmoot.a
 LIBS       ?= -lz -lrecode -lexpat
 
-KNOWN_TARGETS = toklex tokio tokio hmm+exit dummyhmm kmwio dummyhmm linetag
-TARGETS = linetag
+KNOWN_TARGETS = toklex tokio tokio hmm+exit dummyhmm kmwio dummyhmm linetag taster
+TARGETS = taster
 
 all: $(TARGETS)
 
@@ -46,7 +46,11 @@ kmwio: kmwio.o $(STATICLIBS)
 
 linetag: linetag.o $(STATICLIBS)
 
+taster: taster.o $(STATICLIBS)
+
 ##-- patterns: .o
+taster.o: taster.cc mootFlavor.h
+
 %.o: %.cc
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
