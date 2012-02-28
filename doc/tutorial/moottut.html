@@ -71,14 +71,14 @@ documentation.</p>
 <hr />
 <h1><a name="the_big_idea">The Big Idea</a></h1>
 <p>The moot utilities are designed for Part-of-Speech Tagging:
-assigning a single univocal &quot;tag&quot; to each input token.
+assigning a single univocal <em>tag</em> to each input token.
 The runtime tagger (moot) determines which tags to assign
 by (sequence) maximization of uni-, bi-, and trigram probabilities,
-as well as lexical probabilties and optionally lexical-class
+as well as lexical probabilties and optional lexical-class
 probabilities.  Probability data is passed to the runtime tagger
-in a &quot;model&quot;.  Runtime data to the tagger must be tokenized
-(&quot;cooked&quot;), and may optionally for each input token a set
-of possible analyses (a &quot;lexical class&quot;) for that token.</p>
+in a <em>model</em>.  Runtime data to the tagger must be tokenized
+(&quot;cooked&quot;), and may optionally include for each input token a set
+of possible analyses (a <em>lexical class</em>) for that token.</p>
 <p>
 </p>
 <hr />
@@ -86,7 +86,7 @@ of possible analyses (a &quot;lexical class&quot;) for that token.</p>
 <p>Before an input file can be tagged, statistical data in the
 form of a <strong>model</strong> must first be provided.
 The easiest way to produce such a model is by using the
-&quot;mootrain&quot; (<a href="././../programs/mootrain.html">the mootrain manpage</a>) utility to gather frequency
+<a href="././../programs/mootrain.html">mootrain</a> utility to gather frequency
 data from a pre-tagged corpus, thus inducing a maximum-likelihood
 model.</p>
 <p>
@@ -143,7 +143,7 @@ option to &quot;moot&quot;.</p>
 <p>Assume you have some raw (unformatted) text to be tagged in the file
 &quot;test.txt&quot;.  Before the text can be tagged, it must first be
 split into indivdual tokens.  The moot utilities contain a
-rudimentary preprocessor, &quot;mootpp&quot; (<a href="././../programs/mootpp.html">the mootpp manpage</a>), to perform
+rudimentary preprocessor, <a href="././../programs/mootpp.html">mootpp</a>, to perform
 this task.  The incantation:</p>
 <pre>
  mootpp -o test.t test.txt</pre>
@@ -174,7 +174,7 @@ the appropriate incantation is:</p>
 <h1><a name="tagging">Tagging</a></h1>
 <p>Having trained a model, as well as tokenized (and optionally analyzed)
 your input file, you are now ready to call the runtime tagger,
-moot (<a href="././../programs/moot.html">the moot manpage</a>).</p>
+<a href="././../programs/moot.html">moot</a>.</p>
 <p>
 </p>
 <h2><a name="tagging__rare_cooked_input">Tagging: Rare Cooked Input</a></h2>
@@ -207,7 +207,7 @@ corpus for testing.  If you have such a medium cooked
 file &quot;test.ttt&quot; tagged with the &quot;truth&quot;, as well as
 a moot output file &quot;test.tt&quot; for the same tokens, you
 can check the accuracy of the tagger
-with the program &quot;mooteval&quot; (<a href="././../programs/mooteval.html">the mooteval manpage</a>):</p>
+with the program <a href="././../programs/mooteval.html">mooteval</a>.</p>
 <pre>
  mooteval -2 test.ttt test.tt</pre>
 <p>

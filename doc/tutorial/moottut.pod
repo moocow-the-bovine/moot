@@ -18,14 +18,14 @@ documentation.
 =head1 The Big Idea
 
 The moot utilities are designed for Part-of-Speech Tagging:
-assigning a single univocal "tag" to each input token.
+assigning a single univocal I<tag> to each input token.
 The runtime tagger (moot) determines which tags to assign
 by (sequence) maximization of uni-, bi-, and trigram probabilities,
-as well as lexical probabilties and optionally lexical-class
+as well as lexical probabilties and optional lexical-class
 probabilities.  Probability data is passed to the runtime tagger
-in a "model".  Runtime data to the tagger must be tokenized
-("cooked"), and may optionally for each input token a set
-of possible analyses (a "lexical class") for that token.
+in a I<model>.  Runtime data to the tagger must be tokenized
+("cooked"), and may optionally include for each input token a set
+of possible analyses (a I<lexical class>) for that token.
 
 =cut
 
@@ -38,7 +38,7 @@ of possible analyses (a "lexical class") for that token.
 Before an input file can be tagged, statistical data in the
 form of a B<model> must first be provided.
 The easiest way to produce such a model is by using the
-"mootrain" (L<mootrain>) utility to gather frequency
+L<mootrain|mootrain> utility to gather frequency
 data from a pre-tagged corpus, thus inducing a maximum-likelihood
 model.
 
@@ -116,7 +116,7 @@ option to "moot".
 Assume you have some raw (unformatted) text to be tagged in the file
 "test.txt".  Before the text can be tagged, it must first be
 split into indivdual tokens.  The moot utilities contain a
-rudimentary preprocessor, "mootpp" (L<mootpp>), to perform
+rudimentary preprocessor, L<mootpp|mootpp>, to perform
 this task.  The incantation:
 
  mootpp -o test.t test.txt
@@ -161,7 +161,7 @@ See the mootm(1) manpage for details.
 
 Having trained a model, as well as tokenized (and optionally analyzed)
 your input file, you are now ready to call the runtime tagger,
-moot (L<moot>).
+L<moot|moot>.
 
 =cut
 
@@ -213,7 +213,7 @@ corpus for testing.  If you have such a medium cooked
 file "test.ttt" tagged with the "truth", as well as
 a moot output file "test.tt" for the same tokens, you
 can check the accuracy of the tagger
-with the program "mooteval" (L<mooteval>):
+with the program L<mooteval|mooteval>.
 
  mooteval -2 test.ttt test.tt
 

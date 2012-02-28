@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "MOOTTUT 1"
-.TH MOOTTUT 1 "2010-04-15" "moot v2.0.9" "moot PoS Tagger"
+.TH MOOTTUT 1 "2012-02-28" "moot v2.0.9-0" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -138,20 +138,20 @@ documentation.
 .SH "The Big Idea"
 .IX Header "The Big Idea"
 The moot utilities are designed for Part-of-Speech Tagging:
-assigning a single univocal \*(L"tag\*(R" to each input token.
+assigning a single univocal \fItag\fR to each input token.
 The runtime tagger (moot) determines which tags to assign
 by (sequence) maximization of uni\-, bi\-, and trigram probabilities,
-as well as lexical probabilties and optionally lexical-class
+as well as lexical probabilties and optional lexical-class
 probabilities.  Probability data is passed to the runtime tagger
-in a \*(L"model\*(R".  Runtime data to the tagger must be tokenized
-(\*(L"cooked\*(R"), and may optionally for each input token a set
-of possible analyses (a \*(L"lexical class\*(R") for that token.
+in a \fImodel\fR.  Runtime data to the tagger must be tokenized
+(\*(L"cooked\*(R"), and may optionally include for each input token a set
+of possible analyses (a \fIlexical class\fR) for that token.
 .SH "Training"
 .IX Header "Training"
 Before an input file can be tagged, statistical data in the
 form of a \fBmodel\fR must first be provided.
 The easiest way to produce such a model is by using the
-\&\*(L"mootrain\*(R" (mootrain) utility to gather frequency
+mootrain utility to gather frequency
 data from a pre-tagged corpus, thus inducing a maximum-likelihood
 model.
 .SS "Training from a Tagged Corpus"
@@ -215,7 +215,7 @@ option to \*(L"moot\*(R".
 Assume you have some raw (unformatted) text to be tagged in the file
 \&\*(L"test.txt\*(R".  Before the text can be tagged, it must first be
 split into indivdual tokens.  The moot utilities contain a
-rudimentary preprocessor, \*(L"mootpp\*(R" (mootpp), to perform
+rudimentary preprocessor, mootpp, to perform
 this task.  The incantation:
 .PP
 .Vb 1
@@ -249,7 +249,7 @@ See the \fImootm\fR\|(1) manpage for details.
 .IX Header "Tagging"
 Having trained a model, as well as tokenized (and optionally analyzed)
 your input file, you are now ready to call the runtime tagger,
-moot (moot).
+moot.
 .SS "Tagging: Rare Cooked Input"
 .IX Subsection "Tagging: Rare Cooked Input"
 If you are not using an external analysis program,
@@ -284,7 +284,7 @@ corpus for testing.  If you have such a medium cooked
 file \*(L"test.ttt\*(R" tagged with the \*(L"truth\*(R", as well as
 a moot output file \*(L"test.tt\*(R" for the same tokens, you
 can check the accuracy of the tagger
-with the program \*(L"mooteval\*(R" (mooteval):
+with the program mooteval.
 .PP
 .Vb 1
 \& mooteval \-2 test.ttt test.tt
