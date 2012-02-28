@@ -216,6 +216,7 @@ public:
     size_t e_lab, b_re, e_re;
     while (mis->valid() && !mis->eof()) {
       mis->getline(line);
+      if (line.find("%%")==0) continue; //-- ignore comments
       e_lab = line.find('\t');
       b_re  = e_lab==line.npos ? line.npos : line.find_first_not_of("\t\r\n",e_lab);
       e_re  = b_re==line.npos  ? line.npos : line.find_first_of("\t\r\n",b_re);
