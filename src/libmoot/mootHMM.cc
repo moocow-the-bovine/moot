@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2010 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
 
 /*--------------------------------------------------------------------------
  * File: mootHMM.cc
- * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author: Bryan Jurish <moocow@cpan.org>
  * Description:
  *   + moot PoS tagger : 1st-order HMM tagger/disambiguator : guts
  *--------------------------------------------------------------------------*/
@@ -163,10 +163,7 @@ void mootHMM::clear(bool wipe_everything, bool unlogify)
     //-- free id-tables
     tokids.clear();
     tagids.clear();
-
-    for (int i = 0; i < NTokFlavors; i++) {
-      flavids[i] = 0;
-    }
+    taster.clear();
 
     start_tagid = 0;
     unknown_lex_threshhold = 1;
@@ -330,6 +327,15 @@ bool mootHMM::load_model(const string &modelname,
   return true;
 }
 
+/*--------------------------------------------------------------------------
+ * Compilation : load_flavors()
+ */
+bool mootHMM::load_flavors(const string &flavorfile)
+{
+  taster.clear();
+  taster.load(flavorfile);
+  return true;
+}
 
 /*--------------------------------------------------------------------------
  * Compilation : compile()
@@ -339,6 +345,9 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 		      const mootClassfreqs &classfreqs,
 		      const mootTagString &start_tag_str)
 {
+  //--------------------------------------
+  // compile: preliminaries
+
   //-- sanity check
   if (ngrams.ugtotal == 0) {
     carp("mootHMM::compile(): Error: bad unigram total in 'ngrams'!\n");
@@ -387,9 +396,10 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
   }
   ngprobsh.clear();
 
-  //-- compilation variables
+  //--------------------------------------
+  // compile: common variables
   TokID                       tokid;          //-- current token-ID
-  mootTokenFlavor             tokflav;        //-- current token-flavor
+  FlavorID                    flavid;         //-- current token-flavor-ID
   LexClass                    lclass;         //-- current lexical class
   ClassID                     classid;        //-- current lexical class-ID
   TagID                       tagid;          //-- current tag-ID
@@ -400,6 +410,9 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
       = lexprobs[0];
   LexClassProbSubTable       &unctagcts       //-- "unknown" class-class counts (later, probabilites)
       = lcprobs[0];
+
+  //--------------------------------------
+  // compile: lexfreqs
 
   //-- compile lexical probabilities : let lexfreqs figure out specials
   //   : this must happen elsewhere (we have const here and want it that way!)
@@ -418,9 +431,8 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
       if (toktotal == 0) continue;
 
       //-- get token flavor, id
-      tokflav = tokenFlavor(tokstr);
-      tokid   = token2id(tokstr);
-      //tokid   = tokflav != TokFlavorUnknown ? tokids.name2id(tokstr) : flavids[tokflav];
+      tokid  = token2id(tokstr);  //-- token or flavor id
+      flavid = taster.flavor_id(tokstr);
 
       //-- ... for all tags occurring with this token(lftagi)
       for (mootLexfreqs::LexfreqSubtable::const_iterator lftagi = entry.freqs.begin();
@@ -429,7 +441,7 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	{
 	  const mootTagString &tagstr = lftagi->first;
 	  const mootLexfreqs::LexfreqCount tagcount = lftagi->second;
-	  const mootLexfreqs::LexfreqCount tagtotal = lexfreqs.taglookup(tagstr);
+	  const mootLexfreqs::LexfreqCount tagtotal = lexfreqs.f_tag(tagstr);
 	  
 	  //-- sanity check
 	  if (tagtotal == 0) continue;
@@ -438,7 +450,7 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	  tagid  = tagids.name2id(tagstr);
 	  
 	  //-- "unknown" token check
-	  if (tokflav == TokFlavorAlpha && toktotal <= unknown_lex_threshhold) //-- dubious
+	  if (flavid == taster.noid && toktotal <= unknown_lex_threshhold) //-- dubious
 	    {
 	      //-- "unknown" token: just store the raw counts for now
 	    
@@ -458,17 +470,27 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	}
     }
 
-  //-- Normalize "unknown" lexical probabilities
+  //--------------------------------------
+  // compile: lexfreqs: @UNKNOWN
+
+  //-- ensure lexprobs has at least 1 slot (for "@UNKNOWN" token)
   if (lexprobs.size() == 0) lexprobs.resize(1);
-  for (LexProbSubTable::iterator lpsi = untagcts.begin();
-       lpsi != untagcts.end();
-       lpsi++)
-    {
-      if (lpsi->second == 0) continue;
-      const mootTagString &tagstr = tagids.id2name(lpsi->first);
-      const mootLexfreqs::LexfreqCount tagtotal = lexfreqs.taglookup(tagstr);
-      lpsi->second /= tagtotal;
-    }
+
+  //-- Normalize "unknown" lexical probabilities, ONLY if no data was specified for the pseudo-token "@UNKNOWN"==tokids.id2name(0)
+  if (lexfreqs.f_text(tokids.id2name(0)) == 0) {
+    for (LexProbSubTable::iterator lpsi = untagcts.begin();
+	 lpsi != untagcts.end();
+	 lpsi++)
+      {
+	if (lpsi->second == 0) continue;
+	const mootTagString &tagstr = tagids.id2name(lpsi->first);
+	const mootLexfreqs::LexfreqCount tagtotal = lexfreqs.f_tag(tagstr);
+	lpsi->second /= tagtotal;
+      }
+  }
+
+  //--------------------------------------
+  // compile: lexical classes
 
   if (use_lex_classes) {
     //-- compile class probabilities : for all stringy classes (lcti)
@@ -525,6 +547,9 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	  }
       }
 
+    //--------------------------------------
+    // compile: lexical classes: unknown
+
     //-- Normalize "unknown" class probabilities
     if (!unctagcts.empty()) {
       for (LexClassProbSubTable::iterator lcpsi = unctagcts.begin();
@@ -537,6 +562,9 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	}
     }
   }
+
+  //--------------------------------------
+  // compile: n-grams
 
   //-- Compute ngram probabilites
   ProbT ugtotal = ngrams.ugtotal - ngrams.lookup(start_tag_str);
@@ -582,6 +610,9 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	    }
 	}
     }
+
+  //--------------------------------------
+  // compile: cleanup
 
   viterbi_clear();
   return true;
@@ -632,16 +663,12 @@ void mootHMM::compile_unknown_lexclass(const mootClassfreqs &classfreqs)
  *--------------------------------------------------------------------------*/
 void mootHMM::assign_ids_lf(const mootLexfreqs &lexfreqs)
 {
-  //-- add special flavor-tokens
-  for (TokID i = 0; i < NTokFlavors; i++) {
-    if (i == TokFlavorAlpha || i == TokFlavorUnknown) { continue; }
-    flavids[i] =
-      tokids.nameExists(mootTokenFlavorNames[i])
-      ? tokids.name2id(mootTokenFlavorNames[i])
-      : tokids.insert(mootTokenFlavorNames[i]);
+  //-- add flavor-ids
+  //taster = lexfreqs.taster; //???
+  taster.noid = 0;
+  for (mootTaster::Rules::iterator fri=taster.rules.begin(); fri!=taster.rules.end(); ++fri) {
+    fri->id = (fri->lab == taster.nolabel) ? taster.noid : tokids.get_id(fri->lab);
   }
-  flavids[TokFlavorAlpha] = 0;
-  flavids[TokFlavorUnknown] = 0;
 
   //-- compile lexical IDs
   for (mootLexfreqs::LexfreqTokTable::const_iterator lfti = lexfreqs.lftable.begin();
@@ -650,9 +677,8 @@ void mootHMM::assign_ids_lf(const mootLexfreqs &lexfreqs)
     {
       const mootTokString &tokstr = lfti->first;
       const mootLexfreqs::LexfreqEntry &entry = lfti->second;
-
 #   ifndef MOOT_LEX_NONALPHA
-      mootTokenFlavor flav = tokenFlavor(tokstr);
+      mootFlavorID flavid = taster.flavor_id(tokstr);
 #   endif
 
       //-- ... for all tags occurring with this token(lftagi)
@@ -667,7 +693,7 @@ void mootHMM::assign_ids_lf(const mootLexfreqs &lexfreqs)
 	  if (!tagids.nameExists(tagstr)) tagids.insert(tagstr);
 
 #       ifndef MOOT_LEX_NONALPHA
-	  if (flav != TokFlavorAlpha)
+	  if (flavid != taster.noid)
 	    //-- ignore non-alphabetics
 	    continue;
 #       endif
@@ -1371,8 +1397,7 @@ void mootHMM::tag_mark_best(mootSentence &sentence)
       if (sri->toktype() != TokTypeVanilla) continue; //-- ignore non-vanilla tokens
 
       if (save_flavors) {
-	sri->tok_analyses.push_back
-	  (mootToken::Analysis(mootTokenFlavorNames[tokenFlavor(sri->text())]));
+	sri->tok_analyses.push_back(mootToken::Analysis(taster.flavor(sri->text())));
       }
 
       //-- get total column probability
@@ -1908,6 +1933,8 @@ bool mootHMM::_bindump(mootio::mostream *obs, const HeaderInfo &hdr, const char 
     }
 #endif //--MOOT_ENABLE_SUFFIX_TRIE
 
+  //-- TODO: FIX
+#if 0
   int i;
   for (i = 0; i < NTokFlavors; i++) {
     if (!tokid_item.save(obs, flavids[i])) {
@@ -1916,6 +1943,7 @@ bool mootHMM::_bindump(mootio::mostream *obs, const HeaderInfo &hdr, const char 
       return false;
     }
   }
+#endif
 
   return true;
 }
@@ -2119,6 +2147,7 @@ bool mootHMM::_binload(mootio::mistream *ibs, const HeaderInfo &hdr, const char 
     }
 #endif
 
+#if 0 /* TODO: FIX */
   int i;
   for (i = 0; i < NTokFlavors; i++) {
     if (!tokid_item.load(ibs, flavids[i])) {
@@ -2127,6 +2156,7 @@ bool mootHMM::_binload(mootio::mistream *ibs, const HeaderInfo &hdr, const char 
       return false;
     }
   }
+#endif
 
   return true;
 }

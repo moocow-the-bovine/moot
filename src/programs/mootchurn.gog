@@ -6,7 +6,7 @@ program "mootchurn"
 #program_version "0.01"
 
 purpose	"File format converter for moocow's PoS tagger."
-author  "Bryan Jurish <jurish@uni-potsdam.de>"
+author  "Bryan Jurish <moocow@cpan.org>"
 on_reparse "warn"
 
 #-----------------------------------------------------------------------------

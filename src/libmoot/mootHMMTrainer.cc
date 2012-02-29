@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2008 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2008 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
 
 /*--------------------------------------------------------------------------
  * File: mootHMMTrainer.cc
- * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author: Bryan Jurish <moocow@cpan.org>
  * Description:
  *   + HMM-Trainer for moot PoS-tagger: the guts
  *--------------------------------------------------------------------------*/
@@ -63,6 +63,9 @@ moot_BEGIN_NAMESPACE
 /*------------------------------------------------------------
  * Top-level Training
  */
+
+
+//------------------------------------------------------
 bool mootHMMTrainer::train_from_file(const string &filename)
 {
   FILE *file = fopen(filename.c_str(),"r");
@@ -76,6 +79,8 @@ bool mootHMMTrainer::train_from_file(const string &filename)
   return rc;
 }
 
+
+//------------------------------------------------------
 bool mootHMMTrainer::train_from_reader(TokenReader *reader)
 {
   mootTokenType typ;
@@ -110,6 +115,24 @@ bool mootHMMTrainer::train_from_reader(TokenReader *reader)
       break;
     }
   }
+  return true;
+}
+
+//------------------------------------------------------
+bool mootHMMTrainer::train_from_stream(FILE *in, const string &srcname)
+{
+  TokenReader *tr = TokenIO::new_reader(tiofNative|tiofWellDone);
+  tr->reader_name(srcname);
+  tr->from_file(in);
+  bool rc = train_from_reader(tr);
+  delete tr;
+  return rc;
+};
+
+//------------------------------------------------------
+bool mootHMMTrainer::train_finish(void)
+{
+  lexfreqs.compute_specials();
   return true;
 }
 
@@ -151,8 +174,7 @@ void mootHMMTrainer::train_token(const mootToken &curtok)
   if (curtok.toktype() != TokTypeVanilla) return; //-- ignore comments, etc.
 
   if (curtok.besttag().empty()) {
-    carp("mootHMMTrainer::train_token(): no best tag for token `%s'",
-	 curtok.text().c_str());
+    carp("mootHMMTrainer::train_token(): no best tag for token `%s'", curtok.text().c_str());
   }
 
   //-- count lexical frequencies
@@ -218,7 +240,7 @@ void mootHMMTrainer::carp(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
-  vfprintf(stderr, fmt, ap);
+  moot_vcarp(fmt, ap);
   va_end(ap);
 }
 

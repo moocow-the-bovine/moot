@@ -63,7 +63,7 @@
 void
 cmdline_parser_print_version (void)
 {
-  printf("mootcompile (%s %s) by Bryan Jurish <moocow@ling.uni-potsdam.de>\n", PACKAGE, VERSION);
+  printf("mootcompile (%s %s) by Bryan Jurish <moocow@cpan.org>\n", PACKAGE, VERSION);
 }
 
 void

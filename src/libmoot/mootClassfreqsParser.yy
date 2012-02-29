@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@
 
 /*----------------------------------------------------------------------
  * Name: mootClassfreqsParser.yy
- * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author: Bryan Jurish <moocow@cpan.org>
  * Description:
  *   + specification for lexical-class frequency parameter-file parser for moot PoS-tagger
  *   + process with Alain Coetmeur's 'bison++' to produce a C++ parser

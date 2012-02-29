@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@
 
 /*============================================================================
  * File: mootLexfreqs.cc
- * Author:  Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author:  Bryan Jurish <moocow@cpan.org>
  * Description:
  *    Class for storage & retrieval of lexical frequency parameters
  *============================================================================*/
@@ -45,6 +45,45 @@ void mootLexfreqs::clear(void)
   lftable.clear();
   tagtable.clear();
 }
+
+void mootLexfreqs::add_count(const mootTokString &text,
+			     const mootTagString &tag,
+			     const LexfreqCount count)
+{
+  //-- adjust token-table
+  LexfreqTokTable::iterator lfi = lftable.find(text);
+  if (lfi == lftable.end()) {
+    //-- new token
+    lfi = lftable.insert(LexfreqTokTable::value_type(text,LexfreqEntry(count))).first;
+    lfi->second.freqs[tag] = count;
+  } else {
+    //-- known token
+    lfi->second.count += count;
+
+    LexfreqSubtable::iterator lsi = lfi->second.freqs.find(tag);
+    if (lsi == lfi->second.freqs.end()) {
+      //-- unknown (tok,tag) pair
+      lfi->second.freqs[tag] = count;
+    } else {
+      //-- known (tok,tag) pair: just add
+      lsi->second += count;
+    }
+  }
+
+  if (!isTokFlavorName(text)) {
+    //-- adjust total tag-count
+    LexfreqTagTable::iterator lftagi = tagtable.find(tag);
+    if (lftagi != tagtable.end()) {
+      lftagi->second += count;
+    } else {
+      tagtable[tag] = count;
+    }
+
+    //-- adjust total token-count
+    n_tokens += count;
+  }
+};
+
 
 /*----------------------------------------------------------------------
  * Lookup

@@ -5,7 +5,7 @@
 program "mootconfig"
 
 purpose	"moocow's part-of-speech tagger: report configuration"
-author  "Bryan Jurish <jurish@uni-potsdam.de>"
+author  "Bryan Jurish <moocow@cpan.org>"
 
 #-----------------------------------------------------------------------------
 # Details

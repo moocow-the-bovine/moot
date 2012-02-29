@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2012 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@
 
 /*--------------------------------------------------------------------------
  * File: mootUtils.cc
- * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author: Bryan Jurish <moocow@cpan.org>
  * Description:
  *   + moocow's PoS tagger : useful utilities
  *--------------------------------------------------------------------------*/
@@ -131,12 +131,25 @@ void moot_normalize_ws(const std::string &in,
 /*----------------------------------------------------------------------
  * String Utilities: remove_newlines(): C
  */
-//(inlined)
+
+void moot_remove_newlines(char *buf, size_t len)
+{
+  for (; len > 0; len--, buf++) {
+    if (*buf == '\n') *buf = ' ';
+  }
+}
+
 
 /*----------------------------------------------------------------------
  * String Utilities: remove_newlines(): STL
  */
-//(inlined)  
+
+void moot_remove_newlines(std::string &s)
+{
+  for (std::string::iterator si = s.begin(); si != s.end(); si++) {
+    if (*si == '\n') *si = ' ';
+  }
+}
 
 /*----------------------------------------------------------------------
  * String Utilities: moot_strtok()
@@ -159,6 +172,7 @@ void moot_strtok(const std::string &s,
 /*----------------------------------------------------------------------
  * String Utilities: printf
  */
+
 int std_vsprintf(std::string &s, const char *fmt, va_list &ap)
 {
   char *obuf = NULL;
@@ -169,6 +183,31 @@ int std_vsprintf(std::string &s, const char *fmt, va_list &ap)
   return len;
 }
 
+int std_sprintf(std::string &s, const char *fmt, ...)
+{
+  va_list ap;
+  va_start(ap,fmt);
+  int rc = std_vsprintf(s,fmt,ap);
+  va_end(ap);
+  return rc;
+}
+
+std::string std_vssprintf(const char *fmt, va_list &ap)
+{
+  std::string s;
+  std_vsprintf(s,fmt,ap);
+  return s;
+}
+
+std::string std_ssprintf(const char *fmt, ...)
+{
+  va_list ap;
+  string  s;
+  va_start(ap,fmt);
+  std_vsprintf(s,fmt,ap);
+  va_end(ap);
+  return s;
+}
 
 
 /*--------------------------------------------------------------------
@@ -461,7 +500,7 @@ std::string moot_banner(void)
 #endif // MOOT_LIBXML_ENABLED
 
 #ifdef MOOT_RECODE_ENABLED
-  s.append("  librecode recoding library by François Pinard.\n");
+  s.append("  librecode recoding library by FranÃ§ois Pinard.\n");
 #endif // MOOT_RECODE_ENABLED
 
 #ifdef MOOT_ZLIB_ENABLED
@@ -500,6 +539,58 @@ std::string moot_program_banner(const std::string &prog_name,
 
   return s;
 }
+
+//--------------------------------------------------------------
+void moot_vcarp(const char *fmt, va_list &ap)
+{
+  vfprintf(stderr, fmt, ap);
+  fflush(stderr);
+}
+
+//--------------------------------------------------------------
+void moot_carp(const char *fmt, ...)
+{
+  va_list ap;
+  va_start(ap,fmt);
+  moot_vcarp(fmt, ap);
+  va_end(ap);
+}
+
+//--------------------------------------------------------------
+void moot_vcroak(const char *fmt, va_list &ap)
+{
+  moot_vcarp(fmt,ap);
+  abort();
+}
+
+//--------------------------------------------------------------
+void moot_croak(const char *fmt, ...)
+{
+  va_list ap;
+  va_start(ap,fmt);
+  moot_vcroak(fmt, ap);
+  va_end(ap);
+}
+
+//--------------------------------------------------------------
+void moot_vmsg(int curLevel, int minLevel, const char *fmt, va_list &ap)
+{
+  if (curLevel >= minLevel) {
+    vfprintf(stderr,fmt,ap);
+    fflush(stderr);
+  }
+}
+
+//--------------------------------------------------------------
+void moot_msg(int curLevel, int minLevel, const char *fmt, ...)
+{
+  va_list ap;
+  va_start(ap,fmt);
+  moot_vmsg(curLevel,minLevel,fmt,ap);
+  va_end(ap);
+}
+
+
 
 }; //-- namespace moot
 

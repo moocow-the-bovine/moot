@@ -6,7 +6,7 @@ program "mootcompile"
 #program_version "0.01"
 
 purpose	"moocow's HMM part-of-speech tagger/disambiguator: model compiler."
-author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+author  "Bryan Jurish <moocow@cpan.org>"
 on_reparse "warn"
 
 #-----------------------------------------------------------------------------

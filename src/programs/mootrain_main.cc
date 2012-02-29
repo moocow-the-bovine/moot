@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2002-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@
 
 /*--------------------------------------------------------------------------
  * File: moottrain_main.cc
- * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author: Bryan Jurish <moocow@cpan.org>
  * Description:
  *   + CHMM PoS tagger/disambiguator for DWDS project: trainer : main()
  *--------------------------------------------------------------------------*/
@@ -92,6 +92,7 @@ typedef enum {
   vlWarnings=4,
   vlEverything=5
 } VerbosityLevel;
+int vlevel = vlEverything;
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -104,12 +105,11 @@ void GetMyOptions(int argc, char **argv)
   // -- load environmental defaults
   cmdline_parser_envdefaults(&args);
 
+  // -- verbosity
+  vlevel = args.verbose_arg;
+
   // -- show banner
-  if (args.verbose_arg >= vlProgress)
-    fprintf(stderr,
-	    moot_program_banner(PROGNAME,
-				PACKAGE_VERSION,
-				"Bryan Jurish <jurish@ling.uni-potsdam.de>").c_str());
+  moot_msg(vlevel, vlProgress,  moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
 
   // -- set up file-churner
   churner.progname = PROGNAME;
@@ -251,11 +251,7 @@ int main (int argc, char **argv)
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
     nfiles++;
-    if (args.verbose_arg >= vlProgress) {
-      fprintf(stderr,"%s: training from file '%s'...",
-	      PROGNAME, churner.in.name.c_str());
-      fflush(stderr);
-    }
+    moot_msg(vlevel, vlProgress, "%s: training from file '%s'...", PROGNAME, churner.in.name.c_str());
     if (lfout.valid())
       lfout.printf("%s  Corpus     : %s\n", cmts, churner.in.name.c_str());
     if (ngout.valid())
@@ -267,27 +263,18 @@ int main (int argc, char **argv)
     reader->reader_name(churner.in.name);
     hmmt.train_from_reader(reader);
     reader->close();
-    
-    if (args.verbose_arg >= vlProgress) {
-      fprintf(stderr," done.\n");
-      fflush(stderr);
-    }
+
+    moot_msg(vlevel, vlProgress, "done.\n");
   }
 
+  //-- finish
+  moot_msg(vlevel, vlProgress, "%s: finalizing model...", PROGNAME);
+  hmmt.train_finish();
+  moot_msg(vlevel, vlProgress, "done.\n");
 
   //-- save: lexfreqs
   if (hmmt.want_lexfreqs) {
-    if (args.verbose_arg >= vlProgress)
-      fprintf(stderr, "%s: computing counts for special lexemes...", PROGNAME);
-
-    hmmt.lexfreqs.compute_specials();
-
-    if (args.verbose_arg >= vlProgress)
-      fprintf(stderr, "done.\n");
-
-    if (args.verbose_arg >= vlProgress)
-      fprintf(stderr, "%s: saving lexical frequency file '%s'...",
-	      PROGNAME, lfout.name.c_str());
+    moot_msg(vlevel, vlProgress, "%s: saving lexical frequency file '%s'...", PROGNAME, lfout.name.c_str());
 
     //-- print summary to file
     if (lfout.valid()) {
@@ -310,9 +297,7 @@ int main (int argc, char **argv)
 
   // -- save: n-grams
   if (hmmt.want_ngrams) {
-    if (args.verbose_arg >= vlProgress)
-      fprintf(stderr, "%s: saving ngram frequency file '%s'...",
-	      PROGNAME, ngout.name.c_str());
+    moot_msg(vlevel, vlProgress, "%s: saving ngram frequency file '%s'...", PROGNAME, ngout.name.c_str());
 
     //-- finish summary
     ngout.printf("%s  EOS Tag     : %s\n", cmts, hmmt.eos_tag.c_str());
@@ -335,9 +320,7 @@ int main (int argc, char **argv)
 
   //-- save: classfreqs
   if (hmmt.want_classfreqs) {
-    if (args.verbose_arg >= vlProgress)
-      fprintf(stderr, "%s: saving class frequency file '%s'...",
-	      PROGNAME, lcout.name.c_str());
+    moot_msg(vlevel,vlProgress, "%s: saving class frequency file '%s'...", PROGNAME, lcout.name.c_str());
 
     //-- print summary to file
     lcout.printf("%s  Num/Tokens    : %g\n", cmts, hmmt.lcfreqs.totalcount);

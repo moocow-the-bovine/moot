@@ -1,7 +1,7 @@
 /* -*- Mode: C++ -*- */
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2010 by Bryan Jurish <jurish@uni-potsdam.de>
+   Copyright (C) 2003-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@
 
 /*--------------------------------------------------------------------------
  * File: mootHMM.h
- * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author: Bryan Jurish <moocow@cpan.org>
  * Description:
  *   + moot PoS tagger : Hidden Markov Model (Disambiguator): headers
  *--------------------------------------------------------------------------*/
@@ -35,6 +35,7 @@
 
 #include <math.h>
 
+#include <mootFlavor.h>
 #include <mootTokenIO.h>
 #include <mootZIO.h>
 #include <mootBinHeader.h>
@@ -142,6 +143,9 @@ public:
 
   /** Type for a token-identider. Zero indicates an unknown token. */
   typedef mootEnumID TokID;
+
+  /** Type for a flavor-identider. 0 indicates a "normal" (e.g. alphabetic) token */
+  typedef mootEnumID FlavorID;
 
   /**
    * Typedef for a lexical ClassID. Zero indicates
@@ -507,9 +511,7 @@ public:
   TokIDTable        tokids;     /**< Token-ID lookup table */
   TagIDTable        tagids;     /**< Tag-ID lookup table */
   ClassIDTable      classids;   /**< Class-ID lookup table */
-
-  /* TokenFlavor to TokenID lookup table for non-alphabetics */
-  TokID             flavids[NTokFlavors];
+  mootTaster	    taster;     /**< regex-based flavor heuristics */
   //@}
 
   /*---------------------------------------------------------------------*/
@@ -617,10 +619,10 @@ public:
       vbestpath(NULL)
   {
     //-- create special token entries
-    for (TokID i = 0; i < NTokFlavors; i++) { flavids[i] = 0; }
     unknown_token_name("@UNKNOWN");
     unknown_tag_name("UNKNOWN");
     uclass = LexClass();
+    taster.set_default_rules();
   };
 
 
@@ -691,6 +693,7 @@ public:
   //------------------------------------------------------------
   /** \name Compilation / Initialization */
   //@{
+
   /**
    * Top-level: load and compile a single model, and estimate all
    * smoothing constants.  Returns true on success, false on failure.
@@ -717,6 +720,11 @@ public:
 			  bool  do_estimate_clambdas=true,
 			  bool  do_build_suffix_trie=true,
 			  bool  do_compute_logprobs=true);
+
+  /**
+   * Load flavor rules from a named file \a flavorfile.
+   */
+  virtual bool load_flavors(const string &flavorfile);
 
   /**
    * Compile
@@ -1262,10 +1270,10 @@ public:
   {
 #ifdef MOOT_LEX_NONALPHA
     TokID tokid = tokids.name2id(token);
-    return tokid ? tokid : flavids[tokenFlavor(token)];
+    return tokid ? tokid : taster.flavor_id(token);
 #else
-    mootTokenFlavor flav = tokenFlavor(token);
-    return flavids[flav]==0 ? tokids.name2id(token) : flavids[flav];
+    TokID tokid = taster.flavor_id(token);
+    return tokid ? tokid : tokids.name2id(token);
 #endif
   };
 

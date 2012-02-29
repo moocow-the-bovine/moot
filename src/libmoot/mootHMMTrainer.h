@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@
 
 /*--------------------------------------------------------------------------
  * File: mootHMMTrainer.h
- * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author: Bryan Jurish <moocow@cpan.org>
  * Description:
  *   + Trainer for moocow's PoS-tagger: shared headers
  *--------------------------------------------------------------------------*/
@@ -141,20 +141,13 @@ public:
   bool train_from_reader(TokenReader *reader);
 
   /** Gather training data from a native text-format C-stream */
-  bool train_from_stream(FILE *in=stdin, const string &srcname="(unknown)")
-  {
-    TokenReader *tr = TokenIO::new_reader(tiofNative|tiofWellDone);
-    tr->reader_name(srcname);
-    tr->from_file(in);
-    //TokenReaderCookedFile reader(true,in,srcname);
-    //reader.lexer.ignore_first_analysis = true;
-    bool rc = train_from_reader(tr);
-    delete tr;
-    return rc;
-  };
+  bool train_from_stream(FILE *in=stdin, const string &srcname="(unknown)");
 
   /** Gather training data from a file using mootTaggerLexer */
   bool train_from_file(const string &filename);
+
+  /** Finish training and compute "special" pseudo-frequencies (e.g. @UNKNOWN, flavors, etc.) */
+  bool train_finish(void);
   //@}
 
   /*------------------------------------------------------------*/

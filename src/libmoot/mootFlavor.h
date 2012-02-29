@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2012 by Bryan Jurish <moocow.bovine@gmail.com>
+   Copyright (C) 2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@
 
 /*--------------------------------------------------------------------------
  * File: mootFlavor.h
- * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author: Bryan Jurish <moocow@cpan.org>
  * Description:
  *   + moocow's PoS tagger : token information : "flavors"
  *--------------------------------------------------------------------------*/
@@ -46,6 +46,11 @@ namespace moot {
   using namespace std;
 
 //==============================================================================
+// types
+typedef string mootFlavorStr;
+typedef UInt   mootFlavorID;
+
+//==============================================================================
 // mootTaster
 /**
  * \brief High-level heuristic token classifier
@@ -57,7 +62,7 @@ namespace moot {
 class mootTaster {
 public:
   //--------------------------------------------------------------------
-  // Embedded Types
+  // Embedded Types & Constants
 
   //------------------------------------------------------------
   // mootTaster::Rule
@@ -70,22 +75,23 @@ public:
   public:
     //--------------------------------------------------
     // mootTaster::Rule: data members
-    string   lab;   ///< symbolic label
-    string   re_s;  ///< POSIX.2 regex to match ("extended" regex string; see regex(7) manpage)
-    regex_t *re_t;  ///< regex to match (compiled)
+    mootFlavorStr lab;   ///< symbolic label
+    mootFlavorID  id;    ///< numeric id (zero by default)
+    string   	  re_s;  ///< POSIX.2 regex to match ("extended" regex string; see regex(7) manpage)
+    regex_t	  *re_t;  ///< regex to match (compiled)
 
   public:
     //--------------------------------------------------
     // mootTaster::Rule: constructors etc.
 
     /** String-based constructor */
-    Rule(const std::string &label="", const std::string& regex="")
-      : lab(label), re_s(regex), re_t(NULL)
+    Rule(const mootFlavorStr &label="", const std::string& regex="")
+      : lab(label), id(0), re_s(regex), re_t(NULL)
     { compile(); };
 
     /** Copy constructor */
     Rule(const Rule &r)
-      : lab(r.lab), re_s(r.re_s), re_t(NULL)
+      : lab(r.lab), id(r.id), re_s(r.re_s), re_t(NULL)
     { compile(); };
 
     /** destructor */
@@ -120,16 +126,17 @@ public:
   // Data Members
   typedef vector<Rule> Rules;
 
-  Rules rules;		///< matching heuristics in order of decreasing priority
-  string nolabel;	///< label to return if no rule matches (default: empty)
+  Rules rules;			///< matching heuristics in order of decreasing priority
+  mootFlavorStr nolabel;	///< label to return if no rule matches (default: empty)
+  mootFlavorID  noid;		///< id to return if no rule matches (default: empty)
 
 public:
   //--------------------------------------------------------------------
   // Constructors etc.
 
   /** Default constructor */
-  mootTaster(const string &default_label="")
-    : nolabel(default_label)
+  mootTaster(const mootFlavorStr &default_label="", mootFlavorID default_id=0)
+    : nolabel(default_label), noid(default_id)
   {};
 
   /** Destructor */
@@ -153,32 +160,57 @@ public:
   { rules.push_back(r); };
 
   /** append a single rule specification */
-  inline void append_rule(const std::string &label, const std::string &regex)
+  inline void append_rule(const mootFlavorStr &label, const std::string &regex)
   { rules.push_back(Rule(label,regex)); };
 
   /** set the default label \a nolabel in global object and all rules with target label \a nolabel  */
-  void set_default_label(const std::string &label, bool update_rules=true);
+  void set_default_label(const mootFlavorStr &label, bool update_rules=true);
 
 public:
   //--------------------------------------------------------------------
   // methods: info
 
   /** check whether this taster defines at least one rule for label \a l */
-  bool has_label(const std::string &l) const;
+  bool has_label(const mootFlavorStr &l) const;
 
-  /** set of all label names defined by this taster */
-  set<string> labels(void) const;
+  /** get set of all label names defined by this taster */
+  set<mootFlavorStr> labels(void) const;
 
 public:
   //--------------------------------------------------------------------
   // methods: matching
 
+  //--------------------------------------
+  /** get index of first rule matching \a s, or \a rules.end() if no rule matches */
+  Rules::const_iterator find(const char *s) const;
+
+  /** get index of first rule matching \a s, or \a rules.end() if no rule matches; std::string version */
+  inline Rules::const_iterator find(const std::string &s) const
+  { return find(s.c_str()); };
+
+  //--------------------------------------
   /** get label of first rule matching \a s, or \a this->nolabel if no rule matches */
-  const string& flavor(const char *s) const;
+  inline const mootFlavorStr& flavor(const char *s) const
+  {
+    Rules::const_iterator ri = find(s);
+    return (ri == rules.end()) ? nolabel : ri->lab;
+  };
 
   /** get label of first rule matching \a s, or \a this->nolabel if no rule matches */
-  inline const string& flavor(const string &s) const
+  inline const mootFlavorStr& flavor(const string &s) const
   { return flavor(s.c_str()); };
+
+  //--------------------------------------
+  /** get label of first rule matching \a s, or \a this->nolabel if no rule matches */
+  inline mootFlavorID flavor_id(const char *s) const
+  {
+    Rules::const_iterator ri = find(s);
+    return (ri == rules.end()) ? noid : ri->id;
+  };
+
+  /** get label of first rule matching \a s, or \a this->nolabel if no rule matches */
+  inline mootFlavorID flavor_id(const string &s) const
+  { return flavor_id(s.c_str()); };
 
 public:
   //--------------------------------------------------------------------
@@ -197,6 +229,10 @@ public:
 
   /** load (append) rules from a named file */
   void load(const char *filename);
+
+  /** load (append) rules from a named file */
+  void load(const std::string &filename)
+  { load(filename.c_str()); };
 
   /** set default TnT-style rules */
   void set_default_rules(void);

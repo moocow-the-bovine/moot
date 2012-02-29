@@ -1,4 +1,4 @@
-Bryan Jurish <moocow@ling.uni-potsdam.de> wrote and maintains the 'moot' package.
+Bryan Jurish <moocow@cpan.org> wrote and maintains the 'moot' package.
 
 Code from the gnulib project is included.
 See the files in src/libmoot/gnulib for details.

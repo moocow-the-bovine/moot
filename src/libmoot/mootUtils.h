@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2012 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@
 
 /*--------------------------------------------------------------------------
  * File: mootUtils.h
- * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author: Bryan Jurish <moocow@cpan.org>
  * Description:
  *   + moocow's PoS tagger : useful utilities
  *--------------------------------------------------------------------------*/
@@ -173,26 +173,14 @@ namespace moot {
    * @param buf target buffer
    * @param len length of target buffer in bytes
    */
-  inline void moot_remove_newlines(char *buf, size_t len)
-  {
-    for (; len > 0; len--, buf++) {
-      if (*buf == '\n') *buf = ' ';
-    }
-  };
+  void moot_remove_newlines(char *buf, size_t len);
 
   /** Remove all newlines from a NUL-terminated C string. */
   inline void moot_remove_newlines(char *s)
-  {
-    moot_remove_newlines(s, strlen(s));
-  };
+  { moot_remove_newlines(s, strlen(s)); };
 
   /** Remove all newlines from an STL string. */
-  inline void moot_remove_newlines(std::string &s)
-  {
-    for (std::string::iterator si = s.begin(); si != s.end(); si++) {
-      if (*si == '\n') *si = ' ';
-    }
-  };
+  void moot_remove_newlines(std::string &s);
 
   /** Tokenize an STL string to an existing list.
    *
@@ -231,41 +219,21 @@ namespace moot {
    * @param fmt printf format
    * @param ap printf args
    */
-  inline int std_sprintf(std::string &s, const char *fmt, ...)
-  {
-      va_list ap;
-      va_start(ap,fmt);
-      int rc = std_vsprintf(s,fmt,ap);
-      va_end(ap);
-      return rc;
-  };
+  int std_sprintf(std::string &s, const char *fmt, ...);
 
   /** Stupid wrapper for printf() returning a C++ string
    *
    * @param fmt printf format
    * @param ap printf args
    */
-  inline std::string std_vssprintf(const char *fmt, va_list &ap)
-  {
-    std::string s;
-    std_vsprintf(s,fmt,ap);
-    return s;
-  };
+  std::string std_vssprintf(const char *fmt, va_list &ap);
 
   /** Stupid wrapper for printf() returning a C++ string
    *
    * @param fmt printf format
    * @param ap printf args
    */
-  inline std::string std_ssprintf(const char *fmt, ...)
-  {
-      va_list ap;
-      string  s;
-      va_start(ap,fmt);
-      std_vsprintf(s,fmt,ap);
-      va_end(ap);
-      return s;
-  };
+  std::string std_ssprintf(const char *fmt, ...);
   //@}
 
   /*----------------------------------------------------------------------*/
@@ -388,8 +356,9 @@ namespace moot {
   //@}
 
   /*----------------------------------------------------------------------*/
-  /** \name Command-line utilities */
+  /** \name Message and Command-line utilities */
   //@{
+
   /** Return a banner string for the library */
   std::string moot_banner(void);
 
@@ -398,6 +367,34 @@ namespace moot {
 				  const std::string &prog_version,
 				  const std::string &prog_author,
 				  bool is_free=true);
+
+  /** verbose message to stderr, va_list version */
+  void moot_vcarp(const char *fmt, va_list &ap);
+
+  /** verbose message to stderr */
+  void moot_carp(const char *fmt, ...);
+
+  /** verbose message to stderr followed by abort(), va_list version */
+  void moot_vcroak(const char *fmt, ...);
+
+  /** verbose message to stderr followed by abort() */
+  void moot_croak(const char *fmt, ...);
+
+  /** conditional message to stderr (prints only if curLevel>=minLevel), va_list version
+   *  @param curLevel current verbosity level
+   *  @param minLevel minimum level for print
+   *  @param fmt printf format
+   *  @param ... printf arguments
+   */
+  void moot_vmsg(int curLevel, int minLevel, const char *fmt, va_list &ap);
+
+  /** conditional message to stderr (prints only if curLevel>=minLevel), varargs version
+   *  @param curLevel current verbosity level
+   *  @param minLevel minimum level for print
+   *  @param fmt printf format
+   *  @param ... printf arguments
+   */
+  void moot_msg(int curLevel, int minLevel, const char *fmt, ...);
   //@}
 
 }; /* namespace moot */

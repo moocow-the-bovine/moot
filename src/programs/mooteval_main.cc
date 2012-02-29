@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2004 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2004 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@
 
 /*--------------------------------------------------------------------------
  * File: mooteval_main.cc
- * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author: Bryan Jurish <moocow@cpan.org>
  * Description:
  *   + moocow's tagger: evaluator: main()
  *--------------------------------------------------------------------------*/
@@ -134,7 +134,7 @@ void GetMyOptions(int argc, char **argv)
     fprintf(stderr,
 	    moot_program_banner(PROGNAME,
 				PACKAGE_VERSION,
-				"Bryan Jurish <jurish@ling.uni-potsdam.de>").c_str());
+				"Bryan Jurish <moocow@cpan.org>").c_str());
   //-- options: verbosity
   if (args.verbose_arg <= 0)      vlevel = evlSilent;
   else if (args.verbose_arg <= 1) vlevel = evlBasic;

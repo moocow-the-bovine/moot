@@ -6,7 +6,7 @@ program "moottaste"
 #program_version "0.01"
 
 purpose	"moocow's HMM part-of-speech tagger: heuristic token classifier."
-author  "Bryan Jurish <jurish@uni-potsdam.de>"
+author  "Bryan Jurish <moocow@cpan.org>"
 on_reparse "warn"
 
 #-----------------------------------------------------------------------------

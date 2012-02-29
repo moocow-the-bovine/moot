@@ -6,7 +6,7 @@ program "moot"
 #program_version "0.01"
 
 purpose	"moocow's HMM part-of-speech tagger/disambiguator."
-author  "Bryan Jurish <jurish@uni-potsdam.de>"
+author  "Bryan Jurish <moocow@cpan.org>"
 on_reparse "warn"
 
 #-----------------------------------------------------------------------------

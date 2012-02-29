@@ -4,10 +4,10 @@ AC_PREREQ(2.5)
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
 define([THE_PACKAGE_VERSION], [2.0.9-0])
-define([THE_PACKAGE_MAINTAINER],  [jurish@uni-potsdam.de])
+define([THE_PACKAGE_MAINTAINER],  [moocow@cpan.org])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
-dnl AC_INIT(moot, 2.0.0, moocow@ling.uni-potsdam.de)
+dnl AC_INIT(moot, 2.0.0, moocow@cpan.org)
 
 dnl source && aux dir
 AC_CONFIG_AUX_DIR(config)

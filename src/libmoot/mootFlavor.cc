@@ -1,7 +1,7 @@
 /* -*- Mode: C++ -*- */
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2012 by Bryan Jurish <moocow.bovine@gmail.com>
+   Copyright (C) 2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@
 
 /*--------------------------------------------------------------------------
  * File: mootFlavor.cc
- * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author: Bryan Jurish <moocow@cpan.org>
  * Description:
  *   + moocow's PoS tagger : token information : "flavors"
  *--------------------------------------------------------------------------*/
@@ -61,7 +61,7 @@ void mootTaster::Rule::compile()
 // mootTaster: rule-set
 
 //----------------------------------------------------------------------
-void mootTaster::set_default_label(const std::string &label, bool update_rules)
+void mootTaster::set_default_label(const mootFlavorStr &label, bool update_rules)
 {
   if (update_rules) {
     for (Rules::iterator ri=rules.begin(); ri!=rules.end(); ++ri) {
@@ -76,7 +76,7 @@ void mootTaster::set_default_label(const std::string &label, bool update_rules)
 // mootTaster: info
 
 //----------------------------------------------------------------------
-bool mootTaster::has_label(const std::string &l) const
+bool mootTaster::has_label(const mootFlavorStr &l) const
 {
   for (Rules::const_iterator ri=rules.begin(); ri!=rules.end(); ++ri) {
     if (ri->lab==l) return true;
@@ -85,9 +85,9 @@ bool mootTaster::has_label(const std::string &l) const
 }
 
 //----------------------------------------------------------------------
-set<string> mootTaster::labels(void) const
+set<mootFlavorStr> mootTaster::labels(void) const
 {
-  set<string> labs;
+  set<mootFlavorStr> labs;
   for (Rules::const_iterator ri=rules.begin(); ri!=rules.end(); ++ri) {
     labs.insert(ri->lab);
   }
@@ -98,15 +98,14 @@ set<string> mootTaster::labels(void) const
 // mootTaster: matching
 
 //----------------------------------------------------------------------
-const string& mootTaster::flavor(const char *s) const
+mootTaster::Rules::const_iterator mootTaster::find(const char *s) const
 {
   for (Rules::const_iterator ri=rules.begin(); ri!=rules.end(); ++ri) {
-    if (ri->match(s)) return ri->lab;
+    if (ri->match(s)) return ri;
   }
-  return nolabel;
-};
-
-
+  return rules.end();
+ 
+}
 
 //==============================================================================
 // mootTaster: I/O

@@ -63,7 +63,7 @@
 void
 cmdline_parser_print_version (void)
 {
-  printf("mooteval (%s %s) by Bryan Jurish <jurish@uni-potsdam.de>\n", PACKAGE, VERSION);
+  printf("mooteval (%s %s) by Bryan Jurish <moocow@cpan.org>\n", PACKAGE, VERSION);
 }
 
 void

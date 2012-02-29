@@ -201,7 +201,7 @@ int read();
 /*-*- Mode: Flex++ -*-*/
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2009 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -219,7 +219,7 @@ int read();
 */
 /*----------------------------------------------------------------------
  * Name: mootPPLexer.ll
- * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author: Bryan Jurish <moocow@cpan.org>
  * Description:
  *   + preprocessor for the moot tagger
  *   + process with Coetmeur's flex++ to produce 'moot_lexer.cc'

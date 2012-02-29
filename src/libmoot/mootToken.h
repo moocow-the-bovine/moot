@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2010 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2010 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@
 
 /*--------------------------------------------------------------------------
  * File: mootToken.h
- * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
+ * Author: Bryan Jurish <moocow@cpan.org>
  * Description:
  *   + moocow's PoS tagger : token information
  *--------------------------------------------------------------------------*/
@@ -554,6 +554,7 @@ mootToken &sentence_printf_append(mootSentence &s, mootTokenType typ, const char
  * Pattern-based Typification
  *----------------------------------------------------------------------*/
 
+#if 1
 /** Enum for TnT-style token typification */
 typedef enum {
   TokFlavorAlpha,      /**< (Mostly) alphabetic token: "foo", "bar", "foo2bar" */
@@ -661,6 +662,8 @@ inline bool isTokFlavorName(const mootTokString &tokstr)
   }
   return (tokstr == "@USECASE");
 };
+
+#endif /* if 0: flavors */
 
 }; /* namespace moot */
 
