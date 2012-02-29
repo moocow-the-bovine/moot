@@ -89,6 +89,9 @@ void GetMyOptions(int argc, char **argv)
   if (cmdline_parser(argc, argv, &args) != 0)
     exit(1);
 
+  //-- locale
+  moot_setlocale();
+
   //-- load environmental defaults
   cmdline_parser_envdefaults(&args);
 
@@ -143,15 +146,11 @@ void GetMyOptions(int argc, char **argv)
   //-- io: writer: sink
   writer->to_mstream(&out);
 
-  //-- locale
-  moot_setlocale();
-
   //-- taster
   if (args.flavors_arg != NULL) {
     mifstream tin;
     if (!tin.open(args.flavors_arg,"r")) {
-      fprintf(stderr,"%s: open failed for flavor file '%s': %s\n",
-	      PROGNAME, tin.name.c_str(), strerror(errno));
+      fprintf(stderr,"%s: open failed for flavor file '%s': %s\n", PROGNAME, tin.name.c_str(), strerror(errno));
       exit(1);
     }
     taster.load(&tin);

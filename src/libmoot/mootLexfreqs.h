@@ -35,6 +35,7 @@
 #define _moot_LEXFREQS_H
 
 #include <mootToken.h>
+#include <mootFlavor.h>
 
 moot_BEGIN_NAMESPACE
 
@@ -88,12 +89,16 @@ public:
   LexfreqTokTable    lftable;    /**< lexeme->(tag->count) lookup table */
   LexfreqTagTable    tagtable;   /**< tag->count lookup table */
   LexfreqCount       n_tokens;   /**< total number of tokens counted */
+  mootTaster	     taster;     /**< token classification heuristics */
+  LexfreqCount	     unknown_threshhold; /**< maximum frequency for special @UNKNOWN lexeme (default=1) */
 
 public:
   //------ public methods
   /** Default constructor */
-  mootLexfreqs(size_t initial_bucket_count=0) : n_tokens(0)
+  mootLexfreqs(size_t initial_bucket_count=0)
+    : n_tokens(0), unknown_threshhold(1)
   {
+    taster.set_default_rules();
     if (initial_bucket_count != 0) {
       lftable.resize(initial_bucket_count);
     }
@@ -139,11 +144,9 @@ public:
   };
 
   /**
-   * Add counts for 'special' tokens to the object.
+   * Add counts for 'special' (flavor-based) tokens to the object.
    * This should be called after you have added
    * all 'real' tokens.
-   *
-   * \see token2type().
    */
   void compute_specials(void);
 

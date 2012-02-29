@@ -29,6 +29,9 @@ struct gengetopt_args_info {
   int classes_flag;	 /* Generate only lexical-class frequency file. (default=0). */
   char * eos_tag_arg;	 /* Specify boundary tag (default=__$) (default=__$). */
   int verbose_ngrams_flag;	 /* Generate long-form ngrams (default=no) (default=0). */
+  char * flavors_arg;	 /* Use flavor heuristics from FILE (default=built-in). (default=NULL). */
+  int no_flavors_flag;	 /* Don't use any flavor heuristics at all. (default=0). */
+  double unknown_threshhold_arg;	 /* Freq. threshhold for 'unknown' lexical probabilities (default=1.0). */
 
   int help_given;	 /* Whether help was given */
   int version_given;	 /* Whether version was given */
@@ -42,6 +45,9 @@ struct gengetopt_args_info {
   int classes_given;	 /* Whether classes was given */
   int eos_tag_given;	 /* Whether eos-tag was given */
   int verbose_ngrams_given;	 /* Whether verbose-ngrams was given */
+  int flavors_given;	 /* Whether flavors was given */
+  int no_flavors_given;	 /* Whether no-flavors was given */
+  int unknown_threshhold_given;	 /* Whether unknown-threshhold was given */
   
   char **inputs;         /* unnamed arguments */
   unsigned inputs_num;   /* number of unnamed arguments */

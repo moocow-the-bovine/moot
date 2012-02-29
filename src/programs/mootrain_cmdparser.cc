@@ -83,22 +83,25 @@ cmdline_parser_print_help (void)
   
   printf("\n");
   printf(" Options:\n");
-  printf("   -h        --help                     Print help and exit.\n");
-  printf("   -V        --version                  Print version and exit.\n");
-  printf("   -cFILE    --rcfile=FILE              Read an alternate configuration file.\n");
+  printf("   -h        --help                       Print help and exit.\n");
+  printf("   -V        --version                    Print version and exit.\n");
+  printf("   -cFILE    --rcfile=FILE                Read an alternate configuration file.\n");
   printf("\n");
   printf(" Basic Options:\n");
-  printf("   -vLEVEL   --verbose=LEVEL            Verbosity level.\n");
-  printf("   -oSTRING  --output=STRING            Specify basename for output files (default=INPUT)\n");
-  printf("   -IFORMAT  --input-format=FORMAT      Specify input file(s) format(s).\n");
-  printf("             --input-encoding=ENCODING  Override document encoding for XML input.\n");
+  printf("   -vLEVEL   --verbose=LEVEL              Verbosity level.\n");
+  printf("   -oSTRING  --output=STRING              Specify basename for output files (default=INPUT)\n");
+  printf("   -IFORMAT  --input-format=FORMAT        Specify input file(s) format(s).\n");
+  printf("             --input-encoding=ENCODING    Override document encoding for XML input.\n");
   printf("\n");
   printf(" Model Format Options:\n");
-  printf("   -l        --lex                      Generate only lexical frequency file.\n");
-  printf("   -n        --ngrams                   Generate only n-gram frequency file.\n");
-  printf("   -C        --classes                  Generate only lexical-class frequency file.\n");
-  printf("   -eTAG     --eos-tag=TAG              Specify boundary tag (default=__$)\n");
-  printf("   -N        --verbose-ngrams           Generate long-form ngrams (default=no)\n");
+  printf("   -l        --lex                        Generate only lexical frequency file.\n");
+  printf("   -n        --ngrams                     Generate only n-gram frequency file.\n");
+  printf("   -C        --classes                    Generate only lexical-class frequency file.\n");
+  printf("   -eTAG     --eos-tag=TAG                Specify boundary tag (default=__$)\n");
+  printf("   -N        --verbose-ngrams             Generate long-form ngrams (default=no)\n");
+  printf("   -fFILE    --flavors=FILE               Use flavor heuristics from FILE (default=built-in).\n");
+  printf("   -F        --no-flavors                 Don't use any flavor heuristics at all.\n");
+  printf("   -tDOUBLE  --unknown-threshhold=DOUBLE  Freq. threshhold for 'unknown' lexical probabilities\n");
 }
 
 #if defined(HAVE_STRDUP) || defined(strdup)
@@ -131,6 +134,9 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->classes_flag = 0; 
   args_info->eos_tag_arg = gog_strdup("__$"); 
   args_info->verbose_ngrams_flag = 0; 
+  args_info->flavors_arg = NULL; 
+  args_info->no_flavors_flag = 0; 
+  args_info->unknown_threshhold_arg = 1.0; 
 }
 
 
@@ -152,6 +158,9 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->classes_given = 0;
   args_info->eos_tag_given = 0;
   args_info->verbose_ngrams_given = 0;
+  args_info->flavors_given = 0;
+  args_info->no_flavors_given = 0;
+  args_info->unknown_threshhold_given = 0;
 
   clear_args(args_info);
 
@@ -181,6 +190,9 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "classes", 0, NULL, 'C' },
 	{ "eos-tag", 1, NULL, 'e' },
 	{ "verbose-ngrams", 0, NULL, 'N' },
+	{ "flavors", 1, NULL, 'f' },
+	{ "no-flavors", 0, NULL, 'F' },
+	{ "unknown-threshhold", 1, NULL, 't' },
         { NULL,	0, NULL, 0 }
       };
       static char short_options[] = {
@@ -195,6 +207,9 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'C',
 	'e', ':',
 	'N',
+	'f', ':',
+	'F',
+	't', ':',
 	'\0'
       };
 
@@ -336,6 +351,32 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
            args_info->verbose_ngrams_flag = !(args_info->verbose_ngrams_flag);
           break;
         
+        case 'f':	 /* Use flavor heuristics from FILE (default=built-in). */
+          if (args_info->flavors_given) {
+            fprintf(stderr, "%s: `--flavors' (`-f') option given more than once\n", PROGRAM);
+          }
+          args_info->flavors_given++;
+          if (args_info->flavors_arg) free(args_info->flavors_arg);
+          args_info->flavors_arg = gog_strdup(val);
+          break;
+        
+        case 'F':	 /* Don't use any flavor heuristics at all. */
+          if (args_info->no_flavors_given) {
+            fprintf(stderr, "%s: `--no-flavors' (`-F') option given more than once\n", PROGRAM);
+          }
+          args_info->no_flavors_given++;
+         if (args_info->no_flavors_given <= 1)
+           args_info->no_flavors_flag = !(args_info->no_flavors_flag);
+          break;
+        
+        case 't':	 /* Freq. threshhold for 'unknown' lexical probabilities */
+          if (args_info->unknown_threshhold_given) {
+            fprintf(stderr, "%s: `--unknown-threshhold' (`-t') option given more than once\n", PROGRAM);
+          }
+          args_info->unknown_threshhold_given++;
+          args_info->unknown_threshhold_arg = (double)strtod(val, NULL);
+          break;
+        
         case 0:	 /* Long option(s) with no short form */
         /* Print help and exit. */
           if (strcmp(olong, "help") == 0) {
@@ -454,6 +495,35 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->verbose_ngrams_given++;
            if (args_info->verbose_ngrams_given <= 1)
              args_info->verbose_ngrams_flag = !(args_info->verbose_ngrams_flag);
+          }
+          
+          /* Use flavor heuristics from FILE (default=built-in). */
+          else if (strcmp(olong, "flavors") == 0) {
+            if (args_info->flavors_given) {
+              fprintf(stderr, "%s: `--flavors' (`-f') option given more than once\n", PROGRAM);
+            }
+            args_info->flavors_given++;
+            if (args_info->flavors_arg) free(args_info->flavors_arg);
+            args_info->flavors_arg = gog_strdup(val);
+          }
+          
+          /* Don't use any flavor heuristics at all. */
+          else if (strcmp(olong, "no-flavors") == 0) {
+            if (args_info->no_flavors_given) {
+              fprintf(stderr, "%s: `--no-flavors' (`-F') option given more than once\n", PROGRAM);
+            }
+            args_info->no_flavors_given++;
+           if (args_info->no_flavors_given <= 1)
+             args_info->no_flavors_flag = !(args_info->no_flavors_flag);
+          }
+          
+          /* Freq. threshhold for 'unknown' lexical probabilities */
+          else if (strcmp(olong, "unknown-threshhold") == 0) {
+            if (args_info->unknown_threshhold_given) {
+              fprintf(stderr, "%s: `--unknown-threshhold' (`-t') option given more than once\n", PROGRAM);
+            }
+            args_info->unknown_threshhold_given++;
+            args_info->unknown_threshhold_arg = (double)strtod(val, NULL);
           }
           
           else {

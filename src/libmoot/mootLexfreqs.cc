@@ -96,38 +96,43 @@ void mootLexfreqs::add_count(const mootTokString &text,
  *----------------------------------------------------------------------*/
 void mootLexfreqs::compute_specials(void)
 {
-  LexfreqEntry *entries[NTokFlavors];
-  int flav;
-  
-  //-- initialize entry pointers
-  for (flav = 0; flav < NTokFlavors; flav++) {
-    if (flav == TokFlavorAlpha) { //  || typ == TokFlavorUnknown
-      entries[flav] = NULL;
-    } else {
-      entries[flav] = &(lftable[mootTokenFlavorNames[flav]]);
-      entries[flav]->clear();
-    }
+  string unknown_str("@UNKNOWN");
+
+  //-- ensure entries for all known flavors exist
+  set<mootFlavorStr> flavors = taster.labels();
+  if (flavors.find(taster.nolabel)!=flavors.end()) {
+    flavors.erase(flavors.find(taster.nolabel));
+  }
+  if (unknown_threshhold > 0) {
+    flavors.insert(unknown_str);
+  }
+  for (set<mootFlavorStr>::const_iterator fi=flavors.begin(); fi!=flavors.end(); ++fi) {
+    LexfreqTokTable::iterator lfi = lftable.find(*fi);
+    if (lfi == lftable.end())
+      lftable.insert(LexfreqTokTable::value_type(*fi, LexfreqEntry()));
   }
 
   //-- iterate over all tokens
-  for (LexfreqTokTable::const_iterator lfti = lftable.begin();
-       lfti != lftable.end();
-       lfti++)
-    {
-      flav = tokenFlavor(lfti->first);
-      if (isTokFlavorName(lfti->first) || flav==TokFlavorAlpha)
-	// || typ == TokTypeUnknown
-	continue;
-      
-      //-- found a special: add its counts to proper subtable
-      entries[flav]->count += lfti->second.count;
-      for (LexfreqSubtable::const_iterator lsi = lfti->second.freqs.begin();
-	   lsi != lfti->second.freqs.end();
-	   lsi++)
-	{
-	  entries[flav]->freqs[lsi->first] += lsi->second;
-	}
+  for (LexfreqTokTable::const_iterator lfti = lftable.begin(); lfti != lftable.end(); ++lfti) {
+    const mootFlavorStr& flav = taster.flavor(lfti->first);
+
+    if (flavors.find(lfti->first) != flavors.end()) {
+      //-- don't merge pseudo-types into other pseudo-types
+      continue;
     }
+    else if (flav != taster.nolabel) {
+      //-- found a special: add its counts to proper subtable
+      for (LexfreqSubtable::const_iterator lsi = lfti->second.freqs.begin(); lsi != lfti->second.freqs.end(); ++lsi) {
+	add_count(flav, lsi->first, lsi->second);
+      }
+    }
+    else if (lfti->second.count <= unknown_threshhold && unknown_threshhold > 0) {
+      //-- found a pseudo-unknown token: add its counts to the "@UNKNOWN" entry
+      for (LexfreqSubtable::const_iterator lsi = lfti->second.freqs.begin(); lsi != lfti->second.freqs.end(); ++lsi) {
+	add_count(unknown_str, lsi->first, lsi->second);
+      }
+    }
+  }
 };
 
 /*----------------------------------------------------------------------
@@ -193,6 +198,19 @@ bool mootLexfreqs::save(const char *filename)
 bool mootLexfreqs::save(FILE *file, const char *filename)
 {
   set<mootTokString> toks;
+
+#if 1
+  //-- save flavors
+  if (taster.rules.size()>0 || !taster.nolabel.empty()) {
+    fprintf(file,"%%%%\n");
+    for (mootTaster::Rules::const_iterator ri=taster.rules.begin(); ri!=taster.rules.end(); ++ri) {
+      fprintf(file, "%%%%$FLAVOR %s\t%s\n", ri->lab.c_str(), ri->re_s.c_str());
+    }
+    if (!taster.nolabel.empty()) {
+      fprintf(file, "%%%%$FLAVOR DEFAULT %s\n", taster.nolabel.c_str());
+    }
+  }
+#endif
 
   //-- prepare sorted key-list
   for (LexfreqTokTable::const_iterator lfi = lftable.begin(); lfi != lftable.end(); lfi++) {

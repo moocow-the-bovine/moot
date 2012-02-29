@@ -73,8 +73,11 @@ mofstream lcout;
 // -- global classes/structs
 mootHMMTrainer  hmmt;
 mootLexfreqs   &lexfreqs = hmmt.lexfreqs;
+mootTaster     &taster   = hmmt.lexfreqs.taster;
 mootNgrams     &ngrams   = hmmt.ngrams;
 mootClassfreqs &lcfreqs  = hmmt.lcfreqs;
+
+const char *flavor_src = "???";
 
 //-- token i/o
 int ifmt         = tiofNone;
@@ -101,6 +104,9 @@ void GetMyOptions(int argc, char **argv)
 {
   if (cmdline_parser(argc, argv, &args) != 0)
     exit(1);
+
+  //-- locale
+  moot_setlocale();
 
   // -- load environmental defaults
   cmdline_parser_envdefaults(&args);
@@ -152,6 +158,7 @@ void GetMyOptions(int argc, char **argv)
     hmmt.want_ngrams = true;
     hmmt.want_classfreqs = true;
   }
+  hmmt.lexfreqs.unknown_threshhold = args.unknown_threshhold_arg;
   hmmt.eos_tag = args.eos_tag_arg;
 
   //-- sanity check(s)
@@ -200,16 +207,34 @@ void GetMyOptions(int argc, char **argv)
   }
 #endif
 
+  //-- flavors
+  if (!args.no_flavors_flag && args.flavors_given) {
+    mifstream tin;
+    if (!tin.open(args.flavors_arg,"r")) {
+      moot_croak("%s: open failed for flavor file '%s': %s\n", PROGNAME, tin.name.c_str(), strerror(errno));
+    }
+    taster.clear();
+    taster.load(&tin);
+    tin.close();
+    flavor_src = args.flavors_arg;
+  } else if (!args.no_flavors_flag) {
+    taster.set_default_rules();
+    //taster.set_default_label("@ALPHA");
+    flavor_src = "(built-in)";
+  } else {
+    //-- no flavors at all
+    taster.clear();
+    flavor_src = "(none)";
+  }
+
   //-- report
   if (args.verbose_arg >= vlProgress) {
     //fprintf(stderr, "%s: kmax               : %d\n", PROGNAME, hmmt.kmax);
     fprintf(stderr, "%s: EOS tag            : %s\n", PROGNAME, hmmt.eos_tag.c_str());
-    fprintf(stderr, "%s: Lexical frequenies : %s\n", PROGNAME,
-	    !lfout.name.empty() ? lfout.name.c_str() : "(null)");
-    fprintf(stderr, "%s: Ngram frequencies  : %s\n", PROGNAME,
-	    !ngout.name.empty() ? ngout.name.c_str() : "(null)");
-    fprintf(stderr, "%s: Class frequencies  : %s\n", PROGNAME,
-	    !lcout.name.empty() ? lcout.name.c_str() : "(null)");
+    fprintf(stderr, "%s: Flavors            : %s : %u rules\n", PROGNAME, flavor_src, taster.size());
+    fprintf(stderr, "%s: Lexical frequenies : %s\n", PROGNAME, !lfout.name.empty() ? lfout.name.c_str() : "(null)");
+    fprintf(stderr, "%s: Ngram frequencies  : %s\n", PROGNAME, !ngout.name.empty() ? ngout.name.c_str() : "(null)");
+    fprintf(stderr, "%s: Class frequencies  : %s\n", PROGNAME, !lcout.name.empty() ? lcout.name.c_str() : "(null)");
   }
 }
   
@@ -235,18 +260,12 @@ int main (int argc, char **argv)
   tm *now_tm = localtime(&now_time);
 
   //-- initialize summary info
-  if (hmmt.want_lexfreqs) {
-    lfout.printf("%s %s lexical frequency file generated on %s",
-		 cmts, PROGNAME, asctime(now_tm));
-  }
-  if (hmmt.want_ngrams) {
-    ngout.printf("%s %s ngram frequency file generated on %s",
-		 cmts, PROGNAME, asctime(now_tm));
-  }
-  if (hmmt.want_classfreqs) {
-    lcout.printf("%s %s class frequency file generated on %s",
-		 cmts, PROGNAME, asctime(now_tm));
-  }
+  if (hmmt.want_lexfreqs)
+    lfout.printf("%s %s lexical frequency file generated on %s", cmts, PROGNAME, asctime(now_tm));
+  if (hmmt.want_ngrams)
+    ngout.printf("%s %s ngram frequency file generated on %s", cmts, PROGNAME, asctime(now_tm));
+  if (hmmt.want_classfreqs)
+    lcout.printf("%s %s class frequency file generated on %s", cmts, PROGNAME, asctime(now_tm));
 
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
@@ -278,10 +297,14 @@ int main (int argc, char **argv)
 
     //-- print summary to file
     if (lfout.valid()) {
+      lfout.printf("%s  LC_CTYPE   : %s\n", cmts, setlocale(LC_CTYPE,NULL));
+      lfout.printf("%s  Flavor File: %s\n", cmts, flavor_src);
+      lfout.printf("%s  Num/Flavors: %u\n", cmts, taster.size());
       lfout.printf("%s  Num/Tokens : %g\n", cmts, hmmt.lexfreqs.n_tokens);
       lfout.printf("%s  Num/Types  : %u\n", cmts, hmmt.lexfreqs.lftable.size());
       lfout.printf("%s  Num/Tags   : %u\n", cmts, hmmt.lexfreqs.tagtable.size());
       lfout.printf("%s  Num/Pairs  : %u tok*tag\n", cmts, hmmt.lexfreqs.n_pairs());
+      lfout.printf("%s  UnknownMaxF: %g\n", cmts, hmmt.lexfreqs.unknown_threshhold);
     }
 
     //-- lexfreqs: save: guts

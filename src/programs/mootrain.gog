@@ -97,15 +97,36 @@ not be an element of the actual tag-set -- that is, it should not
 be a valid analysis for any token.
 "
 
-#int "kmax" k "Specify maximum n-gram length (default=3)" \
-#  argh="LENGTH" \
-#  default="3" \
-#  details="
-#Specifying any value less than 3 may cause lambda estimation
-#to fail miserably in mootHMM and/or mootCHMM -- don't do it.
-#"
-
 flag "verbose-ngrams" N "Generate long-form ngrams (default=no)"
+
+
+string "flavors" f "Use flavor heuristics from FILE (default=built-in)." \
+    arg="FILE" \
+    default=NULL \
+    details="
+If specified, FILE should be a list of token classification rules, one rule per line,
+in order of decreasing precedence.
+Each line is a TAB-separated list whose first field is a symbolic flavor label (conventionally
+beginning with the character '@'), and whose second field is a regular expression.
+"
+
+flag "no-flavors" F "Don't use any flavor heuristics at all." \
+    default=0 \
+    details="
+If specified, flavor heuristics will not be used at all.
+Note that in this case, you can still specify either built-in or user-defined flavors
+to L<moot(1)|moot> or L<mootcompile(1)|mootcompile>.
+"
+
+double "unknown-threshhold" t "Freq. threshhold for 'unknown' lexical probabilities" \
+  arg="FLOAT" \
+  default="1.0" \
+  details="
+Setting this option here will case a special @UKNOWN entry to be added to the
+lexical frequency model file.  Note that such an entry will be overriden
+during model compilation if you specify a non-zero unknown lexical threshhold
+to L<moot(1)|moot> or L<mootcompile(1)|mootcompile>.
+"
 
 #---------------------------------------------------
 # XML options
