@@ -18,7 +18,7 @@ WriteMakefile
   (
    NAME		=> 'Moot',
    DISTNAME	=> 'moot-perl',
-   AUTHOR       => 'Bryan Jurish <jurish@uni-potsdam.de>',
+   AUTHOR       => 'Bryan Jurish <moocow@cpan.org>',
    ABSTRACT	=> 'Perl interface to the libmoot part-of-speech tagging library',
    VERSION_FROM	=> 'Moot.pm',
 
