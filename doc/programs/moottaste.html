@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>moottype - moocow's HMM part-of-speech tagger: token type classifier.</title>
+<title>moottaste - moocow's HMM part-of-speech tagger: heuristic token classifier.</title>
 <link rel="stylesheet" href="mootprogs.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
@@ -48,12 +48,12 @@
 </p>
 <hr />
 <h1><a name="name">NAME</a></h1>
-<p>moottype - moocow's HMM part-of-speech tagger: token type classifier.</p>
+<p>moottaste - moocow's HMM part-of-speech tagger: heuristic token classifier.</p>
 <p>
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p>moottype [OPTIONS] INPUT(s)</p>
+<p>moottaste [OPTIONS] INPUT(s)</p>
 <pre>
  Arguments:
     INPUT(s)  Input files / file-lists.</pre>
@@ -63,6 +63,8 @@
     -V          --version                   Print version and exit.
     -cFILE      --rcfile=FILE               Read an alternate configuration file.
     -vLEVEL     --verbose=LEVEL             Verbosity level.
+    -fFILE      --flavors=FILE              Use flavor heuristics from FILE (default=built-in).
+    -FLABEL     --default-flavor=LABEL      Use LABEL as the default flavor (default=empty string or from flavor-file).
     -l          --list                      INPUTs are file-lists, not filenames.
     -oFILE      --output=FILE               Specify output file (default=stdout).</pre>
 <pre>
@@ -75,9 +77,9 @@
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
-<p>moocow's HMM part-of-speech tagger: token type classifier.</p>
-<p>'moottype' shows the types of its input tokens, as determined
-by compiled-in rules.  Mainly useful for debugging.</p>
+<p>moocow's HMM part-of-speech tagger: heuristic token classifier.</p>
+<p>'moottaste' shows the 'flavors' of its input tokens, as determined
+by heuristic regular-expression-based rules.  Mainly useful for debugging.</p>
 <p>It takes as its input one or more 'rare' (-tagged,-analyzed)
 or 'medium rare' (-tagged,+analyzed) files and produces a
 'medium' (+tagged,-analyzed) or 'well done' (+tagged,+analyzed)
@@ -150,6 +152,22 @@ of either the 'rare' (-tagged,-analyzed) or
 </li>
 </ol>
 </dd>
+<dt><strong><a name="flavors_file_ffile" class="item"><code>--flavors=FILE</code> , <code>-fFILE</code></a></strong></dt>
+
+<dd>
+<p>Use flavor heuristics from FILE (default=built-in).</p>
+<p>Default: 'NULL'</p>
+<p>If specified, FILE should be a list of token classification rules, one rule per line,
+in order of decreasing precedence.
+Each line is a TAB-separated list whose first field is a symbolic flavor label (conventionally
+beginning with the character '@'), and whose second field is a regular expression.</p>
+</dd>
+<dt><strong><a name="default_flavor_label_flabel" class="item"><code>--default-flavor=LABEL</code> , <code>-FLABEL</code></a></strong></dt>
+
+<dd>
+<p>Use LABEL as the default flavor (default=empty string or from flavor-file).</p>
+<p>Default: 'NULL'</p>
+</dd>
 <dt><strong><a name="list_l" class="item"><code>--list</code> , <code>-l</code></a></strong></dt>
 
 <dd>
@@ -219,10 +237,10 @@ Blank lines and comments (lines beginning with '#')
 are ignored.</p>
 <p>The following configuration files are read by default:</p>
 <ul>
-<li><strong><a name="etc_moottyperc" class="item">/etc/moottyperc</a></strong>
+<li><strong><a name="etc_moottasterc" class="item">/etc/moottasterc</a></strong>
 
 </li>
-<li><strong><a name="moottyperc" class="item">~/.moottyperc</a></strong>
+<li><strong><a name="moottasterc" class="item">~/.moottasterc</a></strong>
 
 </li>
 </ul>
@@ -238,7 +256,7 @@ using Getopt::Gen version 0.13.
 Translation was initiated
 as:</p>
 <pre>
-   optgen.perl -l --nocfile --nohfile --notimestamp -F moottype moottype.gog</pre>
+   optgen.perl -l --nocfile --nohfile --notimestamp -F moottaste moottaste.gog</pre>
 <p>
 </p>
 <hr />

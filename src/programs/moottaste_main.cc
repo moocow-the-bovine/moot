@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2007 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2002-2012 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,7 @@
 */
 
 /*--------------------------------------------------------------------------
- * File: moottype_main.cc
+ * File: moottaste_main.cc
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description:
  *   + moot HMM PoS tagger/disambiguator : typifier: main()
@@ -35,11 +35,12 @@
 
 #include <string>
 
+#include <mootFlavor.h>
 #include <mootTokenIO.h>
 #include <mootTokenExpatIO.h>
 #include <mootCIO.h>
 #include <mootUtils.h>
-#include "moottype_cmdparser.h"
+#include "moottaste_cmdparser.h"
 
 using namespace std;
 using namespace moot;
@@ -56,7 +57,7 @@ typedef enum {
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-const char *PROGNAME = "moottype";
+const char *PROGNAME = "moottaste";
 
 // options & file-churning
 gengetopt_args_info  args;
@@ -76,6 +77,9 @@ int &ofmt_default = ifmt;
 
 TokenReader *reader = NULL;
 TokenWriter *writer = NULL;
+
+//-- taster
+mootTaster taster;
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -101,6 +105,7 @@ void GetMyOptions(int argc, char **argv)
 	    PROGNAME, out.name.c_str(), strerror(errno));
     exit(1);
   }
+
 
   //-- set up file-churner
   churner.progname = PROGNAME;
@@ -137,6 +142,38 @@ void GetMyOptions(int argc, char **argv)
 
   //-- io: writer: sink
   writer->to_mstream(&out);
+
+  //-- locale
+  moot_setlocale();
+
+  //-- taster
+  if (args.flavors_arg != NULL) {
+    mifstream tin;
+    if (!tin.open(args.flavors_arg,"r")) {
+      fprintf(stderr,"%s: open failed for flavor file '%s': %s\n",
+	      PROGNAME, tin.name.c_str(), strerror(errno));
+      exit(1);
+    }
+    taster.load(&tin);
+    tin.close();
+    if (args.verbose_arg >= vlProgress) {
+      writer->printf_comment("  Flavors: %s\n", args.flavors_arg);
+      fprintf(stderr,"%s: loaded %u flavor rules from file '%s'\n", PROGNAME, taster.size(), args.flavors_arg);
+      fflush(stderr);
+    }
+  } else {
+    taster.set_default_rules();
+    //taster.set_default_label("@ALPHA");
+    if (args.verbose_arg >= vlProgress) {
+      writer->printf_comment("  Flavors: (built-in)\n");
+      fprintf(stderr,"%s: using %u built-in flavor rules\n", PROGNAME, taster.size());
+      fflush(stderr);
+    }
+  }
+
+  if (args.default_flavor_given) {
+    taster.set_default_label(args.default_flavor_arg);
+  }
 }
 
 
@@ -146,8 +183,6 @@ void GetMyOptions(int argc, char **argv)
 int main (int argc, char **argv)
 {
   GetMyOptions(argc,argv);
-  mootSentence *sent;
-  int rtok;
 
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
@@ -160,11 +195,12 @@ int main (int argc, char **argv)
     //hmm.tag_file(churner.in.file, out.file, churner.in.name);
 
     reader->from_mstream(&churner.in);
+    int rtok;
     while (reader && (rtok = reader->get_sentence()) != TokTypeEOF) {
-      sent = reader->sentence();
+      mootSentence *sent = reader->sentence();
       for (mootSentence::iterator si=sent->begin(); si != sent->end(); si++) {
-	mootTokenFlavor flav = tokenFlavor(si->text());
-	si->besttag(mootTokenFlavorNames[flav]);
+	const std::string &flavor = taster.flavor(si->text());
+	si->besttag(flavor);
       }
       if (writer) writer->put_sentence(*sent);
     }

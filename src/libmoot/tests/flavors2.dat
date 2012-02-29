@@ -1,0 +1,5 @@
+@ALL_ALPHA	^[[:alpha:]]+$
+@ALL_ALPHAM	^[[:alpha:]ͤ]+$
+@ALL_PUNCT	^[[:punct:]]+$
+@ALL_DIGIT	^[[:digit:]]+$
+@HAS_NONALPHA	[^[:alpha:]]

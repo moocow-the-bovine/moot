@@ -3,13 +3,13 @@
 
 =head1 NAME
 
-moottype - moocow's HMM part-of-speech tagger: token type classifier.
+moottaste - moocow's HMM part-of-speech tagger: heuristic token classifier.
 
 
 
 =head1 SYNOPSIS
 
-moottype [OPTIONS] INPUT(s)
+moottaste [OPTIONS] INPUT(s)
 
  Arguments:
     INPUT(s)  Input files / file-lists.
@@ -19,6 +19,8 @@ moottype [OPTIONS] INPUT(s)
     -V          --version                   Print version and exit.
     -cFILE      --rcfile=FILE               Read an alternate configuration file.
     -vLEVEL     --verbose=LEVEL             Verbosity level.
+    -fFILE      --flavors=FILE              Use flavor heuristics from FILE (default=built-in).
+    -FLABEL     --default-flavor=LABEL      Use LABEL as the default flavor (default=empty string or from flavor-file).
     -l          --list                      INPUTs are file-lists, not filenames.
     -oFILE      --output=FILE               Specify output file (default=stdout).
 
@@ -37,11 +39,11 @@ moottype [OPTIONS] INPUT(s)
 
 =head1 DESCRIPTION
 
-moocow's HMM part-of-speech tagger: token type classifier.
+moocow's HMM part-of-speech tagger: heuristic token classifier.
 
 
-'moottype' shows the types of its input tokens, as determined
-by compiled-in rules.  Mainly useful for debugging.
+'moottaste' shows the 'flavors' of its input tokens, as determined
+by heuristic regular-expression-based rules.  Mainly useful for debugging.
 
 It takes as its input one or more 'rare' (-tagged,-analyzed)
 or 'medium rare' (-tagged,+analyzed) files and produces a
@@ -157,6 +159,31 @@ Print everything.
 
 =back
 
+
+
+
+
+=item C<--flavors=FILE> , C<-fFILE>
+
+Use flavor heuristics from FILE (default=built-in).
+
+Default: 'NULL'
+
+
+If specified, FILE should be a list of token classification rules, one rule per line,
+in order of decreasing precedence.
+Each line is a TAB-separated list whose first field is a symbolic flavor label (conventionally
+beginning with the character '@'), and whose second field is a regular expression.
+
+
+
+
+
+=item C<--default-flavor=LABEL> , C<-FLABEL>
+
+Use LABEL as the default flavor (default=empty string or from flavor-file).
+
+Default: 'NULL'
 
 
 
@@ -286,9 +313,9 @@ The following configuration files are read by default:
 
 =over 4
 
-=item * /etc/moottyperc
+=item * /etc/moottasterc
 
-=item * ~/.moottyperc
+=item * ~/.moottasterc
 
 =back
 
@@ -312,7 +339,7 @@ using Getopt::Gen version 0.13.
 Translation was initiated
 as:
 
-   optgen.perl -l --nocfile --nohfile --notimestamp -F moottype moottype.gog
+   optgen.perl -l --nocfile --nohfile --notimestamp -F moottaste moottaste.gog
 
 =cut
 

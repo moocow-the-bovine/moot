@@ -2,10 +2,10 @@
 #
 # Getopt::Gen specification for moot
 #-----------------------------------------------------------------------------
-program "moottype"
+program "moottaste"
 #program_version "0.01"
 
-purpose	"moocow's HMM part-of-speech tagger: token type classifier."
+purpose	"moocow's HMM part-of-speech tagger: heuristic token classifier."
 author  "Bryan Jurish <jurish@uni-potsdam.de>"
 on_reparse "warn"
 
@@ -13,8 +13,8 @@ on_reparse "warn"
 # Details
 #-----------------------------------------------------------------------------
 details "
-'moottype' shows the types of its input tokens, as determined
-by compiled-in rules.  Mainly useful for debugging.
+'moottaste' shows the 'flavors' of its input tokens, as determined
+by heuristic regular-expression-based rules.  Mainly useful for debugging.
 
 It takes as its input one or more 'rare' (-tagged,-analyzed)
 or 'medium rare' (-tagged,+analyzed) files and produces a
@@ -26,8 +26,8 @@ formats.
 #-----------------------------------------------------------------------------
 # Files
 #-----------------------------------------------------------------------------
-rcfile "/etc/moottyperc"
-rcfile "~/.moottyperc"
+rcfile "/etc/moottasterc"
+rcfile "~/.moottasterc"
 
 
 #-----------------------------------------------------------------------------
@@ -82,6 +82,20 @@ Print everything.
 
 =back
 "
+
+string "flavors" f "Use flavor heuristics from FILE (default=built-in)." \
+    arg="FILE" \
+    default=NULL \
+    details="
+If specified, FILE should be a list of token classification rules, one rule per line,
+in order of decreasing precedence.
+Each line is a TAB-separated list whose first field is a symbolic flavor label (conventionally
+beginning with the character '@'), and whose second field is a regular expression.
+"
+
+string "default-flavor" F "Use LABEL as the default flavor (default=empty string or from flavor-file)." \
+  arg="LABEL" \
+  default=NULL
 
 flag  "list"   l  "INPUTs are file-lists, not filenames." \
     details="Useful for large batch-processing jobs."

@@ -215,6 +215,18 @@ AC_CHECK_FUNCS([getuid getpwuid],[],[])
 dnl gnulib: useful functions
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+dnl check for regex headers
+AC_CHECK_HEADERS([regex.h],
+	[],
+	[AC_MSG_WARN([Required header file 'regex.h' not found!])
+    	 AC_MSG_WARN([Is the directory containing 'regex.h' in your 'CPPFLAGS' environment variable?])
+    	 AC_MSG_ERROR([Required header(s) not found -- aborting.])
+	])
+dnl regex headers
+dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
 ## ------------------------------------------------------------
 ## DISTCHECK: simulate missing development-only packages
 AC_ARG_VAR(DISTCHECK,
@@ -791,7 +803,7 @@ if test "$moot_doc_formats" != "none" ; then
 	mootdump.gog \
 	mooteval.gog \
 	mootchurn.gog \
-	moottype.gog \
+	moottaste.gog \
 	mootdyn.gog \
 	"
   for g in $DOC_MAN1_GOGS ; do

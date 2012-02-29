@@ -40,6 +40,7 @@ libmoot_la_SOURCES = \
 	mootSuffixTrie.cc \
 	\
 	mootToken.cc \
+	mootFlavor.cc \
 	\
 	mootTokenLexer.cc \
 	mootTokenIO.cc \
@@ -207,6 +208,7 @@ pkginclude_HEADERS = \
 	mootBinHeader.h \
 	\
 	mootToken.h \
+	mootFlavor.h \
 	\
 	mootTokenIO.h \
 	mootTokenLexer.h \

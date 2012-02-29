@@ -49,7 +49,7 @@ linetag: linetag.o $(STATICLIBS)
 taster: taster.o $(STATICLIBS)
 
 ##-- patterns: .o
-taster.o: taster.cc mootFlavor.h
+//taster.o: taster.cc mootFlavor.h
 
 %.o: %.cc
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<

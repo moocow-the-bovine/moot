@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2012 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -36,10 +36,20 @@
 #include <mootCIO.h>
 
 #include <list>
+#include <locale.h>
 
 namespace moot {
   using namespace std;
   using namespace mootio;
+
+  /*----------------------------------------------------------------------*/
+  /** \name Locale Utilities */
+  //@{
+  /** initialize the current locale from the environment */
+  inline void moot_setlocale(void)
+  { setlocale(LC_ALL,""); };
+  //@}
+
 
   /*----------------------------------------------------------------------*/
   /** \name String Utilities */
@@ -228,6 +238,33 @@ namespace moot {
       int rc = std_vsprintf(s,fmt,ap);
       va_end(ap);
       return rc;
+  };
+
+  /** Stupid wrapper for printf() returning a C++ string
+   *
+   * @param fmt printf format
+   * @param ap printf args
+   */
+  inline std::string std_vssprintf(const char *fmt, va_list &ap)
+  {
+    std::string s;
+    std_vsprintf(s,fmt,ap);
+    return s;
+  };
+
+  /** Stupid wrapper for printf() returning a C++ string
+   *
+   * @param fmt printf format
+   * @param ap printf args
+   */
+  inline std::string std_ssprintf(const char *fmt, ...)
+  {
+      va_list ap;
+      string  s;
+      va_start(ap,fmt);
+      std_vsprintf(s,fmt,ap);
+      va_end(ap);
+      return s;
   };
   //@}
 

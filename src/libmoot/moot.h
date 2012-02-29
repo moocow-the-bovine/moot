@@ -1,7 +1,7 @@
 /* -*- Mode: C++ -*- */
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@ling.uni-potsdam.de>
+   Copyright (C) 2003-2012 by Bryan Jurish <moocow@ling.uni-potsdam.de>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -64,6 +64,7 @@
 //----------------------------------------------------------------------
 // mootToken I/O
 #include <mootToken.h>
+#include <mootFlavor.h>
 #include <mootTokenIO.h>
 #include <mootGenericLexer.h>
 #include <mootPPLexer.h>

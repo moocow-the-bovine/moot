@@ -1,6 +1,10 @@
 #include "../mootTypes.h"
 #include "../mootTokenIO.h"
-#include "mootFlavor.h"
+#include "../mootFlavor.h"
+
+extern "C" {
+#include <locale.h>
+}
 
 using namespace moot;
 
@@ -9,6 +13,9 @@ int main(int argc, char **argv) {
   TokenWriterNative tw;
   mootTaster tas("@ALPHA");
   FILE *infile = stdin;
+
+  //-- initialize locale
+  setlocale(LC_ALL,"");
 
   tr.lexer.first_analysis_is_best = true;
   tr.lexer.ignore_first_analysis  = false;
@@ -34,7 +41,7 @@ int main(int argc, char **argv) {
     mootSentence *sent = tr.tr_sentence;
     for (mootSentence::iterator si = sent->begin(); si != sent->end(); si++) {
       //si->tok_analyses.clear();
-      const std::string &f = tas.match(si->text());
+      const std::string &f = tas.flavor(si->text());
       si->besttag(f);
     }
     tw.put_sentence(*sent);

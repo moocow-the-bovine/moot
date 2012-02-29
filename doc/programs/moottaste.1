@@ -123,17 +123,17 @@
 .rm #[ #] #H #V #F C
 .\" ========================================================================
 .\"
-.IX Title "MOOTTYPE 1"
-.TH MOOTTYPE 1 "2011-08-12" "moot v2.0.9" "moot PoS Tagger"
+.IX Title "MOOTTASTE 1"
+.TH MOOTTASTE 1 "2012-02-29" "moot v2.0.9-0" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
 .nh
 .SH "NAME"
-moottype \- moocow's HMM part\-of\-speech tagger: token type classifier.
+moottaste \- moocow's HMM part\-of\-speech tagger: heuristic token classifier.
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
-moottype [\s-1OPTIONS\s0] \s-1INPUT\s0(s)
+moottaste [\s-1OPTIONS\s0] \s-1INPUT\s0(s)
 .PP
 .Vb 2
 \& Arguments:
@@ -144,6 +144,8 @@ moottype [\s-1OPTIONS\s0] \s-1INPUT\s0(s)
 \&    \-V          \-\-version                   Print version and exit.
 \&    \-cFILE      \-\-rcfile=FILE               Read an alternate configuration file.
 \&    \-vLEVEL     \-\-verbose=LEVEL             Verbosity level.
+\&    \-fFILE      \-\-flavors=FILE              Use flavor heuristics from FILE (default=built\-in).
+\&    \-FLABEL     \-\-default\-flavor=LABEL      Use LABEL as the default flavor (default=empty string or from flavor\-file).
 \&    \-l          \-\-list                      INPUTs are file\-lists, not filenames.
 \&    \-oFILE      \-\-output=FILE               Specify output file (default=stdout).
 \&
@@ -155,10 +157,10 @@ moottype [\s-1OPTIONS\s0] \s-1INPUT\s0(s)
 .Ve
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-moocow's \s-1HMM\s0 part-of-speech tagger: token type classifier.
+moocow's \s-1HMM\s0 part-of-speech tagger: heuristic token classifier.
 .PP
-\&'moottype' shows the types of its input tokens, as determined
-by compiled-in rules.  Mainly useful for debugging.
+\&'moottaste' shows the 'flavors' of its input tokens, as determined
+by heuristic regular-expression-based rules.  Mainly useful for debugging.
 .PP
 It takes as its input one or more 'rare' (\-tagged,\-analyzed)
 or 'medium rare' (\-tagged,+analyzed) files and produces a
@@ -230,6 +232,23 @@ Print everything.
 .RE
 .RS 4
 .RE
+.ie n .IP """\-\-flavors=FILE"" , ""\-fFILE""" 4
+.el .IP "\f(CW\-\-flavors=FILE\fR , \f(CW\-fFILE\fR" 4
+.IX Item "--flavors=FILE , -fFILE"
+Use flavor heuristics from \s-1FILE\s0 (default=built\-in).
+.Sp
+Default: '\s-1NULL\s0'
+.Sp
+If specified, \s-1FILE\s0 should be a list of token classification rules, one rule per line,
+in order of decreasing precedence.
+Each line is a TAB-separated list whose first field is a symbolic flavor label (conventionally
+beginning with the character '@'), and whose second field is a regular expression.
+.ie n .IP """\-\-default\-flavor=LABEL"" , ""\-FLABEL""" 4
+.el .IP "\f(CW\-\-default\-flavor=LABEL\fR , \f(CW\-FLABEL\fR" 4
+.IX Item "--default-flavor=LABEL , -FLABEL"
+Use \s-1LABEL\s0 as the default flavor (default=empty string or from flavor-file).
+.Sp
+Default: '\s-1NULL\s0'
 .ie n .IP """\-\-list"" , ""\-l""" 4
 .el .IP "\f(CW\-\-list\fR , \f(CW\-l\fR" 4
 .IX Item "--list , -l"
@@ -306,9 +325,9 @@ are ignored.
 .PP
 The following configuration files are read by default:
 .IP "\(bu" 4
-/etc/moottyperc
+/etc/moottasterc
 .IP "\(bu" 4
-~/.moottyperc
+~/.moottasterc
 .SH "ADDENDA"
 .IX Header "ADDENDA"
 .SS "About this Document"
@@ -319,7 +338,7 @@ Translation was initiated
 as:
 .PP
 .Vb 1
-\&   optgen.perl \-l \-\-nocfile \-\-nohfile \-\-notimestamp \-F moottype moottype.gog
+\&   optgen.perl \-l \-\-nocfile \-\-nohfile \-\-notimestamp \-F moottaste moottaste.gog
 .Ve
 .SH "BUGS AND LIMITATIONS"
 .IX Header "BUGS AND LIMITATIONS"
