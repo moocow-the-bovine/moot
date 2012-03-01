@@ -83,6 +83,9 @@ Print everything.
 =back
 "
 
+flag "no-banner" B "Suppress initial banner message (implied at verbosity levels <= 2)" \
+  default="0"
+
 string "flavors" f "Use flavor heuristics from FILE (default=built-in)." \
     arg="FILE" \
     default=NULL \

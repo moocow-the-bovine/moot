@@ -36,7 +36,7 @@
 #include <mootCIO.h>
 
 #include <list>
-#include <locale.h>
+#include <vector>
 
 namespace moot {
   using namespace std;
@@ -46,8 +46,10 @@ namespace moot {
   /** \name Locale Utilities */
   //@{
   /** initialize the current locale from the environment */
-  inline void moot_setlocale(void)
-  { setlocale(LC_ALL,""); };
+  void moot_setlocale(void);
+
+  /** get current value of LC_CTYPE, or the string "(unavailable)" */
+  const char *moot_lc_ctype(void);
   //@}
 
 
@@ -183,27 +185,38 @@ namespace moot {
   void moot_remove_newlines(std::string &s);
 
   /** Tokenize an STL string to an existing list.
+   *  Multiple adjacent delimiters are treated as a single delimiter;
+   *  i.e. no empty strings are returned.
    *
    * @param s source string
    * @param delim string of delimiter characters
    * @param out destination string list
    */
-  void moot_strtok(const std::string &s,
-		   const std::string &delim,
-		   std::list<std::string> &out);
+  void moot_strtok(const std::string &s, const std::string &delim, std::list<std::string> &out);
 
   /** Tokenize an STL string to a new list.
    *
    * @param s source string
    * @param delim string of delimiter characters
    */
-  inline std::list<std::string> moot_strtok(const std::string &s,
-					    const std::string &delim)
-  {
-    std::list<std::string> slist;
-    moot_strtok(s,delim,slist);
-    return slist;
-  };
+  std::list<std::string> moot_strtok(const std::string &s, const std::string &delim);
+
+  /** Split an STL string to an existing list.
+   *  All delimiters are significant, i.e. empty output strings are allowed.
+   *
+   * @param s source string
+   * @param delim string of delimiter characters
+   * @param out destination string list
+   */
+  void moot_strsplit(const std::string &s, const std::string &delim, std::vector<std::string> &out);
+
+  /** Tokenize an STL string to a new list.
+   *
+   * @param s source string
+   * @param delim string of delimiter characters
+   */
+  std::vector<std::string> moot_strsplit(const std::string &s, const std::string &delim);
+
 
   /** Stupid wrapper for append+printf() onto C++ strings.
    *
@@ -242,6 +255,10 @@ namespace moot {
   
   /** Check whether a file exists by trying to open it with 'fopen()' */
   bool moot_file_exists(const char *filename);
+
+  /** Check whether a file exists by trying to open it with 'fopen()', std::string version */
+  inline bool moot_file_exists(const std::string &filename)
+  { return moot_file_exists(filename.c_str()); };
   
   /** Get path+basename of a file */
   std::string moot_unextend(const char *filename);
@@ -259,35 +276,6 @@ namespace moot {
   {
     return moot_extension(filename, strlen(filename));
   };
-
-  /**
-   * Utility for mootHMM::load_model() and friends: parse a model name according
-   * to the conventions described in mootfiles(5).
-   * @param modelname name of the model
-   * @param binfile output string for binary model filename
-   * @param lexfile output string for lexical frequency text-format filename
-   * @param ngfile output string for n-gram frequency text-format filename
-   * @param lcfile output string for class frequency text-format filename
-   */
-  bool hmm_parse_model_name(const std::string &modelname,
-			    std::string &binfile,
-			    std::string &lexfile,
-			    std::string &ngfile,
-			    std::string &lcfile);
-
-  /**
-   * Utility for mootHMM::load_model() and friends: parse a text-model name according
-   * to the conventions described in mootfiles(5).
-   * @param modelname name of the model
-   * @param lexfile output string for lexical frequency text-format filename
-   * @param ngfile output string for n-gram frequency text-format filename
-   * @param lcfile output string for class frequency text-format filename
-   */
-  bool hmm_parse_model_name_text(const std::string &modelname,
-				 std::string &lexfile,
-				 std::string &ngfile,
-				 std::string &lcfile);
-
 
 
   /**

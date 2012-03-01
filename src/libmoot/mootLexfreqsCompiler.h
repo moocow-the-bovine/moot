@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -68,6 +68,7 @@ class mootLexfreqsCompiler : public mootLexfreqsParser {
   // -- public methods: CONSTRUCTORS / DESTRUCTORS
   /** Default constructor */
   mootLexfreqsCompiler() : objname(NULL), srcname(NULL) {};
+
   /** Default destructor */
   virtual ~mootLexfreqsCompiler() {};
 

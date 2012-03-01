@@ -450,6 +450,11 @@ public:
   bool      use_lex_classes;
 
   /**
+   * Whether to use heuristic regex-based token "flavors" (Default=true).
+   */
+  bool      use_flavors;
+
+  /**
    * Boundary tag, used during compilation, viterbi_start(), and viterbi_finish()
    * This gets set by the \c start_tag_str argument to compile().
    * Whatever it is, it should be consistend with what you trained on.
@@ -589,6 +594,7 @@ public:
       hash_ngrams(false),
       relax(true),
       use_lex_classes(true),
+      use_flavors(true),
       start_tagid(0),
       unknown_lex_threshhold(1.0),
       unknown_class_threshhold(1.0),
@@ -622,7 +628,6 @@ public:
     unknown_token_name("@UNKNOWN");
     unknown_tag_name("UNKNOWN");
     uclass = LexClass();
-    taster.set_default_rules();
   };
 
 

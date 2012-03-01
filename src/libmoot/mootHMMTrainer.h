@@ -38,6 +38,7 @@
 #include <mootNgrams.h>
 //#include <mootLexfreqs.h> //-- included by mootClassfreqs.h
 #include <mootClassfreqs.h>
+#include <mootFlavor.h>
 
 moot_BEGIN_NAMESPACE
 
@@ -76,6 +77,9 @@ public:
 
   /** Raw lexical-class frequency data */
   mootClassfreqs lcfreqs;
+
+  /** Heuristic token classifier (default: built-in rules) */
+  mootTaster taster;
   //@}
 
   /*-------------------------------------------------------------*/
@@ -84,6 +88,7 @@ public:
   bool want_ngrams;     /**< Whether to gather n-gram frequency data */
   bool want_lexfreqs;   /**< Whether to gather lexical frequency data */
   bool want_classfreqs; /**< Whether to gather lexical-class frequency data */
+  bool want_flavors;    /**< Whether to gather lexical-flavor information */
   //@}
 
   /*-------------------------------------------------------------*/
@@ -113,6 +118,7 @@ public:
     : want_ngrams(true),
       want_lexfreqs(true),
       want_classfreqs(true),
+      want_flavors(true),
       eos_tag("__$"),
       last_was_eos(false)
   {};
@@ -131,6 +137,7 @@ public:
     lexfreqs.clear();
     ngrams.clear();
     lcfreqs.clear();
+    taster.set_default_rules();
   };
   //@}
 

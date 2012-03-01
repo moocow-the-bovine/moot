@@ -96,11 +96,8 @@ void GetMyOptions(int argc, char **argv)
   cmdline_parser_envdefaults(&args);
 
   //-- show banner
-  if (args.verbose_arg > vlSilent)
-    fprintf(stderr,
-	    moot_program_banner(PROGNAME,
-				PACKAGE_VERSION,
-				"Bryan Jurish <moocow@cpan.org>").c_str());
+  if (!args.no_banner_given)
+    moot_msg(args.verbose_arg, vlSummary,  moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
 
   //-- output file
   if (!out.open(args.output_arg,"w")) {
@@ -147,12 +144,12 @@ void GetMyOptions(int argc, char **argv)
   writer->to_mstream(&out);
 
   //-- taster
-  if (args.flavors_arg != NULL) {
+  if (args.flavors_given && args.flavors_arg[0]) {
+    //-- flavors given and non-empty: load file
     mifstream tin;
-    if (!tin.open(args.flavors_arg,"r")) {
-      fprintf(stderr,"%s: open failed for flavor file '%s': %s\n", PROGNAME, tin.name.c_str(), strerror(errno));
-      exit(1);
-    }
+    if (!tin.open(args.flavors_arg,"r"))
+      moot_croak("%s: open failed for flavor file '%s': %s\n", PROGNAME, tin.name.c_str(), strerror(errno));
+    taster.clear();
     taster.load(&tin);
     tin.close();
     if (args.verbose_arg >= vlProgress) {
@@ -160,9 +157,19 @@ void GetMyOptions(int argc, char **argv)
       fprintf(stderr,"%s: loaded %u flavor rules from file '%s'\n", PROGNAME, taster.size(), args.flavors_arg);
       fflush(stderr);
     }
-  } else {
+  }
+  else if (args.flavors_given) {
+    //-- flavors given and empty: disable
+    taster.clear();
+    if (args.verbose_arg >= vlProgress) {
+      writer->printf_comment("  Flavors: (disabled)\n");
+      fprintf(stderr,"%s: disabled flavors\n", PROGNAME);
+      fflush(stderr);
+    }
+  }
+  else {
+    //-- flavors not given: use default rules
     taster.set_default_rules();
-    //taster.set_default_label("@ALPHA");
     if (args.verbose_arg >= vlProgress) {
       writer->printf_comment("  Flavors: (built-in)\n");
       fprintf(stderr,"%s: using %u built-in flavor rules\n", PROGNAME, taster.size());

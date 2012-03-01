@@ -50,6 +50,9 @@ int "verbose" v "Verbosity level." \
     default="2" \
     details="Be more or less verbose.  Recognized values are in the range 0..3."
 
+flag "no-banner" B "Suppress initial banner message (implied at verbosity levels <= 1)" \
+  default="0"
+
 string "output" o "Specify basename for output files (default=INPUT)"
 
 string "input-format" I "Specify input file(s) format(s)." \
@@ -87,6 +90,9 @@ flag "ngrams"	n "Generate only n-gram frequency file." \
 flag "classes"	C "Generate only lexical-class frequency file." \
     default="0"
 
+flag "flavors"	F "Generate only flavor heuristic file." \
+    default="0"
+
 string "eos-tag" e "Specify boundary tag (default=__$)" \
   arg="TAG" \
   default="__$" \
@@ -100,30 +106,23 @@ be a valid analysis for any token.
 flag "verbose-ngrams" N "Generate long-form ngrams (default=no)"
 
 
-string "flavors" f "Use flavor heuristics from FILE (default=built-in)." \
+string "flavors-from" f "Use flavor heuristics from FILE (default=built-in)." \
     arg="FILE" \
     default=NULL \
     details="
-If specified, FILE should be a list of token classification rules, one rule per line,
-in order of decreasing precedence.
-Each line is a TAB-separated list whose first field is a symbolic flavor label (conventionally
-beginning with the character '@'), and whose second field is a regular expression.
-"
-
-flag "no-flavors" F "Don't use any flavor heuristics at all." \
-    default=0 \
-    details="
-If specified, flavor heuristics will not be used at all.
-Note that in this case, you can still specify either built-in or user-defined flavors
-to L<moot(1)|moot> or L<mootcompile(1)|mootcompile>.
+If specified, FILE should be a \"flavor\" file containing a list of regular-expression based token classification rules
+to be used in computing special entries for the lexical frequency file.
+See L<mootfiles(5)|mootfiles> for a full specification of the moot flavor file format.
+If unspecified, the default behavior is to use a built-in set of classification heuristics.
+If FILE is an empty string, no flavor heuristics at all will be applied.
 "
 
 double "unknown-threshhold" t "Freq. threshhold for 'unknown' lexical probabilities" \
   arg="FLOAT" \
   default="1.0" \
   details="
-Setting this option here will case a special @UKNOWN entry to be added to the
-lexical frequency model file.  Note that such an entry will be overriden
+Setting this option to a non-zero value will case a special @UKNOWN entry to be added to the
+lexical frequency model file.  Note that such an entry will be overridden
 during model compilation if you specify a non-zero unknown lexical threshhold
 to L<moot(1)|moot> or L<mootcompile(1)|mootcompile>.
 "

@@ -216,12 +216,22 @@ dnl gnulib: useful functions
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 dnl vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-dnl check for regex headers
-AC_CHECK_HEADERS([regex.h],
-	[],
+dnl check for locale and regex headers
+AC_CHECK_HEADERS([regex.h],[],
 	[AC_MSG_WARN([Required header file 'regex.h' not found!])
     	 AC_MSG_WARN([Is the directory containing 'regex.h' in your 'CPPFLAGS' environment variable?])
     	 AC_MSG_ERROR([Required header(s) not found -- aborting.])
+	])
+AC_CHECK_FUNCS([regcomp regexec],[],
+	[AC_MSG_WARN([Required regular expression support not found!])
+    	 AC_MSG_ERROR([Required function(s) not found -- aborting.])
+	])
+
+AC_CHECK_HEADERS([locale.h],[],
+	[AC_MSG_WARN([locale support disabled])
+	])
+AC_CHECK_FUNCS([setlocale],[],
+	[AC_MSG_WARN([locale support disabled])
 	])
 dnl regex headers
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

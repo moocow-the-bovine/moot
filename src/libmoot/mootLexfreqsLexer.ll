@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -112,7 +112,7 @@ textorsp   [^\n\r\t]
 ({whitespace}*)"\t"({whitespace}*) {
   // -- tab: return the current token-buffer
   //theColumn += yyleng+7; // -- interpret tab as 8 spaces
-  theColumn += yyleng; // -- interpret tab as 8 spaces
+  theColumn += yyleng; // -- interpret tab as a single character
   return '\t';
 }
 

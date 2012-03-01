@@ -21,32 +21,34 @@ extern "C" {
 struct gengetopt_args_info {
   char * rcfile_arg;	 /* Read an alternate configuration file. (default=NULL). */
   int verbose_arg;	 /* Verbosity level. (default=2). */
+  int no_banner_flag;	 /* Suppress initial banner message (implied at verbosity levels <= 1) (default=0). */
   char * output_arg;	 /* Specify basename for output files (default=INPUT) (default=NULL). */
   char * input_format_arg;	 /* Specify input file(s) format(s). (default=NULL). */
   char * input_encoding_arg;	 /* Override document encoding for XML input. (default=NULL). */
   int lex_flag;	 /* Generate only lexical frequency file. (default=0). */
   int ngrams_flag;	 /* Generate only n-gram frequency file. (default=0). */
   int classes_flag;	 /* Generate only lexical-class frequency file. (default=0). */
+  int flavors_flag;	 /* Generate only flavor heuristic file. (default=0). */
   char * eos_tag_arg;	 /* Specify boundary tag (default=__$) (default=__$). */
   int verbose_ngrams_flag;	 /* Generate long-form ngrams (default=no) (default=0). */
-  char * flavors_arg;	 /* Use flavor heuristics from FILE (default=built-in). (default=NULL). */
-  int no_flavors_flag;	 /* Don't use any flavor heuristics at all. (default=0). */
+  char * flavors_from_arg;	 /* Use flavor heuristics from FILE (default=built-in). (default=NULL). */
   double unknown_threshhold_arg;	 /* Freq. threshhold for 'unknown' lexical probabilities (default=1.0). */
 
   int help_given;	 /* Whether help was given */
   int version_given;	 /* Whether version was given */
   int rcfile_given;	 /* Whether rcfile was given */
   int verbose_given;	 /* Whether verbose was given */
+  int no_banner_given;	 /* Whether no-banner was given */
   int output_given;	 /* Whether output was given */
   int input_format_given;	 /* Whether input-format was given */
   int input_encoding_given;	 /* Whether input-encoding was given */
   int lex_given;	 /* Whether lex was given */
   int ngrams_given;	 /* Whether ngrams was given */
   int classes_given;	 /* Whether classes was given */
+  int flavors_given;	 /* Whether flavors was given */
   int eos_tag_given;	 /* Whether eos-tag was given */
   int verbose_ngrams_given;	 /* Whether verbose-ngrams was given */
-  int flavors_given;	 /* Whether flavors was given */
-  int no_flavors_given;	 /* Whether no-flavors was given */
+  int flavors_from_given;	 /* Whether flavors-from was given */
   int unknown_threshhold_given;	 /* Whether unknown-threshhold was given */
   
   char **inputs;         /* unnamed arguments */

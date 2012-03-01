@@ -85,7 +85,7 @@ public:
     // mootTaster::Rule: constructors etc.
 
     /** String-based constructor */
-    Rule(const mootFlavorStr &label="", const std::string& regex="")
+    Rule(const mootFlavorStr &label="", const std::string &regex="")
       : lab(label), id(0), re_s(regex), re_t(NULL)
     { compile(); };
 
@@ -103,6 +103,14 @@ public:
 
     /** (re-)compile rule */
     void compile();
+
+    /** equality predicate compares lab,re_s */
+    inline bool operator==(const Rule &r2) const
+    { return lab==r2.lab && /*id==r2.id &&*/ re_s==r2.re_s; };
+
+    /** assignment operator */
+    inline Rule& operator=(const Rule &r2)
+    { lab=r2.lab; id=r2.id; re_s=r2.re_s; compile(); return *this; };
 
   public:
     //--------------------------------------------------
@@ -137,7 +145,7 @@ public:
   /** Default constructor */
   mootTaster(const mootFlavorStr &default_label="", mootFlavorID default_id=0)
     : nolabel(default_label), noid(default_id)
-  {};
+  { set_default_rules(); };
 
   /** Destructor */
   ~mootTaster()
@@ -149,11 +157,31 @@ public:
 
 public:
   //--------------------------------------------------------------------
-  // methods: rule-set
+  // methods: info
 
   /** get current number of rules */
   inline size_t size() const
   { return rules.size(); };
+
+  /** get current number of rules */
+  inline bool empty() const
+  { return rules.empty(); };
+
+  /** equality predicate tests rules, nolabel, noid */
+  inline bool operator==(const mootTaster &t2) const
+  { return rules==t2.rules && nolabel==t2.nolabel && noid==t2.noid; };
+
+  /** returns true iff this taster is equivalent to the default set of built-in rules */
+  inline bool is_builtin(void) const
+  { return operator==(mootTaster()); };
+
+  /** assignment operator */
+  inline mootTaster& operator=(const mootTaster &t2)
+  { rules=t2.rules; nolabel=t2.nolabel; noid=t2.noid; return *this; };
+
+public:
+  //--------------------------------------------------------------------
+  // methods: rule-set
 
   /** append a single rule */
   inline void append_rule(const Rule &r)
@@ -214,7 +242,7 @@ public:
 
 public:
   //--------------------------------------------------------------------
-  // methods: I/O
+  // methods: I/O: load
 
   /** load (append) rules from a moot input stream (mistream).
    *  File format is a list of rules in order of decreasing precedence,
@@ -224,19 +252,39 @@ public:
    *  expression, or a line:
    *    "DEFAULT" "\t" LABEL
    *  which cases the default label to be set to LABEL.
+   *
+   *  If specified the literal prefix \a prefix is removed from each line before parsing.
    */
-  void load(mootio::mistream* mis);
+  bool load(mootio::mistream *mis, const std::string &prefix="");
 
   /** load (append) rules from a named file */
-  void load(const char *filename);
+  bool load(const char *filename, const std::string &prefix="");
 
   /** load (append) rules from a named file */
-  void load(const std::string &filename)
-  { load(filename.c_str()); };
+  bool load(const std::string &filename, const std::string &prefix="")
+  { return load(filename.c_str(), prefix); };
 
-  /** set default TnT-style rules */
+  /** set default TnT-style rules (called by default constructor) */
   void set_default_rules(void);
 
+  //--------------------------------------------------------------------
+  // methods: I/O: save
+
+  /** save rules to a moot output stream (mostream).
+   *  If specified the literal prefix \a prefix is prepended to each output line.
+   */
+  bool save(mootio::mostream *mos, const std::string &prefix="") const;
+
+  /** save rules to a named file (clobbers old file) */
+  bool save(const char *filename, const std::string &prefix="") const;
+
+  /** save rules to a named file, std::string version */
+  bool save(const std::string &filename, const std::string &prefix="") const
+  { return save(filename.c_str(), prefix); };
+
+  /** save rules to an open C FILE* */
+  bool save(FILE *f, const std::string &prefix="") const
+  { mootio::mcstream mcs(f); return save(&mcs,prefix); };
     
 }; //-- /mootTaster
 

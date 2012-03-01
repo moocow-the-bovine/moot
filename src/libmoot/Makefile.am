@@ -76,6 +76,7 @@ libmoot_la_SOURCES = \
 	mootMIParser.cc \
 	\
 	mootUtils.cc \
+	mootModelSpec.cc \
 	mootIO.cc
 
 #	mootCHMM.cc
@@ -249,6 +250,7 @@ pkginclude_HEADERS = \
 	mootMIParser.h \
 	\
 	mootUtils.h \
+	mootModelSpec.h \
 	\
 	@INSTALL_OSFCN_H@
 

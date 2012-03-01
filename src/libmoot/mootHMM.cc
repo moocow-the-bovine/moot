@@ -37,6 +37,7 @@
 #include <string.h>
 
 #include <mootHMM.h>
+#include <mootModelSpec.h>
 #include <mootTokenIO.h>
 #include <mootCIO.h>
 #include <mootZIO.h>
@@ -190,21 +191,20 @@ bool mootHMM::load_model(const string &modelname,
 			 bool  do_build_suffix_trie,
 			 bool  do_compute_logprobs)
 {
-  string binfile, lexfile, ngfile, lcfile;
-  hmm_parse_model_name(modelname, binfile,lexfile,ngfile,lcfile);
+  mootModelSpec ms(modelname);
 
   //-- sanity check
-  if (binfile.empty() && lexfile.empty() && ngfile.empty() && lcfile.empty()) {
+  if (ms.binfile.empty() && ms.lexfile.empty() && ms.ngfile.empty() && ms.lcfile.empty()) {
     carp("%s: Error: no model found for `%s'!\n", myname, modelname.c_str());
     return false;
   }
 
   //-- load model: binary
-  if (!binfile.empty()) {
+  if (!ms.binfile.empty()) {
     if (verbose >= vlProgress)
-      carp("%s: loading binary HMM model file '%s'...", myname, binfile.c_str());
-    if (!load(binfile.c_str())) {
-      carp("\n%s: load FAILED for binary HMM model file '%s'\n", myname, binfile.c_str());
+      carp("%s: loading binary HMM model file '%s'...", myname, ms.binfile.c_str());
+    if (!load(ms.binfile.c_str())) {
+      carp("\n%s: load FAILED for binary HMM model file '%s'\n", myname, ms.binfile.c_str());
       return false;
     }
     else if (verbose >= vlProgress) carp(" loaded.\n");
@@ -216,39 +216,60 @@ bool mootHMM::load_model(const string &modelname,
     mootNgrams     ngfreqs;
 
     //-- load model: lexical frequencies
-    if (!lexfile.empty() && moot_file_exists(lexfile.c_str())) {
+    if (!ms.lexfile.empty() && moot_file_exists(ms.lexfile)) {
       if (verbose >= vlProgress)
-	carp("%s: loading lexical frequency file '%s'...", myname, lexfile.c_str());
+	carp("%s: loading lexical frequency file '%s'...", myname, ms.lexfile.c_str());
 
-      if (!lexfreqs.load(lexfile.c_str())) {
-	carp("\n%s: load FAILED for lexical frequency file `%s'\n", myname, lexfile.c_str());
+      if (!lexfreqs.load(ms.lexfile.c_str())) {
+	carp("\n%s: load FAILED for lexical frequency file `%s'\n", myname, ms.lexfile.c_str());
 	return false;
       }
       else if (verbose >= vlProgress) carp(" loaded.\n");
     }
 
     // -- load model: n-gram frequencies
-    if (!ngfile.empty() && moot_file_exists(ngfile.c_str())) {
+    if (!ms.ngfile.empty() && moot_file_exists(ms.ngfile)) {
       if (verbose >= vlProgress)
-	carp("%s: loading n-gram frequency file '%s'...", myname, ngfile.c_str());
+	carp("%s: loading n-gram frequency file '%s'...", myname, ms.ngfile.c_str());
 
-      if (!ngfreqs.load(ngfile.c_str())) {
-	carp("\n%s: load FAILED for n-gram frequency file `%s'\n", myname, ngfile.c_str());
+      if (!ngfreqs.load(ms.ngfile.c_str())) {
+	carp("\n%s: load FAILED for n-gram frequency file `%s'\n", myname, ms.ngfile.c_str());
 	return false;
       }
       else if (verbose >= vlProgress) carp(" loaded.\n");
     }
 
     // -- load model: class frequencies
-    if (use_lex_classes && !lcfile.empty() && moot_file_exists(lcfile.c_str())) {
+    if (use_lex_classes && !ms.lcfile.empty() && moot_file_exists(ms.lcfile)) {
       if (verbose >= vlProgress)
-	carp("%s: loading class frequency file '%s'...", myname, lcfile.c_str());
+	carp("%s: loading class frequency file '%s'...", myname, ms.lcfile.c_str());
 
-      if (!classfreqs.load(lcfile.c_str())) {
-	carp("\n%s: load FAILED for class frequency file `%s'\n", myname, lcfile.c_str());
+      if (!classfreqs.load(ms.lcfile.c_str())) {
+	carp("\n%s: load FAILED for class frequency file `%s'\n", myname, ms.lcfile.c_str());
 	return false;
       }
       else if (verbose >= vlProgress) carp(" loaded.\n");
+    }
+
+    // -- load model: flavors
+    if (use_flavors && !ms.flafile.empty() && moot_file_exists(ms.flafile)) {
+      if (verbose >= vlProgress)
+	carp("%s: loading token flavor rules from file '%s'...", myname, ms.flafile.c_str());
+
+      if (!taster.load(ms.flafile)) {
+	carp("\n%s: load FAILED for token flavor rules file `%s'\n", myname, ms.flafile.c_str());
+	return false;
+      }
+      else if (verbose >= vlProgress) carp(" loaded.\n");
+    }
+    else if (use_flavors) {
+      if (verbose >= vlProgress) carp("%s: using built-in token flavor rules\n", myname);
+      taster.set_default_rules();
+    }
+    else {
+      //-- flavors disabled
+      if (verbose >= vlProgress) carp("%s: disabling token flavor rules\n", myname);
+      taster.clear();
     }
 
     //-- compile HMM

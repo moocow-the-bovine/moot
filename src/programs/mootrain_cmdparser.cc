@@ -89,6 +89,7 @@ cmdline_parser_print_help (void)
   printf("\n");
   printf(" Basic Options:\n");
   printf("   -vLEVEL   --verbose=LEVEL              Verbosity level.\n");
+  printf("   -B        --no-banner                  Suppress initial banner message (implied at verbosity levels <= 1)\n");
   printf("   -oSTRING  --output=STRING              Specify basename for output files (default=INPUT)\n");
   printf("   -IFORMAT  --input-format=FORMAT        Specify input file(s) format(s).\n");
   printf("             --input-encoding=ENCODING    Override document encoding for XML input.\n");
@@ -97,10 +98,10 @@ cmdline_parser_print_help (void)
   printf("   -l        --lex                        Generate only lexical frequency file.\n");
   printf("   -n        --ngrams                     Generate only n-gram frequency file.\n");
   printf("   -C        --classes                    Generate only lexical-class frequency file.\n");
+  printf("   -F        --flavors                    Generate only flavor heuristic file.\n");
   printf("   -eTAG     --eos-tag=TAG                Specify boundary tag (default=__$)\n");
   printf("   -N        --verbose-ngrams             Generate long-form ngrams (default=no)\n");
-  printf("   -fFILE    --flavors=FILE               Use flavor heuristics from FILE (default=built-in).\n");
-  printf("   -F        --no-flavors                 Don't use any flavor heuristics at all.\n");
+  printf("   -fFILE    --flavors-from=FILE          Use flavor heuristics from FILE (default=built-in).\n");
   printf("   -tDOUBLE  --unknown-threshhold=DOUBLE  Freq. threshhold for 'unknown' lexical probabilities\n");
 }
 
@@ -126,16 +127,17 @@ clear_args(struct gengetopt_args_info *args_info)
 {
   args_info->rcfile_arg = NULL; 
   args_info->verbose_arg = 2; 
+  args_info->no_banner_flag = 0; 
   args_info->output_arg = NULL; 
   args_info->input_format_arg = NULL; 
   args_info->input_encoding_arg = NULL; 
   args_info->lex_flag = 0; 
   args_info->ngrams_flag = 0; 
   args_info->classes_flag = 0; 
+  args_info->flavors_flag = 0; 
   args_info->eos_tag_arg = gog_strdup("__$"); 
   args_info->verbose_ngrams_flag = 0; 
-  args_info->flavors_arg = NULL; 
-  args_info->no_flavors_flag = 0; 
+  args_info->flavors_from_arg = NULL; 
   args_info->unknown_threshhold_arg = 1.0; 
 }
 
@@ -150,16 +152,17 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->version_given = 0;
   args_info->rcfile_given = 0;
   args_info->verbose_given = 0;
+  args_info->no_banner_given = 0;
   args_info->output_given = 0;
   args_info->input_format_given = 0;
   args_info->input_encoding_given = 0;
   args_info->lex_given = 0;
   args_info->ngrams_given = 0;
   args_info->classes_given = 0;
+  args_info->flavors_given = 0;
   args_info->eos_tag_given = 0;
   args_info->verbose_ngrams_given = 0;
-  args_info->flavors_given = 0;
-  args_info->no_flavors_given = 0;
+  args_info->flavors_from_given = 0;
   args_info->unknown_threshhold_given = 0;
 
   clear_args(args_info);
@@ -182,16 +185,17 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "version", 0, NULL, 'V' },
 	{ "rcfile", 1, NULL, 'c' },
 	{ "verbose", 1, NULL, 'v' },
+	{ "no-banner", 0, NULL, 'B' },
 	{ "output", 1, NULL, 'o' },
 	{ "input-format", 1, NULL, 'I' },
 	{ "input-encoding", 1, NULL, 0 },
 	{ "lex", 0, NULL, 'l' },
 	{ "ngrams", 0, NULL, 'n' },
 	{ "classes", 0, NULL, 'C' },
+	{ "flavors", 0, NULL, 'F' },
 	{ "eos-tag", 1, NULL, 'e' },
 	{ "verbose-ngrams", 0, NULL, 'N' },
-	{ "flavors", 1, NULL, 'f' },
-	{ "no-flavors", 0, NULL, 'F' },
+	{ "flavors-from", 1, NULL, 'f' },
 	{ "unknown-threshhold", 1, NULL, 't' },
         { NULL,	0, NULL, 0 }
       };
@@ -200,15 +204,16 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'V',
 	'c', ':',
 	'v', ':',
+	'B',
 	'o', ':',
 	'I', ':',
 	'l',
 	'n',
 	'C',
+	'F',
 	'e', ':',
 	'N',
 	'f', ':',
-	'F',
 	't', ':',
 	'\0'
       };
@@ -288,6 +293,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->verbose_arg = (int)atoi(val);
           break;
         
+        case 'B':	 /* Suppress initial banner message (implied at verbosity levels <= 1) */
+          if (args_info->no_banner_given) {
+            fprintf(stderr, "%s: `--no-banner' (`-B') option given more than once\n", PROGRAM);
+          }
+          args_info->no_banner_given++;
+         if (args_info->no_banner_given <= 1)
+           args_info->no_banner_flag = !(args_info->no_banner_flag);
+          break;
+        
         case 'o':	 /* Specify basename for output files (default=INPUT) */
           if (args_info->output_given) {
             fprintf(stderr, "%s: `--output' (`-o') option given more than once\n", PROGRAM);
@@ -333,6 +347,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
            args_info->classes_flag = !(args_info->classes_flag);
           break;
         
+        case 'F':	 /* Generate only flavor heuristic file. */
+          if (args_info->flavors_given) {
+            fprintf(stderr, "%s: `--flavors' (`-F') option given more than once\n", PROGRAM);
+          }
+          args_info->flavors_given++;
+         if (args_info->flavors_given <= 1)
+           args_info->flavors_flag = !(args_info->flavors_flag);
+          break;
+        
         case 'e':	 /* Specify boundary tag (default=__$) */
           if (args_info->eos_tag_given) {
             fprintf(stderr, "%s: `--eos-tag' (`-e') option given more than once\n", PROGRAM);
@@ -352,21 +375,12 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           break;
         
         case 'f':	 /* Use flavor heuristics from FILE (default=built-in). */
-          if (args_info->flavors_given) {
-            fprintf(stderr, "%s: `--flavors' (`-f') option given more than once\n", PROGRAM);
+          if (args_info->flavors_from_given) {
+            fprintf(stderr, "%s: `--flavors-from' (`-f') option given more than once\n", PROGRAM);
           }
-          args_info->flavors_given++;
-          if (args_info->flavors_arg) free(args_info->flavors_arg);
-          args_info->flavors_arg = gog_strdup(val);
-          break;
-        
-        case 'F':	 /* Don't use any flavor heuristics at all. */
-          if (args_info->no_flavors_given) {
-            fprintf(stderr, "%s: `--no-flavors' (`-F') option given more than once\n", PROGRAM);
-          }
-          args_info->no_flavors_given++;
-         if (args_info->no_flavors_given <= 1)
-           args_info->no_flavors_flag = !(args_info->no_flavors_flag);
+          args_info->flavors_from_given++;
+          if (args_info->flavors_from_arg) free(args_info->flavors_from_arg);
+          args_info->flavors_from_arg = gog_strdup(val);
           break;
         
         case 't':	 /* Freq. threshhold for 'unknown' lexical probabilities */
@@ -415,6 +429,16 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->verbose_given++;
             args_info->verbose_arg = (int)atoi(val);
+          }
+          
+          /* Suppress initial banner message (implied at verbosity levels <= 1) */
+          else if (strcmp(olong, "no-banner") == 0) {
+            if (args_info->no_banner_given) {
+              fprintf(stderr, "%s: `--no-banner' (`-B') option given more than once\n", PROGRAM);
+            }
+            args_info->no_banner_given++;
+           if (args_info->no_banner_given <= 1)
+             args_info->no_banner_flag = !(args_info->no_banner_flag);
           }
           
           /* Specify basename for output files (default=INPUT) */
@@ -477,6 +501,16 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
              args_info->classes_flag = !(args_info->classes_flag);
           }
           
+          /* Generate only flavor heuristic file. */
+          else if (strcmp(olong, "flavors") == 0) {
+            if (args_info->flavors_given) {
+              fprintf(stderr, "%s: `--flavors' (`-F') option given more than once\n", PROGRAM);
+            }
+            args_info->flavors_given++;
+           if (args_info->flavors_given <= 1)
+             args_info->flavors_flag = !(args_info->flavors_flag);
+          }
+          
           /* Specify boundary tag (default=__$) */
           else if (strcmp(olong, "eos-tag") == 0) {
             if (args_info->eos_tag_given) {
@@ -498,23 +532,13 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           
           /* Use flavor heuristics from FILE (default=built-in). */
-          else if (strcmp(olong, "flavors") == 0) {
-            if (args_info->flavors_given) {
-              fprintf(stderr, "%s: `--flavors' (`-f') option given more than once\n", PROGRAM);
+          else if (strcmp(olong, "flavors-from") == 0) {
+            if (args_info->flavors_from_given) {
+              fprintf(stderr, "%s: `--flavors-from' (`-f') option given more than once\n", PROGRAM);
             }
-            args_info->flavors_given++;
-            if (args_info->flavors_arg) free(args_info->flavors_arg);
-            args_info->flavors_arg = gog_strdup(val);
-          }
-          
-          /* Don't use any flavor heuristics at all. */
-          else if (strcmp(olong, "no-flavors") == 0) {
-            if (args_info->no_flavors_given) {
-              fprintf(stderr, "%s: `--no-flavors' (`-F') option given more than once\n", PROGRAM);
-            }
-            args_info->no_flavors_given++;
-           if (args_info->no_flavors_given <= 1)
-             args_info->no_flavors_flag = !(args_info->no_flavors_flag);
+            args_info->flavors_from_given++;
+            if (args_info->flavors_from_arg) free(args_info->flavors_from_arg);
+            args_info->flavors_from_arg = gog_strdup(val);
           }
           
           /* Freq. threshhold for 'unknown' lexical probabilities */

@@ -50,6 +50,7 @@
 #include <mootSTLHacks.h>
 #include <mootTypes.h>
 #include <mootUtils.h>
+#include <mootModelSpec.h>
 #include <mootEnum.h>
 
 //----------------------------------------------------------------------

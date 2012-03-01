@@ -2,4 +2,5 @@
 @ALL_ALPHAM	^[[:alpha:]ͤ]+$
 @ALL_PUNCT	^[[:punct:]]+$
 @ALL_DIGIT	^[[:digit:]]+$
-@HAS_NONALPHA	[^[:alpha:]]
+%%@HAS_NONALPHA	[^[:alpha:]]
+DEFAULT		@OTHER

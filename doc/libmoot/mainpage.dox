@@ -1,10 +1,10 @@
 /* -*- Mode: C++ -*- */
 /** 
-\mainpage libmoot: moocow's PoS tagging library
+\mainpage libmoot: moot PoS tagging library
 
-\author Bryan Jurish <jurish@uni-potsdam.de>
+\author Bryan Jurish <moocow@cpan.org>
 
-\version 2.0.8
+\version 2.0.9
 
 
 \section Intro Introduction

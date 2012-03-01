@@ -21,6 +21,7 @@ extern "C" {
 struct gengetopt_args_info {
   char * rcfile_arg;	 /* Read an alternate configuration file. (default=NULL). */
   int verbose_arg;	 /* Verbosity level. (default=3). */
+  int no_banner_flag;	 /* Suppress initial banner message (implied at verbosity levels <= 2) (default=0). */
   char * flavors_arg;	 /* Use flavor heuristics from FILE (default=built-in). (default=NULL). */
   char * default_flavor_arg;	 /* Use LABEL as the default flavor (default=empty string or from flavor-file). (default=NULL). */
   int list_flag;	 /* INPUTs are file-lists, not filenames. (default=0). */
@@ -34,6 +35,7 @@ struct gengetopt_args_info {
   int version_given;	 /* Whether version was given */
   int rcfile_given;	 /* Whether rcfile was given */
   int verbose_given;	 /* Whether verbose was given */
+  int no_banner_given;	 /* Whether no-banner was given */
   int flavors_given;	 /* Whether flavors was given */
   int default_flavor_given;	 /* Whether default-flavor was given */
   int list_given;	 /* Whether list was given */

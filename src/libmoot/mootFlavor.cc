@@ -108,15 +108,18 @@ mootTaster::Rules::const_iterator mootTaster::find(const char *s) const
 }
 
 //==============================================================================
-// mootTaster: I/O
+// mootTaster: I/O: load
 
 //----------------------------------------------------------------------
-void mootTaster::load(mootio::mistream* mis)
+bool mootTaster::load(mootio::mistream* mis, const std::string &prefix)
 {
   string line, lab, re;
   size_t e_lab, b_re, e_re;
   while (mis->valid() && !mis->eof()) {
     mis->getline(line);
+    if (!prefix.empty() && line.substr(0,prefix.size())==prefix) {
+      line.erase(0,prefix.size()); //-- remove prefix if requested
+    }
     if (line.find("%%")==0) continue; //-- ignore comments
     e_lab = line.find('\t');
     b_re  = e_lab==line.npos ? line.npos : line.find_first_not_of("\t\r\n",e_lab);
@@ -139,27 +142,50 @@ void mootTaster::load(mootio::mistream* mis)
     //-- normal rule
     rules.push_back(Rule(lab,re));
   }
+  return true;
 };
 
 //----------------------------------------------------------------------
-void mootTaster::load(const char *filename)
+bool mootTaster::load(const char *filename, const std::string &prefix)
 {
   mootio::mifstream mis(filename);
-  load(&mis);
+  return load(&mis,prefix);
 };
 
 //----------------------------------------------------------------------
 void mootTaster::set_default_rules(void)
 {
   clear();
-  append_rule("",		"^[^0-9]");
+  append_rule("@ALPHA",		"^[^0-9]");
   append_rule("@CARD",		"^([0-9]+)$");
   append_rule("@CARDPUNCT",	"^([0-9]+)([,\\.\\-])$");
   append_rule("@CARDSEPS",	"^([0-9])([0-9,\\.\\-]+)$");
   append_rule("@CARDSUFFIX",	"^([0-9])([0-9,\\.\\-]*)([^0-9,\\.\\-])(.{0,3})$");
+  set_default_label("@ALPHA");
 };
 
+//==============================================================================
+// mootTaster: I/O: save
 
+//----------------------------------------------------------------------
+bool mootTaster::save(mootio::mostream *mos, const std::string &prefix) const
+{
+  for (Rules::const_iterator ri=rules.begin(); ri!=rules.end(); ++ri) {
+    const Rule &r = *ri;
+    mos->puts(prefix);
+    mos->printf("%s\t%s\n", r.lab.c_str(), r.re_s.c_str());
+  }
+  mos->puts(prefix);
+  mos->printf("%s\t%s\n", "DEFAULT", nolabel.c_str());
+  return true;
+}
+
+//----------------------------------------------------------------------
+bool mootTaster::save(const char *filename, const std::string &prefix) const
+{
+  mootio::mofstream mos(filename);
+  return save(&mos,prefix);
+};
 
 //----------------------------------------------------------------------
 }; /* namespace moot */

@@ -89,16 +89,16 @@ public:
   LexfreqTokTable    lftable;    /**< lexeme->(tag->count) lookup table */
   LexfreqTagTable    tagtable;   /**< tag->count lookup table */
   LexfreqCount       n_tokens;   /**< total number of tokens counted */
-  mootTaster	     taster;     /**< token classification heuristics */
+
+  mootTaster	    *taster;		 /**< token classification heuristics (NULL for none) */
   LexfreqCount	     unknown_threshhold; /**< maximum frequency for special @UNKNOWN lexeme (default=1) */
 
 public:
   //------ public methods
   /** Default constructor */
   mootLexfreqs(size_t initial_bucket_count=0)
-    : n_tokens(0), unknown_threshhold(1)
+    : n_tokens(0), taster(NULL), unknown_threshhold(1)
   {
-    taster.set_default_rules();
     if (initial_bucket_count != 0) {
       lftable.resize(initial_bucket_count);
     }
@@ -146,7 +146,7 @@ public:
   /**
    * Add counts for 'special' (flavor-based) tokens to the object.
    * This should be called after you have added
-   * all 'real' tokens.
+   * all 'real' tokens and set \a taster to a non-NULL mootTaster*.
    */
   void compute_specials(void);
 

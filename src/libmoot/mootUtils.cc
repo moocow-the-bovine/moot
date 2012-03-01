@@ -50,9 +50,34 @@ extern "C" {
 #ifdef MOOT_ZLIB_ENABLED
 # include <zlib.h>
 #endif
+#ifdef HAVE_LOCALE_H
+# include <locale.h>
+#endif
 
 namespace moot {
   using namespace std;
+
+/*----------------------------------------------------------------------
+ * Locale Utilities
+ *---------------------------------------------------------------------*/
+void moot_setlocale(void)
+{
+#ifdef HAVE_LOCALE_H
+  setlocale(LC_ALL,"");
+#else
+  //moot_carp("WARNING: locale support disabled\n");
+  return;
+#endif
+};
+
+const char *moot_lc_ctype(void)
+{
+#ifdef HAVE_LOCALE_H
+  return setlocale(LC_CTYPE,NULL);
+#else
+  return "(unavailable)";
+#endif
+};
 
 /*----------------------------------------------------------------------
  * String Utilities
@@ -167,7 +192,38 @@ void moot_strtok(const std::string &s,
       out.push_back(string());
       out.back().assign(s,beg,end-beg);
     }
-}
+};
+
+//----------------------------------------------------------------------
+std::list<std::string> moot_strtok(const std::string &s, const std::string &delim)
+{
+  std::list<std::string> l;
+  moot_strtok(s,delim,l);
+  return l;
+};
+
+/*----------------------------------------------------------------------
+ * String Utilities: moot_strsplit()
+ */
+void moot_strsplit(const std::string &s, const std::string &delim, std::vector<std::string> &out)
+{
+  out.clear();
+  size_t si, sj;
+  for (si=0; si < s.size(); si=sj+1) {
+    sj = s.find_first_of(delim,si);
+    out.push_back(s.substr(si,(sj-si)));
+    if (sj==s.npos) break;
+  }
+};
+
+//----------------------------------------------------------------------
+std::vector<std::string> moot_strsplit(const std::string &s, const std::string &delim)
+{
+  std::vector<std::string> l;
+  moot_strsplit(s,delim,l);
+  return l;
+};
+
 
 /*----------------------------------------------------------------------
  * String Utilities: printf
@@ -252,73 +308,6 @@ std::string moot_unextend(const char *filename)
  */
 //(inlined)
 
-/*--------------------------------------------------------------------------
- * Named File utilities: parse_model_name()
- */
-bool hmm_parse_model_name(const string &modelname,
-			  string &binfile,
-			  string &lexfile,
-			  string &ngfile,
-			  string &lcfile)
-{
-  if (moot_file_exists(modelname.c_str())) {
-    binfile = modelname;
-    lexfile.clear();
-    ngfile.clear();
-    lcfile.clear();
-  }
-  else {
-    binfile.clear();
-    return hmm_parse_model_name_text(modelname,lexfile,ngfile,lcfile);
-  }
-
-  return !(binfile.empty() && lexfile.empty() && ngfile.empty() && lcfile.empty());
-}
-
-/*--------------------------------------------------------------------------
- * Named File utilities: parse_model_name_text()
- */
-bool hmm_parse_model_name_text(const string &modelname,
-			       string &lexfile,
-			       string &ngfile,
-			       string &lcfile)
-{
-  size_t icomma1 = modelname.find(',',0);
-
-  //-- lexfile
-  if (icomma1 != modelname.npos) {
-    lexfile.assign(modelname,0,icomma1);
-
-    //-- ngfile
-    size_t icomma2 = modelname.find(',',icomma1+1);
-    if (icomma2 != modelname.npos) {
-      ngfile.assign(modelname,icomma1+1,icomma2-icomma1-1);
-
-      //-- lcfile
-      lcfile.assign(modelname,icomma2+1,modelname.size()-(icomma2+1));
-    }
-    else {
-      ngfile.assign(modelname,icomma1+1,modelname.size()-(icomma1+1));
-      lcfile.clear();
-    }
-  }
-  else {
-    //-- no commas: expand modelname as basename
-    lexfile = modelname;
-    lexfile.append(".lex");
-    //if (!moot_file_exists(lexfile.c_str())) lexfile.clear();  //-- not here: (used for training!)
-
-    ngfile = modelname;
-    ngfile.append(".123");
-    //if (!moot_file_exists(ngfile.c_str())) ngfile.clear(); //-- not here: (used for training!)
-
-    lcfile = modelname;
-    lcfile.append(".clx");
-    //if (!moot_file_exists(lcfile.c_str())) lcfile.clear(); //-- not here: (used for training!)
-  }
-
-  return !(lexfile.empty() && ngfile.empty() && lcfile.empty());
-}
 
 /*----------------------------------------------------------------------
  * cmdutil_file_churner

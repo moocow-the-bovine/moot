@@ -49,6 +49,7 @@
 #include <mootTokenExpatIO.h>
 #include <mootCIO.h>
 #include <mootUtils.h>
+#include <mootModelSpec.h>
 
 #include "mootrain_cmdparser.h"
 
@@ -69,11 +70,13 @@ cmdutil_file_churner churner;
 mofstream lfout;
 mofstream ngout;
 mofstream lcout;
+mofstream flout;
 
 // -- global classes/structs
 mootHMMTrainer  hmmt;
+mootModelSpec   ms;
+mootTaster     &taster   = hmmt.taster;
 mootLexfreqs   &lexfreqs = hmmt.lexfreqs;
-mootTaster     &taster   = hmmt.lexfreqs.taster;
 mootNgrams     &ngrams   = hmmt.ngrams;
 mootClassfreqs &lcfreqs  = hmmt.lcfreqs;
 
@@ -115,7 +118,8 @@ void GetMyOptions(int argc, char **argv)
   vlevel = args.verbose_arg;
 
   // -- show banner
-  moot_msg(vlevel, vlProgress,  moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
+  if (!args.no_banner_given)
+    moot_msg(vlevel, vlProgress,  moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
 
   // -- set up file-churner
   churner.progname = PROGNAME;
@@ -125,38 +129,30 @@ void GetMyOptions(int argc, char **argv)
   churner.paranoid = true;
 
   // -- parse model spec
-  string lexfile;
-  string ngfile;
-  string lcfile;
   if (args.output_given) {
-    if (!hmm_parse_model_name_text(args.output_arg, lexfile, ngfile, lcfile)) {
-      fprintf(stderr, "%s: could not parse output model specification '%s'\n",
-	      PROGNAME, args.output_arg);
-      exit(1);
-    }
-  } else if (args.inputs_num > 0) {
+    if (!ms.parse(args.output_arg, false)) 
+      moot_croak("%s: could not parse output model specification '%s'\n", PROGNAME, args.output_arg);
+  }
+  else if (args.inputs_num > 0) {
     string mymodel = moot_unextend(args.inputs[0]);
-
-    if (!hmm_parse_model_name_text(mymodel, lexfile, ngfile, lcfile)) {
-      fprintf(stderr, "%s: could not get output model from corpus-name '%s'\n",
-	      PROGNAME, args.inputs[0]);
-      exit(1);
-    }
-  } else {
-    fprintf(stderr, "%s: You must specify either a corpus or an output model!\n",
-	    PROGNAME);
-    exit(1);
+    if (!ms.parse(mymodel, false))
+      moot_croak("%s: could not get output model from corpus-name '%s'\n", PROGNAME, args.inputs[0]);
+  }
+  else {
+    moot_croak("%s: you must specify either a corpus or an output model!\n", PROGNAME);
   }
 
   // -- assign various flags
-  if (args.lex_given || args.ngrams_given || args.classes_given) {
+  if (args.lex_given || args.ngrams_given || args.classes_given || args.flavors_given) {
     hmmt.want_lexfreqs = args.lex_given;
     hmmt.want_ngrams = args.ngrams_given;
     hmmt.want_classfreqs = args.classes_given;
+    hmmt.want_flavors = args.flavors_given;
   } else {
     hmmt.want_lexfreqs = true;
     hmmt.want_ngrams = true;
     hmmt.want_classfreqs = true;
+    hmmt.want_flavors = true;
   }
   hmmt.lexfreqs.unknown_threshhold = args.unknown_threshhold_arg;
   hmmt.eos_tag = args.eos_tag_arg;
@@ -165,27 +161,14 @@ void GetMyOptions(int argc, char **argv)
   //(none)
 
   // -- open output files
-  if (hmmt.want_lexfreqs) {
-    if (!lfout.open(lexfile, "w")) {
-      fprintf(stderr, "%s: open failed for lexical frequency file '%s': %s\n",
-	      PROGNAME, lfout.name.c_str(), strerror(errno));
-      exit(1);
-    }
-  }
-  if (hmmt.want_ngrams) {
-    if (!ngout.open(ngfile,"w")) {
-      fprintf(stderr, "%s: open failed for ngram frequency file '%s': %s\n",
-	      PROGNAME, ngout.name.c_str(), strerror(errno));
-      exit(1);
-    }
-  }
-  if (hmmt.want_classfreqs) {
-    if (!lcout.open(lcfile,"w")) {
-      fprintf(stderr, "%s: open failed for class frequency file '%s': %s\n",
-	      PROGNAME, lcout.name.c_str(), strerror(errno));
-      exit(1);
-    }
-  }
+  if (hmmt.want_lexfreqs && !lfout.open(ms.lexfile, "w"))
+    moot_croak("%s: open failed for lexical frequency file '%s': %s\n", PROGNAME, lfout.name.c_str(), strerror(errno));
+  if (hmmt.want_ngrams && !ngout.open(ms.ngfile,"w"))
+    moot_croak("%s: open failed for ngram frequency file '%s': %s\n", PROGNAME, ngout.name.c_str(), strerror(errno));
+  if (hmmt.want_classfreqs && !lcout.open(ms.lcfile,"w"))
+    moot_croak("%s: open failed for class frequency file '%s': %s\n", PROGNAME, lcout.name.c_str(), strerror(errno));
+  if (hmmt.want_flavors && !flout.open(ms.flafile,"w"))
+    moot_croak("%s: open failed for output flavor file '%s': %s\n", PROGNAME, flout.name.c_str(), strerror(errno));
 
   //-- i/o format : input
   ifmt = TokenIO::parse_format_request(args.input_format_arg,
@@ -195,10 +178,8 @@ void GetMyOptions(int argc, char **argv)
 
   //-- io: new_reader
   reader = TokenIO::new_reader(ifmt);
-  if (!reader) {
-    fprintf(stderr, "%s: Error: could not set up TokenReader!\n", PROGNAME);
-    exit(1);
-  }
+  if (!reader)
+    moot_croak("%s: Error: could not set up TokenReader!\n", PROGNAME);
 
 #ifdef MOOT_EXPAT_ENABLED
   //-- io: encoding: reader
@@ -208,21 +189,22 @@ void GetMyOptions(int argc, char **argv)
 #endif
 
   //-- flavors
-  if (!args.no_flavors_flag && args.flavors_given) {
+  if (!args.flavors_from_given) {
+    //-- flavor file unspecified: use backwards-compatible built-in rules
+    //taster.set_default_rules();  //-- default anyway
+    flavor_src = "(built-in)";
+  }
+  else if (args.flavors_from_arg[0]) {
+    //-- flavor file specified and non-empty: load file
     mifstream tin;
-    if (!tin.open(args.flavors_arg,"r")) {
-      moot_croak("%s: open failed for flavor file '%s': %s\n", PROGNAME, tin.name.c_str(), strerror(errno));
-    }
+    if (!tin.open(args.flavors_from_arg,"r"))
+      moot_croak("%s: open failed for input flavor file '%s': %s\n", PROGNAME, tin.name.c_str(), strerror(errno));
     taster.clear();
     taster.load(&tin);
-    tin.close();
-    flavor_src = args.flavors_arg;
-  } else if (!args.no_flavors_flag) {
-    taster.set_default_rules();
-    //taster.set_default_label("@ALPHA");
-    flavor_src = "(built-in)";
-  } else {
-    //-- no flavors at all
+    flavor_src = args.flavors_from_arg;
+  }
+  else {
+    //-- flavor file specified as empty string: no flavors at all
     taster.clear();
     flavor_src = "(none)";
   }
@@ -231,10 +213,11 @@ void GetMyOptions(int argc, char **argv)
   if (args.verbose_arg >= vlProgress) {
     //fprintf(stderr, "%s: kmax               : %d\n", PROGNAME, hmmt.kmax);
     fprintf(stderr, "%s: EOS tag            : %s\n", PROGNAME, hmmt.eos_tag.c_str());
-    fprintf(stderr, "%s: Flavors            : %s : %u rules\n", PROGNAME, flavor_src, taster.size());
+    fprintf(stderr, "%s: Flavors (in)       : %s : %u rules\n", PROGNAME, flavor_src, taster.size());
     fprintf(stderr, "%s: Lexical frequenies : %s\n", PROGNAME, !lfout.name.empty() ? lfout.name.c_str() : "(null)");
     fprintf(stderr, "%s: Ngram frequencies  : %s\n", PROGNAME, !ngout.name.empty() ? ngout.name.c_str() : "(null)");
     fprintf(stderr, "%s: Class frequencies  : %s\n", PROGNAME, !lcout.name.empty() ? lcout.name.c_str() : "(null)");
+    fprintf(stderr, "%s: Flavors (out)      : %s\n", PROGNAME, !flout.name.empty() ? flout.name.c_str() : "(null)");
   }
 }
   
@@ -266,6 +249,8 @@ int main (int argc, char **argv)
     ngout.printf("%s %s ngram frequency file generated on %s", cmts, PROGNAME, asctime(now_tm));
   if (hmmt.want_classfreqs)
     lcout.printf("%s %s class frequency file generated on %s", cmts, PROGNAME, asctime(now_tm));
+  if (hmmt.want_flavors)
+    flout.printf("%s %s flavor rule file generated on %s", cmts, PROGNAME, asctime(now_tm));
 
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
@@ -297,24 +282,26 @@ int main (int argc, char **argv)
 
     //-- print summary to file
     if (lfout.valid()) {
-      lfout.printf("%s  LC_CTYPE   : %s\n", cmts, setlocale(LC_CTYPE,NULL));
-      lfout.printf("%s  Flavor File: %s\n", cmts, flavor_src);
-      lfout.printf("%s  Num/Flavors: %u\n", cmts, taster.size());
       lfout.printf("%s  Num/Tokens : %g\n", cmts, hmmt.lexfreqs.n_tokens);
       lfout.printf("%s  Num/Types  : %u\n", cmts, hmmt.lexfreqs.lftable.size());
       lfout.printf("%s  Num/Tags   : %u\n", cmts, hmmt.lexfreqs.tagtable.size());
       lfout.printf("%s  Num/Pairs  : %u tok*tag\n", cmts, hmmt.lexfreqs.n_pairs());
       lfout.printf("%s  UnknownMaxF: %g\n", cmts, hmmt.lexfreqs.unknown_threshhold);
+      lfout.printf("%s  LC_CTYPE   : %s\n", cmts, moot_lc_ctype());
+      if (hmmt.want_flavors) {
+	lfout.printf("%s  Flavors    : %s\n", cmts, flout.name.c_str());
+	taster.save(&lfout, string(cmts)+"\t");
+      } else {
+	lfout.printf("%s  Flavors    : (none)\n", cmts);
+      }
     }
 
     //-- lexfreqs: save: guts
     if (!hmmt.lexfreqs.save(lfout.file, lfout.name.c_str())) {
-      fprintf(stderr, "\n%s: save FAILED for lexical frequency file '%s'\n",
-	      PROGNAME, lfout.name.c_str());
-      exit(2);
-    } else if (args.verbose_arg >= vlProgress) {
-      fprintf(stderr, " saved.\n");
+      moot_croak("\n%s: save FAILED for lexical frequency file '%s'\n", PROGNAME, lfout.name.c_str());
     }
+    moot_msg(vlevel,vlProgress, " saved.\n");
+
     lfout.close();
   }
 
@@ -331,12 +318,10 @@ int main (int argc, char **argv)
 
     //-- guts
     if (!hmmt.ngrams.save(ngout.file, ngout.name.c_str(), !args.verbose_ngrams_given)) {
-      fprintf(stderr, "\n%s: save FAILED for n-gram frequency file '%s'\n",
-	      PROGNAME, ngout.name.c_str());
-      exit(2);
-    } else if (args.verbose_arg >= vlProgress) {
-      fprintf(stderr, " saved.\n");
-    }
+      moot_croak("\n%s: save FAILED for n-gram frequency file '%s'\n", PROGNAME, ngout.name.c_str());
+    } 
+    moot_msg(vlevel,vlProgress, " saved.\n");
+
     ngout.close();
   }
 
@@ -354,15 +339,28 @@ int main (int argc, char **argv)
 
     //-- classfreqs: save: guts
     if (!hmmt.lcfreqs.save(lcout.file, lcout.name.c_str())) {
-      fprintf(stderr, "\n%s: save FAILED for class frequency file '%s'\n",
-	      PROGNAME, lcout.name.c_str());
-      exit(2);
-    } else if (args.verbose_arg >= vlProgress) {
-      fprintf(stderr, " saved.\n");
+      moot_croak("\n%s: save FAILED for class frequency file '%s'\n", PROGNAME, lcout.name.c_str());
     }
+    moot_msg(vlevel,vlProgress," saved.\n");
+
     lcout.close();
   }
 
+  //-- save: flavors
+  if (hmmt.want_flavors) {
+    moot_msg(vlevel,vlProgress, "%s: saving flavor rule file '%s'...", PROGNAME, flout.name.c_str());
+
+    //-- print summary to file
+    flout.printf("%s  LC_CTYPE=%s\n", cmts, moot_lc_ctype());
+
+    //-- flacors: save: guts
+    if (!taster.save(&flout)) {
+      moot_croak("\n%s: save FAILED for flavor rule file '%s'\n", PROGNAME, flout.name.c_str());
+    }
+    moot_msg(vlevel,vlProgress," saved.\n");
+
+    flout.close();
+  }
 
   return 0;
 }
