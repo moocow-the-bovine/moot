@@ -86,10 +86,11 @@ const char *moot_lc_ctype(void)
 /*----------------------------------------------------------------------
  * String Utilities: parse_doubles()
  */
-bool moot_parse_doubles(char *str, double *dbls, size_t ndbls)
+bool moot_parse_doubles(const char *str, double *dbls, size_t ndbls)
 {
   size_t i;
-  char  *s, *comma;
+  const char *s;
+  char *comma;
   if (!str) return false;
   for (i = 0, s = str; i < ndbls; i++, s = comma+1) {
     dbls[i] = strtod(s, &comma);

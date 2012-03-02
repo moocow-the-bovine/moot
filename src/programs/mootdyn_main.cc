@@ -49,15 +49,6 @@
 using namespace std;
 using namespace moot;
 
-typedef enum {
-  vlSilent = 0,
-  vlErrors = 1,
-  vlWarnings = 2,
-  vlSummary = 3,
-  vlProgress = 4,
-  vlEverything = 5
-} verbosityLevel;
-
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
@@ -109,7 +100,7 @@ void GetMyOptions(int argc, char **argv)
 
   //-- show banner
   if (!args.no_banner_given)
-    moot_msg(args.verbose_arg, vlSummary, moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
+    moot_msg(args.verbose_arg, vlInfo, moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
 
   //-- output file
   if (!out.open(args.output_arg,"w")) {
@@ -194,12 +185,7 @@ void GetMyOptions(int argc, char **argv)
 
   // -- assign "verbose" flag
   hmmp->ndots = args.dots_arg;
-  if (args.verbose_arg <= vlSilent) hmmp->verbose = mootHMM::vlSilent;
-  else if (args.verbose_arg <= vlErrors) hmmp->verbose = mootHMM::vlErrors;
-  else if (args.verbose_arg <= vlWarnings) hmmp->verbose = mootHMM::vlWarnings;
-  else if (args.verbose_arg <= vlSummary) hmmp->verbose = mootHMM::vlWarnings;
-  else if (args.verbose_arg <= vlProgress) hmmp->verbose = mootHMM::vlProgress;
-  else hmmp->verbose = mootHMM::vlEverything;
+  hmmp->verbose = args.verbose_arg;
 
   // -- parse and assign n-gram smoothing constants (nlambdas)
   if (args.nlambdas_given) {
@@ -386,13 +372,13 @@ int main (int argc, char **argv)
   GetMyOptions(argc,argv);
 
   // -- get init-stop time = analysis-start time
-  if (args.verbose_arg >= vlSummary) {
+  if (args.verbose_arg >= vlInfo) {
     ielapsed = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
   }
 
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
-    if (args.verbose_arg >= vlSummary) nfiles++;
+    if (args.verbose_arg >= vlInfo) nfiles++;
     if (args.verbose_arg >= vlProgress) {
       writer->printf_comment("\n File: %s\n", churner.in.name.c_str());
       fprintf(stderr,"%s: analyzing file '%s'...", PROGNAME, churner.in.name.c_str());
@@ -414,7 +400,7 @@ int main (int argc, char **argv)
   }
 
   // -- summary
-  if (args.verbose_arg >= vlSummary) {
+  if (args.verbose_arg >= vlInfo) {
     // -- timing
     aelapsed  = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC) - ielapsed; 
 

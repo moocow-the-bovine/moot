@@ -289,7 +289,10 @@ bool mootHMM::load_model(const string &modelname,
     else if (verbose >= vlProgress) carp(" compiled.\n");
 
     //-- check whether to use classes
-    if (lcprobs.size() <= 2) use_lex_classes = false;
+    if (lcprobs.size() <= 2 && use_lex_classes) {
+      use_lex_classes = false;
+      moot_msg(verbose, vlWarnings, "%s: Warning: no class frequencies available: disabling lexical classes!\n", myname);
+    }
 
     //-- estimate smoothing constants: lexical probabiltiies (wlambdas)
     if (do_estimate_wlambdas) {

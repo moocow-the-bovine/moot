@@ -114,8 +114,9 @@ EXTRA_DIST += mootrain.gog
 #~~~~~~~~
 mootcompile_SOURCES = \
 	mootcompile_main.cc \
-	mootcompile_cmdparser.cc mootcompile_cmdparser.h
-mootcompile_main.o: mootcompile_cmdparser.h
+	mootcompile_cmdparser.cc mootcompile_cmdparser.h \
+	computils.h computils.cc
+mootcompile_main.o: mootcompile_cmdparser.h computils.h
 mootcompile_LDFLAGS = $(LDFLAGS_COMMON)
 mootcompile_LDADD = $(LDADD_COMMON)
 EXTRA_DIST += mootcompile.gog
@@ -132,8 +133,9 @@ EXTRA_DIST += mootdump.gog
 #~~~~~~~~
 moot_SOURCES = \
 	moot_main.cc \
-	moot_cmdparser.cc moot_cmdparser.h
-moot_main.o: moot_cmdparser.h
+	moot_cmdparser.cc moot_cmdparser.h \
+	computils.cc computils.h
+moot_main.o: moot_cmdparser.h computils.h
 moot_LDFLAGS = $(LDFLAGS_COMMON)
 moot_LDADD = $(LDADD_COMMON)
 EXTRA_DIST += moot.gog

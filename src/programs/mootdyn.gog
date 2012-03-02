@@ -78,7 +78,7 @@ Print everything.
 =back
 "
 
-flag "no-banner" B "Suppress initial banner message (implied at verbosity levels <= 2)" \
+flag "no-banner" - "Suppress initial banner message (implied at verbosity levels <= 2)" \
   default="0"
 
 flag  "no-header" H  "Suppres leading comments in destination file." \

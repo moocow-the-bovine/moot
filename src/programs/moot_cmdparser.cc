@@ -107,6 +107,7 @@ cmdline_parser_print_help (void)
   printf("   -AFREQ    --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.\n");
   printf("             --trie-theta=FLOAT           Suffix backoff coefficient.\n");
   printf("   -LBOOL    --use-classes=BOOL           Whether to use lexical class-probabilities.\n");
+  printf("   -FBOOL    --use-flavors=BOOL           Whether to use token 'flavor' heuristics (default=1 (true))\n");
   printf("   -RBOOL    --relax=BOOL                 Whether to relax token-tag associability (default=1 (true))\n");
   printf("   -NFLOATS  --nlambdas=FLOATS            N-Gram smoothing constants (default=estimate)\n");
   printf("   -WFLOATS  --wlambdas=FLOATS            Lexical smoothing constants (default=estimate)\n");
@@ -159,6 +160,7 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->trie_threshhold_arg = 10; 
   args_info->trie_theta_arg = 0; 
   args_info->use_classes_arg = 1; 
+  args_info->use_flavors_arg = 1; 
   args_info->relax_arg = 1; 
   args_info->nlambdas_arg = NULL; 
   args_info->wlambdas_arg = NULL; 
@@ -200,6 +202,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->trie_threshhold_given = 0;
   args_info->trie_theta_given = 0;
   args_info->use_classes_given = 0;
+  args_info->use_flavors_given = 0;
   args_info->relax_given = 0;
   args_info->nlambdas_given = 0;
   args_info->wlambdas_given = 0;
@@ -249,6 +252,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "trie-threshhold", 1, NULL, 'A' },
 	{ "trie-theta", 1, NULL, 0 },
 	{ "use-classes", 1, NULL, 'L' },
+	{ "use-flavors", 1, NULL, 'F' },
 	{ "relax", 1, NULL, 'R' },
 	{ "nlambdas", 1, NULL, 'N' },
 	{ "wlambdas", 1, NULL, 'W' },
@@ -281,6 +285,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'a', ':',
 	'A', ':',
 	'L', ':',
+	'F', ':',
 	'R', ':',
 	'N', ':',
 	'W', ':',
@@ -481,6 +486,14 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->use_classes_given++;
           args_info->use_classes_arg = (int)atoi(val);
+          break;
+        
+        case 'F':	 /* Whether to use token 'flavor' heuristics (default=1 (true)) */
+          if (args_info->use_flavors_given) {
+            fprintf(stderr, "%s: `--use-flavors' (`-F') option given more than once\n", PROGRAM);
+          }
+          args_info->use_flavors_given++;
+          args_info->use_flavors_arg = (int)atoi(val);
           break;
         
         case 'R':	 /* Whether to relax token-tag associability (default=1 (true)) */
@@ -779,6 +792,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->use_classes_given++;
             args_info->use_classes_arg = (int)atoi(val);
+          }
+          
+          /* Whether to use token 'flavor' heuristics (default=1 (true)) */
+          else if (strcmp(olong, "use-flavors") == 0) {
+            if (args_info->use_flavors_given) {
+              fprintf(stderr, "%s: `--use-flavors' (`-F') option given more than once\n", PROGRAM);
+            }
+            args_info->use_flavors_given++;
+            args_info->use_flavors_arg = (int)atoi(val);
           }
           
           /* Whether to relax token-tag associability (default=1 (true)) */

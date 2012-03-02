@@ -30,7 +30,7 @@ rcfile "~/.mootcompilerc"
 #-----------------------------------------------------------------------------
 # Arguments
 #-----------------------------------------------------------------------------
-argument "MODEL(s)" "Text-format input models." \
+argument "MODEL" "Text-format input model." \
     details="
 For details on moot file formats, see L<mootfiles>.
 "

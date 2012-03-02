@@ -87,6 +87,7 @@ cmdline_parser_print_help (void)
   printf("   -V        --version                    Print version and exit.\n");
   printf("   -cFILE    --rcfile=FILE                Read an alternate configuration file.\n");
   printf("   -vLEVEL   --verbose=LEVEL              Verbosity level.\n");
+  printf("             --no-banner                  Suppress initial banner message (implied at verbosity levels <= 2)\n");
   printf("   -H        --no-header                  Suppres leading comments in destination file.\n");
   printf("   -dNTOKS   --dots=NTOKS                 Print a dot for every NTOKS tokens processed.\n");
   printf("   -l        --list                       INPUTs are file-lists, not filenames.\n");
@@ -151,6 +152,7 @@ clear_args(struct gengetopt_args_info *args_info)
 {
   args_info->rcfile_arg = NULL; 
   args_info->verbose_arg = 4; 
+  args_info->no_banner_flag = 0; 
   args_info->no_header_flag = 0; 
   args_info->dots_arg = 0; 
   args_info->list_flag = 0; 
@@ -198,6 +200,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->version_given = 0;
   args_info->rcfile_given = 0;
   args_info->verbose_given = 0;
+  args_info->no_banner_given = 0;
   args_info->no_header_given = 0;
   args_info->dots_given = 0;
   args_info->list_given = 0;
@@ -253,6 +256,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "version", 0, NULL, 'V' },
 	{ "rcfile", 1, NULL, 'c' },
 	{ "verbose", 1, NULL, 'v' },
+	{ "no-banner", 0, NULL, 0 },
 	{ "no-header", 0, NULL, 'H' },
 	{ "dots", 1, NULL, 'd' },
 	{ "list", 0, NULL, 'l' },
@@ -707,6 +711,16 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->verbose_given++;
             args_info->verbose_arg = (int)atoi(val);
+          }
+          
+          /* Suppress initial banner message (implied at verbosity levels <= 2) */
+          else if (strcmp(olong, "no-banner") == 0) {
+            if (args_info->no_banner_given) {
+              fprintf(stderr, "%s: `--no-banner' option given more than once\n", PROGRAM);
+            }
+            args_info->no_banner_given++;
+           if (args_info->no_banner_given <= 1)
+             args_info->no_banner_flag = !(args_info->no_banner_flag);
           }
           
           /* Suppres leading comments in destination file. */

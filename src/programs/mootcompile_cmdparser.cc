@@ -75,11 +75,11 @@ cmdline_parser_print_help (void)
   printf("  moocow's HMM part-of-speech tagger/disambiguator: model compiler.\n");
   printf("\n");
   
-  printf("Usage: %s [OPTIONS]... MODEL(s)\n", "mootcompile");
+  printf("Usage: %s [OPTIONS]... MODEL\n", "mootcompile");
   
   printf("\n");
   printf(" Arguments:\n");
-  printf("   MODEL(s)  Text-format input models.\n");
+  printf("   MODEL  Text-format input model.\n");
   
   printf("\n");
   printf(" Options:\n");

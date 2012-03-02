@@ -323,6 +323,10 @@ int main (int argc, char **argv)
   if (hmmt.want_classfreqs) {
     moot_msg(vlevel,vlProgress, "%s: saving class frequency file '%s'...", PROGNAME, lcout.name.c_str());
 
+    //-- sanity check
+    if (hmmt.lcfreqs.lctable.size() <= 2)
+      moot_msg(vlevel,vlWarnings, "%s: Warning: found only %u lexical classes in training data: are you sure your data is pre-analyzed?\n", PROGNAME, hmmt.lcfreqs.lctable.size());
+
     //-- print summary to file
     lcout.printf("%s  Num/Tokens    : %g\n", cmts, hmmt.lcfreqs.totalcount);
     lcout.printf("%s  Num/Classes   : %u\n", cmts, hmmt.lcfreqs.lctable.size());

@@ -61,7 +61,7 @@ namespace moot {
    * Parse a comma-separated list of doubles (at most 'ndbls') from str into dbls.
    * You should already have allocated space for \c ndbls doubles in \c dbls.
    */
-  bool moot_parse_doubles(char *str, double *dbls, size_t ndbls);
+  bool moot_parse_doubles(const char *str, double *dbls, size_t ndbls);
   
   /*----------------------------------------------------------------------
    * normalize_ws_*()
