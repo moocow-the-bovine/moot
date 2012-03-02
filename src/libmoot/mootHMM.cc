@@ -483,11 +483,14 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	    lpsi->second += tagcount;
 	  }
 	}
-#endif
 	if (tokid != 0) {
 	  //-- it's a kosher token (too?): compute lexical probability: p(tok|tag)
 	  lexprobs[tokid][tagid] = tagcount / tagtotal;
 	}
+#else
+	//-- v2.0.9-1: always compute lexical probability: p(tok|tag)
+	lexprobs[tokid][tagid] = tagcount / tagtotal;
+#endif
       }
     }
 
@@ -543,11 +546,14 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	    lcpsi->second += ctagcount;
 	  }
 	}
-#endif
 	if (classid != 0) {
 	  //-- it's a kosher class (too?): compute class probability: p(class|tag)
 	  lcprobs[classid][tagid] = ctagcount / ctagtotal;
 	}
+#else
+	//-- v2.0.9-1: always compute class probability: p(class|tag)
+	lcprobs[classid][tagid] = ctagcount / ctagtotal;
+#endif
       }
     }
 
