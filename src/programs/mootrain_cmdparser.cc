@@ -86,8 +86,6 @@ cmdline_parser_print_help (void)
   printf("   -h        --help                       Print help and exit.\n");
   printf("   -V        --version                    Print version and exit.\n");
   printf("   -cFILE    --rcfile=FILE                Read an alternate configuration file.\n");
-  printf("\n");
-  printf(" Basic Options:\n");
   printf("   -vLEVEL   --verbose=LEVEL              Verbosity level.\n");
   printf("   -B        --no-banner                  Suppress initial banner message (implied at verbosity levels <= 1)\n");
   printf("   -oSTRING  --output=STRING              Specify basename for output files (default=INPUT)\n");
@@ -126,7 +124,7 @@ static void
 clear_args(struct gengetopt_args_info *args_info)
 {
   args_info->rcfile_arg = NULL; 
-  args_info->verbose_arg = 2; 
+  args_info->verbose_arg = 3; 
   args_info->no_banner_flag = 0; 
   args_info->output_arg = NULL; 
   args_info->input_format_arg = NULL; 

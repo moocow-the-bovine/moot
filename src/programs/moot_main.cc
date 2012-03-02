@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2009 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2002-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public
@@ -56,15 +56,6 @@
 using namespace std;
 using namespace moot;
 
-typedef enum {
-  vlSilent = 0,
-  vlErrors = 1,
-  vlWarnings = 2,
-  vlSummary = 3,
-  vlProgress = 4,
-  vlEverything = 5
-} verbosityLevel;
-
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
@@ -73,6 +64,7 @@ const char *PROGNAME = "moot";
 // options & file-churning
 gengetopt_args_info  args;
 cmdutil_file_churner churner;
+int vlevel;
 
 // -- files
 mofstream out;
@@ -80,7 +72,6 @@ size_t nfiles = 0;
 
 // -- global classes/structs
 mootHMM        hmm;
-
 
 // -- token i/o
 int ifmt         = tiofNone;
@@ -113,12 +104,12 @@ void GetMyOptions(int argc, char **argv)
   //-- load environmental defaults
   cmdline_parser_envdefaults(&args);
 
-  //-- show banner
-  if (args.verbose_arg > vlSilent)
-    fprintf(stderr,
-	    moot_program_banner(PROGNAME,
-				PACKAGE_VERSION,
-				"Bryan Jurish <moocow@cpan.org>").c_str());
+  //-- get verbosity level
+  vlevel = args.verbose_arg;
+
+  //-- show banner?
+  if (!args.no_banner_given)
+    moot_msg(args.verbose_arg, vlInfo,  moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
 
   //-- output file
   if (!out.open(args.output_arg,"w")) {
@@ -190,7 +181,7 @@ void GetMyOptions(int argc, char **argv)
   if (args.verbose_arg <= vlSilent) hmm.verbose = mootHMM::vlSilent;
   else if (args.verbose_arg <= vlErrors) hmm.verbose = mootHMM::vlErrors;
   else if (args.verbose_arg <= vlWarnings) hmm.verbose = mootHMM::vlWarnings;
-  else if (args.verbose_arg <= vlSummary) hmm.verbose = mootHMM::vlWarnings;
+  else if (args.verbose_arg <= vlInfo) hmm.verbose = mootHMM::vlWarnings;
   else if (args.verbose_arg <= vlProgress) hmm.verbose = mootHMM::vlProgress;
   else hmm.verbose = mootHMM::vlEverything;
 
@@ -380,13 +371,13 @@ int main (int argc, char **argv)
   GetMyOptions(argc,argv);
 
   // -- get init-stop time = analysis-start time
-  if (args.verbose_arg >= vlSummary) {
+  if (args.verbose_arg >= vlInfo) {
     ielapsed = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
   }
 
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
-    if (args.verbose_arg >= vlSummary) nfiles++;
+    if (args.verbose_arg >= vlInfo) nfiles++;
     if (args.verbose_arg >= vlProgress) {
       writer->printf_comment("\n     File: %s\n", churner.in.name.c_str());
       fprintf(stderr,"%s: analyzing file '%s'...", PROGNAME, churner.in.name.c_str());
@@ -408,7 +399,7 @@ int main (int argc, char **argv)
   }
 
   // -- summary
-  if (args.verbose_arg >= vlSummary) {
+  if (args.verbose_arg >= vlInfo) {
     // -- timing
     aelapsed  = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC) - ielapsed; 
 

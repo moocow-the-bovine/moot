@@ -78,6 +78,9 @@ Print everything.
 =back
 "
 
+flag "no-banner" B "Suppress initial banner message (implied at verbosity levels <= 2)" \
+  default="0"
+
 flag  "no-header" H  "Suppres leading comments in destination file." \
     details="
 Primarily useful as a workaround for nonconformant conservative XML output.

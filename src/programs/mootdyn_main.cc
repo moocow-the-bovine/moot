@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2010 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2010-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public
@@ -108,11 +108,8 @@ void GetMyOptions(int argc, char **argv)
   cmdline_parser_envdefaults(&args);
 
   //-- show banner
-  if (args.verbose_arg > vlSilent)
-    fprintf(stderr,
-	    moot_program_banner(PROGNAME,
-				PACKAGE_VERSION,
-				"Bryan Jurish <moocow@cpan.org>").c_str());
+  if (!args.no_banner_given)
+    moot_msg(args.verbose_arg, vlSummary, moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
 
   //-- output file
   if (!out.open(args.output_arg,"w")) {

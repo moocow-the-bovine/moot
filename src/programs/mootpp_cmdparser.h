@@ -20,7 +20,8 @@ extern "C" {
 
 struct gengetopt_args_info {
   char * rcfile_arg;	 /* Read an alternate configuration file. (default=NULL). */
-  int verbose_arg;	 /* Verbosity level. (default=1). */
+  int verbose_arg;	 /* Verbosity level. (default=3). */
+  int no_banner_flag;	 /* Suppress initial banner message (implied at verbosity levels <= 2) (default=0). */
   char * output_arg;	 /* Write output to FILE. (default=-). */
   int list_flag;	 /* Arguments are input-file lists. (default=0). */
   int recover_flag;	 /* Attempt to recover from minor errors. (default=0). */
@@ -30,6 +31,7 @@ struct gengetopt_args_info {
   int version_given;	 /* Whether version was given */
   int rcfile_given;	 /* Whether rcfile was given */
   int verbose_given;	 /* Whether verbose was given */
+  int no_banner_given;	 /* Whether no-banner was given */
   int output_given;	 /* Whether output was given */
   int list_given;	 /* Whether list was given */
   int recover_given;	 /* Whether recover was given */

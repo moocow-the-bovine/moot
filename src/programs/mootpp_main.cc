@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2009 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2002-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public
@@ -55,6 +55,7 @@ using namespace mootio;
  * Globals
  *--------------------------------------------------------------------------*/
 const char *PROGNAME = "mootpp";
+int vlevel;
 
 //-- files
 mofstream out;
@@ -77,20 +78,16 @@ void GetMyOptions(int argc, char **argv)
   if (cmdline_parser(argc, argv, &args) != 0)
     exit(1);
 
-  // -- show banner
-  if (args.verbose_arg > 0)
-    fprintf(stderr,
-	    moot_program_banner(PROGNAME,
-				PACKAGE_VERSION,
-				"Bryan Jurish <moocow@cpan.org>").c_str());
+  //-- verbosity
+  vlevel = args.verbose_arg;
 
+  // -- show banner
+  if (!args.no_banner_given)
+    moot_msg(vlevel, vlInfo, moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
 
   // -- output file
-  if (!out.open(args.output_arg,"w")) {
-    fprintf(stderr,"%s: open failed for output-file \"%s\": %s\n",
-	    PROGNAME, out.name.c_str(), strerror(errno));
-    exit(1);
-  }
+  if (!out.open(args.output_arg,"w"))
+    moot_croak("%s: open failed for output-file \"%s\": %s\n", PROGNAME, out.name.c_str(), strerror(errno));
 
   // -- set up file-churner
   churner.progname = PROGNAME;
@@ -119,18 +116,12 @@ int main (int argc, char **argv)
   int nfiles = 0;
 
   GetMyOptions(argc,argv);
-  lexer->verbose = args.verbose_arg;
+  lexer->verbose = (vlevel >= vlInfo);
 
   // -- big loop
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
-    if (args.verbose_arg > 0) {
-      nfiles++;
-      if (args.verbose_arg > 1) {
-	fprintf(stderr,"%s: processing file '%s'... ",
-		PROGNAME, churner.in.name.c_str());
-	fflush(stderr);
-      }
-    }
+    if (vlevel >= vlInfo) ++nfiles;
+    moot_msg(vlevel, vlProgress,  "%s: processing file '%s'... ", PROGNAME, churner.in.name.c_str());
     writer->printf_comment("\n    File: %s\n", churner.in.name.c_str());
 
     lexer->from_mstream(&churner.in);
@@ -139,7 +130,7 @@ int main (int argc, char **argv)
     int lxtok;
     mootSentence sent;
     while ((lxtok = lexer->yylex()) != mootPPLexer::PPEOF) {
-      if (args.verbose_arg > 0) lexer->ntokens++;
+      if (vlevel >= vlInfo) ++lexer->ntokens;
       switch (lxtok) { 
       case mootPPLexer::EOS:
 	if (lexer->yytext[0] != '<') {  //-- hack: check for xml markup
@@ -164,16 +155,13 @@ int main (int argc, char **argv)
     }
     if (!sent.empty()) writer->put_sentence(sent); //-- put final sentence
 
-    if (args.verbose_arg > 1) {
-      fprintf(stderr," done.\n");
-      fflush(stderr);
-    }
+    moot_msg(vlevel, vlProgress, " done.\n");
   }
   writer->close();
   out.close();
 
   // -- summary
-  if (args.verbose_arg > 0) {
+  if (vlevel >= vlInfo) {
     double elapsed = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
 
     // -- print summary

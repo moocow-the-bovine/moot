@@ -20,7 +20,8 @@ extern "C" {
 
 struct gengetopt_args_info {
   char * rcfile_arg;	 /* Read an alternate configuration file. (default=NULL). */
-  int verbose_arg;	 /* Verbosity level. (default=5). */
+  int verbose_arg;	 /* Verbosity level. (default=3). */
+  int no_banner_flag;	 /* Suppress initial banner message (implied at verbosity levels <= 2) (default=0). */
   int dots_arg;	 /* Print a dot for every NTOKS tokens processed. (default=0). */
   int list_flag;	 /* INPUTs are file-lists, not filenames. (default=0). */
   char * output_arg;	 /* Specify output file (default=stdout). (default=-). */
@@ -34,6 +35,7 @@ struct gengetopt_args_info {
   int version_given;	 /* Whether version was given */
   int rcfile_given;	 /* Whether rcfile was given */
   int verbose_given;	 /* Whether verbose was given */
+  int no_banner_given;	 /* Whether no-banner was given */
   int dots_given;	 /* Whether dots was given */
   int list_given;	 /* Whether list was given */
   int output_given;	 /* Whether output was given */

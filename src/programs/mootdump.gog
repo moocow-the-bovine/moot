@@ -42,7 +42,9 @@ For details on moot file formats, see L<mootfiles>.
 int "verbose" v "Verbosity level." \
     arg="LEVEL" \
     default="3" \
-    details="Be more or less verbose.  Recognized values are in the range 0..3."
+    details=`cat verbose.pod`
+
+flag "no-banner" B "Suppress initial banner message (implied at verbosity levels <= 2)" default="0"
 
 int "hash-ngrams" g "Whether to hash stored n-grams (default=yes)" \
     arg="BOOL" \

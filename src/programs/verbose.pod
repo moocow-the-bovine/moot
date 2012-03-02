@@ -1,0 +1,33 @@
+Be more or less verbose.  Recognized values are in the range 0..6:
+
+=over 4
+
+=item 0 (silent)
+
+Disable all diagnostic messages.
+
+=item 1 (errors)
+
+Print error messages to stderr.
+
+=item 2 (warnings)
+
+Print warnings to stderr.
+
+=item 3 (info)
+
+Print general diagnostic information to stderr.
+
+=item 4 (progress)
+
+Print progress information to stderr.
+
+=item 5 (debug)
+
+Print debugging information to stderr (if applicable).
+
+=item 6 (trace)
+
+Print execution trace information to stderr (if applicable).
+
+=back

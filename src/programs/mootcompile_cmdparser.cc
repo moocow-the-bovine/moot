@@ -87,6 +87,7 @@ cmdline_parser_print_help (void)
   printf("   -V        --version                    Print version and exit.\n");
   printf("   -cFILE    --rcfile=FILE                Read an alternate configuration file.\n");
   printf("   -vLEVEL   --verbose=LEVEL              Verbosity level.\n");
+  printf("   -B        --no-banner                  Suppress initial banner message (implied at verbosity levels <= 2)\n");
   printf("   -oFILE    --output=FILE                Specify output file (default=stdout).\n");
   printf("   -zLEVEL   --compress=LEVEL             Compression level for output file.\n");
   printf("\n");
@@ -96,6 +97,7 @@ cmdline_parser_print_help (void)
   printf("   -AFREQ    --trie-threshhold=FREQ       Frequency upper bound for trie inclusion.\n");
   printf("             --trie-theta=FLOAT           Suffix backoff coefficient.\n");
   printf("   -LBOOL    --use-classes=BOOL           Whether to use lexical class-probabilities.\n");
+  printf("   -FBOOL    --use-flavors=BOOL           Whether to use token 'flavor' heuristics (default=1 (true))\n");
   printf("   -RBOOL    --relax=BOOL                 Whether to relax token-tag associability (default=1 (true))\n");
   printf("   -NFLOATS  --nlambdas=FLOATS            N-Gram smoothing constants (default=estimate)\n");
   printf("   -WFLOATS  --wlambdas=FLOATS            Lexical smoothing constants (default=estimate)\n");
@@ -129,7 +131,8 @@ static void
 clear_args(struct gengetopt_args_info *args_info)
 {
   args_info->rcfile_arg = NULL; 
-  args_info->verbose_arg = 2; 
+  args_info->verbose_arg = 4; 
+  args_info->no_banner_flag = 0; 
   args_info->output_arg = gog_strdup("-"); 
   args_info->compress_arg = -1; 
   args_info->hash_ngrams_arg = 0; 
@@ -137,6 +140,7 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->trie_threshhold_arg = 10; 
   args_info->trie_theta_arg = 0; 
   args_info->use_classes_arg = 1; 
+  args_info->use_flavors_arg = 1; 
   args_info->relax_arg = 1; 
   args_info->nlambdas_arg = NULL; 
   args_info->wlambdas_arg = NULL; 
@@ -160,6 +164,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->version_given = 0;
   args_info->rcfile_given = 0;
   args_info->verbose_given = 0;
+  args_info->no_banner_given = 0;
   args_info->output_given = 0;
   args_info->compress_given = 0;
   args_info->hash_ngrams_given = 0;
@@ -167,6 +172,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->trie_threshhold_given = 0;
   args_info->trie_theta_given = 0;
   args_info->use_classes_given = 0;
+  args_info->use_flavors_given = 0;
   args_info->relax_given = 0;
   args_info->nlambdas_given = 0;
   args_info->wlambdas_given = 0;
@@ -198,6 +204,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "version", 0, NULL, 'V' },
 	{ "rcfile", 1, NULL, 'c' },
 	{ "verbose", 1, NULL, 'v' },
+	{ "no-banner", 0, NULL, 'B' },
 	{ "output", 1, NULL, 'o' },
 	{ "compress", 1, NULL, 'z' },
 	{ "hash-ngrams", 1, NULL, 'g' },
@@ -205,6 +212,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "trie-threshhold", 1, NULL, 'A' },
 	{ "trie-theta", 1, NULL, 0 },
 	{ "use-classes", 1, NULL, 'L' },
+	{ "use-flavors", 1, NULL, 'F' },
 	{ "relax", 1, NULL, 'R' },
 	{ "nlambdas", 1, NULL, 'N' },
 	{ "wlambdas", 1, NULL, 'W' },
@@ -222,12 +230,14 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'V',
 	'c', ':',
 	'v', ':',
+	'B',
 	'o', ':',
 	'z', ':',
 	'g', ':',
 	'a', ':',
 	'A', ':',
 	'L', ':',
+	'F', ':',
 	'R', ':',
 	'N', ':',
 	'W', ':',
@@ -316,6 +326,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->verbose_arg = (int)atoi(val);
           break;
         
+        case 'B':	 /* Suppress initial banner message (implied at verbosity levels <= 2) */
+          if (args_info->no_banner_given) {
+            fprintf(stderr, "%s: `--no-banner' (`-B') option given more than once\n", PROGRAM);
+          }
+          args_info->no_banner_given++;
+         if (args_info->no_banner_given <= 1)
+           args_info->no_banner_flag = !(args_info->no_banner_flag);
+          break;
+        
         case 'o':	 /* Specify output file (default=stdout). */
           if (args_info->output_given) {
             fprintf(stderr, "%s: `--output' (`-o') option given more than once\n", PROGRAM);
@@ -363,6 +382,14 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           }
           args_info->use_classes_given++;
           args_info->use_classes_arg = (int)atoi(val);
+          break;
+        
+        case 'F':	 /* Whether to use token 'flavor' heuristics (default=1 (true)) */
+          if (args_info->use_flavors_given) {
+            fprintf(stderr, "%s: `--use-flavors' (`-F') option given more than once\n", PROGRAM);
+          }
+          args_info->use_flavors_given++;
+          args_info->use_flavors_arg = (int)atoi(val);
           break;
         
         case 'R':	 /* Whether to relax token-tag associability (default=1 (true)) */
@@ -491,6 +518,16 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->verbose_arg = (int)atoi(val);
           }
           
+          /* Suppress initial banner message (implied at verbosity levels <= 2) */
+          else if (strcmp(olong, "no-banner") == 0) {
+            if (args_info->no_banner_given) {
+              fprintf(stderr, "%s: `--no-banner' (`-B') option given more than once\n", PROGRAM);
+            }
+            args_info->no_banner_given++;
+           if (args_info->no_banner_given <= 1)
+             args_info->no_banner_flag = !(args_info->no_banner_flag);
+          }
+          
           /* Specify output file (default=stdout). */
           else if (strcmp(olong, "output") == 0) {
             if (args_info->output_given) {
@@ -553,6 +590,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             }
             args_info->use_classes_given++;
             args_info->use_classes_arg = (int)atoi(val);
+          }
+          
+          /* Whether to use token 'flavor' heuristics (default=1 (true)) */
+          else if (strcmp(olong, "use-flavors") == 0) {
+            if (args_info->use_flavors_given) {
+              fprintf(stderr, "%s: `--use-flavors' (`-F') option given more than once\n", PROGRAM);
+            }
+            args_info->use_flavors_given++;
+            args_info->use_flavors_arg = (int)atoi(val);
           }
           
           /* Whether to relax token-tag associability (default=1 (true)) */

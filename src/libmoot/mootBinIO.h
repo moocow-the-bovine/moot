@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2011 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -47,14 +47,14 @@ namespace mootBinIO {
    * Generic functions
    */
   /** Load a single binary item using its native size */
-  template<class T>
+  template<typename T>
   inline bool loadItem(mootio::mistream *is, T &x)
   {
       return is->read(reinterpret_cast<char *>(&x), sizeof(T)) == sizeof(T);
   };
 
   /** Save a single binary item using its native size */
-  template<class T>
+  template<typename T>
   inline bool saveItem(mootio::mostream *os, const T &x)
   {
     return os->write(reinterpret_cast<const char *>(&x), sizeof(T));
@@ -579,6 +579,57 @@ namespace mootBinIO {
       return (maxcount_item.save(os, x.maxcount)
 	      && theta_item.save(os, x.theta)
 	      && vec_item.save(os, x));
+    };
+  };
+
+  /*------------------------------------------------------------
+   * moot types: Taster
+   */
+  /** \brief Binary I/O template instantiation for mootTaster::Rule */
+  template<>
+  class Item<mootTaster::Rule> {
+  public:
+    Item<string> string_item;
+    Item<UInt>   uint_item;
+  public:
+    inline bool load(mootio::mistream *is, mootTaster::Rule &x) const
+    {
+      x.clear();
+      if (!(string_item.load(is,x.lab)
+	    && string_item.load(is,x.re_s)
+	    && uint_item.load(is,x.id)))
+	return false;
+      x.compile();
+      return true;
+    };
+    inline bool save(mootio::mostream *os, const mootTaster::Rule &x) const
+    {
+      return (string_item.save(os,x.lab)
+	      && string_item.save(os,x.re_s)
+	      && uint_item.save(os,x.id));
+    };
+  };
+
+  /** \brief Binary I/O template instantiation for mootTaster */
+  template<>
+  class Item<mootTaster> {
+  public:
+    Item<mootTaster::Rules> rules_item;
+    Item<string> string_item;
+    Item<UInt>   uint_item;
+  public:
+    inline bool load(mootio::mistream *is, mootTaster &x) const
+    {
+      x.clear();
+      return (rules_item.load(is,x.rules)
+	      && string_item.load(is,x.nolabel)
+	      && uint_item.load(is,x.noid));
+    };
+    inline bool save(mootio::mostream *os, const mootTaster &x) const
+    {
+      return (rules_item.save(os,x.rules)
+	      && string_item.save(os,x.nolabel)
+	      && uint_item.save(os,x.noid));
     };
   };
 

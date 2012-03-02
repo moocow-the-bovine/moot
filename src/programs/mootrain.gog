@@ -44,11 +44,12 @@ See L<mootfiles> for details on moot file formats.
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
-group "Basic Options"
+#group "Basic Options"
+
 int "verbose" v "Verbosity level." \
     arg="LEVEL" \
-    default="2" \
-    details="Be more or less verbose.  Recognized values are in the range 0..3."
+    default="3" \
+    details=`cat verbose.pod`
 
 flag "no-banner" B "Suppress initial banner message (implied at verbosity levels <= 1)" \
   default="0"

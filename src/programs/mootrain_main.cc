@@ -90,14 +90,6 @@ int ifmt_default = tiofWellDone;
 TokenReader *reader = NULL;
 
 //-- verbosity level
-typedef enum {
-  vlSilent=0,
-  vlErrors=1,
-  vlProgress=2,
-  //vlTiming=3,
-  vlWarnings=4,
-  vlEverything=5
-} VerbosityLevel;
 int vlevel = vlEverything;
 
 /*--------------------------------------------------------------------------
@@ -119,7 +111,7 @@ void GetMyOptions(int argc, char **argv)
 
   // -- show banner
   if (!args.no_banner_given)
-    moot_msg(vlevel, vlProgress,  moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
+    moot_msg(vlevel, vlInfo,  moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
 
   // -- set up file-churner
   churner.progname = PROGNAME;
@@ -210,7 +202,7 @@ void GetMyOptions(int argc, char **argv)
   }
 
   //-- report
-  if (args.verbose_arg >= vlProgress) {
+  if (args.verbose_arg >= vlInfo) {
     //fprintf(stderr, "%s: kmax               : %d\n", PROGNAME, hmmt.kmax);
     fprintf(stderr, "%s: EOS tag            : %s\n", PROGNAME, hmmt.eos_tag.c_str());
     fprintf(stderr, "%s: Flavors (in)       : %s : %u rules\n", PROGNAME, flavor_src, taster.size());
@@ -289,8 +281,9 @@ int main (int argc, char **argv)
       lfout.printf("%s  UnknownMaxF: %g\n", cmts, hmmt.lexfreqs.unknown_threshhold);
       lfout.printf("%s  LC_CTYPE   : %s\n", cmts, moot_lc_ctype());
       if (hmmt.want_flavors) {
-	lfout.printf("%s  Flavors    : %s\n", cmts, flout.name.c_str());
-	taster.save(&lfout, string(cmts)+"\t");
+	lfout.printf("%s  Flavors    : %s [%u rules]\n", cmts, flavor_src, taster.size());
+	if (vlevel >= vlDebug) 
+	  taster.save(&lfout, string(cmts)+"\t");
       } else {
 	lfout.printf("%s  Flavors    : (none)\n", cmts);
       }

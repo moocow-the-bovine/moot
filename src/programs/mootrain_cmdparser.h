@@ -20,7 +20,7 @@ extern "C" {
 
 struct gengetopt_args_info {
   char * rcfile_arg;	 /* Read an alternate configuration file. (default=NULL). */
-  int verbose_arg;	 /* Verbosity level. (default=2). */
+  int verbose_arg;	 /* Verbosity level. (default=3). */
   int no_banner_flag;	 /* Suppress initial banner message (implied at verbosity levels <= 1) (default=0). */
   char * output_arg;	 /* Specify basename for output files (default=INPUT) (default=NULL). */
   char * input_format_arg;	 /* Specify input file(s) format(s). (default=NULL). */

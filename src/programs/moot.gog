@@ -48,40 +48,12 @@ For details on moot file formats, see L<mootfiles>.
 # Options
 #-----------------------------------------------------------------------------
 #group "Basic Options"
+
 int "verbose" v "Verbosity level." \
-    arg="LEVEL" \
-    default="3" \
-    details="
-Be more or less verbose.  Recognized values are in the range 0..5:
+    arg="LEVEL" default="3" \
+    details=`cat verbose.pod`
 
-=over 4
-
-=item 0
-
-Be silent.
-
-=item 1
-
-Print error messages to stderr.
-
-=item 2
-
-Print warnings to stderr.
-
-=item 3
-
-Print summary information to stderr.
-
-=item 4
-
-Print progress information to stderr.
-
-=item 5
-
-Print everything.
-
-=back
-"
+flag "no-banner" B "Suppress initial banner message (implied at verbosity levels <= 2)" default="0"
 
 flag  "no-header" H  "Suppres leading comments in destination file." \
     details="

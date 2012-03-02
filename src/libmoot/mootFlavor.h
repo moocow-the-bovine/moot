@@ -288,6 +288,8 @@ public:
     
 }; //-- /mootTaster
 
+/** Default built-in taster */
+extern const mootTaster builtinTaster;
 
 
 }; /* namespace moot */

@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.9-0])
+define([THE_PACKAGE_VERSION], [2.0.9-1])
 define([THE_PACKAGE_MAINTAINER],  [moocow@cpan.org])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -823,6 +823,7 @@ if test "$moot_doc_formats" != "none" ; then
   AC_SUBST(DOC_MAN1_GOGS)
   AC_SUBST(DOC_GOGS)
   AC_CONFIG_LINKS(doc/programs/acknowledge.pod:src/programs/acknowledge.pod)
+  AC_CONFIG_LINKS(doc/programs/verbose.pod:src/programs/verbose.pod)
   ##
   ##-- /doc: .gog sources
 

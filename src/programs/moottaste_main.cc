@@ -45,15 +45,6 @@
 using namespace std;
 using namespace moot;
 
-typedef enum {
-  vlSilent = 0,
-  vlErrors = 1,
-  vlWarnings = 2,
-  vlSummary = 3,
-  vlProgress = 4,
-  vlEverything = 5
-} verbosityLevel;
-
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
@@ -62,6 +53,7 @@ const char *PROGNAME = "moottaste";
 // options & file-churning
 gengetopt_args_info  args;
 cmdutil_file_churner churner;
+int vlevel;
 
 // -- files
 mofstream out;
@@ -95,9 +87,12 @@ void GetMyOptions(int argc, char **argv)
   //-- load environmental defaults
   cmdline_parser_envdefaults(&args);
 
+  //-- verbosity
+  vlevel = args.verbose_arg;
+
   //-- show banner
   if (!args.no_banner_given)
-    moot_msg(args.verbose_arg, vlSummary,  moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
+    moot_msg(vlevel, vlInfo,  moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
 
   //-- output file
   if (!out.open(args.output_arg,"w")) {
@@ -152,7 +147,7 @@ void GetMyOptions(int argc, char **argv)
     taster.clear();
     taster.load(&tin);
     tin.close();
-    if (args.verbose_arg >= vlProgress) {
+    if (vlevel >= vlProgress) {
       writer->printf_comment("  Flavors: %s\n", args.flavors_arg);
       fprintf(stderr,"%s: loaded %u flavor rules from file '%s'\n", PROGNAME, taster.size(), args.flavors_arg);
       fflush(stderr);
@@ -161,7 +156,7 @@ void GetMyOptions(int argc, char **argv)
   else if (args.flavors_given) {
     //-- flavors given and empty: disable
     taster.clear();
-    if (args.verbose_arg >= vlProgress) {
+    if (vlevel >= vlProgress) {
       writer->printf_comment("  Flavors: (disabled)\n");
       fprintf(stderr,"%s: disabled flavors\n", PROGNAME);
       fflush(stderr);
@@ -170,7 +165,7 @@ void GetMyOptions(int argc, char **argv)
   else {
     //-- flavors not given: use default rules
     taster.set_default_rules();
-    if (args.verbose_arg >= vlProgress) {
+    if (vlevel >= vlProgress) {
       writer->printf_comment("  Flavors: (built-in)\n");
       fprintf(stderr,"%s: using %u built-in flavor rules\n", PROGNAME, taster.size());
       fflush(stderr);
@@ -192,7 +187,7 @@ int main (int argc, char **argv)
 
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
-    if (args.verbose_arg >= vlProgress) {
+    if (vlevel >= vlProgress) {
       writer->printf_comment("\n     File: %s\n", churner.in.name.c_str());
       fprintf(stderr,"%s: analyzing file '%s'...", PROGNAME, churner.in.name.c_str());
       fflush(stderr);
@@ -211,7 +206,7 @@ int main (int argc, char **argv)
       if (writer) writer->put_sentence(*sent);
     }
     
-    if (args.verbose_arg >= vlProgress) {
+    if (vlevel >= vlProgress) {
       fprintf(stderr," done.\n");
       fflush(stderr);
     }

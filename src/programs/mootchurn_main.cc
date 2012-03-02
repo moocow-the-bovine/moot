@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2004-2010 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2004-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public
@@ -89,14 +89,7 @@ int ndots = 0;
 double  elapsed;
 
 //-- verbosity levels
-typedef enum {
-  vlSilent = 0,
-  vlErrors = 1,
-  vlWarnings = 2,
-  vlSummary = 3,
-  vlProgress = 4,
-  vlEverything = 5
-} verbosityLevel;
+int vlevel;
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -106,23 +99,15 @@ void GetMyOptions(int argc, char **argv)
   if (cmdline_parser(argc, argv, &args) != 0)
     exit(1);
 
-  //-- show banner
-  if (args.verbose_arg > 0) {
-    fprintf(stderr,
-	    moot_program_banner(PROGNAME,
-				PACKAGE_VERSION,
-				"Bryan Jurish <moocow@cpan.org>").c_str());
-  }
+  vlevel = args.verbose_arg;
 
-  //-- options: verbosity
-  //(ignored)
+  //-- show banner
+  if (!args.no_banner_given)
+    moot_msg(vlevel, vlInfo, moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
 
   //-- options: output file
-  if (!out.open(args.output_arg,"wb")) {
-    fprintf(stderr,"%s: open failed for output-file \"%s\": %s\n",
-	    PROGNAME, out.name.c_str(), strerror(errno));
-    exit(1);
-  }
+  if (!out.open(args.output_arg,"wb"))
+    moot_croak("%s: open failed for output-file \"%s\": %s\n", PROGNAME, out.name.c_str(), strerror(errno));
 
   //-- set up file-churner
   churner.progname = PROGNAME;
@@ -205,13 +190,8 @@ int main (int argc, char **argv)
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file())
     {
-      if (args.verbose_arg >= vlProgress) {
-	//fprintf(out.file, "\n%%%% File: %s\n\n", churner.in.name);
-	fprintf(stderr,"%s: churning file '%s'...",
-		PROGNAME, churner.in.name.c_str());
-	fflush(stderr);
-      }
-      nfiles++;
+      moot_msg(vlevel,vlProgress,"%s: churning file '%s'...", PROGNAME, churner.in.name.c_str());
+      ++nfiles;
 
       reader->from_mstream(&churner.in);
 
@@ -266,7 +246,7 @@ int main (int argc, char **argv)
   //-- timing
 
   //-- report summary
-  if (args.verbose_arg >= vlSummary) {
+  if (vlevel >= vlInfo) {
     elapsed = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
     print_summary(stderr);
   }

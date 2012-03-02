@@ -4,7 +4,7 @@
 program "mootpp"
 #program_version "0.01"
 
-purpose	"Tokenizer for moocow's part-of-speech tagger."
+purpose	"Rudimentary tokenizer for moocow's part-of-speech tagger."
 author  "Bryan Jurish <moocow@cpan.org>"
 on_reparse "warn"
 
@@ -31,8 +31,11 @@ argument "FILE(s)" "Input files" \
 
 int "verbose" v "Verbosity level." \
     arg="LEVEL" \
-    default="1" \
-    details="Range: 0..1"
+    default="3" \
+    details=`cat verbose.pod`
+
+flag "no-banner" B "Suppress initial banner message (implied at verbosity levels <= 2)" \
+  default="0"
 
 string	"output" o "Write output to FILE." \
     arg="FILE" \

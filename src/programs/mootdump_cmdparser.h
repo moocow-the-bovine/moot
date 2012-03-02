@@ -21,6 +21,7 @@ extern "C" {
 struct gengetopt_args_info {
   char * rcfile_arg;	 /* Read an alternate configuration file. (default=NULL). */
   int verbose_arg;	 /* Verbosity level. (default=3). */
+  int no_banner_flag;	 /* Suppress initial banner message (implied at verbosity levels <= 2) (default=0). */
   int hash_ngrams_arg;	 /* Whether to hash stored n-grams (default=yes) (default=1). */
   int const_flag;	 /* Enable dump of scalar model constants (default=0). */
   int lex_flag;	 /* Enable lexical probability dump (default=0). */
@@ -33,6 +34,7 @@ struct gengetopt_args_info {
   int version_given;	 /* Whether version was given */
   int rcfile_given;	 /* Whether rcfile was given */
   int verbose_given;	 /* Whether verbose was given */
+  int no_banner_given;	 /* Whether no-banner was given */
   int hash_ngrams_given;	 /* Whether hash-ngrams was given */
   int const_given;	 /* Whether const was given */
   int lex_given;	 /* Whether lex was given */

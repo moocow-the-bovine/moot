@@ -272,7 +272,7 @@ endif
 
 ## --- distclean: built by 'configure'
 DISTCLEANFILES = \
-	*.gog acknowledge.pod
+	*.gog acknowledge.pod verbose.pod
 
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = \

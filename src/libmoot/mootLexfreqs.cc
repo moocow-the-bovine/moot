@@ -39,6 +39,7 @@ moot_BEGIN_NAMESPACE
  * Manipulators
  *----------------------------------------------------------------------*/
 
+//--------------------------------------------------------------
 void mootLexfreqs::clear(void)
 {
   n_tokens = 0;
@@ -46,9 +47,8 @@ void mootLexfreqs::clear(void)
   tagtable.clear();
 }
 
-void mootLexfreqs::add_count(const mootTokString &text,
-			     const mootTagString &tag,
-			     const LexfreqCount count)
+//--------------------------------------------------------------
+void mootLexfreqs::add_count(const mootTokString &text, const mootTagString &tag, const LexfreqCount count)
 {
   //-- adjust token-table
   LexfreqTokTable::iterator lfi = lftable.find(text);
@@ -70,20 +70,34 @@ void mootLexfreqs::add_count(const mootTokString &text,
     }
   }
 
-  if (!isTokFlavorName(text)) {
-    //-- adjust total tag-count
-    LexfreqTagTable::iterator lftagi = tagtable.find(tag);
-    if (lftagi != tagtable.end()) {
-      lftagi->second += count;
-    } else {
-      tagtable[tag] = count;
-    }
-
-    //-- adjust total token-count
-    n_tokens += count;
+  //-- adjust total tag-count (pre-v2.0.9-1, we didn't add add tag- or total-token-counts for pseudo-lexemes here)
+  LexfreqTagTable::iterator lftagi = tagtable.find(tag);
+  if (lftagi != tagtable.end()) {
+    lftagi->second += count;
+  } else {
+    tagtable[tag] = count;
   }
+
+  //-- adjust total token-count
+  n_tokens += count;
 };
 
+//--------------------------------------------------------------
+void mootLexfreqs::remove_word(const mootTokString &text)
+{
+  //-- adjust (text->tag->freq) table
+  LexfreqTokTable::iterator lfi = lftable.find(text);
+  if (lfi==lftable.end()) return;
+
+  //-- adjust tag counts
+  for (LexfreqSubtable::const_iterator lsi=lfi->second.freqs.begin(); lsi != lfi->second.freqs.end(); ++lsi) {
+    tagtable[lsi->first] -= lsi->second;
+    n_tokens             -= lsi->second;
+  }
+
+  //-- remove entry
+  lftable.erase(lfi);
+}
 
 /*----------------------------------------------------------------------
  * Lookup
@@ -94,7 +108,7 @@ void mootLexfreqs::add_count(const mootTokString &text,
 /*----------------------------------------------------------------------
  * Compilation
  *----------------------------------------------------------------------*/
-void mootLexfreqs::compute_specials(void)
+void mootLexfreqs::compute_specials(mootTaster *taster, bool compute_unknown)
 {
   string unknown_str("@UNKNOWN");
   mootFlavorStr noFlavor(""); //-- dummy string used when taster==NULL
@@ -102,42 +116,64 @@ void mootLexfreqs::compute_specials(void)
   //-- ensure entries for all known flavors exist
   set<mootFlavorStr> flavors;
   if (taster != NULL) {
-    flavors = taster->labels();
-    if (flavors.find(taster->nolabel)!=flavors.end()) {
-      flavors.erase(flavors.find(taster->nolabel));
-    }
+    flavors  = taster->labels();
+    if (flavors.find(taster->nolabel)!=flavors.end())
+      flavors.erase(flavors.find(taster->nolabel));   //-- don't track counts for the default flavor
   }
-  if (unknown_threshhold > 0) {
+
+  if (compute_unknown && unknown_threshhold > 0)
     flavors.insert(unknown_str);
-  }
-  for (set<mootFlavorStr>::const_iterator fi=flavors.begin(); fi!=flavors.end(); ++fi) {
-    LexfreqTokTable::iterator lfi = lftable.find(*fi);
-    if (lfi == lftable.end())
+
+  //-- ensure flavor entries exist, but don't overwrite any existing entries
+  set<mootFlavorStr> all_flavors = flavors;
+  all_flavors.insert(unknown_str);
+  for (set<mootFlavorStr>::const_iterator fi=all_flavors.begin(); fi!=all_flavors.end(); ++fi) {
+    if (f_text(*fi) != 0) {
+      //-- existing entry: remove from flavors
+      flavors.erase(flavors.find(*fi));
+    } else {
+      //-- no entry exists (or f==0): create one
       lftable.insert(LexfreqTokTable::value_type(*fi, LexfreqEntry()));
+    }
   }
 
   //-- iterate over all tokens
   for (LexfreqTokTable::const_iterator lfti = lftable.begin(); lfti != lftable.end(); ++lfti) {
     const mootFlavorStr& flav = taster ? taster->flavor(lfti->first) : noFlavor;
 
-    if (flavors.find(lfti->first) != flavors.end()) {
-      //-- don't merge pseudo-types into other pseudo-types
+    if (all_flavors.find(lfti->first) != all_flavors.end()) {
+      //-- pseudo-lexeme: don't merge it into any (other) pseudo-lexeme, even ones we're not computing
       continue;
     }
-    else if (taster && flav != taster->nolabel) {
-      //-- found a special: add its counts to proper subtable
+    else if (taster && flav != taster->nolabel && flavors.find(lfti->first) == flavors.end()) {
+      //-- found a flavor-special: add its counts to the appropriate flavor entry
       for (LexfreqSubtable::const_iterator lsi = lfti->second.freqs.begin(); lsi != lfti->second.freqs.end(); ++lsi) {
 	add_count(flav, lsi->first, lsi->second);
       }
     }
-    else if (lfti->second.count <= unknown_threshhold && unknown_threshhold > 0) {
-      //-- found a pseudo-unknown token: add its counts to the "@UNKNOWN" entry
+    else if (compute_unknown && unknown_threshhold > 0 && lfti->second.count <= unknown_threshhold) {
+      //-- found a pseudo-unknown: add its counts to the "@UNKNOWN" entry
       for (LexfreqSubtable::const_iterator lsi = lfti->second.freqs.begin(); lsi != lfti->second.freqs.end(); ++lsi) {
 	add_count(unknown_str, lsi->first, lsi->second);
       }
     }
   }
 };
+
+//----------------------------------------------------------------------
+void mootLexfreqs::remove_specials(mootTaster *taster, bool remove_unknown)
+{
+  set<mootFlavorStr> flavors;
+  if (taster) {
+    flavors = taster->labels();
+  }
+  if (remove_unknown) {
+    flavors.insert("@UNKNOWN");
+  }
+  for (set<mootFlavorStr>::const_iterator fi=flavors.begin(); fi!=flavors.end(); ++fi) {
+    remove_word(*fi);
+  }
+}
 
 /*----------------------------------------------------------------------
  * Information

@@ -89,19 +89,16 @@ public:
   LexfreqTokTable    lftable;    /**< lexeme->(tag->count) lookup table */
   LexfreqTagTable    tagtable;   /**< tag->count lookup table */
   LexfreqCount       n_tokens;   /**< total number of tokens counted */
-
-  mootTaster	    *taster;		 /**< token classification heuristics (NULL for none) */
   LexfreqCount	     unknown_threshhold; /**< maximum frequency for special @UNKNOWN lexeme (default=1) */
 
 public:
   //------ public methods
   /** Default constructor */
   mootLexfreqs(size_t initial_bucket_count=0)
-    : n_tokens(0), taster(NULL), unknown_threshhold(1)
+    : n_tokens(0), unknown_threshhold(1.0)
   {
-    if (initial_bucket_count != 0) {
+    if (initial_bucket_count != 0)
       lftable.resize(initial_bucket_count);
-    }
   };
 
   /** Default destructor */
@@ -117,38 +114,55 @@ public:
   /** Add 'count' to the current count for (token,tag) */
   void add_count(const mootTokString &text, const mootTagString &tag, const LexfreqCount count);
 
+  /** Remove entry for a word */
+  void remove_word(const mootTokString &text);
+
   //------ public methods: lookup
 
   /** get total frequency of a text type ("token") */
   inline LexfreqCount f_text(const mootTokString &text) const
   {
-    LexfreqTokTable::const_iterator txti = lftable.find(text);
-    return txti == lftable.end() ? 0 : txti->second.count;
+    LexfreqTokTable::const_iterator wi = lftable.find(text);
+    return wi == lftable.end() ? 0 : wi->second.count;
   };
 
   /** get frequency of a tag */
   inline LexfreqCount f_tag(const mootTagString &tag) const
   {
-    LexfreqTagTable::const_iterator tagi = tagtable.find(tag);
-    return tagi == tagtable.end() ? 0 : tagi->second;
+    LexfreqTagTable::const_iterator ti = tagtable.find(tag);
+    return ti == tagtable.end() ? 0 : ti->second;
   };
 
   /** get total frequency of a (text,tag) pair */
   inline LexfreqCount f_text_tag(const mootTokString &text, const mootTagString &tag) const
   {
-    LexfreqTokTable::const_iterator txti = lftable.find(text);
-    if (txti == lftable.end()) return 0;
-    const LexfreqSubtable& tagfreqs = txti->second.freqs;
-    LexfreqSubtable::const_iterator tagi = tagfreqs.find(tag);
-    return tagi == tagfreqs.end() ? 0 : tagi->second;
+    LexfreqTokTable::const_iterator wi = lftable.find(text);
+    if (wi == lftable.end()) return 0;
+    LexfreqSubtable::const_iterator wti = wi->second.freqs.find(tag);
+    return wti == wi->second.freqs.end() ? 0 : wti->second;
   };
 
   /**
-   * Add counts for 'special' (flavor-based) tokens to the object.
-   * This should be called after you have added
-   * all 'real' tokens and set \a taster to a non-NULL mootTaster*.
+   * Compute counts for 'special' pseudo-lexemes to the object.
+   * These include all flavors defined by \a taster (if specified and non-null),
+   * as well as the special @UNKNOWN token.
+   *
+   * \warning This method will \b NOT overwrite entries for any (pseudo-)lexeme
+   * with a defined frequency greater than zero. Call remove_specials() first
+   * if you want to re-compute all special entries.
+   *
+   * \param taster mootTaster for determining which lexeme "flavors"
+   * \param compute_unknown whether to also compute @UNKNOWN entry
    */
-  void compute_specials(void);
+  void compute_specials(mootTaster *taster=NULL, bool compute_unknown=true);
+
+  /**
+   * Remove entries for 'special' pseudo-lexemes from the object.
+   *
+   * \param taster mootTaster for determining which lexemes to remove
+   * \param compute_unknown whether to also remove @UNKNOWN entry
+   */
+  void remove_specials(mootTaster *taster=NULL, bool remove_unknown=true);
 
   /**
    * Return the number of distinct (token,tag) pairs we've counted.

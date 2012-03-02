@@ -347,6 +347,18 @@ namespace moot {
   /** \name Message and Command-line utilities */
   //@{
 
+  /** enum for verbosity levels */
+  typedef enum {
+    vlSilent = 0,
+    vlErrors = 1,
+    vlWarnings = 2,
+    vlInfo = 3,
+    vlProgress = 4,
+    vlDebug = 5,
+    vlTrace = 6,
+    vlEverything = 255
+  } VerbosityLevel;
+
   /** Return a banner string for the library */
   std::string moot_banner(void);
 

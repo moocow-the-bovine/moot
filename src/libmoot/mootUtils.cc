@@ -477,7 +477,7 @@ std::string moot_banner(void)
 {
   string s = ("  libmoot version "
 	      PACKAGE_VERSION
-	      " (c) 2003-2010 Bryan Jurish.\n");
+	      " (c) 2003-2012 Bryan Jurish.\n");
   //--
 
 #ifdef MOOT_EXPAT_ENABLED
@@ -489,7 +489,7 @@ std::string moot_banner(void)
 #endif // MOOT_LIBXML_ENABLED
 
 #ifdef MOOT_RECODE_ENABLED
-  s.append("  librecode recoding library by François Pinard.\n");
+  s.append("  librecode recoding library by Francois Pinard.\n");
 #endif // MOOT_RECODE_ENABLED
 
 #ifdef MOOT_ZLIB_ENABLED
@@ -549,7 +549,7 @@ void moot_carp(const char *fmt, ...)
 void moot_vcroak(const char *fmt, va_list &ap)
 {
   moot_vcarp(fmt,ap);
-  abort();
+  exit(255);
 }
 
 //--------------------------------------------------------------

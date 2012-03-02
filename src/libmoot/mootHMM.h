@@ -39,6 +39,7 @@
 #include <mootTokenIO.h>
 #include <mootZIO.h>
 #include <mootBinHeader.h>
+#include <mootUtils.h>
 
 #include <mootClassfreqs.h>
 //#include <mootLexfreqs.h> //-- included by mootClassfreqs.h
@@ -129,15 +130,6 @@ public:
   /** \name Atomic Types */
   //@{
 
-  /** Symbolic verbosity level typedef */
-  typedef enum {
-    vlSilent,     /**< Be silent */
-    vlErrors,     /**< Report errors */
-    vlWarnings,   /**< Report warnings */
-    vlProgress,   /**< Report progess */
-    vlEverything  /**< Report everything we can */
-  } VerbosityLevel;
-
   /** Type for a tag-identifier. Zero indicates an unknown tag. */
   typedef mootEnumID TagID;
 
@@ -152,6 +144,9 @@ public:
    * either a previously unknown class or the empty class.
    */
   typedef mootEnumID ClassID;
+
+  /** Symbolic verbosity level typedef (for backwards-compatibility) */
+  typedef moot::VerbosityLevel VerbosityLevel;
   //@}
 
   /*------------------------------------------------------------
@@ -727,11 +722,6 @@ public:
 			  bool  do_compute_logprobs=true);
 
   /**
-   * Load flavor rules from a named file \a flavorfile.
-   */
-  virtual bool load_flavors(const string &flavorfile);
-
-  /**
    * Compile
    * probabilites from raw frequency counts in 'lexfreqs' and 'ngrams'.
    * Returns false on failure.
@@ -739,7 +729,13 @@ public:
   virtual bool compile(const mootLexfreqs &lexfreqs,
 		       const mootNgrams &ngrams,
 		       const mootClassfreqs &classfreqs,
-		       const mootTagString &start_tag_str="__$");
+		       const mootTagString &start_tag_str="__$",
+		       const mootTaster &mtaster=builtinTaster);
+
+  /** Assign IDs for taster; called by compile().
+   *  Allocates tokids for each flavor label and saves these in taster.
+   */
+  void assign_ids_fl(void);
 
   /** Assign IDs for tokens and tags from lexfreqs: called by compile() */
   void assign_ids_lf(const mootLexfreqs &lexfreqs);
@@ -1275,9 +1271,9 @@ public:
   {
 #ifdef MOOT_LEX_NONALPHA
     TokID tokid = tokids.name2id(token);
-    return tokid ? tokid : taster.flavor_id(token);
+    return tokid || !use_flavors ? tokid : taster.flavor_id(token);
 #else
-    TokID tokid = taster.flavor_id(token);
+    TokID tokid = use_flavors ? taster.flavor_id(token) : 0;
     return tokid ? tokid : tokids.name2id(token);
 #endif
   };

@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2002-2007 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2002-2012 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public
@@ -80,6 +80,9 @@ void GetMyOptions(int argc, char **argv)
   //-- load environmental defaults
   cmdline_parser_envdefaults(&args);
 
+  //-- locale
+  moot_setlocale();
+
   //-- sanity check
   if (args.inputs_num <= 0) {
     fprintf(stderr, "%s: no input model specified!\n", PROGNAME);
@@ -91,11 +94,8 @@ void GetMyOptions(int argc, char **argv)
   }
 
   //-- show banner
-  if (args.verbose_arg > 1)
-    fprintf(stderr,
-	    moot_program_banner(PROGNAME,
-				PACKAGE_VERSION,
-				"Bryan Jurish <moocow@cpan.org>").c_str());
+  if (!args.no_banner_given)
+    moot_msg(args.verbose_arg, vlInfo, moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
 
   //-- output file
   if (!out.open(args.output_arg,"w")) {
@@ -105,11 +105,7 @@ void GetMyOptions(int argc, char **argv)
   }
 
   // -- assign "verbose" flag
-  if (args.verbose_arg <= 0) hmm.verbose = mootHMM::vlSilent;
-  else if (args.verbose_arg <= 1) hmm.verbose = mootHMM::vlErrors;
-  else if (args.verbose_arg <= 2) hmm.verbose = mootHMM::vlWarnings;
-  else if (args.verbose_arg <= 3) hmm.verbose = mootHMM::vlProgress;
-  else hmm.verbose = mootHMM::vlEverything;
+  hmm.verbose = args.verbose_arg;
 
   //-- assign dump options
   if (args.const_given || args.lex_given || args.class_given || args.suffix_given || args.ngrams_given) {
