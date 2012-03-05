@@ -90,12 +90,13 @@ public:
   LexfreqTagTable    tagtable;   /**< tag->count lookup table */
   LexfreqCount       n_tokens;   /**< total number of tokens counted */
   LexfreqCount	     unknown_threshhold; /**< maximum frequency for special @UNKNOWN lexeme (default=1) */
+  const mootTaster  *taster;		 /**< regex-based token flavor heuristics (default=builtin; NULL for none) */
 
 public:
   //------ public methods
   /** Default constructor */
   mootLexfreqs(size_t initial_bucket_count=0)
-    : n_tokens(0), unknown_threshhold(1.0)
+    : n_tokens(0), unknown_threshhold(1.0), taster(&builtinTaster)
   {
     if (initial_bucket_count != 0)
       lftable.resize(initial_bucket_count);
@@ -145,24 +146,31 @@ public:
   /**
    * Compute counts for 'special' pseudo-lexemes to the object.
    * These include all flavors defined by \a taster (if specified and non-null),
-   * as well as the special @UNKNOWN token.
+   * as well as the special @UNKNOWN token. 
+   * You should have set \a taster before calling this method.
    *
    * \warning This method will \b NOT overwrite entries for any (pseudo-)lexeme
    * with a defined frequency greater than zero. Call remove_specials() first
    * if you want to re-compute all special entries.
    *
-   * \param taster mootTaster for determining which lexeme "flavors"
    * \param compute_unknown whether to also compute @UNKNOWN entry
    */
-  void compute_specials(mootTaster *taster=NULL, bool compute_unknown=true);
+  void compute_specials(bool compute_unknown=true);
 
   /**
    * Remove entries for 'special' pseudo-lexemes from the object.
+   * You should have set \a taster before calling this method.
    *
    * \param taster mootTaster for determining which lexemes to remove
    * \param compute_unknown whether to also remove @UNKNOWN entry
    */
-  void remove_specials(mootTaster *taster=NULL, bool remove_unknown=true);
+  void remove_specials(bool remove_unknown=true);
+
+  /**
+   * Discount pseudo-frequencies for 'special' pseudo-lexemes.
+   * \param zf_special total frequency mass to alot for 'special' pseudo-lexemes.
+   */
+  void discount_specials(CountT zf_special=1.0);
 
   /**
    * Return the number of distinct (token,tag) pairs we've counted.

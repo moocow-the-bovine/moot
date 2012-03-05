@@ -279,7 +279,19 @@ bool mootHMM::load_model(const string &modelname,
     //-- ensure taster-flavors are computed for lexfreqs
     //   + this has to happen here rather than in compile(), since compile() params (e.g. lexfreqs) are const
     lexfreqs.unknown_threshhold = unknown_lex_threshhold;
-    lexfreqs.compute_specials((use_flavors ? &mtaster : NULL), true);
+    lexfreqs.taster = (use_flavors ? &mtaster : NULL);
+    lexfreqs.compute_specials(false);
+
+    //-- discount frequencies for pseudo-lexemes
+    // + here, zf is s.t. zf/(N+zf) = U/N
+    //   i.e., the total probability mass allocated to @UNKNOWNs is determined
+    //   by the total frequency @UNKNOWN relative to total corpus size; a la
+    //   Good-Turing 0* := N(1)/N.
+    ProbT lexU = lexfreqs.f_text("@UNKNOWN");
+    ProbT lexN = lexfreqs.n_tokens - lexU;
+    ProbT zf = (lexU*lexN)/(lexN-lexU);
+    //carp("%s: discounting specials to pseudo-frequency = %g\n", myname, zf); //-- debug
+    lexfreqs.discount_specials(zf);
 
     //-- compile guts (virtualized)
     if (!this->compile(lexfreqs,ngfreqs,classfreqs,start_tag_str,mtaster)) {

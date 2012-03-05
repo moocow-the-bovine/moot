@@ -132,7 +132,8 @@ bool mootHMMTrainer::train_from_stream(FILE *in, const string &srcname)
 //------------------------------------------------------
 bool mootHMMTrainer::train_finish(void)
 {
-  lexfreqs.compute_specials((want_flavors ? &taster : NULL), true);
+  lexfreqs.taster = (want_flavors ? &taster : NULL);
+  lexfreqs.compute_specials(true);
   return true;
 }
 
