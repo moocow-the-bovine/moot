@@ -116,7 +116,7 @@ void mootLexfreqs::compute_specials(bool compute_unknown)
   //-- ensure entries for all known flavors exist
   set<mootFlavorStr> flavors;
   if (taster != NULL) {
-    flavors  = taster->labels();
+    flavors = taster->labels;
     if (flavors.find(taster->nolabel)!=flavors.end())
       flavors.erase(flavors.find(taster->nolabel));   //-- don't track counts for the default flavor
   }
@@ -167,12 +167,10 @@ void mootLexfreqs::compute_specials(bool compute_unknown)
 void mootLexfreqs::remove_specials(bool remove_unknown)
 {
   set<mootFlavorStr> flavors;
-  if (taster) {
-    flavors = taster->labels();
-  }
-  if (remove_unknown) {
+  if (taster)
+    flavors = taster->labels;
+  if (remove_unknown)
     flavors.insert("@UNKNOWN");
-  }
   for (set<mootFlavorStr>::const_iterator fi=flavors.begin(); fi!=flavors.end(); ++fi) {
     remove_word(*fi);
   }
@@ -183,7 +181,7 @@ void mootLexfreqs::discount_specials(CountT zf_special)
 {
   set<mootFlavorStr> flavors;
   set<mootFlavorStr>::const_iterator fi;
-  if (taster) flavors = taster->labels();
+  if (taster) flavors = taster->labels;
   flavors.insert("@UNKNOWN");
 
   //-- get unadjusted total count for all specials
@@ -227,7 +225,7 @@ size_t mootLexfreqs::n_pairs(void)
        lfti != lftable.end();
        lfti++)
     {
-      if (isTokFlavorName(lfti->first)) continue; //-- ignore specials
+      if (taster && taster->has_label(lfti->first)) continue; //-- ignore special pseudo-tokens
       n += lfti->second.freqs.size();
     }
   return n;

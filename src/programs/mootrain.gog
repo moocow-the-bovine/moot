@@ -111,9 +111,9 @@ string "flavors-from" f "Use flavor heuristics from FILE (default=built-in)." \
     arg="FILE" \
     default=NULL \
     details="
-If specified, FILE should be a \"flavor\" file containing a list of regular-expression based token classification rules
+If specified, FILE should be a flavor definition file containing a list of regular-expression based token classification rules
 to be used in computing special entries for the lexical frequency file.
-See L<mootfiles(5)|mootfiles> for a full specification of the moot flavor file format.
+See L<mootfiles(5)|mootfiles> for a full specification of the moot flavor definition file format.
 If unspecified, the default behavior is to use a built-in set of classification heuristics.
 If FILE is an empty string, no flavor heuristics at all will be applied.
 "

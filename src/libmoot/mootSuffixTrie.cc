@@ -221,14 +221,17 @@ bool SuffixTrie::build(const mootLexfreqs &lf,
 bool SuffixTrie::_build_insert(const mootLexfreqs &lf)
 {
   mootLexfreqs::LexfreqTokTable::const_iterator lfi;
+  const mootTaster *taster = lf.taster;
+
   for (lfi = lf.lftable.begin(); lfi != lf.lftable.end(); lfi++) {
     const mootLexfreqs::LexfreqEntry &lfe = lfi->second;
       
     if (lfe.count > maxcount
 #ifdef IGNORE_NON_ALPHAS
-	|| tokenFlavor(lfi->first) != TokFlavorAlpha
+	|| (taster && taster->flavor(lfi->first) != taster.nolabel)
 #endif
-	|| isTokFlavorName(lfi->first))
+	|| (taster && taster->has_label(lfi->first))
+	)
       continue;
 
     trie_rinsert(lfi->first);
@@ -245,15 +248,17 @@ bool SuffixTrie::_build_assoc(const mootLexfreqs &lf, const TagIDTable &tagids)
   mootLexfreqs::LexfreqTokTable::const_iterator lfi;
   mootLexfreqs::LexfreqSubtable::const_iterator lfsi;
   iterator ti, momi;
+  const mootTaster *taster = lf.taster;
 
   for (lfi = lf.lftable.begin(); lfi != lf.lftable.end(); lfi++) {
     const mootLexfreqs::LexfreqEntry &lfe = lfi->second;
 
     if (lfe.count > maxcount
 #ifdef IGNORE_NON_ALPHAS
-	|| tokenFlavor(lfi->first) != TokFlavorAlpha
+	|| (taster && taster->flavor(lfi->first) != taster.nolabel)
 #endif
-	|| isTokFlavorName(lfi->first))
+	|| (taster && taster->has_label(lfi->first))
+	)
       continue;
 
     ti  = rfind_longest(lfi->first);

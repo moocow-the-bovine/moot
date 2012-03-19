@@ -193,5 +193,5 @@ ACKNOWLEDGEMENTS
     development and testing of the class-based HMM tagger / disambiguator.
 
 AUTHOR
-    Bryan Jurish <moocow@ling.uni-potsdam.de>
+    Bryan Jurish <moocow@cpan.org>
 

@@ -52,6 +52,12 @@ typedef UInt   mootFlavorID;
 
 //==============================================================================
 // mootTaster
+
+class mootTaster;  //-- forward decl
+
+/** Default built-in taster */
+extern const mootTaster builtinTaster;
+
 /**
  * \brief High-level heuristic token classifier
  * \detail
@@ -137,6 +143,7 @@ public:
   Rules rules;			///< matching heuristics in order of decreasing priority
   mootFlavorStr nolabel;	///< label to return if no rule matches (default: empty)
   mootFlavorID  noid;		///< id to return if no rule matches (default: empty)
+  set<mootFlavorStr> labels;	///< set of all flavor labels
 
 public:
   //--------------------------------------------------------------------
@@ -152,8 +159,7 @@ public:
   {};
 
   /** clear stored rules */
-  inline void clear()
-  { rules.clear(); };
+  void clear();
 
 public:
   //--------------------------------------------------------------------
@@ -173,11 +179,11 @@ public:
 
   /** returns true iff this taster is equivalent to the default set of built-in rules */
   inline bool is_builtin(void) const
-  { return operator==(mootTaster()); };
+  { return operator==(builtinTaster); };
 
   /** assignment operator */
   inline mootTaster& operator=(const mootTaster &t2)
-  { rules=t2.rules; nolabel=t2.nolabel; noid=t2.noid; return *this; };
+  { rules=t2.rules; nolabel=t2.nolabel; noid=t2.noid; labels=t2.labels; return *this; };
 
 public:
   //--------------------------------------------------------------------
@@ -185,11 +191,14 @@ public:
 
   /** append a single rule */
   inline void append_rule(const Rule &r)
-  { rules.push_back(r); };
+  {
+    rules.push_back(r);
+    labels.insert(r.lab);
+  };
 
   /** append a single rule specification */
   inline void append_rule(const mootFlavorStr &label, const std::string &regex)
-  { rules.push_back(Rule(label,regex)); };
+  { append_rule(Rule(label,regex)); };
 
   /** set the default label \a nolabel in global object and all rules with target label \a nolabel  */
   void set_default_label(const mootFlavorStr &label, bool update_rules=true);
@@ -199,10 +208,8 @@ public:
   // methods: info
 
   /** check whether this taster defines at least one rule for label \a l */
-  bool has_label(const mootFlavorStr &l) const;
-
-  /** get set of all label names defined by this taster */
-  set<mootFlavorStr> labels(void) const;
+  inline bool has_label(const mootFlavorStr &l) const
+  { return labels.find(l) != labels.end(); };
 
 public:
   //--------------------------------------------------------------------
@@ -243,6 +250,7 @@ public:
 public:
   //--------------------------------------------------------------------
   // methods: I/O: load
+
 
   /** load (append) rules from a moot input stream (mistream).
    *  File format is a list of rules in order of decreasing precedence,
@@ -287,9 +295,6 @@ public:
   { mootio::mcstream mcs(f); return save(&mcs,prefix); };
     
 }; //-- /mootTaster
-
-/** Default built-in taster */
-extern const mootTaster builtinTaster;
 
 
 }; /* namespace moot */

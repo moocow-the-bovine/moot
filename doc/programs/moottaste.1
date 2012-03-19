@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "MOOTTASTE 1"
-.TH MOOTTASTE 1 "2012-02-29" "moot v2.0.9-0" "moot PoS Tagger"
+.TH MOOTTASTE 1 "2012-03-19" "moot v2.0.9-1" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -144,6 +144,7 @@ moottaste [\s-1OPTIONS\s0] \s-1INPUT\s0(s)
 \&    \-V          \-\-version                   Print version and exit.
 \&    \-cFILE      \-\-rcfile=FILE               Read an alternate configuration file.
 \&    \-vLEVEL     \-\-verbose=LEVEL             Verbosity level.
+\&    \-B          \-\-no\-banner                 Suppress initial banner message (implied at verbosity levels <= 2)
 \&    \-fFILE      \-\-flavors=FILE              Use flavor heuristics from FILE (default=built\-in).
 \&    \-FLABEL     \-\-default\-flavor=LABEL      Use LABEL as the default flavor (default=empty string or from flavor\-file).
 \&    \-l          \-\-list                      INPUTs are file\-lists, not filenames.
@@ -210,28 +211,38 @@ Verbosity level.
 .Sp
 Default: '3'
 .Sp
-Be more or less verbose.  Recognized values are in the range 0..5:
+Be more or less verbose.  Recognized values are in the range 0..6:
 .RS 4
-.IP "0" 4
-Be silent.
-.IP "1" 4
-.IX Item "1"
+.IP "0 (silent)" 4
+.IX Item "0 (silent)"
+Disable all diagnostic messages.
+.IP "1 (errors)" 4
+.IX Item "1 (errors)"
 Print error messages to stderr.
-.IP "2" 4
-.IX Item "2"
+.IP "2 (warnings)" 4
+.IX Item "2 (warnings)"
 Print warnings to stderr.
-.IP "3" 4
-.IX Item "3"
-Print summary information to stderr.
-.IP "4" 4
-.IX Item "4"
+.IP "3 (info)" 4
+.IX Item "3 (info)"
+Print general diagnostic information to stderr.
+.IP "4 (progress)" 4
+.IX Item "4 (progress)"
 Print progress information to stderr.
-.IP "5" 4
-.IX Item "5"
-Print everything.
+.IP "5 (debug)" 4
+.IX Item "5 (debug)"
+Print debugging information to stderr (if applicable).
+.IP "6 (trace)" 4
+.IX Item "6 (trace)"
+Print execution trace information to stderr (if applicable).
 .RE
 .RS 4
 .RE
+.ie n .IP """\-\-no\-banner"" , ""\-B""" 4
+.el .IP "\f(CW\-\-no\-banner\fR , \f(CW\-B\fR" 4
+.IX Item "--no-banner , -B"
+Suppress initial banner message (implied at verbosity levels <= 2)
+.Sp
+Default: '0'
 .ie n .IP """\-\-flavors=FILE"" , ""\-fFILE""" 4
 .el .IP "\f(CW\-\-flavors=FILE\fR , \f(CW\-fFILE\fR" 4
 .IX Item "--flavors=FILE , -fFILE"
@@ -373,7 +384,7 @@ which was used in the development and testing of the
 class-based \s-1HMM\s0 tagger / disambiguator.
 .SH "AUTHOR"
 .IX Header "AUTHOR"
-Bryan Jurish <jurish@uni\-potsdam.de>
+Bryan Jurish <moocow@cpan.org>
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
 moot

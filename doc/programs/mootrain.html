@@ -24,7 +24,6 @@
 	<li><a href="#options">OPTIONS</a></li>
 	<ul>
 
-		<li><a href="#basic_options">Basic Options</a></li>
 		<li><a href="#model_format_options">Model Format Options</a></li>
 	</ul>
 
@@ -60,22 +59,24 @@
     INPUT(s)  Tagged input corpus file(s).</pre>
 <pre>
  Options
-    -h          --help                     Print help and exit.
-    -V          --version                  Print version and exit.
-    -cFILE      --rcfile=FILE              Read an alternate configuration file.</pre>
-<pre>
- Basic Options
-    -vLEVEL     --verbose=LEVEL            Verbosity level.
-    -oSTRING    --output=STRING            Specify basename for output files (default=INPUT)
-    -IFORMAT    --input-format=FORMAT      Specify input file(s) format(s).
-                --input-encoding=ENCODING  Override document encoding for XML input.</pre>
+    -h          --help                       Print help and exit.
+    -V          --version                    Print version and exit.
+    -cFILE      --rcfile=FILE                Read an alternate configuration file.
+    -vLEVEL     --verbose=LEVEL              Verbosity level.
+    -B          --no-banner                  Suppress initial banner message (implied at verbosity levels &lt;= 1)
+    -oSTRING    --output=STRING              Specify basename for output files (default=INPUT)
+    -IFORMAT    --input-format=FORMAT        Specify input file(s) format(s).
+                --input-encoding=ENCODING    Override document encoding for XML input.</pre>
 <pre>
  Model Format Options
-    -l          --lex                      Generate only lexical frequency file.
-    -n          --ngrams                   Generate only n-gram frequency file.
-    -C          --classes                  Generate only lexical-class frequency file.
-    -eTAG       --eos-tag=TAG              Specify boundary tag (default=__$)
-    -N          --verbose-ngrams           Generate long-form ngrams (default=no)</pre>
+    -l          --lex                        Generate only lexical frequency file.
+    -n          --ngrams                     Generate only n-gram frequency file.
+    -C          --classes                    Generate only lexical-class frequency file.
+    -F          --flavors                    Generate only flavor heuristic file.
+    -eTAG       --eos-tag=TAG                Specify boundary tag (default=__$)
+    -N          --verbose-ngrams             Generate long-form ngrams (default=no)
+    -fFILE      --flavors-from=FILE          Use flavor heuristics from FILE (default=built-in).
+    -tDOUBLE    --unknown-threshhold=DOUBLE  Freq. threshhold for 'unknown' lexical probabilities</pre>
 <p>
 </p>
 <hr />
@@ -126,17 +127,48 @@ or 'well done' (+tagged,-analyzed).</p>
 <p>Default: 'NULL'</p>
 <p>See also: <a href="#configuration_files">CONFIGURATION FILES</a>.</p>
 </dd>
-</dl>
-<p>
-</p>
-<h2><a name="basic_options">Basic Options</a></h2>
-<dl>
 <dt><strong><a name="verbose_level_vlevel" class="item"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
 
 <dd>
 <p>Verbosity level.</p>
-<p>Default: '2'</p>
-<p>Be more or less verbose.  Recognized values are in the range 0..3.</p>
+<p>Default: '3'</p>
+<p>Be more or less verbose.  Recognized values are in the range 0..6:</p>
+<ol>
+<li><strong><a name="silent" class="item">(silent)</a></strong>
+
+<p>Disable all diagnostic messages.</p>
+</li>
+<li><strong><a name="errors" class="item">(errors)</a></strong>
+
+<p>Print error messages to stderr.</p>
+</li>
+<li><strong><a name="warnings" class="item">(warnings)</a></strong>
+
+<p>Print warnings to stderr.</p>
+</li>
+<li><strong><a name="info" class="item">(info)</a></strong>
+
+<p>Print general diagnostic information to stderr.</p>
+</li>
+<li><strong><a name="progress" class="item">(progress)</a></strong>
+
+<p>Print progress information to stderr.</p>
+</li>
+<li><strong><a name="debug" class="item">(debug)</a></strong>
+
+<p>Print debugging information to stderr (if applicable).</p>
+</li>
+<li><strong><a name="trace" class="item">(trace)</a></strong>
+
+<p>Print execution trace information to stderr (if applicable).</p>
+</li>
+</ol>
+</dd>
+<dt><strong><a name="no_banner_b" class="item"><code>--no-banner</code> , <code>-B</code></a></strong></dt>
+
+<dd>
+<p>Suppress initial banner message (implied at verbosity levels &lt;= 1)</p>
+<p>Default: '0'</p>
 </dd>
 <dt><strong><a name="output_string_ostring" class="item"><code>--output=STRING</code> , <code>-oSTRING</code></a></strong></dt>
 
@@ -186,6 +218,12 @@ negation.</p>
 <p>Generate only lexical-class frequency file.</p>
 <p>Default: '0'</p>
 </dd>
+<dt><strong><a name="flavors_f" class="item"><code>--flavors</code> , <code>-F</code></a></strong></dt>
+
+<dd>
+<p>Generate only flavor heuristic file.</p>
+<p>Default: '0'</p>
+</dd>
 <dt><strong><a name="eos_tag_tag_etag" class="item"><code>--eos-tag=TAG</code> , <code>-eTAG</code></a></strong></dt>
 
 <dd>
@@ -201,6 +239,27 @@ be a valid analysis for any token.</p>
 <dd>
 <p>Generate long-form ngrams (default=no)</p>
 <p>Default: '0'</p>
+</dd>
+<dt><strong><a name="flavors_from_file_ffile" class="item"><code>--flavors-from=FILE</code> , <code>-fFILE</code></a></strong></dt>
+
+<dd>
+<p>Use flavor heuristics from FILE (default=built-in).</p>
+<p>Default: 'NULL'</p>
+<p>If specified, FILE should be a flavor definition file containing a list of regular-expression based token classification rules
+to be used in computing special entries for the lexical frequency file.
+See <a href="././mootfiles.html">mootfiles(5)</a> for a full specification of the moot flavor definition file format.
+If unspecified, the default behavior is to use a built-in set of classification heuristics.
+If FILE is an empty string, no flavor heuristics at all will be applied.</p>
+</dd>
+<dt><strong><a name="unknown_threshhold_double_tdouble" class="item"><code>--unknown-threshhold=DOUBLE</code> , <code>-tDOUBLE</code></a></strong></dt>
+
+<dd>
+<p>Freq. threshhold for 'unknown' lexical probabilities</p>
+<p>Default: '1.0'</p>
+<p>Setting this option to a non-zero value will case a special @UKNOWN entry to be added to the
+lexical frequency model file.  Note that such an entry will be overridden
+during model compilation if you specify a non-zero unknown lexical threshhold
+to <a href="././moot.html">moot(1)</a> or <a href="././mootcompile.html">mootcompile(1)</a>.</p>
 </dd>
 </dl>
 <p>
@@ -231,7 +290,7 @@ are ignored.</p>
 <p>
 </p>
 <h2><a name="about_this_document">About this Document</a></h2>
-<p>Documentation file auto-generated by optgen.perl version 0.07
+<p>Documentation file auto-generated by optgen.perl version 0.06
 using Getopt::Gen version 0.13.
 Translation was initiated
 as:</p>
@@ -274,7 +333,7 @@ class-based HMM tagger / disambiguator.</p>
 </p>
 <hr />
 <h1><a name="author">AUTHOR</a></h1>
-<p>Bryan Jurish &lt;<a href="mailto:jurish@uni-potsdam.de">jurish@uni-potsdam.de</a>&gt;</p>
+<p>Bryan Jurish &lt;<a href="mailto:moocow@cpan.org">moocow@cpan.org</a>&gt;</p>
 <p>
 </p>
 <hr />

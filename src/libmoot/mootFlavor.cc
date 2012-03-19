@@ -65,6 +65,14 @@ void mootTaster::Rule::compile()
 // mootTaster: rule-set
 
 //----------------------------------------------------------------------
+void mootTaster::clear()
+{
+  rules.clear();
+  labels.clear();
+  labels.insert(nolabel);
+};
+
+//----------------------------------------------------------------------
 void mootTaster::set_default_label(const mootFlavorStr &label, bool update_rules)
 {
   if (update_rules) {
@@ -72,31 +80,15 @@ void mootTaster::set_default_label(const mootFlavorStr &label, bool update_rules
       if (ri->lab == nolabel) ri->lab = label;
     }
   }
+  labels.erase(nolabel);
   nolabel = label;
+  labels.insert(label);
 }
 
 
 //==============================================================================
 // mootTaster: info
-
-//----------------------------------------------------------------------
-bool mootTaster::has_label(const mootFlavorStr &l) const
-{
-  for (Rules::const_iterator ri=rules.begin(); ri!=rules.end(); ++ri) {
-    if (ri->lab==l) return true;
-  }
-  return false;
-}
-
-//----------------------------------------------------------------------
-set<mootFlavorStr> mootTaster::labels(void) const
-{
-  set<mootFlavorStr> labs;
-  for (Rules::const_iterator ri=rules.begin(); ri!=rules.end(); ++ri) {
-    labs.insert(ri->lab);
-  }
-  return labs;
-}
+//  - inlined
 
 //==============================================================================
 // mootTaster: matching
@@ -144,7 +136,7 @@ bool mootTaster::load(mootio::mistream* mis, const std::string &prefix)
     }
 
     //-- normal rule
-    rules.push_back(Rule(lab,re));
+    append_rule(Rule(lab,re));
   }
   return true;
 };

@@ -32,28 +32,6 @@
 namespace moot {
   using namespace std;
 
-  const char *mootTokenTypeNames[NTokTypes] =
-    {
-      "TokTypeUnknown",
-      "TokTypeVanilla",
-      "TokTypeLibXML",
-      "TokTypeXMLRaw",
-      "TokTypeComment",
-      "TokTypeEOS",
-      "TokTypeEOF",
-      "TokTypeUser"
-    };
-
-  const char *mootTokenFlavorNames[NTokFlavors] =
-    {
-      "@ALPHA",
-      "@CARD",
-      "@CARDPUNCT",
-      "@CARDSUFFIX",
-      "@CARDSEPS",
-      "@UNKNOWN"
-    };
-
 /*--------------------------------------------------------------------------
  * mootSentence
  */

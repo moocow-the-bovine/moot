@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "MOOTRAIN 1"
-.TH MOOTRAIN 1 "2011-08-12" "moot v2.0.9" "moot PoS Tagger"
+.TH MOOTRAIN 1 "2012-03-19" "moot v2.0.9-1" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -140,22 +140,24 @@ mootrain [\s-1OPTIONS\s0] \s-1INPUT\s0(s)
 \&    INPUT(s)  Tagged input corpus file(s).
 \&
 \& Options
-\&    \-h          \-\-help                     Print help and exit.
-\&    \-V          \-\-version                  Print version and exit.
-\&    \-cFILE      \-\-rcfile=FILE              Read an alternate configuration file.
-\&
-\& Basic Options
-\&    \-vLEVEL     \-\-verbose=LEVEL            Verbosity level.
-\&    \-oSTRING    \-\-output=STRING            Specify basename for output files (default=INPUT)
-\&    \-IFORMAT    \-\-input\-format=FORMAT      Specify input file(s) format(s).
-\&                \-\-input\-encoding=ENCODING  Override document encoding for XML input.
+\&    \-h          \-\-help                       Print help and exit.
+\&    \-V          \-\-version                    Print version and exit.
+\&    \-cFILE      \-\-rcfile=FILE                Read an alternate configuration file.
+\&    \-vLEVEL     \-\-verbose=LEVEL              Verbosity level.
+\&    \-B          \-\-no\-banner                  Suppress initial banner message (implied at verbosity levels <= 1)
+\&    \-oSTRING    \-\-output=STRING              Specify basename for output files (default=INPUT)
+\&    \-IFORMAT    \-\-input\-format=FORMAT        Specify input file(s) format(s).
+\&                \-\-input\-encoding=ENCODING    Override document encoding for XML input.
 \&
 \& Model Format Options
-\&    \-l          \-\-lex                      Generate only lexical frequency file.
-\&    \-n          \-\-ngrams                   Generate only n\-gram frequency file.
-\&    \-C          \-\-classes                  Generate only lexical\-class frequency file.
-\&    \-eTAG       \-\-eos\-tag=TAG              Specify boundary tag (default=_\|_$)
-\&    \-N          \-\-verbose\-ngrams           Generate long\-form ngrams (default=no)
+\&    \-l          \-\-lex                        Generate only lexical frequency file.
+\&    \-n          \-\-ngrams                     Generate only n\-gram frequency file.
+\&    \-C          \-\-classes                    Generate only lexical\-class frequency file.
+\&    \-F          \-\-flavors                    Generate only flavor heuristic file.
+\&    \-eTAG       \-\-eos\-tag=TAG                Specify boundary tag (default=_\|_$)
+\&    \-N          \-\-verbose\-ngrams             Generate long\-form ngrams (default=no)
+\&    \-fFILE      \-\-flavors\-from=FILE          Use flavor heuristics from FILE (default=built\-in).
+\&    \-tDOUBLE    \-\-unknown\-threshhold=DOUBLE  Freq. threshhold for \*(Aqunknown\*(Aq lexical probabilities
 .Ve
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
@@ -202,16 +204,45 @@ Read an alternate configuration file.
 Default: '\s-1NULL\s0'
 .Sp
 See also: \*(L"\s-1CONFIGURATION\s0 \s-1FILES\s0\*(R".
-.SS "Basic Options"
-.IX Subsection "Basic Options"
 .ie n .IP """\-\-verbose=LEVEL"" , ""\-vLEVEL""" 4
 .el .IP "\f(CW\-\-verbose=LEVEL\fR , \f(CW\-vLEVEL\fR" 4
 .IX Item "--verbose=LEVEL , -vLEVEL"
 Verbosity level.
 .Sp
-Default: '2'
+Default: '3'
 .Sp
-Be more or less verbose.  Recognized values are in the range 0..3.
+Be more or less verbose.  Recognized values are in the range 0..6:
+.RS 4
+.IP "0 (silent)" 4
+.IX Item "0 (silent)"
+Disable all diagnostic messages.
+.IP "1 (errors)" 4
+.IX Item "1 (errors)"
+Print error messages to stderr.
+.IP "2 (warnings)" 4
+.IX Item "2 (warnings)"
+Print warnings to stderr.
+.IP "3 (info)" 4
+.IX Item "3 (info)"
+Print general diagnostic information to stderr.
+.IP "4 (progress)" 4
+.IX Item "4 (progress)"
+Print progress information to stderr.
+.IP "5 (debug)" 4
+.IX Item "5 (debug)"
+Print debugging information to stderr (if applicable).
+.IP "6 (trace)" 4
+.IX Item "6 (trace)"
+Print execution trace information to stderr (if applicable).
+.RE
+.RS 4
+.RE
+.ie n .IP """\-\-no\-banner"" , ""\-B""" 4
+.el .IP "\f(CW\-\-no\-banner\fR , \f(CW\-B\fR" 4
+.IX Item "--no-banner , -B"
+Suppress initial banner message (implied at verbosity levels <= 1)
+.Sp
+Default: '0'
 .ie n .IP """\-\-output=STRING"" , ""\-oSTRING""" 4
 .el .IP "\f(CW\-\-output=STRING\fR , \f(CW\-oSTRING\fR" 4
 .IX Item "--output=STRING , -oSTRING"
@@ -262,6 +293,12 @@ Default: '0'
 Generate only lexical-class frequency file.
 .Sp
 Default: '0'
+.ie n .IP """\-\-flavors"" , ""\-F""" 4
+.el .IP "\f(CW\-\-flavors\fR , \f(CW\-F\fR" 4
+.IX Item "--flavors , -F"
+Generate only flavor heuristic file.
+.Sp
+Default: '0'
 .ie n .IP """\-\-eos\-tag=TAG"" , ""\-eTAG""" 4
 .el .IP "\f(CW\-\-eos\-tag=TAG\fR , \f(CW\-eTAG\fR" 4
 .IX Item "--eos-tag=TAG , -eTAG"
@@ -279,6 +316,29 @@ be a valid analysis for any token.
 Generate long-form ngrams (default=no)
 .Sp
 Default: '0'
+.ie n .IP """\-\-flavors\-from=FILE"" , ""\-fFILE""" 4
+.el .IP "\f(CW\-\-flavors\-from=FILE\fR , \f(CW\-fFILE\fR" 4
+.IX Item "--flavors-from=FILE , -fFILE"
+Use flavor heuristics from \s-1FILE\s0 (default=built\-in).
+.Sp
+Default: '\s-1NULL\s0'
+.Sp
+If specified, \s-1FILE\s0 should be a flavor definition file containing a list of regular-expression based token classification rules
+to be used in computing special entries for the lexical frequency file.
+See \fImootfiles\fR\|(5) for a full specification of the moot flavor definition file format.
+If unspecified, the default behavior is to use a built-in set of classification heuristics.
+If \s-1FILE\s0 is an empty string, no flavor heuristics at all will be applied.
+.ie n .IP """\-\-unknown\-threshhold=DOUBLE"" , ""\-tDOUBLE""" 4
+.el .IP "\f(CW\-\-unknown\-threshhold=DOUBLE\fR , \f(CW\-tDOUBLE\fR" 4
+.IX Item "--unknown-threshhold=DOUBLE , -tDOUBLE"
+Freq. threshhold for 'unknown' lexical probabilities
+.Sp
+Default: '1.0'
+.Sp
+Setting this option to a non-zero value will case a special \f(CW@UKNOWN\fR entry to be added to the
+lexical frequency model file.  Note that such an entry will be overridden
+during model compilation if you specify a non-zero unknown lexical threshhold
+to \fImoot\fR\|(1) or \fImootcompile\fR\|(1).
 .SH "CONFIGURATION FILES"
 .IX Header "CONFIGURATION FILES"
 Configuration files are expected to contain lines of the form:
@@ -302,7 +362,7 @@ The following configuration files are read by default:
 .IX Header "ADDENDA"
 .SS "About this Document"
 .IX Subsection "About this Document"
-Documentation file auto-generated by optgen.perl version 0.07
+Documentation file auto-generated by optgen.perl version 0.06
 using Getopt::Gen version 0.13.
 Translation was initiated
 as:
@@ -344,7 +404,7 @@ which was used in the development and testing of the
 class-based \s-1HMM\s0 tagger / disambiguator.
 .SH "AUTHOR"
 .IX Header "AUTHOR"
-Bryan Jurish <jurish@uni\-potsdam.de>
+Bryan Jurish <moocow@cpan.org>
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
 mootfiles,

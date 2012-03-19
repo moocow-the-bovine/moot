@@ -1505,13 +1505,21 @@ void mootHMM::tag_dump_trace(mootSentence &sentence)
       tokp = &eostok;
     }
     TokID tokid = token2id(tokp->text());
-    mootTokenFlavor flav = tokenFlavor(tokp->text());
+    FlavorID flav_id = taster.noid;
+    const mootFlavorStr* flav_lab = &taster.nolabel;
+    if (use_flavors) {
+      mootTaster::Rules::const_iterator flavi = taster.find(tokp->text());
+      if (flavi != taster.rules.end()) {
+	flav_id = flavi->id;
+	flav_lab = &flavi->lab;
+      }
+    }
  
     //-- comment: token
     sentence_printf_append(s, TokTypeComment,
 			   "moot:trace\tWORD %d:%s\tflavor=(%d:%s) bpprmin=%g bbestpr=%g",
 			   tokid, (tokp==&eostok ? tokp->text().c_str() : tokids.id2name(tokid).c_str()),
-			   flav, mootTokenFlavorNames[flav],
+			   flav_id, flav_lab->c_str(),
 			   vcol->bpprmin, vcol->bbestpr);
 
     //-- iterate: Viterbi rows (current tags)

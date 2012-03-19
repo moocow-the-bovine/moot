@@ -15,22 +15,24 @@ mootrain [OPTIONS] INPUT(s)
     INPUT(s)  Tagged input corpus file(s).
 
  Options
-    -h          --help                     Print help and exit.
-    -V          --version                  Print version and exit.
-    -cFILE      --rcfile=FILE              Read an alternate configuration file.
-
- Basic Options
-    -vLEVEL     --verbose=LEVEL            Verbosity level.
-    -oSTRING    --output=STRING            Specify basename for output files (default=INPUT)
-    -IFORMAT    --input-format=FORMAT      Specify input file(s) format(s).
-                --input-encoding=ENCODING  Override document encoding for XML input.
+    -h          --help                       Print help and exit.
+    -V          --version                    Print version and exit.
+    -cFILE      --rcfile=FILE                Read an alternate configuration file.
+    -vLEVEL     --verbose=LEVEL              Verbosity level.
+    -B          --no-banner                  Suppress initial banner message (implied at verbosity levels <= 1)
+    -oSTRING    --output=STRING              Specify basename for output files (default=INPUT)
+    -IFORMAT    --input-format=FORMAT        Specify input file(s) format(s).
+                --input-encoding=ENCODING    Override document encoding for XML input.
 
  Model Format Options
-    -l          --lex                      Generate only lexical frequency file.
-    -n          --ngrams                   Generate only n-gram frequency file.
-    -C          --classes                  Generate only lexical-class frequency file.
-    -eTAG       --eos-tag=TAG              Specify boundary tag (default=__$)
-    -N          --verbose-ngrams           Generate long-form ngrams (default=no)
+    -l          --lex                        Generate only lexical frequency file.
+    -n          --ngrams                     Generate only n-gram frequency file.
+    -C          --classes                    Generate only lexical-class frequency file.
+    -F          --flavors                    Generate only flavor heuristic file.
+    -eTAG       --eos-tag=TAG                Specify boundary tag (default=__$)
+    -N          --verbose-ngrams             Generate long-form ngrams (default=no)
+    -fFILE      --flavors-from=FILE          Use flavor heuristics from FILE (default=built-in).
+    -tDOUBLE    --unknown-threshhold=DOUBLE  Freq. threshhold for 'unknown' lexical probabilities
 
 =cut
 
@@ -121,26 +123,55 @@ See also: L<CONFIGURATION FILES>.
 
 
 
-=back
-
-=cut
-
-#--------------------------------------------------------------
-# Option-Group Basic Options
-#--------------------------------------------------------------
-=pod
-
-=head2 Basic Options
-
-=over 4
-
 =item C<--verbose=LEVEL> , C<-vLEVEL>
 
 Verbosity level.
 
-Default: '2'
+Default: '3'
 
-Be more or less verbose.  Recognized values are in the range 0..3.
+Be more or less verbose.  Recognized values are in the range 0..6:
+
+=over 4
+
+=item 0 (silent)
+
+Disable all diagnostic messages.
+
+=item 1 (errors)
+
+Print error messages to stderr.
+
+=item 2 (warnings)
+
+Print warnings to stderr.
+
+=item 3 (info)
+
+Print general diagnostic information to stderr.
+
+=item 4 (progress)
+
+Print progress information to stderr.
+
+=item 5 (debug)
+
+Print debugging information to stderr (if applicable).
+
+=item 6 (trace)
+
+Print execution trace information to stderr (if applicable).
+
+=back
+
+
+
+
+
+=item C<--no-banner> , C<-B>
+
+Suppress initial banner message (implied at verbosity levels E<lt>= 1)
+
+Default: '0'
 
 
 
@@ -228,6 +259,15 @@ Default: '0'
 
 
 
+=item C<--flavors> , C<-F>
+
+Generate only flavor heuristic file.
+
+Default: '0'
+
+
+
+
 =item C<--eos-tag=TAG> , C<-eTAG>
 
 Specify boundary tag (default=__$)
@@ -249,6 +289,39 @@ be a valid analysis for any token.
 Generate long-form ngrams (default=no)
 
 Default: '0'
+
+
+
+
+=item C<--flavors-from=FILE> , C<-fFILE>
+
+Use flavor heuristics from FILE (default=built-in).
+
+Default: 'NULL'
+
+
+If specified, FILE should be a flavor definition file containing a list of regular-expression based token classification rules
+to be used in computing special entries for the lexical frequency file.
+See L<mootfiles(5)|mootfiles> for a full specification of the moot flavor definition file format.
+If unspecified, the default behavior is to use a built-in set of classification heuristics.
+If FILE is an empty string, no flavor heuristics at all will be applied.
+
+
+
+
+
+=item C<--unknown-threshhold=DOUBLE> , C<-tDOUBLE>
+
+Freq. threshhold for 'unknown' lexical probabilities
+
+Default: '1.0'
+
+
+Setting this option to a non-zero value will case a special @UKNOWN entry to be added to the
+lexical frequency model file.  Note that such an entry will be overridden
+during model compilation if you specify a non-zero unknown lexical threshhold
+to L<moot(1)|moot> or L<mootcompile(1)|mootcompile>.
+
 
 
 
@@ -302,7 +375,7 @@ The following configuration files are read by default:
 
 =head2 About this Document
 
-Documentation file auto-generated by optgen.perl version 0.07
+Documentation file auto-generated by optgen.perl version 0.06
 using Getopt::Gen version 0.13.
 Translation was initiated
 as:
@@ -366,7 +439,7 @@ class-based HMM tagger / disambiguator.
 
 =head1 AUTHOR
 
-Bryan Jurish E<lt>jurish@uni-potsdam.deE<gt>
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 SEE ALSO
 
