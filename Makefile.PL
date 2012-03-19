@@ -3,8 +3,8 @@ use ExtUtils::MakeMaker;
 ##----------------------------------------------------------------------
 ## Configuration
 ##----------------------------------------------------------------------
-if (system("pkg-config --atleast-version=2.0.8 moot") != 0) {
-  die("Required module moot >= v2.0.8 not found!\n");
+if (system("pkg-config --atleast-version=2.0.9 moot") != 0) {
+  die("Required module moot >= v2.0.9 not found!\n");
 }
 
 $MOOT_IFLAGS = join(' ', map { $s=`pkg-config --cflags-only-I $_`; chomp($s); $s } qw(moot));

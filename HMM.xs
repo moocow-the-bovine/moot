@@ -109,6 +109,15 @@ OUTPUT:
  RETVAL
 
 ##------------------------------------------------------
+bool
+use_flavors(mootHMM *hmm, ...)
+CODE:
+ if (items>1) hmm->use_flavors=SvTRUE(ST(1));
+ RETVAL=hmm->use_flavors;
+OUTPUT:
+ RETVAL
+
+##------------------------------------------------------
 TagID
 start_tagid(mootHMM *hmm, ...)
 CODE:

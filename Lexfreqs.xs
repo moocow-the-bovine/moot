@@ -45,6 +45,20 @@ CODE:
    lf->compute_specials();
 
 ##--------------------------------------------------------------
+## remove specials
+void
+remove_specials(mootLexfreqs *lf)
+CODE:
+   lf->remove_specials();
+
+##--------------------------------------------------------------
+## discount specials
+void
+discount_specials(mootLexfreqs *lf, CountT zf_special=1.0)
+CODE:
+ lf->discount_specials(zf_special);
+
+##--------------------------------------------------------------
 ## n_pairs
 size_t
 n_pairs(mootLexfreqs *lf)
@@ -75,7 +89,7 @@ CODE:
 CountT
 f_tag(mootLexfreqs *lf, char *tag)
 CODE:
- RETVAL = lf->taglookup(tag);
+ RETVAL = lf->f_tag(tag);
 OUTPUT:
  RETVAL
 
@@ -84,8 +98,7 @@ OUTPUT:
 CountT
 f_word(mootLexfreqs *lf, char *word)
 CODE:
- moot::mootLexfreqs::LexfreqTokTable::const_iterator lfi = lf->lftable.find(word);
- RETVAL = (lfi==lf->lftable.end() ? 0 : lfi->second.count);
+ RETVAL = lf->f_word(word);
 OUTPUT:
  RETVAL
 
@@ -94,12 +107,7 @@ OUTPUT:
 CountT
 f_word_tag(mootLexfreqs *lf, char *word, char *tag)
 CODE:
- RETVAL = 0;
- moot::mootLexfreqs::LexfreqTokTable::const_iterator lfi = lf->lftable.find(word);
- if (lfi != lf->lftable.end()) {
-   moot::mootLexfreqs::LexfreqSubtable::const_iterator lsi = lfi->second.freqs.find(tag);
-   if (lsi != lfi->second.freqs.end()) RETVAL = lsi->second;
- }
+ RETVAL = lf->f_word_tag(word,tag);
 OUTPUT:
  RETVAL
 
