@@ -84,35 +84,35 @@ OUTPUT:
 int
 vlSilent()
 CODE:
- RETVAL = moot::mootHMM::vlSilent;
+ RETVAL = moot::vlSilent;
 OUTPUT:
  RETVAL
 
 int
 vlErrors()
 CODE:
- RETVAL = moot::mootHMM::vlErrors;
+ RETVAL = moot::vlErrors;
 OUTPUT:
  RETVAL
 
 int
 vlWarnings()
 CODE:
- RETVAL = moot::mootHMM::vlWarnings;
+ RETVAL = moot::vlWarnings;
 OUTPUT:
  RETVAL
 
 int
 vlProgress()
 CODE:
- RETVAL = moot::mootHMM::vlProgress;
+ RETVAL = moot::vlProgress;
 OUTPUT:
  RETVAL
 
 int
 vlEverything()
 CODE:
- RETVAL = moot::mootHMM::vlEverything;
+ RETVAL = moot::vlEverything;
 OUTPUT:
  RETVAL
 

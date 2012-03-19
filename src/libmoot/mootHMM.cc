@@ -287,7 +287,7 @@ bool mootHMM::load_model(const string &modelname,
     //   i.e., the total probability mass allocated to @UNKNOWNs is determined
     //   by the total frequency @UNKNOWN relative to total corpus size; a la
     //   Good-Turing 0* := N(1)/N.
-    ProbT lexU = lexfreqs.f_text("@UNKNOWN");
+    ProbT lexU = lexfreqs.f_word("@UNKNOWN");
     ProbT lexN = lexfreqs.n_tokens - lexU;
     ProbT zf = (lexU*lexN)/(lexN-lexU);
     //carp("%s: discounting specials to pseudo-frequency = %g\n", myname, zf); //-- debug

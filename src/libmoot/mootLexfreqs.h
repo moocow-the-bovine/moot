@@ -121,9 +121,9 @@ public:
   //------ public methods: lookup
 
   /** get total frequency of a text type ("token") */
-  inline LexfreqCount f_text(const mootTokString &text) const
+  inline LexfreqCount f_word(const mootTokString &w) const
   {
-    LexfreqTokTable::const_iterator wi = lftable.find(text);
+    LexfreqTokTable::const_iterator wi = lftable.find(w);
     return wi == lftable.end() ? 0 : wi->second.count;
   };
 
@@ -134,10 +134,10 @@ public:
     return ti == tagtable.end() ? 0 : ti->second;
   };
 
-  /** get total frequency of a (text,tag) pair */
-  inline LexfreqCount f_text_tag(const mootTokString &text, const mootTagString &tag) const
+  /** get total frequency of a (word,tag) pair */
+  inline LexfreqCount f_word_tag(const mootTokString &w, const mootTagString &tag) const
   {
-    LexfreqTokTable::const_iterator wi = lftable.find(text);
+    LexfreqTokTable::const_iterator wi = lftable.find(w);
     if (wi == lftable.end()) return 0;
     LexfreqSubtable::const_iterator wti = wi->second.freqs.find(tag);
     return wti == wi->second.freqs.end() ? 0 : wti->second;

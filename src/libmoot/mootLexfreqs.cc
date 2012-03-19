@@ -128,7 +128,7 @@ void mootLexfreqs::compute_specials(bool compute_unknown)
   set<mootFlavorStr> all_flavors = flavors;
   all_flavors.insert(unknown_str);
   for (set<mootFlavorStr>::const_iterator fi=all_flavors.begin(); fi!=all_flavors.end(); ++fi) {
-    if (f_text(*fi) != 0) {
+    if (f_word(*fi) != 0) {
       //-- existing entry: remove from flavors
       flavors.erase(*fi);
       //moot_carp("compute_specials(): NOT re-computing counts for existing pseudo-lexeme '%s'\n", fi->c_str()); //--DEBUG
@@ -187,7 +187,7 @@ void mootLexfreqs::discount_specials(CountT zf_special)
   //-- get unadjusted total count for all specials
   CountT f_special = 0.0;
   for (fi=flavors.begin(); fi!=flavors.end(); ++fi) {
-    f_special += f_text(*fi);
+    f_special += f_word(*fi);
   }
   if (f_special == 0.0) return; //-- nothing to discount
 
