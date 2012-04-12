@@ -58,6 +58,7 @@ using namespace moot;
 // options & file-churning
 gengetopt_args_info  args;
 cmdutil_file_churner churner;
+HmmSpec<gengetopt_args_info> spec;
 
 // -- files
 mofstream out;
@@ -148,33 +149,10 @@ void GetMyOptions(int argc, char **argv)
   //-- io: writer: sink
   writer->to_mstream(&out);
 
-  //-- setup computils.h HmmSpec (model constants etc)
-  hs.hash_ngrams = args.hash_ngrams_arg;
-  hs.relax = args.relax_arg;
-  hs.use_classes = args.use_classes_arg;
-  hs.use_flavors = args.use_flavors_arg;
-  hs.unknown_token_name = args.unknown_token_arg;
-  hs.unknown_tag_name = args.unknown_tag_arg;
-  hs.eos_tag = args.eos_tag_arg;
-  hs.unknown_lex_threshhold = args.unknown_threshhold_arg;
-  hs.unknown_class_threshhold = args.class_threshhold_arg;
-  hs.beam_width = args.beam_width_arg;
-  hs.nlambdas = args.nlambdas_arg;
-  hs.wlambdas = args.wlambdas_arg;
-  hs.clambdas = args.clambdas_arg;
-  hs.trie_depth = args.trie_depth_arg;
-  hs.trie_threshhold = args.trie_threshhold_arg;
-  hs.trie_theta = args.trie_theta_arg;
-  hs.trie_args_given = (args.trie_depth_given || args.trie_threshhold_given || args.trie_theta_given);
-  //
-  //-- runtime options
-  hs.save_ambiguities = args.save_ambiguities_given;
-  hs.save_mark_unknown = args.mark_unknown_given;
-  hs.ndots = args.dots_arg;
-
   //-- load model
-  if (!load_hmm(args.model_arg))
-    moot_croak("%s: load FAILED for model `%s'\n", PROGNAME, args.model_arg);
+  spec.args = args;
+  if (!spec.load_hmm())
+    moot_croak("%s: load FAILED for model `%s'\n", PROGNAME, spec.model_arg());
 
   //-- report
   moot_msg(vlevel,vlProgress,"%s: Initialization complete\n", PROGNAME);
