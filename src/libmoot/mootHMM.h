@@ -790,40 +790,14 @@ public:
   //@{
 
   /** Top-level tagging interface: TokenIO layer */
-  void tag_io(TokenReader *reader, TokenWriter *writer)
-  {
-    int rtok;
-    mootSentence *sent;
-    while (reader && (rtok = reader->get_sentence()) != TokTypeEOF) {
-      sent = reader->sentence();
-      if (!sent) continue;
-      tag_sentence(*sent);
-
-      if (writer) {
-	if ((writer->tw_format & tiofTrace)) tag_dump_trace(*sent);
-	writer->put_sentence(*sent);
-      }
-    }
-  };
+  void tag_io(TokenReader *reader, TokenWriter *writer);
 
   /**
    * Top-level tagging interface: mootSentence input & output (destructive).
    * Calling this method will (re-)populate the \c besttag
    * datum in the \c sentence argument.
    */
-  inline void tag_sentence(mootSentence &sentence) {
-    viterbi_clear();
-    for (mootSentence::const_iterator si = sentence.begin();
-	 si != sentence.end();
-	 si++)
-      {
-	viterbi_step(*si);
-	if (ndots && (ntokens % ndots)==0) fputc('.', stderr);
-      }
-    viterbi_finish();
-    tag_mark_best(sentence);
-    nsents++;
-  };
+  void tag_sentence(mootSentence &sentence);
   //@}
 
   /*====================================================================
@@ -991,8 +965,9 @@ public:
 
 
   //------------------------------------------------------------
-  // Viterbi: Low/Mid-level: path utilities
-  /** \name Low/Mid-Level Viterbi Path Utilties  */
+  // Viterbi: Low-Level: path utilities
+
+  /** \name Low-Level Viterbi Path Utilties  */
   //@{
 
   /** Get current best path (in input order), considering all current tags */
@@ -1019,23 +994,7 @@ public:
    * path to this node can be reconstructed (in reverse order) by
    * traversing the \c pth_prev pointers until \c (pth_prev==NULL) .
    */
-  inline ViterbiNode *viterbi_best_node(void)
-  {
-    ViterbiNode *pnod;
-    vbestpr = MOOT_PROB_NEG;
-    vbestpn = NULL;
-
-    ViterbiRow  *prow;
-    for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
-      for (pnod = prow->nodes; pnod != NULL; pnod = pnod->nod_next) {
-	if (pnod->lprob > vbestpr) {
-	  vbestpr = pnod->lprob;
-	  vbestpn = pnod;
-	}
-      }
-    }
-    return vbestpn;
-  };
+  ViterbiNode *viterbi_best_node(void);
 
   /**
    * Get best current path from Viterbi state tables resulting in tag 'tagid'.
@@ -1043,28 +1002,8 @@ public:
    * reconstructed (in reverse order) by traversing the 'pth_prev'
    * pointers until (pth_prev==NULL).
    */
-  inline ViterbiNode *viterbi_best_node(TagID tagid)
-  {
-    ViterbiNode *pnod;
-    vbestpr = MOOT_PROB_NEG;
-    ViterbiRow  *prow;
-    vbestpn = NULL;
-    for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
-      if (prow->tagid == tagid) {
-	for (pnod = prow->nodes; pnod != NULL; pnod = pnod->nod_next) {
-	  if (pnod->lprob > vbestpr) {
-	    vbestpr = pnod->lprob;
-	    vbestpn = pnod;
-	  }
-	}
-	return vbestpn;
-      }
-    }
-    return NULL;
-  };
+  ViterbiNode *viterbi_best_node(TagID tagid);
  
-  //------------------------------------------------------------
-  // Viterbi: Low/Mid: node-to-path conversion
   /**
    * Useful utility: build a path (in input order) from a ViterbiNode.
    * See caveats for 'struct ViterbiPathNode' -- return value is non-const
@@ -1072,34 +1011,23 @@ public:
    *
    * Uses 'vbestpath' to store constructed path.
    */
-  inline ViterbiPathNode *viterbi_node_path(ViterbiNode *node)
-  {
-    viterbi_clear_bestpath();
-    ViterbiPathNode *pnod; 
-    for ( ; node != NULL; node = node->pth_prev) {
-      pnod            = viterbi_get_pathnode();
-      pnod->node      = node;
-      pnod->path_next = vbestpath;
-      vbestpath       = pnod;
-    }
-    return vbestpath;
-  };
+  ViterbiPathNode *viterbi_node_path(ViterbiNode *node);
   //@}
 
   //------------------------------------------------------------
-  // public methods: low-level: Viterbi
+  // Viterbi: low-level: iteration
 
   /** \name Low-level Viterbi iteration utilities */
   //{@
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /** Returns true iff \p col is a valid (non-empty) Viterbi trellis column */
-  inline bool viterbi_column_ok(const ViterbiColumn *col) const {
-    return (col
-	    && col->rows 
-	    && col->rows->nodes
-	    );
+  inline bool viterbi_column_ok(const ViterbiColumn *col) const
+  {
+    return (col && col->rows  && col->rows->nodes);
   };
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /**
    * Get and populate a new Viterbi-trellis row in column \p col for destination Tag-ID
    * \p curtagid with lexical (log-)probability \p wordpr.
@@ -1109,89 +1037,17 @@ public:
    * If specified, \p probmin can be used to override beam-pruning
    * for non-NULL columns.
    */
-  inline ViterbiColumn *viterbi_populate_row(TagID curtagid,
-					     ProbT wordpr=MOOT_PROB_ONE,
-					     ViterbiColumn *col=NULL,
-					     ProbT probmin=MOOT_PROB_NONE)
-  {
-    ViterbiRow  *prow, *row = viterbi_get_row();
-    ViterbiNode *pnod, *nod = NULL;
-
-    if (!col) {
-      col           = viterbi_get_column();
-      col->rows     = NULL;
-      col->bbestpr  = MOOT_PROB_NEG;
-      if (vtable) col->bpprmin = vtable->bbestpr - beamwd;
-      else        col->bpprmin = MOOT_PROB_NEG;
-    }
-    if (probmin != MOOT_PROB_NONE) col->bpprmin = probmin;
-    col->col_prev = vtable;
-    row->nodes = NULL;
-    row->wprob = wordpr;
-
-    for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
-      vbestpr = MOOT_PROB_NEG;
-      vbestpn = NULL;
-
-      for (pnod = prow->nodes; pnod != NULL; pnod = pnod->nod_next) {
-	//-- beam pruning
-	if (beamwd && pnod->lprob < col->bpprmin) continue;
-
-	//-- probability lookup
-	vtagpr = pnod->lprob + tagp(pnod->ptagid, prow->tagid, curtagid);
-	if (vtagpr > vbestpr
-# ifdef MOOT_LEX_IS_TIEBREAKER
-	    || (vtagpr == vbestpr && wordpr > prow->wprob)
-# endif
-	    ) 
-	  {
-	    vbestpr = vtagpr;
-	    vbestpn = pnod;
-	  }
-      }
-
-      //-- set node information
-      if (vbestpn != NULL) {
-	nod = viterbi_get_node();
-	nod->tagid    = curtagid;
-	nod->ptagid   = prow->tagid;
-	nod->lprob    = vbestpr + wordpr;
-	nod->pth_prev = vbestpn;
-	nod->nod_next = row->nodes;
-
-	row->nodes    = nod;
-
-	//-- save beam information
-	if (nod->lprob > col->bbestpr) col->bbestpr = nod->lprob;
-      }
-    }
-
-    //-- set row information
-    row->tagid    = curtagid;
-    row->row_next = col->rows;
-    col->rows     = row;
-
-    return col;
-  };
+  ViterbiColumn *viterbi_populate_row(TagID 		curtagid,
+				      ProbT 		wordpr   =MOOT_PROB_ONE,
+				      ViterbiColumn     *col	 =NULL,
+				      ProbT 		probmin  =MOOT_PROB_NONE);
 
 
-  //------------------------------------------------------------
-  // Viterbi: Low-level: clear best-path
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /** Clear internal \a vbestpath temporary */
-  inline void viterbi_clear_bestpath(void)
-  {
-    //-- move to trash: path-nodes
-    ViterbiPathNode *pnod, *pnod_next;
-    for (pnod = vbestpath; pnod != NULL; pnod = pnod_next) {
-      pnod_next       = pnod->path_next;
-      pnod->path_next = trash_pathnodes;
-      trash_pathnodes = pnod;
-    }
-    vbestpath = NULL;
-  };
+  void viterbi_clear_bestpath(void);
 
-  //------------------------------------------------------------
-  // Viterbi: fallback
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /**
    * Step a single Viterbi iteration, last-ditch effort: consider
    * all tags in tagset.  Implicitly called by other viterbi_step()
@@ -1202,11 +1058,14 @@ public:
 
 
   //------------------------------------------------------------
-  /** \name Low-level Trash-stack Utilities */
+  /** \name Low-level Viterbi trash-stack utilities */
 
   //@{
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /** Returns a pointer to an unused ViterbiNode, possibly allocating a new one. */
-  inline ViterbiNode *viterbi_get_node(void) {
+  inline ViterbiNode *viterbi_get_node(void)
+  {
     ViterbiNode *nod;
     if (trash_nodes != NULL) {
       nod         = trash_nodes;
@@ -1217,10 +1076,10 @@ public:
     return nod;
   };
 
-  //------------------------------------------------------------
-  // Viterbi: trash utilities: Rows
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /** Returns a pointer to an unused ViterbiRow, possibly allocating a new one. */
-  inline ViterbiRow *viterbi_get_row(void) {
+  inline ViterbiRow *viterbi_get_row(void)
+  {
     ViterbiRow *row;
     if (trash_rows != NULL) {
       row        = trash_rows;
@@ -1231,10 +1090,10 @@ public:
     return row;
   };
 
-  //------------------------------------------------------------
-  // Viterbi: trash utilities: columns
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /** Returns a pointer to an unused ViterbiColumn, possibly allocating a new one. */
-  inline ViterbiColumn *viterbi_get_column(void) {
+  inline ViterbiColumn *viterbi_get_column(void)
+  {
     ViterbiColumn *col;
     if (trash_columns != NULL) {
       col           = trash_columns;
@@ -1245,10 +1104,10 @@ public:
     return col;
   };
 
-  //------------------------------------------------------------
-  // Viterbi: trash utilities: path-nodes
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /** Returns a pointer to an unused ViterbiPathNode, possibly allocating a new one. */
-  inline ViterbiPathNode *viterbi_get_pathnode(void) {
+  inline ViterbiPathNode *viterbi_get_pathnode(void)
+  {
     ViterbiPathNode *pnod;
     if (trash_pathnodes != NULL) {
       pnod            = trash_pathnodes;
@@ -1261,11 +1120,12 @@ public:
   //@}
 
 
-
   //------------------------------------------------------------
   // Low-level: ID Lookup
   /** \name ID Lookup */
   //@{
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /** Get the TokID for a given token, using type-based lookup */
   inline TokID token2id(const mootTokString &token) const
   {
@@ -1278,14 +1138,11 @@ public:
 #endif
   };
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /** Add \c tag fields of mootToken::analyses to \c tok_class */
-  inline void token2lexclass(const mootToken &token, LexClass &tok_class)
-  {
-    for (mootToken::Analyses::const_iterator ani = token.analyses().begin(); ani != token.analyses().end(); ani++) {
-      tok_class.insert(tagids.name2id(ani->tag));
-    }
-  };
+  void token2lexclass(const mootToken &token, LexClass &tok_class) const;
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /**
    * Convert string-form tagsets to lexical classes.
    * If \c add_tagids is true, then tag-IDs will
@@ -1296,25 +1153,7 @@ public:
    *
    * \note \c lclass is NOT cleared by this method.
    */
-  inline LexClass *tagset2lexclass(const mootTagSet &tagset,
-				   LexClass *lclass=NULL,
-				   bool add_tagids=false)
-  {
-    if (!lclass) lclass = new LexClass();
-    //-- ... for all tags in the class (utsi)
-    for (mootTagSet::const_iterator tsi = tagset.begin();
-	 tsi != tagset.end();
-	 tsi++)
-      {
-	//-- lookup or assign a tag id
-	TagID tagid = tagids.name2id(*tsi);
-	if (add_tagids && tagid==0) tagid = tagids.insert(*tsi);
-
-	//-- insert tagid into lexical class
-	lclass->insert(tagid);
-      }
-    return lclass;
-  };
+  LexClass *tagset2lexclass(const mootTagSet &tagset, LexClass *lclass=NULL, bool add_tagids=false);
 
 
   /**
@@ -1323,46 +1162,7 @@ public:
    * @param autopopulate if true, new classes will be autopopulated with uniform distributions (implies \c autocreate).
    * @param autocreate if true, new classes will be created and assigned class-ids.
    */
-  inline ClassID class2id(const LexClass &lclass,
-			  bool autopopulate=true,
-			  bool autocreate=true)
-  {
-    ClassID cid = classids.name2id(lclass);
-    if (cid == 0) {
-      nnewclasses++;
-      if (!autopopulate && !autocreate) return cid;  //-- map unknown classes to zero
-
-      //-- previously unknown class: fill 'er up with default values
-      cid = classids.insert(lclass);
-      if (cid >= lcprobs.size()) {
-	n_classes = cid+1;
-
-	//-- resize() should really happen 2 lines down,
-	//   but that might break something : test this at some point!
-	lcprobs.resize(n_classes);
-      }
-      if (autopopulate) {
-	LexClassProbSubTable &lcps = lcprobs[cid];
-	if (!lclass.empty()) {
-	  //-- non-empty class: restrict population to class-members
-	  ProbT lcprob = log(1.0/static_cast<ProbT>(lclass.size()));
-
-	  for (LexClass::const_iterator lci = lclass.begin(); lci != lclass.end(); lci++) {
-	    lcps[*lci] = lcprob;
-	  }
-	} else {
-	  //-- empty class: use class for "unknown" token instead [HACK!]
-	  const LexProbSubTable &lps = lexprobs[0];
-	  ProbT lpprob = log(1.0/static_cast<ProbT>(lps.size()));
-
-	  for (LexProbSubTable::const_iterator lpsi = lps.begin(); lpsi != lps.end(); lpsi++) {
-	    lcps[lpsi->key()] = lpprob;
-	  }
-	}
-      }
-    }
-    return cid;
-  };
+  ClassID class2id(const LexClass &lclass, bool autopopulate=true, bool autocreate=true);
   //@}
 
 

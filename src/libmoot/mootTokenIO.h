@@ -77,23 +77,6 @@ static const int tiofMedium = tiofText|tiofTagged;
 /** Format alias for 'Cooked Well Done' files. */
 static const int tiofWellDone = tiofText|tiofAnalyzed|tiofTagged; //|tiofCost
 
-/** Enum for I/O mode flags */
-/*
-enum TokenIOModeE {
-  tiomNone,     ///< no I/O
-  tiomUnknown,  ///< unknown mode (dangerous)
-  tiomFilename, ///< named file I/O
-  tiomFile,     ///< FILE* I/O
-  tiomFd,       ///< file descriptor I/O
-  tiomCBuffer,  ///< C memory-buffer I/O
-  tiomCString,  ///< NUL-terminated string I/O
-  tiomString,   ///< STL string I/O
-  tiomUser,     ///< some other user-defined I/O mode
-  tiomNModes    ///< number of modes; not really an I/O mode itself
-};
-typedef TokenIOModeE TokenIOMode;
-*/
-
 
 /** \brief Abstract class for token I/O */
 class TokenIO {

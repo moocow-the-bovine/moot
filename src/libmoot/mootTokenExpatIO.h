@@ -244,12 +244,14 @@ public:
   /**
    * Get the next token from the buffer.
    * On completion, current token (if any) is in *tr_token.
+   * \warning subsequent calls to get_token(), get_sentence() etc may invalidate the pointer
    */
   virtual mootTokenType get_token(void);
 
   /**
    * Read in next sentence.
    * On completion, current sentence (if any) is in *tr_sentence.
+   * \warning subsequent calls to get_token(), get_sentence() etc may invalidate the pointer
    */
   virtual mootTokenType get_sentence(void);
   //@}

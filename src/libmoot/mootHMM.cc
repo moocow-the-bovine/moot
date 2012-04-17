@@ -1098,6 +1098,44 @@ bool mootHMM::compute_logprobs(void)
   return true;
 }
 
+//======================================================================
+// Tagging: Top-Level
+
+//--------------------------------------------------------------
+void mootHMM::tag_io(TokenReader *reader, TokenWriter *writer)
+{
+  int rtok;
+  mootSentence *sent;
+  while (reader && (rtok = reader->get_sentence()) != TokTypeEOF) {
+    sent = reader->sentence();
+    if (!sent) continue;
+    tag_sentence(*sent);
+    
+    if (writer) {
+      if ((writer->tw_format & tiofTrace)) tag_dump_trace(*sent);
+      writer->put_sentence(*sent);
+    }
+  }
+}
+
+//--------------------------------------------------------------
+void mootHMM::tag_sentence(mootSentence &sentence)
+{
+  viterbi_clear();
+  for (mootSentence::const_iterator si = sentence.begin(); si != sentence.end(); ++si) {
+    viterbi_step(*si);
+    if (ndots && (ntokens % ndots)==0) fputc('.', stderr);
+  }
+  viterbi_finish();
+  tag_mark_best(sentence);
+  ++nsents;
+}
+
+
+
+//======================================================================
+// Viterbi: Mid-level
+
 /*--------------------------------------------------------------
  * Viterbi: clear
  */
@@ -1559,10 +1597,218 @@ void mootHMM::tag_dump_trace(mootSentence &sentence)
   sentence.swap(s);
 }
 
+//======================================================================
+// Viterbi: Low-Level: path utilities
 
-/*--------------------------------------------------------------------------
- * Debug / HMM Dump
- *--------------------------------------------------------------------------*/
+//--------------------------------------------------------------
+mootHMM::ViterbiNode *mootHMM::viterbi_best_node(void)
+{
+  ViterbiNode *pnod;
+  vbestpr = MOOT_PROB_NEG;
+  vbestpn = NULL;
+
+  ViterbiRow  *prow;
+  for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
+    for (pnod = prow->nodes; pnod != NULL; pnod = pnod->nod_next) {
+      if (pnod->lprob > vbestpr) {
+	vbestpr = pnod->lprob;
+	vbestpn = pnod;
+      }
+    }
+  }
+  return vbestpn;
+}
+
+//--------------------------------------------------------------
+mootHMM::ViterbiNode *mootHMM::viterbi_best_node(TagID tagid)
+{
+  ViterbiNode *pnod;
+  vbestpr = MOOT_PROB_NEG;
+  ViterbiRow  *prow;
+  vbestpn = NULL;
+  for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
+    if (prow->tagid == tagid) {
+      for (pnod = prow->nodes; pnod != NULL; pnod = pnod->nod_next) {
+	if (pnod->lprob > vbestpr) {
+	  vbestpr = pnod->lprob;
+	  vbestpn = pnod;
+	}
+      }
+      return vbestpn;
+    }
+  }
+  return NULL;
+}
+
+//--------------------------------------------------------------
+mootHMM::ViterbiPathNode *mootHMM::viterbi_node_path(ViterbiNode *node)
+{
+  viterbi_clear_bestpath();
+  ViterbiPathNode *pnod; 
+  for ( ; node != NULL; node = node->pth_prev) {
+    pnod            = viterbi_get_pathnode();
+    pnod->node      = node;
+    pnod->path_next = vbestpath;
+    vbestpath       = pnod;
+  }
+  return vbestpath;
+}
+
+//======================================================================
+// Viterbi: Low-Level: iteration utilities
+
+//--------------------------------------------------------------
+mootHMM::ViterbiColumn *mootHMM::viterbi_populate_row(TagID curtagid, ProbT wordpr, ViterbiColumn *col, ProbT probmin)
+{
+  ViterbiRow  *prow, *row = viterbi_get_row();
+  ViterbiNode *pnod, *nod = NULL;
+
+  if (!col) {
+    col           = viterbi_get_column();
+    col->rows     = NULL;
+    col->bbestpr  = MOOT_PROB_NEG;
+    if (vtable) col->bpprmin = vtable->bbestpr - beamwd;
+    else        col->bpprmin = MOOT_PROB_NEG;
+  }
+  if (probmin != MOOT_PROB_NONE) col->bpprmin = probmin;
+  col->col_prev = vtable;
+  row->nodes = NULL;
+  row->wprob = wordpr;
+
+  for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
+    vbestpr = MOOT_PROB_NEG;
+    vbestpn = NULL;
+
+    for (pnod = prow->nodes; pnod != NULL; pnod = pnod->nod_next) {
+      //-- beam pruning
+      if (beamwd && pnod->lprob < col->bpprmin) continue;
+
+      //-- probability lookup
+      vtagpr = pnod->lprob + tagp(pnod->ptagid, prow->tagid, curtagid);
+      if (vtagpr > vbestpr
+# ifdef MOOT_LEX_IS_TIEBREAKER
+	  || (vtagpr == vbestpr && wordpr > prow->wprob)
+# endif
+	  ) 
+	{
+	  vbestpr = vtagpr;
+	  vbestpn = pnod;
+	}
+    }
+
+    //-- set node information
+    if (vbestpn != NULL) {
+      nod = viterbi_get_node();
+      nod->tagid    = curtagid;
+      nod->ptagid   = prow->tagid;
+      nod->lprob    = vbestpr + wordpr;
+      nod->pth_prev = vbestpn;
+      nod->nod_next = row->nodes;
+
+      row->nodes    = nod;
+
+      //-- save beam information
+      if (nod->lprob > col->bbestpr) col->bbestpr = nod->lprob;
+    }
+  }
+
+  //-- set row information
+  row->tagid    = curtagid;
+  row->row_next = col->rows;
+  col->rows     = row;
+
+  return col;
+}
+
+//--------------------------------------------------------------
+void mootHMM::viterbi_clear_bestpath(void)
+{
+  //-- move to trash: path-nodes
+  ViterbiPathNode *pnod, *pnod_next;
+  for (pnod = vbestpath; pnod != NULL; pnod = pnod_next) {
+    pnod_next       = pnod->path_next;
+    pnod->path_next = trash_pathnodes;
+    trash_pathnodes = pnod;
+  }
+  vbestpath = NULL;
+}
+
+//======================================================================
+// Low-Level: ID Lookup
+
+//--------------------------------------------------------------
+void mootHMM::token2lexclass(const mootToken &token, LexClass &tok_class) const
+{
+  for (mootToken::Analyses::const_iterator ani = token.analyses().begin(); ani != token.analyses().end(); ++ani) {
+    tok_class.insert(tagids.name2id(ani->tag));
+  }
+}
+
+//--------------------------------------------------------------
+mootHMM::LexClass *mootHMM::tagset2lexclass(const mootTagSet &tagset, LexClass *lclass, bool add_tagids)
+{
+  if (!lclass) lclass = new LexClass();
+  //-- ... for all tags in the class (utsi)
+  for (mootTagSet::const_iterator tsi = tagset.begin(); tsi != tagset.end(); ++tsi) {
+    //-- lookup or assign a tag id
+    TagID tagid = tagids.name2id(*tsi);
+    if (add_tagids && tagid==0) tagid = tagids.insert(*tsi);
+
+    //-- insert tagid into lexical class
+    lclass->insert(tagid);
+  }
+  return lclass;
+}
+
+//--------------------------------------------------------------
+mootHMM::ClassID mootHMM::class2id(const LexClass &lclass, bool autopopulate, bool autocreate)
+{
+  ClassID cid = classids.name2id(lclass);
+  if (cid == 0) {
+    nnewclasses++;
+    if (!autopopulate && !autocreate) return cid;  //-- map unknown classes to zero
+
+    //-- previously unknown class: fill 'er up with default values
+    cid = classids.insert(lclass);
+    if (cid >= lcprobs.size()) {
+      n_classes = cid+1;
+
+      //-- resize() should really happen 2 lines down,
+      //   but that might break something : test this at some point!
+      lcprobs.resize(n_classes);
+    }
+    if (autopopulate) {
+      LexClassProbSubTable &lcps = lcprobs[cid];
+      if (!lclass.empty()) {
+	//-- non-empty class: restrict population to class-members
+	ProbT lcprob = log(1.0/static_cast<ProbT>(lclass.size()));
+
+	for (LexClass::const_iterator lci = lclass.begin(); lci != lclass.end(); lci++) {
+	  lcps[*lci] = lcprob;
+	}
+      } else {
+	//-- empty class: use class for "unknown" token instead [HACK!]
+	const LexProbSubTable &lps = lexprobs[0];
+	ProbT lpprob = log(1.0/static_cast<ProbT>(lps.size()));
+
+	for (LexProbSubTable::const_iterator lpsi = lps.begin(); lpsi != lps.end(); lpsi++) {
+	  lcps[lpsi->key()] = lpprob;
+	}
+      }
+    }
+  }
+  return cid;
+};
+
+
+
+
+
+//======================================================================
+// DEBUG
+
+//--------------------------------------------------------------
+// Debug: HMM dump
 void mootHMM::txtdump(FILE *file, bool dump_constants, bool dump_lexprobs, bool dump_classprobs, bool dump_suftrie, bool dump_ngprobs)
 {
   fprintf(file, "%%%% mootHMM text dump\n");
