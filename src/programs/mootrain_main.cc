@@ -205,7 +205,7 @@ void GetMyOptions(int argc, char **argv)
   if (args.verbose_arg >= vlInfo) {
     //fprintf(stderr, "%s: kmax               : %d\n", PROGNAME, hmmt.kmax);
     fprintf(stderr, "%s: EOS tag            : %s\n", PROGNAME, hmmt.eos_tag.c_str());
-    fprintf(stderr, "%s: Flavors (in)       : %s : %u rules\n", PROGNAME, flavor_src, taster.size());
+    fprintf(stderr, "%s: Flavors (in)       : %s : %zu rules\n", PROGNAME, flavor_src, taster.size());
     fprintf(stderr, "%s: Lexical frequenies : %s\n", PROGNAME, !lfout.name.empty() ? lfout.name.c_str() : "(null)");
     fprintf(stderr, "%s: Ngram frequencies  : %s\n", PROGNAME, !ngout.name.empty() ? ngout.name.c_str() : "(null)");
     fprintf(stderr, "%s: Class frequencies  : %s\n", PROGNAME, !lcout.name.empty() ? lcout.name.c_str() : "(null)");

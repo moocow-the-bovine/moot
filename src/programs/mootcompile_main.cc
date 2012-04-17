@@ -140,7 +140,7 @@ int main (int argc, char **argv)
     fprintf(stderr, "%s   Lexical lambdas   : lambdaw0=%g, lambdaw1=%g\n", cmts, hmm.wlambda0, hmm.wlambda0);
     fprintf(stderr, "%s   Use classes?      : %s\n", cmts, hmm.use_lex_classes ? "yes" : "no");
     fprintf(stderr, "%s   Use flavors?      : %s\n", cmts, hmm.use_flavors ? "yes" : "no");
-    fprintf(stderr, "%s   Num/Flavors       : %u\n", cmts, hmm.taster.size());
+    fprintf(stderr, "%s   Num/Flavors       : %zu\n", cmts, hmm.taster.size());
     fprintf(stderr, "%s   Class Threshhold  : %g\n", cmts, hmm.unknown_class_threshhold);
     fprintf(stderr, "%s   Class lambdas     : lambdac0=%g, lambdac1=%g\n", cmts, hmm.clambda0, hmm.clambda1);
     fprintf(stderr, "%s   Beam Width        : %g\n", cmts, hmm.beamwd);

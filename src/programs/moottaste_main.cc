@@ -149,7 +149,7 @@ void GetMyOptions(int argc, char **argv)
     tin.close();
     if (vlevel >= vlProgress) {
       writer->printf_comment("  Flavors: %s\n", args.flavors_arg);
-      fprintf(stderr,"%s: loaded %u flavor rules from file '%s'\n", PROGNAME, taster.size(), args.flavors_arg);
+      fprintf(stderr,"%s: loaded %zu flavor rules from file '%s'\n", PROGNAME, taster.size(), args.flavors_arg);
       fflush(stderr);
     }
   }
@@ -167,7 +167,7 @@ void GetMyOptions(int argc, char **argv)
     taster.set_default_rules();
     if (vlevel >= vlProgress) {
       writer->printf_comment("  Flavors: (built-in)\n");
-      fprintf(stderr,"%s: using %u built-in flavor rules\n", PROGNAME, taster.size());
+      fprintf(stderr,"%s: using %zu built-in flavor rules\n", PROGNAME, taster.size());
       fflush(stderr);
     }
   }
