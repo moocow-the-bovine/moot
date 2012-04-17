@@ -247,7 +247,7 @@ namespace moot {
       if (relax_given()) hmmp->relax = relax_arg();
       if (use_classes_given()) hmmp->use_lex_classes = use_classes_arg();
       if (use_flavors_given()) hmmp->use_flavors = use_flavors_arg();
-      if (beam_width_given()) hmmp->beamwd = beam_width_arg();
+      if (beam_width_given()) hmmp->beamwd = log(beam_width_arg());
       if (save_ambiguities_given()) hmmp->save_ambiguities = save_ambiguities_arg();
       if (save_mark_unknown_given()) hmmp->save_mark_unknown = save_mark_unknown_arg();
       if (ndots_given()) hmmp->ndots = ndots_arg();

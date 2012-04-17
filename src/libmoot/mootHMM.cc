@@ -35,6 +35,7 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <string.h>
+#include <assert.h>
 
 #include <mootHMM.h>
 #include <mootModelSpec.h>
@@ -455,57 +456,54 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
   // compile: lexfreqs
 
   //-- compile lexical probabilities : for all tokens (lfti)
-  for (mootLexfreqs::LexfreqTokTable::const_iterator lfti = lexfreqs.lftable.begin();
-       lfti != lexfreqs.lftable.end();
-       lfti++)
-    {
-      const mootTokString &tokstr = lfti->first;
-      const mootLexfreqs::LexfreqEntry &entry = lfti->second;
-      const mootLexfreqs::LexfreqCount toktotal = entry.count;
+  for (mootLexfreqs::LexfreqTokTable::const_iterator lfti = lexfreqs.lftable.begin(); lfti != lexfreqs.lftable.end(); ++lfti) {
+    const mootTokString &tokstr = lfti->first;
+    const mootLexfreqs::LexfreqEntry &entry = lfti->second;
+    const mootLexfreqs::LexfreqCount toktotal = entry.count;
 
+    //-- sanity check
+    if (toktotal == 0) continue;
+
+    //-- get token flavor, id
+    tokid  = token2id(tokstr);  //-- token or flavor id
+    flavid = taster.flavor_id(tokstr);
+
+    //-- ... for all tags occurring with this token(lftagi)
+    for (mootLexfreqs::LexfreqSubtable::const_iterator lftagi = entry.freqs.begin(); lftagi != entry.freqs.end(); ++lftagi) {
+      const mootTagString &tagstr = lftagi->first;
+      const mootLexfreqs::LexfreqCount tagcount = lftagi->second;
+      const mootLexfreqs::LexfreqCount tagtotal = lexfreqs.f_tag(tagstr);
+	
       //-- sanity check
-      if (toktotal == 0) continue;
-
-      //-- get token flavor, id
-      tokid  = token2id(tokstr);  //-- token or flavor id
-      flavid = taster.flavor_id(tokstr);
-
-      //-- ... for all tags occurring with this token(lftagi)
-      for (mootLexfreqs::LexfreqSubtable::const_iterator lftagi = entry.freqs.begin(); lftagi != entry.freqs.end(); ++lftagi) {
-	const mootTagString &tagstr = lftagi->first;
-	const mootLexfreqs::LexfreqCount tagcount = lftagi->second;
-	const mootLexfreqs::LexfreqCount tagtotal = lexfreqs.f_tag(tagstr);
+      if (tagtotal == 0) continue;
 	
-	//-- sanity check
-	if (tagtotal == 0) continue;
-	
-	//-- get tag-ID
-	tagid  = tagids.name2id(tagstr);
+      //-- get tag-ID
+      tagid  = tagids.name2id(tagstr);
 	
 #if 0
-	//-- "unknown" token check (disabled, v2.0.9-1)
-	if (flavid == taster.noid && toktotal <= unknown_lex_threshhold) { //-- dubious
-	  //-- "unknown" token: just store the raw counts for now
+      //-- "unknown" token check (disabled, v2.0.9-1)
+      if (flavid == taster.noid && toktotal <= unknown_lex_threshhold) { //-- dubious
+	//-- "unknown" token: just store the raw counts for now
 
-	  //-- ... and add to "unknown" counts
-	  unTotal += tagcount;
-	  LexProbSubTable::iterator lpsi = untagcts.find(tagid);
-	  if (lpsi == untagcts.end()) {
-	    untagcts[tagid] = tagcount;
-	  } else {
-	    lpsi->second += tagcount;
-	  }
+	//-- ... and add to "unknown" counts
+	unTotal += tagcount;
+	LexProbSubTable::iterator lpsi = untagcts.find(tagid);
+	if (lpsi == untagcts.end()) {
+	  untagcts[tagid] = tagcount;
+	} else {
+	  lpsi->second += tagcount;
 	}
-	if (tokid != 0) {
-	  //-- it's a kosher token (too?): compute lexical probability: p(tok|tag)
-	  lexprobs[tokid][tagid] = tagcount / tagtotal;
-	}
-#else
-	//-- v2.0.9-1: always compute lexical probability: p(tok|tag)
-	lexprobs[tokid][tagid] = tagcount / tagtotal;
-#endif
       }
+      if (tokid != 0) {
+	//-- it's a kosher token (too?): compute lexical probability: p(tok|tag)
+	lexprobs[tokid][tagid] = tagcount / tagtotal;
+      }
+#else
+      //-- v2.0.9-1: always compute lexical probability: p(tok|tag)
+      lexprobs[tokid][tagid] = tagcount / tagtotal;
+#endif
     }
+  }
 
   if (lexprobs.size() == 0) lexprobs.resize(1); //-- ensure at least a lexical entry for the "unknown" token
 #if 0
@@ -592,46 +590,37 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
   ProbT ugtotal = ngrams.ugtotal - ngrams.lookup(start_tag_str);
   ProbT f;
 
-  for (mootNgrams::NgramTable::const_iterator ngi1 = ngrams.ngtable.begin();
-       ngi1 != ngrams.ngtable.end();
-       ngi1++)
-    {
-      //-- look at unigrams first : get ID
-      tagid = tagids.name2id(ngi1->first);
-      f     = ngi1->second.count;
+  for (mootNgrams::NgramTable::const_iterator ngi1 = ngrams.ngtable.begin(); ngi1 != ngrams.ngtable.end(); ++ngi1) {
+    //-- look at unigrams first : get ID
+    tagid = tagids.name2id(ngi1->first);
+    f     = ngi1->second.count;
 
-      //-- compute unigram probability, storing as '0 0 $tagid'
-      set_ngram_prob((ngi1->second.count / ugtotal), 0,0,tagid);
+    //-- compute unigram probability, storing as '0 0 $tagid'
+    set_ngram_prob((ngi1->second.count / ugtotal), 0,0,tagid);
 
-      //-- ignore zero probabilities
-      if (ngi1->second.count == 0) continue;
+    //-- ignore zero probabilities
+    if (ngi1->second.count == 0) continue;
 
-      //-- next, look at bigrams
-      for (mootNgrams::BigramTable::const_iterator ngi2 = ngi1->second.freqs.begin();
-	   ngi2 != ngi1->second.freqs.end();
-	   ngi2++)
-	{
-	  //-- get ID
-	  tagid2 = tagids.name2id(ngi2->first);
-	  f      = ngi2->second.count;
+    //-- next, look at bigrams
+    for (mootNgrams::BigramTable::const_iterator ngi2 = ngi1->second.freqs.begin(); ngi2 != ngi1->second.freqs.end(); ++ngi2) {
+      //-- get ID
+      tagid2 = tagids.name2id(ngi2->first);
+      f      = ngi2->second.count;
 
-	  //-- compute bigram probability, storing as '0 $tagid1 $tagid2'
-	  set_ngram_prob((ngi2->second.count / ngi1->second.count), 0,tagid,tagid2);
+      //-- compute bigram probability, storing as '0 $tagid1 $tagid2'
+      set_ngram_prob((ngi2->second.count / ngi1->second.count), 0,tagid,tagid2);
 
-	  //-- look at trigrams now
-	  for (mootNgrams::TrigramTable::const_iterator ngi3 = ngi2->second.freqs.begin();
-	       ngi3 != ngi2->second.freqs.end();
-	       ngi3++)
-	    {
-	      //-- get ID
-	      tagid3 = tagids.name2id(ngi3->first);
-	      f      = ngi3->second;
+      //-- look at trigrams now
+      for (mootNgrams::TrigramTable::const_iterator ngi3 = ngi2->second.freqs.begin(); ngi3 != ngi2->second.freqs.end(); ++ngi3) {
+	//-- get ID
+	tagid3 = tagids.name2id(ngi3->first);
+	f      = ngi3->second;
 
-	      //-- compute trigram probability, storing as '$tagid1 $tagid2 $tagid3'
-	      set_ngram_prob((ngi3->second / ngi2->second.count), tagid,tagid2,tagid3);
-	    }
-	}
+	//-- compute trigram probability, storing as '$tagid1 $tagid2 $tagid3'
+	set_ngram_prob((ngi3->second / ngi2->second.count), tagid,tagid2,tagid3);
+      }
     }
+  }
 
   //--------------------------------------
   // compile: cleanup
@@ -650,31 +639,25 @@ void mootHMM::compile_unknown_lexclass(const mootClassfreqs &classfreqs)
   //-- do we have any classes at all?
   if (!use_lex_classes) return;
 
-  for (mootClassfreqs::ClassfreqTable::const_iterator lcti = classfreqs.lctable.begin();
-       lcti != classfreqs.lctable.end();
-       lcti++)
-    {
-      const mootTagSet                        &tagset = lcti->first;
-      const mootClassfreqs::ClassfreqEntry     &entry = lcti->second;
-      const CountT                         classtotal = entry.count;
+  for (mootClassfreqs::ClassfreqTable::const_iterator lcti = classfreqs.lctable.begin(); lcti != classfreqs.lctable.end(); ++lcti) {
+    const mootTagSet                        &tagset = lcti->first;
+    const mootClassfreqs::ClassfreqEntry     &entry = lcti->second;
+    const CountT                         classtotal = entry.count;
 
-      if (classtotal > unknown_class_threshhold && !tagset.empty())
-	continue;
+    if (classtotal > unknown_class_threshhold && !tagset.empty())
+      continue;
 
-      //-- add IDs to 'uclass'
-      tagset2lexclass(tagset, &uclass, false);
+    //-- add IDs to 'uclass'
+    tagset2lexclass(tagset, &uclass, false);
 
-      //-- add target tags for empty classes, too
-      if (tagset.empty()) {
-	//-- ... for all tags assigned to this class (lctagi)
-	for (mootClassfreqs::ClassfreqSubtable::const_iterator lctagi = entry.freqs.begin();
-	     lctagi != entry.freqs.end();
-	     lctagi++)
-	  {
-	    uclass.insert(tagids.name2id(lctagi->first));
-	  }
+    //-- add target tags for empty classes, too
+    if (tagset.empty()) {
+      //-- ... for all tags assigned to this class (lctagi)
+      for (mootClassfreqs::ClassfreqSubtable::const_iterator lctagi = entry.freqs.begin(); lctagi != entry.freqs.end(); ++lctagi) {
+	uclass.insert(tagids.name2id(lctagi->first));
       }
     }
+  }
 
   //-- update n_classes
   n_classes = classids.size();
@@ -705,47 +688,41 @@ void mootHMM::assign_ids_lf(const mootLexfreqs &lexfreqs)
   }
 
   //-- compile lexical IDs
-  for (mootLexfreqs::LexfreqTokTable::const_iterator lfti = lexfreqs.lftable.begin();
-       lfti != lexfreqs.lftable.end();
-       lfti++)
-    {
-      const mootTokString &tokstr = lfti->first;
-      const mootLexfreqs::LexfreqEntry &entry = lfti->second;
+  for (mootLexfreqs::LexfreqTokTable::const_iterator lfti = lexfreqs.lftable.begin(); lfti != lexfreqs.lftable.end(); ++lfti) {
+    const mootTokString &tokstr = lfti->first;
+    const mootLexfreqs::LexfreqEntry &entry = lfti->second;
 #   ifndef MOOT_LEX_NONALPHA
-      mootFlavorID flavid = taster.flavor_id(tokstr);
+    mootFlavorID flavid = taster.flavor_id(tokstr);
 #   endif
 
-      //-- ... for all tags occurring with this token(lftagi)
-      for (mootLexfreqs::LexfreqSubtable::const_iterator lftagi = entry.freqs.begin();
-	   lftagi != entry.freqs.end();
-	   lftagi++)
-	{
-	  const mootTagString &tagstr   = lftagi->first;
-	  //const CountT        &tagcount = lftagi->second;
+    //-- ... for all tags occurring with this token(lftagi)
+    for (mootLexfreqs::LexfreqSubtable::const_iterator lftagi = entry.freqs.begin(); lftagi != entry.freqs.end(); ++lftagi) {
+      const mootTagString &tagstr   = lftagi->first;
+      //const CountT        &tagcount = lftagi->second;
 
-	  //-- always assign a tag-id
-	  if (!tagids.nameExists(tagstr)) tagids.insert(tagstr);
+      //-- always assign a tag-id
+      if (!tagids.nameExists(tagstr)) tagids.insert(tagstr);
 
 #       ifndef MOOT_LEX_NONALPHA
-	  if (flavid != taster.noid)
-	    //-- ignore non-alphabetics
-	    continue;
+      if (flavid != taster.noid)
+	//-- ignore non-alphabetics
+	continue;
 #       endif
 
-	  if (
+      if (
 #       ifndef MOOT_LEX_UNKNOWN_TOKENS
-	      //-- unknown threshhold check
-	      entry.count > unknown_lex_threshhold &&
+	  //-- unknown threshhold check
+	  entry.count > unknown_lex_threshhold &&
 #       endif
-	      !tokids.nameExists(tokstr))
-	    {
-	      //-- it's a kosher token : assign a token-ID
-	      tokids.insert(tokstr);
-	    }
-       
-	  //-- otherwise, it's below the unknown threshhold, so we ignore it here
+	  !tokids.nameExists(tokstr))
+	{
+	  //-- it's a kosher token : assign a token-ID
+	  tokids.insert(tokstr);
 	}
+       
+      //-- otherwise, it's below the unknown threshhold, so we ignore it here
     }
+  }
 
   //-- update number of tags, classes
   n_tags = tagids.size();
@@ -758,12 +735,9 @@ void mootHMM::assign_ids_lf(const mootLexfreqs &lexfreqs)
 void mootHMM::assign_ids_ng(const mootNgrams   &ngrams)
 {
   //-- Compile tag IDs (from unigrams only!)
-  for (mootNgrams::NgramTable::const_iterator ngi1 = ngrams.ngtable.begin();
-       ngi1 != ngrams.ngtable.end();
-       ngi1++)
-    {
-      if (!tagids.nameExists(ngi1->first)) tagids.insert(ngi1->first);
-    }
+  for (mootNgrams::NgramTable::const_iterator ngi1 = ngrams.ngtable.begin(); ngi1 != ngrams.ngtable.end(); ++ngi1) {
+    if (!tagids.nameExists(ngi1->first)) tagids.insert(ngi1->first);
+  }
 
   //-- update number of tags
   n_tags = tagids.size();
@@ -777,38 +751,32 @@ void mootHMM::assign_ids_cf(const mootClassfreqs &classfreqs)
   LexClass lclass;
 
   //-- compile class IDs : for each string class (lcti) :
-  for (mootClassfreqs::ClassfreqTable::const_iterator lcti = classfreqs.lctable.begin();
-       lcti != classfreqs.lctable.end();
-       lcti++)
-    {
-      const mootTagSet &tagset = lcti->first;
-      const mootClassfreqs::ClassfreqEntry &entry = lcti->second;
+  for (mootClassfreqs::ClassfreqTable::const_iterator lcti = classfreqs.lctable.begin(); lcti != classfreqs.lctable.end(); ++lcti) {
+    const mootTagSet &tagset = lcti->first;
+    const mootClassfreqs::ClassfreqEntry &entry = lcti->second;
 
-      //-- ... convert to an id-class, adding tags
-      lclass.clear();
-      tagset2lexclass(tagset,&lclass,true);
+    //-- ... convert to an id-class, adding tags
+    lclass.clear();
+    tagset2lexclass(tagset,&lclass,true);
 
-      if (
+    if (
 #ifndef MOOT_LEX_UNKNOWN_CLASSES
-	  //-- unknown threshhold check
-	  entry.count > unknown_class_threshhold &&
+	//-- unknown threshhold check
+	entry.count > unknown_class_threshhold &&
 #endif // MOOT_LEX_UNKNOWN_CLASSES
-	  !classids.nameExists(lclass) )
-	{
-	  //-- it's a kosher class : assign a class-ID (don't autopopulate
-	  classids.insert(lclass);
-	}
+	!classids.nameExists(lclass) )
+      {
+	//-- it's a kosher class : assign a class-ID (don't autopopulate
+	classids.insert(lclass);
+      }
 
-      //-- ... for all tags assigned to this class (lctagi)
-      for (mootClassfreqs::ClassfreqSubtable::const_iterator lctagi = entry.freqs.begin();
-	   lctagi != entry.freqs.end();
-	   lctagi++)
-	{
-	  const mootTagString &tagstr   = lctagi->first;
-	  //-- just assign a tag-id
-	  if (!tagids.nameExists(tagstr)) tagids.insert(tagstr);
-	}
+    //-- ... for all tags assigned to this class (lctagi)
+    for (mootClassfreqs::ClassfreqSubtable::const_iterator lctagi = entry.freqs.begin(); lctagi != entry.freqs.end(); ++lctagi) {
+      const mootTagString &tagstr   = lctagi->first;
+      //-- just assign a tag-id
+      if (!tagids.nameExists(tagstr)) tagids.insert(tagstr);
     }
+  }
 
   //-- update number of tags, classes
   n_tags = tagids.size();
@@ -852,73 +820,64 @@ bool mootHMM::estimate_lambdas(const mootNgrams &ngrams)
   nglambda3 = 0.0;
 
   //---- get best-guess counts: (n>=1)-grams
-  for (mootNgrams::NgramTable::const_iterator ngi1 = ngrams.ngtable.begin();
-       ngi1 != ngrams.ngtable.end();
-       ngi1++)
-    {
-      f_t1 = ngi1->second.count;
+  for (mootNgrams::NgramTable::const_iterator ngi1 = ngrams.ngtable.begin(); ngi1 != ngrams.ngtable.end(); ++ngi1) {
+    f_t1 = ngi1->second.count;
 
-      if (ngi1->second.freqs.empty()) {
-	//---- best-guess counts: 1-gram only
-	nglambda1 += f_t1;
-      }
-      else {
-	//---- get best-guess counts: (n>=2)-grams
-	for (mootNgrams::BigramTable::const_iterator ngi2 = ngi1->second.freqs.begin();
-	     ngi2 != ngi1->second.freqs.end();
-	     ngi2++)
-	  {
-	    //-- previous bigram count: f(t1,t2)
-	    f_t12 = ngi2->second.count;
+    if (ngi1->second.freqs.empty()) {
+      //---- best-guess counts: 1-gram only
+      nglambda1 += f_t1;
+    }
+    else {
+      //---- get best-guess counts: (n>=2)-grams
+      for (mootNgrams::BigramTable::const_iterator ngi2 = ngi1->second.freqs.begin(); ngi2 != ngi1->second.freqs.end(); ++ngi2) {
+	//-- previous bigram count: f(t1,t2)
+	f_t12 = ngi2->second.count;
 
-	    //-- previous unigram count : f(t2)
-	    f_t2 = ngrams.lookup(ngi2->first);
+	//-- previous unigram count : f(t2)
+	f_t2 = ngrams.lookup(ngi2->first);
 
-	    if (ngi2->second.freqs.empty()) {
-	      //---- best-guess counts: 1- and 2-grams only
+	if (ngi2->second.freqs.empty()) {
+	  //---- best-guess counts: 1- and 2-grams only
 
-	      //-- compute adjusted probabilities
-	      ngp12  =  f_t1  == 1  ?  0  : (f_t12  - 1.0) / (f_t1  - 1.0);
-	      ngp2   =  f_N   == 1  ?  0  : (f_t2   - 1.0) / (f_N   - 1.0);
+	  //-- compute adjusted probabilities
+	  ngp12  =  f_t1  == 1  ?  0  : (f_t12  - 1.0) / (f_t1  - 1.0);
+	  ngp2   =  f_N   == 1  ?  0  : (f_t2   - 1.0) / (f_N   - 1.0);
 
-	      //-- adjust lambdas
-	      if (ngp12 >= ngp2)
-		nglambda2 += f_t12;
-	      else
-		nglambda1 += f_t12;
-	    }
-	    else {
-	      //---- best-guess counts: 1-, 2-, and 3-grams
-	      for (mootNgrams::TrigramTable::const_iterator ngi3 = ngi2->second.freqs.begin();
-		   ngi3 != ngi2->second.freqs.end();
-		   ngi3++)
-		{
-		  //-- current trigram count : f(t1,t2,t3)
-		  f_t123 = ngi3->second;
+	  //-- adjust lambdas
+	  if (ngp12 >= ngp2)
+	    nglambda2 += f_t12;
+	  else
+	    nglambda1 += f_t12;
+	}
+	else {
+	  //---- best-guess counts: 1-, 2-, and 3-grams
+	  for (mootNgrams::TrigramTable::const_iterator ngi3 = ngi2->second.freqs.begin(); ngi3 != ngi2->second.freqs.end(); ++ngi3) {
+	    //-- current trigram count : f(t1,t2,t3)
+	    f_t123 = ngi3->second;
 
-		  //-- current bigram count : f(t2,t3)
-		  f_t23 = ngrams.lookup(ngi2->first,ngi3->first);
+	    //-- current bigram count : f(t2,t3)
+	    f_t23 = ngrams.lookup(ngi2->first,ngi3->first);
 
-		  //-- current unigram count : f(t3)
-		  f_t3 = ngrams.lookup(ngi3->first);
+	    //-- current unigram count : f(t3)
+	    f_t3 = ngrams.lookup(ngi3->first);
 
-		  //-- compute adjusted probabilities
-		  ngp123 =  f_t12 == 1  ?  0  : (f_t123 - 1.0) / (f_t12 - 1.0);
-		  ngp23  =  f_t2  == 1  ?  0  : (f_t23  - 1.0) / (f_t2  - 1.0);
-		  ngp3   =  f_N   == 1  ?  0  : (f_t3   - 1.0) / (f_N   - 1.0);
+	    //-- compute adjusted probabilities
+	    ngp123 =  f_t12 == 1  ?  0  : (f_t123 - 1.0) / (f_t12 - 1.0);
+	    ngp23  =  f_t2  == 1  ?  0  : (f_t23  - 1.0) / (f_t2  - 1.0);
+	    ngp3   =  f_N   == 1  ?  0  : (f_t3   - 1.0) / (f_N   - 1.0);
 
-		  //-- adjust lambdas
-		  if (ngp123 >= ngp23  && ngp123 >= ngp3)
-		    nglambda3 += f_t123;
-		  else if (ngp23  >= ngp123 && ngp23  >= ngp3)
-		    nglambda2 += f_t123;
-		  else
-		    nglambda1 += f_t123;
-		}
-	    }
+	    //-- adjust lambdas
+	    if (ngp123 >= ngp23  && ngp123 >= ngp3)
+	      nglambda3 += f_t123;
+	    else if (ngp23  >= ngp123 && ngp23  >= ngp3)
+	      nglambda2 += f_t123;
+	    else
+	      nglambda1 += f_t123;
 	  }
+	}
       }
     }
+  }
 
   //-- sanity check
   if (nglambda3==0 && nglambda2==0 && nglambda1==0) {
@@ -982,11 +941,11 @@ bool mootHMM::compute_logprobs(void)
     TagID   tag1=0, tag2=0, tag3=0;
 
     //-- trigram probabilities: stored as '$tagid1,$tagid2,$tagid3'
-    for (tag3 = 1; tag3 < n_tags; tag3++) {
+    for (tag3 = 1; tag3 < n_tags; ++tag3) {
       p3 = tagp(tag3);
-      for (tag2 = 1; tag2 < n_tags; tag2++) {
+      for (tag2 = 1; tag2 < n_tags; ++tag2) {
 	p23 = tagp(tag2,tag3);
-	for (tag1 = 1; tag1 < n_tags; tag1++) {
+	for (tag1 = 1; tag1 < n_tags; ++tag1) {
 	  //-- trigram probabilities: stored as '$tagid1,$tagid2,$tagid3'
 	  p = ( (nglambda1 * p3)
 		+ (nglambda2 * p23)
@@ -1014,7 +973,7 @@ bool mootHMM::compute_logprobs(void)
     ProbT p = 0;
 
     //-- compute log probabilities: trigrams: <t1,t2,t3> -> l3*p(t3|t1,t2) + l2*p(t3|t2) + l1*p(t3)
-    for (NgramProbHash::iterator ngpi = ngprobsh.begin(); ngpi != ngprobsh.end(); ngpi++) {
+    for (NgramProbHash::iterator ngpi = ngprobsh.begin(); ngpi != ngprobsh.end(); ++ngpi) {
       const NgramProbKey &ngram = ngpi->first;
       if (ngram.tag1 == 0 || ngram.tag2 == 0) continue;
       p    = ( (nglambda1   * tagp(ngram.tag3))
@@ -1024,7 +983,7 @@ bool mootHMM::compute_logprobs(void)
     }
 
     //-- compute log probabilities: bigrams: <0,t2,t3> -> l2*p(t3|t2) + l1*p(t3)
-    for (NgramProbHash::iterator ngpi = ngprobsh.begin(); ngpi != ngprobsh.end(); ngpi++) {
+    for (NgramProbHash::iterator ngpi = ngprobsh.begin(); ngpi != ngprobsh.end(); ++ngpi) {
       const NgramProbKey &ngram = ngpi->first;
       if (ngram.tag1 != 0 || ngram.tag2 == 0) continue;
       p    = ( (nglambda1   * tagp(ngram.tag3))
@@ -1033,7 +992,7 @@ bool mootHMM::compute_logprobs(void)
     }
 
     //-- compute log probabilities: unigrams: <0,0,t3> -> l1*p(t3)
-    for (NgramProbHash::iterator ngpi = ngprobsh.begin(); ngpi != ngprobsh.end(); ngpi++) {
+    for (NgramProbHash::iterator ngpi = ngprobsh.begin(); ngpi != ngprobsh.end(); ++ngpi) {
       const NgramProbKey &ngram = ngpi->first;
       if (ngram.tag1 != 0 || ngram.tag2 != 0) continue;
       p    = ( (nglambda1   * ngpi->second) );
@@ -1042,14 +1001,11 @@ bool mootHMM::compute_logprobs(void)
   }
 
   //-- lexical probabilities
-  for (LexProbTable::iterator lpi = lexprobs.begin(); lpi != lexprobs.end(); lpi++) {
-    for (LexProbSubTable::iterator lpsi = lpi->begin();
-	 lpsi != lpi->end();
-	 lpsi++)
-      {
-	//lpsi->second = log(wlambda0 + (wlambda1 * lpsi->second));
-	lpsi->second = log(wlambda1 * lpsi->second);
-      }
+  for (LexProbTable::iterator lpi = lexprobs.begin(); lpi != lexprobs.end(); ++lpi) {
+    for (LexProbSubTable::iterator lpsi = lpi->begin(); lpsi != lpi->end(); ++lpsi) {
+      //lpsi->second = log(wlambda0 + (wlambda1 * lpsi->second));
+      lpsi->second = log(wlambda1 * lpsi->second);
+    }
 #ifdef LEX_SORT_BYVALUE
     //-- sort it
     lpi->sort_byvalue();
@@ -1057,14 +1013,11 @@ bool mootHMM::compute_logprobs(void)
   }
 
   //-- class probabilities
-  for (LexClassProbTable::iterator lcpi = lcprobs.begin(); lcpi != lcprobs.end(); lcpi++) {
-    for (LexClassProbSubTable::iterator lcpsi = lcpi->begin();
-	 lcpsi != lcpi->end();
-	 lcpsi++)
-      {
-	//lcpsi->second = log(clambda0 + (clambda1 * lcpsi->second));
-	lcpsi->second = log(clambda1 * lcpsi->second);
-      }
+  for (LexClassProbTable::iterator lcpi = lcprobs.begin(); lcpi != lcprobs.end(); ++lcpi) {
+    for (LexClassProbSubTable::iterator lcpsi = lcpi->begin(); lcpsi != lcpi->end(); ++lcpsi) {
+      //lcpsi->second = log(clambda0 + (clambda1 * lcpsi->second));
+      lcpsi->second = log(clambda1 * lcpsi->second);
+    }
 #ifdef LEX_SORT_BYVALUE
     //-- sort it
     lcpi->sort_byvalue();
@@ -1073,8 +1026,8 @@ bool mootHMM::compute_logprobs(void)
 
 #ifdef MOOT_ENABLE_SUFFIX_TRIE
   //-- suffix-trie probabilities
-  for (SuffixTrie::iterator sti = suftrie.begin(); sti != suftrie.end(); sti++) {
-    for (SuffixTrieDataT::iterator stdi = sti->data.begin(); stdi != sti->data.end(); stdi++) {
+  for (SuffixTrie::iterator sti = suftrie.begin(); sti != suftrie.end(); ++sti) {
+    for (SuffixTrieDataT::iterator stdi = sti->data.begin(); stdi != sti->data.end(); ++stdi) {
       stdi->second = log(stdi->second);
     }
 # ifdef LEX_SORT_BYVALUE
@@ -1134,17 +1087,66 @@ void mootHMM::tag_io(TokenReader *reader, TokenWriter *writer)
 //--------------------------------------------------------------
 void mootHMM::tag_stream(TokenReader *reader, TokenWriter *writer)
 {
-  int rtok=TokTypeUnknown;
-  mootSentence  sent; //-- sentence buffer
-  while (rtok != TokTypeEOF) {
-    rtok = reader->get_token();
-    sent.push_back( *reader->tr_token );
+  int rtok;
+  mootSentence toks;   //-- "sentence" buffer
+  ViterbiNode *fnod=NULL;   //-- flushable node
 
-    assert( !"argh!" );
+  viterbi_clear();
+  toks.push_front( mootToken(TokTypeUnknown) );
+
+  while ( (rtok=reader->get_token()) != TokTypeEOF ) {
+    toks.push_back( *reader->tr_token );
+
+    switch (rtok) {
+    case TokTypeVanilla:
+      viterbi_step( toks.back() );
+      if ( (fnod=viterbi_flushable_node()) )
+	viterbi_flush(writer,toks,fnod);
+      break;
+    case TokTypeEOS:
+      viterbi_finish();
+      viterbi_flush(writer,toks,viterbi_best_node());
+      break;
+    default:
+      //-- ignore
+      break;
+    }
   }
+
+  if ( !toks.empty() ) {
+    toks.push_back( mootToken(TokTypeEOF) );
+    viterbi_flush(writer,toks,viterbi_best_node());
+  }
+  return;
 }
 
+//--------------------------------------------------------------
+void mootHMM::viterbi_flush(TokenWriter *writer, mootSentence &toks, ViterbiNode *nod)
+{
+  if (toks.empty()) return;
+  ViterbiNode       tmp = *nod;			//-- temporary for shift
+  ViterbiPathNode *pnod = viterbi_node_path(nod);
 
+  tag_mark_best(pnod, toks);
+  //toks.back().insert("FLUSHED", "", 1); //-- DEBUG
+  if (writer) {
+    if ((writer->tw_format & tiofTrace)) tag_dump_trace(toks);
+    writer->put_tokens(toks);
+  }
+
+  //-- shift token-buffer & trellis window
+  toks.clear();
+  viterbi_clear();
+
+  //-- viterbi_clear() inserted a BOS marker: tweak it appropriately
+  nod = vtable->rows->nodes;
+  nod->tagid  = tmp.tagid;
+  nod->ptagid = tmp.tagid==start_tagid ? start_tagid : tmp.ptagid;
+  vtable->rows->tagid = tmp.tagid;  
+
+  //-- ... and add an appropriate token to toks (not flushable)
+  toks.push_back( mootToken(TokTypeUnknown) );
+}
 
 //======================================================================
 // Viterbi: Mid-level
@@ -1211,7 +1213,7 @@ void mootHMM::viterbi_step(TokID tokid, const mootTokString &toktext)
   if (tokid >= n_toks) tokid = 0;
 
   //-- info: check for "unknown" token
-  if (tokid==0) nnewtokens++;
+  if (tokid==0) ++nnewtokens;
 
   //-- Update beam-pruning variable(s)
   //bpprmin = vtable->bbestpr - beamwd;
@@ -1234,7 +1236,7 @@ void mootHMM::viterbi_step(TokID tokid, const mootTokString &toktext)
 #endif //-- MOOT_ENABLE_SUFFIX_TRIE
 
   //-- for each possible destination tag 'vtagid'
-  for (LexProbSubTable::const_iterator lpsi = lps->begin(); lpsi != lps->end(); lpsi++) {
+  for (LexProbSubTable::const_iterator lpsi = lps->begin(); lpsi != lps->end(); ++lpsi) {
     vtagid  = lpsi->first;
 
     //-- ignore "unknown" tag
@@ -1273,8 +1275,8 @@ void mootHMM::viterbi_step(TokID tokid,
 
   //-- info: check for "unknown" token + class
   if (tokid==0) {
-    nnewtokens++;
-    if (classid == 0) nunknown++;
+    ++nnewtokens;
+    if (classid == 0) ++nunknown;
   }
 
   //-- set constants
@@ -1330,7 +1332,7 @@ void mootHMM::viterbi_step(TokID tokid,
      * internal coverage ("strictness" of specified class: only 99.61%
      * vs. 100%), so we don't do it this way by default.
      */
-    for (LexProbSubTable::const_iterator lpsi = lps->begin(); lpsi != lps->end(); lpsi++)
+    for (LexProbSubTable::const_iterator lpsi = lps->begin(); lpsi != lps->end(); ++lpsi)
       {
 	vtagid  = lpsi->first;
 
@@ -1353,7 +1355,7 @@ void mootHMM::viterbi_step(TokID tokid,
      * do it this way instead of the "relaxed" way by default.
      */
     LexProbSubTable::const_iterator lpsi;
-    for (LexClass::const_iterator lci = lclass.begin(); lci != lclass.end(); lci++)
+    for (LexClass::const_iterator lci = lclass.begin(); lci != lclass.end(); ++lci)
       {
 	vtagid  = *lci;
 
@@ -1412,7 +1414,7 @@ void mootHMM::viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col)
 void mootHMM::_viterbi_step_fallback(TokID tokid, ViterbiColumn *col)
 {
   //-- info
-  nfallbacks++;
+  ++nfallbacks;
 
   //-- sanity
   if (tokid >= n_toks) tokid = 0;
@@ -1425,7 +1427,7 @@ void mootHMM::_viterbi_step_fallback(TokID tokid, ViterbiColumn *col)
   //bpprmin = MOOT_PROB_NEG;
 
   //-- for each possible destination tag 'vtagid' (except "UNKNOWN")
-  for (vtagid = 1; vtagid < n_tags; vtagid++) {
+  for (vtagid = 1; vtagid < n_tags; ++vtagid) {
 
     //-- get lexical probability: p(tok|tag) 
     lpsi = lps.find(vtagid);
@@ -1448,20 +1450,17 @@ void mootHMM::_viterbi_step_fallback(TokID tokid, ViterbiColumn *col)
   }
 }
 
-
-
 /*--------------------------------------------------------------------------
  * Mid-level: output
  *--------------------------------------------------------------------------*/
-void mootHMM::tag_mark_best(mootSentence &sentence)
+void mootHMM::tag_mark_best(ViterbiPathNode *pnod, mootSentence &sentence)
 {
   //-- populate 'vbestpath' with (ViterbiPathNode*)s
-  ViterbiPathNode *pnod = viterbi_best_path();
   mootSentence::iterator senti;
 
-  if (pnod) pnod = pnod->path_next;  //-- skip boundary tag
+  if (pnod) pnod = pnod->path_next;  //-- skip first (boundary) tag
 
-  for (senti = sentence.begin(); senti != sentence.end(); senti++) {
+  for (senti = sentence.begin(); senti != sentence.end(); ++senti) {
     if (senti->toktype() != TokTypeVanilla) continue; //-- ignore non-vanilla tokens
     if (pnod && pnod->node) {
       senti->besttag(tagids.id2name(pnod->node->tagid));
@@ -1469,15 +1468,14 @@ void mootHMM::tag_mark_best(mootSentence &sentence)
     }
     else {
       //-- this should never actually happen, but it has...
-      carp("%s: Error: no best tag for token '%s'!\n",
-	   "mootHMM::tag_mark_best()", senti->text().c_str());
+      carp("%s: Error: no best tag for token '%s'!\n", "mootHMM::tag_mark_best()", senti->text().c_str());
       senti->besttag(tagids.id2name(0)); //-- use 'unknown' tag
     }
   }
 
   if (save_ambiguities) {
     mootSentence::reverse_iterator sri;
-    ViterbiColumn *c = vtable && vtable->col_prev ? vtable->col_prev : NULL;
+    ViterbiColumn *c = (vtable && vtable->col_prev ? vtable->col_prev : NULL);
     if (!c) return;
 
     for (sri=sentence.rbegin(); c != NULL && sri != sentence.rend(); sri++, c=c->col_prev) {
@@ -1549,7 +1547,7 @@ void mootHMM::tag_dump_trace(mootSentence &sentence)
     if (si != sentence.end()) {
       s.push_back(*si);
       if (si->toktype() != TokTypeVanilla) { //-- ignore non-vanilla tokens
-	si++;
+	++si;
 	continue;
       }
       tokp = &(*si);
@@ -1589,7 +1587,7 @@ void mootHMM::tag_dump_trace(mootSentence &sentence)
 			       );
 
 	//-- iteratate: tag ids (next tags)
-	for (TagID nxtid=0; nxtid < tagids.size(); nxtid++) {
+	for (TagID nxtid=0; nxtid < tagids.size(); ++nxtid) {
 	  ProbT vnxtpr = tagp(vnod->ptagid, vrow->tagid, nxtid);
 	  sentence_printf_append(s, TokTypeComment, "moot:trace\t  NEXT %d:%s\t%d:%s\t%d:%s\tntxtprob=%g",
 				 vnod->ptagid, tagids.id2name(vnod->ptagid).c_str(),
@@ -1602,8 +1600,8 @@ void mootHMM::tag_dump_trace(mootSentence &sentence)
     }
 
     //-- increment iterator(s)
-    si++;
-    vci++;
+    ++si;
+    ++vci;
   }
 
   //-- swap input and output sentences
@@ -1616,11 +1614,11 @@ void mootHMM::tag_dump_trace(mootSentence &sentence)
 //--------------------------------------------------------------
 mootHMM::ViterbiNode *mootHMM::viterbi_best_node(void)
 {
+  ViterbiRow  *prow;
   ViterbiNode *pnod;
   vbestpr = MOOT_PROB_NEG;
   vbestpn = NULL;
 
-  ViterbiRow  *prow;
   for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
     for (pnod = prow->nodes; pnod != NULL; pnod = pnod->nod_next) {
       if (pnod->lprob > vbestpr) {
@@ -1635,9 +1633,9 @@ mootHMM::ViterbiNode *mootHMM::viterbi_best_node(void)
 //--------------------------------------------------------------
 mootHMM::ViterbiNode *mootHMM::viterbi_best_node(TagID tagid)
 {
+  ViterbiRow  *prow;
   ViterbiNode *pnod;
   vbestpr = MOOT_PROB_NEG;
-  ViterbiRow  *prow;
   vbestpn = NULL;
   for (prow = vtable->rows; prow != NULL; prow = prow->row_next) {
     if (prow->tagid == tagid) {
@@ -1651,6 +1649,26 @@ mootHMM::ViterbiNode *mootHMM::viterbi_best_node(TagID tagid)
     }
   }
   return NULL;
+}
+
+//--------------------------------------------------------------
+mootHMM::ViterbiNode* mootHMM::viterbi_flushable_node(void)
+{
+  ProbT minpr          = vtable->bbestpr - beamwd;
+  ProbT bestpr         = MOOT_PROB_NEG;
+  ViterbiNode *bestnod = NULL;
+  size_t n_nodes=0;
+  for (ViterbiRow *vrow=vtable->rows; vrow != NULL; vrow=vrow->row_next) {
+    for (ViterbiNode *vnod=vrow->nodes; vnod != NULL; vnod=vnod->nod_next) {
+      if (vnod->lprob < minpr)	continue;
+      if (++n_nodes > 1)	return NULL;
+      if (vnod->lprob > bestpr) {
+	bestpr  = vnod->lprob;
+	bestnod = vnod;
+      }
+    }
+  }
+  return bestnod;
 }
 
 //--------------------------------------------------------------
@@ -1778,7 +1796,7 @@ mootHMM::ClassID mootHMM::class2id(const LexClass &lclass, bool autopopulate, bo
 {
   ClassID cid = classids.name2id(lclass);
   if (cid == 0) {
-    nnewclasses++;
+    ++nnewclasses;
     if (!autopopulate && !autocreate) return cid;  //-- map unknown classes to zero
 
     //-- previously unknown class: fill 'er up with default values
@@ -1796,7 +1814,7 @@ mootHMM::ClassID mootHMM::class2id(const LexClass &lclass, bool autopopulate, bo
 	//-- non-empty class: restrict population to class-members
 	ProbT lcprob = log(1.0/static_cast<ProbT>(lclass.size()));
 
-	for (LexClass::const_iterator lci = lclass.begin(); lci != lclass.end(); lci++) {
+	for (LexClass::const_iterator lci = lclass.begin(); lci != lclass.end(); ++lci) {
 	  lcps[*lci] = lcprob;
 	}
       } else {
@@ -1804,7 +1822,7 @@ mootHMM::ClassID mootHMM::class2id(const LexClass &lclass, bool autopopulate, bo
 	const LexProbSubTable &lps = lexprobs[0];
 	ProbT lpprob = log(1.0/static_cast<ProbT>(lps.size()));
 
-	for (LexProbSubTable::const_iterator lpsi = lps.begin(); lpsi != lps.end(); lpsi++) {
+	for (LexProbSubTable::const_iterator lpsi = lps.begin(); lpsi != lps.end(); ++lpsi) {
 	  lcps[lpsi->key()] = lpprob;
 	}
       }
@@ -1849,7 +1867,7 @@ void mootHMM::txtdump(FILE *file, bool dump_constants, bool dump_lexprobs, bool 
     fprintf(file, "beamwd\t%e (=%e)\n", beamwd, exp(beamwd));
     //
     fputs("uclass\t", file);
-    for (LexClass::const_iterator lci = uclass.begin();  lci != uclass.end(); lci++) {
+    for (LexClass::const_iterator lci = uclass.begin();  lci != uclass.end(); ++lci) {
       if (lci!=uclass.begin()) fputc(' ', file);
       fputs(tagids.id2name(*lci).c_str(), file);
     }
@@ -1883,9 +1901,9 @@ void mootHMM::txtdump(FILE *file, bool dump_constants, bool dump_lexprobs, bool 
     LexProbTable::const_iterator lpi;
     for (lpi = lexprobs.begin() , tokid = 0;
 	 lpi != lexprobs.end()  ;
-	 lpi++                  , tokid++)
+	 ++lpi                  , ++tokid)
       {
-	for (LexProbSubTable::const_iterator lpsi = lpi->begin(); lpsi != lpi->end(); lpsi++)
+	for (LexProbSubTable::const_iterator lpsi = lpi->begin(); lpsi != lpi->end(); ++lpsi)
 	  {
 	    TagID tagid = lpsi->first;
 	    ProbT prob  = lpsi->second;
@@ -1909,12 +1927,12 @@ void mootHMM::txtdump(FILE *file, bool dump_constants, bool dump_lexprobs, bool 
     ClassID cid;
     for (cpi = lcprobs.begin() , cid = 0;
 	 cpi != lcprobs.end()  ;
-	 cpi++                 , cid++)
+	 ++cpi                 , ++cid)
       {
 	const LexClass &lclass = classids.id2name(cid);
 	string classname = "";
 
-	for (LexClass::const_iterator lci = lclass.begin();  lci != lclass.end(); lci++) {
+	for (LexClass::const_iterator lci = lclass.begin();  lci != lclass.end(); ++lci) {
 	  if (lci!=lclass.begin()) classname.push_back(' ');
 	  classname.append(tagids.id2name(*lci));
 	}
@@ -1924,7 +1942,7 @@ void mootHMM::txtdump(FILE *file, bool dump_constants, bool dump_lexprobs, bool 
 	  continue;
 	}
 
-	for (LexClassProbSubTable::const_iterator cpsi = cpi->begin(); cpsi != cpi->end(); cpsi++)
+	for (LexClassProbSubTable::const_iterator cpsi = cpi->begin(); cpsi != cpi->end(); ++cpsi)
 	  {
 	    TagID ctagid = cpsi->first;
 	    ProbT cprob  = cpsi->second;
@@ -1945,9 +1963,9 @@ void mootHMM::txtdump(FILE *file, bool dump_constants, bool dump_lexprobs, bool 
     fprintf(file, "%%%% \"Suffix\"\tTagID(\"TagStr\")\tlog(p(Suffix|TagID))\tp\n");
     fprintf(file, "%%%%-----------------------------------------------------\n");
 #ifdef MOOT_ENABLE_SUFFIX_TRIE
-    for (SuffixTrie::const_iterator sti = suftrie.begin(); sti != suftrie.end(); sti++) {
+    for (SuffixTrie::const_iterator sti = suftrie.begin(); sti != suftrie.end(); ++sti) {
       string suf = suftrie.node_string(*sti);
-      for (SuffixTrieDataT::const_iterator stdi=sti->data.begin(); stdi != sti->data.end(); stdi++)
+      for (SuffixTrieDataT::const_iterator stdi=sti->data.begin(); stdi != sti->data.end(); ++stdi)
 	{
 	  fprintf(file, "\"%s\"\t%u(\"%s\")\t%e\t%e\n",
 		  suf.c_str(),
@@ -1977,9 +1995,9 @@ void mootHMM::txtdump(FILE *file, bool dump_constants, bool dump_lexprobs, bool 
 
     if ( (hash_ngrams && !ngprobsh.empty()) || (!hash_ngrams && ngprobsa!=NULL) ) {
       if (!hash_ngrams) {
-	for (pptagid = 0; pptagid < n_tags; pptagid++) {
-	  for (ptagid = 0; ptagid < n_tags; ptagid++) {
-	    for (tagid = 0; tagid < n_tags; tagid++) {
+	for (pptagid = 0; pptagid < n_tags; ++pptagid) {
+	  for (ptagid = 0; ptagid < n_tags; ++ptagid) {
+	    for (tagid = 0; tagid < n_tags; ++tagid) {
 	      prob = tagp(pptagid, ptagid, tagid);
 	      if (prob != MOOT_PROB_ZERO) {
 		fprintf(file, "%u(\"%s\")\t%u(\"%s\")\t%u(\"%s\")\t%e\t%e\n",
@@ -1993,7 +2011,7 @@ void mootHMM::txtdump(FILE *file, bool dump_constants, bool dump_lexprobs, bool 
 	  }
 	}
       } else { //-- if (hash_ngrams)
-	for (NgramProbHash::const_iterator ngi = ngprobsh.begin(); ngi != ngprobsh.end(); ngi++) {
+	for (NgramProbHash::const_iterator ngi = ngprobsh.begin(); ngi != ngprobsh.end(); ++ngi) {
 	  prob    = ngi->second;
 	  pptagid = ngi->first.tag1;
 	  ptagid  = ngi->first.tag2;
@@ -2028,7 +2046,7 @@ void mootHMM::viterbi_txtdump(TokenWriter *w, int ncols)
   ViterbiColumn  *col;
   size_t         coli;
 
-  for (coli = 0, col = vtable; col != NULL; col = col->col_prev, coli++) {
+  for (coli = 0, col = vtable; col != NULL; col = col->col_prev, ++coli) {
     viterbi_txtdump_col(w,col,ncols-coli);
   }
 
@@ -2056,7 +2074,7 @@ void mootHMM::viterbi_txtdump_col(TokenWriter *w, ViterbiColumn *col, int colnum
 		exp(beamwd), exp(col->bbestpr), exp(col->bpprmin), exp(col->bbestpr-beamwd));
 
 
-  for (rowi = 0, row = col->rows; row != NULL; row = row->row_next, rowi++) {
+  for (rowi = 0, row = col->rows; row != NULL; row = row->row_next, ++rowi) {
     w->printf_raw("%%%%-----------------------------------------------------\n");
     w->printf_raw("%%%% ROW %d.%u [tag=%u(\"%s\")] ; l(wordp)=%e ; wordp=%e\n",
 		  colnum, rowi, row->tagid, tagids.id2name(row->tagid).c_str(),
@@ -2478,7 +2496,7 @@ bool mootHMM::_binload(mootio::mistream *ibs, const HeaderInfo &hdr, const char 
     TokID x;
     int i;
     //-- load data
-    for (i=0; i < 6; i++) {
+    for (i=0; i < 6; ++i) {
       if (!tokid_item.load(ibs, x)) {
 	carp("mootHMM::load(): could not load old-style flavor data%s%s\n", (filename ? " from file " : ""), (filename ? filename : ""));
 	return false;

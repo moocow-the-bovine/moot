@@ -166,12 +166,13 @@ public:
   public:
     inline size_t operator()(const LexClass &x) const {
       size_t hv = 0;
-      for (LexClass::const_iterator xi = x.begin(); xi != x.end(); xi++) {
+      for (LexClass::const_iterator xi = x.begin(); xi != x.end(); ++xi) {
 	hv = 5*hv + *xi;
       }
       return hv;
     };
   };
+
   /** Equality predicate: utility struct for hash_map<LexClass,...>. */
   struct LexClassEqual {
   public:
@@ -809,12 +810,11 @@ public:
   /** \name Mid-level Viterbi algorithm API */
   //@{
 
-  //------------------------------------------------------------
-  // Viterbi: Mid-level: clear
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /** Clear Viterbi state table(s) */
   void viterbi_clear(void);
 
-  //------------------------------------------------------------
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Viterbi: single iteration: (mootToken)
   /**
    * Step a single Viterbi iteration, \c mootToken version.
@@ -822,13 +822,13 @@ public:
    */
   inline void viterbi_step(const mootToken &token) {
     if (token.toktype() != TokTypeVanilla) return; //-- ignore non-vanilla tokens
-    ntokens++;
+    ++ntokens;
     LexClass tok_class;
     token2lexclass(token, tok_class);
     viterbi_step(token2id(token.text()), tok_class, token.text());
   };
 
-  //------------------------------------------------------------
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Viterbi: single iteration: (TokID,LexClass=set<ClassID>)
   /**
    * Step a single Viterbi iteration, considering only the tags
@@ -841,7 +841,7 @@ public:
   {
     if (use_lex_classes) {
       if (lexclass.empty()) {
-	nunclassed++;
+	++nunclassed;
 	viterbi_step(tokid, 0, uclass, toktext);
       } else {
 	//-- non-empty class : get ID (assign empty distribution if unknown)
@@ -851,7 +851,7 @@ public:
     } else {
       //-- !use_lex_classes
       if (lexclass.empty()) {
-	nunclassed++;
+	++nunclassed;
 	viterbi_step(tokid, toktext);
       } else {
 	viterbi_step(tokid, 0, lexclass, toktext);
@@ -859,7 +859,7 @@ public:
     }
   };
 
-  //------------------------------------------------------------
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Viterbi: single iteration: (TokID,ClassID,LexClass)
   /**
    * Step a single Viterbi iteration, considering only the tags
@@ -870,7 +870,7 @@ public:
 		    const LexClass &lclass,
 		    const mootTokString &toktext="");
 
-  //------------------------------------------------------------
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Viterbi: single iteration: (TokID)
   /**
    * Step a single Viterbi iteration, considering all known tags
@@ -880,7 +880,7 @@ public:
    */
   void viterbi_step(TokID tokid, const mootTokString &toktext="");
 
-  //------------------------------------------------------------
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Viterbi: single iteration: (TokString)
   /**
    * \deprecated{prefer \c viterbi_step(mootToken)}
@@ -892,7 +892,7 @@ public:
     return viterbi_step(token2id(token_text), token_text);
   };
 
-  //------------------------------------------------------------
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Viterbi: single iteration: (TokString,set<TagString>)
   /**
    * \deprecated{prefer \c viterbi_step(mootToken)}
@@ -906,7 +906,7 @@ public:
     viterbi_step(token2id(token_text), lclass, token_text);
   };
 
-  //------------------------------------------------------------
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Viterbi: single iteration: (TokID,TagID,col=NULL)
   /**
    * \deprecated{prefer \c viterbi_step(mootToken)}
@@ -915,7 +915,7 @@ public:
    */
   void viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col=NULL);
 
-  //------------------------------------------------------------
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Viterbi: single iteration: (TokString,TagString)
   /**
    * \deprecated{prefer \c viterbi_step(mootToken)}
@@ -928,7 +928,7 @@ public:
   };
 
 
-  //------------------------------------------------------------
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Viterbi: finish
   /**
    * Run final Viterbi iteration, using \c final_tagid as the boundary tag
@@ -938,6 +938,7 @@ public:
     viterbi_step(0, final_tagid);
   };
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /**
    * Run final Viterbi iteration, using instance datum \c start_tagid as the final tag.
    */
@@ -946,24 +947,56 @@ public:
     viterbi_step(0, start_tagid);
   };
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // Viterbi: finish
+  /**
+   * Run final Viterbi iteration, using \c final_tagid as the boundary tag
+   */
+  void viterbi_flush(TokenWriter *writer, mootSentence &toks, ViterbiNode *nod);
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /**
    * Mid-level tagging interface: mark 'best' tags in sentence
-   * structure: fills \c besttag datum of each \c mootToken element
-   * of \c sentence.  Before calling this method, you should
+   * structure for the current best Viterbi path as returned by viterbi_best_path().
+   * Fills \c besttag datum of each \a TokTypeVanilla element
+   * of \a sentence.  Before calling this method, you should
    * have done following:
    *
    * \li called \c viterbi_clear() to initialize the Viterbi trellis.
    * \li called \c viterbi_step(mootToken) once for each element of \c sentence.
    * \li called \c viterbi_finish() to push the boundary tag onto the Viterbi trellis.
+   *
+   * @param sentence (partial) sentence to mark; TokTypeVanilla elements should correspond 1:1 with the ViterbiColumn*s in \a vtable
    */
-  void tag_mark_best(mootSentence &sentence);
+  inline void tag_mark_best(mootSentence &sentence)
+  {
+    tag_mark_best(viterbi_best_path(), sentence);
+  };
 
+  /**
+   * Mid-level tagging interface: mark 'best' tags in sentence
+   * structure for path \a pnod: fills \c besttag datum of each \a TokTypeVanilla element
+   * of \a sentence.  Before calling this method, you should
+   * have done following:
+   *
+   * \li called \c viterbi_clear() to initialize the Viterbi trellis.
+   * \li called \c viterbi_step(mootToken) once for each element of \c sentence.
+   * \li called \c viterbi_finish() to push the boundary tag onto the Viterbi trellis.
+   *
+   * @param pnod serialized best path for \a sentence
+   * @param sentence (partial) sentence to mark; TokTypeVanilla elements should correspond 1:1 with the path in \a pnod
+   */
+  //@param skip_first if true (default), the first path node will be skipped (it's usually an implicit BOS marker) 
+  void tag_mark_best(ViterbiPathNode *pnod, mootSentence &sentence);
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /**
    * Mid-level tagging interface: dump verbose trace to \c sentence (destructive).
    * Calling this method will add verbose trace information as comments to \c sentence.
    * Same caveats as for tag_mark_best().
    */
   void tag_dump_trace(mootSentence &sentence);
+
   //@}
 
 
@@ -973,24 +1006,28 @@ public:
   /** \name Low-Level Viterbi Path Utilties  */
   //@{
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /** Get current best path (in input order), considering all current tags */
   inline ViterbiPathNode *viterbi_best_path(void)
   {
     return viterbi_node_path(viterbi_best_node());
   };
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /** Get current best path (in input order), considering only tag 'tagid' */
   inline ViterbiPathNode *viterbi_best_path(TagID tagid)
   {
     return viterbi_node_path(viterbi_best_node(tagid));
   };
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /** Get current best path (in input order), considering only tag 'tag' */
   inline ViterbiPathNode *viterbi_best_path(const mootTagString &tagstr)
   {
     return viterbi_best_path(tagids.name2id(tagstr));
   };
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /**
    * Get best current node from Viterbi state tables, considering all
    * possible current tags (all rows in current column).  The best full
@@ -999,6 +1036,7 @@ public:
    */
   ViterbiNode *viterbi_best_node(void);
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /**
    * Get best current path from Viterbi state tables resulting in tag 'tagid'.
    * The best full path to this node can be
@@ -1006,7 +1044,19 @@ public:
    * pointers until (pth_prev==NULL).
    */
   ViterbiNode *viterbi_best_node(TagID tagid);
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  /** Check whether the current viterbi trellis is unambiguous
+   *  Returns a pointer to the unique "best" current node in the Viterbi trellis
+   *  if there is only one possible node currently under consideration after
+   *  considering beam-pruning parameters, or NULL if not only a single
+   *  node is currently active (i.e. if the best path can conceivably still
+   *  "flop" away from the current best node.)
+   *  \li returned node can be passed to e.g. viterbi_node_path()
+   */
+  ViterbiNode* viterbi_flushable_node(void);
  
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   /**
    * Useful utility: build a path (in input order) from a ViterbiNode.
    * See caveats for 'struct ViterbiPathNode' -- return value is non-const

@@ -85,6 +85,12 @@ emitted but do not cause the program to abort if this option is specified.
 Potentially useful for large automated batch-processing jobs.
 "
 
+flag  "stream"    S  "Use stream-wise I/O routines instead of sentence buffers." \
+  details="
+Should have a smaller memory footprint for long input sentences, but may
+be slower than the default.
+"
+
 string "output"	o "Specify output file (default=stdout)." \
     arg="FILE" \
     default="-"
@@ -360,7 +366,7 @@ the current best path.  Setting this option to zero disables
 beam pruning.
 "
 
-flag "save-ambiguities" S "Annotate tagged tokens with lexical ambiguities" \
+flag "save-ambiguities" - "Annotate tagged tokens with lexical ambiguities" \
   details="
 Useful for debugging.
 "

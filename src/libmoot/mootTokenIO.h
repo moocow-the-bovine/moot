@@ -157,6 +157,7 @@ public:
    * @param fmt_request format request (overrides filename heuristics)
    * @param fmt_implied implied format flags
    * @param fmt_default default format flags
+   * @returns new TokenReader for \a filename, or NULL if something went wrong.
    * @warning Caller is responsible for deleting the object returned.
    */
   static class TokenReader *file_reader(const char *filename, const char *fmt_request=NULL, int fmt_implied=tiofNone, int fmt_default=tiofNone);
@@ -168,6 +169,7 @@ public:
    * @param fmt_request format request (overrides filename heuristics)
    * @param fmt_implied implied format flags
    * @param fmt_default default format flags
+   * @returns new TokenWriter for \a filename, or NULL if something went wrong.
    * @warning Caller is responsible for deleting the object returned.
    */
   static class TokenWriter *file_writer(const char *filename, const char *fmt_request=NULL, int fmt_implied=tiofNone, int fmt_default=tiofNone);
@@ -375,6 +377,14 @@ public:
     }
     tr_istream_created = false;
     tr_istream = NULL;
+  };
+
+  /** Test whether this reader is currently opened.
+   *  Default just checks <code>tr_istream && tr_istream->valid()</code>
+   */
+  virtual bool opened(void)
+  {
+    return tr_istream!=NULL && tr_istream->valid();
   };
   //@}
 
@@ -785,6 +795,14 @@ public:
     tw_ostream_created = false;	
     tw_ostream = NULL;
   };
+
+  /** Test whether this reader is currently opened.
+   *  Default just checks <code>tr_istream && tr_istream->valid()</code>
+   */
+  virtual bool opened(void)
+  {
+    return tw_ostream!=NULL && tw_ostream->valid();
+  };
   //@}
 
 
@@ -800,14 +818,24 @@ public:
   };
 
   /**
+   * Write a single (partial) sentence to the currently selected output sink.
+   * Descendants may override this method.
+   * Default implementation just calls put_token() for every element of sentence.
+   */
+  virtual void put_tokens(const mootSentence &tokens)
+  {
+    for (mootSentence::const_iterator si=tokens.begin(); si!=tokens.end(); si++)
+      put_token(*si);
+  };
+
+  /**
    * Write a single sentence to the currently selected output sink.
    * Descendants may override this method.
-   * Default implementation just calls putToken() for every element of sentence.
+   * Default implementation just calls put_sentence().
    */
   virtual void put_sentence(const mootSentence &sentence)
   {
-    for (mootSentence::const_iterator si = sentence.begin(); si != sentence.end(); si++)
-      put_token(*si);
+    put_tokens(sentence);
   };
   //@}
 
@@ -965,6 +993,9 @@ public:
   virtual void put_token(const mootToken &token) {
     _put_token(token,tw_ostream);
   };
+  virtual void put_tokens(const mootSentence &tokens) {
+    _put_tokens(tokens,tw_ostream);
+  };
   virtual void put_sentence(const mootSentence &sentence) {
     _put_sentence(sentence,tw_ostream);
   };
@@ -981,6 +1012,9 @@ public:
   //@{
   /** Write a single token to a mootio::mostream (with eot marker) */
   void _put_token(const mootToken &token, mootio::mostream *os);
+
+  /** Write a partial sentence to a mootio::mostream (without eos marker) */
+  void _put_tokens(const mootSentence &tokens, mootio::mostream *os);
 
   /** Write a whole sentence to a mootio::mostream (with eos marker) */
   void _put_sentence(const mootSentence &sentence, mootio::mostream *os);

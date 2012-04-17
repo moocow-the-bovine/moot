@@ -293,7 +293,13 @@ class TokenReader *TokenIO::file_reader(const char *filename, const char *reques
 {
   int fmt = parse_format_request(request,filename,fmt_implied,fmt_default);
   TokenReader *tr = new_reader(fmt);
-  if (tr && filename) tr->from_filename(filename);
+  if (tr && filename) {
+    tr->from_filename(filename);
+    if (!tr->opened()) {
+      delete tr;
+      return NULL;
+    }
+  }
   return tr;
 }
 
@@ -302,7 +308,13 @@ class TokenWriter *TokenIO::file_writer(const char *filename, const char *reques
 {
   int fmt = parse_format_request(request,filename,fmt_implied,fmt_default);
   TokenWriter *tw = new_writer(fmt);
-  if (tw && filename) tw->to_filename(filename);
+  if (tw && filename) {
+    tw->to_filename(filename);
+    if (!tw->opened()) {
+      delete tw;
+      return NULL;
+    }
+  }
   return tw;
 }
 
@@ -531,17 +543,25 @@ void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
 }
 
 /*------------------------------------------------------------
+ * TokenWriterNative : Output : Utilities : put_tokens()
+ */
+void TokenWriterNative::_put_tokens(const mootSentence &tokens, mootio::mostream *os)
+{
+  if (!os || !os->valid() || tw_format & tiofNull) return;
+  for (mootSentence::const_iterator si=tokens.begin(); si!=tokens.end(); ++si) {
+    _put_token(*si, os);
+  }
+}
+
+/*------------------------------------------------------------
  * TokenWriterNative : Output : Utilities : put_sentence()
  */
 void TokenWriterNative::_put_sentence(const mootSentence &sentence, mootio::mostream *os)
 {
   if (!os || !os->valid() || tw_format & tiofNull) return;
-  for (mootSentence::const_iterator si = sentence.begin();
-       si != sentence.end();
-       si++)
-    {
-      _put_token(*si, os);
-    }
+  for (mootSentence::const_iterator si = sentence.begin(); si!=sentence.end(); ++si) {
+    _put_token(*si, os);
+  }
   if (!sentence.empty() || sentence.back().toktype() != TokTypeEOS) {
     os->putbyte('\n');
   }

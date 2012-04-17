@@ -521,6 +521,11 @@ public:
     _put_token(token,tw_ostream);
   };
 
+  /** Write a partial sentence to the current output sink. */
+  virtual void put_tokens(const mootSentence &tokens) {
+    _put_tokens(tokens,tw_ostream);
+  };
+
   /** Write a whole sentence to the current output sink. */
   virtual void put_sentence(const mootSentence &sentence) {
     _put_sentence(sentence,tw_ostream);
@@ -560,15 +565,25 @@ public:
     else              _put_token_gen(token,os);
   };
 
+  /** Write a partial sentence to a C stream, obeying use_raw_xml flag */
+  inline void _put_tokens(const mootSentence &tokens, mootio::mostream *os)
+  {
+    if (!os || (tw_format&tiofNone) || !os->valid()) return;
+    if (use_raw_xml) {
+      for (mootSentence::const_iterator si=tokens.begin(); si!=tokens.end(); si++) _put_token_raw(*si, os);
+    } else {
+      for (mootSentence::const_iterator si=tokens.begin(); si!=tokens.end(); si++) _put_token_gen(*si, os);
+    }
+  };
+
   /** Write a single sentence to a C stream, obeying use_raw_xml flag */
   inline void _put_sentence(const mootSentence &sentence, mootio::mostream *os)
   {
     if (!os || (tw_format&tiofNone) || !os->valid()) return;
-    mootSentence::const_iterator si;
     if (use_raw_xml) {
-      for (si = sentence.begin(); si != sentence.end(); si++) _put_token_raw(*si, os);
+      for (mootSentence::const_iterator si=sentence.begin(); si!=sentence.end(); si++) _put_token_raw(*si, os);
     } else {
-      for (si = sentence.begin(); si != sentence.end(); si++) _put_token_gen(*si, os);
+      for (mootSentence::const_iterator si=sentence.begin(); si!=sentence.end(); si++) _put_token_gen(*si, os);
       _put_token_gen(mootToken(TokTypeEOS), os);
     }
   };

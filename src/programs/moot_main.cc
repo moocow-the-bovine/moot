@@ -235,7 +235,11 @@ int main (int argc, char **argv)
     //hmm.tag_file(churner.in.file, out.file, churner.in.name);
 
     reader->from_mstream(&churner.in);
-    hmm.tag_io(reader, writer);
+    if (args.stream_given) {
+      hmm.tag_stream(reader,writer);
+    } else {
+      hmm.tag_io(reader, writer);
+    }
     
     if (vlevel >= vlProgress) {
       moot_carp(" done.\n");
