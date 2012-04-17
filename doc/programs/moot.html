@@ -69,6 +69,7 @@
     -dNTOKS     --dots=NTOKS                 Print a dot for every NTOKS tokens processed.
     -l          --list                       INPUTs are file-lists, not filenames.
     -r          --recover                    Attempt to recover from minor errors.
+    -S          --stream                     Use stream-wise I/O routines instead of sentence buffers.
     -oFILE      --output=FILE                Specify output file (default=stdout).</pre>
 <pre>
  Format Options
@@ -95,7 +96,7 @@
     -UNAME      --unknown-tag=NAME           Symbolic name of the 'unknown' tag
     -eTAG       --eos-tag=TAG                Specify boundary tag (default=__$)
     -ZDOUBLE    --beam-width=DOUBLE          Specify cutoff factor for beam pruning
-    -S          --save-ambiguities           Annotate tagged tokens with lexical ambiguities
+                --save-ambiguities           Annotate tagged tokens with lexical ambiguities
     -m          --mark-unknown               Mark unknown tokens.</pre>
 <p>
 </p>
@@ -225,6 +226,14 @@ as filenames of the input files themselves.</p>
 <p>Minor errors such as missing files, etc. cause an error message to be
 emitted but do not cause the program to abort if this option is specified.</p>
 <p>Potentially useful for large automated batch-processing jobs.</p>
+</dd>
+<dt><strong><a name="stream_s" class="item"><code>--stream</code> , <code>-S</code></a></strong></dt>
+
+<dd>
+<p>Use stream-wise I/O routines instead of sentence buffers.</p>
+<p>Default: '0'</p>
+<p>Should have a smaller memory footprint for long input sentences, but may
+be slower than the default.</p>
 </dd>
 <dt><strong><a name="output_file_ofile" class="item"><code>--output=FILE</code> , <code>-oFILE</code></a></strong></dt>
 
@@ -477,7 +486,7 @@ are less than 1/NUM*p_best , where p_best is the probability of
 the current best path.  Setting this option to zero disables
 beam pruning.</p>
 </dd>
-<dt><strong><a name="save_ambiguities_s" class="item"><code>--save-ambiguities</code> , <code>-S</code></a></strong></dt>
+<dt><strong><a name="save_ambiguities" class="item"><code>--save-ambiguities</code></a></strong></dt>
 
 <dd>
 <p>Annotate tagged tokens with lexical ambiguities</p>

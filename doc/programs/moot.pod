@@ -24,6 +24,7 @@ moot [OPTIONS] INPUT(s)
     -dNTOKS     --dots=NTOKS                 Print a dot for every NTOKS tokens processed.
     -l          --list                       INPUTs are file-lists, not filenames.
     -r          --recover                    Attempt to recover from minor errors.
+    -S          --stream                     Use stream-wise I/O routines instead of sentence buffers.
     -oFILE      --output=FILE                Specify output file (default=stdout).
 
  Format Options
@@ -50,7 +51,7 @@ moot [OPTIONS] INPUT(s)
     -UNAME      --unknown-tag=NAME           Symbolic name of the 'unknown' tag
     -eTAG       --eos-tag=TAG                Specify boundary tag (default=__$)
     -ZDOUBLE    --beam-width=DOUBLE          Specify cutoff factor for beam pruning
-    -S          --save-ambiguities           Annotate tagged tokens with lexical ambiguities
+                --save-ambiguities           Annotate tagged tokens with lexical ambiguities
     -m          --mark-unknown               Mark unknown tokens.
 
 =cut
@@ -251,6 +252,20 @@ Minor errors such as missing files, etc. cause an error message to be
 emitted but do not cause the program to abort if this option is specified.
 
 Potentially useful for large automated batch-processing jobs.
+
+
+
+
+
+=item C<--stream> , C<-S>
+
+Use stream-wise I/O routines instead of sentence buffers.
+
+Default: '0'
+
+
+Should have a smaller memory footprint for long input sentences, but may
+be slower than the default.
 
 
 
@@ -659,7 +674,7 @@ beam pruning.
 
 
 
-=item C<--save-ambiguities> , C<-S>
+=item C<--save-ambiguities>
 
 Annotate tagged tokens with lexical ambiguities
 
