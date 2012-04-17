@@ -207,33 +207,33 @@ public:
 
   virtual void from_mstream(mootio::mistream *mistreamp) {
     TokenReader::from_mstream(mistreamp);
-    mootExpatParser::from_mstream(tr_istream);
+    mootExpatParser::from_mstream(tr_istream,false);
     done = 0;
   };
   virtual void from_mstream(mootio::mistream &mis) {
     TokenReader::from_mstream(mis);
-    mootExpatParser::from_mstream(tr_istream);
+    mootExpatParser::from_mstream(tr_istream,false);
     done = 0;
   };
   virtual void from_filename(const char *filename) {
     TokenReader::from_filename(filename);
-    mootExpatParser::from_mstream(tr_istream);
+    mootExpatParser::from_mstream(tr_istream,false);
   };
   virtual void from_file(FILE *infile) {
     TokenReader::from_file(infile);
-    mootExpatParser::from_mstream(tr_istream);
+    mootExpatParser::from_mstream(tr_istream,false);
   };
   virtual void from_fd(int fd) {
     TokenReader::from_fd(fd);
-    mootExpatParser::from_mstream(tr_istream);
+    mootExpatParser::from_mstream(tr_istream,false);
   };
   virtual void from_buffer(const void *buf, size_t len) {
     TokenReader::from_buffer(buf,len);
-    mootExpatParser::from_mstream(tr_istream);
+    mootExpatParser::from_mstream(tr_istream,false);
   };
   virtual void from_cxxstream(std::istream &is) {
     TokenReader::from_cxxstream(is);
-    mootExpatParser::from_mstream(tr_istream);
+    mootExpatParser::from_mstream(tr_istream,false);
   };
   //@}
 

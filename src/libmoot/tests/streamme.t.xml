@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<doc>
+  <!-- a comment-->
+  <eos/>
+  <token>
+    <text>foo</text>
+  </token>
+  <token>
+    <text>bar</text>
+  </token>
+  <token>
+    <text>baz</text>
+  </token>
+  <eos/>
+  <token>
+    <text>another</text>
+  </token>
+  <token>
+    <text>sentence</text>
+  </token>
+  <token>
+    <text>with_no_final_eos</text>
+  </token>
+  <eos/>
+</doc>

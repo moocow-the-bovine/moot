@@ -53,7 +53,7 @@ mootExpatParser::mootExpatParser(size_t bufsize, const std::string &encoding)
  */
 mootExpatParser::~mootExpatParser(void)
 {
-  close();
+  this->close();
   if (xml_buf) {
     free(xml_buf);
     xml_buf = NULL;
@@ -126,9 +126,9 @@ void mootExpatParser::reset(void)
 /*----------------------------------------------------
  * mootExpatParser: Input Selection: from_mstream()
  */
-void mootExpatParser::from_mstream(mootio::mistream *mistreamp)
+void mootExpatParser::from_mstream(mootio::mistream *mistreamp, bool autoclose)
 {
-  close();
+  if (autoclose) this->close();
   xp_istream = mistreamp;
   xp_istream_created = false;
 };
@@ -141,7 +141,7 @@ void mootExpatParser::from_filename(const char *filename) {
   xp_istream_created = true;
   if (!xp_istream->valid()) {
     carp("open failed for \"%s\": %s", filename, strerror(errno));
-    close();
+    this->close();
   }
 };
 

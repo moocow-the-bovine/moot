@@ -1102,6 +1102,19 @@ bool mootHMM::compute_logprobs(void)
 // Tagging: Top-Level
 
 //--------------------------------------------------------------
+void mootHMM::tag_sentence(mootSentence &sentence)
+{
+  viterbi_clear();
+  for (mootSentence::const_iterator si = sentence.begin(); si != sentence.end(); ++si) {
+    viterbi_step(*si);
+    if (ndots && (ntokens % ndots)==0) fputc('.', stderr);
+  }
+  viterbi_finish();
+  tag_mark_best(sentence);
+  ++nsents;
+}
+
+//--------------------------------------------------------------
 void mootHMM::tag_io(TokenReader *reader, TokenWriter *writer)
 {
   int rtok;
@@ -1119,16 +1132,16 @@ void mootHMM::tag_io(TokenReader *reader, TokenWriter *writer)
 }
 
 //--------------------------------------------------------------
-void mootHMM::tag_sentence(mootSentence &sentence)
+void mootHMM::tag_stream(TokenReader *reader, TokenWriter *writer)
 {
-  viterbi_clear();
-  for (mootSentence::const_iterator si = sentence.begin(); si != sentence.end(); ++si) {
-    viterbi_step(*si);
-    if (ndots && (ntokens % ndots)==0) fputc('.', stderr);
+  int rtok=TokTypeUnknown;
+  mootSentence  sent; //-- sentence buffer
+  while (rtok != TokTypeEOF) {
+    rtok = reader->get_token();
+    sent.push_back( *reader->tr_token );
+
+    assert( !"argh!" );
   }
-  viterbi_finish();
-  tag_mark_best(sentence);
-  ++nsents;
 }
 
 

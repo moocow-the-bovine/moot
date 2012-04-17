@@ -33,6 +33,21 @@ namespace moot {
   using namespace std;
 
 /*--------------------------------------------------------------------------
+ * globals
+ */
+const char* mootTokenTypeNames[NTokTypes] =
+  {
+    "Unknown",
+    "Vanilla",
+    "LibXML",
+    "XMLRaw",
+    "Comment",
+    "EOS",
+    "EOF",
+    "User"
+  };
+
+/*--------------------------------------------------------------------------
  * mootSentence
  */
 mootToken &sentence_printf_append(mootSentence &s, mootTokenType typ, const char *fmt, ...)

@@ -789,15 +789,18 @@ public:
   /** \name Top-level Tagging Interface */
   //@{
 
-  /** Top-level tagging interface: TokenIO layer */
-  void tag_io(TokenReader *reader, TokenWriter *writer);
-
   /**
    * Top-level tagging interface: mootSentence input & output (destructive).
    * Calling this method will (re-)populate the \c besttag
    * datum in the \c sentence argument.
    */
   void tag_sentence(mootSentence &sentence);
+
+  /** Top-level tagging interface: TokenIO layer using sentence-level I/O */
+  virtual void tag_io(TokenReader *reader, TokenWriter *writer);
+
+  /** Top-level tagging interface: TokenIO layer using token-level I/O */
+  virtual void tag_stream(TokenReader *reader, TokenWriter *writer);
   //@}
 
   /*====================================================================

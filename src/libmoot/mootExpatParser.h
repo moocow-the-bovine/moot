@@ -157,14 +157,14 @@ namespace moot {
      * This is the basic case.
      * Descendant classes may override this method.
      */
-    virtual void from_mstream(mootio::mistream *mistreamp);
+    virtual void from_mstream(mootio::mistream *mistreamp, bool autoclose=false);
 
     /**
      * Select input from a mootio::mistream reference.
      * This is the basic case.
      * Descendant classes may override this method.
      */
-    virtual void from_mstream(mootio::mistream &mistream) { from_mstream(&mistream); };
+    virtual void from_mstream(mootio::mistream &mistream, bool autoclose=false) { from_mstream(&mistream,autoclose); };
 
     /**
      * Select input from a named file.

@@ -2,10 +2,10 @@
 
 CXX ?= g++
 
-OFLAGS   ?= -ggdb
+OFLAGS   ?= -ggdb -g3 -O0
 IFLAGS   ?= -I..
 DEFS     ?= -DHAVE_CONFIG_H
-WFLAGS   ?= -Wall
+WFLAGS   ?= -Wall -Wno-deprecated
 CFLAGS   ?= $(WFLAGS) $(IFLAGS) $(DEFS) $(OFLAGS)
 CXXFLAGS ?= $(CFLAGS)
 
@@ -14,8 +14,8 @@ LDFLAGS    ?= $(OFLAGS) -L..
 STATICLIBS ?= ../.libs/libmoot.a
 LIBS       ?= -lz -lrecode -lexpat
 
-KNOWN_TARGETS = toklex tokio tokio hmm+exit dummyhmm kmwio dummyhmm linetag taster
-TARGETS = taster
+KNOWN_TARGETS = toklex tokio hmm+exit dummyhmm kmwio dummyhmm linetag taster streamio
+TARGETS = streamio
 
 all: $(TARGETS)
 
@@ -59,6 +59,9 @@ hmm+exit: hmm+exit.o $(STATICLIBS)
 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 toklex: toklex.o $(STATICLIBS)
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+streamio: streamio.o $(STATICLIBS)
 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 ##-- patterns: default

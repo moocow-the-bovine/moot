@@ -287,6 +287,25 @@ class TokenWriter *TokenIO::new_writer(int fmt)
   return new TokenWriterNative(fmt);
 }
 
+
+//------------------------------------------------------------
+class TokenReader *TokenIO::file_reader(const char *filename, const char *request, int fmt_implied, int fmt_default)
+{
+  int fmt = parse_format_request(request,filename,fmt_implied,fmt_default);
+  TokenReader *tr = new_reader(fmt);
+  if (tr && filename) tr->from_filename(filename);
+  return tr;
+}
+
+//------------------------------------------------------------
+class TokenWriter *TokenIO::file_writer(const char *filename, const char *request, int fmt_implied, int fmt_default)
+{
+  int fmt = parse_format_request(request,filename,fmt_implied,fmt_default);
+  TokenWriter *tw = new_writer(fmt);
+  if (tw && filename) tw->to_filename(filename);
+  return tw;
+}
+
 /*==========================================================================
  * TokenReader
  *==========================================================================*/

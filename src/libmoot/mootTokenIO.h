@@ -120,7 +120,7 @@ public:
    * Top-level format-instantiation utility.
    *
    * @param request user-requested format string, has highest priority
-   * @param filename filename used to guess basic format flags
+   * @param filename filename used to guess basic format flags (only used if \a request is NULL or empty)
    * @param fmt_implied implied format bitmask (required information content)
    * @param fmt_default default format bitmask (for empty formats)
    */
@@ -149,6 +149,28 @@ public:
    * @warning caller is responsible for delting the object returned.
    */
   static class TokenWriter *new_writer(int fmt);
+
+  /**
+   * Create a new TokenReader object for reading from the file \a filename.
+   * Wrapper for new_reader(parse_format_request(request,filename,fmt_implied,fmt_default)).from_filename(filename)
+   * @param filename filename from which to read, will be opened with TokenReader::from_filename()
+   * @param fmt_request format request (overrides filename heuristics)
+   * @param fmt_implied implied format flags
+   * @param fmt_default default format flags
+   * @warning Caller is responsible for deleting the object returned.
+   */
+  static class TokenReader *file_reader(const char *filename, const char *fmt_request=NULL, int fmt_implied=tiofNone, int fmt_default=tiofNone);
+
+  /**
+   * Create a new TokenWriter object for writing to the file \a filename.
+   * Wrapper for new_writer(parse_format_request(request,filename,fmt_implied,fmt_default)).to_filename(filename)
+   * @param filename file to be written, will be opened with TokenWriter::to_filename()
+   * @param fmt_request format request (overrides filename heuristics)
+   * @param fmt_implied implied format flags
+   * @param fmt_default default format flags
+   * @warning Caller is responsible for deleting the object returned.
+   */
+  static class TokenWriter *file_writer(const char *filename, const char *fmt_request=NULL, int fmt_implied=tiofNone, int fmt_default=tiofNone);
   //@}
 };
 
@@ -244,8 +266,9 @@ public:
    * This is the basic case.
    * Descendendant classes may want to override this method.
    */
-  virtual void from_mstream(mootio::mistream *mistreamp) {
-    close();
+  virtual void from_mstream(mootio::mistream *mistreamp)
+  {
+    this->close();
     tr_istream = mistreamp;
     byte_number(1);
     line_number(1);
@@ -257,8 +280,9 @@ public:
    * Select input from a mootio::mistream object, reference version.
    * Default implementation just calls from_mstream(&mis).
    */
-  virtual void from_mstream(mootio::mistream &mis) {
-    from_mstream(&mis);
+  virtual void from_mstream(mootio::mistream &mis)
+  {
+    this->from_mstream(&mis);
   };
 
   /**
@@ -269,11 +293,11 @@ public:
    */
   virtual void from_filename(const char *filename)
   {
-    from_mstream(new mootio::mifstream(filename,"rb"));
+    this->from_mstream(new mootio::mifstream(filename,"rb"));
     tr_istream_created = true;
     if (!tr_istream->valid()) {
       carp("open failed for \"%s\": %s", filename, strerror(errno));
-      close();
+      this->close();
     }
   };
 
@@ -285,7 +309,7 @@ public:
    */
   virtual void from_file(FILE *file)
   {
-    from_mstream(new mootio::micstream(file));
+    this->from_mstream(new mootio::micstream(file));
     tr_istream_created = true;
   };
 
@@ -297,7 +321,7 @@ public:
    */
   virtual void from_fd(int fd)
   {
-    close();
+    this->close();
     throw domain_error("from_fd(): not implemented");
   };
 
@@ -309,7 +333,7 @@ public:
    */
   virtual void from_buffer(const void *buf, size_t len)
   {
-    from_mstream(new mootio::micbuffer(buf,len));
+    this->from_mstream(new mootio::micbuffer(buf,len));
     tr_istream_created = true;
   };
 
@@ -319,7 +343,8 @@ public:
    * Descendants using C string input may override this method.
    * Default implementation calls from_cbuffer(s,len).
    */
-  virtual void from_string(const char *s) {
+  virtual void from_string(const char *s)
+  {
     from_buffer(s,strlen(s));
   };
 
@@ -331,7 +356,7 @@ public:
    */
   virtual void from_cxxstream(std::istream &is)
   {
-    from_mstream(new mootio::micxxstream(is));
+    this->from_mstream(new mootio::micxxstream(is));
     tr_istream_created = true;
   };
 
@@ -472,7 +497,7 @@ public:
   /** Default destructor */
   virtual ~TokenReaderNative(void)
   {
-    close();
+    this->close();
   };
   //@}
 
@@ -673,8 +698,9 @@ public:
    * This is the basic case.
    * Descendendant classes may override this method.
    */
-  virtual void to_mstream(mootio::mostream *mostreamp) {
-    close();
+  virtual void to_mstream(mootio::mostream *mostreamp)
+  {
+    this->close();
     tw_ostream = mostreamp;
     if (!(tw_format&tiofNull) && (!tw_ostream || !tw_ostream->valid())) {
       carp("Warning: selecting output to invalid stream");
@@ -686,8 +712,9 @@ public:
    * Select output to a mootio::mistream object, reference version.
    * Default implementation just calls to_mstream(&mos).
    */
-  virtual void to_mstream(mootio::mostream &mos) {
-    to_mstream(&mos);
+  virtual void to_mstream(mootio::mostream &mos)
+  {
+    this->to_mstream(&mos);
   };
 
   /**
@@ -697,11 +724,11 @@ public:
    */
   virtual void to_filename(const char *filename)
   {
-    to_mstream(new mootio::mofstream(filename,"wb"));
+    this->to_mstream(new mootio::mofstream(filename,"wb"));
     tw_ostream_created = true;
     if (!tw_ostream->valid()) {
       carp("open failed for \"%s\": %s", filename, strerror(errno));
-      close();
+      this->close();
     }
   };
 
@@ -713,7 +740,7 @@ public:
    */
   virtual void to_file(FILE *file)
   {
-    to_mstream(new mootio::mocstream(file));
+    this->to_mstream(new mootio::mocstream(file));
     tw_ostream_created = true;
   };
 
@@ -725,7 +752,7 @@ public:
    */
   virtual void to_fd(int fd)
   {
-    close();
+    this->close();
     throw domain_error("to_fd(): not implemented.");
   };
 
@@ -733,11 +760,11 @@ public:
    * Select output to a C++ stream.
    * Caller is responsible for allocation and de-allocation.
    * Descendants using C++ stream input may override this method.
-   * Default implementation calls from_mstream().
+   * Default implementation calls to_mstream().
    */
   virtual void to_cxxstream(std::ostream &os)
   {
-    to_mstream(new mootio::mocxxstream(os));
+    this->to_mstream(new mootio::mocxxstream(os));
     tw_ostream_created = true;
   };
 
