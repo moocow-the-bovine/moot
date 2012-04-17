@@ -33,27 +33,27 @@
 #include <string.h>
 #include <stdarg.h>
 
-#ifdef HAVE_TIME_H
-#include <time.h>
-#endif
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-
 #include <string>
 
 #include <moot.h>
 #include <mootUtils.h>
+
+#include "computils.h"
 #include "mootdyn_cmdparser.h"
 
 using namespace std;
 using namespace moot;
 
+//----------------------------------------------------------------------
+// spec overrides
+namespace moot {
+  template<> int  HmmSpec<gengetopt_args_info,mootDynHMM>::use_flavors_arg() { return false; };
+  template<> bool HmmSpec<gengetopt_args_info,mootDynHMM>::use_flavors_given() { return false; };
+};
+
 /*--------------------------------------------------------------------------
  * Globals
  *--------------------------------------------------------------------------*/
-const char *PROGNAME = "mootdyn";
-
 // options & file-churning
 gengetopt_args_info  args;
 cmdutil_file_churner churner;
@@ -65,6 +65,7 @@ size_t nfiles = 0;
 // -- global classes/structs
 mootDynHMM *hmmp = NULL;
 mootDynHMMOptions hmm_opts;
+HmmSpec<gengetopt_args_info,mootDynHMM> spec;
 
 // -- token i/o
 int ifmt         = tiofNone;
@@ -98,9 +99,15 @@ void GetMyOptions(int argc, char **argv)
   //-- load environmental defaults
   cmdline_parser_envdefaults(&args);
 
+  //-- initialize locale
+  moot_setlocale();
+
+  //-- get verbosity level
+  vlevel = args.verbose_arg;
+
   //-- show banner
   if (!args.no_banner_given)
-    moot_msg(args.verbose_arg, vlInfo, moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
+    moot_msg(vlevel, vlInfo, moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
 
   //-- output file
   if (!out.open(args.output_arg,"w")) {
@@ -163,147 +170,18 @@ void GetMyOptions(int argc, char **argv)
     exit(1);
   }
 
-  //-- assign "unknown" ids & other flags
-  hmmp->hash_ngrams = args.hash_ngrams_arg;
-  hmmp->relax = args.relax_arg;
-  hmmp->use_lex_classes = args.use_classes_arg;
-  hmmp->unknown_token_name(args.unknown_token_arg);
-  hmmp->unknown_tag_name(args.unknown_tag_arg);
-  hmmp->unknown_lex_threshhold = args.unknown_threshhold_arg;
-  hmmp->unknown_class_threshhold = args.class_threshhold_arg;
-#ifdef MOOT_ENABLE_SUFFIX_TRIE
-  hmmp->suftrie.maxlen() = args.trie_depth_arg;
-  hmmp->suftrie.maxcount = args.trie_threshhold_arg;
-  hmmp->suftrie.theta    = args.trie_theta_arg;
-#else
-  if (args.trie_depth_given || args.trie_threshhold_given || args.trie_theta_given) {
-    fprintf(stderr, "%s: suffix trie support disabled: ignoring trie-related options\n", PROGNAME);
-  }
-#endif
-  hmmp->save_ambiguities = args.save_ambiguities_given;
-  hmmp->save_mark_unknown = args.mark_unknown_given;
-
-  // -- assign "verbose" flag
-  hmmp->ndots = args.dots_arg;
-  hmmp->verbose = args.verbose_arg;
-
-  // -- parse and assign n-gram smoothing constants (nlambdas)
-  if (args.nlambdas_given) {
-    double nlambdas[3] = {0,1,0};
-    if (!moot_parse_doubles(args.nlambdas_arg, nlambdas, 3)) {
-      fprintf(stderr, "%s: could not parse N-Gram smoothing constants '%s'\n",
-	      PROGNAME, args.nlambdas_arg);
-      exit(1);
-    }
-    hmmp->nglambda1 = nlambdas[0];
-    hmmp->nglambda2 = nlambdas[1];
-#ifdef MOOT_USE_TRIGRAMS
-    hmmp->nglambda3 = nlambdas[2];
-#else
-    if (nlambdas[2] != 0) {
-      fprintf(stderr, "%s: Warning: use of trigrams disabled.\n", PROGNAME);
-    }
-#endif
-    if (nlambdas[0]+nlambdas[1]+nlambdas[2] != 1) {
-      fprintf(stderr, "%s: Warning: N-gram smoothing constants do not sum to one: %s\n",
-	      PROGNAME, args.nlambdas_arg);
-    }
-  }
-
-  // -- parse and assign lexical smoothing constants (wlambdas)
-  if (args.wlambdas_given) {
-    double wlambdas[2] = {1,0};
-    if (!moot_parse_doubles(args.wlambdas_arg, wlambdas, 2)) {
-      fprintf(stderr, "%s: could not parse lexical smoothing constants '%s'\n",
-	      PROGNAME, args.wlambdas_arg);
-      exit(1);
-    }
-    hmmp->wlambda0 = wlambdas[0];
-    hmmp->wlambda1 = wlambdas[1];
-    if (hmmp->wlambda0 + hmmp->wlambda1 != 1) {
-      fprintf(stderr, "%s: Warning: Lexical smoothing constants do not sum to one: %s\n",
-	      PROGNAME, args.wlambdas_arg);
-    }
-  }
-
-  // -- parse and assign lexical smoothing constants (clambdas)
-  if (args.clambdas_given) {
-    double clambdas[2] = {1,0};
-    if (!moot_parse_doubles(args.clambdas_arg, clambdas, 2)) {
-      fprintf(stderr, "%s: could not parse lexical-class smoothing constants '%s'\n",
-	      PROGNAME, args.clambdas_arg);
-      exit(1);
-    }
-    hmmp->clambda0 = clambdas[0];
-    hmmp->clambda1 = clambdas[1];
-    if (hmmp->clambda0 + hmmp->clambda1 != 1) {
-      fprintf(stderr, "%s: Warning: Lexical-class smoothing constants do not sum to one: %s\n",
-	      PROGNAME, args.clambdas_arg);
-    }
-  }
-
-  //-- assign beam-width
-  hmmp->beamwd = args.beam_width_arg;
-
-  //-- load model spec
-  if (!hmmp->load_model(args.model_arg,
-			args.eos_tag_arg,
-			PROGNAME,
-			!args.nlambdas_given,
-			!args.wlambdas_given,
-			!args.clambdas_given))
-    {
-      fprintf(stderr, "%s: could not load model `%s'\n", PROGNAME, args.model_arg);
-    }
+  //-- standard model options
+  spec.args = args;
+  spec.hmmp = hmmp;
+  if (!spec.load_hmm())
+    moot_croak("%s: load FAILED for model `%s'\n", PROGNAME, spec.model_arg());
 
   // -- report
-  if (args.verbose_arg >= vlProgress) {
-    fprintf(stderr, "%s: Initialization complete\n", PROGNAME);
-  }
-
-  //-- get time
-  time_t now_time = time(NULL);
-  /*
-  tm     now_tm;
-  localtime_r(&now_time, &now_tm);
-  */
-  tm *now_tm = localtime(&now_time);
+  moot_msg(vlevel,vlProgress,"%s: Initialization complete\n", PROGNAME);
 
   //-- report to output-file
-  if (!args.no_header_given) {
-    writer->put_comment_block_begin();
-    writer->printf_raw(" %s output file generated on %s", PROGNAME, asctime(now_tm));
-    writer->printf_raw("\n");
-    writer->printf_raw(" DynHMM Configuration:\n");
-    hmmp->tw_put_info(writer);
-    writer->printf_raw("\n");
-    writer->printf_raw(" HMM Configuration:\n");
-    writer->printf_raw("   Unknown Token     : %s\n", hmmp->tokids.id2name(0).c_str());
-    writer->printf_raw("   Unknown Tag       : %s\n", hmmp->tagids.id2name(0).c_str());
-    writer->printf_raw("   Border Tag        : %s\n", hmmp->tagids.id2name(hmmp->start_tagid).c_str());
-    writer->printf_raw("   N-Gram lambdas    : lambda1=%g, lambda2=%g, lambda3=%g\n",
-		       exp(hmmp->nglambda1), exp(hmmp->nglambda2), exp(hmmp->nglambda3));
-    writer->printf_raw("\n");
-    writer->printf_raw("   Hash n-grams?     : %s\n", (hmmp->hash_ngrams ? "yes" : "no"));
-    writer->printf_raw("   Lex. Threshhold   : %g\n", hmmp->unknown_lex_threshhold);
-    writer->printf_raw("   Lexical lambdas   : lambdaw0=%g, lambdaw1=%g\n",
-		       exp(hmmp->wlambda0), exp(hmmp->wlambda1));
-    writer->printf_raw("   Use classes?      : %s\n",
-		       hmmp->use_lex_classes ? "yes" : "no");
-    writer->printf_raw("   Class Threshhold  : %g\n", hmmp->unknown_class_threshhold);
-    writer->printf_raw("   Class lambdas     : lambdac0=%g, lambdac1=%g\n",
-		       exp(hmmp->clambda0), exp(hmmp->clambda1));
-    writer->printf_raw("   Beam Width        : %g\n", exp(hmmp->beamwd));
-#ifdef MOOT_ENABLE_SUFFIX_TRIE
-    writer->printf_raw("   Suffix theta      : %g\n", hmmp->suftrie.theta);
-    writer->printf_raw("   Suffix trie size  : %u\n", hmmp->suftrie.size());
-#else
-    writer->printf_raw("   Suffix theta      : (DISABLED)\n");
-    writer->printf_raw("   Suffix trie size  : (DISABLED)\n");
-#endif
-    writer->printf_raw("\n");
-    writer->put_comment_block_end();
-  }
+  if (!args.no_header_given)
+    put_hmm_header(writer, *hmmp);
 }
 
 /*--------------------------------------------------------------------------
@@ -369,20 +247,19 @@ void print_summary_to_file(FILE *file)
  *--------------------------------------------------------------------------*/
 int main (int argc, char **argv)
 {
+  PROGNAME = "mootdyn";
   GetMyOptions(argc,argv);
 
   // -- get init-stop time = analysis-start time
-  if (args.verbose_arg >= vlInfo) {
+  if (vlevel >= vlInfo)
     ielapsed = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC);
-  }
 
   // -- the guts
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
-    if (args.verbose_arg >= vlInfo) nfiles++;
-    if (args.verbose_arg >= vlProgress) {
+    ++nfiles;
+    if (vlevel >= vlProgress) {
       writer->printf_comment("\n File: %s\n", churner.in.name.c_str());
-      fprintf(stderr,"%s: analyzing file '%s'...", PROGNAME, churner.in.name.c_str());
-      fflush(stderr);
+      moot_carp("%s: analyzing file '%s'...", PROGNAME, churner.in.name.c_str());
     }
 
     //hmmp->tag_file(churner.in.file, out.file, churner.in.name);
@@ -390,9 +267,8 @@ int main (int argc, char **argv)
     reader->from_mstream(&churner.in);
     hmmp->tag_io(reader, writer);
     
-    if (args.verbose_arg >= vlProgress) {
-      fprintf(stderr," done.\n");
-      fflush(stderr);
+    if (vlevel >= vlProgress) {
+      moot_carp(" done.\n");
     }
     else if (hmmp->ndots) {
       fputc('\n', stderr);
@@ -400,7 +276,7 @@ int main (int argc, char **argv)
   }
 
   // -- summary
-  if (args.verbose_arg >= vlInfo) {
+  if (vlevel >= vlInfo) {
     // -- timing
     aelapsed  = static_cast<double>(clock()) / static_cast<double>(CLOCKS_PER_SEC) - ielapsed; 
 

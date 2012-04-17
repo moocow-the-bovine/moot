@@ -179,8 +179,9 @@ EXTRA_DIST += moottaste.gog
 #~~~~~~~~
 mootdyn_SOURCES = \
 	mootdyn_main.cc \
-	mootdyn_cmdparser.cc mootdyn_cmdparser.h
-mootdyn_main.o: mootdyn_cmdparser.h
+	mootdyn_cmdparser.cc mootdyn_cmdparser.h \
+	computils.cc computils.h
+mootdyn_main.o: mootdyn_cmdparser.h computils.h
 mootdyn_LDFLAGS = $(LDFLAGS_COMMON)
 mootdyn_LDADD = $(LDADD_COMMON)
 EXTRA_DIST += mootdyn.gog

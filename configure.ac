@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.9-1])
+define([THE_PACKAGE_VERSION], [2.0.9-2])
 define([THE_PACKAGE_MAINTAINER],  [moocow@cpan.org])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -91,13 +91,11 @@ if test "$enable_debug" = "yes" ; then
 
    if test "$GCC" == "yes" ; then
      AC_MSG_NOTICE([GNU C compiler detected: setting appropriate debug flags])
-     moot_OFLAGS="-g"
+     moot_OFLAGS="-O0 -ggdb -g3"
    else
      AC_MSG_WARN([GNU C compiler not detected: you must use CFLAGS, CXXFLAGS, LDFLAGS to set debugging flags])
-     moot_OFLAGS=""
+     moot_OFLAGS="-g"
    fi
-
-   moot_OFLAGS="-g"
 
    AC_DEFINE(MOOT_DEBUG_ENABLED,1,
 	     [Define this to enable debugging code])

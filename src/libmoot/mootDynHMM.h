@@ -198,7 +198,7 @@ public:
    *  Default implementation does nothing. */
   virtual void tw_put_info(moot::TokenWriter *tw)
   {
-    tw->printf_raw("   DynHMM class      : %s\n", "mootDynHMM (?)");
+    tw->printf_raw("  +DynHMM class      : %s\n", "mootDynHMM (?)");
   };
   //@}
 

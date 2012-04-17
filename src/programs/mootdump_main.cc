@@ -89,8 +89,7 @@ void GetMyOptions(int argc, char **argv)
     exit(1);
   }
   else if (args.inputs_num > 1) {
-    fprintf(stderr, "%s: multiple input models specified -- ignoring all but first!\n",
-	    PROGNAME);
+    fprintf(stderr, "%s: multiple input models specified -- ignoring all but first!\n", PROGNAME);
   }
 
   //-- show banner
@@ -134,15 +133,13 @@ int main (int argc, char **argv)
 
   //-- the guts : load input model
   if (!hmm.load_model(args.inputs[0], "__$", PROGNAME)) {
-    fprintf(stderr, "%s: load FAILED for model `%s' -- aborting!\n",
-	    PROGNAME, args.inputs[0]);
+    fprintf(stderr, "%s: load FAILED for model `%s' -- aborting!\n", PROGNAME, args.inputs[0]);
     exit(1);
   }
 
   //-- produce text dump
   if (args.verbose_arg > 1)
-    fprintf(stderr, "%s: writing HMM text dump to '%s' ...",
-	    PROGNAME, out.name.c_str());
+    fprintf(stderr, "%s: writing HMM text dump to '%s' ...", PROGNAME, out.name.c_str());
 
   hmm.txtdump(out.file, dump_constants, dump_lexprobs, dump_classprobs, dump_suftrie, dump_ngprobs);
 

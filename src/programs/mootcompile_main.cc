@@ -37,12 +37,30 @@
 #include "computils.h"
 #include "mootcompile_cmdparser.h"
 
+//----------------------------------------------------------------------
+// spec overrides
+namespace moot {
+  template<> const char* HmmSpec<gengetopt_args_info,mootHMM>::model_arg()   { return args.inputs[0]; }
+  template<> bool	 HmmSpec<gengetopt_args_info,mootHMM>::model_given() { return args.inputs_num > 0; }
+
+  template<> int  HmmSpec<gengetopt_args_info,mootHMM>::save_ambiguities_arg() { return false; };
+  template<> bool HmmSpec<gengetopt_args_info,mootHMM>::save_ambiguities_given() { return false; };
+
+  template<> int  HmmSpec<gengetopt_args_info,mootHMM>::save_mark_unknown_arg() { return false; };
+  template<> bool HmmSpec<gengetopt_args_info,mootHMM>::save_mark_unknown_given() { return false; };
+
+  template<> size_t HmmSpec<gengetopt_args_info,mootHMM>::ndots_arg() { return 0; };
+  template<> bool   HmmSpec<gengetopt_args_info,mootHMM>::ndots_given() { return false; };
+};
+
 /*--------------------------------------------------------------------------
  * Globals (see also computils.h)
  *--------------------------------------------------------------------------*/
 
 // options & file-churning
 gengetopt_args_info  args;
+mootHMM hmm;
+HmmSpec<gengetopt_args_info,mootHMM> spec;
 
 // -- files
 mofstream out;
@@ -80,30 +98,6 @@ void GetMyOptions(int argc, char **argv)
     moot_croak("%s: open failed for output-file '%s': %s\n", PROGNAME, out.name.c_str(), strerror(errno));
   }
   out.close(); //-- close again: HMM will write it itself
-
-  //-- setup computils.h HmmSpec (model constants etc)
-  hs.hash_ngrams = args.hash_ngrams_arg;
-  hs.relax = args.relax_arg;
-  hs.use_classes = args.use_classes_arg;
-  hs.use_flavors = args.use_flavors_arg;
-  hs.unknown_token_name = args.unknown_token_arg;
-  hs.unknown_tag_name = args.unknown_tag_arg;
-  hs.eos_tag = args.eos_tag_arg;
-  hs.unknown_lex_threshhold = args.unknown_threshhold_arg;
-  hs.unknown_class_threshhold = args.class_threshhold_arg;
-  hs.beam_width = args.beam_width_arg;
-  hs.nlambdas = args.nlambdas_arg;
-  hs.wlambdas = args.wlambdas_arg;
-  hs.clambdas = args.clambdas_arg;
-  hs.trie_depth = args.trie_depth_arg;
-  hs.trie_threshhold = args.trie_threshhold_arg;
-  hs.trie_theta = args.trie_theta_arg;
-  hs.trie_args_given = (args.trie_depth_given || args.trie_threshhold_given || args.trie_theta_given);
-  //
-  //-- runtime options (not really needed here)
-  hs.save_ambiguities = 0;
-  hs.save_mark_unknown = 0;
-  hs.ndots = 0;
 }
 
 
@@ -117,8 +111,10 @@ int main (int argc, char **argv)
   GetMyOptions(argc,argv);
 
   //-- the guts : load & compile input model (single model ONLY!)
-  if (!load_hmm(args.inputs[0])) 
-    moot_croak("%s: load FAILED for model `%s' -- aborting!\n", PROGNAME, args.inputs[0]);
+  spec.args = args;
+  spec.hmmp = &hmm;
+  if (!spec.load_hmm(false))
+    moot_croak("%s: compile FAILED for text model `%s' -- aborting\n", PROGNAME, spec.model_arg());
 
   //-- dump binary model
   moot_msg(vlevel,vlProgress,"%s: saving binary HMM `%s' ...", PROGNAME, out.name.c_str());
@@ -139,6 +135,7 @@ int main (int argc, char **argv)
 #endif
     fprintf(stderr, "\n");
     fprintf(stderr, "%s   Hash n-grams?     : %s\n", cmts, (hmm.hash_ngrams ? "yes" : "no"));
+    fprintf(stderr, "%s   Relax?            : %s\n", cmts, (hmm.relax ? "yes" : "no"));
     fprintf(stderr, "%s   Lex. Threshhold   : %g\n", cmts, hmm.unknown_lex_threshhold);
     fprintf(stderr, "%s   Lexical lambdas   : lambdaw0=%g, lambdaw1=%g\n", cmts, hmm.wlambda0, hmm.wlambda0);
     fprintf(stderr, "%s   Use classes?      : %s\n", cmts, hmm.use_lex_classes ? "yes" : "no");

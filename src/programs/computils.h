@@ -35,6 +35,17 @@
 #include <errno.h>
 #include <string.h>
 
+
+#ifdef HAVE_TIME_H
+#include <time.h>
+#endif
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+
+#include <moot.h>
+
+#if 0
 #include <mootHMM.h>
 #include <mootLexfreqs.h>
 #include <mootClassfreqs.h>
@@ -42,6 +53,7 @@
 #include <mootCIO.h>
 #include <mootUtils.h>
 #include <mootModelSpec.h>
+#endif
 
 using namespace std;
 using namespace moot;
@@ -50,17 +62,18 @@ using namespace mootio;
 namespace moot {
   // -- global classes/structs
   extern const char *PROGNAME;
-  extern mootHMM     hmm;
   extern int	     vlevel;
 
-  template <typename ArgsT>
+  template <typename ArgsT, class HMMT=mootHMM>
   class HmmSpec {
   public:
     typedef ArgsT Args;
 
   public:
     Args args;
+    HMMT* hmmp;
 
+  public:
     int hash_ngrams_arg()   { return args.hash_ngrams_arg; };
     bool hash_ngrams_given() { return args.hash_ngrams_given; };
 
@@ -122,29 +135,48 @@ namespace moot {
     bool model_given() { return args.model_given; };
 
   public:
-    HmmSpec(void)
+    HmmSpec()
     { memset(this,0,sizeof(HmmSpec)); };
 
-    void set_hmm_compile_options(); //-- globals: hmm, PROGNAME
-    void set_hmm_runtime_options(); //-- globals: hmm, PROGNAME
-    bool load_hmm(bool try_bin=true); //-- globals: hmm, PROGNAME
+    /** set compile-time options (clobber); uses globals: PROGNAME */
+    void set_hmm_compile_options();
+
+    /** set runtime options; uses globals: PROGNAME */
+    void set_hmm_runtime_options(bool given_only=false);
+
+    /** load hmm (global); calls set_hmm_compile_options(), set_hmm_runtime_options() */
+    bool load_hmm(bool try_bin=true);
+
+    /** utility for compile-only option checking; returns \a opt_given */
+    bool check_compile_option(const char *opt_name, bool opt_given);
   };
+
+  //-- header stuff, top-level (globals: PROGNAME)
+  void put_hmm_header(TokenWriter *writer, mootHMM    &hmm);
+  void put_hmm_header(TokenWriter *writer, mootDynHMM &dyn);
+
+  //-- header stuff, low-level (globals: PROGNAME)
+  void put_hmm_header_begin(TokenWriter *writer);
+  void put_hmm_header_config(TokenWriter *writer, mootHMM    &hmm);
+  void put_hmm_header_config(TokenWriter *writer, mootDynHMM &dyn);
+  void put_hmm_header_end(TokenWriter *writer);
+
 
   //############################################################################
   //############################################################################
 
   //--------------------------------------------------------------------------
-  template <typename SpecT>
-  void HmmSpec<SpecT>::set_hmm_compile_options()
+  template <typename SpecT, class HMMT>
+  void HmmSpec<SpecT,HMMT>::set_hmm_compile_options()
   {
     //-- hmm: compile-time options
-    hmm.hash_ngrams = hash_ngrams_arg();
-    hmm.unknown_lex_threshhold = unknown_lex_threshhold_arg();
-    hmm.unknown_class_threshhold = unknown_class_threshhold_arg();
+    hmmp->hash_ngrams = hash_ngrams_arg();
+    hmmp->unknown_lex_threshhold = unknown_lex_threshhold_arg();
+    hmmp->unknown_class_threshhold = unknown_class_threshhold_arg();
 #ifdef MOOT_ENABLE_SUFFIX_TRIE
-    hmm.suftrie.maxlen() = trie_depth_arg();
-    hmm.suftrie.maxcount = trie_threshhold_arg();
-    hmm.suftrie.theta = trie_theta_arg();
+    hmmp->suftrie.maxlen() = trie_depth_arg();
+    hmmp->suftrie.maxcount = trie_threshhold_arg();
+    hmmp->suftrie.theta = trie_theta_arg();
 #else
     if (trie_depth_given() || trie_threshhold_given() || trie_theta_given()) {
       moot_msg(vlevel,vlWarning, "%s: Warning: suffix trie support disabled: ignoring trie-related option(s)\n", PROGNAME);
@@ -156,10 +188,10 @@ namespace moot {
       double nlambdas_[3] = {0,1,0};
       if (!moot_parse_doubles(nlambdas_arg(), nlambdas_, 3))
 	moot_croak("%s: could not parse n-gram smoothing constants '%s'\n", PROGNAME, nlambdas_arg());
-      hmm.nglambda1 = nlambdas_[0];
-      hmm.nglambda2 = nlambdas_[1];
+      hmmp->nglambda1 = nlambdas_[0];
+      hmmp->nglambda2 = nlambdas_[1];
 #ifdef MOOT_USE_TRIGRAMS
-      hmm.nglambda3 = nlambdas_[2];
+      hmmp->nglambda3 = nlambdas_[2];
 #else
       if (nlambdas_[2] != 0)
 	moot_msg(vlevel,vlWarnings,"%s: Warning: use of trigrams disabled.\n", PROGNAME);
@@ -173,9 +205,9 @@ namespace moot {
       double wlambdas_[2] = {1,0};
       if (!moot_parse_doubles(wlambdas_arg(), wlambdas_, 2))
 	moot_croak("%s: could not parse lexical smoothing constants '%s'\n", PROGNAME, wlambdas_arg());
-      hmm.wlambda0 = wlambdas_[0];
-      hmm.wlambda1 = wlambdas_[1];
-      if (hmm.wlambda0 + hmm.wlambda1 != 1)
+      hmmp->wlambda0 = wlambdas_[0];
+      hmmp->wlambda1 = wlambdas_[1];
+      if (hmmp->wlambda0 + hmmp->wlambda1 != 1)
 	moot_msg(vlevel,vlWarnings,"%s: Warning: Lexical smoothing constants do not sum to one: %s\n", PROGNAME, wlambdas_arg());
     }
   
@@ -184,71 +216,91 @@ namespace moot {
       double clambdas_[2] = {1,0};
       if (!moot_parse_doubles(clambdas_arg(), clambdas_, 2))
 	moot_croak("%s: could not parse lexical-class smoothing constants '%s'\n", PROGNAME, clambdas_arg());
-      hmm.clambda0 = clambdas_[0];
-      hmm.clambda1 = clambdas_[1];
-      if (hmm.clambda0 + hmm.clambda1 != 1)
+      hmmp->clambda0 = clambdas_[0];
+      hmmp->clambda1 = clambdas_[1];
+      if (hmmp->clambda0 + hmmp->clambda1 != 1)
 	moot_msg(vlevel,vlWarnings,"%s: Warning: Lexical-class smoothing constants do not sum to one: %s\n", PROGNAME, clambdas_arg());
     }
   };
 
   //--------------------------------------------------------------------------
-  template <typename SpecT>
-  void HmmSpec<SpecT>::set_hmm_runtime_options()
+  template <typename SpecT, class HMMT>
+  void HmmSpec<SpecT,HMMT>::set_hmm_runtime_options(bool given_only)
   {
     //-- runtime options
-    hmm.unknown_token_name(unknown_token_arg());
-    hmm.unknown_tag_name(unknown_tag_arg());
-    hmm.relax = relax_arg();
-    hmm.use_lex_classes = use_classes_arg();
-    hmm.use_flavors = use_flavors_arg();
-    hmm.beamwd = beam_width_arg();
-    hmm.save_ambiguities = save_ambiguities_arg();
-    hmm.save_mark_unknown = save_mark_unknown_arg();
-    hmm.ndots = ndots_arg();
-    hmm.verbose = vlevel;
+    if (!given_only) {
+      //-- clobber / initialize
+      hmmp->unknown_token_name(unknown_token_arg());
+      hmmp->unknown_tag_name(unknown_tag_arg());
+      hmmp->relax = relax_arg();
+      hmmp->use_lex_classes = use_classes_arg();
+      hmmp->use_flavors = use_flavors_arg();
+      hmmp->beamwd = beam_width_arg();
+      hmmp->save_ambiguities = save_ambiguities_arg();
+      hmmp->save_mark_unknown = save_mark_unknown_arg();
+      hmmp->ndots = ndots_arg();
+      hmmp->verbose = vlevel;
+    } else {
+      //-- explicit override only
+      if (unknown_token_given()) hmmp->unknown_token_name(unknown_token_arg());
+      if (unknown_tag_given()) hmmp->unknown_tag_name(unknown_tag_arg());
+      if (relax_given()) hmmp->relax = relax_arg();
+      if (use_classes_given()) hmmp->use_lex_classes = use_classes_arg();
+      if (use_flavors_given()) hmmp->use_flavors = use_flavors_arg();
+      if (beam_width_given()) hmmp->beamwd = beam_width_arg();
+      if (save_ambiguities_given()) hmmp->save_ambiguities = save_ambiguities_arg();
+      if (save_mark_unknown_given()) hmmp->save_mark_unknown = save_mark_unknown_arg();
+      if (ndots_given()) hmmp->ndots = ndots_arg();
+      hmmp->verbose = vlevel;
+    }
   };
 
   //--------------------------------------------------------------------------
-  template <typename SpecT>
-  bool HmmSpec<SpecT>::load_hmm(bool try_bin)
+  template <typename SpecT, class HMMT>
+  bool HmmSpec<SpecT,HMMT>::check_compile_option(const char *opt_name, bool opt_given)
   {
+    if (opt_given)
+      moot_msg(vlevel,vlWarnings, "%s: Warning: ignoring model compilation option `--%s' for binary model `%s'\n", PROGNAME, opt_name, model_arg());
+    return opt_given;
+  };
+
+  //--------------------------------------------------------------------------
+  template <typename SpecT, class HMMT>
+  bool HmmSpec<SpecT,HMMT>::load_hmm(bool try_bin)
+  {
+    //-- check whether compile-time-only options were specified for binary model
     set_hmm_runtime_options();
-    set_hmm_compile_options();
+    if ( try_bin && moot_file_exists(model_arg()) ) {
+      check_compile_option("hash-ngrams", hash_ngrams_given());
+      check_compile_option("unknown-threshhold",unknown_lex_threshhold_given());
+      check_compile_option("class-threshhold",unknown_class_threshhold_given());
+#ifdef MOOT_ENABLE_SUFFIX_TRIE
+      check_compile_option("trie-depth",trie_depth_given());
+      check_compile_option("trie-threshhold",trie_threshhold_given());
+      check_compile_option("trie-theta",trie_theta_given());
+#endif
+      check_compile_option("nlambdas",nlambdas_given());
+      check_compile_option("wlambdas",wlambdas_given());
+      check_compile_option("clambdas",clambdas_given());
+    } else {
+      set_hmm_compile_options();
+    }
 
     //-- actually load model
-    if (!hmm.load_model(model_arg(),
-			eos_tag_arg(),
-			PROGNAME,
-			(!nlambdas_given()),
-			(!wlambdas_given()),
-			(!clambdas_given())))
+    if (!hmmp->load_model(model_arg(),
+			  eos_tag_arg(),
+			  PROGNAME,
+			  (!nlambdas_given()),
+			  (!wlambdas_given()),
+			  (!clambdas_given())))
       {
 	moot_croak("%s: could not load model `%s'\n", PROGNAME, model_arg());
       }
 
-    //-- check whether compile-time-only options were specified for binary model
-    if (try_bin && moot_file_exists(model_arg())
-	&& (hash_ngrams_given()
-	    || unknown_lex_threshhold_given()
-	    || unknown_class_threshhold_given()
-#ifdef MOOT_ENABLE_SUFFIX_TRIE
-	    || trie_depth_given()
-	    || trie_threshhold_given()
-	    || trie_theta_given()
-#endif
-	    || nlambdas_given()
-	    || wlambdas_given()
-	    || clambdas_given()))
-      {
-	moot_msg(vlevel,vlWarnings, "%s: Warning: model compilation option(s) are meaningless for binary model '%s'\n", PROGNAME, model_arg());
-      }
-
-    //-- re-set runtime options
-    set_hmm_runtime_options();    
+    //-- re-set runtime options (override)
+    set_hmm_runtime_options(true);
     return true;
   };
-
-  
 
 }
 

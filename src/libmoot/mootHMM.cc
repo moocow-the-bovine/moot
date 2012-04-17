@@ -257,6 +257,7 @@ bool mootHMM::load_model(const string &modelname,
       if (verbose >= vlProgress)
 	carp("%s: loading flavor definition file '%s'...", myname, ms.flafile.c_str());
 
+      mtaster.clear();
       if (!mtaster.load(ms.flafile)) {
 	carp("\n%s: load FAILED for flavor definition file `%s'\n", myname, ms.flafile.c_str());
 	return false;

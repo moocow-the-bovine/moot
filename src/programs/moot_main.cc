@@ -33,15 +33,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#ifdef HAVE_TIME_H
-#include <time.h>
-#endif
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-
 #include <string>
-
 #include <mootTokenIO.h>
 #include <mootTokenExpatIO.h>
 
@@ -57,8 +49,9 @@ using namespace moot;
 
 // options & file-churning
 gengetopt_args_info  args;
+HmmSpec<gengetopt_args_info,mootHMM> spec;
+mootHMM hmm;
 cmdutil_file_churner churner;
-HmmSpec<gengetopt_args_info> spec;
 
 // -- files
 mofstream out;
@@ -151,53 +144,16 @@ void GetMyOptions(int argc, char **argv)
 
   //-- load model
   spec.args = args;
+  spec.hmmp = &hmm;
   if (!spec.load_hmm())
     moot_croak("%s: load FAILED for model `%s'\n", PROGNAME, spec.model_arg());
 
   //-- report
   moot_msg(vlevel,vlProgress,"%s: Initialization complete\n", PROGNAME);
 
-  //-- get time
-  time_t now_time = time(NULL);
-  /*
-  tm     now_tm;
-  localtime_r(&now_time, &now_tm);
-  */
-  tm *now_tm = localtime(&now_time);
-
   //-- report to output-file
-  if (!args.no_header_given) {
-    writer->put_comment_block_begin();
-    writer->printf_raw("\n %s output file generated on %s", PROGNAME, asctime(now_tm));
-    writer->printf_raw(" Configuration:\n");
-    writer->printf_raw("   Unknown Token     : %s\n", hmm.tokids.id2name(0).c_str());
-    writer->printf_raw("   Unknown Tag       : %s\n", hmm.tagids.id2name(0).c_str());
-    writer->printf_raw("   Border Tag        : %s\n", hmm.tagids.id2name(hmm.start_tagid).c_str());
-#ifdef MOOT_USE_TRIGRAMS
-    writer->printf_raw("   N-Gram lambdas    : lambda1=%g, lambda2=%g, lambda3=%g\n", exp(hmm.nglambda1), exp(hmm.nglambda2), exp(hmm.nglambda3));
-#else
-    writer->printf_raw("   N-Gram lambdas    : lambda1=%g, lambda2=%g\n", exp(hmm.nglambda1), exp(hmm.nglambda2));
-#endif
-    writer->printf_raw("\n");
-    writer->printf_raw("   Hash n-grams?     : %s\n", (hmm.hash_ngrams ? "yes" : "no"));
-    writer->printf_raw("   Lex. Threshhold   : %g\n", hmm.unknown_lex_threshhold);
-    writer->printf_raw("   Lexical lambdas   : lambdaw0=%g, lambdaw1=%g\n", exp(hmm.wlambda0), exp(hmm.wlambda1));
-    writer->printf_raw("   Use classes?      : %s\n", hmm.use_lex_classes ? "yes" : "no");
-    writer->printf_raw("   Use flavors?      : %s\n", hmm.use_flavors ? "yes" : "no");
-    writer->printf_raw("   Num/Flavors       : %u\n", hmm.taster.size());
-    writer->printf_raw("   Class Threshhold  : %g\n", hmm.unknown_class_threshhold);
-    writer->printf_raw("   Class lambdas     : lambdac0=%g, lambdac1=%g\n", exp(hmm.clambda0), exp(hmm.clambda1));
-    writer->printf_raw("   Beam Width        : %g\n", exp(hmm.beamwd));
-#ifdef MOOT_ENABLE_SUFFIX_TRIE
-    writer->printf_raw("   Suffix theta      : %g\n", hmm.suftrie.theta);
-    writer->printf_raw("   Suffix trie size  : %u\n", hmm.suftrie.size());
-#else
-    writer->printf_raw("   Suffix theta      : (DISABLED)\n");
-    writer->printf_raw("   Suffix trie size  : (DISABLED)\n");
-#endif
-    writer->printf_raw("\n");
-    writer->put_comment_block_end();
-  }
+  if (!args.no_header_given)
+    put_hmm_header(writer, hmm);
 }
 
 /*--------------------------------------------------------------------------
