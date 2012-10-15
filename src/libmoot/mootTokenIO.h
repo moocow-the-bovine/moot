@@ -687,7 +687,8 @@ public:
     : tw_format(fmt),
       tw_name(name),
       tw_ostream(NULL),
-      tw_ostream_created(false)
+      tw_ostream_created(false),
+      tw_is_comment_block(false)
   {};
 
   /** Default destructor */
