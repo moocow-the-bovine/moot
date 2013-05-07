@@ -11,6 +11,7 @@ dnl AC_INIT(moot, 2.0.0, moocow@cpan.org)
 
 dnl source && aux dir
 AC_CONFIG_AUX_DIR(config)
+AC_CONFIG_MACRO_DIR(m4)
 
 dnl canonical target (sets $target, $target_(cpu|vendor|os) : used for bindist)
 AC_CANONICAL_TARGET
