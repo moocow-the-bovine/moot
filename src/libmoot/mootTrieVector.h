@@ -467,7 +467,7 @@ public:
   {
     vector_type::clear();
     //-- add root: (mom,mindtr,label,ndtrs,data)
-    push_back(node_type(NoNode,NoNode,0,0,trie_default_data));
+    this->push_back(node_type(NoNode,NoNode,0,0,trie_default_data));
 
     map_iterator       pi;
     size_t             pos;
@@ -492,12 +492,12 @@ public:
 	  dnodid = vector_type::size();
 
 	  //reserve(dnodid);
-	  push_back(node_type(knodid,               // (mom,
-			      NoNode,               //  , mindtr
-			      dlabel,               //  , label
-			      0,                    //  , ndtrs
-			      trie_default_data));  //  , data)
-
+	  this->push_back(node_type(knodid,               // (mom,
+				    NoNode,               //  , mindtr
+				    dlabel,               //  , label
+				    0,                    //  , ndtrs
+				    trie_default_data));  //  , data)
+	  
 	  node_type &mnode = this->operator[](knodid);    //-- get mother-node
 	  ++mnode.ndtrs;                            //-- update num/dtrs for mom
 
