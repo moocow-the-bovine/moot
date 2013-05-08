@@ -28,8 +28,8 @@ WriteMakefile
    LIBS         => "$MOOT_LDFLAGS $MOOT_LIBS",      ##-- additional libraries
    DEFINE       => '-DHAVE_CONFIG_H',     ##-- additional defines
    INC          => $MOOT_IFLAGS,      ##-- additional includes
-   CCFLAGS      => '-Wno-deprecated',          ##-- additional flags
-   OPTIMIZE    => '-O2 -pipe', ##-- optimization flags
+   #CCFLAGS      => '',                ##-- additional(?) flags ... DynaLoader refuses to load on perl v5.14 / 32-bit i686 / debian wheezy if this is set!
+   OPTIMIZE    => '-O2 -pipe -Wno-deprecated', ##-- optimization flags
    OBJECT       => 'Moot.o MootPerl.o',
 
    ##-- install these

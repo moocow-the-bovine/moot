@@ -4,7 +4,7 @@ use 5.008004;
 use strict;
 use warnings;
 use Carp;
-use AutoLoader;
+#use AutoLoader;
 use Exporter;
 
 our @ISA = qw(Exporter);
