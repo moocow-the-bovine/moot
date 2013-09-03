@@ -491,14 +491,16 @@ beam pruning.</p>
 <dd>
 <p>Annotate tagged tokens with lexical ambiguities</p>
 <p>Default: '0'</p>
-<p>Useful for debugging.</p>
+<p>Save tag-wise ambiguity probabilities as analyses following a '@@'.
+Useful for debugging together with the 'Cost' output flag.</p>
 </dd>
 <dt><strong><a name="mark_unknown_m" class="item"><code>--mark-unknown</code> , <code>-m</code></a></strong></dt>
 
 <dd>
 <p>Mark unknown tokens.</p>
 <p>Default: '0'</p>
-<p>Useful for debugging.</p>
+<p>Mark tokens whose literal text is not known to the lexicon by appending a '*' analysis.
+Useful for model debugging.</p>
 </dd>
 </dl>
 <p>

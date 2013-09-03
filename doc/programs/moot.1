@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "MOOT 1"
-.TH MOOT 1 "2013-06-27" "moot v2.0.9-2" "moot PoS Tagger"
+.TH MOOT 1 "2013-09-03" "moot v2.0.9-3" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -592,7 +592,8 @@ Annotate tagged tokens with lexical ambiguities
 .Sp
 Default: '0'
 .Sp
-Useful for debugging.
+Save tag-wise ambiguity probabilities as analyses following a '@@'.
+Useful for debugging together with the 'Cost' output flag.
 .ie n .IP """\-\-mark\-unknown"" , ""\-m""" 4
 .el .IP "\f(CW\-\-mark\-unknown\fR , \f(CW\-m\fR" 4
 .IX Item "--mark-unknown , -m"
@@ -600,7 +601,8 @@ Mark unknown tokens.
 .Sp
 Default: '0'
 .Sp
-Useful for debugging.
+Mark tokens whose literal text is not known to the lexicon by appending a '*' analysis.
+Useful for model debugging.
 .SH "CONFIGURATION FILES"
 .IX Header "CONFIGURATION FILES"
 Configuration files are expected to contain lines of the form:

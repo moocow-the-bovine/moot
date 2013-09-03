@@ -681,7 +681,8 @@ Annotate tagged tokens with lexical ambiguities
 Default: '0'
 
 
-Useful for debugging.
+Save tag-wise ambiguity probabilities as analyses following a '@@'.
+Useful for debugging together with the 'Cost' output flag.
 
 
 
@@ -694,7 +695,8 @@ Mark unknown tokens.
 Default: '0'
 
 
-Useful for debugging.
+Mark tokens whose literal text is not known to the lexicon by appending a '*' analysis.
+Useful for model debugging.
 
 
 
