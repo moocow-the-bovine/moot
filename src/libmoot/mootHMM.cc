@@ -1474,6 +1474,7 @@ void mootHMM::tag_mark_best(ViterbiPathNode *pnod, mootSentence &sentence)
   }
 
   if (save_ambiguities) {
+    //-- save ambiguities?
     mootSentence::reverse_iterator sri;
     ViterbiColumn *c = (vtable && vtable->col_prev ? vtable->col_prev : NULL);
     if (!c) return;
@@ -1481,9 +1482,8 @@ void mootHMM::tag_mark_best(ViterbiPathNode *pnod, mootSentence &sentence)
     for (sri=sentence.rbegin(); c != NULL && sri != sentence.rend(); sri++, c=c->col_prev) {
       if (sri->toktype() != TokTypeVanilla) continue; //-- ignore non-vanilla tokens
 
-      if (save_flavors) {
-	sri->tok_analyses.push_back(mootToken::Analysis(taster.flavor(sri->text())));
-      }
+      //-- append ambiguity-analysis marker
+      sri->tok_analyses.push_back(mootToken::Analysis("@@","@@"));
 
       //-- get total column probability
       ViterbiRow *r;
@@ -1507,11 +1507,22 @@ void mootHMM::tag_mark_best(ViterbiPathNode *pnod, mootSentence &sentence)
 	  (mootToken::Analysis(tagids.id2name(r->tagid),
 			       "",
 			       exp(trowpr)/pcolsum));
-
       }
+    }
+  }
 
-      if (save_mark_unknown && tokids.name2id(sri->text()) == 0) {
-	sri->tok_analyses.push_back(mootToken::Analysis("*","*"));
+  if (save_flavors) {
+    //-- mark flavors?
+    for (mootSentence::iterator si=sentence.begin(); si!=sentence.end(); ++si) {
+      si->tok_analyses.push_back(mootToken::Analysis(taster.flavor("$F=" + si->text())));
+    }
+  }
+
+  if (save_mark_unknown) {
+    //-- mark unknowns?
+    for (mootSentence::iterator si=sentence.begin(); si!=sentence.end(); ++si) {
+      if (tokids.name2id(si->text()) == 0) {
+	si->tok_analyses.push_back(mootToken::Analysis("*","*"));
       }
     }
   }

@@ -150,6 +150,7 @@ void GetMyOptions(int argc, char **argv)
 
   //-- report
   moot_msg(vlevel,vlProgress,"%s: Initialization complete\n", PROGNAME);
+  moot_msg(vlevel,vlInfo,"+ save_mark_unknown = %d\n", hmm.save_mark_unknown);
 
   //-- report to output-file
   if (!args.no_header_given)

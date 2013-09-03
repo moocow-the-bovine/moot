@@ -368,12 +368,14 @@ beam pruning.
 
 flag "save-ambiguities" - "Annotate tagged tokens with lexical ambiguities" \
   details="
-Useful for debugging.
+Save tag-wise ambiguity probabilities as analyses following a '@@'.
+Useful for debugging together with the 'Cost' output flag.
 "
 
 flag "mark-unknown" m "Mark unknown tokens." \
   details="
-Useful for debugging.
+Mark tokens whose literal text is not known to the lexicon by appending a '*' analysis.
+Useful for model debugging.
 "
 
 #-----------------------------------------------------------------------------
