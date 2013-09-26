@@ -11,27 +11,42 @@ use Pod::Usage;
 ##------------------------------------------------------------------------------
 our $prog = basename($0);
 our $outfile = '-';
+our ($word,$tag);
 
 ##------------------------------------------------------------------------------
 ## Command-line
 ##------------------------------------------------------------------------------
 GetOptions(##-- General
 	   'help|h' => \$help,
+	   'word|w=s' => \$word,
+	   'tag|t=s'  => \$tag,
 	  );
 
-pod2usage({-exitval=>0, -verbose=>0}) if ($help || @ARGV < 2);
+pod2usage({-exitval=>0, -verbose=>0}) if ($help);
 
 ##------------------------------------------------------------------------------
 ## MAIN
 
-our $ngin = Moot::Ngrams->new();
-our $ngfile = shift(@ARGV);
-$ngin->load($ngfile) || die("$prog: load failed for n-gram file '$ngfile': $!");
+our $lxin   = Moot::Lexfreqs->new();
+our $lxfile = shift(@ARGV);
+$lxin->load($lxfile) || die("$prog: load failed for lexical-frequency file '$lxfile': $!");
 
-our @ngram = @ARGV[0..($#ARGV >= 2 ? 2 : $#ARGV)];
-our $count = $ngin->lookup(@ngram[0..($#ngram > 2 ? 2 : $#ngram)]);
+$word = shift(@ARGV) if (@ARGV && !$word);
+$tag  = shift(@ARGV) if (@ARGV && !$tag);
+$word //= '';
+$tag  //= '';
+my ($count);
+if ($word ne '' && $tag ne '') {
+  $count = $lxin->f_word_tag($word,$tag);
+} elsif ($word ne '') {
+  $count = $lxin->f_word($word);
+} elsif ($tag ne '') {
+  $count = $lxin->f_tag($tag);
+} else {
+  pod2usage({-exitval=>1, -verbose=>0, -msg=>'You must specify either -word or -tag!'});
+}
 
-print join("\t", @ngram, $count, "\n");
+print join("\t", (map {$_ eq '' ? '*' : $_} ($word,$tag)), $count, "\n");
 
 
 __END__
@@ -40,14 +55,16 @@ __END__
 
 =head1 NAME
 
-  mootlookup-123.perl - lookup N-gram(s) in moot n-gram text model files
+  mootlookup-lex.perl - lookup lexical frequency in moot text model files
 
 =head1 SYNOPSIS
 
- mootlookup-123.perl [OPTIONS] NGRAM_FILE [TAG_STRING(s)...]
+ mootlookup-lex.perl [OPTIONS] LEXFREQ_FILE [WORD [TAG]]
 
  Options:
   -help                     # this help message
+  -word=WORD 		    # get count for WORD (maybe be combined with -tag)
+  -tag=TAG 		    # get count for TAG (may be combined with -word)
 
 =cut
 
