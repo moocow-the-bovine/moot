@@ -55,6 +55,12 @@ Output evaluator for moocow's PoS tagger.
 (L<mooteval>)
 
 
+=item 
+
+
+(L<>)
+
+
 =item mootpp
 
 Rudimentary tokenizer for moocow's part-of-speech tagger.
@@ -71,12 +77,6 @@ moocow's part-of-speech tagger : HMM trainer
 
 moocow's HMM part-of-speech tagger: heuristic token classifier.
 (L<moottaste>)
-
-
-=item 
-
-
-(L<>)
 
 
 =item mootfiles
@@ -172,10 +172,10 @@ mootconfig(1),
 mootdump(1),
 mootdyn(1),
 mooteval(1),
+(1),
 mootpp(1),
 mootrain(1),
 moottaste(1),
-(1),
 mootm(1)
 
 =head1 AUTHOR
