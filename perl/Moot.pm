@@ -67,6 +67,7 @@ for Hidden Markov Model part-of-speech tagging.
 
 =head1 SEE ALSO
 
+Moot::HMM(3perl),
 Moot::Constants(3perl),
 Moot::Lexfreqs(3perl),
 Moot::Ngrams(3perl),
