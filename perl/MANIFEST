@@ -24,5 +24,10 @@ Moot/HMM/Boltzmann.pm
 Moot/HMM/DynLex.pm
 Moot/HMM/Dyn.pm
 
+mootlookup-lex.perl
+mootlookup-123.perl
+mootmerge-lex.perl
+mootmerge-123.perl
+
 t/01_ini.t
 t/common.plt
