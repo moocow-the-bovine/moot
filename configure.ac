@@ -702,20 +702,20 @@ AM_CONDITIONAL(HAVE_PYTHON, [test -n "$PYTHON" -a "$PYTHON" != "no"])
 
 ##------------------------------------------------------------
 ## re2c_ucl
-AC_ARG_ENABLE([re2c-ucl],
-	AC_HELP_STRING([--disable-re2c-ucl],[disable auto-generation of Unicode character class regexes]),
+AC_ARG_ENABLE([re2c-auto],
+	AC_HELP_STRING([--disable-re2c-auto],[disable auto-generation of Unicode regexes]),
 	[],
-	[enable_re2c_ucl=auto])
+	[enable_re2c_auto=auto])
 
-AC_MSG_CHECKING([whether to auto-generate Unicode character class regexes (re2c_ucl)])
-if test -n "$PYTHON" -a "$PYTHON" != "no" -a -n "$RE2C" -a "$RE2C" != "no" -a "$enable_re2c_ucl" != "no" ; then
+AC_MSG_CHECKING([whether to auto-generate Unicode regexes (re2c_ucl, re2c_tolower)])
+if test -n "$PYTHON" -a "$PYTHON" != "no" -a -n "$PERL" -a "$PERL" != "no" -a -n "$RE2C" -a "$RE2C" != "no" -a "$enable_re2c_auto" != "no" ; then
    AC_MSG_RESULT(yes)
-   enable_re2c_ucl=yes
+   enable_re2c_auto=yes
 else
    AC_MSG_RESULT(no)
-   enable_re2c_ucl=no
+   enable_re2c_auto=no
 fi
-AM_CONDITIONAL(HAVE_RE2C_UCL, [test "$enable_re2c_ucl" != "no"])
+AM_CONDITIONAL(ENABLE_RE2C_AUTO, [test "$enable_re2c_auto" != "no"])
 ## /re2c_ucl
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

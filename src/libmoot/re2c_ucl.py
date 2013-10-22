@@ -37,11 +37,7 @@ def script(chr):
 	return 'Unknown'
 
 def convert_hex ( x ):
-	ord_x = ord ( x )
-	if ord_x > 9: 
-		return "\\x%x" % ord_x
-	else:
-		return "\\x0%x" % ord_x
+	return "%0.2x" % ord(x)
 
 def list2string ( data ):
 	last = "\000"

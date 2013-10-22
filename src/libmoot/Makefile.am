@@ -184,11 +184,18 @@ mootNoConfig.h: mootAutoConfig.h.in
 osfcn.h: myosfcn.h
 	cp "$<" "$@"
 
-if HAVE_RE2C_UCL
+if ENABLE_RE2C_AUTO
 wasteScannerScan.re: wasteScannerScan.re.skel re2c_ucl.py
 	$(PYTHON) re2c_ucl.py -o $@ $<
+
+wasteToLower.re: wasteToLower.re.skel re2c_tolower.perl
+	$(PERL) re2c_tolower.perl $< > $@ 2>/dev/null
 else
 wasteScannerScan.re: wasteScannerScan.re.dist
+	-rm -f "$@"
+	cp "$<" "$@"
+
+wasteToLower.re: wasteToLower.re.dist
 	-rm -f "$@"
 	cp "$<" "$@"
 endif
@@ -198,7 +205,7 @@ if HAVE_RE2C
 SUFFIXES: .re
 .re.cc:
 	$(RE2C) -s -o $@ $<
-RE2C_OUT += wasteScannerScan.cc
+RE2C_OUT += wasteScannerScan.cc wasteToLower.cc
 endif
 
 ##-----------------------------------------------------------------------

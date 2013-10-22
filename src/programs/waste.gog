@@ -1,0 +1,98 @@
+# -*- Mode: Shell-Script -*-
+# Getopt::Gen specification for 'waste'
+#-----------------------------------------------------------------------------
+program "waste"
+#program_version "0.01"
+
+purpose	"Low-level rule-based scanner stage for moot/WASTE HMM tokenizer."
+author  "Bryan Jurish <moocow@cpan.org>, Kay-Michael Würzner <wuerzner@bbaw.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details "
+waste is a rudimentary pre-processor for raw text intended
+for use with the 'moot' part-of-speech tagging tools.  It takes
+as its input one or more 'raw' files, and produces a 'rare'
+output file.  Most SGML markup should be eliminated by mootpp.
+See L<mootfiles> for details on moot file formats.
+"
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+argument "FILE(s)" "Input files" \
+    details="See also the --list option."
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+
+int "verbose" v "Verbosity level." \
+    arg="LEVEL" \
+    default="3" \
+    details=`cat verbose.pod`
+
+flag "no-banner" B "Suppress initial banner message (implied at verbosity levels <= 2)" \
+  default="0"
+
+string	"output" o "Write output to FILE." \
+    arg="FILE" \
+    default="-" \
+    details="
+Output files are in 'rare' format: one token per line, a blank line
+indicates a sentence boundary.
+"
+
+flag "list" l "Arguments are input-file lists." \
+    default="0" \
+    details="
+If this flag is given, the FILE(s) arguments should be lists
+of input filenames, one filename per line, which should be
+processed.  Otherwise, the FILE(s) arguments are interpreted
+as filenames of the input files themselves.
+"
+
+flag  "recover"   r  "Attempt to recover from minor errors." \
+    details="
+Minor errors such as missing files, etc. cause an error message to be
+emitted but do not cause the program to abort if this option is specified.
+Useful for large automated batch-processing jobs.
+"
+
+string "output-format" O "Specify output file format." \
+  arg="FORMAT" \
+  details="
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+
+Default='Rare'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+"
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+addenda "
+
+=head2 Caveats
+
+When writing in XML format, you should first ensure that your input data
+is properly encoded in UTF-8.
+
+"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+acknowledge `cat acknowledge.pod`
+
+seealso "
+L<mootfiles>,
+mootm(1),
+L<moot>,
+L<mootchurn>
+"
