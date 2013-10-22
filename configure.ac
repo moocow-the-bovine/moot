@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.9-3])
+define([THE_PACKAGE_VERSION], [2.0.10-pre1])
 define([THE_PACKAGE_MAINTAINER],  [moocow@cpan.org])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -673,6 +673,51 @@ AM_CONDITIONAL(HAVE_OPTGEN, [test "$OPTGEN_PERL" != "no"])
 dnl
 dnl /optgen.perl
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+##------------------------------------------------------------
+## re2c
+AC_ARG_VAR(RE2C,[Path to your re2c executable.])
+if test -z "$RE2C"; then
+  AC_PATH_PROG(RE2C,[re2c],[])
+else
+  AC_MSG_NOTICE([using environment variable RE2C=$RE2C])
+fi
+AC_SUBST(RE2C)
+AM_CONDITIONAL(HAVE_RE2C, [test -n "$RE2C" -a "$RE2C" != "no"])
+## /re2c
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+##------------------------------------------------------------
+## check for python
+AC_ARG_VAR(PYTHON, [Path to your python interpreter.])
+if test -z "$PYTHON" ; then
+  AC_PATH_PROG(PYTHON,[python],[])
+else
+  AC_MSG_NOTICE([using environment variable PYTHON=$PYTHON])
+fi
+AC_SUBST(PYTHON)
+AM_CONDITIONAL(HAVE_PYTHON, [test -n "$PYTHON" -a "$PYTHON" != "no"])
+## /python
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+##------------------------------------------------------------
+## re2c_ucl
+AC_ARG_ENABLE([re2c-ucl],
+	AC_HELP_STRING([--disable-re2c-ucl],[disable auto-generation of Unicode character class regexes]),
+	[],
+	[enable_re2c_ucl=auto])
+
+AC_MSG_CHECKING([whether to auto-generate Unicode character class regexes (re2c_ucl)])
+if test -n "$PYTHON" -a "$PYTHON" != "no" -a -n "$RE2C" -a "$RE2C" != "no" -a "$enable_re2c_ucl" != "no" ; then
+   AC_MSG_RESULT(yes)
+   enable_re2c_ucl=yes
+else
+   AC_MSG_RESULT(no)
+   enable_re2c_ucl=no
+fi
+AM_CONDITIONAL(HAVE_RE2C_UCL, [test "$enable_re2c_ucl" != "no"])
+## /re2c_ucl
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

@@ -175,11 +175,20 @@ mootEventLexer.o: mootEventLexer.h mootEvent.h $(fxx_cc_deps)
 ## Additional rules
 
 mootNoConfig.h: mootAutoConfig.h.in
-	rm -f "$@"
+	-rm -f "$@"
 	cp "$<" "$@"
 
 osfcn.h: myosfcn.h
-	cp $< $@
+	cp "$<" "$@"
+
+if HAVE_RE2C_UCL
+wasteScannerScan.re: wasteScannerScan.re.skel re2c_ucl.py
+	$(PYTHON) re2c_ucl.py -o $@ $<
+else
+wasteScannerScan.re: wasteScannerScan.re.dist
+	-rm -f "$@"
+	cp "$<" "$@"
+endif
 
 ##-----------------------------------------------------------------------
 ## headers
@@ -356,7 +365,7 @@ libmoot_la_LIBADD = gnulib/libgnu.la
 #MOSTLYCLEANFILES =
 
 ## --- clean:  built by 'make'
-CLEANFILES = osfcn.h
+CLEANFILES = osfcn.h *.re
 
 ## --- distclean: built by 'configure'
 #DISTCLEANFILES =
@@ -407,6 +416,8 @@ EXTRA_DIST = \
 	$(FLEXXX_DEPS) \
 	$(BISONXX_DEPS) \
 	myosfcn.h \
+	wasteScannerScan.re.dist \
+	wasteScannerScan.re.skel \
 	gnulib/config.h
 
 dist_old = \
