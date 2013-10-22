@@ -14,8 +14,8 @@ LDFLAGS    ?= $(OFLAGS) -L..
 STATICLIBS ?= ../.libs/libmoot.a
 LIBS       ?= -lz -lrecode -lexpat
 
-KNOWN_TARGETS = toklex tokio hmm+exit dummyhmm kmwio dummyhmm linetag taster streamio
-TARGETS = streamio
+KNOWN_TARGETS = toklex tokio hmm+exit dummyhmm kmwio dummyhmm linetag taster streamio wastescan
+TARGETS = wastescan
 
 all: $(TARGETS)
 
@@ -62,6 +62,9 @@ toklex: toklex.o $(STATICLIBS)
 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 streamio: streamio.o $(STATICLIBS)
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+wastescan: wastescan.o $(STATICLIBS)
 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 ##-- patterns: default

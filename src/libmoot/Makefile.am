@@ -77,7 +77,10 @@ libmoot_la_SOURCES = \
 	\
 	mootUtils.cc \
 	mootModelSpec.cc \
-	mootIO.cc
+	mootIO.cc \
+	\
+	wasteScanner.cc \
+	wasteScannerScan.cc
 
 #	mootCHMM.cc
 #	mootEvent.cc
@@ -190,6 +193,14 @@ wasteScannerScan.re: wasteScannerScan.re.dist
 	cp "$<" "$@"
 endif
 
+RE2C_OUT =
+if HAVE_RE2C
+SUFFIXES: .re
+.re.cc:
+	$(RE2C) -s -o $@ $<
+RE2C_OUT += wasteScannerScan.cc
+endif
+
 ##-----------------------------------------------------------------------
 ## headers
 ##-----------------------------------------------------------------------
@@ -260,6 +271,9 @@ pkginclude_HEADERS = \
 	\
 	mootUtils.h \
 	mootModelSpec.h \
+	\
+	wasteTypes.h \
+	wasteScanner.h \
 	\
 	@INSTALL_OSFCN_H@
 
@@ -365,7 +379,7 @@ libmoot_la_LIBADD = gnulib/libgnu.la
 #MOSTLYCLEANFILES =
 
 ## --- clean:  built by 'make'
-CLEANFILES = osfcn.h *.re
+CLEANFILES = osfcn.h *.re $(RE2C_OUT)
 
 ## --- distclean: built by 'configure'
 #DISTCLEANFILES =
