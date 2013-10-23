@@ -98,7 +98,7 @@ void GetMyOptions(int argc, char **argv)
 
   // -- show banner
   if (!args.no_banner_given)
-    moot_msg(vlevel, vlInfo, moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org>").c_str());
+    moot_msg(vlevel, vlInfo, moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner").c_str());
 
   // -- output file
   if (!out.open(args.output_arg,"w"))
@@ -130,9 +130,23 @@ void GetMyOptions(int argc, char **argv)
 }
 
 /*--------------------------------------------------------------------------
- * guts: scan
+ * guts: -scan -lex
  */
-int scanMain(void) {
+void scan_lex_main(void) {
+  moot_croak("%s: -scan -lex mode not yet implemented!\n", PROGNAME);
+}
+
+/*--------------------------------------------------------------------------
+ * guts: -no-scan -lex
+ */
+void lex_main(void) {
+  moot_croak("%s: -no-scan -lex mode not yet implemented!\n", PROGNAME);
+}
+
+/*--------------------------------------------------------------------------
+ * guts: -scan -no-lex
+ */
+void scan_main(void) {
   wasteScanner scanner;
 
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
@@ -163,10 +177,7 @@ int scanMain(void) {
     }
     writer->printf_comment("$EOF\t%lu 0\tEOF\n", scanner.theByte);
   }
-
-  return 0;
 }
-
 
 /*--------------------------------------------------------------------------
  * main
@@ -175,14 +186,17 @@ int main (int argc, char **argv)
 {
   GetMyOptions(argc,argv);
 
-  if (args.scan_flag && !args.lex_flag) {
-    scanMain();
+  if      (args.scan_flag && args.lex_flag) {
+    scan_lex_main();
   }
   else if (!args.scan_flag && args.lex_flag) {
-    moot_croak("%s: -no-scan -lex mode not yet implemented!\n", PROGNAME);
+    lex_main();
   }
-  else if (args.scan_flag && args.lex_flag) {
-    moot_croak("%s: -scan -lex mode not yet implemented!\n", PROGNAME);
+  else if (args.scan_flag && !args.lex_flag) {
+    scan_main();
+  }
+  else {
+    moot_croak("%s: ERROR: can't handle scan_flag=%d && lex_flag=%d combination!\n", PROGNAME, args.scan_flag, args.lex_flag);
   }
 
   moot_msg(vlevel, vlProgress, " done.\n");

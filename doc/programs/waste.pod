@@ -27,7 +27,7 @@ waste [OPTIONS] FILE(s)
     -S        --no-scan               Disable raw text scanning stage.
     -x        --lex                   Enable lexical classification stage (default).
     -X        --no-lex                Disable lexical classification stage.
-    -IFORMAT  --input-format=FORMAT   Specify input file format (for -no-scan)
+    -IFORMAT  --input-format=FORMAT   Specify input file format for -no-scan mode
     -OFORMAT  --output-format=FORMAT  Specify output file format.
 
 =cut
@@ -246,7 +246,7 @@ Default: '0'
 
 =item C<--input-format=FORMAT> , C<-IFORMAT>
 
-Specify input file format (for -no-scan)
+Specify input file format for -no-scan mode
 
 Default: 'NULL'
 
@@ -390,7 +390,7 @@ class-based HMM tagger / disambiguator.
 
 =head1 AUTHOR
 
-Bryan Jurish E<lt>moocow@cpan.orgE<gt>, Kay-Michael Würzner E<lt>wuerzner@bbaw.deE<gt>
+Bryan Jurish E<lt>moocow@cpan.orgE<gt> and Kay-Michael Würzner E<lt>wuerzner@bbaw.deE<gt>
 
 =head1 SEE ALSO
 
