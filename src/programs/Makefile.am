@@ -19,7 +19,7 @@
 #bin_PROGRAMS = ${prog_1} ... ${prog_N}
 #bin_PROGRAMS = mootpp mootm moothmm moot mootrain
 #bin_PROGRAMS = mootpp moothmm moot mootrain
-bin_PROGRAMS = mootpp mootrain mootcompile mootdump moot mooteval mootchurn moottaste mootdyn
+bin_PROGRAMS = mootpp mootrain mootcompile mootdump moot mooteval mootchurn moottaste mootdyn waste
 #mootngsmooth
 #mootconfig
 
@@ -185,6 +185,15 @@ mootdyn_main.o: mootdyn_cmdparser.h computils.h
 mootdyn_LDFLAGS = $(LDFLAGS_COMMON)
 mootdyn_LDADD = $(LDADD_COMMON)
 EXTRA_DIST += mootdyn.gog
+
+#~~~~~~~~
+waste_SOURCES = \
+	waste_main.cc \
+	waste_cmdparser.cc waste_cmdparser.h
+waste_main.o: waste_cmdparser.h
+waste_LDFLAGS = $(LDFLAGS_COMMON)
+waste_LDADD = $(LDADD_COMMON)
+EXTRA_DIST += waste.gog
 
 
 ##-----------------------------------------------------------------------

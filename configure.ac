@@ -859,6 +859,7 @@ if test "$moot_doc_formats" != "none" ; then
 	mootchurn.gog \
 	moottaste.gog \
 	mootdyn.gog \
+	waste.gog \
 	"
   for g in $DOC_MAN1_GOGS ; do
     AC_CONFIG_LINKS(doc/programs/${g}:src/programs/${g})  

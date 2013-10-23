@@ -8,43 +8,50 @@
 #include <wasteTypes.h>
 #include <mootCxxIO.h>
 
+using namespace moot;
+
 //======================================================================
 const char *token_type_name(int tok)
 {
+  return wasteScannerTypeNames[tok];
+}
+
+const char *token_type_name_OLD(int tok)
+{
   switch (tok) {
-  case TOKEN_UNKNOWN: return "TOKEN_UNKNOWN";
-  case TOKEN_WORD: return "TOKEN_WORD";
-  case TOKEN_HYPH: return "TOKEN_HYPH";
-  case TOKEN_SPACE: return "TOKEN_SPACE";
-  case TOKEN_NL: return "TOKEN_NL";
-  case TOKEN_GREEK: return "TOKEN_GREEK";
-  case TOKEN_NUM: return "TOKEN_NUM";
-  case TOKEN_DOT: return "TOKEN_DOT";
-  case TOKEN_EOS: return "TOKEN_EOS";
-  case TOKEN_COMMA: return "TOKEN_COMMA";
-  case TOKEN_QUOTE: return "TOKEN_QUOTE";
-  case TOKEN_SC: return "TOKEN_SC";
-  case TOKEN_ROMAN_NUM: return "TOKEN_ROMAN_NUM";
-  case STOP_LOWER: return "STOP_LOWER";
-  case STOP_UPPER: return "STOP_UPPER";
-  case STOP_CAPS: return "STOP_CAPS";
-  case LATIN_LOWER: return "LATIN_LOWER";
-  case LATIN_UPPER: return "LATIN_UPPER";
-  case LATIN_CAPS: return "LATIN_CAPS";
-  case TOKEN_MONEY: return "TOKEN_MONEY";
-  case TOKEN_SB: return "TOKEN_SB";
-  case TOKEN_PERCENT: return "TOKEN_PERCENT";
-  case TOKEN_XML: return "TOKEN_XML";
-  case ABBREV: return "ABBREV";
-  case TOKEN_APOS: return "TOKEN_APOS";
-  case TOKEN_PLUS: return "TOKEN_PLUS";
-  case TOKEN_LBR: return "TOKEN_LBR";
-  case TOKEN_RBR: return "TOKEN_RBR";
-  case TOKEN_SLASH: return "TOKEN_SLASH";
-  case TOKEN_COLON: return "TOKEN_COLON";
-  case TOKEN_SEMICOLON: return "TOKEN_SEMICOLON";
-  case TOKEN_WB: return "TOKEN_WB";
-  case TOKEN_REST: return "TOKEN_REST";
+  case wst_TOKEN_UNKNOWN: return "TOKEN_UNKNOWN";
+  case wst_TOKEN_WORD: return "TOKEN_WORD";
+  case wst_TOKEN_HYPH: return "TOKEN_HYPH";
+  case wst_TOKEN_SPACE: return "TOKEN_SPACE";
+  case wst_TOKEN_NL: return "TOKEN_NL";
+  case wst_TOKEN_GREEK: return "TOKEN_GREEK";
+  case wst_TOKEN_NUM: return "TOKEN_NUM";
+  case wst_TOKEN_DOT: return "TOKEN_DOT";
+  case wst_TOKEN_EOS: return "TOKEN_EOS";
+  case wst_TOKEN_COMMA: return "TOKEN_COMMA";
+  case wst_TOKEN_QUOTE: return "TOKEN_QUOTE";
+  case wst_TOKEN_SC: return "TOKEN_SC";
+  case wst_TOKEN_ROMAN_NUM: return "TOKEN_ROMAN_NUM";
+  case wst_STOP_LOWER: return "STOP_LOWER";
+  case wst_STOP_UPPER: return "STOP_UPPER";
+  case wst_STOP_CAPS: return "STOP_CAPS";
+  case wst_LATIN_LOWER: return "LATIN_LOWER";
+  case wst_LATIN_UPPER: return "LATIN_UPPER";
+  case wst_LATIN_CAPS: return "LATIN_CAPS";
+  case wst_TOKEN_MONEY: return "TOKEN_MONEY";
+  case wst_TOKEN_SB: return "TOKEN_SB";
+  case wst_TOKEN_PERCENT: return "TOKEN_PERCENT";
+  case wst_TOKEN_XML: return "TOKEN_XML";
+  case wst_ABBREV: return "ABBREV";
+  case wst_TOKEN_APOS: return "TOKEN_APOS";
+  case wst_TOKEN_PLUS: return "TOKEN_PLUS";
+  case wst_TOKEN_LBR: return "TOKEN_LBR";
+  case wst_TOKEN_RBR: return "TOKEN_RBR";
+  case wst_TOKEN_SLASH: return "TOKEN_SLASH";
+  case wst_TOKEN_COLON: return "TOKEN_COLON";
+  case wst_TOKEN_SEMICOLON: return "TOKEN_SEMICOLON";
+  case wst_TOKEN_WB: return "TOKEN_WB";
+  case wst_TOKEN_REST: return "TOKEN_REST";
   default: break;
   }
   return "";
@@ -93,7 +100,7 @@ int main ( int argc, char* argv[] )
 
     switch ( rtok )
     {
-      case TOKEN_NL:
+      case wst_TOKEN_NL:
 	s_text = "\\n";
 	break;
       default:

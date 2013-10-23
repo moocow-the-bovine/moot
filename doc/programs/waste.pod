@@ -1,0 +1,406 @@
+
+=pod
+
+=head1 NAME
+
+waste - Low-level rule-based scanner stage for moot/WASTE HMM tokenizer.
+
+
+
+=head1 SYNOPSIS
+
+waste [OPTIONS] FILE(s)
+
+ Arguments:
+    FILE(s)  Input files
+
+ Options
+    -h        --help                  Print help and exit.
+    -V        --version               Print version and exit.
+    -cFILE    --rcfile=FILE           Read an alternate configuration file.
+    -vLEVEL   --verbose=LEVEL         Verbosity level.
+    -B        --no-banner             Suppress initial banner message (implied at verbosity levels <= 2)
+    -oFILE    --output=FILE           Write output to FILE.
+    -l        --list                  Arguments are input-file lists.
+    -r        --recover               Attempt to recover from minor errors.
+    -s        --scan                  Enable raw text scanning stage (default).
+    -S        --no-scan               Disable raw text scanning stage.
+    -x        --lex                   Enable lexical classification stage (default).
+    -X        --no-lex                Disable lexical classification stage.
+    -IFORMAT  --input-format=FORMAT   Specify input file format (for -no-scan)
+    -OFORMAT  --output-format=FORMAT  Specify output file format.
+
+=cut
+
+###############################################################
+# Description
+###############################################################
+=pod
+
+=head1 DESCRIPTION
+
+Low-level rule-based scanner stage for moot/WASTE HMM tokenizer.
+
+
+waste is a low-level rule-based scanner stage for the moot/WASTE HMM
+tokenizer system.  It takes as its input one or more 'raw' files, and produces
+a 'medium' or 'medium-rare'  output file.
+See L<mootfiles> for details on moot file formats.
+
+
+=cut
+
+###############################################################
+# Arguments
+###############################################################
+=pod
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item C<FILE(s)>
+
+Input files
+
+See also the --list option.
+
+=back
+
+
+
+=cut
+
+
+###############################################################
+# Options
+###############################################################
+=pod
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--help> , C<-h>
+
+Print help and exit.
+
+Default: '0'
+
+
+
+
+=item C<--version> , C<-V>
+
+Print version and exit.
+
+Default: '0'
+
+
+
+
+=item C<--rcfile=FILE> , C<-cFILE>
+
+Read an alternate configuration file.
+
+Default: 'NULL'
+
+See also: L<CONFIGURATION FILES>.
+
+
+
+
+=item C<--verbose=LEVEL> , C<-vLEVEL>
+
+Verbosity level.
+
+Default: '3'
+
+Be more or less verbose.  Recognized values are in the range 0..6:
+
+=over 4
+
+=item 0 (silent)
+
+Disable all diagnostic messages.
+
+=item 1 (errors)
+
+Print error messages to stderr.
+
+=item 2 (warnings)
+
+Print warnings to stderr.
+
+=item 3 (info)
+
+Print general diagnostic information to stderr.
+
+=item 4 (progress)
+
+Print progress information to stderr.
+
+=item 5 (debug)
+
+Print debugging information to stderr (if applicable).
+
+=item 6 (trace)
+
+Print execution trace information to stderr (if applicable).
+
+=back
+
+
+
+
+
+=item C<--no-banner> , C<-B>
+
+Suppress initial banner message (implied at verbosity levels E<lt>= 2)
+
+Default: '0'
+
+
+
+
+=item C<--output=FILE> , C<-oFILE>
+
+Write output to FILE.
+
+Default: '-'
+
+
+Output files are in 'rare' format: one token per line, a blank line
+indicates a sentence boundary.
+
+
+
+
+
+=item C<--list> , C<-l>
+
+Arguments are input-file lists.
+
+Default: '0'
+
+
+If this flag is given, the FILE(s) arguments should be lists
+of input filenames, one filename per line, which should be
+processed.  Otherwise, the FILE(s) arguments are interpreted
+as filenames of the input files themselves.
+
+
+
+
+
+=item C<--recover> , C<-r>
+
+Attempt to recover from minor errors.
+
+Default: '0'
+
+
+Minor errors such as missing files, etc. cause an error message to be
+emitted but do not cause the program to abort if this option is specified.
+Useful for large automated batch-processing jobs.
+
+
+
+
+
+=item C<--scan> , C<-s>
+
+Enable raw text scanning stage (default).
+
+Default: '1'
+
+
+
+
+=item C<--no-scan> , C<-S>
+
+Disable raw text scanning stage.
+
+Default: '0'
+
+
+
+
+=item C<--lex> , C<-x>
+
+Enable lexical classification stage (default).
+
+Default: '1'
+
+
+
+
+=item C<--no-lex> , C<-X>
+
+Disable lexical classification stage.
+
+Default: '0'
+
+
+
+
+=item C<--input-format=FORMAT> , C<-IFORMAT>
+
+Specify input file format (for -no-scan)
+
+Default: 'NULL'
+
+
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.  Only meaningful if the scanner stage has been
+disabled with the -no-scan (-S) option.
+
+Default='Text,Location'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+
+
+
+
+
+=item C<--output-format=FORMAT> , C<-OFORMAT>
+
+Specify output file format.
+
+Default: 'NULL'
+
+
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.
+
+Default='MediumRare,Location'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+
+
+
+
+
+=back
+
+
+
+
+=cut
+
+###############################################################
+# configuration files
+###############################################################
+=pod
+
+=head1 CONFIGURATION FILES
+
+Configuration files are expected to contain lines of the form:
+
+    LONG_OPTION_NAME    OPTION_VALUE
+
+where LONG_OPTION_NAME is the long name of some option,
+without the leading '--', and OPTION_VALUE is the value for
+that option, if any.  Fields are whitespace-separated.
+Blank lines and comments (lines beginning with '#')
+are ignored.
+
+No configuration files are read by default.
+
+=cut
+
+
+
+###############################################################
+# Addenda
+###############################################################
+=pod
+
+=head1 ADDENDA
+
+
+
+=head2 Caveats
+
+When writing in XML format, you should first ensure that your input data
+is properly encoded in UTF-8.
+
+
+
+=head2 About this Document
+
+Documentation file auto-generated by optgen.perl version 0.07
+using Getopt::Gen version 0.13.
+Translation was initiated
+as:
+
+   optgen.perl -l --nocfile --nohfile --notimestamp -F waste waste.gog
+
+=cut
+
+
+###############################################################
+# Bugs
+###############################################################
+=pod
+
+=head1 BUGS AND LIMITATIONS
+
+Unknown.
+
+=cut
+
+###############################################################
+# Footer
+###############################################################
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+
+Development of this package was supported by the project
+'Kollokationen im WE<ouml>rterbuch'
+( "collocations in the dictionary", http://www.bbaw.de/forschung/kollokationen )
+in association with the project
+'Digitales WE<ouml>rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
+( "digital dictionary of the German language of the 20th century", http://www.dwds.de )
+at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de )
+with funding from
+the Alexander von Humboldt Stiftung ( http://www.avh.de )
+and from the Zukunftsinvestitionsprogramm of the
+German federal government.
+
+I am grateful to Christiane Fellbaum, Alexander Geyken,
+Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
+for offering useful insights in the course of development
+of this package.
+
+Thomas Hanneforth wrote and maintains the libFSM C++ library
+for finite-state device operations used by the
+class-based HMM tagger / disambiguator, without which
+this package could not have been built.
+
+Alexander Geyken and Thomas Hanneforth developed the
+rule-based morphological analysis system for German
+which was used in the development and testing of the
+class-based HMM tagger / disambiguator.
+
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>, Kay-Michael Würzner E<lt>wuerzner@bbaw.deE<gt>
+
+=head1 SEE ALSO
+
+
+L<mootfiles>,
+mootm(1),
+L<moot>,
+L<mootchurn>
+
+
+=cut
+
+

@@ -12,10 +12,9 @@ on_reparse "warn"
 # Details
 #-----------------------------------------------------------------------------
 details "
-waste is a rudimentary pre-processor for raw text intended
-for use with the 'moot' part-of-speech tagging tools.  It takes
-as its input one or more 'raw' files, and produces a 'rare'
-output file.  Most SGML markup should be eliminated by mootpp.
+waste is a low-level rule-based scanner stage for the moot/WASTE HMM
+tokenizer system.  It takes as its input one or more 'raw' files, and produces
+a 'medium' or 'medium-rare'  output file.
 See L<mootfiles> for details on moot file formats.
 "
 
@@ -61,6 +60,31 @@ emitted but do not cause the program to abort if this option is specified.
 Useful for large automated batch-processing jobs.
 "
 
+flag "scan"	  s  "Enable raw text scanning stage (default)." \
+    default="1" \
+    code="'args_info->scan_flag=1;'"
+flag "no-scan"	  S  "Disable raw text scanning stage." \
+    code="'args_info->scan_flag=0;'"
+
+flag "lex"	  x  "Enable lexical classification stage (default)." \
+    default="1" \
+    code="'args_info->lex_flag=1;'"
+flag "no-lex"	  X  "Disable lexical classification stage." \
+    code="'args_info->lex_flag=0;'"
+
+string "input-format" I "Specify input file format (for -no-scan)" \
+  arg="FORMAT" \
+  details="
+Value should be a comma-separated list of format flag names,
+optionally prefixed with an exclamation point (!) to indicate
+negation.  Only meaningful if the scanner stage has been
+disabled with the -no-scan (-S) option.
+
+Default='Text,Location'
+
+See 'I/O Format Flags' in L<mootfiles> for details.
+"
+
 string "output-format" O "Specify output file format." \
   arg="FORMAT" \
   details="
@@ -68,7 +92,7 @@ Value should be a comma-separated list of format flag names,
 optionally prefixed with an exclamation point (!) to indicate
 negation.
 
-Default='Rare'
+Default='MediumRare,Location'
 
 See 'I/O Format Flags' in L<mootfiles> for details.
 "

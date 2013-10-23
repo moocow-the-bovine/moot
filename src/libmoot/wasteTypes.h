@@ -19,7 +19,7 @@
 */
 
 /*--------------------------------------------------------------------------
- * File: wasteToLower.h
+ * File: wasteTypes.h
  * Author: Bryan Jurish <moocow@cpan.org>, Kay-Michael Würzner
  * Description:
  *   + moot PoS tagger : WASTE HMM tokenizer: common definitions
@@ -32,57 +32,67 @@
 #ifndef _WASTE_TYPES_H
 #define _WASTE_TYPES_H
 
-// scanner return value semantics
+namespace moot {
 
-#define TOKEN_UNKNOWN    -1
-#define TOKEN_EOF        0
-#define TOKEN_WORD       1
-#define TOKEN_HYPH       2
+/** return value enum for wasteScanner::yylex() */
+enum wasteScannerTypeE {
+  wst_TOKEN_EOF,
+  wst_TOKEN_UNKNOWN,
+  wst_TOKEN_WORD,
+  wst_TOKEN_HYPH,
 
-#define TOKEN_SPACE      3
-#define TOKEN_NL         4
+  wst_TOKEN_SPACE,
+  wst_TOKEN_NL,
 
-#define TOKEN_GREEK      5
+  wst_TOKEN_GREEK,
 
-#define TOKEN_NUM        6
-#define TOKEN_DOT        7
-#define TOKEN_EOS        8
-#define TOKEN_COMMA      9
-#define TOKEN_QUOTE     10
-#define TOKEN_SC        11
-#define TOKEN_ROMAN_NUM 12
+  wst_TOKEN_NUM,
+  wst_TOKEN_DOT,
+  wst_TOKEN_EOS,
+  wst_TOKEN_COMMA,
+  wst_TOKEN_QUOTE,
+  wst_TOKEN_SC,
+  wst_TOKEN_ROMAN_NUM,
 
-#define STOP_LOWER      13
-#define STOP_UPPER      14
-#define STOP_CAPS       15
+  wst_STOP_LOWER,
+  wst_STOP_UPPER,
+  wst_STOP_CAPS,
 
-#define LATIN_LOWER     16
-#define LATIN_UPPER     17
-#define LATIN_CAPS      18
+  wst_LATIN_LOWER,
+  wst_LATIN_UPPER,
+  wst_LATIN_CAPS,
 
-#define TOKEN_MONEY     19
-#define TOKEN_SB        20
+  wst_TOKEN_MONEY,
+  wst_TOKEN_SB,
 
-#define LATIN_LOWER_TRUNC     21
-#define LATIN_LOWER_TRUNC1    22
-#define LATIN_LOWER_TRUNC2    23
-#define TOKEN_TRUNC     24
+  wst_LATIN_LOWER_TRUNC,
+  wst_LATIN_LOWER_TRUNC1,
+  wst_LATIN_LOWER_TRUNC2,
+  wst_TOKEN_TRUNC,
 
-#define TOKEN_PERCENT   25
+  wst_TOKEN_PERCENT,
 
-#define TOKEN_XML       26
+  wst_TOKEN_XML,
 
-#define ABBREV          27
-#define TOKEN_APOS      28
-#define TOKEN_PLUS      29
-#define TOKEN_LBR       30
-#define TOKEN_RBR       31
-#define TOKEN_SLASH     32
-#define TOKEN_COLON     33
-#define TOKEN_SEMICOLON 34
+  wst_ABBREV,
+  wst_TOKEN_APOS,
+  wst_TOKEN_PLUS,
+  wst_TOKEN_LBR,
+  wst_TOKEN_RBR,
+  wst_TOKEN_SLASH,
+  wst_TOKEN_COLON,
+  wst_TOKEN_SEMICOLON,
 
-#define TOKEN_WB        35
-#define TOKEN_REST     100
+  wst_TOKEN_WB,
+  wst_TOKEN_REST,
+
+  wst_N_TYPES
+};
+
+/** Useful for debugging waste-scanner types */
+extern const char *wasteScannerTypeNames[wst_N_TYPES];
+
+}; /*--/namespace moot --*/
 
 #endif /* _WASTE_TYPES_H */
 

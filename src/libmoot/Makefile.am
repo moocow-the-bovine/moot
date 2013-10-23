@@ -81,6 +81,7 @@ libmoot_la_SOURCES = \
 	mootModelSpec.cc \
 	mootIO.cc \
 	\
+	wasteTypes.cc \
 	wasteScanner.cc \
 	wasteScannerScan.cc \
 	wasteCase.cc

@@ -358,35 +358,35 @@ Any = Any1|Any2|Any3;
 	XML                     = "<"[/]?[a-zA-Z?][^<>\n]*">";
 	*/
 
-	//"$SB$" (WS* "$SB$")*     { add_columns( yyleng() ); return TOKEN_SB; }
+	//"$SB$" (WS* "$SB$")*     { add_columns( yyleng() ); return wst_TOKEN_SB; }
     /*!re2c
 
 	"%%"[^%\n]+"%%"          { add_columns( yyleng() ); goto std; }
 
-	"$WB$"                   { add_columns( yyleng() ); return TOKEN_WB; }
-	"$SB$"                   { add_columns( yyleng() ); return TOKEN_SB; }
+	"$WB$"                   { add_columns( yyleng() ); return wst_TOKEN_WB; }
+	"$SB$"                   { add_columns( yyleng() ); return wst_TOKEN_SB; }
 
-	XML                      { add_columns( yyleng() ); return TOKEN_XML; }
+	XML                      { add_columns( yyleng() ); return wst_TOKEN_XML; }
 
-        LINK2                    { add_columns( yyleng() ); return TOKEN_REST; }
+        LINK2                    { add_columns( yyleng() ); return wst_TOKEN_REST; }
 
-	ROMAN                    { add_columns( yyleng() ); return TOKEN_ROMAN_NUM; }
-        LATIN+	                 { add_columns( yyleng() ); return LATIN_LOWER; }
+	ROMAN                    { add_columns( yyleng() ); return wst_TOKEN_ROMAN_NUM; }
+        LATIN+	                 { add_columns( yyleng() ); return wst_LATIN_LOWER; }
 
-        Greek+                   { add_columns( yyleng() ); return TOKEN_GREEK; }
+        Greek+                   { add_columns( yyleng() ); return wst_TOKEN_GREEK; }
 
-	NUMBER                   { add_columns( yyleng() ); return TOKEN_NUM; }
+	NUMBER                   { add_columns( yyleng() ); return wst_TOKEN_NUM; }
 
-	HYPH                     { add_columns( yyleng() ); return TOKEN_HYPH; }
-	SC                       { add_columns( yyleng() ); return TOKEN_SC; }
+	HYPH                     { add_columns( yyleng() ); return wst_TOKEN_HYPH; }
+	SC                       { add_columns( yyleng() ); return wst_TOKEN_SC; }
 
-	WS*[\n]WS*               { add_columns( yyleng() ); return TOKEN_NL; }
+	WS*[\n]WS*               { add_columns( yyleng() ); return wst_TOKEN_NL; }
 
-        WS+                      { add_columns( yyleng() ); return TOKEN_SPACE; }
+        WS+                      { add_columns( yyleng() ); return wst_TOKEN_SPACE; }
 
-	Lo|Lt                    { add_columns( yyleng() ); return TOKEN_REST; }
+	Lo|Lt                    { add_columns( yyleng() ); return wst_TOKEN_REST; }
 
-        ANY_CHARACTER            { add_columns( yyleng() ); return TOKEN_REST; }
+        ANY_CHARACTER            { add_columns( yyleng() ); return wst_TOKEN_REST; }
 
     */
 }

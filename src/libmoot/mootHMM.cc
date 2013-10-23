@@ -1929,13 +1929,16 @@ void mootHMM::txtdump(FILE *file, bool dump_constants, bool dump_lexprobs, bool 
   //--/dump_suftrie
 
   if (dump_ngprobs) {
+    long unsigned int n_tags_lu = n_tags;
+    long unsigned int ng_array_size = n_tags_lu * n_tags_lu * n_tags_lu;
+
     fprintf(file, "\n");
     fprintf(file, "%%%%-----------------------------------------------------\n");
     fprintf(file, "%%%% N-gram (Uni-, Bi-, and Trigram) Probabilities\n");
     fprintf(file, "%%%%  + n_tags = %zu\n", n_tags);
     fprintf(file, "%%%%  + tagids_size = %u\n", tagids.size());
     fprintf(file, "%%%%  + hash_size = %zu\n", ngprobsh.size());
-    fprintf(file, "%%%%  + array_size = %lu\n", (hash_ngrams ? 0 : (n_tags*n_tags*n_tags)));
+    fprintf(file, "%%%%  + array_size = %lu\n", (hash_ngrams ? 0 : ng_array_size));
     fprintf(file, "%%%% Tag1Id(\"Tag1Str\")\tTag2Id(\"Tag2Str\")\tTag3Id(\"Tag3Str\")\tlog(p(Tag3|Tag1,Tag2))\tp\n");
     fprintf(file, "%%%%-----------------------------------------------------\n");
     TagID pptagid;
