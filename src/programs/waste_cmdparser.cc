@@ -63,7 +63,7 @@
 void
 cmdline_parser_print_version (void)
 {
-  printf("waste (%s %s) by Bryan Jurish <moocow@cpan.org>, Kay-Michael Würzner <wuerzner@bbaw.de>\n", PACKAGE, VERSION);
+  printf("waste (%s %s) by Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner <wuerzner@bbaw.de>\n", PACKAGE, VERSION);
 }
 
 void
@@ -95,7 +95,7 @@ cmdline_parser_print_help (void)
   printf("   -S        --no-scan               Disable raw text scanning stage.\n");
   printf("   -x        --lex                   Enable lexical classification stage (default).\n");
   printf("   -X        --no-lex                Disable lexical classification stage.\n");
-  printf("   -IFORMAT  --input-format=FORMAT   Specify input file format (for -no-scan)\n");
+  printf("   -IFORMAT  --input-format=FORMAT   Specify input file format for -no-scan mode\n");
   printf("   -OFORMAT  --output-format=FORMAT  Specify output file format.\n");
 }
 
@@ -359,7 +359,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->lex_flag=0;
           break;
         
-        case 'I':	 /* Specify input file format (for -no-scan) */
+        case 'I':	 /* Specify input file format for -no-scan mode */
           if (args_info->input_format_given) {
             fprintf(stderr, "%s: `--input-format' (`-I') option given more than once\n", PROGRAM);
           }
@@ -505,7 +505,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->lex_flag=0;
           }
           
-          /* Specify input file format (for -no-scan) */
+          /* Specify input file format for -no-scan mode */
           else if (strcmp(olong, "input-format") == 0) {
             if (args_info->input_format_given) {
               fprintf(stderr, "%s: `--input-format' (`-I') option given more than once\n", PROGRAM);

@@ -5,7 +5,7 @@ program "waste"
 #program_version "0.01"
 
 purpose	"Low-level rule-based scanner stage for moot/WASTE HMM tokenizer."
-author  "Bryan Jurish <moocow@cpan.org>, Kay-Michael Würzner <wuerzner@bbaw.de>"
+author  "Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner <wuerzner@bbaw.de>"
 on_reparse "warn"
 
 #-----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ flag "lex"	  x  "Enable lexical classification stage (default)." \
 flag "no-lex"	  X  "Disable lexical classification stage." \
     code="'args_info->lex_flag=0;'"
 
-string "input-format" I "Specify input file format (for -no-scan)" \
+string "input-format" I "Specify input file format for -no-scan mode" \
   arg="FORMAT" \
   details="
 Value should be a comma-separated list of format flag names,

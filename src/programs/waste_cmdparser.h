@@ -29,7 +29,7 @@ struct gengetopt_args_info {
   int no_scan_flag;	 /* Disable raw text scanning stage. (default=0). */
   int lex_flag;	 /* Enable lexical classification stage (default). (default=1). */
   int no_lex_flag;	 /* Disable lexical classification stage. (default=0). */
-  char * input_format_arg;	 /* Specify input file format (for -no-scan) (default=NULL). */
+  char * input_format_arg;	 /* Specify input file format for -no-scan mode (default=NULL). */
   char * output_format_arg;	 /* Specify output file format. (default=NULL). */
 
   int help_given;	 /* Whether help was given */
