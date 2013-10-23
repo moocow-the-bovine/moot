@@ -438,13 +438,13 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
   //--------------------------------------
   // compile: common variables
   TokID                       tokid;          //-- current token-ID
-  FlavorID                    flavid;         //-- current token-flavor-ID
   LexClass                    lclass;         //-- current lexical class
   ClassID                     classid;        //-- current lexical class-ID
   TagID                       tagid;          //-- current tag-ID
   TagID                       tagid2;         //-- next tag-ID (for bigrams)
   TagID                       tagid3;         //-- next-next tag-ID (for trigrams)
   /*-- v2.0.9-1: disabled special handling of "unknown" token and class
+  FlavorID                    flavid;         //-- current token-flavor-ID
   mootLexfreqs::LexfreqCount unTotal = 0 ;    //-- total "unknown" token count
   LexProbSubTable            &untagcts        //-- "unknown" tag counts (later, probabilites)
       = lexprobs[0];
@@ -464,9 +464,8 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
     //-- sanity check
     if (toktotal == 0) continue;
 
-    //-- get token flavor, id
+    //-- get token id
     tokid  = token2id(tokstr);  //-- token or flavor id
-    flavid = taster.flavor_id(tokstr);
 
     //-- ... for all tags occurring with this token(lftagi)
     for (mootLexfreqs::LexfreqSubtable::const_iterator lftagi = entry.freqs.begin(); lftagi != entry.freqs.end(); ++lftagi) {
@@ -480,41 +479,12 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
       //-- get tag-ID
       tagid  = tagids.name2id(tagstr);
 	
-#if 0
-      //-- "unknown" token check (disabled, v2.0.9-1)
-      if (flavid == taster.noid && toktotal <= unknown_lex_threshhold) { //-- dubious
-	//-- "unknown" token: just store the raw counts for now
-
-	//-- ... and add to "unknown" counts
-	unTotal += tagcount;
-	LexProbSubTable::iterator lpsi = untagcts.find(tagid);
-	if (lpsi == untagcts.end()) {
-	  untagcts[tagid] = tagcount;
-	} else {
-	  lpsi->second += tagcount;
-	}
-      }
-      if (tokid != 0) {
-	//-- it's a kosher token (too?): compute lexical probability: p(tok|tag)
-	lexprobs[tokid][tagid] = tagcount / tagtotal;
-      }
-#else
       //-- v2.0.9-1: always compute lexical probability: p(tok|tag)
       lexprobs[tokid][tagid] = tagcount / tagtotal;
-#endif
     }
   }
 
   if (lexprobs.size() == 0) lexprobs.resize(1); //-- ensure at least a lexical entry for the "unknown" token
-#if 0
-  //-- Normalize "unknown" lexical probabilities (disabled, v2.0.9-1)
-  for (LexProbSubTable::iterator lpsi = untagcts.begin(); lpsi != untagcts.end(); ++lpsi) {
-    if (lpsi->second == 0) continue;
-    const mootTagString &tagstr = tagids.id2name(lpsi->first);
-    const mootLexfreqs::LexfreqCount tagtotal = lexfreqs.taglookup(tagstr);
-    lpsi->second /= tagtotal;
-  }
-#endif
 
   //--------------------------------------
   // compile: lexical classes
@@ -546,41 +516,11 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 	//-- get tag-ID
 	tagid  = tagids.name2id(ctagstr);
 
-#if 0
-	//-- unknown class check (v2.0.9-1: disabled)
-	if ( !uclass.empty() && (classtotal <= unknown_class_threshhold || lclass.empty()) ) {
-	  //-- "unknown" class: just store the raw counts for now
-	  LexClassProbSubTable::iterator lcpsi = unctagcts.find(tagid);
-	  if (lcpsi == unctagcts.end()) {
-	    unctagcts[tagid] = ctagcount;
-	  } else {
-	    lcpsi->second += ctagcount;
-	  }
-	}
-	if (classid != 0) {
-	  //-- it's a kosher class (too?): compute class probability: p(class|tag)
-	  lcprobs[classid][tagid] = ctagcount / ctagtotal;
-	}
-#else
 	//-- v2.0.9-1: always compute class probability: p(class|tag)
 	lcprobs[classid][tagid] = ctagcount / ctagtotal;
-#endif
       }
     }
 
-#if 0
-    //--------------------------------------
-    // compile: lexical classes: unknown (v2.0.9-1: disabled)
-
-    //-- Normalize "unknown" class probabilities
-    if (!unctagcts.empty()) {
-      for (LexClassProbSubTable::iterator lcpsi = unctagcts.begin(); lcpsi != unctagcts.end(); ++lcpsi) {
-	const mootTagString   &tagstr = tagids.id2name(lcpsi->first);
-	const CountT        ctagtotal = classfreqs.taglookup(tagstr);
-	lcpsi->second                /= ctagtotal;
-      }
-    }
-#endif
   }
 
   //--------------------------------------
@@ -588,12 +528,10 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
 
   //-- Compute ngram probabilites
   ProbT ugtotal = ngrams.ugtotal - ngrams.lookup(start_tag_str);
-  ProbT f;
 
   for (mootNgrams::NgramTable::const_iterator ngi1 = ngrams.ngtable.begin(); ngi1 != ngrams.ngtable.end(); ++ngi1) {
     //-- look at unigrams first : get ID
     tagid = tagids.name2id(ngi1->first);
-    f     = ngi1->second.count;
 
     //-- compute unigram probability, storing as '0 0 $tagid'
     set_ngram_prob((ngi1->second.count / ugtotal), 0,0,tagid);
@@ -605,7 +543,6 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
     for (mootNgrams::BigramTable::const_iterator ngi2 = ngi1->second.freqs.begin(); ngi2 != ngi1->second.freqs.end(); ++ngi2) {
       //-- get ID
       tagid2 = tagids.name2id(ngi2->first);
-      f      = ngi2->second.count;
 
       //-- compute bigram probability, storing as '0 $tagid1 $tagid2'
       set_ngram_prob((ngi2->second.count / ngi1->second.count), 0,tagid,tagid2);
@@ -614,7 +551,6 @@ bool mootHMM::compile(const mootLexfreqs &lexfreqs,
       for (mootNgrams::TrigramTable::const_iterator ngi3 = ngi2->second.freqs.begin(); ngi3 != ngi2->second.freqs.end(); ++ngi3) {
 	//-- get ID
 	tagid3 = tagids.name2id(ngi3->first);
-	f      = ngi3->second;
 
 	//-- compute trigram probability, storing as '$tagid1 $tagid2 $tagid3'
 	set_ngram_prob((ngi3->second / ngi2->second.count), tagid,tagid2,tagid3);

@@ -28,6 +28,8 @@ lib_LTLIBRARIES = libmoot.la
 ## --- manpages -- section is auto-detected
 #man_MANS = ${man_1} ... ${man_N}
 
+.DELETE_ON_ERROR:
+
 ##-----------------------------------------------------------------------
 ## sources
 ##-----------------------------------------------------------------------
@@ -80,7 +82,8 @@ libmoot_la_SOURCES = \
 	mootIO.cc \
 	\
 	wasteScanner.cc \
-	wasteScannerScan.cc
+	wasteScannerScan.cc \
+	wasteCase.cc
 
 #	mootCHMM.cc
 #	mootEvent.cc
@@ -188,14 +191,14 @@ if ENABLE_RE2C_AUTO
 wasteScannerScan.re: wasteScannerScan.re.skel re2c_ucl.py
 	$(PYTHON) re2c_ucl.py -o $@ $<
 
-wasteToLower.re: wasteToLower.re.skel re2c_tolower.perl
-	$(PERL) re2c_tolower.perl $< > $@ 2>/dev/null
+wasteCase.re: wasteCase.re.skel re2c_case.perl
+	$(PERL) re2c_case.perl $< > $@ 2>/dev/null
 else
 wasteScannerScan.re: wasteScannerScan.re.dist
 	-rm -f "$@"
 	cp "$<" "$@"
 
-wasteToLower.re: wasteToLower.re.dist
+wasteCase.re: wasteCase.re.dist
 	-rm -f "$@"
 	cp "$<" "$@"
 endif
@@ -204,8 +207,8 @@ RE2C_OUT =
 if HAVE_RE2C
 SUFFIXES: .re
 .re.cc:
-	$(RE2C) -s -o $@ $<
-RE2C_OUT += wasteScannerScan.cc wasteToLower.cc
+	$(RE2C) -i -s -o $@ $<
+RE2C_OUT += wasteScannerScan.cc wasteCase.cc
 endif
 
 ##-----------------------------------------------------------------------
@@ -281,6 +284,7 @@ pkginclude_HEADERS = \
 	\
 	wasteTypes.h \
 	wasteScanner.h \
+	wasteCase.h \
 	\
 	@INSTALL_OSFCN_H@
 
@@ -415,6 +419,8 @@ MAINTAINERCLEANFILES = \
 	mootClassfreqsLexer.cc mootClassfreqsLexer.h \
 	mootClassfreqsParser.cc mootClassfreqsParser.h \
 	\
+	$(RE2C_OUT) \
+	\
 	gmon.out
 
 ##-----------------------------------------------------------------------
@@ -439,6 +445,8 @@ EXTRA_DIST = \
 	myosfcn.h \
 	wasteScannerScan.re.dist \
 	wasteScannerScan.re.skel \
+	wasteCase.re.dist \
+	wasteCase.re.skel \
 	gnulib/config.h
 
 dist_old = \

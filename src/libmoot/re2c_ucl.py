@@ -37,7 +37,7 @@ def script(chr):
 	return 'Unknown'
 
 def convert_hex ( x ):
-	return "%0.2x" % ord(x)
+	return "\\x%0.2x" % ord(x)
 
 def list2string ( data ):
 	last = "\000"

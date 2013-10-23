@@ -14,8 +14,8 @@ LDFLAGS    ?= $(OFLAGS) -L..
 STATICLIBS ?= ../.libs/libmoot.a
 LIBS       ?= -lz -lrecode -lexpat
 
-KNOWN_TARGETS = toklex tokio hmm+exit dummyhmm kmwio dummyhmm linetag taster streamio wastescan
-TARGETS = wastescan
+KNOWN_TARGETS = toklex tokio hmm+exit dummyhmm kmwio dummyhmm linetag taster streamio wastescan wastelc
+TARGETS = wastescan wastelc
 
 all: $(TARGETS)
 
@@ -48,8 +48,10 @@ linetag: linetag.o $(STATICLIBS)
 
 taster: taster.o $(STATICLIBS)
 
+wastelc: wastelc.o $(STATICLIBS)
+
 ##-- patterns: .o
-//taster.o: taster.cc mootFlavor.h
+taster.o: taster.cc mootFlavor.h
 
 %.o: %.cc
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
@@ -68,8 +70,8 @@ wastescan: wastescan.o $(STATICLIBS)
 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 ##-- patterns: default
-.DEFAULT:
-	$(LD) $(LDFLAGS) -o $@ $^ $(STATICLIBS) $(LIBS)
+#.DEFAULT:
+#	$(LD) $(LDFLAGS) -o $@ $^ $(STATICLIBS) $(LIBS)
 
 %: %.o $(STATICLIBS)
-	$(LD) $(LDFLAGS) -o $@ $^ $(STATICLIBS) $(LIBS)
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)

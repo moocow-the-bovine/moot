@@ -1,0 +1,35 @@
+/*-*- Mode: C++; coding: utf-8; c-basic-offset: 2; -*-*/
+#include "wasteCase.h"
+
+namespace moot {
+
+std::string utf8ToLower(const std::string &s)
+{
+  std::string ls;
+  const unsigned char *sp  = (const unsigned char*)s.data();
+  const unsigned char *end = sp + s.size();
+
+  while (sp < end) {
+    /*!re2c
+      re2c:define:YYCTYPE = "unsigned char";
+      re2c:define:YYCURSOR = sp;
+      re2c:yyfill:enable = 0;
+      re2c:indent:top = 4;
+      re2c:indent:string = "  ";
+    */
+
+    //-- Auto-generated lower-case rules go here
+    /*!re2c
+      %%ULC%%
+    */
+
+    //-- Explicit rules
+    /*!re2c
+     (.|"\n")  { ls.push_back(*(sp-1)); continue; /* explicit last-dicth effort byte-identity fallback */ }
+    */
+  }
+
+  return ls;
+}
+
+}; /*-- /namespace moot */

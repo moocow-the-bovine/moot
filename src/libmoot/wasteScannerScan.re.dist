@@ -1,14 +1,15 @@
-#include <dwdsScanner.h>
+#include "wasteScanner.h"
+#include "wasteTypes.h"
 
-int dwds::Scanner::scan ( )
+int moot::wasteScanner::yylex ( )
 {
 std:
-	m_token = m_cursor;
+	yytoken = yycursor;
     /*!re2c
         re2c:define:YYCTYPE = "unsigned char";
-        re2c:define:YYCURSOR = m_cursor;
-        re2c:define:YYMARKER = m_marker;
-        re2c:define:YYLIMIT = m_limit;
+        re2c:define:YYCURSOR = yycursor;
+        re2c:define:YYMARKER = yymarker;
+        re2c:define:YYLIMIT = yylimit;
         re2c:define:YYFILL:naked = 1;
         re2c:define:YYFILL@len = #;
         re2c:define:YYFILL = "if (!fill(#)) { return 0; }";
@@ -283,7 +284,6 @@ Any3 = ([\xe1][\x81][\x80-\xbf])|([\xe1][\x80][\x80-\xbf])|([\xe1][\x83][\x80-\x
 Any = Any1|Any2|Any3;
     */
 
-	*/
 
 	//-- Numbers
 	/*!re2c
@@ -358,35 +358,35 @@ Any = Any1|Any2|Any3;
 	XML                     = "<"[/]?[a-zA-Z?][^<>\n]*">";
 	*/
 
-	//"$SB$" (WS* "$SB$")*     { m_offset += length (); return TOKEN_SB; }
+	//"$SB$" (WS* "$SB$")*     { add_columns( yyleng() ); return TOKEN_SB; }
     /*!re2c
 
-	"%%"[^%\n]+"%%"          { m_offset += length (); goto std; }
+	"%%"[^%\n]+"%%"          { add_columns( yyleng() ); goto std; }
 
-	"$WB$"                   { m_offset += length (); return TOKEN_WB; }
-	"$SB$"                   { m_offset += length (); return TOKEN_SB; }
+	"$WB$"                   { add_columns( yyleng() ); return TOKEN_WB; }
+	"$SB$"                   { add_columns( yyleng() ); return TOKEN_SB; }
 
-	XML                      { m_offset += length (); return TOKEN_XML; }
+	XML                      { add_columns( yyleng() ); return TOKEN_XML; }
 
-        LINK2                    { m_offset += length (); return TOKEN_REST; }
+        LINK2                    { add_columns( yyleng() ); return TOKEN_REST; }
 
-	ROMAN                    { m_offset += length (); return TOKEN_ROMAN_NUM; }
-        LATIN+	                 { m_offset += length (); return LATIN_LOWER; }
+	ROMAN                    { add_columns( yyleng() ); return TOKEN_ROMAN_NUM; }
+        LATIN+	                 { add_columns( yyleng() ); return LATIN_LOWER; }
 
-        Greek+                   { m_offset += length (); return TOKEN_GREEK; }
+        Greek+                   { add_columns( yyleng() ); return TOKEN_GREEK; }
 
-	NUMBER                   { m_offset += length (); return TOKEN_NUM; }
+	NUMBER                   { add_columns( yyleng() ); return TOKEN_NUM; }
 
-	HYPH                     { m_offset += length (); return TOKEN_HYPH; }
-	SC                       { m_offset += length (); return TOKEN_SC; }
+	HYPH                     { add_columns( yyleng() ); return TOKEN_HYPH; }
+	SC                       { add_columns( yyleng() ); return TOKEN_SC; }
 
-	WS*[\n]WS*               { m_offset += length (); return TOKEN_NL; }
+	WS*[\n]WS*               { add_columns( yyleng() ); return TOKEN_NL; }
 
-        WS+                      { m_offset += length (); return TOKEN_SPACE; }
+        WS+                      { add_columns( yyleng() ); return TOKEN_SPACE; }
 
-	Lo|Lt                    { m_offset += length (); return TOKEN_REST; }
+	Lo|Lt                    { add_columns( yyleng() ); return TOKEN_REST; }
 
-        ANY_CHARACTER            { m_offset += length (); return TOKEN_REST; }
+        ANY_CHARACTER            { add_columns( yyleng() ); return TOKEN_REST; }
 
     */
 }
