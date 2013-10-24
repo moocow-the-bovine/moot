@@ -29,7 +29,7 @@ namespace moot
       Lexicon lex;
 
       wasteLexicon();
-      ~wasteLexicon;
+      ~wasteLexicon();
 
       void load(mistream *mis);
       void load(const char *filename);
@@ -47,6 +47,8 @@ namespace moot
       /** \name Low-level data */
       //@{
       TokenReader    *scanner;          /**< Input source */
+      mootToken       wl_token;
+      mootSentence    wl_sentence;
       //@}
 
       /** \name Lexica */
@@ -118,16 +120,16 @@ namespace moot
       virtual size_t line_number(size_t n) { return scanner ? scanner->line_number(n) : 0; };
 
       /** Get current column number. Descendants may override this method. */
-      virtual size_t column_number(void) { return scanner.theColumn; };
+      virtual size_t column_number(void) { return scanner ? scanner->column_number() : 0; };
 
       /** Set current column number. Descendants may override this method. */
-      virtual size_t column_number(size_t n) { return scanner.theColumn = n; };
+      virtual size_t column_number(size_t n) { return scanner ? scanner->column_number(n) : 0; };
 
       /** Get current byte number. Descendants may override this method. */
-      virtual mootio::ByteOffset byte_number(void) { return scanner.theByte; };
+      virtual mootio::ByteOffset byte_number(void) { return scanner ? scanner->byte_number() : 0; };
 
       /** Get current byte number. Descendants may override this method. */
-      virtual mootio::ByteOffset byte_number(size_t n) { return scanner.theByte = n; };
+      virtual mootio::ByteOffset byte_number(size_t n) { return scanner ? scanner->byte_number(n) : 0; };
       //@}
 
       /*------------------------------------------------------------*/

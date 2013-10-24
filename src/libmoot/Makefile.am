@@ -84,9 +84,9 @@ libmoot_la_SOURCES = \
 	wasteTypes.cc \
 	wasteScanner.cc \
 	wasteScannerScan.cc \
+ 	wasteLexer.cc \
 	wasteCase.cc
 
-#	wasteLexer.cc
 
 #	mootCHMM.cc
 #	mootEvent.cc
