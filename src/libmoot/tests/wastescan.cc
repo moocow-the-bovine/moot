@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <string.h>
 #include <wasteScanner.h>
+#include <wasteLexer.h>
 #include <wasteTypes.h>
 #include <mootCxxIO.h>
 

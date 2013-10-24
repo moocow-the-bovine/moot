@@ -84,6 +84,7 @@ libmoot_la_SOURCES = \
 	wasteTypes.cc \
 	wasteScanner.cc \
 	wasteScannerScan.cc \
+	wasteLexer.cc \
 	wasteCase.cc
 
 #	mootCHMM.cc
@@ -285,6 +286,7 @@ pkginclude_HEADERS = \
 	\
 	wasteTypes.h \
 	wasteScanner.h \
+	wasteLexer.h \
 	wasteCase.h \
 	\
 	@INSTALL_OSFCN_H@
