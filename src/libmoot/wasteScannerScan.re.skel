@@ -59,6 +59,8 @@ std:
 	Latin_Mn_DTA           = ([\xCD][\xA4])|([\xCC][\x80-\xBF]);
 	Latin_Mn               = Latin_Mn_DTA;
 	LATIN                  = Latin | (Latin Mn) | (Latin Lm);
+	ALPHA_HEAD             = Lu | Ll | Lt | Lo ;
+	ALPHA                  = ALPHA_HEAD ( Lm | Mn )*;
 	*/
 
 	//-- Conjunctions
@@ -123,7 +125,7 @@ std:
 
         WS+                      { add_columns( yyleng() ); return wst_TOKEN_SPACE; }
 
-	Lo|Lt                    { add_columns( yyleng() ); return wst_TOKEN_REST; }
+	ALPHA+                   { add_columns( yyleng() ); return wst_TOKEN_REST; }
 
         ANY_CHARACTER            { add_columns( yyleng() ); return wst_TOKEN_REST; }
 
