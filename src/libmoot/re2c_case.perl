@@ -60,7 +60,7 @@ sub build_rules {
   }
 
   ##-- lc: append identity rules
-  foreach my $i (grep {$id_lc[$_]} (0..$#id_lc)) {
+  foreach my $i (grep {$id_lc[$_]} (1..$#id_lc)) {
     push(@rules_lc,
 	 "\n",
 	 "LcId${i}\t= ", join("|", map {"($_)"} sort keys %{$id_lc[$i]}), ";\n",
@@ -69,7 +69,7 @@ sub build_rules {
   }
 
   ##-- uc: append identity rules
-  foreach my $i (grep {$id_uc[$_]} (0..$#id_uc)) {
+  foreach my $i (grep {$id_uc[$_]} (1..$#id_uc)) {
     push(@rules_uc,
 	 "\n",
 	 "UcId${i}\t= ", join("|", map {"($_)"} sort keys %{$id_uc[$i]}), ";\n",
@@ -85,7 +85,7 @@ while (<>) {
   if (/^\s*%%ULC%%\s*$/) {
     print @rules_lc;
   }
-  elsif (/^\s*%%ULC%%\s*$/) {
+  elsif (/^\s*%%UUC%%\s*$/) {
     print @rules_uc;
   }
   else {

@@ -76,6 +76,8 @@ enum mootTokenTypeE {
   TokTypeComment,    /**< a comment, should be ignored by processing routines */
   TokTypeEOS,        /**< end-of-sentence */
   TokTypeEOF,        /**< end-of-file */
+  TokTypeWB,	     /**< word-break hint */
+  TokTypeSB,	     /**< sentence-break hint */
   TokTypeUser,       /**< user-defined token type: use in conjunction with 'tok_data' */
   NTokTypes          /**< number of token-types (not a type itself) */
 };

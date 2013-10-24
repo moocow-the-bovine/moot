@@ -22,8 +22,29 @@
 
 namespace moot {
 
-/** Useful for debugging waste-scanner types */
-const char *wasteScannerTypeNames[wst_N_TYPES] =
+//----------------------------------------------------------------------
+const char *wasteScannerTypeNames[NwScanTypes] =
+  {
+    "EOF",
+    "WB",
+    "SB",
+    "Latin",
+    "Greek",
+    "Alpha",
+    "Newline",
+    "Space",
+    "Number",
+    "Roman",
+    "Hyphen",
+    "Punct",
+    "Link",
+    "XML",
+    "Comment",
+    "Other"
+  };
+
+//----------------------------------------------------------------------
+const char *wasteLexerTypeNames[wst_N_TYPES] =
   {
     "TOKEN_EOF",
     "TOKEN_UNKNOWN",

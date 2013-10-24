@@ -36,6 +36,31 @@ namespace moot {
 
 /** return value enum for wasteScanner::yylex() */
 enum wasteScannerTypeE {
+  wScanTypeEOF,		/**< end-of-stream */
+  wScanTypeWB,		/**< $WB$: word-break hint */
+  wScanTypeSB,		/**< $SB$: sentence-break hint */
+  wScanTypeLatin,	/**< latin string */
+  wScanTypeGreek,	/**< greek string */
+  wScanTypeAlpha,	/**< alphabetic string, any script */
+  wScanTypeNewline,	/**< newline */
+  wScanTypeSpace,	/**< whitespace without embedded newline */
+  wScanTypeNumber,	/**< number string */
+  wScanTypeRoman,	/**< roman numeral string (subset of latin) */
+  wScanTypeHyphen,	/**< hyphen, en-, or em-dash */
+  wScanTypePunct,	/**< punctuation and "special" characters */
+  wScanTypeLink,	/**< URI or other link */
+  wScanTypeXML,		/**< raw XML */
+  wScanTypeComment,	/**< raw comment */
+  wScanTypeOther,	/**< any other character */
+  NwScanTypes		/**< eof */
+};
+
+/** Symbolic names for wasteScannerTypeE, useful for debugging */
+extern const char *wasteScannerTypeNames[NwScanTypes];
+
+
+/** old dwdsScanner type constants */
+enum wasteLexerTypeE {
   wst_TOKEN_EOF,
   wst_TOKEN_UNKNOWN,
   wst_TOKEN_WORD,
@@ -89,8 +114,9 @@ enum wasteScannerTypeE {
   wst_N_TYPES
 };
 
-/** Useful for debugging waste-scanner types */
-extern const char *wasteScannerTypeNames[wst_N_TYPES];
+/** Useful for debugging old dwdsScanner types */
+extern const char *wasteLexerTypeNames[wst_N_TYPES];
+
 
 }; /*--/namespace moot --*/
 

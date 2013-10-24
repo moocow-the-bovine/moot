@@ -35,7 +35,7 @@ int main ( int argc, char* argv[] )
   //-- ye olde guttes
   mootio::ByteCount nbytes;
   std::string s,ls;
-  for (nbytes=min->getline(s); nbytes >= 0 && !min->eof(); nbytes=min->getline(s)) {
+  for (nbytes=min->getline(s); !min->eof(); nbytes=min->getline(s)) {
     ls = moot::utf8ToLower(s);
     mout->puts(ls);
   }

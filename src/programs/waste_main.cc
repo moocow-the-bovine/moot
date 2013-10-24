@@ -61,7 +61,7 @@ int vlevel;
 //-- files
 mofstream out;
 
-//-- Token I/O: reader (for -no-scan)
+//-- Token I/O: reader (for --no-scan)
 int ifmt = tiofNone;
 int ifmt_implied = tiofRare;
 int ifmt_default = tiofRare|tiofLocation;
@@ -94,7 +94,7 @@ void GetMyOptions(int argc, char **argv)
 
   //-- operation mode
   if (!args.scan_flag && !args.lex_flag)
-    moot_croak("%s: ERROR: you must enable at least one of -scan or -lex !\n", PROGNAME);
+    moot_croak("%s: ERROR: you must enable at least one of --scan or --lex !\n", PROGNAME);
 
   // -- show banner
   if (!args.no_banner_given)
@@ -133,21 +133,21 @@ void GetMyOptions(int argc, char **argv)
  * guts: -scan -lex
  */
 void scan_lex_main(void) {
-  moot_croak("%s: -scan -lex mode not yet implemented!\n", PROGNAME);
+  moot_croak("%s: ERROR: --scan --lex mode not yet implemented!\n", PROGNAME);
 }
 
 /*--------------------------------------------------------------------------
  * guts: -no-scan -lex
  */
 void lex_main(void) {
-  moot_croak("%s: -no-scan -lex mode not yet implemented!\n", PROGNAME);
+  moot_croak("%s: ERROR: --no-scan --lex mode not yet implemented!\n", PROGNAME);
 }
 
 /*--------------------------------------------------------------------------
  * guts: -scan -no-lex
  */
 void scan_main(void) {
-  wasteScanner scanner;
+  wasteTokenScanner scanner(ofmt);
 
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
     if (vlevel >= vlInfo) ++nfiles;
@@ -155,27 +155,13 @@ void scan_main(void) {
     writer->printf_comment(" %s:File: %s\n", PROGNAME, churner.in.name.c_str());
 
     scanner.from_mstream(&churner.in);
-    scanner.to_mstream(&out);
-    int typ;
-    mootToken tok;
+    int toktyp;
 
-    while ( (typ=scanner.yylex()) != 0 ) {
-      tok.clear();
-      switch ( typ ) {
-      case wst_TOKEN_NL:
-	tok.text("\\n");
-	break;
-      default:
-	tok.text(scanner.yytext());
-	break;
-      }
-
-      tok.insert( wasteScannerTypeNames[typ], "" );
-      tok.location( scanner.theByte-scanner.yyleng(), scanner.yyleng() );
-      writer->put_token(tok);
+    while ( (toktyp=scanner.get_token()) != TokTypeEOF ) {
+      writer->put_token( *(scanner.token()) );
       ++ntokens;
     }
-    writer->printf_comment("$EOF\t%lu 0\tEOF\n", scanner.theByte);
+    writer->printf_comment("$EOF\t%lu 0\tEOF\n", scanner.byte_number() );
   }
 }
 

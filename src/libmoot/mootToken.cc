@@ -44,6 +44,8 @@ const char* mootTokenTypeNames[NTokTypes] =
     "Comment",
     "EOS",
     "EOF",
+    "WB",
+    "SB",
     "User"
   };
 

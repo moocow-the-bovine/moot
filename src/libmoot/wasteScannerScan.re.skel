@@ -1,9 +1,9 @@
+/* -*- Mode: C++ -*-; coding: utf-8; c-basic-offset: 2; */
 #include "wasteScanner.h"
 #include "wasteTypes.h"
 
 int moot::wasteScanner::yylex ( )
 {
-std:
 	yytoken = yycursor;
     /*!re2c
         re2c:define:YYCTYPE = "unsigned char";
@@ -55,21 +55,9 @@ std:
 
 	//-- Combine alphabet and modifiers
 	/*!re2c
-	Greek_Mn_DTA           = ([\xCD][\x97])|([\xCC][\x80-\xBF]);
-	Latin_Mn_DTA           = ([\xCD][\xA4])|([\xCC][\x80-\xBF]);
-	Latin_Mn               = Latin_Mn_DTA;
-	LATIN                  = Latin | (Latin Mn) | (Latin Lm);
-	ALPHA_HEAD             = Lu | Ll | Lt | Lo ;
-	ALPHA                  = ALPHA_HEAD ( Lm | Mn )*;
+	LATIN                  = Latin (Lm|Mn)*;
+	ALPHA                  = (Lu | Ll | Lt | Lo) ( Lm | Mn )*;
 	*/
-
-	//-- Conjunctions
-	/*!re2c
-	CON_WORD                = "und"|"oder"|"sowie";
-        CON_PUNCT               = [/,];
-        CON_ABBR                = [uo][\.];
-        CON                     = CON_WORD|CON_PUNCT|CON_ABBR;
-        */
 
 	//-- LINKS
 	/*!re2c
@@ -99,35 +87,29 @@ std:
 	XML                     = "<"[/]?[a-zA-Z?][^<>\n]*">";
 	*/
 
-	//"$SB$" (WS* "$SB$")*     { add_columns( yyleng() ); return wst_TOKEN_SB; }
-    /*!re2c
+	/*!re2c
+	"%%"[^%\n]+"%%"          { add_columns( yyleng() ); return wScanTypeComment; }
 
-	"%%"[^%\n]+"%%"          { add_columns( yyleng() ); goto std; }
+	"$WB$"                   { add_columns( yyleng() ); return wScanTypeWB; }
+	"$SB$"                   { add_columns( yyleng() ); return wScanTypeSB; }
 
-	"$WB$"                   { add_columns( yyleng() ); return wst_TOKEN_WB; }
-	"$SB$"                   { add_columns( yyleng() ); return wst_TOKEN_SB; }
+	XML                      { add_columns( yyleng() ); return wScanTypeXML; }
+        LINK2                    { add_columns( yyleng() ); return wScanTypeLink; }
 
-	XML                      { add_columns( yyleng() ); return wst_TOKEN_XML; }
+	ROMAN                    { add_columns( yyleng() ); return wScanTypeRoman; }
 
-        LINK2                    { add_columns( yyleng() ); return wst_TOKEN_REST; }
+        LATIN+	                 { add_columns( yyleng() ); return wScanTypeLatin; }
+        Greek+                   { add_columns( yyleng() ); return wScanTypeGreek; }
 
-	ROMAN                    { add_columns( yyleng() ); return wst_TOKEN_ROMAN_NUM; }
-        LATIN+	                 { add_columns( yyleng() ); return wst_LATIN_LOWER; }
+	NUMBER                   { add_columns( yyleng() ); return wScanTypeNumber; }
+	HYPH                     { add_columns( yyleng() ); return wScanTypeHyphen; }
+	SC                       { add_columns( yyleng() ); return wScanTypePunct; }
 
-        Greek+                   { add_columns( yyleng() ); return wst_TOKEN_GREEK; }
+	WS*[\n]WS*               { add_columns( yyleng() ); return wScanTypeNewline; }
+        WS+                      { add_columns( yyleng() ); return wScanTypeSpace; }
 
-	NUMBER                   { add_columns( yyleng() ); return wst_TOKEN_NUM; }
+	ALPHA+                   { add_columns( yyleng() ); return wScanTypeAlpha; }
 
-	HYPH                     { add_columns( yyleng() ); return wst_TOKEN_HYPH; }
-	SC                       { add_columns( yyleng() ); return wst_TOKEN_SC; }
-
-	WS*[\n]WS*               { add_columns( yyleng() ); return wst_TOKEN_NL; }
-
-        WS+                      { add_columns( yyleng() ); return wst_TOKEN_SPACE; }
-
-	ALPHA+                   { add_columns( yyleng() ); return wst_TOKEN_REST; }
-
-        ANY_CHARACTER            { add_columns( yyleng() ); return wst_TOKEN_REST; }
-
-    */
+        ANY_CHARACTER            { add_columns( yyleng() ); return wScanTypeOther; }
+	*/
 }
