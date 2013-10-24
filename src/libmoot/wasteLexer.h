@@ -19,6 +19,10 @@
 
 #include <mootTokenIO.h>
 #include <mootSTLHacks.h>
+#include <wasteTypes.h>
+
+#include <vector>
+#include <string>
 
 namespace moot
 {
@@ -41,14 +45,83 @@ namespace moot
   {
     public:
       /*--------------------------------------------------------------------
+       * wasteLexer: Types
+       */
+      /*------------------------------------------------------------*/
+      /** Multi-dimensional vector for constant access on feature bundles */
+      typedef std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::string> > > > > > wasteTagset;
+      
+      /** Possible states of the dehyphenation procedure */
+      enum wasteLexer_state
+      {
+        ls_flush   = 0x01,
+        ls_hyph    = 0x02,
+        ls_head    = 0x04,
+        ls_tail    = 0x08,
+        ls_nl      = 0x10,
+        ls_exclude = 0x20,
+      };
+
+      /** Token feature indexes */
+      enum cls
+      {
+        stop     = 0,
+        rom      = 1,
+        alpha    = 2,
+        num      = 3,
+        dot      = 4,
+        comma    = 5,
+        colon    = 6,
+        scolon   = 7,
+        eos      = 8,
+        lbr      = 9,
+        rbr      = 10,
+        hyphen   = 11,
+        plus     = 12,
+        slash    = 13,
+        quote    = 14,
+        apos     = 15,
+        sc       = 16,
+        other    = 17,
+        n_cls    = 18
+      };
+
+      enum cas
+      {
+        non      = 0,
+        lo       = 1,
+        up       = 2,
+        cap      = 3,
+        n_cas    = 4
+      };
+
+      enum binary
+      {
+        uk       = 0,
+        kn       = 1,
+        n_binary = 2
+      };
+
+      enum len
+      {
+        le_null  = 0,
+        le_one   = 1,
+        le_three = 2,
+        le_five  = 3,
+        longer   = 4,
+        n_len    = 5
+      };
+
+      /*--------------------------------------------------------------------
        * wasteLexer: Data
        */
       /*------------------------------------------------------------*/
       /** \name Low-level data */
       //@{
       TokenReader    *scanner;          /**< Input source */
-      mootToken       wl_token;
-      mootSentence    wl_sentence;
+      mootToken       wl_token;         /**< Local token */
+      mootSentence    wl_sentence;      /**< Local sentence */
+      wasteTagset     wl_tagset;        /**< Token feature bundles */
       //@}
 
       /** \name Lexica */

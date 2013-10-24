@@ -82,6 +82,7 @@ libmoot_la_SOURCES = \
 	mootIO.cc \
 	\
 	wasteTypes.cc \
+	wasteLexerTypes.cc \
 	wasteScanner.cc \
 	wasteScannerScan.cc \
  	wasteLexer.cc \
@@ -194,10 +195,17 @@ if ENABLE_RE2C_AUTO
 wasteScannerScan.re: wasteScannerScan.re.skel re2c_ucl.py
 	$(PYTHON) re2c_ucl.py -o $@ $<
 
+wasteLexerTypes.re: wasteLexerTypes.re.skel re2c_ucl.py
+	$(PYTHON) re2c_ucl.py -o $@ $<
+
 wasteCase.re: wasteCase.re.skel re2c_case.perl
 	$(PERL) re2c_case.perl $< > $@ 2>/dev/null
 else
 wasteScannerScan.re: wasteScannerScan.re.dist
+	-rm -f "$@"
+	cp "$<" "$@"
+
+wasteLexerTypes.re: wasteLexerTypes.re.dist
 	-rm -f "$@"
 	cp "$<" "$@"
 
@@ -211,7 +219,7 @@ if HAVE_RE2C
 SUFFIXES: .re
 .re.cc:
 	$(RE2C) -i -s -o $@ $<
-RE2C_OUT += wasteScannerScan.cc wasteCase.cc
+RE2C_OUT += wasteScannerScan.cc wasteLexerTypes.cc wasteCase.cc
 endif
 
 ##-----------------------------------------------------------------------
@@ -449,6 +457,8 @@ EXTRA_DIST = \
 	myosfcn.h \
 	wasteScannerScan.re.dist \
 	wasteScannerScan.re.skel \
+	wasteLexerTypes.re.dist \
+	wasteLexerTypes.re.skel \
 	wasteCase.re.dist \
 	wasteCase.re.skel \
 	gnulib/config.h

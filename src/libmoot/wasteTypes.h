@@ -32,6 +32,8 @@
 #ifndef _WASTE_TYPES_H
 #define _WASTE_TYPES_H
 
+#include <string>
+
 namespace moot {
 
 /** return value enum for wasteScanner::yylex() */
@@ -117,6 +119,8 @@ enum wasteLexerTypeE {
 /** Useful for debugging old dwdsScanner types */
 extern const char *wasteLexerTypeNames[wst_N_TYPES];
 
+wasteLexerTypeE waste_casetype(const std::string &tok_text);
+wasteLexerTypeE waste_lexertype(const std::string &tok_text);
 
 }; /*--/namespace moot --*/
 

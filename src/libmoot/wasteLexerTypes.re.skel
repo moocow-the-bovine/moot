@@ -1,0 +1,95 @@
+#include <wasteTypes.h>
+
+namespace moot {
+
+wasteLexerTypeE waste_casetype(const std::string &s)
+{
+  const unsigned char *sp  = (const unsigned char*)s.data();
+  const unsigned char *m   = sp;
+
+  /*!re2c
+    re2c:define:YYCTYPE = "unsigned char";
+    re2c:define:YYCURSOR = sp;
+    re2c:define:YYMARKER = m;
+    re2c:yyfill:enable   = 0;
+    re2c:indent:top = 4;
+    re2c:indent:string = "  ";
+  */
+
+    //-- Auto-generated property rules go here
+  /*!re2c
+      %%UCL%%
+  */
+
+  /*!re2c
+    QUOTE_L                = ([`\"])|([`][`])|([\xE2][\x80][\x98\x9A\x9B\x9C\x9E\x9F]);
+
+    Latin_Lu+ [\000]                    { return wst_LATIN_CAPS; }
+    (QUOTE_L|[\x28])? Latin_Lu          { return wst_LATIN_UPPER; }
+
+    [^]                      { return wst_LATIN_LOWER; }
+  */
+}
+
+wasteLexerTypeE waste_lexertype(const std::string &s)
+{
+  const unsigned char *sp  = (const unsigned char*)s.data();
+  const unsigned char *m   = sp;
+
+  /*!re2c
+
+
+    KOMMA                   = ([,]);
+    DOT                     = ([\.]);
+    EOS                     = ([?!]|([\xE2][\x80][\xA6]))+|[\.]{2,};
+    APOS                    = ['`]|([\xCA][\xBC\xBD])|([\xD9][\xAC])|([\xE2][\x80][\x98\x99\x9A\x9B]);
+    PERCENT                 = [%§] | ([\xe2] [\x80] [\xb0\xb1]);
+    MONEY                   = Sc;
+    
+    QUOTE_R                 = (['\"])|([\'][\'])|([\xE2][\x80][\x99\x9D]);
+    QUOTE_G1                = ([\xC2][\xAB])|([\xE2][\x80][\xB9]);
+    QUOTE_G2                = ([\xC2][\xBB])|([\xE2][\x80][\xBA]);
+    QUOTE_G                 = QUOTE_G1|QUOTE_G2;
+    QUOTE                   = QUOTE_L|QUOTE_R|QUOTE_G;
+
+    HYPH1                   = [-];
+    HYPH2                   = ([\xC2][\xAC])|([\xC2][\xAD])|([\xE2][\xB8][\x97]);
+    HYPH                    = HYPH1|HYPH2;
+
+    TRUNC                   = (Latin|Nd)* Latin (Latin|Nd|HYPH)* HYPH;
+
+    INT                     = Nd+ | (Nd{1,3} ([ \.\,] Nd{3})+);
+    FLOAT                   = INT ([,] INT)?;
+    CARD                    = FLOAT;
+
+    LBR                     = [\(\[\{];
+    RBR                     = [\)\]\}];
+
+    SLASH                   = [\\/];
+
+    SC                      = Pc|Pd|Pe|Pf|Pi|Po|Ps|Sk|Sm|So|QUOTE;
+
+    EOS                                 { return wst_TOKEN_EOS; }
+    DOT                                 { return wst_TOKEN_DOT; }
+    KOMMA                               { return wst_TOKEN_COMMA; }
+    PERCENT                             { return wst_TOKEN_PERCENT; }
+    MONEY                               { return wst_TOKEN_MONEY; }
+    "+"                                 { return wst_TOKEN_PLUS; }
+    ":"                                 { return wst_TOKEN_COLON; }
+    ";"                                 { return wst_TOKEN_SEMICOLON; }
+    APOS                                { return wst_TOKEN_APOS; }
+    QUOTE                               { return wst_TOKEN_QUOTE; }
+    LBR                                 { return wst_TOKEN_LBR; }
+    RBR                                 { return wst_TOKEN_RBR; }
+    SLASH                               { return wst_TOKEN_SLASH; }
+    HYPH                                { return wst_TOKEN_HYPH; }
+    SC                                  { return wst_TOKEN_SC; }
+    TRUNC                               { return wst_TOKEN_TRUNC; }
+    CARD                                { return wst_TOKEN_NUM; }
+    [^]                      	        { return wst_TOKEN_REST; }
+
+   */
+  return wst_TOKEN_SC;
+}
+
+}; /*-- /namespace moot */

@@ -1,14 +1,60 @@
 #include "wasteLexer.h"
 
+#include <sstream>
+
 namespace moot
 {
 
 //----------------------------------------------------------------------
 wasteLexer::wasteLexer(int fmt, const std::string &myname)
-  : TokenReader(fmt, myname)
+  : TokenReader(fmt, myname),
+    scanner(NULL)
 {
+  // wasteLexer has local contents
   tr_token = &wl_token;
   tr_sentence = &wl_sentence;
+
+  // build the tagset
+  const char* cls_strings[n_cls] = {"stop","rom","alpha","num","$.","$,","$:","$;","$?","$(","$)","$-","$+","$/","$\"","$\'","$~","other"};
+  const char* cas_strings[n_cas] = {"*","lo","up","cap"};
+  const char* abbr_strings[n_binary] = {"0","1"};
+  const char* len_strings[n_len] = {"0","1","3","5","N"};
+  const char* blanks_strings[n_binary] = {"0","1"};
+
+  wl_tagset.resize(n_cls);
+  for (int i = 0; i < n_cls; ++i)
+  {
+    wl_tagset[i].resize(n_cas);
+    for (int j = 0; j < n_cas; ++j)
+    {
+      wl_tagset[i][j].resize(n_binary);
+      for (int k = 0; k < n_binary; ++k)
+      {
+        wl_tagset[i][j][k].resize(n_len);
+        for (int l = 0; l < n_len; ++l)
+        {
+          wl_tagset[i][j][k][l].resize(n_binary);
+          for (int m = 0; m < n_binary; ++m)
+          {
+            wl_tagset[i][j][k][l][m].resize(7);
+            std::ostringstream tag;
+            tag << cls_strings[i]
+              << ',' << cas_strings[j]
+              << ",a" << abbr_strings[k]
+              << ",l" << len_strings[l]
+              << ",b" << blanks_strings[m];
+            wl_tagset[i][j][k][l][m][0] = tag.str ();
+            wl_tagset[i][j][k][l][m][1] = tag.str () + ",s0,S0,w0";
+            wl_tagset[i][j][k][l][m][2] = tag.str () + ",s0,S1,w0";
+            wl_tagset[i][j][k][l][m][3] = tag.str () + ",s0,S0,w1";
+            wl_tagset[i][j][k][l][m][4] = tag.str () + ",s0,S1,w1";
+            wl_tagset[i][j][k][l][m][5] = tag.str () + ",s1,S0,w1";
+            wl_tagset[i][j][k][l][m][6] = tag.str () + ",s1,S1,w1";
+          }
+        }
+      }
+    }
+  }
 }
 
 //----------------------------------------------------------------------
@@ -19,7 +65,8 @@ wasteLexer::~wasteLexer()
 //----------------------------------------------------------------------
 void wasteLexer::from_mstream(mootio::mistream *mistreamp)
 {
-  scanner->from_mstream(mistreamp);
+  if(scanner)
+    scanner->from_mstream(mistreamp);
 }
 
 //----------------------------------------------------------------------
