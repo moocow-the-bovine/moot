@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2010 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2013 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -397,7 +397,10 @@ void TokenReaderExpat::CommentHandler(const XML_Char *s)
 	 cli != cmtlines.end();
 	 cli++)
       {
-	save_context_data(cli->data(),cli->size(),TokTypeComment);
+	mootTokenType typ = TokTypeComment;
+	if      (*cli == "$SB$") { typ=TokTypeSB; } //-- sentence-break hint comment
+	else if (*cli == "$WB$") { typ=TokTypeWB; } //-- word-break hint comment
+	save_context_data(cli->data(),cli->size(),typ);
       }
   }
 }
@@ -539,6 +542,8 @@ void TokenWriterExpat::_put_token_raw(const mootToken &token, mootio::mostream *
 
   switch(token.toktype()) {
   case TokTypeComment:
+  case TokTypeWB:
+  case TokTypeSB:
     //-- ignore: we should already have raw XML for these
     break;
 
@@ -592,6 +597,8 @@ void TokenWriterExpat::_put_token_gen(const mootToken &token, mootio::mostream *
   switch(token.toktype()) {
 
     case TokTypeComment:
+    case TokTypeWB:
+    case TokTypeSB:
     //-- generate XML comments
     if (tw_is_comment_block) {
       //-- embedded comment: handle gracefully

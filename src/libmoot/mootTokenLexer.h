@@ -53,7 +53,7 @@
 
 
 /* % here is the declaration from section1 %header{  */ 
-#line 47 "mootTokenLexer.ll"
+#line 48 "mootTokenLexer.ll"
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
@@ -73,17 +73,19 @@
  \li Blank lines are interpreted as end-of-sentence (\i EOS)
  \li Input contains raw text only (no markup!)
  \li Comments are introduced with '\%\%', and continue to the end of the line
+ \li Word- and sentence-break hints are special comments "\%\%\$WB\$", "\%\%\$SB\$"
  \li Supports multiple tags per token
 
  \b Format:
 <pre>
  FILE       ::= SENTENCE*
- SENTENCE   ::= (TOKEN*) "\n"
+ SENTENCE   ::= ((TOKEN|COMMENT)*) "\n"
  TOKEN      ::= TOKEN_TEXT ("\t" ANALYSIS)* ("\r"*) "\n"
  TOKEN_TEXT ::= [^\\t\\r\\n]*
  ANALYSIS   ::= (DETAIL*) (COST?) (DETAIL*) "[" TAG ( "]" | " " ) (DETAIL*) (COST?) (DETAIL*)
  DETAIL     ::= [^\\t\\r\\n]
  COST       ::= "<" FLOAT ">"
+ COMMENT    ::= "^%%" (.*) "\n"
 </pre>
 */
 
@@ -91,15 +93,15 @@
 #include <mootGenericLexer.h>
 
 using namespace moot;
-#line 88 "mootTokenLexer.ll"
+#line 91 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CLASS  mootTokenLexer
-#line 90 "mootTokenLexer.ll"
+#line 93 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_INHERIT  \
   : public moot::GenericLexer
-#line 93 "mootTokenLexer.ll"
+#line 96 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_INPUT_CODE  \
   return moot::GenericLexer::yyinput(buffer,result,max_size);
-#line 96 "mootTokenLexer.ll"
+#line 99 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_MEMBERS  \
   public: \
   /* -- public typedefs */\
@@ -127,7 +129,7 @@ using namespace moot;
    /** current analysis (real) */ \
    moot::mootToken::Analysis *manalysis;\
    \
-   /** whether to ignore comments (default=false) */ \
+   /** whether to ignore comments and hints (default=false) */ \
    bool ignore_comments; \
    /** whether first analysis parsed should be considered 'best' (default=true) */ \
    bool first_analysis_is_best; \
@@ -171,7 +173,7 @@ using namespace moot;
   virtual void   mgl_yy_switch_to_buffer(void *buf) \
                  {yy_switch_to_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
   virtual void   mgl_begin(int stateno);
-#line 169 "mootTokenLexer.ll"
+#line 172 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CONSTRUCTOR_INIT  :\
   GenericLexer("mootTokenLexer"), \
   yyin(NULL), \
@@ -186,10 +188,10 @@ using namespace moot;
   parse_location(false), \
   parse_analysis_cost(true), \
   analysis_cost_details(false)
-#line 185 "mootTokenLexer.ll"
+#line 188 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CONSTRUCTOR_CODE  \
   mtoken = &mtoken_default;
-#line 220 "mootTokenLexer.ll"
+#line 223 "mootTokenLexer.ll"
 #line 52 "./flexskel.h"
 
 
@@ -441,7 +443,7 @@ class YY_mootTokenLexer_CLASS YY_mootTokenLexer_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 509 "mootTokenLexer.ll"
+#line 521 "mootTokenLexer.ll"
 #endif
 #line 302 "./flexskel.h"
 

@@ -1,8 +1,8 @@
-/*-*- Mode: Flex++ -*-*/
+/*-*- Mode: Flex++; c-basic-offset: 2; -*-*/
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2010 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2013 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -29,6 +29,7 @@
  *     - n>=0 (possible) tags per token
  *     - blank lines mark end-of-sentence
  *     - supports line-comments introduced by '%%'
+ *     - supports word- and sentence-break hints "%%$WB$", "%%$SB$"
  *     - raw text (no markup!)
  *     - token-line format (TAB-separated)
  *        TOKEN_TEXT  ANALYSIS_1 ... ANALYSIS_N
@@ -63,17 +64,19 @@
  \li Blank lines are interpreted as end-of-sentence (\i EOS)
  \li Input contains raw text only (no markup!)
  \li Comments are introduced with '\%\%', and continue to the end of the line
+ \li Word- and sentence-break hints are special comments "\%\%\$WB\$", "\%\%\$SB\$"
  \li Supports multiple tags per token
 
  \b Format:
 <pre>
  FILE       ::= SENTENCE*
- SENTENCE   ::= (TOKEN*) "\n"
+ SENTENCE   ::= ((TOKEN|COMMENT)*) "\n"
  TOKEN      ::= TOKEN_TEXT ("\t" ANALYSIS)* ("\r"*) "\n"
  TOKEN_TEXT ::= [^\\t\\r\\n]*
  ANALYSIS   ::= (DETAIL*) (COST?) (DETAIL*) "[" TAG ( "]" | " " ) (DETAIL*) (COST?) (DETAIL*)
  DETAIL     ::= [^\\t\\r\\n]
  COST       ::= "<" FLOAT ">"
+ COMMENT    ::= "^%%" (.*) "\n"
 </pre>
 */
 
@@ -120,7 +123,7 @@ using namespace moot;
    /** current analysis (real) */ \
    moot::mootToken::Analysis *manalysis;\
    \
-   /** whether to ignore comments (default=false) */ \
+   /** whether to ignore comments and hints (default=false) */ \
    bool ignore_comments; \
    /** whether first analysis parsed should be considered 'best' (default=true) */ \
    bool first_analysis_is_best; \
@@ -248,9 +251,16 @@ locsep     [ \r\+]
   if (!ignore_comments) {
     mtoken->clear();
     mtoken->toktype(TokTypeComment);
+    if (yyleng==7 && yytext[2]=='$' && yytext[4]=='B' &&  yytext[5]=='$') {
+      switch (yytext[3]) {
+      case 'W': mtoken->toktype(TokTypeWB); break;
+      case 'S': mtoken->toktype(TokTypeSB); break;
+      default:  break;
+      } 
+    }
     mtoken->textAppend(reinterpret_cast<const char *>(yytext)+2, yyleng-3);
     if (!parse_location) loc_set(theByte-yyleng, yyleng);
-    return TokTypeComment;
+    return lasttyp=mtoken->toktype();
   }
 }
 
@@ -288,6 +298,8 @@ locsep     [ \r\+]
    case TokTypeUnknown:
    case TokTypeVanilla:
    case TokTypeComment:
+   case TokTypeSB:
+   case TokTypeWB:
    case TokTypeUser:
      lasttyp = TokTypeEOS;
      break;

@@ -487,6 +487,8 @@ void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
   switch (token.toktype()) {
 
   case TokTypeComment:
+  case TokTypeWB:
+  case TokTypeSB:
     put_comment_buffer(token.text().data(), token.text().size());
     return;
 
