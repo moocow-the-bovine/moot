@@ -182,6 +182,13 @@ sub test_wscan {
     $ws->from_fh($what);
   }
   elsif ($which eq 'string') {
+    ##-- from_fh() doesn't work with string-handles if wrapped with FILE* type
+    #open($fh, "<", \$what) or die("$0: open failed for string filehandle");
+    #$ws->from_fh($fh);
+    ##
+    #$ws->from_string($what);
+    ##
+    ##-- from_fh() doesn't work with string-handles if wrapped with FILE* type
     open($fh, "<", \$what) or die("$0: open failed for string filehandle");
     $ws->from_fh($fh);
   }
@@ -195,6 +202,7 @@ sub test_wscan {
   $Data::Dumper::Terse = 1;
   $Data::Dumper::Pair = '=>';
   $Data::Dumper::Sortkeys = 1;
+  $|=1;
   while (defined($tok=$ws->get_token)) {
     print Dumper($tok), "\n";
   }
@@ -207,7 +215,9 @@ sub test_wscan {
 }
 #test_wscan(file=>'scanme.txt');
 #test_wscan(fh=>\*STDIN);
-test_wscan(string=>'Test 123.456');
+test_wscan(string=>"Test 123\nfoo bar.\n");
+##
+#$buf = ("Test 123.456\nfoo bar." x 1024); test_wscan(string=>$buf);
 
 ##--------------------------------------------------------------
 ## MAIN

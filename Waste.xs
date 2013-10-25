@@ -54,7 +54,7 @@ OUTPUT:
 
 ##--------------------------------------------------------------
 void
-from_fh(wasteTokenScanner* wts, FILE *fp)
+from_fp(wasteTokenScanner* wts, FILE *fp)
 CODE:
  wts->from_file(fp);
 
@@ -63,6 +63,16 @@ void
 from_file(wasteTokenScanner* wts, const char *filename)
 CODE:
  wts->from_filename(filename);
+
+##--------------------------------------------------------------
+void
+from_fh(wasteTokenScanner* wts, SV *ioref)
+PREINIT:
+ mootPerlInputFH *min;
+CODE:
+ min = new mootPerlInputFH(ioref);
+ wts->from_mstream(min);
+ wts->tr_istream_created = true;
 
 ##=====================================================================
 ## Token-Level Access

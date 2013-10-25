@@ -158,3 +158,65 @@ void sentence2tokdata(mootSentence *s, U32 utf8)
     hv_stores(tokhv, "tag", stdstring2sv(si->tok_besttag,utf8));
   }
 }
+
+/*======================================================================
+ * mootPerlInputFH
+ */
+
+//--------------------------------------------------------------
+mootPerlInputFH::mootPerlInputFH(SV *sv) 
+  : ioref(sv), io(NULL)
+{
+  if (ioref) {
+    SvREFCNT_inc(ioref);
+    io = IoIFP( sv_2io(ioref) );
+  }
+}
+
+//--------------------------------------------------------------
+mootPerlInputFH::~mootPerlInputFH(void)
+{
+  if (ioref) {
+    SvREFCNT_dec(ioref);
+  }
+}
+
+//--------------------------------------------------------------
+bool mootPerlInputFH::eof(void)
+{
+  bool rc = (io == NULL || PerlIO_eof(io));
+  if (!rc) {
+    int c = PerlIO_getc(io);
+    if (c==EOF) rc = true;
+    else PerlIO_ungetc(io,c);
+  }
+  fprintf(stderr, "mootPerlInputFH(%p).eof() == %d\n", this, (rc ? 1 : 0));
+  return rc;
+}
+
+//--------------------------------------------------------------
+bool mootPerlInputFH::valid(void)
+{
+  bool rc = (io != NULL && !PerlIO_error(io));
+  fprintf(stderr, "mootPerlInputFH(%p).valid() == %d\n", this, (rc ? 1 : 0));
+  return rc;
+}
+
+//--------------------------------------------------------------
+int mootPerlInputFH::getbyte(void)
+{
+  if (eof() || !valid()) return EOF;
+  return PerlIO_getc(io);
+}
+
+//--------------------------------------------------------------
+mootio::ByteCount mootPerlInputFH::read(char *buf, size_t n)
+{
+  if (eof() || !valid()) {
+    fprintf(stderr, "mootPerlInputFH(%p).read(buf,n=%u) == %d\n", this, n, -1);
+    return -1;
+  }
+  mootio::ByteCount rc = (mootio::ByteCount)PerlIO_read(io, buf, n);
+  fprintf(stderr, "mootPerlInputFH(%p).read(buf,n=%u) == %d\n", this, n, rc);
+  return rc;
+};
