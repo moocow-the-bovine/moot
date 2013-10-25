@@ -94,6 +94,10 @@ mootTokenType wasteLexer::get_token(void)
   default:			return toktyp;
   }
 
+  wasteLexerTypeE lexertyp = waste_lexertype(wl_token.text());
+  switch ( lexertyp ) {
+  }
+
   /*
   //-- token text
   if (wts_token.text().empty())

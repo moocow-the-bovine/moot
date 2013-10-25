@@ -283,10 +283,9 @@ Any = Any1|Any2|Any3;
   */
 
   /*!re2c
-    QUOTE_L                = ([`\"])|([`][`])|([\xE2][\x80][\x98\x9A\x9B\x9C\x9E\x9F]);
 
     Latin_Lu+ [\000]                    { return wst_LATIN_CAPS; }
-    (QUOTE_L|[\x28])? Latin_Lu          { return wst_LATIN_UPPER; }
+    Latin_Lu                            { return wst_LATIN_UPPER; }
 
     [^]                      { return wst_LATIN_LOWER; }
   */
@@ -307,6 +306,7 @@ wasteLexerTypeE waste_lexertype(const std::string &s)
     PERCENT                 = [%§] | ([\xe2] [\x80] [\xb0\xb1]);
     MONEY                   = Sc;
     
+    QUOTE_L                 = ([`\"])|([`][`])|([\xE2][\x80][\x98\x9A\x9B\x9C\x9E\x9F]);
     QUOTE_R                 = (['\"])|([\'][\'])|([\xE2][\x80][\x99\x9D]);
     QUOTE_G1                = ([\xC2][\xAB])|([\xE2][\x80][\xB9]);
     QUOTE_G2                = ([\xC2][\xBB])|([\xE2][\x80][\xBA]);
@@ -327,6 +327,8 @@ wasteLexerTypeE waste_lexertype(const std::string &s)
     RBR                     = [\)\]\}];
 
     SLASH                   = [\\/];
+    
+    WS                      = [ \r\n\t\f];
 
     SC                      = Pc|Pd|Pe|Pf|Pi|Po|Ps|Sk|Sm|So|QUOTE;
 
@@ -347,6 +349,13 @@ wasteLexerTypeE waste_lexertype(const std::string &s)
     SC                                  { return wst_TOKEN_SC; }
     TRUNC                               { return wst_TOKEN_TRUNC; }
     CARD                                { return wst_TOKEN_NUM; }
+    Latin_Lu+ [\000]                    { return wst_LATIN_CAPS; }
+    Latin_Lu                            { return wst_LATIN_UPPER; }
+    Latin_Ll                            { return wst_LATIN_LOWER; }
+
+    WS*[\n]WS*                          { return wst_TOKEN_NL; }
+    WS                                  { return wst_TOKEN_SPACE; }
+
     [^]                      	        { return wst_TOKEN_REST; }
 
    */
