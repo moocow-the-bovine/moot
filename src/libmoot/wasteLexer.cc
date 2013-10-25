@@ -19,6 +19,7 @@
 */
 
 #include "wasteLexer.h"
+#include "wasteCase.h"
 #include <sstream>
 
 moot_BEGIN_NAMESPACE
@@ -118,6 +119,12 @@ wasteLexer::~wasteLexer()
 }
 
 //----------------------------------------------------------------------
+void wasteLexer::from_reader(TokenReader *reader)
+{
+  scanner = reader;
+}
+
+//----------------------------------------------------------------------
 void wasteLexer::from_mstream(mootio::mistream *mistreamp)
 {
   if(scanner)
@@ -139,9 +146,11 @@ mootTokenType wasteLexer::get_token(void)
   if (!scanner)
     return wl_token.toktype(TokTypeEOF);
 
-  //TODO: dehyphenation
-  // ls_blanked is set by the constructor
-  while ( wl_state & ls_blanked )
+  // TODO: dehyphenation
+  // skip whitespace
+  // BOD serves as whitespace
+  bool skip = true;
+  while ( skip )
   {
     // grab next token from scanner and copy it
     mootTokenType toktyp = scanner->get_token();
@@ -161,34 +170,118 @@ mootTokenType wasteLexer::get_token(void)
     std::string real_toktext = scanner->token()->text();
     wasteLexerTypeE lexertyp = waste_lexertype(real_toktext);
     switch ( lexertyp ) {
+      //
+      // whitespace
+      //
       case wLexerTypeSpace:
       case wLexerTypeNewline:
         wl_state |= ls_blanked;
         continue;
+
+      //
+      // punctuation
+      //
+      case wLexerTypeEOS:
+        set_token(wl_token, real_toktext, eos, non, uk, 0, (wl_state&ls_blanked) ? kn : uk);
+        break;
+      case wLexerTypeDot:
+        set_token(wl_token, real_toktext, dot, non, uk, 0, (wl_state&ls_blanked) ? kn : uk);
+        break;
+      case wLexerTypeComma:
+        set_token(wl_token, real_toktext, comma, non, uk, 0, (wl_state&ls_blanked) ? kn : uk);
+        break;
+      case wLexerTypePercent:
+      case wLexerTypeMonetary:
+      case wLexerTypePunct:
+        set_token(wl_token, real_toktext, sc, non, uk, 0, (wl_state&ls_blanked) ? kn : uk);
+        break;
+      case wLexerTypePlus:
+        set_token(wl_token, real_toktext, plus, non, uk, 0, (wl_state&ls_blanked) ? kn : uk);
+        break;
+      case wLexerTypeColon:
+        set_token(wl_token, real_toktext, colon, non, uk, 0, (wl_state&ls_blanked) ? kn : uk);
+        break;
+      case wLexerTypeSemicolon:
+        set_token(wl_token, real_toktext, scolon, non, uk, 0, (wl_state&ls_blanked) ? kn : uk);
+        break;
+      case wLexerTypeApostrophe:
+        set_token(wl_token, real_toktext, apos, non, uk, 0, (wl_state&ls_blanked) ? kn : uk);
+        break;
+      case wLexerTypeQuote:
+        set_token(wl_token, real_toktext, quote, non, uk, 0, (wl_state&ls_blanked) ? kn : uk);
+        break;
+      case wLexerTypeLBR:
+        set_token(wl_token, real_toktext, lbr, non, uk, 0, (wl_state&ls_blanked) ? kn : uk);
+        break;
+      case wLexerTypeRBR:
+        set_token(wl_token, real_toktext, rbr, non, uk, 0, (wl_state&ls_blanked) ? kn : uk);
+        break;
+      case wLexerTypeSlash:
+        set_token(wl_token, real_toktext, slash, non, uk, 0, (wl_state&ls_blanked) ? kn : uk);
+        break;
+      case wLexerTypeHyph:
+        set_token(wl_token, real_toktext, hyphen, non, uk, 0, (wl_state&ls_blanked) ? kn : uk);
+        break;
+
+      //
+      // alpha
+      //
+      case wLexerTypeAlphaLower:
+        set_token(wl_token, real_toktext,
+                 (wl_stopwords.lookup(real_toktext)) ? stop : alpha,
+                  lo,
+                 (wl_abbrevs.lookup(real_toktext))   ? kn   : uk,
+                  real_toktext.length(),
+                 (wl_state&ls_blanked)               ? kn   : uk);
+        break;
+      case wLexerTypeAlphaUpper:
+        set_token(wl_token, real_toktext,
+                 (wl_stopwords.lookup(real_toktext)) ? stop : alpha,
+                  up,
+                 (wl_abbrevs.lookup(real_toktext))   ? kn   : uk,
+                  real_toktext.length(),
+                 (wl_state&ls_blanked)               ? kn   : uk);
+        break;
+      case wLexerTypeAlphaCaps:
+        set_token(wl_token, real_toktext,
+                 (wl_stopwords.lookup(real_toktext)) ? stop : alpha,
+                  cap,
+                 (wl_abbrevs.lookup(real_toktext))   ? kn   : uk,
+                  real_toktext.length(),
+                 (wl_state&ls_blanked)               ? kn   : uk);
+        break;
+
+      //
+      // numbers 
+      //
+      case wLexerTypeNumber:
+        set_token(wl_token, real_toktext, num, non, uk, real_toktext.length(), (wl_state&ls_blanked) ? kn : uk);
+        break;
+      case wLexerTypeRoman:
+        set_token(wl_token, real_toktext,
+                 (wl_stopwords.lookup(real_toktext)) ? stop : rom,
+                 (wl_stopwords.lookup(real_toktext)) ? cap  : non,
+                  uk, real_toktext.length(),+
+                 (wl_state&ls_blanked) ? kn : uk);
+        break;
+
+      //
+      // default rule
+      //
+      default:
+        set_token(wl_token, real_toktext, other, non,
+                  wl_abbrevs.lookup(real_toktext) ? kn : uk,
+                  real_toktext.length(),
+                 (wl_state&ls_blanked) ? kn : uk);
     }
     // unset blanked state
     wl_state &= ~(ls_blanked);
+    skip = false;
   }
 
-  /*
-  //-- token text
-  if (wts_token.text().empty())
-    wts_token.text(scanner.yytext());
-
   //-- token location
-  wts_token.location( scanner.theByte-scanner.yyleng(), scanner.yyleng() );
+  wl_token.location( scanner->token()->location () );
 
-  //-- +Tagged: set tag text
-  if ( tr_format&tiofTagged )
-    wts_token.besttag( wasteScannerTypeNames[scantyp] );
-
-  //-- +Analyzed: set analysis text
-  if ( tr_format&tiofAnalyzed )
-    wts_token.insert( wasteScannerTypeNames[scantyp], "" );
-
-  //-- return
-  return wts_token.toktype();
-  */
   return wl_token.toktype();
 }
 
@@ -201,6 +294,46 @@ mootTokenType wasteLexer::get_sentence(void)
     wl_sentence.push_back( wl_token );
   }
   return toktyp;
+}
+
+//----------------------------------------------------------------------
+void wasteLexer::set_token(mootToken &token, const std::string &tok_text, cls wl_cls, cas wl_cas, binary wl_abbr, size_t length, binary wl_blanked)
+{
+  // length classification
+  len wl_length;
+  switch ( length )
+  {
+    case 0:
+      wl_length = le_null;
+      break;
+    case 1:
+      wl_length = le_one;
+      break;
+    case 2:
+    case 3:
+      wl_length = le_three;
+      break;
+    case 4:
+    case 5:
+      wl_length = le_five;
+      break;
+    default:
+      wl_length = longer;
+  }
+
+  // special token text
+  token.tok_text = wl_tagset[wl_cls][wl_cas][wl_abbr][wl_length][wl_blanked][0];
+  if ( wl_cls == stop )
+  {
+    token.tok_text += ':';
+    token.tok_text += utf8ToLower( tok_text );
+  }
+
+  // analyses + real token text
+  for ( int i = 1; i <= 6; ++i ) {
+    token.insert( wl_tagset[wl_cls][wl_cas][wl_abbr][wl_length][wl_blanked][i],
+                  std::string("[") + wl_tagset[wl_cls][wl_cas][wl_abbr][wl_length][wl_blanked][i] + " " + tok_text + "]" );
+  }
 }
 
 moot_END_NAMESPACE

@@ -61,6 +61,7 @@ wasteLexerTypeE waste_lexertype(const std::string &s)
     INT                     = Nd+ | (Nd{1,3} ([ \.\,] Nd{3})+);
     FLOAT                   = INT ([,] INT)?;
     CARD                    = FLOAT;
+    ROMAN                   = [IXVLMDC]+;
 
     LBR                     = [\(\[\{];
     RBR                     = [\)\]\}];
@@ -70,6 +71,9 @@ wasteLexerTypeE waste_lexertype(const std::string &s)
     WS                      = [ \r\n\t\f];
 
     SC                      = Pc|Pd|Pe|Pf|Pi|Po|Ps|Sk|Sm|So|QUOTE;
+
+    "\\n"                               { return wLexerTypeNewline; }
+    WS                                  { return wLexerTypeSpace; }
 
     EOS                                 { return wLexerTypeEOS; }
     "."                                 { return wLexerTypeDot; }
@@ -87,13 +91,11 @@ wasteLexerTypeE waste_lexertype(const std::string &s)
     HYPH                                { return wLexerTypeHyph; }
     SC                                  { return wLexerTypePunct; }
     TRUNC                               { return wLexerTypeAlphaTrunc; }
-    CARD                                { return wLexerTypeNumber; }
+    CARD [\000]                         { return wLexerTypeNumber; }
+    ROMAN [\000]                        { return wLexerTypeRoman; }
     Latin_Lu+ [\000]                    { return wLexerTypeAlphaCaps; }
     Latin_Lu                            { return wLexerTypeAlphaUpper; }
     Latin_Ll                            { return wLexerTypeAlphaLower; }
-
-    WS*[\n]WS*                          { return wLexerTypeNewline; }
-    WS                                  { return wLexerTypeSpace; }
 
     [^]                      	        { return wLexerTypeOther; }
 

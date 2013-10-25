@@ -193,10 +193,10 @@ osfcn.h: myosfcn.h
 
 if ENABLE_RE2C_AUTO
 wasteScannerScan.re: wasteScannerScan.re.skel re2c_ucl.py
-	$(PYTHON) re2c_ucl.py -o $@ $<
+	$(PYTHON) re2c_ucl.py -s $(srcdir)/Scripts.txt -o $@ $<
 
 wasteLexerTypes.re: wasteLexerTypes.re.skel re2c_ucl.py
-	$(PYTHON) re2c_ucl.py -o $@ $<
+	$(PYTHON) re2c_ucl.py -s $(srcdir)/Scripts.txt -o $@ $<
 
 wasteCase.re: wasteCase.re.skel re2c_case.perl
 	$(PERL) re2c_case.perl $< > $@ 2>/dev/null

@@ -295,6 +295,9 @@ namespace moot
 
       /** Set abbrev lexicon */
       void abbrevs(const wasteLexicon &abbrevs);
+
+      /** Set token features (token.tok_analyses) w.r.t. model features **/
+      void set_token(mootToken &token, const std::string &tok_text, cls wl_cls, cas wl_cas, binary wl_abbr, size_t length, binary wl_blanked);
       //@}
   };
 
