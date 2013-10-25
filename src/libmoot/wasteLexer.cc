@@ -64,7 +64,8 @@ bool wasteLexicon::load(const char *filename)
 wasteLexer::wasteLexer(int fmt, const std::string &myname)
   : TokenReader(fmt, myname),
     scanner(NULL),
-    wl_state(0x40)
+    wl_state(0x40),
+    wl_dehyph_mode(false)
 {
   // wasteLexer has local contents
   tr_token = &wl_token;
@@ -138,6 +139,30 @@ void wasteLexer::close(void)
 }
 
 //----------------------------------------------------------------------
+mootTokenType wasteLexer::next_token(void)
+{
+  if (!scanner)
+    return wl_token.toktype(TokTypeEOF);
+
+  if (!wl_tokbuf.empty())
+  {
+    wl_token = wl_tokbuf.front();
+    wl_tokbuf.pop_front();
+    return wl_token.toktype();
+  }
+
+  mootTokenType toktyp = scanner->get_token ();
+  switch ( toktyp ) {
+    case TokTypeVanilla:
+      break;
+    default:
+      wl_token = *(scanner->token ());
+      return wl_token.toktype(toktyp);
+  }
+  return wl_token.toktype(toktyp);
+}
+
+//----------------------------------------------------------------------
 mootTokenType wasteLexer::get_token(void)
 {
   wl_token.clear();
@@ -152,8 +177,8 @@ mootTokenType wasteLexer::get_token(void)
   bool skip = true;
   while ( skip )
   {
-    // grab next token from scanner and copy it
-    mootTokenType toktyp = scanner->get_token();
+    // grab next token from scanner
+    mootTokenType toktyp = next_token();
 
     // ??? handle empty token text ???
 
@@ -162,7 +187,7 @@ mootTokenType wasteLexer::get_token(void)
       case TokTypeVanilla:
         break;
       default:
-        wl_token = *(scanner->token ());
+        // wl_token = *(scanner->token ()); -> moved to next_token
         return wl_token.toktype(toktyp);
     }
 

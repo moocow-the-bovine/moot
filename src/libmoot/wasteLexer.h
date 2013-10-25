@@ -41,6 +41,7 @@
 
 #include <vector>
 #include <string>
+#include <list>
 
 namespace moot
 {
@@ -124,6 +125,9 @@ namespace moot
       /*------------------------------------------------------------*/
       /** Multi-dimensional vector for constant access on feature bundles */
       typedef std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::string> > > > > > wasteTagset;
+
+      /** List of mootToken for buffering while dehyphenating */
+      typedef std::list<mootToken> wasteTokenBuffer;
       
       /** Possible states of the lexer (bitmask, mainly used for dehyphenation) */
       enum wasteLexer_state
@@ -198,13 +202,15 @@ namespace moot
       mootSentence      wl_sentence;      /**< Local sentence */
       wasteTagset       wl_tagset;        /**< Token feature bundles */
       int               wl_state;         /**< Current state of the lexer */
+      wasteTokenBuffer  wl_tokbuf;        /**< Buffer for dehyphenation */
+      bool              wl_dehyph_mode;   /**< Dehyphenation switch */
       //@}
 
       /** \name Lexica */
       //@{
-      wasteLexicon   wl_stopwords;      /**< List of stopwords */
-      wasteLexicon   wl_abbrevs;        /**< List of abbreviations */
-      wasteLexicon   wl_conjunctions;   /**< List of conjunctions (for dehyphenating) */
+      wasteLexicon      wl_stopwords;     /**< List of stopwords */
+      wasteLexicon      wl_abbrevs;       /**< List of abbreviations */
+      wasteLexicon      wl_conjunctions;  /**< List of conjunctions (for dehyphenating) */
       //@}
 
       /*--------------------------------------------------------------------
@@ -298,6 +304,20 @@ namespace moot
 
       /** Set token features (token.tok_analyses) w.r.t. model features **/
       void set_token(mootToken &token, const std::string &tok_text, cls wl_cls, cas wl_cas, binary wl_abbr, size_t length, binary wl_blanked);
+
+      /** Turn on/off dehyphenation mode **/
+      inline void dehyph_mode(bool on)
+      {
+        wl_dehyph_mode = on;
+      }
+
+      /**
+       * Grabs the next token from internal scanner.
+       * If wl_dehyph_mode is true, seeks and removes hyphenations,
+       * before setting wl_token.
+       *
+       */
+      mootTokenType next_token(void);
       //@}
   };
 
