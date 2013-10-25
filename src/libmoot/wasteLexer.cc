@@ -62,7 +62,8 @@ bool wasteLexicon::load(const char *filename)
 //----------------------------------------------------------------------
 wasteLexer::wasteLexer(int fmt, const std::string &myname)
   : TokenReader(fmt, myname),
-    scanner(NULL)
+    scanner(NULL),
+    wl_state(0x40)
 {
   // wasteLexer has local contents
   tr_token = &wl_token;
@@ -139,17 +140,34 @@ mootTokenType wasteLexer::get_token(void)
     return wl_token.toktype(TokTypeEOF);
 
   //TODO: dehyphenation
-  mootTokenType toktyp = scanner->get_token();
-  wl_token = *(scanner->token ());
+  // ls_blanked is set by the constructor
+  while ( wl_state & ls_blanked )
+  {
+    // grab next token from scanner and copy it
+    mootTokenType toktyp = scanner->get_token();
 
-  //-- token type
-  switch ( toktyp ) {
-  case TokTypeVanilla:		break;
-  default:			return toktyp;
-  }
+    // ??? handle empty token text ???
 
-  wasteLexerTypeE lexertyp = waste_lexertype(wl_token.text());
-  switch ( lexertyp ) {
+    //-- token type
+    switch ( toktyp ) {
+      case TokTypeVanilla:
+        break;
+      default:
+        wl_token = *(scanner->token ());
+        return wl_token.toktype(toktyp);
+    }
+
+    // classify current token and handle it appropriately
+    std::string real_toktext = scanner->token().text();
+    wasteLexerTypeE lexertyp = waste_lexertype(real_toktext);
+    switch ( lexertyp ) {
+      case wLexerTypeSpace:
+      case wLexerTypeNewline:
+        wl_state |= ls_blanked;
+        continue;
+    }
+    // unset blanked state
+    wl_state &= ~(ls_blanked);
   }
 
   /*

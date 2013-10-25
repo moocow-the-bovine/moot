@@ -125,7 +125,7 @@ namespace moot
       /** Multi-dimensional vector for constant access on feature bundles */
       typedef std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::string> > > > > > wasteTagset;
       
-      /** Possible states of the dehyphenation procedure */
+      /** Possible states of the lexer (bitmask, mainly used for dehyphenation) */
       enum wasteLexer_state
       {
         ls_flush   = 0x01,
@@ -134,6 +134,7 @@ namespace moot
         ls_tail    = 0x08,
         ls_nl      = 0x10,
         ls_exclude = 0x20,
+        ls_blanked = 0x40,
       };
 
       /** Token feature indexes */
@@ -192,10 +193,11 @@ namespace moot
       /*------------------------------------------------------------*/
       /** \name Low-level data */
       //@{
-      TokenReader    *scanner;          /**< Input source */
-      mootToken       wl_token;         /**< Local token */
-      mootSentence    wl_sentence;      /**< Local sentence */
-      wasteTagset     wl_tagset;        /**< Token feature bundles */
+      TokenReader      *scanner;          /**< Input source */
+      mootToken         wl_token;         /**< Local token */
+      mootSentence      wl_sentence;      /**< Local sentence */
+      wasteTagset       wl_tagset;        /**< Token feature bundles */
+      wasteLexer_state  wl_state;         /**< Current state of the lexer */
       //@}
 
       /** \name Lexica */
