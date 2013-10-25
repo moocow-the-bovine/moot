@@ -215,7 +215,7 @@ sub test_wscan {
 }
 #test_wscan(file=>'scanme.txt');
 #test_wscan(fh=>\*STDIN);
-test_wscan(string=>"Test 123\nfoo bar.\n");
+test_wscan(string=>"Test 123\nfoo bar.");
 ##
 #$buf = ("Test 123.456\nfoo bar." x 1024); test_wscan(string=>$buf);
 

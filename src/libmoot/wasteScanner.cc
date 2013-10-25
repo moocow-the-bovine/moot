@@ -21,6 +21,8 @@
 
 #include "wasteTypes.h"
 #include "wasteScanner.h"
+#include <string.h>  //-- for memcpy()
+
 namespace moot {
 
 /*==========================================================================
@@ -55,19 +57,20 @@ wasteScanner::~wasteScanner()
 //----------------------------------------------------------------------
 bool wasteScanner::fill( size_t n )
 {
-  if ( !mglin || mglin->eof() )
-  {
-    if ( (yylimit - yycursor) <= 0 ) {
-      return false;
-    }
-  }
+  if ( (!mglin || mglin->eof()) && yycursor >= yylimit )
+    return false;
 
   ptrdiff_t restSize = yylimit - yytoken;
-  if ( restSize + n >= buffer_size )
+  /*
+  if ( restSize > n ) {
+    return true;
+  }
+  else*/ if ( restSize + n >= buffer_size )
   {
     // extend buffer
     buffer_size *= 2;
     char* newBuffer = new char[buffer_size];
+    //memcpy(newBuffer, yytoken, restSize);  //-- moo: why not memcpy?
     for ( ptrdiff_t i = 0; i < restSize; ++i )
     {
       // memcpy
@@ -83,11 +86,11 @@ bool wasteScanner::fill( size_t n )
   }
   else
   {
-    // move remained data to head.
+    // move remaining unprocessed data to head
     for ( ptrdiff_t i = 0; i < restSize; ++i )
     {
-      //memmove( yybuffer, yytoken, (restSize)*sizeof(char) );
-      *( yybuffer + i ) = * ( yytoken + i );
+      //memmove( yybuffer, yytoken, (restSize)*sizeof(char) );  //-- moo: why not memmove?
+      *( yybuffer + i ) = *( yytoken + i );
     }
     yymarker = yybuffer + ( yymarker - yytoken );
     yycursor = yybuffer + ( yycursor - yytoken );
@@ -95,9 +98,11 @@ bool wasteScanner::fill( size_t n )
     yylimit = yybuffer + restSize;
   }
 
-  // fill to buffer
+  // fill the buffer
   size_t read_size = buffer_size - restSize;
-  yylimit += mglin->read ( yylimit, read_size );
+  yylimit += mglin->read ( yylimit, read_size-1 );
+  *yylimit = '\0';
+  ++yylimit;
 
   return true;
 }
