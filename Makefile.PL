@@ -3,8 +3,8 @@ use ExtUtils::MakeMaker;
 ##----------------------------------------------------------------------
 ## Configuration
 ##----------------------------------------------------------------------
-if (system("pkg-config --atleast-version=2.0.9 moot") != 0) {
-  die("Required module moot >= v2.0.9 not found!\n");
+if (system("pkg-config --atleast-version=2.0.10 moot") != 0) {
+  die("Required module moot >= v2.0.10 not found!\n");
 }
 
 $MOOT_IFLAGS = join(' ', map { $s=`pkg-config --cflags-only-I $_`; chomp($s); $s } qw(moot));
@@ -19,7 +19,7 @@ WriteMakefile
    NAME		=> 'Moot',
    DISTNAME	=> 'moot-perl',
    AUTHOR       => 'Bryan Jurish <moocow@cpan.org>',
-   ABSTRACT	=> 'Perl interface to the libmoot part-of-speech tagging library',
+   ABSTRACT	=> 'Perl interface to the libmoot HMM tagger library',
    VERSION_FROM	=> 'Moot.pm',
 
 
@@ -67,6 +67,7 @@ sub MY::depend {
 		   ." Ngrams.xs"
 		   ." HMM.xs"
 		   ." DynHMM.xs"
+		   ." Waste.xs"
 		  )
 		 ."\n\n"
 		 ##-- c->o dependencies

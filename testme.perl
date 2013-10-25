@@ -5,6 +5,11 @@ use IO::Handle;
 use Data::Dumper;
 use Encode qw(encode decode encode_utf8 decode_utf8);
 use Moot;
+use Devel::Peek;
+
+BEGIN {
+  *refcnt = \&Devel::Peek::SvREFCNT;
+}
 
 ##--------------------------------------------------------------
 ## test: basic
@@ -159,8 +164,50 @@ sub test_hmm {
     }
   }
 }
-test_hmm(@ARGV);
+#test_hmm(@ARGV);
 
+##--------------------------------------------------------------
+## wasteScanner
+
+sub test_wscan {
+  my ($which,$what) = @_ ? @_ : (file=>'scanme.txt');
+  my $ws = Moot::Waste::Scanner->new()
+    or die("$0: Moot::Waste::Scanner->new() failed");
+
+  my ($fh);
+  if ($which eq 'file') {
+    $ws->from_file($what);
+  }
+  elsif ($which eq 'fh') {
+    $ws->from_fh($what);
+  }
+  elsif ($which eq 'string') {
+    open($fh, "<", \$what) or die("$0: open failed for string filehandle");
+    $ws->from_fh($fh);
+  }
+  else {
+    die("$0: unknown 'which'=$which in test_wscan()");
+  }
+
+  ##-- ye olde loope
+  my ($tok);
+  $Data::Dumper::Indent = 0;
+  $Data::Dumper::Terse = 1;
+  $Data::Dumper::Pair = '=>';
+  $Data::Dumper::Sortkeys = 1;
+  while (defined($tok=$ws->get_token)) {
+    print Dumper($tok), "\n";
+  }
+
+  ##-- cleanup
+  $ws->close();
+  undef $ws;
+
+  print STDERR "test_wscan() done\n";
+}
+#test_wscan(file=>'scanme.txt');
+#test_wscan(fh=>\*STDIN);
+test_wscan(string=>'Test 123.456');
 
 ##--------------------------------------------------------------
 ## MAIN
