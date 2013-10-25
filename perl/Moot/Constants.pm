@@ -15,6 +15,8 @@ BEGIN {
               'comment' => TokTypeComment(),
               'eos'     => TokTypeEOS(),
               'eof'     => TokTypeEOF(),
+              'sb'      => TokTypeSB(),
+              'wb'      => TokTypeWB(),
               'user'    => TokTypeUser(),
              );
   @TokType[values %TokType] = keys %TokType;
@@ -61,6 +63,8 @@ Moot::Constants - libmoot : constants
   $i = Moot::TokTypeComment();  ##-- alias: $Moot::TokType{comment}
   $i = Moot::TokTypeEOS();      ##-- alias: $Moot::TokType{eos}
   $i = Moot::TokTypeEOF();      ##-- alias: $Moot::TokType{eof}
+  $i = Moot::TokTypeSB();       ##-- alias: $Moot::TokType{sb}
+  $i = Moot::TokTypeWB();       ##-- alias: $Moot::TokType{wb}
   $i = Moot::TokTypeUser();     ##-- alias: $Moot::TokType{user}
 
   ##-- Token Types: names by index
@@ -94,7 +98,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 by Bryan Jurish
+Copyright (C) 2011-2013 by Bryan Jurish
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

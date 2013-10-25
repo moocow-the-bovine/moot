@@ -17,6 +17,8 @@ MODULE = Moot		PACKAGE = Moot
 
 #ifdef MOOTDEBUG
 
+##-- refcount = __refcnt($SV)
+##   + also see Devel::Peek::Dump($SV), Devel::Peek::SvREFCNT($SV)
 int __refcnt(SV *sv)
 CODE:
  if (sv && SvOK(sv)) {
@@ -37,3 +39,4 @@ INCLUDE: Lexfreqs.xs
 INCLUDE: Ngrams.xs
 INCLUDE: HMM.xs
 INCLUDE: DynHMM.xs
+INCLUDE: Waste.xs

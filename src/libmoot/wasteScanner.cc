@@ -142,7 +142,9 @@ wasteTokenScanner::~wasteTokenScanner(void)
 //----------------------------------------------------------------------
 void wasteTokenScanner::from_mstream(mootio::mistream *mistreamp)
 {
-  scanner.from_mstream(mistreamp);
+  tr_istream         = mistreamp;
+  tr_istream_created = false;
+  scanner.from_mstream(tr_istream);
 }
 
 //----------------------------------------------------------------------
@@ -150,6 +152,7 @@ void wasteTokenScanner::close(void)
 {
   wts_token.clear();
   wts_sentence.clear();
+  scanner.reset();
   TokenReader::close();
 }
 
@@ -165,8 +168,11 @@ mootTokenType wasteTokenScanner::get_token(void)
   case wScanTypeNewline:	wts_token.text("\\n"); break;
   case wScanTypeWB:		wts_token.toktype(TokTypeWB); break;
   case wScanTypeSB:		wts_token.toktype(TokTypeSB); break;
-  case wScanTypeComment:	wts_token.toktype(TokTypeComment); break;
-  default:			break;
+  case wScanTypeComment:
+    wts_token.toktype(TokTypeComment);
+    wts_token.text( scanner.yytext().substr(2, scanner.yytext().size()-4) );
+    break;
+  default: break;
   }
 
   //-- token text

@@ -1,3 +1,4 @@
+/*-*- Mode: C++; coding: utf-8; c-basic-offset: 2; -*-*/
 extern "C" {
  #include "EXTERN.h"
  #include "perl.h"
@@ -49,3 +50,15 @@ mootTagSet *av2tagset(AV *tsav, mootTagSet *tagset, U32 utf8=TRUE);
  * Conversions: in-place
  */
 void sentence2tokdata(mootSentence *s, U32 utf8=TRUE);
+
+/*======================================================================
+ * mootio stream wrappers for I/O on perl scalars ::: TODO
+ */
+/*
+class mootPerlBuffer : virtual public mootio::mcbuffer
+{
+public:
+  SV *sv; //-- underlying sv
+  
+};
+*/

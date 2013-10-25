@@ -71,6 +71,20 @@ OUTPUT:
  RETVAL
 
 mootTokenType
+TokTypeWB()
+CODE:
+ RETVAL=moot::TokTypeWB;
+OUTPUT:
+ RETVAL
+
+mootTokenType
+TokTypeSB()
+CODE:
+ RETVAL=moot::TokTypeSB;
+OUTPUT:
+ RETVAL
+
+mootTokenType
 TokTypeUser()
 CODE:
  RETVAL=moot::TokTypeUser;

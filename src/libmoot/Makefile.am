@@ -85,7 +85,7 @@ libmoot_la_SOURCES = \
 	wasteLexerTypes.cc \
 	wasteScanner.cc \
 	wasteScannerScan.cc \
- 	wasteLexer.cc \
+	wasteLexer.cc \
 	wasteCase.cc
 
 
@@ -402,7 +402,7 @@ libmoot_la_LIBADD = gnulib/libgnu.la
 #MOSTLYCLEANFILES =
 
 ## --- clean:  built by 'make'
-CLEANFILES = osfcn.h *.re $(RE2C_OUT)
+CLEANFILES = osfcn.h *.re
 
 ## --- distclean: built by 'configure'
 #DISTCLEANFILES =

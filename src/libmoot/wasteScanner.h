@@ -163,10 +163,9 @@ namespace moot
      * @param fmt bitmask of moot::TokenIOFormat flags.
      *  \li set moot::tiofTagged to assign token tags to wasteScannerTypeNames[]
      *  \li set moot::tiofAnalyzed to assign single analysis-strings to wasteScannerTypeNames[]
-     *  \li set moot::tiofCost to assign analysis cost to wasteScannerTypeE value
      * @param name name of current input source
      */
-    wasteTokenScanner(int                fmt  =tiofCost,
+    wasteTokenScanner(int                fmt  =tiofText,
 		      const std::string &name ="wasteTokenScanner");
 
     /** Default destructor */

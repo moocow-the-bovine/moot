@@ -103,4 +103,11 @@
 #include <mootTrieVector.h>
 #include <mootSuffixTrie.h>
 
+//----------------------------------------------------------------------
+// WASTE tokenization framework
+#include <wasteTypes.h>
+#include <wasteCase.h>
+#include <wasteScanner.h>
+#include <wasteLexer.h>
+
 #endif /* _MOOT_H */

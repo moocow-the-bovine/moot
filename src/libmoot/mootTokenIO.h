@@ -297,8 +297,8 @@ public:
   {
     this->from_mstream(new mootio::mifstream(filename,"rb"));
     tr_istream_created = true;
-    if (!tr_istream->valid()) {
-      carp("open failed for \"%s\": %s", filename, strerror(errno));
+    if (!tr_istream || !tr_istream->valid()) {
+      this->carp("open failed for \"%s\": %s", filename, strerror(errno));
       this->close();
     }
   };
@@ -714,7 +714,7 @@ public:
     this->close();
     tw_ostream = mostreamp;
     if (!(tw_format&tiofNull) && (!tw_ostream || !tw_ostream->valid())) {
-      carp("Warning: selecting output to invalid stream");
+      this->carp("Warning: selecting output to invalid stream");
     }
     tw_ostream_created = false;
   };
@@ -737,8 +737,8 @@ public:
   {
     this->to_mstream(new mootio::mofstream(filename,"wb"));
     tw_ostream_created = true;
-    if (!tw_ostream->valid()) {
-      carp("open failed for \"%s\": %s", filename, strerror(errno));
+    if (!tw_ostream || !tw_ostream->valid()) {
+      this->carp("open failed for \"%s\": %s", filename, strerror(errno));
       this->close();
     }
   };
