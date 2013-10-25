@@ -44,57 +44,32 @@ const char *wasteScannerTypeNames[NwScanTypes] =
   };
 
 //----------------------------------------------------------------------
-const char *wasteLexerTypeNames[wst_N_TYPES] =
+const char *wasteLexerTypeNames[NwLexerTypes] =
   {
-    "TOKEN_EOF",
-    "TOKEN_UNKNOWN",
-    "TOKEN_WORD",
-    "TOKEN_HYPH",
-
-    "TOKEN_SPACE",
-    "TOKEN_NL",
-
-    "TOKEN_GREEK",
-
-    "TOKEN_NUM",
-    "TOKEN_DOT",
-    "TOKEN_EOS",
-    "TOKEN_COMMA",
-    "TOKEN_QUOTE",
-    "TOKEN_SC",
-    "TOKEN_ROMAN_NUM",
-
-    "STOP_LOWER",
-    "STOP_UPPER",
-    "STOP_CAPS",
-
-    "LATIN_LOWER",
-    "LATIN_UPPER",
-    "LATIN_CAPS",
-
-    "TOKEN_MONEY",
-    "TOKEN_SB",
-
-    "LATIN_LOWER_TRUNC",
-    "LATIN_LOWER_TRUNC1",
-    "LATIN_LOWER_TRUNC2",
-    "TOKEN_TRUNC",
-
-    "TOKEN_PERCENT",
-
-    "TOKEN_XML",
-
-    "ABBREV",
-    "TOKEN_APOS",
-    "TOKEN_PLUS",
-    "TOKEN_LBR",
-    "TOKEN_RBR",
-    "TOKEN_SLASH",
-    "TOKEN_COLON",
-    "TOKEN_SEMICOLON",
-
-    "TOKEN_WB",
-    "TOKEN_REST"
+    "Dot",
+    "Comma",
+    "Hyph",
+    "Apostrophe",
+    "Quote",
+    "Monetary",
+    "Percent",
+    "Plus",
+    "LBR",
+    "RBR",
+    "Slash",
+    "Colon",
+    "Semicolon",
+    "EOS",
+    "Punct",
+    "Space",
+    "Newline",
+    "Number",
+    "Roman",
+    "AlphaLower",
+    "AlphaUpper",
+    "AlphaCaps",
+    "AlphaTrunc",
+    "Other",
   };
 
 }; //--/namespace moot

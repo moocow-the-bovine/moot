@@ -4,7 +4,7 @@ namespace moot {
 
 wasteLexerTypeE waste_casetype(const std::string &s)
 {
-  const unsigned char *sp  = (const unsigned char*)s.data();
+  const unsigned char *sp  = (const unsigned char*)s.c_str();
   const unsigned char *m   = sp;
 
   /*!re2c
@@ -282,12 +282,14 @@ Any3 = ([\xe1][\x81][\x80-\xbf])|([\xe1][\x80][\x80-\xbf])|([\xe1][\x83][\x80-\x
 Any = Any1|Any2|Any3;
   */
 
+  /* TODO: Better defintions of capitalized strings. */
+
   /*!re2c
 
-    Latin_Lu+ [\000]                    { return wst_LATIN_CAPS; }
-    Latin_Lu                            { return wst_LATIN_UPPER; }
+    Latin_Lu+ [\000]                    { return wLexerTypeAlphaCaps; }
+    Latin_Lu                            { return wLexerTypeAlphaUpper; }
 
-    [^]                      { return wst_LATIN_LOWER; }
+    [^]                                 { return wLexerTypeAlphaLower; }
   */
 }
 
@@ -299,8 +301,6 @@ wasteLexerTypeE waste_lexertype(const std::string &s)
   /*!re2c
 
 
-    KOMMA                   = ([,]);
-    DOT                     = ([\.]);
     EOS                     = ([?!]|([\xE2][\x80][\xA6]))+|[\.]{2,};
     APOS                    = ['`]|([\xCA][\xBC\xBD])|([\xD9][\xAC])|([\xE2][\x80][\x98\x99\x9A\x9B]);
     PERCENT                 = [%§] | ([\xe2] [\x80] [\xb0\xb1]);
@@ -332,34 +332,34 @@ wasteLexerTypeE waste_lexertype(const std::string &s)
 
     SC                      = Pc|Pd|Pe|Pf|Pi|Po|Ps|Sk|Sm|So|QUOTE;
 
-    EOS                                 { return wst_TOKEN_EOS; }
-    DOT                                 { return wst_TOKEN_DOT; }
-    KOMMA                               { return wst_TOKEN_COMMA; }
-    PERCENT                             { return wst_TOKEN_PERCENT; }
-    MONEY                               { return wst_TOKEN_MONEY; }
-    "+"                                 { return wst_TOKEN_PLUS; }
-    ":"                                 { return wst_TOKEN_COLON; }
-    ";"                                 { return wst_TOKEN_SEMICOLON; }
-    APOS                                { return wst_TOKEN_APOS; }
-    QUOTE                               { return wst_TOKEN_QUOTE; }
-    LBR                                 { return wst_TOKEN_LBR; }
-    RBR                                 { return wst_TOKEN_RBR; }
-    SLASH                               { return wst_TOKEN_SLASH; }
-    HYPH                                { return wst_TOKEN_HYPH; }
-    SC                                  { return wst_TOKEN_SC; }
-    TRUNC                               { return wst_TOKEN_TRUNC; }
-    CARD                                { return wst_TOKEN_NUM; }
-    Latin_Lu+ [\000]                    { return wst_LATIN_CAPS; }
-    Latin_Lu                            { return wst_LATIN_UPPER; }
-    Latin_Ll                            { return wst_LATIN_LOWER; }
+    EOS                                 { return wLexerTypeEOS; }
+    "."                                 { return wLexerTypeDot; }
+    ","                                 { return wLexerTypeComma; }
+    PERCENT                             { return wLexerTypePercent; }
+    MONEY                               { return wLexerTypeMonetary; }
+    "+"                                 { return wLexerTypePlus; }
+    ":"                                 { return wLexerTypeColon; }
+    ";"                                 { return wLexerTypeSemicolon; }
+    APOS                                { return wLexerTypeApostrophe; }
+    QUOTE                               { return wLexerTypeQuote; }
+    LBR                                 { return wLexerTypeLBR; }
+    RBR                                 { return wLexerTypeRBR; }
+    SLASH                               { return wLexerTypeSlash; }
+    HYPH                                { return wLexerTypeHyph; }
+    SC                                  { return wLexerTypePunct; }
+    TRUNC                               { return wLexerTypeAlphaTrunc; }
+    CARD                                { return wLexerTypeNumber; }
+    Latin_Lu+ [\000]                    { return wLexerTypeAlphaCaps; }
+    Latin_Lu                            { return wLexerTypeAlphaUpper; }
+    Latin_Ll                            { return wLexerTypeAlphaLower; }
 
-    WS*[\n]WS*                          { return wst_TOKEN_NL; }
-    WS                                  { return wst_TOKEN_SPACE; }
+    WS*[\n]WS*                          { return wLexerTypeNewline; }
+    WS                                  { return wLexerTypeSpace; }
 
-    [^]                      	        { return wst_TOKEN_REST; }
+    [^]                      	        { return wLexerTypeOther; }
 
    */
-  return wst_TOKEN_SC;
+  return wLexerTypePunct;
 }
 
 }; /*-- /namespace moot */

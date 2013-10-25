@@ -63,61 +63,41 @@ extern const char *wasteScannerTypeNames[NwScanTypes];
 
 /** old dwdsScanner type constants */
 enum wasteLexerTypeE {
-  wst_TOKEN_EOF,
-  wst_TOKEN_UNKNOWN,
-  wst_TOKEN_WORD,
-  wst_TOKEN_HYPH,
+  
+  wLexerTypeDot,        /** "." */
+  wLexerTypeComma,      /** "," */
+  wLexerTypeHyph,       /** hyphen, en-, or em-dash */
+  wLexerTypeApostrophe, /** single quotes and apostrophe */
+  wLexerTypeQuote,      /** quotation characters (quotes and guillemets) */
+  wLexerTypeMonetary,   /** currency symbols */
+  wLexerTypePercent,    /** paragraph, percent and permille character */
+  wLexerTypePlus,       /** "+" */
+  wLexerTypeLBR,        /** left brackets and left brace */
+  wLexerTypeRBR,        /** right brackets and right brace */
+  wLexerTypeSlash,      /** slash and backslash */
+  wLexerTypeColon,      /** ":" */
+  wLexerTypeSemicolon,  /** ";" */
+  wLexerTypeEOS,        /** sentence terminating punctuation characters */
+  wLexerTypePunct,      /** punctuation and "special" characters */
 
-  wst_TOKEN_SPACE,
-  wst_TOKEN_NL,
+  wLexerTypeSpace,      /** whitespace without embedded newline */
+  wLexerTypeNewline,    /** newline */
 
-  wst_TOKEN_GREEK,
+  wLexerTypeNumber,     /** number string */
+  wLexerTypeRoman,      /** roman numeral string */
 
-  wst_TOKEN_NUM,
-  wst_TOKEN_DOT,
-  wst_TOKEN_EOS,
-  wst_TOKEN_COMMA,
-  wst_TOKEN_QUOTE,
-  wst_TOKEN_SC,
-  wst_TOKEN_ROMAN_NUM,
+  wLexerTypeAlphaLower, /** alphabetic string, any script, lower case */
+  wLexerTypeAlphaUpper, /** alphabetic string, any script, first character in upper case */
+  wLexerTypeAlphaCaps,  /** alphabetic string, any script, all characters in upper case */
+  wLexerTypeAlphaTrunc, /** alphabetic string, any script, terminated by hyphen */
 
-  wst_STOP_LOWER,
-  wst_STOP_UPPER,
-  wst_STOP_CAPS,
+  wLexerTypeOther,      /** any other character */
 
-  wst_LATIN_LOWER,
-  wst_LATIN_UPPER,
-  wst_LATIN_CAPS,
-
-  wst_TOKEN_MONEY,
-  wst_TOKEN_SB,
-
-  wst_LATIN_LOWER_TRUNC,
-  wst_LATIN_LOWER_TRUNC1,
-  wst_LATIN_LOWER_TRUNC2,
-  wst_TOKEN_TRUNC,
-
-  wst_TOKEN_PERCENT,
-
-  wst_TOKEN_XML,
-
-  wst_ABBREV,
-  wst_TOKEN_APOS,
-  wst_TOKEN_PLUS,
-  wst_TOKEN_LBR,
-  wst_TOKEN_RBR,
-  wst_TOKEN_SLASH,
-  wst_TOKEN_COLON,
-  wst_TOKEN_SEMICOLON,
-
-  wst_TOKEN_WB,
-  wst_TOKEN_REST,
-
-  wst_N_TYPES
+  NwLexerTypes          /** number of lexer types */
 };
 
 /** Useful for debugging old dwdsScanner types */
-extern const char *wasteLexerTypeNames[wst_N_TYPES];
+extern const char *wasteLexerTypeNames[NwLexerTypes];
 
 wasteLexerTypeE waste_casetype(const std::string &tok_text);
 wasteLexerTypeE waste_lexertype(const std::string &tok_text);
