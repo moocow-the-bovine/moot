@@ -158,7 +158,7 @@ mootTokenType wasteLexer::get_token(void)
     }
 
     // classify current token and handle it appropriately
-    std::string real_toktext = scanner->token().text();
+    std::string real_toktext = scanner->token()->text();
     wasteLexerTypeE lexertyp = waste_lexertype(real_toktext);
     switch ( lexertyp ) {
       case wLexerTypeSpace:

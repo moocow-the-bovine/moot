@@ -197,7 +197,7 @@ namespace moot
       mootToken         wl_token;         /**< Local token */
       mootSentence      wl_sentence;      /**< Local sentence */
       wasteTagset       wl_tagset;        /**< Token feature bundles */
-      wasteLexer_state  wl_state;         /**< Current state of the lexer */
+      int               wl_state;         /**< Current state of the lexer */
       //@}
 
       /** \name Lexica */
