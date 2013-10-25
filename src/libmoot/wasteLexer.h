@@ -59,33 +59,53 @@ namespace moot
     /// \name Constructors etc.
     //@{
     /** Default constructor */
-    wasteLexicon();
+    wasteLexicon()
+    {};
 
     /** desctructor */
-    ~wasteLexicon();
+    ~wasteLexicon()
+    {};    
 
     /** clear all entries */
-    void clear();
+    inline void clear()
+    {
+      lex.clear();
+    };
     //@}
 
-    //------------------------------------------------------------
-    /// \name Access
+   //------------------------------------------------------------
+    /// \name Access and Manipulation
     //@{
     /** \returns true iff \a word is present in the lexicon */
-    bool lookup(const std::string &word) const;
+    inline bool lookup(const std::string &word) const
+    {
+      return (lex.find(word) != lex.end());
+    };
+
+    /** insert \a word into the lexicon */
+    inline void insert(const std::string &word)
+    {
+      lex.insert(word);
+    };
     //@}
 
     //------------------------------------------------------------
     /// \name I/O
     //@{
-    /** load lexicon from a moot::TokenReader: adds only mootToken::text() of moot::TokTypeVanilla tokens */
-    void load(moot::TokenReader *reader);
+    /** load lexicon from a moot::TokenReader: adds only mootToken::text() of moot::TokTypeVanilla tokens
+     *  \returns true on success, false otherwise
+     */
+    bool load(moot::TokenReader *reader);
 
-    /** load lexicon from a \a mootio::mistream; wraps load(moot::TokenReader*) using a temporary TokenReaderNative */
-    void load(mootio::mistream *mis);
+    /** load lexicon from a \a mootio::mistream; wraps load(moot::TokenReader*) using a temporary TokenReaderNative
+     *  \returns true on success, false otherwise
+     */
+    bool load(mootio::mistream *mis);
 
-    /** load lexicon from a named file; wraps load(mootoi::mistream*) method */
-    void load(const char *filename);
+    /** load lexicon from a named file; wraps load(mootoi::mistream*) method 
+     *  \returns true on success, false otherwise
+     */
+    bool load(const char *filename);
     //@}
   };
 

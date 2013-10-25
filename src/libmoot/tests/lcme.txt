@@ -1,0 +1,7 @@
+ABC	abc
+def	DEF
+
+ÄÖÜ	äöü
+ſͤß	ſͤß
+
+%% A Comment

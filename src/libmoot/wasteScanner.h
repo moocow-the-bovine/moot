@@ -1,5 +1,4 @@
 /* -*- Mode: C++; coding: utf-8; c-basic-offset: 2; -*- */
-
 /*
    libmoot : moot part-of-speech tagging library
    Copyright (C) 2013 by Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner
