@@ -54,9 +54,13 @@ OUTPUT:
 
 ##--------------------------------------------------------------
 void
-from_fp(wasteTokenScanner* wts, FILE *fp)
+from_fh(wasteTokenScanner* wts, SV *ioref)
+PREINIT:
+ mootPerlInputFH *min;
 CODE:
- wts->from_file(fp);
+ min = new mootPerlInputFH(ioref);
+ wts->from_mstream(min);
+ wts->tr_istream_created = true;
 
 ##--------------------------------------------------------------
 void
@@ -66,11 +70,11 @@ CODE:
 
 ##--------------------------------------------------------------
 void
-from_fh(wasteTokenScanner* wts, SV *ioref)
+from_string(wasteTokenScanner* wts, SV *buf)
 PREINIT:
- mootPerlInputFH *min;
+ mootPerlInputBuf *min;
 CODE:
- min = new mootPerlInputFH(ioref);
+ min = new mootPerlInputBuf(buf);
  wts->from_mstream(min);
  wts->tr_istream_created = true;
 

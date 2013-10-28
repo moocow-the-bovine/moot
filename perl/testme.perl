@@ -171,7 +171,7 @@ sub test_hmm {
 
 sub test_wscan {
   my ($which,$what) = @_ ? @_ : (file=>'scanme.txt');
-  my $ws = Moot::Waste::Scanner->new()
+  my $ws = Moot::Waste::Scanner->new( )
     or die("$0: Moot::Waste::Scanner->new() failed");
 
   my ($fh);
@@ -182,6 +182,9 @@ sub test_wscan {
     $ws->from_fh($what);
   }
   elsif ($which eq 'string') {
+    $ws->from_string($what);
+  }
+  elsif ($which eq 'stringfh') {
     ##-- from_fh() doesn't work with string-handles if wrapped with FILE* type
     #open($fh, "<", \$what) or die("$0: open failed for string filehandle");
     #$ws->from_fh($fh);
@@ -204,6 +207,7 @@ sub test_wscan {
   $Data::Dumper::Sortkeys = 1;
   $|=1;
   while (defined($tok=$ws->get_token)) {
+    $tok->{type} = $Moot::TokType[$tok->{type}];
     print Dumper($tok), "\n";
   }
 
@@ -216,8 +220,10 @@ sub test_wscan {
 #test_wscan(file=>'scanme.txt');
 #test_wscan(fh=>\*STDIN);
 test_wscan(string=>"Test 123\nfoo bar.");
+#test_wscan(stringfh=>"Test 123\nfoo bar.");
+#test_wscan(file=>'argh.txt');
 ##
-#$buf = ("Test 123.456\nfoo bar." x 1024); test_wscan(string=>$buf);
+#$buf = ("Test 123.456\nfoo bar." x 1024); test_wscan(stringfh=>$buf);
 
 ##--------------------------------------------------------------
 ## MAIN

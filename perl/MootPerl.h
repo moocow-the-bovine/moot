@@ -51,6 +51,7 @@ mootTagSet *av2tagset(AV *tsav, mootTagSet *tagset, U32 utf8=TRUE);
  */
 void sentence2tokdata(mootSentence *s, U32 utf8=TRUE);
 
+
 /*======================================================================
  * mootPerlInputFH: mootio stream wrapper for perl stream input
  */
@@ -72,4 +73,17 @@ public:
 
   //-- guts ganked from LibXML.xs LibXML_read_perl(SV * ioref, char * buffer, int len)
   virtual mootio::ByteCount read(char *buf, size_t n);
+};
+
+/*======================================================================
+ * mootPerlInputBuf: mootio stream wrapper for perl buffer input
+ */
+class mootPerlInputBuf : virtual public mootio::micbuffer
+{
+public:
+  SV  *sv; //-- underlying SV*
+
+public:
+  mootPerlInputBuf(SV *svbuf=NULL);
+  virtual ~mootPerlInputBuf(void);
 };
