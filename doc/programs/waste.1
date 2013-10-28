@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "WASTE 1"
-.TH WASTE 1 "2013-10-25" "moot v2.0.10-pre1" "moot PoS Tagger"
+.TH WASTE 1 "2013-10-28" "moot v2.0.10-pre1" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -145,13 +145,21 @@ waste [\s-1OPTIONS\s0] \s-1FILE\s0(s)
 \&    \-cFILE    \-\-rcfile=FILE           Read an alternate configuration file.
 \&    \-vLEVEL   \-\-verbose=LEVEL         Verbosity level.
 \&    \-B        \-\-no\-banner             Suppress initial banner message (implied at verbosity levels <= 2)
-\&    \-oFILE    \-\-output=FILE           Write output to FILE.
 \&    \-l        \-\-list                  Arguments are input\-file lists.
 \&    \-r        \-\-recover               Attempt to recover from minor errors.
+\&    \-oFILE    \-\-output=FILE           Write output to FILE.
+\&
+\& Scanner/Lexer Mode Options
 \&    \-s        \-\-scan                  Enable raw text scanning stage (default).
 \&    \-S        \-\-no\-scan               Disable raw text scanning stage.
 \&    \-x        \-\-lex                   Enable lexical classification stage (default).
 \&    \-X        \-\-no\-lex                Disable lexical classification stage.
+\&    \-y        \-\-norm\-hyph             Perform hyphenation normalization?
+\&    \-aFILE    \-\-abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
+\&    \-jFILE    \-\-conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)
+\&    \-wFILE    \-\-stopwords=FILE        Load stopword lexicon from FILE (1 word/line)
+\&
+\& Format Options
 \&    \-IFORMAT  \-\-input\-format=FORMAT   Specify input file format for \-no\-scan mode
 \&    \-OFORMAT  \-\-output\-format=FORMAT  Specify output file format.
 .Ve
@@ -232,15 +240,6 @@ Print execution trace information to stderr (if applicable).
 Suppress initial banner message (implied at verbosity levels <= 2)
 .Sp
 Default: '0'
-.ie n .IP """\-\-output=FILE"" , ""\-oFILE""" 4
-.el .IP "\f(CW\-\-output=FILE\fR , \f(CW\-oFILE\fR" 4
-.IX Item "--output=FILE , -oFILE"
-Write output to \s-1FILE\s0.
-.Sp
-Default: '\-'
-.Sp
-Output files are in 'rare' format: one token per line, a blank line
-indicates a sentence boundary.
 .ie n .IP """\-\-list"" , ""\-l""" 4
 .el .IP "\f(CW\-\-list\fR , \f(CW\-l\fR" 4
 .IX Item "--list , -l"
@@ -262,6 +261,17 @@ Default: '0'
 Minor errors such as missing files, etc. cause an error message to be
 emitted but do not cause the program to abort if this option is specified.
 Useful for large automated batch-processing jobs.
+.ie n .IP """\-\-output=FILE"" , ""\-oFILE""" 4
+.el .IP "\f(CW\-\-output=FILE\fR , \f(CW\-oFILE\fR" 4
+.IX Item "--output=FILE , -oFILE"
+Write output to \s-1FILE\s0.
+.Sp
+Default: '\-'
+.Sp
+Output files are in 'rare' format: one token per line, a blank line
+indicates a sentence boundary.
+.SS "Scanner/Lexer Mode Options"
+.IX Subsection "Scanner/Lexer Mode Options"
 .ie n .IP """\-\-scan"" , ""\-s""" 4
 .el .IP "\f(CW\-\-scan\fR , \f(CW\-s\fR" 4
 .IX Item "--scan , -s"
@@ -286,6 +296,40 @@ Default: '1'
 Disable lexical classification stage.
 .Sp
 Default: '0'
+.ie n .IP """\-\-norm\-hyph"" , ""\-y""" 4
+.el .IP "\f(CW\-\-norm\-hyph\fR , \f(CW\-y\fR" 4
+.IX Item "--norm-hyph , -y"
+Perform hyphenation normalization?
+.Sp
+Default: '0'
+.Sp
+Only meaningful if \-\-lex is enabled.
+.ie n .IP """\-\-abbrevs=FILE"" , ""\-aFILE""" 4
+.el .IP "\f(CW\-\-abbrevs=FILE\fR , \f(CW\-aFILE\fR" 4
+.IX Item "--abbrevs=FILE , -aFILE"
+Load abbreviation lexicon from \s-1FILE\s0 (1 word/line)
+.Sp
+Default: '\s-1NULL\s0'
+.Sp
+Only meaningful if \-\-lex is enabled.
+.ie n .IP """\-\-conjunctions=FILE"" , ""\-jFILE""" 4
+.el .IP "\f(CW\-\-conjunctions=FILE\fR , \f(CW\-jFILE\fR" 4
+.IX Item "--conjunctions=FILE , -jFILE"
+Load conjunction lexicon from \s-1FILE\s0 (1 word/line)
+.Sp
+Default: '\s-1NULL\s0'
+.Sp
+Only meaningful if \-\-lex is enabled.
+.ie n .IP """\-\-stopwords=FILE"" , ""\-wFILE""" 4
+.el .IP "\f(CW\-\-stopwords=FILE\fR , \f(CW\-wFILE\fR" 4
+.IX Item "--stopwords=FILE , -wFILE"
+Load stopword lexicon from \s-1FILE\s0 (1 word/line)
+.Sp
+Default: '\s-1NULL\s0'
+.Sp
+Only meaningful if \-\-lex is enabled.
+.SS "Format Options"
+.IX Subsection "Format Options"
 .ie n .IP """\-\-input\-format=FORMAT"" , ""\-IFORMAT""" 4
 .el .IP "\f(CW\-\-input\-format=FORMAT\fR , \f(CW\-IFORMAT\fR" 4
 .IX Item "--input-format=FORMAT , -IFORMAT"

@@ -39,8 +39,10 @@
 #include <sys/time.h>
 #endif
 
-#include <wasteScanner.h>
 #include <wasteTypes.h>
+#include <wasteScanner.h>
+#include <wasteLexer.h>
+
 #include <mootUtils.h>
 #include <mootCIO.h>
 #include <mootToken.h>
@@ -65,7 +67,6 @@ mofstream out;
 int ifmt = tiofNone;
 int ifmt_implied = tiofRare;
 int ifmt_default = tiofRare|tiofLocation;
-TokenReader *reader = NULL;
 
 //-- Token I/O: writer
 int ofmt = tiofNone;
@@ -130,39 +131,51 @@ void GetMyOptions(int argc, char **argv)
 }
 
 /*--------------------------------------------------------------------------
- * guts: -scan -lex
+ * guts: churn input from a TokenReader
  */
-void scan_lex_main(void) {
-  moot_croak("%s: ERROR: --scan --lex mode not yet implemented!\n", PROGNAME);
-}
-
-/*--------------------------------------------------------------------------
- * guts: -no-scan -lex
- */
-void lex_main(void) {
-  moot_croak("%s: ERROR: --no-scan --lex mode not yet implemented!\n", PROGNAME);
-}
-
-/*--------------------------------------------------------------------------
- * guts: -scan -no-lex
- */
-void scan_main(void) {
-  wasteTokenScanner scanner(ofmt);
-
+void churn_reader(TokenReader *reader)
+{
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
-    if (vlevel >= vlInfo) ++nfiles;
-    moot_msg(vlevel, vlProgress,  "%s: processing file '%s'... ", PROGNAME, churner.in.name.c_str());
-    writer->printf_comment(" %s:File: %s\n", PROGNAME, churner.in.name.c_str());
+    ++nfiles;
+    if (vlevel >= vlInfo) {
+      moot_msg(vlevel, vlProgress,  "%s: processing file '%s'... ", PROGNAME, churner.in.name.c_str());
+      writer->printf_comment(" %s:File: %s\n", PROGNAME, churner.in.name.c_str());
+    }
 
-    scanner.from_mstream(&churner.in);
+    reader->from_mstream(&churner.in);
     int toktyp;
-
-    while ( (toktyp=scanner.get_token()) != TokTypeEOF ) {
-      writer->put_token( *(scanner.token()) );
+    while ( (toktyp=reader->get_token()) != TokTypeEOF ) {
+      writer->put_token( *(reader->token()) );
       ++ntokens;
     }
-    writer->printf_comment("$EOF\t%lu 0\tEOF\n", scanner.byte_number() );
+    if (vlevel >= vlInfo)
+      writer->printf_comment("$EOF\t%lu 0\tEOF\n", reader->byte_number() );
   }
+}
+
+
+/*--------------------------------------------------------------------------
+ * guts: setup lexer
+ */
+wasteLexer *get_lexer(int lexfmt=tiofUnknown, TokenReader *reader=NULL)
+{
+  wasteLexer *lexer = new wasteLexer(lexfmt);
+
+  lexer->dehyph_mode(args.norm_hyph_flag > 0);
+
+  if (args.abbrevs_given && !lexer->wl_abbrevs.load(args.abbrevs_arg))
+    moot_croak("%s: ERROR: can't load abbreviation lexicon from '%s': %s", PROGNAME, args.abbrevs_arg, strerror(errno));
+
+  if (args.conjunctions_given && !lexer->wl_conjunctions.load(args.conjunctions_arg))
+    moot_croak("%s: ERROR: can't load conjunction lexicon from '%s': %s", PROGNAME, args.conjunctions_arg, strerror(errno));
+
+  if (args.stopwords_given && !lexer->wl_stopwords.load(args.stopwords_arg))
+    moot_croak("%s: ERROR: can't load stopword lexicon from '%s': %s", PROGNAME, args.stopwords_arg, strerror(errno));
+
+  if (reader)
+    lexer->from_reader(reader);
+
+  return lexer;
 }
 
 /*--------------------------------------------------------------------------
@@ -172,14 +185,24 @@ int main (int argc, char **argv)
 {
   GetMyOptions(argc,argv);
 
-  if      (args.scan_flag && args.lex_flag) {
-    scan_lex_main();
+  if (args.scan_flag && args.lex_flag) {
+    // --scan --lex
+    wasteTokenScanner scanner( ofmt&(tiofText|tiofLocation|tiofTagged) );
+    wasteLexer *lexer = get_lexer( ofmt, &scanner );
+    churn_reader( lexer );
+    delete lexer;
   }
   else if (!args.scan_flag && args.lex_flag) {
-    lex_main();
+    // --no-scan --lex
+    TokenReader *reader = TokenIO::new_reader(ifmt);
+    wasteLexer *lexer = get_lexer( ofmt, reader );
+    churn_reader( lexer );
+    delete lexer;
   }
   else if (args.scan_flag && !args.lex_flag) {
-    scan_main();
+    // --scan --no-lex
+    wasteTokenScanner scanner(ofmt);
+    churn_reader( &scanner );
   }
   else {
     moot_croak("%s: ERROR: can't handle scan_flag=%d && lex_flag=%d combination!\n", PROGNAME, args.scan_flag, args.lex_flag);

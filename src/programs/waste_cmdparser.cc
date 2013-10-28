@@ -88,13 +88,21 @@ cmdline_parser_print_help (void)
   printf("   -cFILE    --rcfile=FILE           Read an alternate configuration file.\n");
   printf("   -vLEVEL   --verbose=LEVEL         Verbosity level.\n");
   printf("   -B        --no-banner             Suppress initial banner message (implied at verbosity levels <= 2)\n");
-  printf("   -oFILE    --output=FILE           Write output to FILE.\n");
   printf("   -l        --list                  Arguments are input-file lists.\n");
   printf("   -r        --recover               Attempt to recover from minor errors.\n");
+  printf("   -oFILE    --output=FILE           Write output to FILE.\n");
+  printf("\n");
+  printf(" Scanner/Lexer Mode Options:\n");
   printf("   -s        --scan                  Enable raw text scanning stage (default).\n");
   printf("   -S        --no-scan               Disable raw text scanning stage.\n");
   printf("   -x        --lex                   Enable lexical classification stage (default).\n");
   printf("   -X        --no-lex                Disable lexical classification stage.\n");
+  printf("   -y        --norm-hyph             Perform hyphenation normalization?\n");
+  printf("   -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)\n");
+  printf("   -jFILE    --conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)\n");
+  printf("   -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)\n");
+  printf("\n");
+  printf(" Format Options:\n");
   printf("   -IFORMAT  --input-format=FORMAT   Specify input file format for -no-scan mode\n");
   printf("   -OFORMAT  --output-format=FORMAT  Specify output file format.\n");
 }
@@ -122,13 +130,17 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->rcfile_arg = NULL; 
   args_info->verbose_arg = 3; 
   args_info->no_banner_flag = 0; 
-  args_info->output_arg = gog_strdup("-"); 
   args_info->list_flag = 0; 
   args_info->recover_flag = 0; 
+  args_info->output_arg = gog_strdup("-"); 
   args_info->scan_flag = 1; 
   args_info->no_scan_flag = 0; 
   args_info->lex_flag = 1; 
   args_info->no_lex_flag = 0; 
+  args_info->norm_hyph_flag = 0; 
+  args_info->abbrevs_arg = NULL; 
+  args_info->conjunctions_arg = NULL; 
+  args_info->stopwords_arg = NULL; 
   args_info->input_format_arg = NULL; 
   args_info->output_format_arg = NULL; 
 }
@@ -145,13 +157,17 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->rcfile_given = 0;
   args_info->verbose_given = 0;
   args_info->no_banner_given = 0;
-  args_info->output_given = 0;
   args_info->list_given = 0;
   args_info->recover_given = 0;
+  args_info->output_given = 0;
   args_info->scan_given = 0;
   args_info->no_scan_given = 0;
   args_info->lex_given = 0;
   args_info->no_lex_given = 0;
+  args_info->norm_hyph_given = 0;
+  args_info->abbrevs_given = 0;
+  args_info->conjunctions_given = 0;
+  args_info->stopwords_given = 0;
   args_info->input_format_given = 0;
   args_info->output_format_given = 0;
 
@@ -175,13 +191,17 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "rcfile", 1, NULL, 'c' },
 	{ "verbose", 1, NULL, 'v' },
 	{ "no-banner", 0, NULL, 'B' },
-	{ "output", 1, NULL, 'o' },
 	{ "list", 0, NULL, 'l' },
 	{ "recover", 0, NULL, 'r' },
+	{ "output", 1, NULL, 'o' },
 	{ "scan", 0, NULL, 's' },
 	{ "no-scan", 0, NULL, 'S' },
 	{ "lex", 0, NULL, 'x' },
 	{ "no-lex", 0, NULL, 'X' },
+	{ "norm-hyph", 0, NULL, 'y' },
+	{ "abbrevs", 1, NULL, 'a' },
+	{ "conjunctions", 1, NULL, 'j' },
+	{ "stopwords", 1, NULL, 'w' },
 	{ "input-format", 1, NULL, 'I' },
 	{ "output-format", 1, NULL, 'O' },
         { NULL,	0, NULL, 0 }
@@ -192,13 +212,17 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'c', ':',
 	'v', ':',
 	'B',
-	'o', ':',
 	'l',
 	'r',
+	'o', ':',
 	's',
 	'S',
 	'x',
 	'X',
+	'y',
+	'a', ':',
+	'j', ':',
+	'w', ':',
 	'I', ':',
 	'O', ':',
 	'\0'
@@ -288,15 +312,6 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
            args_info->no_banner_flag = !(args_info->no_banner_flag);
           break;
         
-        case 'o':	 /* Write output to FILE. */
-          if (args_info->output_given) {
-            fprintf(stderr, "%s: `--output' (`-o') option given more than once\n", PROGRAM);
-          }
-          args_info->output_given++;
-          if (args_info->output_arg) free(args_info->output_arg);
-          args_info->output_arg = gog_strdup(val);
-          break;
-        
         case 'l':	 /* Arguments are input-file lists. */
           if (args_info->list_given) {
             fprintf(stderr, "%s: `--list' (`-l') option given more than once\n", PROGRAM);
@@ -313,6 +328,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->recover_given++;
          if (args_info->recover_given <= 1)
            args_info->recover_flag = !(args_info->recover_flag);
+          break;
+        
+        case 'o':	 /* Write output to FILE. */
+          if (args_info->output_given) {
+            fprintf(stderr, "%s: `--output' (`-o') option given more than once\n", PROGRAM);
+          }
+          args_info->output_given++;
+          if (args_info->output_arg) free(args_info->output_arg);
+          args_info->output_arg = gog_strdup(val);
           break;
         
         case 's':	 /* Enable raw text scanning stage (default). */
@@ -357,6 +381,42 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
            args_info->no_lex_flag = !(args_info->no_lex_flag);
           /* user code */
           args_info->lex_flag=0;
+          break;
+        
+        case 'y':	 /* Perform hyphenation normalization? */
+          if (args_info->norm_hyph_given) {
+            fprintf(stderr, "%s: `--norm-hyph' (`-y') option given more than once\n", PROGRAM);
+          }
+          args_info->norm_hyph_given++;
+         if (args_info->norm_hyph_given <= 1)
+           args_info->norm_hyph_flag = !(args_info->norm_hyph_flag);
+          break;
+        
+        case 'a':	 /* Load abbreviation lexicon from FILE (1 word/line) */
+          if (args_info->abbrevs_given) {
+            fprintf(stderr, "%s: `--abbrevs' (`-a') option given more than once\n", PROGRAM);
+          }
+          args_info->abbrevs_given++;
+          if (args_info->abbrevs_arg) free(args_info->abbrevs_arg);
+          args_info->abbrevs_arg = gog_strdup(val);
+          break;
+        
+        case 'j':	 /* Load conjunction lexicon from FILE (1 word/line) */
+          if (args_info->conjunctions_given) {
+            fprintf(stderr, "%s: `--conjunctions' (`-j') option given more than once\n", PROGRAM);
+          }
+          args_info->conjunctions_given++;
+          if (args_info->conjunctions_arg) free(args_info->conjunctions_arg);
+          args_info->conjunctions_arg = gog_strdup(val);
+          break;
+        
+        case 'w':	 /* Load stopword lexicon from FILE (1 word/line) */
+          if (args_info->stopwords_given) {
+            fprintf(stderr, "%s: `--stopwords' (`-w') option given more than once\n", PROGRAM);
+          }
+          args_info->stopwords_given++;
+          if (args_info->stopwords_arg) free(args_info->stopwords_arg);
+          args_info->stopwords_arg = gog_strdup(val);
           break;
         
         case 'I':	 /* Specify input file format for -no-scan mode */
@@ -427,16 +487,6 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
              args_info->no_banner_flag = !(args_info->no_banner_flag);
           }
           
-          /* Write output to FILE. */
-          else if (strcmp(olong, "output") == 0) {
-            if (args_info->output_given) {
-              fprintf(stderr, "%s: `--output' (`-o') option given more than once\n", PROGRAM);
-            }
-            args_info->output_given++;
-            if (args_info->output_arg) free(args_info->output_arg);
-            args_info->output_arg = gog_strdup(val);
-          }
-          
           /* Arguments are input-file lists. */
           else if (strcmp(olong, "list") == 0) {
             if (args_info->list_given) {
@@ -455,6 +505,16 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->recover_given++;
            if (args_info->recover_given <= 1)
              args_info->recover_flag = !(args_info->recover_flag);
+          }
+          
+          /* Write output to FILE. */
+          else if (strcmp(olong, "output") == 0) {
+            if (args_info->output_given) {
+              fprintf(stderr, "%s: `--output' (`-o') option given more than once\n", PROGRAM);
+            }
+            args_info->output_given++;
+            if (args_info->output_arg) free(args_info->output_arg);
+            args_info->output_arg = gog_strdup(val);
           }
           
           /* Enable raw text scanning stage (default). */
@@ -503,6 +563,46 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
              args_info->no_lex_flag = !(args_info->no_lex_flag);
             /* user code */
             args_info->lex_flag=0;
+          }
+          
+          /* Perform hyphenation normalization? */
+          else if (strcmp(olong, "norm-hyph") == 0) {
+            if (args_info->norm_hyph_given) {
+              fprintf(stderr, "%s: `--norm-hyph' (`-y') option given more than once\n", PROGRAM);
+            }
+            args_info->norm_hyph_given++;
+           if (args_info->norm_hyph_given <= 1)
+             args_info->norm_hyph_flag = !(args_info->norm_hyph_flag);
+          }
+          
+          /* Load abbreviation lexicon from FILE (1 word/line) */
+          else if (strcmp(olong, "abbrevs") == 0) {
+            if (args_info->abbrevs_given) {
+              fprintf(stderr, "%s: `--abbrevs' (`-a') option given more than once\n", PROGRAM);
+            }
+            args_info->abbrevs_given++;
+            if (args_info->abbrevs_arg) free(args_info->abbrevs_arg);
+            args_info->abbrevs_arg = gog_strdup(val);
+          }
+          
+          /* Load conjunction lexicon from FILE (1 word/line) */
+          else if (strcmp(olong, "conjunctions") == 0) {
+            if (args_info->conjunctions_given) {
+              fprintf(stderr, "%s: `--conjunctions' (`-j') option given more than once\n", PROGRAM);
+            }
+            args_info->conjunctions_given++;
+            if (args_info->conjunctions_arg) free(args_info->conjunctions_arg);
+            args_info->conjunctions_arg = gog_strdup(val);
+          }
+          
+          /* Load stopword lexicon from FILE (1 word/line) */
+          else if (strcmp(olong, "stopwords") == 0) {
+            if (args_info->stopwords_given) {
+              fprintf(stderr, "%s: `--stopwords' (`-w') option given more than once\n", PROGRAM);
+            }
+            args_info->stopwords_given++;
+            if (args_info->stopwords_arg) free(args_info->stopwords_arg);
+            args_info->stopwords_arg = gog_strdup(val);
           }
           
           /* Specify input file format for -no-scan mode */

@@ -27,6 +27,7 @@ argument "FILE(s)" "Input files" \
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
+#group "Basic Options"
 
 int "verbose" v "Verbosity level." \
     arg="LEVEL" \
@@ -35,14 +36,6 @@ int "verbose" v "Verbosity level." \
 
 flag "no-banner" B "Suppress initial banner message (implied at verbosity levels <= 2)" \
   default="0"
-
-string	"output" o "Write output to FILE." \
-    arg="FILE" \
-    default="-" \
-    details="
-Output files are in 'rare' format: one token per line, a blank line
-indicates a sentence boundary.
-"
 
 flag "list" l "Arguments are input-file lists." \
     default="0" \
@@ -60,6 +53,18 @@ emitted but do not cause the program to abort if this option is specified.
 Useful for large automated batch-processing jobs.
 "
 
+string	"output" o "Write output to FILE." \
+    arg="FILE" \
+    default="-" \
+    details="
+Output files are in 'rare' format: one token per line, a blank line
+indicates a sentence boundary.
+"
+
+#-----------------------------------------------------------------------------
+# scan/lex
+group "Scanner/Lexer Mode Options"
+
 flag "scan"	  s  "Enable raw text scanning stage (default)." \
     default="1" \
     code="'args_info->scan_flag=1;'"
@@ -71,6 +76,34 @@ flag "lex"	  x  "Enable lexical classification stage (default)." \
     code="'args_info->lex_flag=1;'"
 flag "no-lex"	  X  "Disable lexical classification stage." \
     code="'args_info->lex_flag=0;'"
+
+flag "norm-hyph" y  "Perform hyphenation normalization?" \
+    details="
+Only meaningful if --lex is enabled.
+"
+
+string "abbrevs" a  "Load abbreviation lexicon from FILE (1 word/line)" \
+    arg="FILE" \
+    details="
+Only meaningful if --lex is enabled.
+"
+
+string "conjunctions" j  "Load conjunction lexicon from FILE (1 word/line)" \
+    arg="FILE" \
+    details="
+Only meaningful if --lex is enabled.
+"
+
+
+string "stopwords" w  "Load stopword lexicon from FILE (1 word/line)" \
+    arg="FILE" \
+    details="
+Only meaningful if --lex is enabled.
+"
+
+#-----------------------------------------------------------------------------
+# I/O
+group "Format Options"
 
 string "input-format" I "Specify input file format for -no-scan mode" \
   arg="FORMAT" \

@@ -87,6 +87,7 @@ wasteLexer::wasteLexer(int fmt, const std::string &myname)
       wl_tagset[i][j].resize(n_binary);
       for (int k = 0; k < n_binary; ++k)
       {
+
         wl_tagset[i][j][k].resize(n_len);
         for (int l = 0; l < n_len; ++l)
         {

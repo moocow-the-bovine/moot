@@ -291,11 +291,12 @@ Any = Any1|Any2|Any3;
 
     [^]                                 { return wLexerTypeAlphaLower; }
   */
+  return wLexerTypeAlphaLower;
 }
 
 wasteLexerTypeE waste_lexertype(const std::string &s)
 {
-  const unsigned char *sp  = (const unsigned char*)s.data();
+  const unsigned char *sp  = (const unsigned char*)s.c_str();
   const unsigned char *m   = sp;
 
   /*!re2c

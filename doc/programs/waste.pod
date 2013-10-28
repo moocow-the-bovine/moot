@@ -20,13 +20,21 @@ waste [OPTIONS] FILE(s)
     -cFILE    --rcfile=FILE           Read an alternate configuration file.
     -vLEVEL   --verbose=LEVEL         Verbosity level.
     -B        --no-banner             Suppress initial banner message (implied at verbosity levels <= 2)
-    -oFILE    --output=FILE           Write output to FILE.
     -l        --list                  Arguments are input-file lists.
     -r        --recover               Attempt to recover from minor errors.
+    -oFILE    --output=FILE           Write output to FILE.
+
+ Scanner/Lexer Mode Options
     -s        --scan                  Enable raw text scanning stage (default).
     -S        --no-scan               Disable raw text scanning stage.
     -x        --lex                   Enable lexical classification stage (default).
     -X        --no-lex                Disable lexical classification stage.
+    -y        --norm-hyph             Perform hyphenation normalization?
+    -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
+    -jFILE    --conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)
+    -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)
+
+ Format Options
     -IFORMAT  --input-format=FORMAT   Specify input file format for -no-scan mode
     -OFORMAT  --output-format=FORMAT  Specify output file format.
 
@@ -163,20 +171,6 @@ Default: '0'
 
 
 
-=item C<--output=FILE> , C<-oFILE>
-
-Write output to FILE.
-
-Default: '-'
-
-
-Output files are in 'rare' format: one token per line, a blank line
-indicates a sentence boundary.
-
-
-
-
-
 =item C<--list> , C<-l>
 
 Arguments are input-file lists.
@@ -207,6 +201,33 @@ Useful for large automated batch-processing jobs.
 
 
 
+
+=item C<--output=FILE> , C<-oFILE>
+
+Write output to FILE.
+
+Default: '-'
+
+
+Output files are in 'rare' format: one token per line, a blank line
+indicates a sentence boundary.
+
+
+
+
+
+=back
+
+=cut
+
+#--------------------------------------------------------------
+# Option-Group Scanner/Lexer Mode Options
+#--------------------------------------------------------------
+=pod
+
+=head2 Scanner/Lexer Mode Options
+
+=over 4
 
 =item C<--scan> , C<-s>
 
@@ -243,6 +264,71 @@ Default: '0'
 
 
 
+
+=item C<--norm-hyph> , C<-y>
+
+Perform hyphenation normalization?
+
+Default: '0'
+
+
+Only meaningful if --lex is enabled.
+
+
+
+
+
+=item C<--abbrevs=FILE> , C<-aFILE>
+
+Load abbreviation lexicon from FILE (1 word/line)
+
+Default: 'NULL'
+
+
+Only meaningful if --lex is enabled.
+
+
+
+
+
+=item C<--conjunctions=FILE> , C<-jFILE>
+
+Load conjunction lexicon from FILE (1 word/line)
+
+Default: 'NULL'
+
+
+Only meaningful if --lex is enabled.
+
+
+
+
+
+=item C<--stopwords=FILE> , C<-wFILE>
+
+Load stopword lexicon from FILE (1 word/line)
+
+Default: 'NULL'
+
+
+Only meaningful if --lex is enabled.
+
+
+
+
+
+=back
+
+=cut
+
+#--------------------------------------------------------------
+# Option-Group Format Options
+#--------------------------------------------------------------
+=pod
+
+=head2 Format Options
+
+=over 4
 
 =item C<--input-format=FORMAT> , C<-IFORMAT>
 

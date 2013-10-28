@@ -119,17 +119,17 @@ namespace moot
   class wasteLexer : public TokenReader
   {
     public:
-      /*--------------------------------------------------------------------
-       * wasteLexer: Types
-       */
-      /*------------------------------------------------------------*/
+      //--------------------------------------------------------------------
+      ///\name Embedded Types
+      //@{
+
       /** Multi-dimensional vector for constant access on feature bundles */
       typedef std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::string> > > > > > wasteTagset;
 
       /** List of mootToken for buffering while dehyphenating */
       typedef std::list<mootToken> wasteTokenBuffer;
       
-      /** Possible states of the lexer (bitmask, mainly used for dehyphenation) */
+      /** bitmask flags for possible lexer states (mainly used for dehyphenation) */
       enum wasteLexer_state
       {
         ls_flush   = 0x01,
@@ -140,8 +140,13 @@ namespace moot
         ls_exclude = 0x20,
         ls_blanked = 0x40,
       };
+      //@}
 
-      /** Token feature indexes */
+      //--------------------------------------------------------------------
+      ///\name token classification feature indices
+      //@{
+
+      /** typographical classes */
       enum cls
       {
         stop     = 0,
@@ -165,6 +170,7 @@ namespace moot
         n_cls    = 18
       };
 
+      /** leter-case */
       enum cas
       {
         non      = 0,
@@ -174,6 +180,7 @@ namespace moot
         n_cas    = 4
       };
 
+      /** binary feature values */
       enum binary
       {
         uk       = 0,
@@ -181,6 +188,7 @@ namespace moot
         n_binary = 2
       };
 
+      /** text length */
       enum len
       {
         le_null  = 0,
@@ -190,9 +198,10 @@ namespace moot
         longer   = 4,
         n_len    = 5
       };
+      //@}
 
       /*--------------------------------------------------------------------
-       * wasteLexer: Data
+       * wasteLexer: data
        */
       /*------------------------------------------------------------*/
       /** \name Low-level data */
@@ -206,6 +215,7 @@ namespace moot
       bool              wl_dehyph_mode;   /**< Dehyphenation switch */
       //@}
 
+      /*------------------------------------------------------------*/
       /** \name Lexica */
       //@{
       wasteLexicon      wl_stopwords;     /**< List of stopwords */
@@ -224,7 +234,6 @@ namespace moot
 
       /** Destructor */
       virtual ~wasteLexer();
-          
       //@}
 
       /*------------------------------------------------------------
@@ -293,15 +302,6 @@ namespace moot
       /** Set token source (usually some wasteScanner) */
       void from_reader(TokenReader *reader);
 
-      /** Set stopword lexicon */
-      void stopwords(const wasteLexicon &stopwords);
-
-      /** Set conjunction lexicon */
-      void conjunctions(const wasteLexicon &conjunctions);
-
-      /** Set abbrev lexicon */
-      void abbrevs(const wasteLexicon &abbrevs);
-
       /** Set token features (token.tok_analyses) w.r.t. model features **/
       void set_token(mootToken &token, const std::string &tok_text, cls wl_cls, cas wl_cas, binary wl_abbr, size_t length, binary wl_blanked);
 
@@ -309,13 +309,11 @@ namespace moot
       inline void dehyph_mode(bool on)
       {
         wl_dehyph_mode = on;
-      }
+      };
 
       /**
        * Grabs the next token from internal scanner.
-       * If wl_dehyph_mode is true, seeks and removes hyphenations,
-       * before setting wl_token.
-       *
+       * If wl_dehyph_mode is true, seeks and removes hyphenations before setting wl_token.
        */
       mootTokenType next_token(void);
       //@}

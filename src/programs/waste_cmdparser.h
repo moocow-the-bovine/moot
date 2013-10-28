@@ -22,13 +22,17 @@ struct gengetopt_args_info {
   char * rcfile_arg;	 /* Read an alternate configuration file. (default=NULL). */
   int verbose_arg;	 /* Verbosity level. (default=3). */
   int no_banner_flag;	 /* Suppress initial banner message (implied at verbosity levels <= 2) (default=0). */
-  char * output_arg;	 /* Write output to FILE. (default=-). */
   int list_flag;	 /* Arguments are input-file lists. (default=0). */
   int recover_flag;	 /* Attempt to recover from minor errors. (default=0). */
+  char * output_arg;	 /* Write output to FILE. (default=-). */
   int scan_flag;	 /* Enable raw text scanning stage (default). (default=1). */
   int no_scan_flag;	 /* Disable raw text scanning stage. (default=0). */
   int lex_flag;	 /* Enable lexical classification stage (default). (default=1). */
   int no_lex_flag;	 /* Disable lexical classification stage. (default=0). */
+  int norm_hyph_flag;	 /* Perform hyphenation normalization? (default=0). */
+  char * abbrevs_arg;	 /* Load abbreviation lexicon from FILE (1 word/line) (default=NULL). */
+  char * conjunctions_arg;	 /* Load conjunction lexicon from FILE (1 word/line) (default=NULL). */
+  char * stopwords_arg;	 /* Load stopword lexicon from FILE (1 word/line) (default=NULL). */
   char * input_format_arg;	 /* Specify input file format for -no-scan mode (default=NULL). */
   char * output_format_arg;	 /* Specify output file format. (default=NULL). */
 
@@ -37,13 +41,17 @@ struct gengetopt_args_info {
   int rcfile_given;	 /* Whether rcfile was given */
   int verbose_given;	 /* Whether verbose was given */
   int no_banner_given;	 /* Whether no-banner was given */
-  int output_given;	 /* Whether output was given */
   int list_given;	 /* Whether list was given */
   int recover_given;	 /* Whether recover was given */
+  int output_given;	 /* Whether output was given */
   int scan_given;	 /* Whether scan was given */
   int no_scan_given;	 /* Whether no-scan was given */
   int lex_given;	 /* Whether lex was given */
   int no_lex_given;	 /* Whether no-lex was given */
+  int norm_hyph_given;	 /* Whether norm-hyph was given */
+  int abbrevs_given;	 /* Whether abbrevs was given */
+  int conjunctions_given;	 /* Whether conjunctions was given */
+  int stopwords_given;	 /* Whether stopwords was given */
   int input_format_given;	 /* Whether input-format was given */
   int output_format_given;	 /* Whether output-format was given */
   
