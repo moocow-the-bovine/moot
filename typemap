@@ -22,6 +22,8 @@ TagID             T_UV
 TokID             T_UV
 mootEnumID        T_UV
 mootTokenType     T_UV
+wasteScannerType  T_UV
+wasteLexerType    T_UV
 
 CountT            T_DOUBLE
 ProbT             T_DOUBLE

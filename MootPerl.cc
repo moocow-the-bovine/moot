@@ -165,7 +165,8 @@ void sentence2tokdata(mootSentence *s, U32 utf8)
 
 //--------------------------------------------------------------
 mootPerlInputFH::mootPerlInputFH(SV *sv) 
-  : ioref(sv), io(NULL)
+  : ioref(sv),
+    io(NULL)
 {
   if (ioref) {
     SvREFCNT_inc(ioref);
@@ -190,7 +191,6 @@ bool mootPerlInputFH::eof(void)
     if (c==EOF) rc = true;
     else PerlIO_ungetc(io,c);
   }
-  fprintf(stderr, "mootPerlInputFH(%p).eof() == %d\n", this, (rc ? 1 : 0));
   return rc;
 }
 
@@ -198,7 +198,6 @@ bool mootPerlInputFH::eof(void)
 bool mootPerlInputFH::valid(void)
 {
   bool rc = (io != NULL && !PerlIO_error(io));
-  fprintf(stderr, "mootPerlInputFH(%p).valid() == %d\n", this, (rc ? 1 : 0));
   return rc;
 }
 
@@ -212,11 +211,34 @@ int mootPerlInputFH::getbyte(void)
 //--------------------------------------------------------------
 mootio::ByteCount mootPerlInputFH::read(char *buf, size_t n)
 {
-  if (eof() || !valid()) {
-    fprintf(stderr, "mootPerlInputFH(%p).read(buf,n=%u) == %d\n", this, n, -1);
+  if (eof() || !valid())
     return -1;
-  }
-  mootio::ByteCount rc = (mootio::ByteCount)PerlIO_read(io, buf, n);
-  fprintf(stderr, "mootPerlInputFH(%p).read(buf,n=%u) == %d\n", this, n, rc);
-  return rc;
+  return (mootio::ByteCount)PerlIO_read(io, buf, n);
 };
+
+
+/*======================================================================
+ * mootPerlInputBuf
+ */
+
+//--------------------------------------------------------------
+mootPerlInputBuf::mootPerlInputBuf(SV *svbuf) 
+  : micbuffer(NULL,0),
+    sv(svbuf)
+{
+  if (sv) {
+    STRLEN len;
+    SvREFCNT_inc(sv);
+    const char *data = SvPVutf8(svbuf, len);
+    this->assign(data,len);
+  }
+}
+
+//--------------------------------------------------------------
+mootPerlInputBuf::~mootPerlInputBuf(void)
+{
+  if (sv) {
+    SvREFCNT_dec(sv);
+  }
+}
+

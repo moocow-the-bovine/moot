@@ -23,6 +23,8 @@ Moot/HMM.pm
 Moot/HMM/Boltzmann.pm
 Moot/HMM/DynLex.pm
 Moot/HMM/Dyn.pm
+Moot/Waste.pm
+Moot/Waste/Scanner.pm
 
 mootlookup-lex.perl
 mootlookup-123.perl
