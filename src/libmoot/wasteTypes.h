@@ -56,45 +56,46 @@ enum wasteScannerTypeE {
   wScanTypeOther,	/**< any other character */
   NwScanTypes		/**< eof */
 };
+typedef wasteScannerTypeE wasteScannerType;
 
 /** Symbolic names for wasteScannerTypeE, useful for debugging */
 extern const char *wasteScannerTypeNames[NwScanTypes];
 
 
-/** old dwdsScanner type constants */
+/** return value enum for wasteLexer::yylex() */
 enum wasteLexerTypeE {
-  
-  wLexerTypeDot,        /** "." */
-  wLexerTypeComma,      /** "," */
-  wLexerTypeHyph,       /** hyphen, en-, or em-dash */
-  wLexerTypeApostrophe, /** single quotes and apostrophe */
-  wLexerTypeQuote,      /** quotation characters (quotes and guillemets) */
-  wLexerTypeMonetary,   /** currency symbols */
-  wLexerTypePercent,    /** paragraph, percent and permille character */
-  wLexerTypePlus,       /** "+" */
-  wLexerTypeLBR,        /** left brackets and left brace */
-  wLexerTypeRBR,        /** right brackets and right brace */
-  wLexerTypeSlash,      /** slash and backslash */
-  wLexerTypeColon,      /** ":" */
-  wLexerTypeSemicolon,  /** ";" */
-  wLexerTypeEOS,        /** sentence terminating punctuation characters */
-  wLexerTypePunct,      /** punctuation and "special" characters */
+  wLexerTypeDot,        /**< "." */
+  wLexerTypeComma,      /**< "," */
+  wLexerTypeHyph,       /**< hyphen, en-, or em-dash */
+  wLexerTypeApostrophe, /**< single quotes and apostrophe */
+  wLexerTypeQuote,      /**< quotation characters (quotes and guillemets) */
+  wLexerTypeMonetary,   /**< currency symbols */
+  wLexerTypePercent,    /**< paragraph, percent and permille character */
+  wLexerTypePlus,       /**< "+" */
+  wLexerTypeLBR,        /**< left brackets and left brace */
+  wLexerTypeRBR,        /**< right brackets and right brace */
+  wLexerTypeSlash,      /**< slash and backslash */
+  wLexerTypeColon,      /**< ":" */
+  wLexerTypeSemicolon,  /**< ";" */
+  wLexerTypeEOS,        /**< sentence terminating punctuation characters */
+  wLexerTypePunct,      /**< punctuation and "special" characters */
 
-  wLexerTypeSpace,      /** whitespace without embedded newline */
-  wLexerTypeNewline,    /** newline */
+  wLexerTypeSpace,      /**< whitespace without embedded newline */
+  wLexerTypeNewline,    /**< newline */
 
-  wLexerTypeNumber,     /** number string */
-  wLexerTypeRoman,      /** roman numeral string */
+  wLexerTypeNumber,     /**< number string */
+  wLexerTypeRoman,      /**< roman numeral string */
 
-  wLexerTypeAlphaLower, /** alphabetic string, any script, lower case */
-  wLexerTypeAlphaUpper, /** alphabetic string, any script, first character in upper case */
-  wLexerTypeAlphaCaps,  /** alphabetic string, any script, all characters in upper case */
-  wLexerTypeAlphaTrunc, /** alphabetic string, any script, terminated by hyphen */
+  wLexerTypeAlphaLower, /**< alphabetic string, any script, lower case */
+  wLexerTypeAlphaUpper, /**< alphabetic string, any script, first character in upper case */
+  wLexerTypeAlphaCaps,  /**< alphabetic string, any script, all characters in upper case */
+  wLexerTypeAlphaTrunc, /**< alphabetic string, any script, terminated by hyphen */
 
-  wLexerTypeOther,      /** any other character */
+  wLexerTypeOther,      /**< any other character */
 
-  NwLexerTypes          /** number of lexer types */
+  NwLexerTypes          /**< number of lexer types */
 };
+typedef wasteLexerTypeE wasteLexerType;
 
 /** Useful for debugging old dwdsScanner types */
 extern const char *wasteLexerTypeNames[NwLexerTypes];

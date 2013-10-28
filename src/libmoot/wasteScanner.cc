@@ -45,6 +45,7 @@ wasteScanner::wasteScanner(const std::string &myname,
 {
   yybuffer = new char[buffer_size];
   yycursor = yylimit = yytoken = yymarker = yybuffer;
+  memset(yybuffer, 0, buffer_size);
 }
 
 //----------------------------------------------------------------------
@@ -57,23 +58,19 @@ wasteScanner::~wasteScanner()
 //----------------------------------------------------------------------
 bool wasteScanner::fill( size_t n )
 {
-  if ( (!mglin || mglin->eof()) && yycursor >= yylimit )
-    return false;
+  if ( !mglin || mglin->eof() ) {
+    return  (yycursor >= yylimit) ? false : true;
+  }
 
   ptrdiff_t restSize = yylimit - yytoken;
-  /*
-  if ( restSize > n ) {
-    return true;
-  }
-  else*/ if ( restSize + n >= buffer_size )
+  if ( restSize + n >= buffer_size )
   {
-    // extend buffer
+    //-- extend buffer
     buffer_size *= 2;
     char* newBuffer = new char[buffer_size];
-    //memcpy(newBuffer, yytoken, restSize);  //-- moo: why not memcpy?
+    //memcpy(newBuffer, yytoken, restSize);  //-- moo: why not memcpy? kmw: ask johannes
     for ( ptrdiff_t i = 0; i < restSize; ++i )
     {
-      // memcpy
       *( newBuffer + i ) = *( yytoken + i );
     }
     yymarker = newBuffer + ( yymarker - yytoken );
@@ -89,7 +86,6 @@ bool wasteScanner::fill( size_t n )
     // move remaining unprocessed data to head
     for ( ptrdiff_t i = 0; i < restSize; ++i )
     {
-      //memmove( yybuffer, yytoken, (restSize)*sizeof(char) );  //-- moo: why not memmove?
       *( yybuffer + i ) = *( yytoken + i );
     }
     yymarker = yybuffer + ( yymarker - yytoken );
@@ -101,8 +97,9 @@ bool wasteScanner::fill( size_t n )
   // fill the buffer
   size_t read_size = buffer_size - restSize;
   yylimit += mglin->read ( yylimit, read_size-1 );
-  *yylimit = '\0';
-  ++yylimit;
+  if ( mglin->eof() ) {
+    *(yylimit++) = '\0'; //-- add NUL-byte pseudo-EOF
+  }
 
   return true;
 }

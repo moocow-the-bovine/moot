@@ -12,7 +12,7 @@ int moot::wasteScanner::yylex ( )
         re2c:define:YYLIMIT = yylimit;
         re2c:define:YYFILL:naked = 1;
         re2c:define:YYFILL@len = #;
-        re2c:define:YYFILL = "if (!fill(#)) { return 0; }";
+        re2c:define:YYFILL = "if (!fill(#)) { return wScanTypeEOF; }";
         re2c:yyfill:enable = 1;
         re2c:indent:top = 8;
         re2c:indent:string="	";
@@ -83,17 +83,17 @@ int moot::wasteScanner::yylex ( )
 	*/
 
 	//-- XML
-	/*!re2c
-	XML                     = "<"[/]?[a-zA-Z?][^<>\n]*">";
+	/*NOT_re2c
+	XML                     = "<"[/]?[a-zA-Z_\.?][^<>\n]*">";
 	*/
 
 	/*!re2c
+	[\x00]     		 { return wScanTypeEOF; /*-- EOF simulation with NUL-byte --*/}
 	"%%"[^%\n]+"%%"          { add_columns( yyleng() ); return wScanTypeComment; }
 
 	"$WB$"                   { add_columns( yyleng() ); return wScanTypeWB; }
 	"$SB$"                   { add_columns( yyleng() ); return wScanTypeSB; }
 
-	XML                      { add_columns( yyleng() ); return wScanTypeXML; }
         LINK2                    { add_columns( yyleng() ); return wScanTypeLink; }
 
 	ROMAN                    { add_columns( yyleng() ); return wScanTypeRoman; }

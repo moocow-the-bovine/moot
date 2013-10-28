@@ -57,10 +57,10 @@ namespace moot
       //@{
       char*       yybuffer;             /**< used for token-buffering */
       char*       yycursor;             /**< current position in buffer */
-      char*       yylimit;              /**< end of buffer */
+      char*       yylimit;              /**< end of buffer content */
       char*       yytoken;              /**< beginning of current token */
       char*       yymarker;             /**< last matching position */
-      size_t      buffer_size;          /**< current length of yybuffer */
+      size_t      buffer_size;          /**< current allocated length of yybuffer */
       //@}
 
       /*--------------------------------------------------------------------
@@ -74,7 +74,8 @@ namespace moot
 		   size_t line=0,
 		   size_t column=0,
 		   mootio::ByteOffset byte=0,
-		   size_t init_bufsize=GenericLexer::MGL_DEFAULT_BUFFER_SIZE);
+		   size_t init_bufsize=GenericLexer::MGL_DEFAULT_BUFFER_SIZE
+		   );
 
       /** Destructor */
       virtual ~wasteScanner();

@@ -200,18 +200,6 @@ wasteLexerTypes.re: wasteLexerTypes.re.skel re2c_ucl.py Scripts.txt
 
 wasteCase.re: wasteCase.re.skel re2c_case.perl
 	$(PERL) $(srcdir)/re2c_case.perl $< > $@ 2>/dev/null
-else
-wasteScannerScan.re: wasteScannerScan.re.dist
-	-rm -f "$@"
-	cp "$<" "$@"
-
-wasteLexerTypes.re: wasteLexerTypes.re.dist
-	-rm -f "$@"
-	cp "$<" "$@"
-
-wasteCase.re: wasteCase.re.dist
-	-rm -f "$@"
-	cp "$<" "$@"
 endif
 
 RE2C_OUT =
@@ -455,11 +443,11 @@ EXTRA_DIST = \
 	$(FLEXXX_DEPS) \
 	$(BISONXX_DEPS) \
 	myosfcn.h \
-	wasteScannerScan.re.dist \
+	wasteScannerScan.re \
 	wasteScannerScan.re.skel \
-	wasteLexerTypes.re.dist \
+	wasteLexerTypes.re \
 	wasteLexerTypes.re.skel \
-	wasteCase.re.dist \
+	wasteCase.re \
 	wasteCase.re.skel \
 	Scripts.txt \
 	gnulib/config.h
