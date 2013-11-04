@@ -206,7 +206,7 @@ wordchar   [^ \t\n\r]
 tab        [\t]
 eoachar    [\t\n\r]
 eotchar    [\n\r]
-newline    [\n]
+newline    (\r?[\n])
 tokchar    [^\t\n\r]
 /*detchar    [^ \t\n\r\<\>\[]*/
 detchar    [^ \t\n\r\[\<]
@@ -232,56 +232,6 @@ locsep     [ \r\+]
  * TOKEN
  */
 %}
-
-<TOKEN>^([ \t]*){newline} {
-  //-- EOS: blank line: maybe return eos (ignore empty sentences)
-  theLine++; theColumn=0; theByte += yyleng;
-  if (mtoken->tok_type != TokTypeEOS) {
-    mtoken->tok_type=TokTypeEOS;
-    mtoken->tok_text="\n";
-    if (!parse_location) loc_set(theByte-yyleng, yyleng);
-    return TokTypeEOS;
-  }
-}
-
-<TOKEN>^"%%"([^\r\n]*){newline} {
-  //-- COMMENT: return comments as special tokens
-  theLine++; theColumn = 0; theByte += yyleng;
-  lasttyp = TokTypeComment;
-  if (!ignore_comments) {
-    mtoken->clear();
-    mtoken->toktype(TokTypeComment);
-    if (yyleng==7 && yytext[2]=='$' && yytext[4]=='B' &&  yytext[5]=='$') {
-      switch (yytext[3]) {
-      case 'W': mtoken->toktype(TokTypeWB); break;
-      case 'S': mtoken->toktype(TokTypeSB); break;
-      default:  break;
-      } 
-    }
-    mtoken->textAppend(reinterpret_cast<const char *>(yytext)+2, yyleng-3);
-    if (!parse_location) loc_set(theByte-yyleng, yyleng);
-    return lasttyp=mtoken->toktype();
-  }
-}
-
-<TOKEN>^({tokchar}*){wordchar} {
-  //-- TOKEN-TEXT: keep only internal whitespace
-  add_columns(yyleng);
-  mtoken->clear();
-  mtoken->toktype(TokTypeVanilla);
-  mtoken->text(reinterpret_cast<const char *>(yytext), yyleng);
-  if (!parse_location) loc_set(theByte-yyleng, yyleng);
-  lasttyp = LexTypeText;
-}
-
-<TOKEN>{newline} {
-  //-- TOKEN: end-of-token
-  add_lines(1);
-  mtoken->toktype(TokTypeVanilla);
-  loc_add(yyleng); //-- include terminating newline as part of token location
-  lasttyp = TokTypeVanilla;
-  return TokTypeVanilla;
-}
 
 <<EOF>> {
   //-- EOF: should only happen in TOKEN mode
@@ -319,17 +269,64 @@ locsep     [ \r\+]
   return lasttyp;
 }
 
-<TOKEN>{space}*/{eoachar} {
-  //-- TOKEN: end-of-token
-  add_columns(yyleng);
+<TOKEN>^([ \t]*){newline} {
+  //-- EOS: blank line: maybe return eos (ignore empty sentences)
+  theLine++; theColumn=0; theByte += yyleng;
+  if (mtoken->tok_type != TokTypeEOS) {
+    mtoken->tok_type=TokTypeEOS;
+    mtoken->tok_text="\n";
+    if (!parse_location) loc_set(theByte-yyleng, yyleng);
+    return TokTypeEOS;
+  }
+}
 
+<TOKEN>^"%%"([^\r\n]*){newline} {
+  //-- COMMENT: return comments as special tokens
+  theLine++; theColumn = 0; theByte += yyleng;
+  lasttyp = TokTypeComment;
+  if (!ignore_comments) {
+    mtoken->clear();
+    mtoken->toktype(TokTypeComment);
+    if (yyleng==7 && yytext[2]=='$' && yytext[4]=='B' &&  yytext[5]=='$') {
+      switch (yytext[3]) {
+      case 'W': mtoken->toktype(TokTypeWB); break;
+      case 'S': mtoken->toktype(TokTypeSB); break;
+      default:  break;
+      } 
+    }
+    mtoken->textAppend(reinterpret_cast<const char *>(yytext)+2, yyleng-3);
+    if (!parse_location) loc_set(theByte-yyleng, yyleng);
+    return lasttyp=mtoken->toktype();
+  }
+}
+
+<TOKEN>^{tokchar}+ {
+  //-- TOKEN-TEXT: allow internal whitespace (for WASTE standlone lexer/classifier - moocow Mon, 04 Nov 2013 10:59:59 +0100)
+  add_columns(yyleng);
+  mtoken->clear();
+  mtoken->toktype(TokTypeVanilla);
+  mtoken->text(reinterpret_cast<const char *>(yytext), yyleng);
+  if (!parse_location) loc_set(theByte-yyleng, yyleng);
+  lasttyp = LexTypeText;
+}
+
+<TOKEN>{newline} {
+  //-- TOKEN: end-of-token
+  add_lines(1);
+  mtoken->toktype(TokTypeVanilla);
+  loc_add(yyleng); //-- include terminating newline as part of token location
+  lasttyp = TokTypeVanilla;
+  return TokTypeVanilla;
+}
+
+<TOKEN>""/{eoachar} {
+  //-- TOKEN: end-of-text (don't trim whitespace for WASTE standlone lexer/classifier - moocow Mon, 04 Nov 2013 10:59:59 +0100)
   if (first_analysis_is_best) {
     current_analysis_is_best = true;
   } else if (parse_location) {
     nextstate = LOC_OFFSET;
-  } else {
-    loc_add(yyleng);
   }
+
   if (ignore_first_analysis) ignore_current_analysis = true;
 
   lasttyp = LexTypeText;

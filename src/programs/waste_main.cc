@@ -65,7 +65,7 @@ mofstream out;
 
 //-- Token I/O: reader (for --no-scan)
 int ifmt = tiofNone;
-int ifmt_implied = tiofRare;
+int ifmt_implied = tiofNone;
 int ifmt_default = tiofRare|tiofLocation;
 
 //-- Token I/O: writer
@@ -143,7 +143,7 @@ void churn_reader(TokenReader *reader)
     }
 
     reader->from_mstream(&churner.in);
-    int toktyp;
+    mootTokenType toktyp;
     while ( (toktyp=reader->get_token()) != TokTypeEOF ) {
       writer->put_token( *(reader->token()) );
       ++ntokens;
@@ -219,6 +219,9 @@ int main (int argc, char **argv)
     // -- print summary
     fprintf(stderr, "\n-----------------------------------------------------\n");
     fprintf(stderr, "%s Summary:\n", PROGNAME);
+    if (!args.scan_flag)
+      fprintf(stderr, "  + Input format    : \"%s\"\n", TokenIO::format_canonical_string(ifmt).c_str());
+    fprintf(stderr, "  + Output format   : \"%s\"\n", TokenIO::format_canonical_string(ofmt).c_str());
     fprintf(stderr, "  + Files processed : %d\n", nfiles);
     fprintf(stderr, "  + Tokens found    : %d\n", ntokens);
     fprintf(stderr, "  + Time Elsapsed   : %.2f sec\n", elapsed);

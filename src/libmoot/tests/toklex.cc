@@ -17,13 +17,11 @@ void churntest(int argc, char **argv) {
   FILE *infile = stdin;
     //-- init
     mootTokenLexer lexer;
-    //lexer.first_analysis_is_best = true;
-    //lexer.ignore_first_analysis = true;
-    //
+    lexer.ignore_comments = false;
     lexer.first_analysis_is_best = false;
     lexer.ignore_first_analysis = false;
     //
-    lexer.parse_location = false;
+    lexer.parse_location = true;
     lexer.parse_analysis_cost = true;
     lexer.analysis_cost_details = false;
 

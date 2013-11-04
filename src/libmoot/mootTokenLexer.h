@@ -443,7 +443,7 @@ class YY_mootTokenLexer_CLASS YY_mootTokenLexer_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 521 "mootTokenLexer.ll"
+#line 518 "mootTokenLexer.ll"
 #endif
 #line 302 "./flexskel.h"
 
