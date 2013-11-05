@@ -455,8 +455,9 @@ moot_BEGIN_NAMESPACE
 TokenWriterExpat::TokenWriterExpat(int                fmt
 				   , bool             got_raw_xml
 				   , const std::string &encoding
+				   , const std::string &name
 				   )
-  : TokenWriter(fmt),
+  : TokenWriter(fmt,name),
     use_raw_xml(got_raw_xml),
     root_elt("doc"),
     eos_elt("eos"),

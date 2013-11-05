@@ -38,6 +38,7 @@
 #include <mootTokenIO.h>
 #include <mootSTLHacks.h>
 #include <wasteTypes.h>
+#include <wasteLexicon.h>
 
 #include <vector>
 #include <string>
@@ -45,71 +46,6 @@
 
 namespace moot
 {
-
-  /*============================================================================
-   * wasteLexicon
-   */
-  /** \brief simple hash_set<>-based lexicon class  */
-  class wasteLexicon
-  {
-  public:
-    typedef moot_STL_NAMESPACE::hash_set<std::string>  Lexicon;  /**< typedef for underlying lexicon data */
-    Lexicon lex;  /**< underlying lexicon data */
-
-    //------------------------------------------------------------
-    /// \name Constructors etc.
-    //@{
-    /** Default constructor */
-    wasteLexicon()
-    {};
-
-    /** desctructor */
-    ~wasteLexicon()
-    {};    
-
-    /** clear all entries */
-    inline void clear()
-    {
-      lex.clear();
-    };
-    //@}
-
-   //------------------------------------------------------------
-    /// \name Access and Manipulation
-    //@{
-    /** \returns true iff \a word is present in the lexicon */
-    inline bool lookup(const std::string &word) const
-    {
-      return (lex.find(word) != lex.end());
-    };
-
-    /** insert \a word into the lexicon */
-    inline void insert(const std::string &word)
-    {
-      lex.insert(word);
-    };
-    //@}
-
-    //------------------------------------------------------------
-    /// \name I/O
-    //@{
-    /** load lexicon from a moot::TokenReader: adds only mootToken::text() of moot::TokTypeVanilla tokens
-     *  \returns true on success, false otherwise
-     */
-    bool load(moot::TokenReader *reader);
-
-    /** load lexicon from a \a mootio::mistream; wraps load(moot::TokenReader*) using a temporary TokenReaderNative
-     *  \returns true on success, false otherwise
-     */
-    bool load(mootio::mistream *mis);
-
-    /** load lexicon from a named file; wraps load(mootoi::mistream*) method 
-     *  \returns true on success, false otherwise
-     */
-    bool load(const char *filename);
-    //@}
-  };
-
   /*============================================================================
    * wasteLexer
    */
@@ -230,7 +166,7 @@ namespace moot
       /** \name Constructors etc. */
       //@{
       /** Default constructor */
-      wasteLexer(int fmt=tiofUnknown, const std::string &myname="moot::wasteLexer");
+      wasteLexer(int fmt=tiofUnknown, const std::string &myname="wasteLexer");
 
       /** Destructor */
       virtual ~wasteLexer();
@@ -242,14 +178,14 @@ namespace moot
       /** \name Input Selection */
       //@{
 
-      /** Select input from a mootio::mistream pointer. */
+      /** Select input from a mootio::mistream pointer; just wraps scanner->from_mstream() */
       virtual void from_mstream(mootio::mistream *mistreamp);
 
       /**
-       * Finish input from currently selected source & perform any required
-       * cleanup operations.
+       * Finish input from currently selected source & perform any required cleanup operations.
+       * Currently just sets scanner=NULL and user is responsible for closing the scanner.
        */
-      virtual void close(void);
+      virtual void close();
       //@}
 
       /*------------------------------------------------------------

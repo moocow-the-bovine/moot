@@ -85,6 +85,7 @@ libmoot_la_SOURCES = \
 	wasteLexerTypes.cc \
 	wasteScanner.cc \
 	wasteScannerScan.cc \
+	wasteLexicon.cc \
 	wasteLexer.cc \
 	wasteCase.cc
 
@@ -283,6 +284,7 @@ pkginclude_HEADERS = \
 	\
 	wasteTypes.h \
 	wasteScanner.h \
+	wasteLexicon.h \
 	wasteLexer.h \
 	wasteCase.h \
 	\

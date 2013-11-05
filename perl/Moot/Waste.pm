@@ -1,6 +1,6 @@
 package Moot::Waste;
 use Moot::Waste::Scanner;
-#use Moot::Waste::Lexer;
+use Moot::Waste::Lexer;
 #use Moot::Waste::Recycler;
 use strict;
 
@@ -19,13 +19,13 @@ Moot::Waste - libmoot : WASTE tokenization system
 
   use Moot::Waste;
 
-  #...
+  #... stuff happens ...
 
 =head1 DESCRIPTION
 
 The Moot::Waste module provides an object-oriented interface to the WASTE tokenization
-system included in the libmoot library for Hidden Markov Model decoding. Really just a wrapper
-for
+system included in the libmoot library for Hidden Markov Model decoding.
+Currently just a wrapper for:
 
  use Moot::Waste::Scanner;
  use Moot::Waste::Lexer;
@@ -47,7 +47,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 Copyright (C) 2013 by Bryan Jurish
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.1 or,
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut

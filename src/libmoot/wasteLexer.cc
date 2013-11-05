@@ -25,38 +25,6 @@
 moot_BEGIN_NAMESPACE
 
 /*============================================================================
- * wasteLexicon
- */
-
-//----------------------------------------------------------------------
-bool wasteLexicon::load(moot::TokenReader *reader)
-{
-  mootTokenType toktyp;
-  while ( (toktyp=reader->get_token()) != TokTypeEOF ) {
-    if (toktyp==TokTypeVanilla || toktyp==TokTypeLibXML)
-      insert( reader->token()->text() );
-  }
-  return true;
-}
-
-//----------------------------------------------------------------------
-bool wasteLexicon::load(mootio::mistream *mis)
-{
-  TokenReaderNative tr(tiofRare, "wasteLexicon::load::TokenReaderNative");
-  tr.from_mstream(mis);
-  bool rc = load(&tr);
-  return rc;
-}
-
-//----------------------------------------------------------------------
-bool wasteLexicon::load(const char *filename)
-{
-  mootio::mifstream mis(filename,"r");
-  bool rc = load(&mis);
-  return rc;
-}
-
-/*============================================================================
  * wasteLexer
  */
 
@@ -129,14 +97,15 @@ void wasteLexer::from_reader(TokenReader *reader)
 //----------------------------------------------------------------------
 void wasteLexer::from_mstream(mootio::mistream *mistreamp)
 {
-  if(scanner)
+  if (scanner)
     scanner->from_mstream(mistreamp);
 }
 
 //----------------------------------------------------------------------
 void wasteLexer::close(void)
 {
-  scanner->close();
+  //if (scanner) scanner->close(); //-- moo: dangerous: this is probably NOT a good idea (the user sets scanner, so he/she is responsible!)
+  scanner = NULL;
 }
 
 //----------------------------------------------------------------------

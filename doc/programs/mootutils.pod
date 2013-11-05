@@ -79,6 +79,12 @@ moocow's HMM part-of-speech tagger: heuristic token classifier.
 (L<moottaste>)
 
 
+=item waste
+
+Low-level rule-based scanner stage for moot/WASTE HMM tokenizer.
+(L<waste>)
+
+
 =item mootfiles
 
 moot file formats
@@ -176,6 +182,7 @@ mooteval(1),
 mootpp(1),
 mootrain(1),
 moottaste(1),
+waste(1),
 mootm(1)
 
 =head1 AUTHOR

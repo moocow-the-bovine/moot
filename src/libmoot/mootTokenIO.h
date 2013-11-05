@@ -1,8 +1,8 @@
-/* -*- Mode: C++ -*- */
+/* -*- Mode: C++; c-basic-offset: 2; -*- */
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2010 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2013 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -219,6 +219,13 @@ public:
    */
   mootSentence *tr_sentence;
 
+  /**
+   * User data associated with this reader object.
+   * Guaranteed to be unused by internal library routines.
+   * Useful e.g. for perl wrappers etc
+   */
+  void *tr_data;
+
 public:
   /*------------------------------------------------------------
    * TokenReader: Constructors
@@ -237,7 +244,8 @@ public:
       tr_istream(NULL),
       tr_istream_created(false),
       tr_token(NULL),
-      tr_sentence(NULL)
+      tr_sentence(NULL),
+      tr_data(NULL)
   {};
 
   /** Default destructor : override in descendant classes */
@@ -671,6 +679,13 @@ public:
   /** Whether we're in a comment-block */
   bool tw_is_comment_block;
 
+  /**
+   * User data associated with this writer object.
+   * Guaranteed to be unused by internal library routines.
+   * Useful e.g. for perl wrappers etc
+   */
+  void *tw_data;
+
 public:
   /*----------------------------------------
    * Writer: Methods
@@ -688,7 +703,8 @@ public:
       tw_name(name),
       tw_ostream(NULL),
       tw_ostream_created(false),
-      tw_is_comment_block(false)
+      tw_is_comment_block(false),
+      tw_data(NULL)
   {};
 
   /** Default destructor */

@@ -6,10 +6,18 @@ mootHMM*          O_OBJECT
 mootDynHMM*       O_OBJECT
 mootDynLexHMM*    O_OBJECT
 mootDynLexHMM_Boltzmann*  O_OBJECT
+wasteLexicon*	  O_OBJECT
+
+TokenReader*	    O_OBJECT
+TokenWriter*	    O_OBJECT
+TokenReaderNative*  O_OBJECT
+TokenWriterNative*  O_OBJECT
+TokenReaderExpat*   O_OBJECT
+TokenWriterExpat*   O_OBJECT
 wasteTokenScanner*  O_OBJECT
+wasteLexer* 	    O_OBJECT
 
 #mootSentence*     T_AV
-
 TagStr            T_CHAR
 
 LexfreqCount      T_FLOAT
@@ -22,8 +30,9 @@ TagID             T_UV
 TokID             T_UV
 mootEnumID        T_UV
 mootTokenType     T_UV
-wasteScannerType  T_UV
-wasteLexerType    T_UV
+#wasteScannerType  T_UV
+#wasteLexerType    T_UV
+TokenIOFormatMask  T_UV
 
 CountT            T_DOUBLE
 ProbT             T_DOUBLE

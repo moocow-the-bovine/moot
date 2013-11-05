@@ -70,7 +70,7 @@ namespace moot
       /** \name Constructors etc. */
       //@{
       /** Default constructor */
-      wasteScanner(const std::string &myname="moot::wasteScanner",
+      wasteScanner(const std::string &myname="wasteScanner",
 		   size_t line=0,
 		   size_t column=0,
 		   mootio::ByteOffset byte=0,

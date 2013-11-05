@@ -7,7 +7,7 @@ if (system("pkg-config --atleast-version=2.0.10 moot") != 0) {
   die("Required module moot >= v2.0.10 not found!\n");
 }
 
-$MOOT_IFLAGS = join(' ', map { $s=`pkg-config --cflags-only-I $_`; chomp($s); $s } qw(moot));
+$MOOT_IFLAGS = join(' ', map { $s=`pkg-config --cflags-only-I $_`; chomp($s); $s } qw(moot)).' -Wno-deprecated';
 $MOOT_LDFLAGS= join(' ', map { $s=`pkg-config --libs-only-L $_`; chomp($s); $s } qw(moot));
 $MOOT_LIBS   = join(' ', map { $s=`pkg-config --libs-only-l $_`; chomp($s); $s } qw(moot));
 
@@ -67,6 +67,9 @@ sub MY::depend {
 		   ." Ngrams.xs"
 		   ." HMM.xs"
 		   ." DynHMM.xs"
+		   ." TokenIO.xs"
+		   ." TokenReader.xs"
+		   ." TokenWriter.xs"
 		   ." Waste.xs"
 		  )
 		 ."\n\n"

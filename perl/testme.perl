@@ -7,6 +7,8 @@ use Encode qw(encode decode encode_utf8 decode_utf8);
 use Moot;
 use Devel::Peek;
 
+use open ':std',':utf8';
+
 BEGIN {
   *refcnt = \&Devel::Peek::SvREFCNT;
 }
@@ -219,11 +221,174 @@ sub test_wscan {
 }
 #test_wscan(file=>'scanme.txt');
 #test_wscan(fh=>\*STDIN);
-test_wscan(string=>"Test 123\nfoo bar.");
+#test_wscan(string=>"Test 123\nfoo bar.");
 #test_wscan(stringfh=>"Test 123\nfoo bar.");
 #test_wscan(file=>'argh.txt');
 ##
 #$buf = ("Test 123.456\nfoo bar." x 1024); test_wscan(stringfh=>$buf);
+
+##--------------------------------------------------------------
+## I/O formats
+
+sub test_iofmt {
+  my $i  = Moot::tiofWellDone();
+  my $i1 = Moot::tiofText | Moot::tiofTagged | Moot::tiofAnalyzed;
+  my $i2 = $Moot::ioFormat{welldone};
+  my $i3 = Moot::TokenIO::parse_format_string('wd');
+  my $i4 = Moot::TokenIO::guess_filename_format('foo.wd');
+
+  my $rc = $i==$i1 && $i==$i2 && $i==$i3 && $i==$i4;
+  print "i/o formats: numeric: ", ($rc ? 'ok' : 'NOT ok'), "\n";
+
+  my $s1 = Moot::TokenIO::format_canonical_string($i);
+  my $s2 = Moot::TokenIO::format_canonical_string($i|Moot::tiofNative|Moot::tiofLocation);
+  $rc = ($s1 eq 'Text,Analyzed,Tagged') && ($s2 eq "Native,$s1,Location");
+  print "i/o formats: names: ", ($rc ? 'ok' : 'NOT ok'), "\n";
+
+  print STDERR "test_iofmt() done\n";
+}
+#test_iofmt();
+
+##--------------------------------------------------------------
+## TokenIO: common
+
+sub fmt2str {
+ my $fmt = shift // 0;
+  return sprintf("%d=0x%x=%s", $fmt, $fmt, Moot::TokenIO::format_canonical_string($fmt));
+}
+sub sent2str {
+  my $s = shift;
+  $Data::Dumper::Indent = 0;
+  $Data::Dumper::Terse = 1;
+  $Data::Dumper::Pair = '=>';
+  $Data::Dumper::Sortkeys = 1;
+  $|=1;
+  return ("[\n"
+	  .join('',map {'  '.Dumper($_).",\n"} @$s)
+	  ."]\n");
+}
+sub reader_from {
+  my ($tr,$which,$what) = @_;
+  my ($fh);
+
+  if ($which eq 'file') {
+    $tr->from_file($what);
+  }
+  elsif ($which eq 'filefh') {
+    open($fh, "<", $what) or die("$0: open failed for filefh filehandle");
+    $tr->from_fh($fh);
+  }
+  elsif ($which eq 'fh') {
+    $tr->from_fh($what);
+  }
+  elsif ($which eq 'string') {
+    $tr->from_string($what);
+  }
+  elsif ($which eq 'stringfh') {
+    ##-- from_fh() doesn't work with string-handles if wrapped with FILE* type
+    #open($fh, "<", \$what) or die("$0: open failed for string filehandle");
+    #$tr->from_fh($fh);
+    ##
+    #$tr->from_string($what);
+    ##
+    ##-- from_fh() doesn't work with string-handles if wrapped with FILE* type
+    open($fh, "<", \$what) or die("$0: open failed for string filehandle");
+    $tr->from_fh($fh);
+  }
+  else {
+    die("$0: unknown 'which'=$which in reader_from()");
+  }
+  return $tr;
+}
+sub writer_to {
+  my $tw = shift;
+  my $which = shift;
+  my $whatr = \$_[0];
+  my ($fh);
+
+  if ($which eq 'file') {
+    $tw->to_file($$whatr);
+  }
+  if ($which eq 'filefh') {
+    open($fh, ">", $$whatr) or die("$0: open failed for filefh filehandle");
+    $tw->to_fh($fh);
+  }
+  elsif ($which eq 'fh') {
+    $tw->to_fh($$whatr);
+  }
+  elsif ($which eq 'string') {
+    $tw->to_string($$whatr);
+  }
+  elsif ($which eq 'stringfh') {
+    open($fh, ">", $whatr) or die("$0: open failed for string filehandle");
+    $tw->to_fh($fh);
+  }
+  else {
+    die("$0: unknown 'which'=$which in writer_to()");
+  }
+  return $tw;
+}
+
+sub reader_pump {
+  my $tr = shift;
+  my ($s);
+  while (defined($s=$tr->get_sentence)) {
+    foreach (@$s) {
+      $_->{type} .= ' '.$Moot::TokType[$_->{type}];
+      $_->{utf8}  = utf8::is_utf8($_->{text});
+    }
+    print sent2str($s) if (@$s);
+  }
+}
+sub rw_churn {
+  my ($tr,$tw) = @_;
+  my ($s);
+  while (defined($s=$tr->get_sentence)) {
+    $tw->put_sentence($s) if (@$s);
+  }
+}
+
+
+##--------------------------------------------------------------
+sub test_trnative {
+  my $tr = Moot::TokenReader::Native->new( Moot::tiofWellDone );
+  print "tr=$tr ; name=", $tr->name(), " ; format=", fmt2str($tr->format()), "\n";
+  reader_from($tr,@_);
+  reader_pump($tr);
+}
+#test_trnative(@ARGV ? (@ARGV>1 ? @ARGV : (file=>$ARGV[0])) : (file=>'in.wd'));
+
+##--------------------------------------------------------------
+sub test_new_reader {
+  my ($req,$filename) = @_;
+  my $fmt = Moot::TokenIO::parse_format_request($req, $filename, 0,0);
+  print "guessed format = ", fmt2str($fmt), "\n";
+  my $tr  = Moot::TokenIO::new_reader($fmt);
+
+  print "tr=$tr ; name=", $tr->name(), " ; format=", fmt2str($tr->format()), "\n";
+  reader_from($tr,file=>$filename);
+  reader_pump($tr);
+}
+#test_new_reader(@ARGV ? @ARGV : ('','testme.wd'));
+
+##--------------------------------------------------------------
+sub test_churn {
+  my ($ifile,$ofile, $ireq,$oreq) = @_;
+  my $tr = Moot::TokenIO::file_reader($ifile,$ireq, 0,0);
+  my $tw = Moot::TokenIO::file_writer($ofile,$oreq, 0,0);
+
+  #$|=1; print STDERR "say please? "; $_=<STDIN>;
+  print STDERR "$0: tr=$tr ; file=$ifile ; name=", $tr->name(), " ; format=", fmt2str($tr->format()), "\n";
+  print STDERR "$0: tw=$tw ; file=$ofile ; name=", $tw->name(), " ; format=", fmt2str($tw->format()), "\n";
+
+  rw_churn($tr,$tw);
+  #print STDERR "undef tr\n"; undef $tr;
+  #print STDERR "undef tw\n"; undef $tw;
+
+  print STDERR "$0: test_churn() done\n";
+}
+test_churn(@ARGV ? @ARGV : ('in.wd','-', '','wd,loc'));
+
 
 ##--------------------------------------------------------------
 ## MAIN
