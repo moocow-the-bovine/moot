@@ -1,3 +1,4 @@
+/* -*- Mode: C++; c-basic-offset 2; */
 #include "MootPerl.h"
 
 #undef VERSION
@@ -27,7 +28,9 @@
  SV* stdstring2sv(const std::string &str, U32 utf8)
  {
    SV *sv = newSVpvn(str.data(), str.size());
-   SvUTF8_on(sv);
+   if (utf8) {
+     SvUTF8_on(sv);
+   }
    return sv;
  }
 #endif /* defined(newSVpvn_utf8) */
@@ -63,9 +66,14 @@ HV* token2hv(const mootToken *tok, U32 utf8)
 
   //-- token: hash
   hv_stores(hv, "type",     newSVuv(tok->tok_type));
-  hv_stores(hv, "text",     newSVpvn(tok->tok_text.data(), tok->tok_text.size()));
-  hv_stores(hv, "tag",      newSVpvn(tok->tok_besttag.data(), tok->tok_besttag.size()));
+  hv_stores(hv, "text",     stdstring2sv(tok->tok_text,utf8));
+  hv_stores(hv, "tag",      stdstring2sv(tok->tok_besttag,utf8));
   hv_stores(hv, "analyses", newRV_noinc((SV*)anav));
+  if (tok->tok_location.offset != 0 || tok->tok_location.length != 0) {
+    //-- token: location: only stored if offset or length is nonzero
+    hv_stores(hv, "offset",   newSVuv(tok->tok_location.offset));
+    hv_stores(hv, "length",   newSVuv(tok->tok_location.length));
+  }
 
   sv_2mortal((SV*)hv);
   return hv;
@@ -82,6 +90,8 @@ mootToken *hv2token(HV *hv, mootToken *tok, U32 utf8)
   if ((svpp=hv_fetchs(hv,"type",0))) tok->tok_type=(mootTokenType)SvUV(*svpp);
   if ((svpp=hv_fetchs(hv,"text",0))) sv2stdstring(*svpp,tok->tok_text,utf8);
   if ((svpp=hv_fetchs(hv,"tag",0)))  sv2stdstring(*svpp,tok->tok_besttag,utf8);
+  if ((svpp=hv_fetchs(hv,"offset",0))) tok->tok_location.offset=(OffsetT)SvUV(*svpp);
+  if ((svpp=hv_fetchs(hv,"length",0))) tok->tok_location.length=(OffsetT)SvUV(*svpp);
 
   if ((avrvpp=hv_fetchs(hv,"analyses",0))) {
     AV *anav = (AV*)SvRV(*avrvpp);
@@ -157,6 +167,32 @@ void sentence2tokdata(mootSentence *s, U32 utf8)
     HV *tokhv = (HV*)si->tok_data;
     hv_stores(tokhv, "tag", stdstring2sv(si->tok_besttag,utf8));
   }
+}
+
+/*======================================================================
+ * TokenIO class name conversions
+ */
+
+//--------------------------------------------------------------
+const char *TokenReaderClass(const TokenReader *tr)
+{
+  if (!tr) return "null";
+  else if (tr->tr_name == "TokenReader")       return "Moot::TokenReader";
+  else if (tr->tr_name == "TokenReaderNative") return "Moot::TokenReader::Native";
+  else if (tr->tr_name == "TokenReaderExpat")  return "Moot::TokenReader::XML";
+  else if (tr->tr_name == "wasteTokenScanner") return "Moot::Waste::Scanner";
+  else if (tr->tr_name == "wasteLexer")        return "Moot::Waste::Lexer";
+  return tr->tr_name.c_str();
+}
+
+//--------------------------------------------------------------
+const char *TokenWriterClass(const TokenWriter *tw)
+{
+  if (!tw) return "null";
+  else if (tw->tw_name == "TokenWriter")       return "Moot::TokenWriter";
+  else if (tw->tw_name == "TokenWriterNative") return "Moot::TokenWriter::Native";
+  else if (tw->tw_name == "TokenWriterExpat")  return "Moot::TokenWriter::XML";
+  return tw->tw_name.c_str();
 }
 
 /*======================================================================
@@ -242,3 +278,108 @@ mootPerlInputBuf::~mootPerlInputBuf(void)
   }
 }
 
+/*======================================================================
+ * mootPerlOutputFH
+ */
+
+//--------------------------------------------------------------
+mootPerlOutputFH::mootPerlOutputFH(SV *sv)
+{
+  if (ioref) {
+    SvREFCNT_inc(ioref);
+    io = IoIFP( sv_2io(ioref) );
+  }
+}
+
+//--------------------------------------------------------------
+mootPerlOutputFH::~mootPerlOutputFH(void)
+{
+  this->close();
+  if (ioref) {
+    SvREFCNT_dec(ioref);
+  }
+}
+
+//--------------------------------------------------------------
+bool mootPerlOutputFH::valid(void)
+{
+  return io != NULL && !PerlIO_error(io);
+}
+
+//--------------------------------------------------------------
+bool mootPerlOutputFH::eof(void)
+{
+  return io == NULL || PerlIO_eof(io);
+}
+
+//--------------------------------------------------------------
+bool mootPerlOutputFH::flush(void)
+{
+  if (io) PerlIO_flush(io);
+  return this->valid();
+}
+
+//--------------------------------------------------------------
+bool mootPerlOutputFH::close(void)
+{
+  return this->flush();
+}
+
+//--------------------------------------------------------------
+bool mootPerlOutputFH::write(const char *buf, size_t n)
+{
+  if (!io) return false;
+  int nwrote = PerlIO_write(io, buf, n);
+  return (nwrote==n);
+}
+
+//--------------------------------------------------------------
+bool mootPerlOutputFH::putbyte(unsigned char c)
+{
+  if (!io) return false;
+  PerlIO_putc(io, c);
+  return this->valid();
+}
+
+//--------------------------------------------------------------
+bool mootPerlOutputFH::puts(const char *s)
+{
+  return this->write(s,strlen(s));
+}
+
+//--------------------------------------------------------------
+bool mootPerlOutputFH::puts(const std::string &s)
+{
+  return this->write(s.data(),s.size());
+}
+
+//--------------------------------------------------------------
+bool mootPerlOutputFH::vprintf(const char *fmt, va_list &ap)
+{
+  if (!io) return false;
+  int nwrote = PerlIO_vprintf(io,fmt,ap);
+  return nwrote >= 0;
+}
+
+
+/*======================================================================
+ * wasteLexerPerl
+ */
+wasteLexerPerl::~wasteLexerPerl()
+{
+  this->close();
+  if (stopwords_sv) {
+    sv_setref_pv(stopwords_sv, "Moot::Waste::Lexicon", NULL);
+    SvREFCNT_dec(stopwords_sv);
+    //-- continue here!
+  }    
+  if (abbrevs_sv)      sv_setref_pv(abbrevs_sv, "Moot::Waste::Lexicon", NULL);
+  if (conjunctions_sv) sv_setref_pv(conjunctions_sv, "Moot::Waste::Lexicon", NULL);
+}
+
+wasteLexerPerl::close()
+{
+  if (scanner_sv)
+    SvREFCNT_dec(scanner_sv);
+  scanner_sv = NULL;
+}

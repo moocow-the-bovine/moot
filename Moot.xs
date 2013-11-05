@@ -39,4 +39,7 @@ INCLUDE: Lexfreqs.xs
 INCLUDE: Ngrams.xs
 INCLUDE: HMM.xs
 INCLUDE: DynHMM.xs
+INCLUDE: TokenIO.xs
+INCLUDE: TokenReader.xs
+INCLUDE: TokenWriter.xs
 INCLUDE: Waste.xs

@@ -1,151 +1,169 @@
-#/*-*- Mode: C++ -*- */
+#/*-*- Mode: C++; c-basic-offset: 2; -*- */
+
+##=====================================================================
+## Moot::Waste::Scanner
+##=====================================================================
 
 MODULE = Moot		PACKAGE = Moot::Waste::Scanner
 
-##=====================================================================
-## Constructors etc.
-##=====================================================================
-
-##-- disable perl prototypes
-PROTOTYPES: DISABLE
-
 ##--------------------------------------------------------------
-## Constructor: new()
 wasteTokenScanner*
-new(char *CLASS)
+new(char *CLASS, TokenIOFormatMask fmt=tiofMedium|tiofLocation)
 CODE:
-  RETVAL=new wasteTokenScanner( (tiofText|tiofTagged|tiofLocation), CLASS );
+  RETVAL=new wasteTokenScanner(fmt, CLASS);
 OUTPUT:
   RETVAL
 
 ##--------------------------------------------------------------
-## Destructor: DESTROY()
-void
-DESTROY(wasteTokenScanner* wts)
-CODE:
- if (wts) delete wts;
-
-##--------------------------------------------------------------
-## reset scanner to initial state
 void
 reset(wasteTokenScanner* wts)
 CODE:
  wts->scanner.reset();
 
-##=====================================================================
-## Input Selection
-##=====================================================================
-
-##--------------------------------------------------------------
-## close currently opened stream, if any
-void
-close(wasteTokenScanner* wts)
-CODE:
- wts->close();
-
-##--------------------------------------------------------------
-## returns true iff stream is opened
-int
-opened(wasteTokenScanner* wts)
-CODE:
- RETVAL = wts->opened() ? 1 : 0;
-OUTPUT:
- RETVAL
-
-##--------------------------------------------------------------
-void
-from_fh(wasteTokenScanner* wts, SV *ioref)
-PREINIT:
- mootPerlInputFH *min;
-CODE:
- min = new mootPerlInputFH(ioref);
- wts->from_mstream(min);
- wts->tr_istream_created = true;
-
-##--------------------------------------------------------------
-void
-from_file(wasteTokenScanner* wts, const char *filename)
-CODE:
- wts->from_filename(filename);
-
-##--------------------------------------------------------------
-void
-from_string(wasteTokenScanner* wts, SV *buf)
-PREINIT:
- mootPerlInputBuf *min;
-CODE:
- min = new mootPerlInputBuf(buf);
- wts->from_mstream(min);
- wts->tr_istream_created = true;
 
 ##=====================================================================
-## Token-Level Access
+## Moot::Waste::Lexer
+## + uses TokenReader::tr_data to hold SV* of underlying reader
 ##=====================================================================
 
+MODULE = Moot		PACKAGE = Moot::Waste::Lexer
+
 ##--------------------------------------------------------------
-HV*
-get_token(wasteTokenScanner* wts)
-PREINIT:
-  mootTokenType toktyp;
+wasteLexer*
+new(char *CLASS, TokenIOFormatMask fmt=tiofUnknown)
 CODE:
-  toktyp = wts->get_token();
-  if (toktyp==TokTypeEOF) {
-    XSRETURN_UNDEF;
-  }
-  else RETVAL = token2hv( wts->token() );
+  RETVAL=new wasteLexer(fmt, CLASS);
 OUTPUT:
   RETVAL
 
+##-------------------------------------------------------------
+void
+close(wasteLexer *wl)
+CODE:
+ wl->close();  
+ if (wl->tr_data) {
+   SvREFCNT_dec( (SV*)wl->tr_data );
+ }
+
+##-------------------------------------------------------------
+void
+_from_reader(wasteLexer *wl, SV *reader)
+PREINIT:
+  TokenReader *tr;
+CODE:
+  if( sv_isobject(reader) && (SvTYPE(SvRV(reader)) == SVt_PVMG) )
+    tr = (TokenReader*)SvIV((SV*)SvRV( reader ));
+  else {
+    warn("Moot::Waste::Lexer::from_reader() -- reader is not a blessed SV reference");
+    XSRETURN_UNDEF;
+  }
+  wl->from_reader(tr);
+  wl->tr_data = reader;
+
+##--------------------------------------------------------------
+bool
+dehyphenate(wasteLexer* wl, ...)
+CODE:
+ if (items > 1) {
+   bool on = (bool)SvTRUE( ST(1) );
+   wl->dehyph_mode(on);
+ }
+ RETVAL = wl->wl_dehyph_mode;
+OUTPUT:
+ RETVAL
+
+##--------------------------------------------------------------
+wasteLexicon*
+stopwords(wasteLexer* wl)
+PREINIT:
+ const char *CLASS="Moot::Waste::Lexicon";
+CODE:
+ RETVAL = &wl->wl_stopwords;
+OUTPUT:
+ RETVAL
+
+##--------------------------------------------------------------
+wasteLexicon*
+abbrevs(wasteLexer* wl)
+PREINIT:
+ const char *CLASS="Moot::Waste::Lexicon";
+CODE:
+ RETVAL = &wl->wl_abbrevs;
+OUTPUT:
+ RETVAL
+
+##--------------------------------------------------------------
+wasteLexicon*
+conjunctions(wasteLexer* wl)
+PREINIT:
+ const char *CLASS="Moot::Waste::Lexicon";
+CODE:
+ RETVAL = &wl->wl_conjunctions;
+OUTPUT:
+ RETVAL
+
 
 ##=====================================================================
-## Diagnostics
+## Moot::Waste::Lexicon
 ##=====================================================================
 
+MODULE = Moot		PACKAGE = Moot::Waste::Lexicon
+
 ##--------------------------------------------------------------
-const char *
-name(wasteTokenScanner* wts, ...)
+wasteLexicon*
+new(char *CLASS)
 CODE:
- if (items > 1) {
-    const char *myname = SvPV_nolen( ST(1) );
-   wts->tr_name = myname;
- }
- RETVAL = wts->tr_name.c_str();
+  RETVAL=new wasteLexicon();
+OUTPUT:
+  RETVAL
+
+##--------------------------------------------------------------
+void
+DESTROY(wasteLexicon* lx)
+CODE:
+ if (lx) delete lx;
+
+##--------------------------------------------------------------
+void
+clear(wasteLexicon* lx)
+CODE:
+ lx->clear();
+
+##--------------------------------------------------------------
+size_t
+size(wasteLexicon* lx)
+CODE:
+ RETVAL = lx->lex.size();
 OUTPUT:
  RETVAL
 
 ##--------------------------------------------------------------
-size_t
-line_number(wasteTokenScanner* wts, ...)
+void
+insert(wasteLexicon* lx, const char *str)
 CODE:
- if (items > 1) {
-   size_t n = (size_t)SvUV( ST(1) );
-   wts->line_number(n);
- }
- RETVAL = wts->line_number();
+ lx->insert(str);
+
+##--------------------------------------------------------------
+bool
+lookup(wasteLexicon* lx, const char *str)
+CODE:
+ RETVAL = lx->lookup(str);
 OUTPUT:
  RETVAL
 
 ##--------------------------------------------------------------
-size_t
-column_number(wasteTokenScanner* wts, ...)
+bool
+_load_reader(wasteLexicon* lx, TokenReader *reader)
 CODE:
- if (items > 1) {
-   size_t n = (size_t)SvUV( ST(1) );
-   wts->column_number(n);
- }
- RETVAL = wts->column_number();
+ RETVAL = lx->load(reader);
 OUTPUT:
  RETVAL
-
+ 
 ##--------------------------------------------------------------
-size_t
-byte_number(wasteTokenScanner* wts, ...)
+bool
+_load_file(wasteLexicon* lx, const char *filename)
 CODE:
- if (items > 1) {
-   size_t n = (size_t)SvUV( ST(1) );
-   wts->byte_number(n);
- }
-RETVAL = (size_t)wts->byte_number();
+ RETVAL = lx->load(filename);
 OUTPUT:
  RETVAL
 

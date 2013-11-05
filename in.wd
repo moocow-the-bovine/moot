@@ -1,0 +1,23 @@
+%% Sentence s1
+``	$(	$T=[$(]
+Ross	NE	$M=[NE]	$M=[NN]	$M=[VVIMP]
+Perot	NE	$M=[NE]
+wäre	VAFIN	$M=[VAFIN]	$M=[VVFIN]
+vielleicht	ADV	$M=[ADV]	$M=[ADJD]
+ein	ART	$M=[ADV]	$X=[ART ~ARTINDEF]	$M=[CARD]	$M=[VVIMP]	$M=[PTKVZ]
+prächtiger	ADJA	$M=[ADJA]	$X=[ADJD ~ADJC]
+Diktator	NN	$M=[NN]
+''	$(
+
+%%$SB$
+
+%% Sentence s2
+Konzernchefs	NN	$M=[NN]
+lehnen	VVFIN	$M=[VVFIN]	$M=[VVINF]
+den	ART	$X=[ART ~ARTDEF]	$M=[PDS]	$M=[PRELS]
+Milliardär	NN	$M=[NN]
+als	KOUS	$M=[ADV]	$M=[KOKOM]	$M=[KOUS]
+US-Präsidenten	NN	$M=[NN]
+ab	PTKVZ	$M=[ADV]	$M=[APPR]	$M=[APZR]	$M=[PTKVZ]
+/	$(	$T=[$(]
+

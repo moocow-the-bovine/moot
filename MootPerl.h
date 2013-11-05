@@ -30,6 +30,9 @@ typedef moot::mootHMM::ClassID ClassID;
 typedef moot::mootTokString    TokStr;
 typedef moot::mootTagString    TagStr;
 
+typedef unsigned int	       TokenIOFormatMask;
+
+
 /*======================================================================
  * Constants
  */
@@ -51,6 +54,11 @@ mootTagSet *av2tagset(AV *tsav, mootTagSet *tagset, U32 utf8=TRUE);
  */
 void sentence2tokdata(mootSentence *s, U32 utf8=TRUE);
 
+/*======================================================================
+ * TokenIO class name conversions
+ */
+const char *TokenReaderClass(const moot::TokenReader *tr);
+const char *TokenWriterClass(const moot::TokenWriter *tw);
 
 /*======================================================================
  * mootPerlInputFH: mootio stream wrapper for perl stream input
@@ -86,4 +94,57 @@ public:
 public:
   mootPerlInputBuf(SV *svbuf=NULL);
   virtual ~mootPerlInputBuf(void);
+};
+
+
+/*======================================================================
+ * mootPerlOutputFH: mootio stream wrapper for perl stream output
+ */
+class mootPerlOutputFH : virtual public mootio::mostream
+{
+public:
+  SV  *ioref; //-- underlying SV*
+  PerlIO *io; //-- == IoIFP( sv_2io(ioref) )
+
+public:
+  mootPerlOutputFH(SV *sv=NULL);
+  virtual ~mootPerlOutputFH(void);
+
+  virtual bool valid(void);
+  virtual bool eof(void);
+
+  virtual bool flush(void);
+  virtual bool close(void);
+
+  virtual bool write(const char *buf, size_t n);
+  virtual bool putbyte(unsigned char c);
+  virtual bool puts(const char *s);
+  virtual bool puts(const std::string &s);
+  virtual bool vprintf(const char *fmt, va_list &ap);
+};
+
+/*======================================================================
+ * wasteLexerPerl : wrapper for wasteLexer which tracks SVs
+ */
+class wasteLexerPerl : virtual public wasteLexer
+{
+public:
+  SV *scanner_sv;
+  SV *stopwords_sv;
+  SV *abbrevs_sv;
+  SV *conjunctions_sv;
+
+public:
+  wasteLexerPerl(TokenIOFormatMask fmt=tiofUnknown)
+    : wasteLexer(tiofUnknown, "Moot::Waste::Lexer"),
+      scanner_sv(NULL),
+      stopwords_sv(NULL),
+      abbrevs_sv(NULL),
+      conjunctions_sv(NULL)
+  {};
+
+  virtual ~wasteLexerPerl();
+  virtual void close();
+
+  void from_reader_sv(SV *reader_sv);
 };

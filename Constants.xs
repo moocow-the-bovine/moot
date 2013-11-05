@@ -95,323 +95,175 @@ OUTPUT:
 ##--------------------------------------------------------------
 ## mootHMM.h : mootHMM::verbosityLevel
 
-int
+UV
 vlSilent()
 CODE:
  RETVAL = moot::vlSilent;
 OUTPUT:
  RETVAL
 
-int
+UV
 vlErrors()
 CODE:
  RETVAL = moot::vlErrors;
 OUTPUT:
  RETVAL
 
-int
+UV
 vlWarnings()
 CODE:
  RETVAL = moot::vlWarnings;
 OUTPUT:
  RETVAL
 
-int
+UV
 vlProgress()
 CODE:
  RETVAL = moot::vlProgress;
 OUTPUT:
  RETVAL
 
-int
+UV
 vlEverything()
 CODE:
  RETVAL = moot::vlEverything;
 OUTPUT:
  RETVAL
 
-##--------------------------------------------------------------
-## wasteTypes.h: wasteScannerTypeE
-
-wasteScannerType
-wScanTypeEOF()
-CODE:
- RETVAL = moot::wScanTypeEOF;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeWB()
-CODE:
- RETVAL = moot::wScanTypeWB;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeSB()
-CODE:
- RETVAL = moot::wScanTypeSB;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeLatin()
-CODE:
- RETVAL = moot::wScanTypeLatin;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeGreek()
-CODE:
- RETVAL = moot::wScanTypeGreek;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeAlpha()
-CODE:
- RETVAL = moot::wScanTypeAlpha;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeNewline()
-CODE:
- RETVAL = moot::wScanTypeNewline;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeSpace()
-CODE:
- RETVAL = moot::wScanTypeSpace;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeNumber()
-CODE:
- RETVAL = moot::wScanTypeNumber;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeRoman()
-CODE:
- RETVAL = moot::wScanTypeRoman;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeHyphen()
-CODE:
- RETVAL = moot::wScanTypeHyphen;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypePunct()
-CODE:
- RETVAL = moot::wScanTypePunct;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeLink()
-CODE:
- RETVAL = moot::wScanTypeLink;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeXML()
-CODE:
- RETVAL = moot::wScanTypeXML;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeComment()
-CODE:
- RETVAL = moot::wScanTypeComment;
-OUTPUT:
- RETVAL
-
-wasteScannerType
-wScanTypeOther()
-CODE:
- RETVAL = moot::wScanTypeOther;
-OUTPUT:
- RETVAL
 
 ##--------------------------------------------------------------
-## wasteTypes.h: wasteLexerTypeE
+## mootTokenIO.h : TokenIOFormat
 
-wasteLexerType
-wLexerTypeDot()
+TokenIOFormatMask
+tiofNone()
 CODE:
- RETVAL = moot::wLexerTypeDot;
+  RETVAL = tiofNone;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeComma()
+TokenIOFormatMask
+tiofUnknown()
 CODE:
- RETVAL = moot::wLexerTypeComma;
+  RETVAL = tiofUnknown;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeHyph()
+TokenIOFormatMask
+tiofNull()
 CODE:
- RETVAL = moot::wLexerTypeHyph;
+  RETVAL = tiofNull;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeApostrophe()
+TokenIOFormatMask
+tiofUser()
 CODE:
- RETVAL = moot::wLexerTypeApostrophe;
+  RETVAL = tiofUser;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeQuote()
+TokenIOFormatMask
+tiofNative()
 CODE:
- RETVAL = moot::wLexerTypeQuote;
+  RETVAL = tiofNative;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeMonetary()
+TokenIOFormatMask
+tiofXML()
 CODE:
- RETVAL = moot::wLexerTypeMonetary;
+  RETVAL = tiofXML;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypePercent()
+TokenIOFormatMask
+tiofConserve()
 CODE:
- RETVAL = moot::wLexerTypePercent;
+  RETVAL = tiofConserve;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypePlus()
+TokenIOFormatMask
+tiofPretty()
 CODE:
- RETVAL = moot::wLexerTypePlus;
+  RETVAL = tiofPretty;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeLBR()
+TokenIOFormatMask
+tiofText()
 CODE:
- RETVAL = moot::wLexerTypeLBR;
+  RETVAL = tiofText;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeRBR()
+TokenIOFormatMask
+tiofAnalyzed()
 CODE:
- RETVAL = moot::wLexerTypeRBR;
+  RETVAL = tiofAnalyzed;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeSlash()
+TokenIOFormatMask
+tiofTagged()
 CODE:
- RETVAL = moot::wLexerTypeSlash;
+  RETVAL = tiofTagged;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeColon()
+TokenIOFormatMask
+tiofPruned()
 CODE:
- RETVAL = moot::wLexerTypeColon;
+  RETVAL = tiofPruned;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeSemicolon()
+TokenIOFormatMask
+tiofLocation()
 CODE:
- RETVAL = moot::wLexerTypeSemicolon;
+  RETVAL = tiofLocation;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeEOS()
+TokenIOFormatMask
+tiofCost()
 CODE:
- RETVAL = moot::wLexerTypeEOS;
+  RETVAL = tiofCost;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypePunct()
+TokenIOFormatMask
+tiofTrace()
 CODE:
- RETVAL = moot::wLexerTypePunct;
+  RETVAL = tiofTrace;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeSpace()
+TokenIOFormatMask
+tiofRare()
 CODE:
- RETVAL = moot::wLexerTypeSpace;
+  RETVAL = tiofRare;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeNewline()
- CODE:
- RETVAL = moot::wLexerTypeNewline;
-OUTPUT:
- RETVAL
-
-wasteLexerType
-wLexerTypeNumber()
+TokenIOFormatMask
+tiofMediumRare()
 CODE:
- RETVAL = moot::wLexerTypeNumber;
+  RETVAL = tiofMediumRare;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeRoman()
+TokenIOFormatMask
+tiofMedium()
 CODE:
- RETVAL = moot::wLexerTypeRoman;
+  RETVAL = tiofMedium;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeAlphaLower()
+TokenIOFormatMask
+tiofWellDone()
 CODE:
- RETVAL = moot::wLexerTypeAlphaLower;
+  RETVAL = tiofWellDone;
 OUTPUT:
- RETVAL
+  RETVAL
 
-wasteLexerType
-wLexerTypeAlphaUpper()
-CODE:
- RETVAL = moot::wLexerTypeAlphaUpper;
-OUTPUT:
- RETVAL
-
-wasteLexerType
-wLexerTypeAlphaCaps()
-CODE:
- RETVAL = moot::wLexerTypeAlphaCaps;
-OUTPUT:
- RETVAL
-
-wasteLexerType
-wLexerTypeAlphaTrunc()
-CODE:
- RETVAL = moot::wLexerTypeAlphaTrunc;
-OUTPUT:
- RETVAL
-
-wasteLexerType
-wLexerTypeOther()
-CODE:
- RETVAL = moot::wLexerTypeOther;
-OUTPUT:
- RETVAL

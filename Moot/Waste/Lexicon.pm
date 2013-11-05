@@ -1,10 +1,21 @@
-package Moot::Waste::Scanner;
-use Moot::TokenReader;
+package Moot::Waste::Lexicon;
 use strict;
 
-our @ISA = qw(Moot::TokenReader);
+#our @ISA = qw();
 
 1; ##-- be happy
+
+##======================================================================
+## constructors etc
+
+sub DESTROY { 
+ $_[0]->close();
+}
+
+sub from_reader {
+  $_[0]->close();
+  $_[0]->_from_reader($_[1]);
+}
 
 __END__
 
@@ -12,41 +23,34 @@ __END__
 
 =head1 NAME
 
-Moot::Waste:Scanner - libmoot : WASTE tokenizer : low-level scanner
+Moot::Waste:Lexer - libmoot : WASTE tokenizer : mid-level lexer
 
 =head1 SYNOPSIS
 
-  use Moot::Waste::Scanner;
+  use Moot::Waste::Lexer;
 
   ##=====================================================================
   ## Usage
 
-  $ws = Moot::Waste::Scanner->new();  ##-- create a new scanner
+  $wl = Moot::Waste::Lexer->new();    ##-- create a new lexer
 
-  $ws->from_file($filename);	      ##-- open a named file
+  $ws->from_reader($reader);	      ##-- low-level TokenReader object (e.g. Moot::WasteScanner)
   $tok = $ws->get_token();            ##-- read next token
   $buf = $ws->get_sentence();         ##-- read all remaining tokens as a list
   $ws->close();                       ##-- close current input source
 
-  $ws->reset();                       ##-- reset scanner data
-
-  #... or any other Moot::TokenReader method
+  #... or (almost) any other Moot::TokenReader method
 
 =head1 DESCRIPTION
 
-The Moot::Waste::Scanner module provides an object-oriented interface to the WASTE tokenization
-system's low-level rule-based segment scanner stage.
-Moot::Waste::Scanner inherits from
-L<Moot::TokenReader|Moot::TokenReader>
-and supports all
-L<Moot::TokenReader|Moot::TokenReader>
-API methods.
+The Moot::Waste::Lexer module provides an object-oriented interface to the WASTE tokenization
+system's mid-level rule-based segment classification stage.
 
 =head1 SEE ALSO
 
-Moot::TokenReader(3perl),
-Moot::Waste(3perl),
 Moot(3perl),
+Moot::Waste(3perl),
+Moot::Waste::Scanner(3perl),
 waste(1),
 perl(1).
 

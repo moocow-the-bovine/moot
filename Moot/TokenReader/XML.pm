@@ -1,5 +1,4 @@
-package Moot::Waste::Scanner;
-use Moot::TokenReader;
+package Moot::TokenReader::XML;
 use strict;
 
 our @ISA = qw(Moot::TokenReader);
@@ -12,42 +11,49 @@ __END__
 
 =head1 NAME
 
-Moot::Waste:Scanner - libmoot : WASTE tokenizer : low-level scanner
+Moot::TokenReader::XML - libmoot: Token I/O: reader: built-in XML format
 
 =head1 SYNOPSIS
 
-  use Moot::Waste::Scanner;
+  use Moot::TokenReader::XML;
 
   ##=====================================================================
   ## Usage
 
-  $ws = Moot::Waste::Scanner->new();  ##-- create a new scanner
+  $tr = Moot::TokenReader::XML->new($fmt);     ##-- constructor
 
-  $ws->from_file($filename);	      ##-- open a named file
-  $tok = $ws->get_token();            ##-- read next token
-  $buf = $ws->get_sentence();         ##-- read all remaining tokens as a list
-  $ws->close();                       ##-- close current input source
-
-  $ws->reset();                       ##-- reset scanner data
+  $tr->from_file($filename);		       ##-- open a named file
+  $sent = $tr->get_sentence();		       ##-- read next sentence
+  $tr->close();			               ##-- close current input source
 
   #... or any other Moot::TokenReader method
 
 =head1 DESCRIPTION
 
-The Moot::Waste::Scanner module provides an object-oriented interface to the WASTE tokenization
-system's low-level rule-based segment scanner stage.
-Moot::Waste::Scanner inherits from
+The Moot::TokenReader::XML module provides wrappers for XML
+word- and sentence-input streams as included in the
+libmoot library for Hidden Markov Model decoding.
+
+Moot::TokenReader::XML inherits from
 L<Moot::TokenReader|Moot::TokenReader>
 and supports all
 L<Moot::TokenReader|Moot::TokenReader>
 API methods.
 
+=head2 File Format
+
+See L<mootfiles(5)|mootfiles>.
+
+
 =head1 SEE ALSO
 
+Moot::TokenReader::Native(3perl),
 Moot::TokenReader(3perl),
-Moot::Waste(3perl),
+Moot::TokenWriter(3perl),
+Moot::TokenIO(3perl),
 Moot(3perl),
-waste(1),
+mootfiles(5),
+moot(1),
 perl(1).
 
 =head1 AUTHOR
