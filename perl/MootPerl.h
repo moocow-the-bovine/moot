@@ -154,27 +154,3 @@ public:
   virtual bool puts(const std::string &s);
   virtual bool vprintf(const char *fmt, va_list &ap);
 };
-
-/*======================================================================
- * wasteLexerPerl : wrapper for wasteLexer which tracks SVs
- */
-
-class wasteLexerPerl : virtual public wasteLexer
-{
-public:
-  static SV *newLexiconSv(wasteLexicon *lex);
-  static void freeLexiconSv(SV *sv);
-
-public:
-  SV *scanner_sv;
-  SV *stopwords_sv;
-  SV *abbrevs_sv;
-  SV *conjunctions_sv;
-
-public:
-  wasteLexerPerl(TokenIOFormatMask fmt=tiofUnknown);
-  virtual ~wasteLexerPerl();
-
-  virtual void close();
-  void from_reader_sv(SV *reader_sv);
-};
