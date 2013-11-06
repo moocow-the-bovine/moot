@@ -38,6 +38,38 @@ typedef unsigned int	       TokenIOFormatMask;
  */
 extern const char *moot_version_string;
 
+
+/*======================================================================
+ * macros
+ */
+#if defined(SvPVutf8_nolen)
+# define sv2stdstring(sv,str,utf8) \
+  str = ((utf8) ? SvPVutf8_nolen(sv) : SvPV_nolen(sv))
+#else
+  static inline
+  void sv2stdstring(SV *sv, std::string &str, U32 utf8)
+  {
+    STRLEN len;
+    char *pv = sv_2pvutf8(sv, &len);
+    str.assign(pv,len);
+  }
+#endif /* defined(SvPVutf8_nolen) */
+
+#if defined(newSVpvn_utf8)
+# define stdstring2sv(str,utf8) \
+  newSVpvn_utf8((str).data(), (str).size(), utf8)
+#else
+ static inline
+ SV* stdstring2sv(const std::string &str, U32 utf8)
+ {
+   SV *sv = newSVpvn(str.data(), str.size());
+   if (utf8) {
+     SvUTF8_on(sv);
+   }
+   return sv;
+ }
+#endif /* defined(newSVpvn_utf8) */
+
 /*======================================================================
  * Conversions: copy
  */
@@ -126,8 +158,13 @@ public:
 /*======================================================================
  * wasteLexerPerl : wrapper for wasteLexer which tracks SVs
  */
+
 class wasteLexerPerl : virtual public wasteLexer
 {
+public:
+  static SV *newLexiconSv(wasteLexicon *lex);
+  static void freeLexiconSv(SV *sv);
+
 public:
   SV *scanner_sv;
   SV *stopwords_sv;
@@ -135,16 +172,9 @@ public:
   SV *conjunctions_sv;
 
 public:
-  wasteLexerPerl(TokenIOFormatMask fmt=tiofUnknown)
-    : wasteLexer(tiofUnknown, "Moot::Waste::Lexer"),
-      scanner_sv(NULL),
-      stopwords_sv(NULL),
-      abbrevs_sv(NULL),
-      conjunctions_sv(NULL)
-  {};
-
+  wasteLexerPerl(TokenIOFormatMask fmt=tiofUnknown);
   virtual ~wasteLexerPerl();
-  virtual void close();
 
+  virtual void close();
   void from_reader_sv(SV *reader_sv);
 };

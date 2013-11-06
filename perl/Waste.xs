@@ -105,23 +105,26 @@ OUTPUT:
 
 ##=====================================================================
 ## Moot::Waste::Lexicon
+## - NO standalone objects allowed: always accessed via wasteLexer (so we can skip ref-counting)
 ##=====================================================================
 
 MODULE = Moot		PACKAGE = Moot::Waste::Lexicon
 
 ##--------------------------------------------------------------
-wasteLexicon*
-new(char *CLASS)
-CODE:
-  RETVAL=new wasteLexicon();
-OUTPUT:
-  RETVAL
+#wasteLexicon*
+#new(char *CLASS)
+#CODE:
+#  RETVAL=new wasteLexicon();
+#  fprintf(stderr, "Waste::Lexicon::new(lx=%p)\n", RETVAL);
+#OUTPUT:
+#  RETVAL
 
 ##--------------------------------------------------------------
-void
-DESTROY(wasteLexicon* lx)
-CODE:
- if (lx) delete lx;
+#void
+#DESTROY(wasteLexicon* lx)
+#CODE:
+# fprintf(stderr, "Waste::Lexicon::DESTROY(lx=%p)\n", lx);
+# //if (lx) delete lx;
 
 ##--------------------------------------------------------------
 void
@@ -167,3 +170,14 @@ CODE:
 OUTPUT:
  RETVAL
 
+##--------------------------------------------------------------
+AV*
+to_array(wasteLexicon* lx, bool utf8=TRUE)
+CODE:
+ RETVAL = newAV();
+ for (wasteLexicon::Lexicon::const_iterator lxi=lx->lex.begin(); lxi!=lx->lex.end(); ++lxi) {
+   SV *sv = stdstring2sv(*lxi, utf8);
+   av_push(RETVAL, sv);
+ }
+OUTPUT:
+ RETVAL

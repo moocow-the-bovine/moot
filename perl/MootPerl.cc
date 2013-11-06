@@ -5,37 +5,6 @@
 #include <mootConfig.h>
 
 /*======================================================================
- * macros
- */
-#if defined(SvPVutf8_nolen)
-# define sv2stdstring(sv,str,utf8) \
-  str = ((utf8) ? SvPVutf8_nolen(sv) : SvPV_nolen(sv))
-#else
-  static inline
-  void sv2stdstring(SV *sv, std::string &str, U32 utf8)
-  {
-    STRLEN len;
-    char *pv = sv_2pvutf8(sv, &len);
-    str.assign(pv,len);
-  }
-#endif /* defined(SvPVutf8_nolen) */
-
-#if defined(newSVpvn_utf8)
-# define stdstring2sv(str,utf8) \
-  newSVpvn_utf8((str).data(), (str).size(), utf8)
-#else
- static inline
- SV* stdstring2sv(const std::string &str, U32 utf8)
- {
-   SV *sv = newSVpvn(str.data(), str.size());
-   if (utf8) {
-     SvUTF8_on(sv);
-   }
-   return sv;
- }
-#endif /* defined(newSVpvn_utf8) */
-
-/*======================================================================
  * Constants
  */
 const char *moot_version_string = PACKAGE_VERSION;
@@ -365,21 +334,56 @@ bool mootPerlOutputFH::vprintf(const char *fmt, va_list &ap)
 /*======================================================================
  * wasteLexerPerl
  */
+
+//--------------------------------------------------------------
+SV *wasteLexerPerl::newLexiconSv(wasteLexicon *lex)
+{
+  SV *sv = sv_newmortal();
+  SV *rv = sv_setref_pv( sv, "Moot::Waste::Lexicon", (void*)lex );
+  fprintf(stderr, "newLexiconSv(lx=%p, sv=%p, rv=%p)\n", lex, sv, rv);
+  return rv;
+}
+
+//--------------------------------------------------------------
+void wasteLexerPerl::freeLexiconSv(SV *sv)
+{
+  if (sv) {
+    sv_setref_pv(sv, "Moot::Waste::Lexicon", NULL);
+    SvREFCNT_dec(sv);
+  }
+}
+
+//--------------------------------------------------------------
+wasteLexerPerl::wasteLexerPerl(TokenIOFormatMask fmt)
+  : wasteLexer(fmt, "Moot::Waste::Lexer"),
+    scanner_sv(NULL),
+    stopwords_sv(NULL),
+    abbrevs_sv(NULL),
+    conjunctions_sv(NULL)
+{
+}
+
+//--------------------------------------------------------------
 wasteLexerPerl::~wasteLexerPerl()
 {
   this->close();
   if (stopwords_sv) {
     sv_setref_pv(stopwords_sv, "Moot::Waste::Lexicon", NULL);
     SvREFCNT_dec(stopwords_sv);
-    //-- continue here!
   }    
-  if (abbrevs_sv)      sv_setref_pv(abbrevs_sv, "Moot::Waste::Lexicon", NULL);
-  if (conjunctions_sv) sv_setref_pv(conjunctions_sv, "Moot::Waste::Lexicon", NULL);
+  if (abbrevs_sv) {
+    sv_setref_pv(abbrevs_sv, "Moot::Waste::Lexicon", NULL);
+    SvREFCNT_dec(abbrevs_sv);
+  }
+  if (conjunctions_sv) {
+    sv_setref_pv(conjunctions_sv, "Moot::Waste::Lexicon", NULL);
+    SvREFCNT_dec(abbrevs_sv);
+  }
 }
 
-wasteLexerPerl::close()
+//--------------------------------------------------------------
+void wasteLexerPerl::close()
 {
-  if (scanner_sv)
-    SvREFCNT_dec(scanner_sv);
+  freeLexiconSv(scanner_sv);
   scanner_sv = NULL;
 }
