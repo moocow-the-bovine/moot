@@ -26,7 +26,7 @@ sub load {
     return $lx->_load_reader($src);
   }
   ##-- default: treat as filehandle
-  my $tr = Moot::TokenReader::Native->new( $Moot::tiofText );
+  my $tr = Moot::TokenReader::Native->new( Moot::tiofText() );
   $tr->from_fh($src);
   return $tr->opened() && $lx->_load_reader($tr);
 }

@@ -181,53 +181,36 @@ sub test_hmm {
 ##--------------------------------------------------------------
 ## wasteScanner
 
-sub test_wscan {
-  my ($which,$what) = @_ ? @_ : (file=>'scanme.txt');
-  my $ws = Moot::Waste::Scanner->new( )
-    or die("$0: Moot::Waste::Scanner->new() failed");
+sub scanner_pump {
+  my $tr = shift;
 
-  my ($fh);
-  if ($which eq 'file') {
-    $ws->from_file($what);
-  }
-  elsif ($which eq 'fh') {
-    $ws->from_fh($what);
-  }
-  elsif ($which eq 'string') {
-    $ws->from_string($what);
-  }
-  elsif ($which eq 'stringfh') {
-    ##-- from_fh() doesn't work with string-handles if wrapped with FILE* type
-    #open($fh, "<", \$what) or die("$0: open failed for string filehandle");
-    #$ws->from_fh($fh);
-    ##
-    #$ws->from_string($what);
-    ##
-    ##-- from_fh() doesn't work with string-handles if wrapped with FILE* type
-    open($fh, "<", \$what) or die("$0: open failed for string filehandle");
-    $ws->from_fh($fh);
-  }
-  else {
-    die("$0: unknown 'which'=$which in test_wscan()");
-  }
-
-  ##-- ye olde loope
-  my ($tok);
   $Data::Dumper::Indent = 0;
   $Data::Dumper::Terse = 1;
   $Data::Dumper::Pair = '=>';
   $Data::Dumper::Sortkeys = 1;
   $|=1;
-  while (defined($tok=$ws->get_token)) {
-    $tok->{type} = $Moot::TokType[$tok->{type}];
-    print Dumper($tok), "\n";
+
+  my ($w);
+  while (defined($w=$tr->get_token)) {
+    $w->{type} .= ' '.$Moot::TokType[$w->{type}];
+    $w->{utf8}  = utf8::is_utf8($w->{text});
+    print ' ',Dumper($w),"\n";
   }
+}
+
+sub test_wscan {
+  my ($which,$what) = @_ ? @_ : (file=>'scanme.txt');
+  my $ws = Moot::Waste::Scanner->new( )
+    or die("$0: Moot::Waste::Scanner->new() failed");
+
+  reader_from($ws,$which,$what);
+  scanner_pump($ws);
 
   ##-- cleanup
   $ws->close();
   undef $ws;
 
-  print STDERR "test_wscan() done\n";
+  print STDERR "test_wscan() done\n"; exit 0;
 }
 #test_wscan(file=>'scanme.txt');
 #test_wscan(fh=>\*STDIN);
@@ -365,6 +348,7 @@ sub test_trnative {
   print "tr=$tr ; name=", $tr->name(), " ; format=", fmt2str($tr->format()), "\n";
   reader_from($tr,@_);
   reader_pump($tr);
+  exit 0;
 }
 #test_trnative(@ARGV ? (@ARGV>1 ? @ARGV : (file=>$ARGV[0])) : (file=>'in.wd'));
 
@@ -380,6 +364,45 @@ sub test_new_reader {
   reader_pump($tr);
 }
 #test_new_reader(@ARGV ? @ARGV : ('','testme.wd'));
+
+##--------------------------------------------------------------
+sub test_buf_writer {
+  my $tw = Moot::TokenWriter::Native->new( Moot::tiofWellDone|Moot::tiofLocation|Moot::tiofCost );
+  #print STDERR "$0: say please? "; $_=<STDIN>;
+
+  print STDERR "$0: to_string()\n";
+  my ($buf);
+  $tw->to_string($buf);
+
+  print STDERR "$0: put_comment()\n";
+  $tw->put_comment(" test Moot::TokenWriter perl buffer interface");
+
+  print STDERR "$0: put_raw()\n";
+  $tw->put_raw("(raw data)\n");
+  foreach (@_) {
+    print STDERR "$0: put(", ($_//'-undef-'), ")\n";
+    if (ref($_)) {
+      if    (ref($_) eq 'ARRAY') { $tw->put_tokens($_); }
+      elsif (ref($_) eq 'Moot::Sentence') { $tw->put_sentence($_); }
+      else { $tw->put_token($_); }
+    }
+    elsif (!defined($_)) {
+      $tw->put_token({type=>Moot::TokTypeEOS});
+    }
+    else {
+      $tw->put_token({text=>$_});
+    }
+  }
+  $tw->close();
+
+  ##-- dump buffer
+  print $buf;
+  print STDERR "$0: test_buf_writer() done\n"; exit 0;
+}
+#test_buf_writer(qw(test 123),undef,{text=>456,tag=>'NN',offset=>42,length=>247,analyses=>[{details=>'foo',prob=>1},{details=>'bar',prob=>2}]});
+#test_buf_writer([{text=>'foo'},{text=>'bar'}],[{text=>'baz'},{text=>'bonk'}]);
+#test_buf_writer(map {bless($_,'Moot::Sentence')} [{text=>'foo'},{text=>'bar'}],[{text=>'baz'},{text=>'bonk'}]);
+#test_buf_writer('foo',{type=>Moot::TokTypeSB},'bar',{type=>Moot::TokTypeWB});
 
 ##--------------------------------------------------------------
 sub test_churn {
@@ -399,23 +422,80 @@ sub test_churn {
 }
 #test_churn(@ARGV ? @ARGV : ('in.wd','-', '','wd,loc'));
 
+##--------------------------------------------------------------
+sub test_waste_lexicon {
+  my $lexer = Moot::Waste::Lexer->new();
+  my $sw    = $lexer->stopwords();
+  #print STDERR "say please? "; $_=<STDIN>;
+
+  #$sw->load("stop.lex");
+  ##--
+  #my $tr=Moot::TokenIO::file_reader("stop.lex", "native,rare"); $sw->load($tr);
+  ##--
+  #open(my $fh,"<stop.lex"); my $tr=Moot::TokenIO::new_reader(Moot::tiofNative|Moot::tiofRare); $tr->from_fh($fh); $sw->load($tr);
+  ##--
+  my ($fh); open($fh,"<stop.lex"); $sw->load($fh);
+  ##--
+  print "SIZE = ", $sw->size, "\n", (map {"LEX: $_ [utf8:".(utf8::is_utf8($_) ? 1 : 0)."]\n"} @{$sw->to_array(1)});
+
+  print STDERR "$0: test_waste_lexicon() done\n"; exit 0;
+}
+#test_waste_lexicon();
 
 ##--------------------------------------------------------------
-sub test_wlexer {
+sub test_waste_lexer {
+  my ($ftype,$file) = @_ ? @_ : ('txt'=>'scanme2.txt');
   my $lexer = Moot::Waste::Lexer->new();
-  my $lx0 = $lexer->abbrevs();
-  my $lx1 = $lexer->stopwords();
+  $lexer->stopwords->load("waste-dtiger/common/dta_stopwords.lex");
+  $lexer->abbrevs->load("waste-dtiger/common/dta_abbrevs.lex");
+  $lexer->conjunctions->load("waste-dtiger/common/dta_conjunctions.lex");
+  $lexer->dehyphenate(1);
 
-  ##-- show data
-  svdumph(lexer=>$lexer,lx0=>$lx0,lx1=>$lx1);
-  print "-- undef lx0,lx1--\n";
-  undef $lx0;
-  undef $lx1;
-  svdumph(lexer=>$lexer,lx0=>$lx0,lx1=>$lx1);
+  my ($scanner);
+  if ($ftype eq 'txt' || $ftype eq 'raw') {
+    $scanner = Moot::Waste::Scanner->new();
+    $scanner->from_file($file);
+  }
+  else {
+    $scanner = Moot::TokenIO::file_reader($file);
+  }
+  #svdumph(scanner=>$scanner);
 
-  print STDERR "$0: test_wlexer() done\n";
+  print STDERR "$0: _set_scanner(\$scanner)\n";
+  $lexer->scanner($scanner);
+  #svdumph(scanner=>$scanner);
+  #print "$0: scanner_refcnt = ", $lexer->_scanner_refcnt, "\n";
+
+  print STDERR "$0: scanner=", ($scanner//'(undef)'), " ; lexer=$lexer \n";
+
+  print STDERR "$0: undef \$scanner\n";
+  undef $scanner;
+  #svdumph(scanner=>$scanner);
+  #print "$0: scanner_refcnt = ", $lexer->_scanner_refcnt, "\n";
+
+  print STDERR "$0: \$scanner = \$lexer->_get_scanner()\n";
+  $scanner = $lexer->scanner();
+  #svdumph(scanner=>$scanner);
+  #print "$0: scanner_refcnt = ", $lexer->_scanner_refcnt, "\n";
+
+  print STDERR "=" x 64, "\n";
+  print STDERR "$0: scanner_pump()\n";
+  scanner_pump($lexer);
+  print STDERR "=" x 64, "\n";
+
+  #print STDERR "$0: lexer->close()\n";
+  #$lexer->close;
+
+  print STDERR "$0: undef \$lexer\n";
+  undef $lexer;
+
+  #svdumph(scanner=>$scanner);
+  print STDERR "$0: undef \$scanner\n";
+  undef $scanner;
+
+  print STDERR "$0: test_waste_lexer() done\n"; exit 0;
 }
-test_wlexer();
+test_waste_lexer(@ARGV);
 
 ##--------------------------------------------------------------
 ## MAIN

@@ -10,9 +10,10 @@ MODULE = Moot		PACKAGE = Moot::Waste::Scanner
 wasteTokenScanner*
 new(char *CLASS, TokenIOFormatMask fmt=tiofMedium|tiofLocation)
 CODE:
-  RETVAL=new wasteTokenScanner(fmt, CLASS);
+ RETVAL=new wasteTokenScanner(fmt, CLASS);
+ //fprintf(stderr, "%s::new() --> %p=%i\n", CLASS,RETVAL,RETVAL);
 OUTPUT:
-  RETVAL
+ RETVAL
 
 ##--------------------------------------------------------------
 void
@@ -32,9 +33,10 @@ MODULE = Moot		PACKAGE = Moot::Waste::Lexer
 wasteLexer*
 new(char *CLASS, TokenIOFormatMask fmt=tiofUnknown)
 CODE:
-  RETVAL=new wasteLexer(fmt, CLASS);
+ RETVAL=new wasteLexer(fmt, CLASS);
+ //fprintf(stderr, "%s::new() --> %p=%i\n", CLASS,RETVAL,RETVAL);
 OUTPUT:
-  RETVAL
+ RETVAL
 
 ##-------------------------------------------------------------
 void
@@ -43,22 +45,44 @@ CODE:
  wl->close();  
  if (wl->tr_data) {
    SvREFCNT_dec( (SV*)wl->tr_data );
+   wl->tr_data = NULL;
  }
 
 ##-------------------------------------------------------------
+##int
+##_scanner_refcnt(wasteLexer *wl)
+##CODE:
+## if (wl->tr_data) {
+##   RETVAL = SvREFCNT((SV*)SvRV((SV*)wl->tr_data));
+## } else {
+##   RETVAL = -1;
+## }
+##OUTPUT:
+## RETVAL
+
+##-------------------------------------------------------------
+SV*
+_get_scanner(wasteLexer *wl)
+CODE:
+ if (!wl->tr_data || !wl->scanner) { XSRETURN_UNDEF; }
+ RETVAL = newSVsv((SV*)wl->tr_data);
+OUTPUT:
+ RETVAL
+
+##-------------------------------------------------------------
 void
-_from_reader(wasteLexer *wl, SV *reader)
+_set_scanner(wasteLexer *wl, SV *scanner_sv)
 PREINIT:
   TokenReader *tr;
 CODE:
-  if( sv_isobject(reader) && (SvTYPE(SvRV(reader)) == SVt_PVMG) )
-    tr = (TokenReader*)SvIV((SV*)SvRV( reader ));
+  if( sv_isobject(scanner_sv) && (SvTYPE(SvRV(scanner_sv)) == SVt_PVMG) )
+    tr = (TokenReader*)SvIV((SV*)SvRV( scanner_sv ));
   else {
-    warn("Moot::Waste::Lexer::from_reader() -- reader is not a blessed SV reference");
+    warn("Moot::Waste::Lexer::_set_scanner() -- scanner_sv is not a blessed SV reference");
     XSRETURN_UNDEF;
   }
   wl->from_reader(tr);
-  wl->tr_data = reader;
+  wl->tr_data = newSVsv(scanner_sv);
 
 ##--------------------------------------------------------------
 bool
@@ -111,19 +135,19 @@ OUTPUT:
 MODULE = Moot		PACKAGE = Moot::Waste::Lexicon
 
 ##--------------------------------------------------------------
+## NO standalone objects!!!
 #wasteLexicon*
 #new(char *CLASS)
 #CODE:
 #  RETVAL=new wasteLexicon();
-#  fprintf(stderr, "Waste::Lexicon::new(lx=%p)\n", RETVAL);
 #OUTPUT:
 #  RETVAL
 
 ##--------------------------------------------------------------
+## NO standalone objects!!!
 #void
 #DESTROY(wasteLexicon* lx)
 #CODE:
-# fprintf(stderr, "Waste::Lexicon::DESTROY(lx=%p)\n", lx);
 # //if (lx) delete lx;
 
 ##--------------------------------------------------------------
@@ -181,3 +205,4 @@ CODE:
  }
 OUTPUT:
  RETVAL
+

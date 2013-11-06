@@ -164,6 +164,16 @@ const char *TokenWriterClass(const TokenWriter *tw)
   return tw->tw_name.c_str();
 }
 
+//--------------------------------------------------------------
+const char *sv_getclass(SV *sv)
+{
+  if (!sv || !SvROK(sv))
+    return NULL;
+  HV *stash = SvSTASH(SvRV(sv));
+  if (!stash) return NULL;
+  return HvNAME(stash);
+}
+
 /*======================================================================
  * mootPerlInputFH
  */
@@ -190,13 +200,12 @@ mootPerlInputFH::~mootPerlInputFH(void)
 //--------------------------------------------------------------
 bool mootPerlInputFH::eof(void)
 {
-  bool rc = (io == NULL || PerlIO_eof(io));
-  if (!rc) {
-    int c = PerlIO_getc(io);
-    if (c==EOF) rc = true;
-    else PerlIO_ungetc(io,c);
-  }
-  return rc;
+  if (!io) return true;
+  //return PerlIO_eof(io);  //-- BUGGY
+  int c = PerlIO_getc(io);
+  if (c==EOF) return true;
+  PerlIO_ungetc(io,c);
+  return false;
 }
 
 //--------------------------------------------------------------
@@ -217,7 +226,7 @@ int mootPerlInputFH::getbyte(void)
 mootio::ByteCount mootPerlInputFH::read(char *buf, size_t n)
 {
   if (eof() || !valid())
-    return -1;
+    return 0;
   return (mootio::ByteCount)PerlIO_read(io, buf, n);
 };
 
@@ -253,6 +262,8 @@ mootPerlInputBuf::~mootPerlInputBuf(void)
 
 //--------------------------------------------------------------
 mootPerlOutputFH::mootPerlOutputFH(SV *sv)
+  : ioref(sv),
+    io(NULL)
 {
   if (ioref) {
     SvREFCNT_inc(ioref);

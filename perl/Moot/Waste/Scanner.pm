@@ -1,8 +1,13 @@
 package Moot::Waste::Scanner;
 use Moot::TokenReader;
+use Carp;
 use strict;
 
 our @ISA = qw(Moot::TokenReader);
+
+sub get_sentence {
+  confess(__PACKAGE__, "::get_sentence() method not supported");
+}
 
 1; ##-- be happy
 
@@ -30,7 +35,7 @@ Moot::Waste:Scanner - libmoot : WASTE tokenizer : low-level scanner
 
   $ws->reset();                       ##-- reset scanner data
 
-  #... or any other Moot::TokenReader method
+  #... or (almost) any other Moot::TokenReader method
 
 =head1 DESCRIPTION
 

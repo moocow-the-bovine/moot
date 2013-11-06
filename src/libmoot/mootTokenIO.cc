@@ -486,9 +486,11 @@ void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
 
   switch (token.toktype()) {
 
-  case TokTypeComment:
-  case TokTypeWB:
   case TokTypeSB:
+    if (token.text().empty()) { put_comment_buffer("$SB$", 4); return; } //-- convenience hack for perl wrappers 
+  case TokTypeWB:
+    if (token.text().empty()) { put_comment_buffer("$WB$", 4); return; } //-- convenience hack for perl wrappers
+  case TokTypeComment:
     put_comment_buffer(token.text().data(), token.text().size());
     return;
 

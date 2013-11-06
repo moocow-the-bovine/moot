@@ -92,6 +92,8 @@ void sentence2tokdata(mootSentence *s, U32 utf8=TRUE);
 const char *TokenReaderClass(const moot::TokenReader *tr);
 const char *TokenWriterClass(const moot::TokenWriter *tw);
 
+const char *sv_getclass(SV *sv);
+
 /*======================================================================
  * mootPerlInputFH: mootio stream wrapper for perl stream input
  */
