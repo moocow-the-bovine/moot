@@ -20,6 +20,7 @@ PROTOTYPES: DISABLE
 void
 DESTROY(TokenReader* tr)
 CODE:
+ //fprintf(stderr, "TokenReader::DESTROY(%s) --> %p=%i\n", sv_getclass(ST(0)), tr,tr);
  if (tr) delete tr;
 
 ##=====================================================================

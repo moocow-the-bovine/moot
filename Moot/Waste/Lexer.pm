@@ -1,6 +1,7 @@
 package Moot::Waste::Lexer;
 use Moot::TokenReader;
 use Moot::Waste::Lexicon;
+use Carp;
 use strict;
 
 our @ISA = qw(Moot::TokenReader);
@@ -10,13 +11,19 @@ our @ISA = qw(Moot::TokenReader);
 ##======================================================================
 ## constructors etc
 
-sub DESTROY { 
- $_[0]->close();
+sub DESTROY {
+  $_[0]->close();
+  $_[0]->SUPER::DESTROY();
 }
 
-sub from_reader {
-  $_[0]->close();
-  $_[0]->_from_reader($_[1]);
+sub scanner {
+  my $lexer = shift;
+  $lexer->_set_scanner(@_) if (@_);
+  return $lexer->_get_scanner();
+}
+
+sub get_sentence {
+  confess(__PACKAGE__, "::get_sentence() method not supported");
 }
 
 __END__
@@ -36,10 +43,12 @@ Moot::Waste:Lexer - libmoot : WASTE tokenizer : mid-level lexer
 
   $wl = Moot::Waste::Lexer->new();    ##-- create a new lexer
 
-  $wl->from_reader($reader);	      ##-- low-level TokenReader object (e.g. Moot::WasteScanner)
+  $wl->scanner($scanner);	      ##-- set low-level TokenReader object (e.g. Moot::WasteScanner)
+  $wl->scanner();	              ##-- get underlying scanner or undef
+  $wl->close();                       ##-- close current input source (unsets scanner)
+
   $tok = $wl->get_token();            ##-- read next token
   $buf = $wl->get_sentence();         ##-- read all remaining tokens as a list
-  $wl->close();                       ##-- close current input source
 
   #... or (almost) any other Moot::TokenReader method
 
