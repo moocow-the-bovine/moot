@@ -11,6 +11,16 @@ use open ':std',':utf8';
 
 BEGIN {
   *refcnt = \&Devel::Peek::SvREFCNT;
+  *svdump = \&Devel::Peek::Dump;
+  *svdumpa = \&Devel::Peek::DumpArray;
+}
+sub svdumph {
+  my ($k,$v);
+  while (@_) {
+    ($k,$v)=splice(@_,0,2);
+    print STDERR "--\n$k = ";
+    svdump($v);
+  }
 }
 
 ##--------------------------------------------------------------
@@ -387,8 +397,25 @@ sub test_churn {
 
   print STDERR "$0: test_churn() done\n";
 }
-test_churn(@ARGV ? @ARGV : ('in.wd','-', '','wd,loc'));
+#test_churn(@ARGV ? @ARGV : ('in.wd','-', '','wd,loc'));
 
+
+##--------------------------------------------------------------
+sub test_wlexer {
+  my $lexer = Moot::Waste::Lexer->new();
+  my $lx0 = $lexer->abbrevs();
+  my $lx1 = $lexer->stopwords();
+
+  ##-- show data
+  svdumph(lexer=>$lexer,lx0=>$lx0,lx1=>$lx1);
+  print "-- undef lx0,lx1--\n";
+  undef $lx0;
+  undef $lx1;
+  svdumph(lexer=>$lexer,lx0=>$lx0,lx1=>$lx1);
+
+  print STDERR "$0: test_wlexer() done\n";
+}
+test_wlexer();
 
 ##--------------------------------------------------------------
 ## MAIN
