@@ -495,7 +495,28 @@ sub test_waste_lexer {
 
   print STDERR "$0: test_waste_lexer() done\n"; exit 0;
 }
-test_waste_lexer(@ARGV);
+#test_waste_lexer(@ARGV);
+
+##--------------------------------------------------------------
+sub test_waste_decoder {
+  my $file = shift || 'decodeme.wd';
+  my $reader  = Moot::TokenIO::file_reader($file, 'wd,loc');
+  my $decoder = Moot::Waste::Decoder->new();
+  my $writer  = Moot::TokenIO::file_writer('-', 'm,loc');
+
+  $decoder->sink($writer);
+  undef $writer;
+  my ($tok);
+  while (defined($tok=$reader->get_token)) {
+    $decoder->put_token($tok);
+  }
+  $reader->close() if ($reader);
+  $decoder->close() if ($decoder);
+  $writer->close() if ($writer);
+
+  print STDERR "$0: test_waste_decoder() done\n"; exit 0;
+}
+test_waste_decoder(@ARGV);
 
 ##--------------------------------------------------------------
 ## MAIN

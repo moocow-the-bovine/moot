@@ -206,3 +206,53 @@ CODE:
 OUTPUT:
  RETVAL
 
+
+##=====================================================================
+## Moot::Waste::Decoder
+## + uses TokenWriter::tw_data to hold SV* of underlying writer
+##=====================================================================
+
+MODULE = Moot		PACKAGE = Moot::Waste::Decoder
+
+##--------------------------------------------------------------
+wasteDecoder*
+new(char *CLASS, TokenIOFormatMask fmt=tiofUnknown)
+CODE:
+ RETVAL=new wasteDecoder(fmt, CLASS);
+ //fprintf(stderr, "%s::new() --> %p=%i\n", CLASS,RETVAL,RETVAL);
+OUTPUT:
+ RETVAL
+
+##-------------------------------------------------------------
+void
+close(wasteDecoder *wd)
+CODE:
+ wd->close();  
+ if (wd->tw_data) {
+   SvREFCNT_dec( (SV*)wd->tw_data );
+   wd->tw_data = NULL;
+ }
+
+##-------------------------------------------------------------
+SV*
+_get_sink(wasteDecoder *wd)
+CODE:
+ if (!wd->tw_data || !wd->wd_sink) { XSRETURN_UNDEF; }
+ RETVAL = newSVsv((SV*)wd->tw_data);
+OUTPUT:
+ RETVAL
+
+##-------------------------------------------------------------
+void
+_set_sink(wasteDecoder *wd, SV *sink_sv)
+PREINIT:
+  TokenWriter *tw;
+CODE:
+  if( sv_isobject(sink_sv) && (SvTYPE(SvRV(sink_sv)) == SVt_PVMG) )
+    tw = (TokenWriter*)SvIV((SV*)SvRV( sink_sv ));
+  else {
+    warn("Moot::Waste::Decoder::_set_sink() -- sink_sv is not a blessed SV reference");
+    XSRETURN_UNDEF;
+  }
+  wd->to_writer(tw);
+  wd->tw_data = newSVsv(sink_sv);

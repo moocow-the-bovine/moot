@@ -377,6 +377,19 @@ CODE:
   sentence2tokdata(s, utf8);
   delete s;
 
+##------------------------------------------------------
+void
+tag_io(mootHMM *hmm, TokenReader *reader, TokenWriter *writer)
+CODE:
+  hmm->tag_io(reader,writer);
+
+##------------------------------------------------------
+void
+tag_stream(mootHMM *hmm, TokenReader *reader, TokenWriter *writer)
+CODE:
+  hmm->tag_stream(reader,writer);
+
+
 ##=====================================================================
 ## I/O
 ##=====================================================================

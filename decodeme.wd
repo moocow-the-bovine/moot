@@ -1,0 +1,8 @@
+alpha,lo,a0,l3,b1	alpha,lo,a0,l3,b1,s0,S0,w1	0 3	[alpha,lo,a0,l3,b1,s0,S0,w0 foo]	[alpha,lo,a0,l3,b1,s0,S1,w0 foo]	[alpha,lo,a0,l3,b1,s0,S0,w1 foo]	[alpha,lo,a0,l3,b1,s0,S1,w1 foo]	[alpha,lo,a0,l3,b1,s1,S0,w1 foo]	[alpha,lo,a0,l3,b1,s1,S1,w1 foo]
+%%$SB$
+alpha,lo,a0,l3,b1	alpha,lo,a0,l3,b1,s0,S0,w1	9 3	[alpha,lo,a0,l3,b1,s0,S0,w0 bar]	[alpha,lo,a0,l3,b1,s0,S1,w0 bar]	[alpha,lo,a0,l3,b1,s0,S0,w1 bar]	[alpha,lo,a0,l3,b1,s0,S1,w1 bar]	[alpha,lo,a0,l3,b1,s1,S0,w1 bar]	[alpha,lo,a0,l3,b1,s1,S1,w1 bar]
+num,*,a0,l3,b1	num,*,a0,l3,b1,s0,S0,w1	13 3	[num,*,a0,l3,b1,s0,S0,w0 123]	[num,*,a0,l3,b1,s0,S1,w0 123]	[num,*,a0,l3,b1,s0,S0,w1 123]	[num,*,a0,l3,b1,s0,S1,w1 123]	[num,*,a0,l3,b1,s1,S0,w1 123]	[num,*,a0,l3,b1,s1,S1,w1 123]
+%% hi there 
+$.,*,a0,l0,b0	$.,*,a0,l0,b0,s0,S0,w0	30 1	[$.,*,a0,l0,b0,s0,S0,w0 .]	[$.,*,a0,l0,b0,s0,S1,w0 .]	[$.,*,a0,l0,b0,s0,S0,w1 .]	[$.,*,a0,l0,b0,s0,S1,w1 .]	[$.,*,a0,l0,b0,s1,S0,w1 .]	[$.,*,a0,l0,b0,s1,S1,w1 .]
+num,*,a0,l3,b0	num,*,a0,l3,b0,s0,S0,w0	31 3	[num,*,a0,l3,b0,s0,S0,w0 456]	[num,*,a0,l3,b0,s0,S1,w0 456]	[num,*,a0,l3,b0,s0,S0,w1 456]	[num,*,a0,l3,b0,s0,S1,w1 456]	[num,*,a0,l3,b0,s1,S0,w1 456]	[num,*,a0,l3,b0,s1,S1,w1 456]
+

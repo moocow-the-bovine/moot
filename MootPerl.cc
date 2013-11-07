@@ -161,6 +161,7 @@ const char *TokenWriterClass(const TokenWriter *tw)
   else if (tw->tw_name == "TokenWriter")       return "Moot::TokenWriter";
   else if (tw->tw_name == "TokenWriterNative") return "Moot::TokenWriter::Native";
   else if (tw->tw_name == "TokenWriterExpat")  return "Moot::TokenWriter::XML";
+  else if (tw->tw_name == "wasteDecoder")      return "Moot::Waste::Decoder";
   return tw->tw_name.c_str();
 }
 

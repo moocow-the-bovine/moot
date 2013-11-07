@@ -32,7 +32,7 @@ __END__
 
 =head1 NAME
 
-Moot::Waste:Lexer - libmoot : WASTE tokenizer : mid-level lexer
+Moot::Waste::Lexer - libmoot : WASTE tokenizer : mid-level lexer
 
 =head1 SYNOPSIS
 
