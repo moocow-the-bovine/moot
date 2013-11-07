@@ -125,7 +125,20 @@ public:
   /** Select output to subordinate TokenWriter */
   void to_writer(TokenWriter *sink);
 
+  /** flush buffer to current output sink if defined */
   void flush_buffer(bool force=false);
+
+  /** peek at top buffer element */
+  inline mootToken &buffer_peek(void)
+  { return wd_buf.front(); };
+
+  /** returns true iff it is safe to shift the buffer */
+  inline bool buffer_can_shift(void) 
+  { return !wd_buf.empty() && wd_tok != &(wd_buf.front()); };
+
+  /** shift the first element off the buffer if possible */
+  inline void buffer_shift(void) 
+  { if (!wd_buf.empty()) wd_buf.pop_front(); };
 
   void _put_token(const mootToken &token);
   void _put_tokens(const mootSentence &tokens);

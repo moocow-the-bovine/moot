@@ -203,6 +203,7 @@ CODE:
    SV *sv = stdstring2sv(*lxi, utf8);
    av_push(RETVAL, sv);
  }
+ sv_2mortal((SV*)RETVAL);
 OUTPUT:
  RETVAL
 
@@ -256,3 +257,58 @@ CODE:
   }
   wd->to_writer(tw);
   wd->tw_data = newSVsv(sink_sv);
+
+##-------------------------------------------------------------
+size_t
+buffer_size(wasteDecoder *wd)
+CODE:
+ RETVAL = wd->wd_buf.size();
+OUTPUT:
+ RETVAL
+
+##-------------------------------------------------------------
+bool
+buffer_empty(wasteDecoder *wd)
+CODE:
+ RETVAL = wd->wd_buf.empty();
+OUTPUT:
+ RETVAL
+
+##-------------------------------------------------------------
+HV*
+buffer_peek(wasteDecoder *wd, bool utf8=TRUE)
+CODE:
+ if (wd->wd_buf.empty()) { XSRETURN_UNDEF; }
+ RETVAL = token2hv( &wd->wd_buf.front(), utf8 );
+OUTPUT:
+ RETVAL
+
+##-------------------------------------------------------------
+bool
+buffer_can_shift(wasteDecoder *wd)
+CODE:
+ RETVAL = wd->buffer_can_shift();
+OUTPUT:
+ RETVAL
+
+##-------------------------------------------------------------
+void
+buffer_shift(wasteDecoder *wd)
+CODE:
+ wd->buffer_shift();
+
+
+##-------------------------------------------------------------
+AV*
+buffer_flush(wasteDecoder *wd, bool force=FALSE, bool utf8=TRUE)
+CODE:
+ if (wd->wd_buf.empty()) { XSRETURN_UNDEF; }
+ RETVAL = newAV();
+ while ( !wd->wd_buf.empty() && (force || wd->buffer_can_shift()) ) {
+   HV *tokhv = token2hv( &(wd->buffer_peek()), utf8 );
+   av_push(RETVAL, newRV_inc((SV*)tokhv));
+   wd->buffer_shift();
+ }
+ sv_2mortal((SV*)RETVAL);
+OUTPUT:
+ RETVAL

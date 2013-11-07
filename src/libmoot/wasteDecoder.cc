@@ -64,7 +64,7 @@ void wasteDecoder::to_writer(TokenWriter *sink)
 void wasteDecoder::flush_buffer(bool force)
 {
   if (!wd_sink) return;
-  for (; !wd_buf.empty() && (force || &(wd_buf.front()) != wd_tok); wd_buf.pop_front()) {
+  for (; !wd_buf.empty() && (force || buffer_can_shift()); wd_buf.pop_front()) {
     wd_sink->put_token(wd_buf.front());
   }
 } 
@@ -79,16 +79,18 @@ void wasteDecoder::_put_token(const mootToken &token)
     {
       //-- parse raw text from details
       const mootTagString &detail = token.tok_analyses.empty() ? "" : token.tok_analyses.front().details;
-      size_t rawtext_start = detail.rfind(' ');
-      mootTagString rawtext(detail, rawtext_start+1, (rawtext_start==detail.npos ? 0 : detail.size()-rawtext_start-2));
+      mootTagString rawtext("");
+      size_t rawtext_start = detail.size() > 21 ? detail.find(' ', 21) : detail.npos;
+      if (rawtext_start!=detail.npos && detail.size()-rawtext_start > 2)
+	rawtext.assign(detail, rawtext_start+1, detail.size()-rawtext_start-2);
 
       if (wd_tok && !tag_attr_w(token.besttag())) {
-	//-- merge tokens
+	//-- merge tokens, don't flush
 	wd_tok->tok_text += rawtext;
 	wd_tok->tok_besttag.push_back(' ');
 	wd_tok->tok_besttag += token.besttag();
 	wd_tok->tok_location.length = (token.tok_location.offset + token.tok_location.length - wd_tok->tok_location.offset);
-	break;
+	return;
       }
       else if (wd_tok) {
 	//-- we have a buffered wd_tok: check for EOS
@@ -109,24 +111,31 @@ void wasteDecoder::_put_token(const mootToken &token)
       break;
     }
 
+  case TokTypeWB:
+    //-- word break: flush wd_tok
+    wd_tok = NULL;
+    wd_buf.push_back( token );
+    break;
+
   case TokTypeSB:
     //-- sentence break: flush WIP token
     wd_tok = NULL;
-    flush_buffer();
     wd_buf.push_back(token);
     if (!wd_sb) {
       wd_buf.push_back( mootToken(TokTypeEOS) );
       wd_sb = true;
     }
-
-  case TokTypeWB:
-    //-- word break: flush WIP token
-    wd_tok = NULL;
+    break;
 
   case TokTypeEOS:
+    //-- EOS: pass through (unless we've just inserted one)
     if (wd_sb) break;
-    
+    wd_sb = true;
+    wd_buf.push_back( token );
+    break;
+  
   default:
+    //-- default: comment, xmlraw, etc: just buffer
     wd_buf.push_back(token);
     break;
   }
