@@ -1,7 +1,7 @@
 package Moot::Waste;
 use Moot::Waste::Scanner;
 use Moot::Waste::Lexer;
-#use Moot::Waste::Recycler;
+use Moot::Waste::Decoder;
 use strict;
 
 

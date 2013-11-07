@@ -80,6 +80,7 @@ Moot::HMM - libmoot : HMM
 
   ##=====================================================================
   ## Constructors etc
+ 
   $hmm  = Moot::HMM->new(\%opts);
   $opts = $hmm->config(\%opts);
   $opts = $hmm->config();
@@ -89,35 +90,35 @@ Moot::HMM - libmoot : HMM
   ##  + all of the following are get/set methods, e.g.
   ##    `$hmm->verbose()' gets the value of the 'verbose' property, and
   ##    `$hmm->verbose($i)' sets it
-
+ 
   $val = $hmm->verbose();
   $ndots = $hmm->ndots();
-
+ 
   $save_ambiguities = $hmm->save_ambiguities();
   $save_flavors = $hmm->save_flavors();
   $save_mark_unknown = $hmm->save_mark_unknown();
-
+ 
   $hash_ngrams = $hmm->hash_ngrams();
   $relax = $hmm->relax();
   $use_lex_classes = $hmm->use_lex_classes();
-
+ 
   $start_tagid = $hmm->start_tagid();
-
+ 
   $unknown_lex_threshhold = $hmm->unknown_lex_threshhold();
   $unknown_class_threshhold = $hmm->unknown_class_threshhold();
-
+ 
   $nglambda1 = $hmm->nglambda1();
   $nglambda2 = $hmm->nglambda2();
   $nglambda3 = $hmm->nglambda3();
-
+ 
   $wlambda0 = $hmm->wlambda0();
   $wlambda1 = $hmm->wlambda1();
-
+ 
   $clambda0 = $hmm->clambda0();
   $clambda1 = $hmm->clambda1();
-
+ 
   $beamwd = $hmm->beamwd();
-
+ 
   $nsents = $hmm->nsents();
   $ntokens = $hmm->ntokens();
   $nnewtokens = $hmm->nnewtokens();
@@ -128,18 +129,18 @@ Moot::HMM - libmoot : HMM
 
   ##=====================================================================
   ## Low-Level Lookup
-
+ 
   $logp = $hmm->wordp($word, $tag);          ##-- log p($word|$tag)
-
+ 
   $logp = $hmm->classp(\@tagset, $tag);      ##-- log p(\@tagset|$tag)
-
+ 
   $logp = $hmm->tagp($tag1);                 ##-- log p($tag1)              : raw
   $logp = $hmm->tagp($tag1,$tag2);           ##-- log p($tag2|$tag1)        : raw
   $logp = $hmm->tagp($tag1,$tag2,$tag3);     ##-- log p($tag3|$tag1,$tag2)  : raw?
 
   ##=====================================================================
   ## Tagging
-
+ 
   ## sentences are tagged in-place; structure:
   @sent = (
            {text=>'This'},
@@ -149,16 +150,18 @@ Moot::HMM - libmoot : HMM
                                       {tag=>'V',details=>'test/V',prob=>42}] },
            {text=>'.'      analyses=>[{tag=>'$.'}]},
           );
-
+ 
   $hmm->tag_sentence(\@sent,$utf8=1,$trace=0);  ##-- clobbers 'tag' key of each token hash
-
+ 
+  $hmm->tag_io    ( $reader, $writer );         ##-- sentence-stream tagging
+  $hmm->tag_stream( $reader, $writer );         ##-- token-stream tagging
 
   ##=====================================================================
   ## I/O
-
+ 
   $hmm = $CLASS_OR_OBJECT->load($model);
   $hmm = $CLASS_OR_OBJECT->loadBin($binfile);
-
+ 
   $bool = $hmm->saveBin($binfile, $zlevel=-1);
   undef = $hmm->txtdump($filename='-');
 
@@ -169,6 +172,7 @@ for Hidden Markov Model part-of-speech tagging.
 
 =head1 SEE ALSO
 
+Moot(3perl),
 Moot::Constants(3perl),
 moot(1),
 perl(1).
@@ -179,7 +183,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 by Bryan Jurish
+Copyright (C) 2011-2013 by Bryan Jurish
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

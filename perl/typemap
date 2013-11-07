@@ -16,6 +16,7 @@ TokenReaderExpat*   O_OBJECT
 TokenWriterExpat*   O_OBJECT
 wasteTokenScanner*  O_OBJECT
 wasteLexer* 	    O_OBJECT
+wasteDecoder* 	    O_OBJECT
 
 #mootSentence*     T_AV
 TagStr            T_CHAR
