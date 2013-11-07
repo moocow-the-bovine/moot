@@ -40,11 +40,22 @@ Moot::Waste::Decoder - libmoot : WASTE tokenizer : post-Viterbi decoder
 
   $wd->sink($scanner);                  ##-- set low-level TokenWriter object (e.g. Moot::TokenWriterNative)
   $wd->sink();                          ##-- get underlying TokenWriter or undef
-  $wd->close();                         ##-- close current input source (unsets sink)
+  $wd->close();                         ##-- close current input source (unsets sink, clears buffer)
 
   $wd->put_token($tok);                 ##-- decode next token
 
   #... or (almost) any other Moot::TokenWriter method
+
+  ##=====================================================================
+  ## Buffer Access (e.g. with no TokenWriter sink)
+
+  $bool = $wd->buffer_empty();          ##-- check whether token-buffer is empty
+  $size = $wd->buffer_size();           ##-- number of buffered tokens, O(N)
+
+  $tok  = $wd->buffer_peek();           ##-- peek at first token of buffer
+  $bool = $wd->buffer_can_shift();      ##-- true iff first token is safe to shift
+  undef = $wd->buffer_shift();          ##-- shifts first element off of buffer
+  $toks = $wd->buffer_flush($force=0);  ##-- get all (safe) tokens from buffer
 
 =head1 DESCRIPTION
 
