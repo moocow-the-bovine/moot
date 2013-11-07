@@ -72,7 +72,7 @@ cmdline_parser_print_help (void)
   cmdline_parser_print_version ();
   printf("\n");
   printf("Purpose:\n");
-  printf("  Low-level rule-based scanner stage for moot/WASTE HMM tokenizer.\n");
+  printf("  Low-level rule-based codec for moot/WASTE HMM tokenizer.\n");
   printf("\n");
   
   printf("Usage: %s [OPTIONS]... FILE(s)\n", "waste");
@@ -92,15 +92,18 @@ cmdline_parser_print_help (void)
   printf("   -r        --recover               Attempt to recover from minor errors.\n");
   printf("   -oFILE    --output=FILE           Write output to FILE.\n");
   printf("\n");
-  printf(" Scanner/Lexer Mode Options:\n");
+  printf(" Mode Options:\n");
   printf("   -s        --scan                  Enable raw text scanning stage (default).\n");
   printf("   -S        --no-scan               Disable raw text scanning stage.\n");
   printf("   -x        --lex                   Enable lexical classification stage (default).\n");
   printf("   -X        --no-lex                Disable lexical classification stage.\n");
-  printf("   -y        --norm-hyph             Perform hyphenation normalization?\n");
+  printf("   -d        --decode                Perform post-Viterbi decoding (overrides --scan, --lex).\n");
+  printf("\n");
+  printf(" Lexer-Only Options:\n");
   printf("   -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)\n");
   printf("   -jFILE    --conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)\n");
   printf("   -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)\n");
+  printf("   -y        --norm-hyph             Enable hyphenation normalization in lexer\n");
   printf("\n");
   printf(" Format Options:\n");
   printf("   -IFORMAT  --input-format=FORMAT   Specify input file format for -no-scan mode\n");
@@ -137,10 +140,11 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->no_scan_flag = 0; 
   args_info->lex_flag = 1; 
   args_info->no_lex_flag = 0; 
-  args_info->norm_hyph_flag = 0; 
+  args_info->decode_flag = 0; 
   args_info->abbrevs_arg = NULL; 
   args_info->conjunctions_arg = NULL; 
   args_info->stopwords_arg = NULL; 
+  args_info->norm_hyph_flag = 0; 
   args_info->input_format_arg = NULL; 
   args_info->output_format_arg = NULL; 
 }
@@ -164,10 +168,11 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->no_scan_given = 0;
   args_info->lex_given = 0;
   args_info->no_lex_given = 0;
-  args_info->norm_hyph_given = 0;
+  args_info->decode_given = 0;
   args_info->abbrevs_given = 0;
   args_info->conjunctions_given = 0;
   args_info->stopwords_given = 0;
+  args_info->norm_hyph_given = 0;
   args_info->input_format_given = 0;
   args_info->output_format_given = 0;
 
@@ -198,10 +203,11 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "no-scan", 0, NULL, 'S' },
 	{ "lex", 0, NULL, 'x' },
 	{ "no-lex", 0, NULL, 'X' },
-	{ "norm-hyph", 0, NULL, 'y' },
+	{ "decode", 0, NULL, 'd' },
 	{ "abbrevs", 1, NULL, 'a' },
 	{ "conjunctions", 1, NULL, 'j' },
 	{ "stopwords", 1, NULL, 'w' },
+	{ "norm-hyph", 0, NULL, 'y' },
 	{ "input-format", 1, NULL, 'I' },
 	{ "output-format", 1, NULL, 'O' },
         { NULL,	0, NULL, 0 }
@@ -219,10 +225,11 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'S',
 	'x',
 	'X',
-	'y',
+	'd',
 	'a', ':',
 	'j', ':',
 	'w', ':',
+	'y',
 	'I', ':',
 	'O', ':',
 	'\0'
@@ -383,13 +390,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->lex_flag=0;
           break;
         
-        case 'y':	 /* Perform hyphenation normalization? */
-          if (args_info->norm_hyph_given) {
-            fprintf(stderr, "%s: `--norm-hyph' (`-y') option given more than once\n", PROGRAM);
+        case 'd':	 /* Perform post-Viterbi decoding (overrides --scan, --lex). */
+          if (args_info->decode_given) {
+            fprintf(stderr, "%s: `--decode' (`-d') option given more than once\n", PROGRAM);
           }
-          args_info->norm_hyph_given++;
-         if (args_info->norm_hyph_given <= 1)
-           args_info->norm_hyph_flag = !(args_info->norm_hyph_flag);
+          args_info->decode_given++;
+         if (args_info->decode_given <= 1)
+           args_info->decode_flag = !(args_info->decode_flag);
+          /* user code */
+          args_info->decode_flag=1;
           break;
         
         case 'a':	 /* Load abbreviation lexicon from FILE (1 word/line) */
@@ -417,6 +426,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->stopwords_given++;
           if (args_info->stopwords_arg) free(args_info->stopwords_arg);
           args_info->stopwords_arg = gog_strdup(val);
+          break;
+        
+        case 'y':	 /* Enable hyphenation normalization in lexer */
+          if (args_info->norm_hyph_given) {
+            fprintf(stderr, "%s: `--norm-hyph' (`-y') option given more than once\n", PROGRAM);
+          }
+          args_info->norm_hyph_given++;
+         if (args_info->norm_hyph_given <= 1)
+           args_info->norm_hyph_flag = !(args_info->norm_hyph_flag);
           break;
         
         case 'I':	 /* Specify input file format for -no-scan mode */
@@ -565,14 +583,16 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->lex_flag=0;
           }
           
-          /* Perform hyphenation normalization? */
-          else if (strcmp(olong, "norm-hyph") == 0) {
-            if (args_info->norm_hyph_given) {
-              fprintf(stderr, "%s: `--norm-hyph' (`-y') option given more than once\n", PROGRAM);
+          /* Perform post-Viterbi decoding (overrides --scan, --lex). */
+          else if (strcmp(olong, "decode") == 0) {
+            if (args_info->decode_given) {
+              fprintf(stderr, "%s: `--decode' (`-d') option given more than once\n", PROGRAM);
             }
-            args_info->norm_hyph_given++;
-           if (args_info->norm_hyph_given <= 1)
-             args_info->norm_hyph_flag = !(args_info->norm_hyph_flag);
+            args_info->decode_given++;
+           if (args_info->decode_given <= 1)
+             args_info->decode_flag = !(args_info->decode_flag);
+            /* user code */
+            args_info->decode_flag=1;
           }
           
           /* Load abbreviation lexicon from FILE (1 word/line) */
@@ -603,6 +623,16 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->stopwords_given++;
             if (args_info->stopwords_arg) free(args_info->stopwords_arg);
             args_info->stopwords_arg = gog_strdup(val);
+          }
+          
+          /* Enable hyphenation normalization in lexer */
+          else if (strcmp(olong, "norm-hyph") == 0) {
+            if (args_info->norm_hyph_given) {
+              fprintf(stderr, "%s: `--norm-hyph' (`-y') option given more than once\n", PROGRAM);
+            }
+            args_info->norm_hyph_given++;
+           if (args_info->norm_hyph_given <= 1)
+             args_info->norm_hyph_flag = !(args_info->norm_hyph_flag);
           }
           
           /* Specify input file format for -no-scan mode */

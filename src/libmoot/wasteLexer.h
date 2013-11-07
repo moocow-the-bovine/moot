@@ -36,12 +36,10 @@
 #define _WASTE_LEXER_H
 
 #include <mootTokenIO.h>
-#include <mootSTLHacks.h>
 #include <wasteTypes.h>
 #include <wasteLexicon.h>
 
 #include <vector>
-#include <string>
 #include <list>
 
 namespace moot

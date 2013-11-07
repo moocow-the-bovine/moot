@@ -804,7 +804,7 @@ public:
    * Descendants may override this method.
    */
   virtual void close(void) {
-    if (tw_is_comment_block) put_comment_block_end();
+    if (tw_is_comment_block) this->put_comment_block_end();
     if (tw_ostream && tw_ostream_created) {
       tw_ostream->close();
       delete tw_ostream;
@@ -842,7 +842,7 @@ public:
   virtual void put_tokens(const mootSentence &tokens)
   {
     for (mootSentence::const_iterator si=tokens.begin(); si!=tokens.end(); si++)
-      put_token(*si);
+      this->put_token(*si);
   };
 
   /**
@@ -852,7 +852,7 @@ public:
    */
   virtual void put_sentence(const mootSentence &sentence)
   {
-    put_tokens(sentence);
+    this->put_tokens(sentence);
   };
   //@}
 
@@ -882,9 +882,9 @@ public:
    * Descendants may override this method.
    */
   virtual void put_comment_buffer(const char *buf, size_t len) {
-    put_comment_block_begin();
-    put_raw_buffer(buf,len);
-    put_comment_block_end();
+    this->put_comment_block_begin();
+    this->put_raw_buffer(buf,len);
+    this->put_comment_block_end();
   };
 
   /**
@@ -892,7 +892,7 @@ public:
    * Descendants may override this method.
    */
   virtual void put_comment(const char *s) {
-    put_comment_buffer(s,strlen(s));
+    this->put_comment_buffer(s,strlen(s));
   };
 
   /**
@@ -900,7 +900,7 @@ public:
    * Descendants may override this method.
    */
   virtual void put_comment_buffer(const std::string &s) {
-    put_comment_buffer(s.data(),s.size());
+    this->put_comment_buffer(s.data(),s.size());
   };
 
   /**
@@ -924,14 +924,14 @@ public:
    * Descendants may override this method.
    */
   virtual void put_raw(const char *s) {
-    put_raw_buffer(s,strlen(s));
+    this->put_raw_buffer(s,strlen(s));
   };
   /**
    * Write some data to the currently selected output sink
    * Descendants may override this method.
    */
   virtual void put_raw(const std::string &s) {
-    put_raw_buffer(s.data(),s.size());
+    this->put_raw_buffer(s.data(),s.size());
   };
 
   /**

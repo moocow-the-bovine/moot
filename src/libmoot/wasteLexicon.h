@@ -32,7 +32,6 @@
 #ifndef _WASTE_LEXICON_H
 #define _WASTE_LEXICON_H
 
-#include <mootSTLHacks.h>
 #include <mootTokenIO.h>
 
 moot_BEGIN_NAMESPACE
@@ -54,7 +53,7 @@ class wasteLexicon
   wasteLexicon()
   {};
 
-  /** desctructor */
+  /** destructor */
   ~wasteLexicon()
   {};    
 

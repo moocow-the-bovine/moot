@@ -4,7 +4,7 @@
 program "waste"
 #program_version "0.01"
 
-purpose	"Low-level rule-based scanner stage for moot/WASTE HMM tokenizer."
+purpose	"Low-level rule-based codec for moot/WASTE HMM tokenizer."
 author  "Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner <wuerzner@bbaw.de>"
 on_reparse "warn"
 
@@ -12,8 +12,9 @@ on_reparse "warn"
 # Details
 #-----------------------------------------------------------------------------
 details "
-waste is a low-level rule-based scanner stage for the moot/WASTE HMM
-tokenizer system.  It takes as its input one or more 'raw' files, and produces
+waste is a low-level rule-based codec for the moot/WASTE HMM
+tokenizer system.
+It functions either as an encoder, taking as input one or more 'raw' files, and produces
 a 'medium' or 'medium-rare'  output file.
 See L<mootfiles> for details on moot file formats.
 "
@@ -62,8 +63,8 @@ indicates a sentence boundary.
 "
 
 #-----------------------------------------------------------------------------
-# scan/lex
-group "Scanner/Lexer Mode Options"
+# scan/lex/decode
+group "Mode Options"
 
 flag "scan"	  s  "Enable raw text scanning stage (default)." \
     default="1" \
@@ -77,10 +78,13 @@ flag "lex"	  x  "Enable lexical classification stage (default)." \
 flag "no-lex"	  X  "Disable lexical classification stage." \
     code="'args_info->lex_flag=0;'"
 
-flag "norm-hyph" y  "Perform hyphenation normalization?" \
-    details="
-Only meaningful if --lex is enabled.
-"
+flag "decode"	  d  "Perform post-Viterbi decoding (overrides --scan, --lex)." \
+    default="0" \
+    code="'args_info->decode_flag=1;'"
+
+#-----------------------------------------------------------------------------
+# lexer options
+group "Lexer-Only Options"
 
 string "abbrevs" a  "Load abbreviation lexicon from FILE (1 word/line)" \
     arg="FILE" \
@@ -94,9 +98,13 @@ string "conjunctions" j  "Load conjunction lexicon from FILE (1 word/line)" \
 Only meaningful if --lex is enabled.
 "
 
-
 string "stopwords" w  "Load stopword lexicon from FILE (1 word/line)" \
     arg="FILE" \
+    details="
+Only meaningful if --lex is enabled.
+"
+
+flag "norm-hyph" y  "Enable hyphenation normalization in lexer" \
     details="
 Only meaningful if --lex is enabled.
 "

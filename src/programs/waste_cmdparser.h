@@ -29,10 +29,11 @@ struct gengetopt_args_info {
   int no_scan_flag;	 /* Disable raw text scanning stage. (default=0). */
   int lex_flag;	 /* Enable lexical classification stage (default). (default=1). */
   int no_lex_flag;	 /* Disable lexical classification stage. (default=0). */
-  int norm_hyph_flag;	 /* Perform hyphenation normalization? (default=0). */
+  int decode_flag;	 /* Perform post-Viterbi decoding (overrides --scan, --lex). (default=0). */
   char * abbrevs_arg;	 /* Load abbreviation lexicon from FILE (1 word/line) (default=NULL). */
   char * conjunctions_arg;	 /* Load conjunction lexicon from FILE (1 word/line) (default=NULL). */
   char * stopwords_arg;	 /* Load stopword lexicon from FILE (1 word/line) (default=NULL). */
+  int norm_hyph_flag;	 /* Enable hyphenation normalization in lexer (default=0). */
   char * input_format_arg;	 /* Specify input file format for -no-scan mode (default=NULL). */
   char * output_format_arg;	 /* Specify output file format. (default=NULL). */
 
@@ -48,10 +49,11 @@ struct gengetopt_args_info {
   int no_scan_given;	 /* Whether no-scan was given */
   int lex_given;	 /* Whether lex was given */
   int no_lex_given;	 /* Whether no-lex was given */
-  int norm_hyph_given;	 /* Whether norm-hyph was given */
+  int decode_given;	 /* Whether decode was given */
   int abbrevs_given;	 /* Whether abbrevs was given */
   int conjunctions_given;	 /* Whether conjunctions was given */
   int stopwords_given;	 /* Whether stopwords was given */
+  int norm_hyph_given;	 /* Whether norm-hyph was given */
   int input_format_given;	 /* Whether input-format was given */
   int output_format_given;	 /* Whether output-format was given */
   

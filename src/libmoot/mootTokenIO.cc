@@ -338,7 +338,7 @@ mootTokenType TokenReader::get_sentence(void)
     //-- allocate new destination token
     tr_sentence->push_back(mootToken());
     tr_token = &(tr_sentence->back());
-    lxtyp = get_token();
+    lxtyp = this->get_token();
   }
 
   tr_token = tr_token_old;

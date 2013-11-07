@@ -108,6 +108,8 @@
 #include <wasteTypes.h>
 #include <wasteCase.h>
 #include <wasteScanner.h>
+#include <wasteLexicon.h>
 #include <wasteLexer.h>
+#include <wasteDecoder.h>
 
 #endif /* _MOOT_H */
