@@ -1,0 +1,4 @@
+abbrevs		/home/moocow/work/moot/moot-models/stat-tok/moo/dtiger+qq/common/dta_abbrevs_flat.lex
+conjunctions	/home/moocow/work/moot/moot-models/stat-tok/moo/dtiger+qq/common/dta_conjunctions.lex
+stopwords	/home/moocow/work/moot/moot-models/stat-tok/moo/dtiger+qq/common/dta_stopwords.lex
+model		/home/moocow/work/moot/moot-models/stat-tok/moo/dtiger+qq/hmm.current/dtiger+qq.rtt_full.model.hmm

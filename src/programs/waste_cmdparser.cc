@@ -93,17 +93,24 @@ cmdline_parser_print_help (void)
   printf("   -oFILE    --output=FILE           Write output to FILE.\n");
   printf("\n");
   printf(" Mode Options:\n");
-  printf("   -s        --scan                  Enable raw text scanning stage (default).\n");
+  printf("   -f        --full                  Alias for --scan --lex --tag --decode (default)\n");
+  printf("   -s        --scan                  Enable raw text scanning stage.\n");
   printf("   -S        --no-scan               Disable raw text scanning stage.\n");
-  printf("   -x        --lex                   Enable lexical classification stage (default).\n");
+  printf("   -x        --lex                   Enable lexical classification stage.\n");
   printf("   -X        --no-lex                Disable lexical classification stage.\n");
-  printf("   -d        --decode                Perform post-Viterbi decoding (overrides --scan, --lex).\n");
+  printf("   -t        --tag                   Enable HMM Viterbi tagging stage.\n");
+  printf("   -T        --no-tag                Disable HMM Viterbi tagging stage.\n");
+  printf("   -d        --decode                Enable post-Viterbi decoding stage.\n");
+  printf("   -D        --no-decode             Disable post-Viterbi decoding stage.\n");
   printf("\n");
   printf(" Lexer-Only Options:\n");
   printf("   -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)\n");
   printf("   -jFILE    --conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)\n");
   printf("   -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)\n");
   printf("   -y        --norm-hyph             Enable hyphenation normalization in lexer\n");
+  printf("\n");
+  printf(" HMM Options:\n");
+  printf("   -MMODEL   --model=MODEL           Use HMM model file(s) MODEL.\n");
   printf("\n");
   printf(" Format Options:\n");
   printf("   -IFORMAT  --input-format=FORMAT   Specify input file format for -no-scan mode\n");
@@ -136,15 +143,20 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->list_flag = 0; 
   args_info->recover_flag = 0; 
   args_info->output_arg = gog_strdup("-"); 
-  args_info->scan_flag = 1; 
+  args_info->full_flag = 0; 
+  args_info->scan_flag = 0; 
   args_info->no_scan_flag = 0; 
-  args_info->lex_flag = 1; 
+  args_info->lex_flag = 0; 
   args_info->no_lex_flag = 0; 
+  args_info->tag_flag = 0; 
+  args_info->no_tag_flag = 0; 
   args_info->decode_flag = 0; 
+  args_info->no_decode_flag = 0; 
   args_info->abbrevs_arg = NULL; 
   args_info->conjunctions_arg = NULL; 
   args_info->stopwords_arg = NULL; 
   args_info->norm_hyph_flag = 0; 
+  args_info->model_arg = gog_strdup("waste.hmm"); 
   args_info->input_format_arg = NULL; 
   args_info->output_format_arg = NULL; 
 }
@@ -164,15 +176,20 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->list_given = 0;
   args_info->recover_given = 0;
   args_info->output_given = 0;
+  args_info->full_given = 0;
   args_info->scan_given = 0;
   args_info->no_scan_given = 0;
   args_info->lex_given = 0;
   args_info->no_lex_given = 0;
+  args_info->tag_given = 0;
+  args_info->no_tag_given = 0;
   args_info->decode_given = 0;
+  args_info->no_decode_given = 0;
   args_info->abbrevs_given = 0;
   args_info->conjunctions_given = 0;
   args_info->stopwords_given = 0;
   args_info->norm_hyph_given = 0;
+  args_info->model_given = 0;
   args_info->input_format_given = 0;
   args_info->output_format_given = 0;
 
@@ -199,15 +216,20 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "list", 0, NULL, 'l' },
 	{ "recover", 0, NULL, 'r' },
 	{ "output", 1, NULL, 'o' },
+	{ "full", 0, NULL, 'f' },
 	{ "scan", 0, NULL, 's' },
 	{ "no-scan", 0, NULL, 'S' },
 	{ "lex", 0, NULL, 'x' },
 	{ "no-lex", 0, NULL, 'X' },
+	{ "tag", 0, NULL, 't' },
+	{ "no-tag", 0, NULL, 'T' },
 	{ "decode", 0, NULL, 'd' },
+	{ "no-decode", 0, NULL, 'D' },
 	{ "abbrevs", 1, NULL, 'a' },
 	{ "conjunctions", 1, NULL, 'j' },
 	{ "stopwords", 1, NULL, 'w' },
 	{ "norm-hyph", 0, NULL, 'y' },
+	{ "model", 1, NULL, 'M' },
 	{ "input-format", 1, NULL, 'I' },
 	{ "output-format", 1, NULL, 'O' },
         { NULL,	0, NULL, 0 }
@@ -221,15 +243,20 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'l',
 	'r',
 	'o', ':',
+	'f',
 	's',
 	'S',
 	'x',
 	'X',
+	't',
+	'T',
 	'd',
+	'D',
 	'a', ':',
 	'j', ':',
 	'w', ':',
 	'y',
+	'M', ':',
 	'I', ':',
 	'O', ':',
 	'\0'
@@ -346,7 +373,18 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->output_arg = gog_strdup(val);
           break;
         
-        case 's':	 /* Enable raw text scanning stage (default). */
+        case 'f':	 /* Alias for --scan --lex --tag --decode (default) */
+          if (args_info->full_given) {
+            fprintf(stderr, "%s: `--full' (`-f') option given more than once\n", PROGRAM);
+          }
+          args_info->full_given++;
+         if (args_info->full_given <= 1)
+           args_info->full_flag = !(args_info->full_flag);
+          /* user code */
+          args_info->full_flag = args_info->scan_flag = args_info->lex_flag = args_info->tag_flag = args_info->decode_flag = 1;
+          break;
+        
+        case 's':	 /* Enable raw text scanning stage. */
           if (args_info->scan_given) {
             fprintf(stderr, "%s: `--scan' (`-s') option given more than once\n", PROGRAM);
           }
@@ -368,7 +406,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->scan_flag=0;
           break;
         
-        case 'x':	 /* Enable lexical classification stage (default). */
+        case 'x':	 /* Enable lexical classification stage. */
           if (args_info->lex_given) {
             fprintf(stderr, "%s: `--lex' (`-x') option given more than once\n", PROGRAM);
           }
@@ -390,7 +428,29 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->lex_flag=0;
           break;
         
-        case 'd':	 /* Perform post-Viterbi decoding (overrides --scan, --lex). */
+        case 't':	 /* Enable HMM Viterbi tagging stage. */
+          if (args_info->tag_given) {
+            fprintf(stderr, "%s: `--tag' (`-t') option given more than once\n", PROGRAM);
+          }
+          args_info->tag_given++;
+         if (args_info->tag_given <= 1)
+           args_info->tag_flag = !(args_info->tag_flag);
+          /* user code */
+          args_info->tag_flag=1;
+          break;
+        
+        case 'T':	 /* Disable HMM Viterbi tagging stage. */
+          if (args_info->no_tag_given) {
+            fprintf(stderr, "%s: `--no-tag' (`-T') option given more than once\n", PROGRAM);
+          }
+          args_info->no_tag_given++;
+         if (args_info->no_tag_given <= 1)
+           args_info->no_tag_flag = !(args_info->no_tag_flag);
+          /* user code */
+          args_info->tag_flag=0;
+          break;
+        
+        case 'd':	 /* Enable post-Viterbi decoding stage. */
           if (args_info->decode_given) {
             fprintf(stderr, "%s: `--decode' (`-d') option given more than once\n", PROGRAM);
           }
@@ -399,6 +459,17 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
            args_info->decode_flag = !(args_info->decode_flag);
           /* user code */
           args_info->decode_flag=1;
+          break;
+        
+        case 'D':	 /* Disable post-Viterbi decoding stage. */
+          if (args_info->no_decode_given) {
+            fprintf(stderr, "%s: `--no-decode' (`-D') option given more than once\n", PROGRAM);
+          }
+          args_info->no_decode_given++;
+         if (args_info->no_decode_given <= 1)
+           args_info->no_decode_flag = !(args_info->no_decode_flag);
+          /* user code */
+          args_info->decode_flag=0;
           break;
         
         case 'a':	 /* Load abbreviation lexicon from FILE (1 word/line) */
@@ -435,6 +506,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->norm_hyph_given++;
          if (args_info->norm_hyph_given <= 1)
            args_info->norm_hyph_flag = !(args_info->norm_hyph_flag);
+          break;
+        
+        case 'M':	 /* Use HMM model file(s) MODEL. */
+          if (args_info->model_given) {
+            fprintf(stderr, "%s: `--model' (`-M') option given more than once\n", PROGRAM);
+          }
+          args_info->model_given++;
+          if (args_info->model_arg) free(args_info->model_arg);
+          args_info->model_arg = gog_strdup(val);
           break;
         
         case 'I':	 /* Specify input file format for -no-scan mode */
@@ -535,7 +615,19 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->output_arg = gog_strdup(val);
           }
           
-          /* Enable raw text scanning stage (default). */
+          /* Alias for --scan --lex --tag --decode (default) */
+          else if (strcmp(olong, "full") == 0) {
+            if (args_info->full_given) {
+              fprintf(stderr, "%s: `--full' (`-f') option given more than once\n", PROGRAM);
+            }
+            args_info->full_given++;
+           if (args_info->full_given <= 1)
+             args_info->full_flag = !(args_info->full_flag);
+            /* user code */
+            args_info->full_flag = args_info->scan_flag = args_info->lex_flag = args_info->tag_flag = args_info->decode_flag = 1;
+          }
+          
+          /* Enable raw text scanning stage. */
           else if (strcmp(olong, "scan") == 0) {
             if (args_info->scan_given) {
               fprintf(stderr, "%s: `--scan' (`-s') option given more than once\n", PROGRAM);
@@ -559,7 +651,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->scan_flag=0;
           }
           
-          /* Enable lexical classification stage (default). */
+          /* Enable lexical classification stage. */
           else if (strcmp(olong, "lex") == 0) {
             if (args_info->lex_given) {
               fprintf(stderr, "%s: `--lex' (`-x') option given more than once\n", PROGRAM);
@@ -583,7 +675,31 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->lex_flag=0;
           }
           
-          /* Perform post-Viterbi decoding (overrides --scan, --lex). */
+          /* Enable HMM Viterbi tagging stage. */
+          else if (strcmp(olong, "tag") == 0) {
+            if (args_info->tag_given) {
+              fprintf(stderr, "%s: `--tag' (`-t') option given more than once\n", PROGRAM);
+            }
+            args_info->tag_given++;
+           if (args_info->tag_given <= 1)
+             args_info->tag_flag = !(args_info->tag_flag);
+            /* user code */
+            args_info->tag_flag=1;
+          }
+          
+          /* Disable HMM Viterbi tagging stage. */
+          else if (strcmp(olong, "no-tag") == 0) {
+            if (args_info->no_tag_given) {
+              fprintf(stderr, "%s: `--no-tag' (`-T') option given more than once\n", PROGRAM);
+            }
+            args_info->no_tag_given++;
+           if (args_info->no_tag_given <= 1)
+             args_info->no_tag_flag = !(args_info->no_tag_flag);
+            /* user code */
+            args_info->tag_flag=0;
+          }
+          
+          /* Enable post-Viterbi decoding stage. */
           else if (strcmp(olong, "decode") == 0) {
             if (args_info->decode_given) {
               fprintf(stderr, "%s: `--decode' (`-d') option given more than once\n", PROGRAM);
@@ -593,6 +709,18 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
              args_info->decode_flag = !(args_info->decode_flag);
             /* user code */
             args_info->decode_flag=1;
+          }
+          
+          /* Disable post-Viterbi decoding stage. */
+          else if (strcmp(olong, "no-decode") == 0) {
+            if (args_info->no_decode_given) {
+              fprintf(stderr, "%s: `--no-decode' (`-D') option given more than once\n", PROGRAM);
+            }
+            args_info->no_decode_given++;
+           if (args_info->no_decode_given <= 1)
+             args_info->no_decode_flag = !(args_info->no_decode_flag);
+            /* user code */
+            args_info->decode_flag=0;
           }
           
           /* Load abbreviation lexicon from FILE (1 word/line) */
@@ -633,6 +761,16 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->norm_hyph_given++;
            if (args_info->norm_hyph_given <= 1)
              args_info->norm_hyph_flag = !(args_info->norm_hyph_flag);
+          }
+          
+          /* Use HMM model file(s) MODEL. */
+          else if (strcmp(olong, "model") == 0) {
+            if (args_info->model_given) {
+              fprintf(stderr, "%s: `--model' (`-M') option given more than once\n", PROGRAM);
+            }
+            args_info->model_given++;
+            if (args_info->model_arg) free(args_info->model_arg);
+            args_info->model_arg = gog_strdup(val);
           }
           
           /* Specify input file format for -no-scan mode */

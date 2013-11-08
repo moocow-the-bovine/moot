@@ -66,21 +66,42 @@ indicates a sentence boundary.
 # scan/lex/decode
 group "Mode Options"
 
-flag "scan"	  s  "Enable raw text scanning stage (default)." \
-    default="1" \
+#-------------------------------------------------------
+flag "full"       f  "Alias for --scan --lex --tag --decode (default)" \
+    code="'args_info->full_flag = args_info->scan_flag = args_info->lex_flag = args_info->tag_flag = args_info->decode_flag = 1;'"
+
+#-------------------------------------------------------
+flag "scan"	  s  "Enable raw text scanning stage." \
     code="'args_info->scan_flag=1;'"
 flag "no-scan"	  S  "Disable raw text scanning stage." \
     code="'args_info->scan_flag=0;'"
 
-flag "lex"	  x  "Enable lexical classification stage (default)." \
-    default="1" \
-    code="'args_info->lex_flag=1;'"
+#-------------------------------------------------------
+flag "lex"	  x  "Enable lexical classification stage." \
+    code="'args_info->lex_flag=1;'" \
+    details="
+If lexer stage is enabled, you should also specify --abbrevs, --conjunctions, and/or --stopwords
+as appropriate for your HMM.
+"
 flag "no-lex"	  X  "Disable lexical classification stage." \
     code="'args_info->lex_flag=0;'"
 
-flag "decode"	  d  "Perform post-Viterbi decoding (overrides --scan, --lex)." \
-    default="0" \
+
+#-------------------------------------------------------
+flag "tag"        t   "Enable HMM Viterbi tagging stage." \
+    code="'args_info->tag_flag=1;'" \
+    details="
+Requires --model option.
+"
+flag "no-tag"     T   "Disable HMM Viterbi tagging stage." \
+    code="'args_info->tag_flag=0;'"
+
+#-------------------------------------------------------
+flag "decode"	  d  "Enable post-Viterbi decoding stage." \
     code="'args_info->decode_flag=1;'"
+flag "no-decode"  D  "Disable post-Viterbi decoding stage." \
+    code="'args_info->decode_flag=0;'"
+
 
 #-----------------------------------------------------------------------------
 # lexer options
@@ -107,6 +128,25 @@ Only meaningful if --lex is enabled.
 flag "norm-hyph" y  "Enable hyphenation normalization in lexer" \
     details="
 Only meaningful if --lex is enabled.
+"
+
+#-----------------------------------------------------------------------------
+# HMM options
+group "HMM Options"
+
+string "model" M "Use HMM model file(s) MODEL." \
+  arg="MODEL" \
+  default="waste.hmm" \
+  details="
+See 'HMM MODEL FILE FORMATS' in L<mootfiles> for details on model file formats.
+This option is intended to be used with a pre-compiled binary model.  If you
+need to set addtitional runtime options, you should call C<moot> directly
+in a pipeline, e.g.
+
+  waste --scan --lex --aabbr.lex -jconj.lex -wstop.lex INFILE.txt -Owd,loc \\
+  | moot -Iwd,loc --stream --model=MODEL --beam-width=100 - \\
+  | waste --decode -Iwd,loc -Owd,loc -o OUTFILE.wd
+
 "
 
 #-----------------------------------------------------------------------------

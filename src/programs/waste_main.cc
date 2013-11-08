@@ -48,6 +48,7 @@
 #include <mootCIO.h>
 #include <mootToken.h>
 #include <mootTokenIO.h>
+#include <mootHMM.h>
 
 #include "waste_cmdparser.h"
 
@@ -64,15 +65,22 @@ int vlevel;
 //-- files
 mofstream out;
 
-//-- Token I/O: reader (for --no-scan)
+//-- optional objects
+TokenReader  *reader=NULL;
+wasteTokenScanner *scanner=NULL;
+wasteLexer   *lexer=NULL;
+mootHMM      *tagger=NULL;
+wasteDecoder *decoder=NULL;
+
+//-- Token I/O: reader; see GetMyOptions() for mode-dependent hacks
 int ifmt = tiofNone;
 int ifmt_implied = tiofNone;
-int ifmt_default = tiofRare|tiofLocation;
+int ifmt_default = tiofText|tiofLocation;
 
-//-- Token I/O: writer
+//-- Token I/O: writer; ; see GetMyOptions() for mode-dependent hacks
 int ofmt = tiofNone;
-int ofmt_implied = tiofNone;
-int ofmt_default = tiofMediumRare|tiofLocation;
+int ofmt_implied = tiofText;
+int ofmt_default = tiofText|tiofLocation; 
 TokenWriter *main_writer = NULL;
 
 //-- options & file-churning
@@ -82,6 +90,57 @@ cmdutil_file_churner churner;
 //-- stats
 int nfiles = 0;
 int ntokens = 0;
+
+//-- mode bitmask flags
+const int wmNone   = 0;
+const int wmScan   = 0x01;
+const int wmLex    = 0x02;
+const int wmTag    = 0x04;
+const int wmDecode = 0x08;
+
+const int wmFull = wmScan|wmLex|wmTag|wmDecode;
+int mode = wmNone;
+std::string modestr("none");
+
+
+/*--------------------------------------------------------------------------
+ * Mode Utils
+ */
+inline int& modeSet(int &m, int flag, bool enabled) {
+  if (enabled) {
+    m |= flag;
+  }
+  else {
+    m &= (~flag);
+  }
+  return m;
+}
+
+inline int modeFirst(int m) {
+  if      (m&wmScan) return wmScan;
+  else if (m&wmLex)  return wmLex;
+  else if (m&wmTag)  return wmTag;
+  else if (m&wmDecode) return wmDecode;
+  return wmNone;
+}
+inline int modeLast(int m) {
+  if      (m&wmDecode) return wmDecode;
+  else if (m&wmTag)  return wmTag;
+  else if (m&wmLex)  return wmLex;
+  else if (m&wmScan) return wmScan;
+  return wmNone;
+}
+inline std::string modeString(int m) {
+  std::string s("");
+  if (m&wmScan) s += "Scan,";
+  if (m&wmLex) s += "Lex,";
+  if (m&wmTag) s += "Tag,";
+  if (m&wmDecode) s += "Decode,";
+  if (s.empty()) { s = "None"; }
+  else { s.erase(s.size()-1); }
+  return s;
+}
+
 
 /*--------------------------------------------------------------------------
  * Option Processing
@@ -95,34 +154,65 @@ void GetMyOptions(int argc, char **argv)
   vlevel = args.verbose_arg;
 
   //-- operation mode
-  if (!args.scan_flag && !args.lex_flag && !args.decode_flag)
-    moot_croak("%s: ERROR: you must enable at least one of --scan, --lex, or --decode !\n", PROGNAME);
+  if ( !args.full_given && !args.scan_given && !args.lex_given && !args.tag_given && !args.decode_given ) {
+    args.full_flag = args.scan_flag = args.lex_flag = args.tag_flag = args.decode_flag = 1;
+  }
+  modeSet(mode, wmScan, args.scan_flag);
+  modeSet(mode, wmLex,  args.lex_flag);
+  modeSet(mode, wmTag,  args.tag_flag);
+  modeSet(mode, wmDecode, args.decode_flag);
+  modestr = modeString(mode);
+  //fprintf(stderr, "%s: DEBUG: mode=%s\n", PROGNAME, modestr.c_str());
 
-  if (args.decode_flag)
-    args.scan_flag = args.lex_flag = 0;
+  //-- sanity check(s)
+  if ( mode==wmNone ) {
+    moot_croak("%s: ERROR: you must enable at least one of --scan, --lex, --tag, or --decode\n", PROGNAME);
+  }
+  else if ( (mode&wmScan) && !(mode&wmLex) && (mode&(wmTag|wmDecode)) )  {
+    moot_croak("%s: ERROR: cannot combine --scan and --decode/--tag without --lex\n", PROGNAME);
+  }
+  else if ( (mode&(wmScan|wmLex)) && !(mode&wmTag) && (mode&wmDecode) ) {
+    moot_croak("%s: ERROR: cannot combine --scan/--lex and --decode without --tag\n", PROGNAME);
+  }
+  else if ( (mode&wmTag) && !args.model_given ) {
+    moot_croak("%s: ERROR: --tag mode requires --model option\n", PROGNAME);
+  }
 
-  // -- show banner
+  //-- show banner
   if (!args.no_banner_given)
     moot_msg(vlevel, vlInfo, moot_program_banner(PROGNAME, PACKAGE_VERSION, "Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner").c_str());
 
-  // -- output file
+  //-- output file
   if (!out.open(args.output_arg,"w"))
     moot_croak("%s: open failed for output-file \"%s\": %s\n", PROGNAME, out.name.c_str(), strerror(errno));
 
-  // -- set up file-churner
+  //-- set up file-churner
   churner.progname = PROGNAME;
   churner.inputs = args.inputs;
   churner.ninputs = args.inputs_num;
   churner.use_list = args.list_given;
   churner.paranoid = !args.recover_given;
 
-  //-- i/o format : input
-  if (args.decode_flag) {
-    ifmt_implied |= tiofTagged|tiofAnalyzed;
-    ofmt_implied |= tiofText;
-    ofmt_default |= tiofText|tiofTagged;
+  //-- i/o formats: mode-dependent hacks: input
+  switch (modeFirst(mode)) {
+  case wmScan:		break;
+  case wmLex:		ifmt_implied |= tiofText; break;
+  case wmTag:		ifmt_implied |= tiofText|tiofAnalyzed; break;
+  case wmDecode:	ifmt_implied |= tiofText|tiofTagged|tiofAnalyzed; break;
+  default: break;
   }
-  if (args.decode_flag || !args.scan_flag)
+
+  //-- i/o formats: mode-dependent hacks: output
+  switch (modeLast(mode)) {
+  case wmDecode:	ofmt_default |= tiofTagged; break;
+  case wmTag:		ofmt_implied |= tiofTagged; break;
+  case wmLex:		ofmt_implied |= tiofAnalyzed; break;
+  case wmScan:		break;
+  default: break;
+  }
+
+  //-- i/o format : input
+  if ( !(mode&wmScan) )
     ifmt = TokenIO::parse_format_request(args.input_format_arg,
 					 (args.inputs_num>0 ? args.inputs[0] : NULL),
 					 ifmt_implied,
@@ -142,7 +232,7 @@ void GetMyOptions(int argc, char **argv)
 /*--------------------------------------------------------------------------
  * guts: scanner/lexer: churn input from a TokenReader
  */
-void churn_io(TokenReader *reader, TokenWriter *writer=main_writer)
+void churn_io(TokenReader *reader, TokenWriter *writer=main_writer, mootHMM *hmm=tagger)
 {
   for (churner.first_input_file(); churner.in.file; churner.next_input_file()) {
     ++nfiles;
@@ -152,16 +242,22 @@ void churn_io(TokenReader *reader, TokenWriter *writer=main_writer)
     }
 
     reader->from_mstream(&churner.in);
-    mootTokenType toktyp;
-    while ( (toktyp=reader->get_token()) != TokTypeEOF ) {
-      writer->put_token( *(reader->token()) );
-      ++ntokens;
+    if (hmm) {
+      hmm->ntokens = 0;
+      hmm->tag_stream(reader,writer);
+      ntokens += hmm->ntokens;
+    }
+    else {
+      mootTokenType toktyp;
+      while ( (toktyp=reader->get_token()) != TokTypeEOF ) {
+	writer->put_token( *(reader->token()) );
+	++ntokens;
+      }
     }
     if (vlevel >= vlInfo)
       writer->printf_comment("$EOF\t%lu 0\tEOF\n", reader->byte_number() );
   }
 }
-
 
 /*--------------------------------------------------------------------------
  * guts: scanner/lexer: setup lexer
@@ -173,13 +269,13 @@ wasteLexer *get_lexer(int lexfmt=tiofUnknown, TokenReader *reader=NULL)
   lexer->dehyph_mode(args.norm_hyph_flag > 0);
 
   if (args.abbrevs_given && !lexer->wl_abbrevs.load(args.abbrevs_arg))
-    moot_croak("%s: ERROR: can't load abbreviation lexicon from '%s': %s", PROGNAME, args.abbrevs_arg, strerror(errno));
+    moot_croak("%s: ERROR: can't load abbreviation lexicon from '%s': %s\n", PROGNAME, args.abbrevs_arg, strerror(errno));
 
   if (args.conjunctions_given && !lexer->wl_conjunctions.load(args.conjunctions_arg))
-    moot_croak("%s: ERROR: can't load conjunction lexicon from '%s': %s", PROGNAME, args.conjunctions_arg, strerror(errno));
+    moot_croak("%s: ERROR: can't load conjunction lexicon from '%s': %s\n", PROGNAME, args.conjunctions_arg, strerror(errno));
 
   if (args.stopwords_given && !lexer->wl_stopwords.load(args.stopwords_arg))
-    moot_croak("%s: ERROR: can't load stopword lexicon from '%s': %s", PROGNAME, args.stopwords_arg, strerror(errno));
+    moot_croak("%s: ERROR: can't load stopword lexicon from '%s': %s\n", PROGNAME, args.stopwords_arg, strerror(errno));
 
   if (reader)
     lexer->from_reader(reader);
@@ -193,39 +289,46 @@ wasteLexer *get_lexer(int lexfmt=tiofUnknown, TokenReader *reader=NULL)
 int main (int argc, char **argv)
 {
   GetMyOptions(argc,argv);
+  TokenReader *churn_reader = NULL;
+  TokenWriter *churn_writer = main_writer;
 
-  if (args.scan_flag && args.lex_flag) {
-    // --scan --lex
-    wasteTokenScanner scanner( ofmt&(tiofText|tiofLocation|tiofTagged) );
-    wasteLexer *lexer = get_lexer( ofmt, &scanner );
-    churn_io( lexer );
-    delete lexer;
+  //-- setup: globals
+  if (mode&wmScan) {
+    churn_reader = scanner = new wasteTokenScanner( ifmt|(ofmt&tiofLocation) );
+    if (modeLast(mode)==wmScan)
+      scanner->tr_format |= ofmt;
+  } else {
+    churn_reader = reader = TokenIO::new_reader(ifmt);
   }
-  else if (!args.scan_flag && args.lex_flag) {
-    // --no-scan --lex
-    TokenReader *reader = TokenIO::new_reader(ifmt);
-    wasteLexer *lexer = get_lexer( ofmt, reader );
-    churn_io( lexer );
-    delete lexer;
+  if (mode&wmLex) {
+    lexer = get_lexer( ofmt, churn_reader );
+    churn_reader = lexer;
   }
-  else if (args.scan_flag && !args.lex_flag) {
-    // --scan --no-lex
-    wasteTokenScanner scanner(ofmt);
-    churn_io( &scanner );
+  if (mode&wmTag) {
+    tagger = new mootHMM();
+    tagger->verbose = args.verbose_arg;
+    if (!tagger->load_model(args.model_arg))
+      moot_croak("%s: ERROR: failed to load model from `%s'\n", PROGNAME, args.model_arg);
   }
-  else if (args.decode_flag) {
-    // --decode
-    TokenReader  *reader  = TokenIO::new_reader(ifmt);
-    wasteDecoder *decoder = new wasteDecoder();
-    decoder->to_writer(main_writer);
-    churn_io( reader, decoder );
-    delete decoder;
-    delete reader;
-  }
-  else {
-    moot_croak("%s: ERROR: can't handle scan_flag=%d && lex_flag=%d && decode_flag=%d combination!\n", PROGNAME, args.scan_flag, args.lex_flag, args.decode_flag);
+  if (mode&wmDecode) {
+    decoder = new wasteDecoder();
+    decoder->to_writer(churn_writer);
+    churn_writer = decoder;
   }
 
+  //-- churn
+  churn_io(churn_reader, churn_writer, tagger);
+
+  //-- cleanup
+  if (decoder) delete decoder;
+  if (tagger)  delete tagger;
+  if (lexer)   delete lexer;
+  if (scanner) delete scanner;
+  if (reader)  delete reader;
+  churn_reader = NULL;
+  churn_writer = NULL;
+
+  //-- finish
   moot_msg(vlevel, vlProgress, " done.\n");
   main_writer->close();
   out.close();
@@ -237,13 +340,13 @@ int main (int argc, char **argv)
     // -- print summary
     fprintf(stderr, "\n-----------------------------------------------------\n");
     fprintf(stderr, "%s Summary:\n", PROGNAME);
-    if (!args.scan_flag)
-      fprintf(stderr, "  + Input format    : \"%s\"\n", TokenIO::format_canonical_string(ifmt).c_str());
-    fprintf(stderr, "  + Output format   : \"%s\"\n", TokenIO::format_canonical_string(ofmt).c_str());
-    fprintf(stderr, "  + Files processed : %d\n", nfiles);
-    fprintf(stderr, "  + Tokens found    : %d\n", ntokens);
-    fprintf(stderr, "  + Time Elsapsed   : %.2f sec\n", elapsed);
-    fprintf(stderr, "  + Throughput      : %.2f toks/sec\n", static_cast<double>(ntokens)/elapsed);
+    fprintf(stderr, "  + %-18s: \"%s\"\n", "Processing Mode", modestr.c_str());
+    fprintf(stderr, "  + %-18s: \"%s\"\n", "Input format", TokenIO::format_canonical_string(ifmt).c_str());
+    fprintf(stderr, "  + %-18s: \"%s\"\n", "Output format", TokenIO::format_canonical_string(ofmt).c_str());
+    fprintf(stderr, "  + %-18s: %d\n", "File(s) processed", nfiles);
+    fprintf(stderr, "  + %-18s: %d\n", "Token(s) found", ntokens);
+    fprintf(stderr, "  + %-18s: %.2f sec\n", "Time elapsed", elapsed);
+    fprintf(stderr, "  + %-18s: %.2f tok/sec\n", "Throughput", static_cast<double>(ntokens)/elapsed);
     fprintf(stderr, "-----------------------------------------------------\n");
   }
   

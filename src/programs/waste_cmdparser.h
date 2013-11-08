@@ -25,15 +25,20 @@ struct gengetopt_args_info {
   int list_flag;	 /* Arguments are input-file lists. (default=0). */
   int recover_flag;	 /* Attempt to recover from minor errors. (default=0). */
   char * output_arg;	 /* Write output to FILE. (default=-). */
-  int scan_flag;	 /* Enable raw text scanning stage (default). (default=1). */
+  int full_flag;	 /* Alias for --scan --lex --tag --decode (default) (default=0). */
+  int scan_flag;	 /* Enable raw text scanning stage. (default=0). */
   int no_scan_flag;	 /* Disable raw text scanning stage. (default=0). */
-  int lex_flag;	 /* Enable lexical classification stage (default). (default=1). */
+  int lex_flag;	 /* Enable lexical classification stage. (default=0). */
   int no_lex_flag;	 /* Disable lexical classification stage. (default=0). */
-  int decode_flag;	 /* Perform post-Viterbi decoding (overrides --scan, --lex). (default=0). */
+  int tag_flag;	 /* Enable HMM Viterbi tagging stage. (default=0). */
+  int no_tag_flag;	 /* Disable HMM Viterbi tagging stage. (default=0). */
+  int decode_flag;	 /* Enable post-Viterbi decoding stage. (default=0). */
+  int no_decode_flag;	 /* Disable post-Viterbi decoding stage. (default=0). */
   char * abbrevs_arg;	 /* Load abbreviation lexicon from FILE (1 word/line) (default=NULL). */
   char * conjunctions_arg;	 /* Load conjunction lexicon from FILE (1 word/line) (default=NULL). */
   char * stopwords_arg;	 /* Load stopword lexicon from FILE (1 word/line) (default=NULL). */
   int norm_hyph_flag;	 /* Enable hyphenation normalization in lexer (default=0). */
+  char * model_arg;	 /* Use HMM model file(s) MODEL. (default=waste.hmm). */
   char * input_format_arg;	 /* Specify input file format for -no-scan mode (default=NULL). */
   char * output_format_arg;	 /* Specify output file format. (default=NULL). */
 
@@ -45,15 +50,20 @@ struct gengetopt_args_info {
   int list_given;	 /* Whether list was given */
   int recover_given;	 /* Whether recover was given */
   int output_given;	 /* Whether output was given */
+  int full_given;	 /* Whether full was given */
   int scan_given;	 /* Whether scan was given */
   int no_scan_given;	 /* Whether no-scan was given */
   int lex_given;	 /* Whether lex was given */
   int no_lex_given;	 /* Whether no-lex was given */
+  int tag_given;	 /* Whether tag was given */
+  int no_tag_given;	 /* Whether no-tag was given */
   int decode_given;	 /* Whether decode was given */
+  int no_decode_given;	 /* Whether no-decode was given */
   int abbrevs_given;	 /* Whether abbrevs was given */
   int conjunctions_given;	 /* Whether conjunctions was given */
   int stopwords_given;	 /* Whether stopwords was given */
   int norm_hyph_given;	 /* Whether norm-hyph was given */
+  int model_given;	 /* Whether model was given */
   int input_format_given;	 /* Whether input-format was given */
   int output_format_given;	 /* Whether output-format was given */
   
