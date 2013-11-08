@@ -12,10 +12,14 @@ on_reparse "warn"
 # Details
 #-----------------------------------------------------------------------------
 details "
-waste is a low-level rule-based codec for the moot/WASTE HMM
-tokenizer system.
-It functions either as an encoder, taking as input one or more 'raw' files, and produces
-a 'medium' or 'medium-rare'  output file.
+waste is the top-level command-line interface to the moot/WASTE HMM tokenizer system.
+It can be used as a complete tokenization pipeline (--full, the default),
+as a standalone scanner (--scan), lexical encoder (--lex), HMM disambiguator (--tag) or lexical decoder (--decode),
+or as (almost) any combination  of the above components.
+Input and output formats depend on the chosen mode of operation; in the default mode,
+it takes as input one or more 'raw' files, and produces a 'medium' output file whose 'best-tag' fields
+are strings of space-separated segment attribute bundles (i.e. probably not interesting unless you are
+trying to debug a WASTE tokenizer model).
 See L<mootfiles> for details on moot file formats.
 "
 
@@ -134,7 +138,7 @@ Only meaningful if --lex is enabled.
 # HMM options
 group "HMM Options"
 
-string "model" M "Use HMM model file(s) MODEL." \
+string "model" M "Use HMM tokenizer model MODEL." \
   arg="MODEL" \
   default="waste.hmm" \
   details="
@@ -143,9 +147,10 @@ This option is intended to be used with a pre-compiled binary model.  If you
 need to set addtitional runtime options, you should call C<moot> directly
 in a pipeline, e.g.
 
-  waste --scan --lex --aabbr.lex -jconj.lex -wstop.lex INFILE.txt -Owd,loc \\
-  | moot -Iwd,loc --stream --model=MODEL --beam-width=100 - \\
-  | waste --decode -Iwd,loc -Owd,loc -o OUTFILE.wd
+  waste --scan -Or,loc INFILE.txt \\
+  | waste --lex -aabbr.lex -jconj.lex -wstop.lex -Ir,loc -Omr,loc - \\
+  | moot  --stream --model=MODEL --beam-width=100 -Imr,loc -Owd,loc - \\
+  | waste --decode -Iwd,loc -Om,loc -o OUTFILE.wd
 
 "
 
@@ -196,8 +201,10 @@ is properly encoded in UTF-8.
 acknowledge `cat acknowledge.pod`
 
 seealso "
+moot(1),
+mootrain(1),
+mootcompile(1),
 L<mootfiles>,
-mootm(1),
 L<moot>,
 L<mootchurn>
 "

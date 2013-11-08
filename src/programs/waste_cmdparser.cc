@@ -110,7 +110,7 @@ cmdline_parser_print_help (void)
   printf("   -y        --norm-hyph             Enable hyphenation normalization in lexer\n");
   printf("\n");
   printf(" HMM Options:\n");
-  printf("   -MMODEL   --model=MODEL           Use HMM model file(s) MODEL.\n");
+  printf("   -MMODEL   --model=MODEL           Use HMM tokenizer model MODEL.\n");
   printf("\n");
   printf(" Format Options:\n");
   printf("   -IFORMAT  --input-format=FORMAT   Specify input file format for -no-scan mode\n");
@@ -508,7 +508,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
            args_info->norm_hyph_flag = !(args_info->norm_hyph_flag);
           break;
         
-        case 'M':	 /* Use HMM model file(s) MODEL. */
+        case 'M':	 /* Use HMM tokenizer model MODEL. */
           if (args_info->model_given) {
             fprintf(stderr, "%s: `--model' (`-M') option given more than once\n", PROGRAM);
           }
@@ -763,7 +763,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
              args_info->norm_hyph_flag = !(args_info->norm_hyph_flag);
           }
           
-          /* Use HMM model file(s) MODEL. */
+          /* Use HMM tokenizer model MODEL. */
           else if (strcmp(olong, "model") == 0) {
             if (args_info->model_given) {
               fprintf(stderr, "%s: `--model' (`-M') option given more than once\n", PROGRAM);

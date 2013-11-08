@@ -90,7 +90,7 @@
     -y        --norm-hyph             Enable hyphenation normalization in lexer</pre>
 <pre>
  HMM Options
-    -MMODEL   --model=MODEL           Use HMM model file(s) MODEL.</pre>
+    -MMODEL   --model=MODEL           Use HMM tokenizer model MODEL.</pre>
 <pre>
  Format Options
     -IFORMAT  --input-format=FORMAT   Specify input file format for -no-scan mode
@@ -100,10 +100,14 @@
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
 <p>Low-level rule-based codec for moot/WASTE HMM tokenizer.</p>
-<p>waste is a low-level rule-based codec for the moot/WASTE HMM
-tokenizer system.
-It functions either as an encoder, taking as input one or more 'raw' files, and produces
-a 'medium' or 'medium-rare'  output file.
+<p>waste is the top-level command-line interface to the moot/WASTE HMM tokenizer system.
+It can be used as a complete tokenization pipeline (--full, the default),
+as a standalone scanner (--scan), lexical encoder (--lex), HMM disambiguator (--tag) or lexical decoder (--decode),
+or as (almost) any combination  of the above components.
+Input and output formats depend on the chosen mode of operation; in the default mode,
+it takes as input one or more 'raw' files, and produces a 'medium' output file whose 'best-tag' fields
+are strings of space-separated segment attribute bundles (i.e. probably not interesting unless you are
+trying to debug a WASTE tokenizer model).
 See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot file formats.</p>
 <p>
 </p>
@@ -314,16 +318,17 @@ as appropriate for your HMM.</p>
 <dt><strong><a name="model_model_mmodel" class="item"><code>--model=MODEL</code> , <code>-MMODEL</code></a></strong></dt>
 
 <dd>
-<p>Use HMM model file(s) MODEL.</p>
+<p>Use HMM tokenizer model MODEL.</p>
 <p>Default: 'waste.hmm'</p>
 <p>See 'HMM MODEL FILE FORMATS' in <a href="././mootfiles.html">the mootfiles manpage</a> for details on model file formats.
 This option is intended to be used with a pre-compiled binary model.  If you
 need to set addtitional runtime options, you should call <code>moot</code> directly
 in a pipeline, e.g.</p>
 <pre>
-  waste --scan --lex --aabbr.lex -jconj.lex -wstop.lex INFILE.txt -Owd,loc \\
-  | moot -Iwd,loc --stream --model=MODEL --beam-width=100 - \\
-  | waste --decode -Iwd,loc -Owd,loc -o OUTFILE.wd</pre>
+  waste --scan -Or,loc INFILE.txt \\
+  | waste --lex -aabbr.lex -jconj.lex -wstop.lex -Ir,loc -Omr,loc - \\
+  | moot  --stream --model=MODEL --beam-width=100 -Imr,loc -Owd,loc - \\
+  | waste --decode -Iwd,loc -Om,loc -o OUTFILE.wd</pre>
 </dd>
 </dl>
 <p>
@@ -426,8 +431,10 @@ class-based HMM tagger / disambiguator.</p>
 </p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
-<p><a href="././mootfiles.html">the mootfiles manpage</a>,
-<code>mootm(1)</code>,
+<p><code>moot(1)</code>,
+<code>mootrain(1)</code>,
+<code>mootcompile(1)</code>,
+<a href="././mootfiles.html">the mootfiles manpage</a>,
 <a href="././moot.html">the moot manpage</a>,
 <a href="././mootchurn.html">the mootchurn manpage</a></p>
 

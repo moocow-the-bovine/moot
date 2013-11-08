@@ -501,17 +501,17 @@ void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
       os->puts(token.text());
     }
 
-    if (tw_format & tiofTagged) {
-      //-- best tag is always standalone first 'analysis'
-      os->putbyte('\t');
-      os->puts(token.besttag());
-    }
-
     if (tw_format & tiofLocation) {
-      //-- location might be first non-tag 'analysis'
+      //-- location is first non-text field if present
       const mootToken::Location loc = token.location();
       os->putbyte('\t');
       os->printf("%lu %lu", loc.offset, loc.length);
+    }
+
+    if (tw_format & tiofTagged) {
+      //-- best tag may be first non-location 'analysis'
+      os->putbyte('\t');
+      os->puts(token.besttag());
     }
 
     if (tw_format & tiofAnalyzed) {

@@ -53,7 +53,7 @@
 
 
 /* % here is the declaration from section1 %header{  */ 
-#line 48 "mootTokenLexer.ll"
+#line 50 "mootTokenLexer.ll"
 /*============================================================================
  * Doxygen docs
  *============================================================================*/
@@ -80,8 +80,9 @@
 <pre>
  FILE       ::= SENTENCE*
  SENTENCE   ::= ((TOKEN|COMMENT)*) "\n"
- TOKEN      ::= TOKEN_TEXT ("\t" ANALYSIS)* ("\r"*) "\n"
+ TOKEN      ::= TOKEN_TEXT ("\t" LOCATION)? ("\t" ANALYSIS)* ("\r"*) "\n"
  TOKEN_TEXT ::= [^\\t\\r\\n]*
+ LOCATION   ::= OFFSET_INT " " LENGTH_INT
  ANALYSIS   ::= (DETAIL*) (COST?) (DETAIL*) "[" TAG ( "]" | " " ) (DETAIL*) (COST?) (DETAIL*)
  DETAIL     ::= [^\\t\\r\\n]
  COST       ::= "<" FLOAT ">"
@@ -93,15 +94,15 @@
 #include <mootGenericLexer.h>
 
 using namespace moot;
-#line 91 "mootTokenLexer.ll"
+#line 94 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CLASS  mootTokenLexer
-#line 93 "mootTokenLexer.ll"
+#line 96 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_INHERIT  \
   : public moot::GenericLexer
-#line 96 "mootTokenLexer.ll"
+#line 99 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_INPUT_CODE  \
   return moot::GenericLexer::yyinput(buffer,result,max_size);
-#line 99 "mootTokenLexer.ll"
+#line 102 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_MEMBERS  \
   public: \
   /* -- public typedefs */\
@@ -173,7 +174,7 @@ using namespace moot;
   virtual void   mgl_yy_switch_to_buffer(void *buf) \
                  {yy_switch_to_buffer(reinterpret_cast<YY_BUFFER_STATE>(buf));};\
   virtual void   mgl_begin(int stateno);
-#line 172 "mootTokenLexer.ll"
+#line 175 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CONSTRUCTOR_INIT  :\
   GenericLexer("mootTokenLexer"), \
   yyin(NULL), \
@@ -188,10 +189,10 @@ using namespace moot;
   parse_location(false), \
   parse_analysis_cost(true), \
   analysis_cost_details(false)
-#line 188 "mootTokenLexer.ll"
+#line 191 "mootTokenLexer.ll"
 #define YY_mootTokenLexer_CONSTRUCTOR_CODE  \
   mtoken = &mtoken_default;
-#line 223 "mootTokenLexer.ll"
+#line 226 "mootTokenLexer.ll"
 #line 52 "./flexskel.h"
 
 
@@ -443,7 +444,7 @@ class YY_mootTokenLexer_CLASS YY_mootTokenLexer_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 518 "mootTokenLexer.ll"
+#line 520 "mootTokenLexer.ll"
 #endif
 #line 302 "./flexskel.h"
 

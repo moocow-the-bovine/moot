@@ -38,7 +38,7 @@ struct gengetopt_args_info {
   char * conjunctions_arg;	 /* Load conjunction lexicon from FILE (1 word/line) (default=NULL). */
   char * stopwords_arg;	 /* Load stopword lexicon from FILE (1 word/line) (default=NULL). */
   int norm_hyph_flag;	 /* Enable hyphenation normalization in lexer (default=0). */
-  char * model_arg;	 /* Use HMM model file(s) MODEL. (default=waste.hmm). */
+  char * model_arg;	 /* Use HMM tokenizer model MODEL. (default=waste.hmm). */
   char * input_format_arg;	 /* Specify input file format for -no-scan mode (default=NULL). */
   char * output_format_arg;	 /* Specify output file format. (default=NULL). */
 

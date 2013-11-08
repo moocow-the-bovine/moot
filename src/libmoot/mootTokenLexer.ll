@@ -32,8 +32,10 @@
  *     - supports word- and sentence-break hints "%%$WB$", "%%$SB$"
  *     - raw text (no markup!)
  *     - token-line format (TAB-separated)
- *        TOKEN_TEXT  ANALYSIS_1 ... ANALYSIS_N
- *     - analysis format(s):
+ *        TOKEN_TEXT   LOCATION?   BESTTAG?   ANALYSIS_1 ... ANALYSIS_N
+ *     - LOCATION format:
+ *        OFFSET " " LENGTH
+ *     - BESTTAG, analysis format(s):
  *        ...(COST?)... "[" TAG ["]"|" "] ...(COST?)...
  *     - COST format(s):
  *       "<" COST_FLOAT ">"
@@ -71,8 +73,9 @@
 <pre>
  FILE       ::= SENTENCE*
  SENTENCE   ::= ((TOKEN|COMMENT)*) "\n"
- TOKEN      ::= TOKEN_TEXT ("\t" ANALYSIS)* ("\r"*) "\n"
+ TOKEN      ::= TOKEN_TEXT ("\t" LOCATION)? ("\t" ANALYSIS)* ("\r"*) "\n"
  TOKEN_TEXT ::= [^\\t\\r\\n]*
+ LOCATION   ::= OFFSET_INT " " LENGTH_INT
  ANALYSIS   ::= (DETAIL*) (COST?) (DETAIL*) "[" TAG ( "]" | " " ) (DETAIL*) (COST?) (DETAIL*)
  DETAIL     ::= [^\\t\\r\\n]
  COST       ::= "<" FLOAT ">"
@@ -269,8 +272,8 @@ locsep     [ \r\+]
   return lasttyp;
 }
 
-<TOKEN>^([ \t]*){newline} {
-  //-- EOS: blank line: maybe return eos (ignore empty sentences)
+<TOKEN>^{newline} {
+  //-- EOS: blank line: maybe return eos (ignore empty sentences) : allow whitespace for WASTE standlone lexer/classifier - moocow Fri, 08 Nov 2013 16:04:25 +0100
   theLine++; theColumn=0; theByte += yyleng;
   if (mtoken->tok_type != TokTypeEOS) {
     mtoken->tok_type=TokTypeEOS;
@@ -323,7 +326,8 @@ locsep     [ \r\+]
   //-- TOKEN: end-of-text (don't trim whitespace for WASTE standlone lexer/classifier - moocow Mon, 04 Nov 2013 10:59:59 +0100)
   if (first_analysis_is_best) {
     current_analysis_is_best = true;
-  } else if (parse_location) {
+  }
+  if (parse_location) {
     nextstate = LOC_OFFSET;
   }
 
@@ -478,10 +482,8 @@ locsep     [ \r\+]
 }
 
 <LOC_OFFSET,LOC_LENGTH>{space}+ { add_columns(yyleng); }
-<LOC_OFFSET,LOC_LENGTH>""/{tab} { nextstate=-1; BEGIN(SEPARATORS); }
 <LOC_OFFSET,LOC_LENGTH>""/{eotchar} { nextstate=-1; BEGIN(TOKEN); }
 <LOC_OFFSET,LOC_LENGTH>""/. { nextstate=-1; BEGIN(SEPARATORS); }
-
 
 
 %{
@@ -556,7 +558,7 @@ void mootTokenLexer::on_EOA(void)
     if (current_analysis_is_best) { 
       mtoken->besttag(manalysis->tag); 
       current_analysis_is_best = false; 
-      if (parse_location) { nextstate=LOC_OFFSET; }
+      //if (parse_location) { nextstate=LOC_OFFSET; }
     }
     /* maybe ignore this analysis */ 
     if (ignore_current_analysis) { 
