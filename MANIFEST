@@ -7,9 +7,13 @@ Lexfreqs.xs
 Ngrams.xs
 HMM.xs
 DynHMM.xs
+TokenIO.xs
+TokenReader.xs
+TokenWriter.xs
+Waste.xs
 
-MootPerl.cc
 MootPerl.h
+MootPerl.cc
 
 perlobject.map
 perl.typemap
@@ -17,13 +21,23 @@ typemap
 
 Moot.pm
 Moot/Constants.pm
-Moot/Lexfreqs.pm
-Moot/Ngrams.pm
 Moot/HMM.pm
 Moot/HMM/Boltzmann.pm
-Moot/HMM/DynLex.pm
 Moot/HMM/Dyn.pm
+Moot/HMM/DynLex.pm
+Moot/Lexfreqs.pm
+Moot/Ngrams.pm
+Moot/TokenIO.pm
+Moot/TokenReader.pm
+Moot/TokenReader/Native.pm
+Moot/TokenReader/XML.pm
+Moot/TokenWriter.pm
+Moot/TokenWriter/Native.pm
+Moot/TokenWriter/XML.pm
 Moot/Waste.pm
+Moot/Waste/Decoder.pm
+Moot/Waste/Lexer.pm
+Moot/Waste/Lexicon.pm
 Moot/Waste/Scanner.pm
 
 mootlookup-lex.perl
