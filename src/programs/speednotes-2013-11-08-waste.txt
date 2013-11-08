@@ -1,0 +1,33 @@
++ tested on kaskade/services2 (Intel(R) Xeon(R) CPU E5-2620 0 @ 2.00GHz)
+
+#/segments (scan) = 1692061
+#/tokens (final)  =  919147
+
+04x: time dwds-tokenizeit-04x.sh dtiger+qq.txt >/dev/null
+> real    1.418s
+> delta = 1.418s ~ 100%
+[1.418] > +thru = 1193k seg/sec ~  648k tok/sec
+
+scan: time ./waste -Bs -Or -c dtiger+qq.rc dtiger+qq.txt >/dev/null
+> real    0.389s
+> delta = 0.389s ~ 5.89%
+[0.389] > +thru = 4349k seg/sec ~ 2362k tok/sec
+
+scan+lex: time ./waste -Bsx -Or -c dtiger+qq.rc dtiger+qq.txt >/dev/null
+> real    4.153s
+> delta = 3.764s ~ 57.01%
+[3.764] > -thru =  449k seg/sec ~  244k tok/sec
+[4.153] > +thru =  407k seg/sec ~  221k tok/sec
+
+scan+lex+tag: time ./waste -Bsxt -Or -c dtiger+qq.rc dtiger+qq.txt >/dev/null
+> real    5.987s
+> delta = 1.834s ~ 27.78%
+[1.834] > -thru =  922k seg/sec ~  501k tok/sec
+[5.987] > +thru =  282k seg/sec ~  153k tok/sec
+
+scan+lex+tag+decode: time ./waste -Bsxtd -Or -c dtiger+qq.rc dtiger+qq.txt >/dev/null
+> real    6.602s
+> delta = 0.615s ~  9.32%
+[0.615] > -thru = 2751k seg/sec ~ 1494k tok/sec
+[6.602] > +thru =  256k seg/sec ~  139k tok/sec
+
