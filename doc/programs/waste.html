@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>waste - Low-level rule-based scanner stage for moot/WASTE HMM tokenizer.</title>
+<title>waste - Low-level rule-based codec for moot/WASTE HMM tokenizer.</title>
 <link rel="stylesheet" href="mootprogs.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
@@ -24,7 +24,9 @@
 	<li><a href="#options">OPTIONS</a></li>
 	<ul>
 
-		<li><a href="#scanner_lexer_mode_options">Scanner/Lexer Mode Options</a></li>
+		<li><a href="#mode_options">Mode Options</a></li>
+		<li><a href="#lexer_only_options">Lexer-Only Options</a></li>
+		<li><a href="#hmm_options">HMM Options</a></li>
 		<li><a href="#format_options">Format Options</a></li>
 	</ul>
 
@@ -50,7 +52,7 @@
 </p>
 <hr />
 <h1><a name="name">NAME</a></h1>
-<p>waste - Low-level rule-based scanner stage for moot/WASTE HMM tokenizer.</p>
+<p>waste - Low-level rule-based codec for moot/WASTE HMM tokenizer.</p>
 <p>
 </p>
 <hr />
@@ -70,15 +72,25 @@
     -r        --recover               Attempt to recover from minor errors.
     -oFILE    --output=FILE           Write output to FILE.</pre>
 <pre>
- Scanner/Lexer Mode Options
-    -s        --scan                  Enable raw text scanning stage (default).
+ Mode Options
+    -f        --full                  Alias for --scan --lex --tag --decode (default)
+    -s        --scan                  Enable raw text scanning stage.
     -S        --no-scan               Disable raw text scanning stage.
-    -x        --lex                   Enable lexical classification stage (default).
+    -x        --lex                   Enable lexical classification stage.
     -X        --no-lex                Disable lexical classification stage.
-    -y        --norm-hyph             Perform hyphenation normalization?
+    -t        --tag                   Enable HMM Viterbi tagging stage.
+    -T        --no-tag                Disable HMM Viterbi tagging stage.
+    -d        --decode                Enable post-Viterbi decoding stage.
+    -D        --no-decode             Disable post-Viterbi decoding stage.</pre>
+<pre>
+ Lexer-Only Options
     -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
     -jFILE    --conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)
-    -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)</pre>
+    -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)
+    -y        --norm-hyph             Enable hyphenation normalization in lexer</pre>
+<pre>
+ HMM Options
+    -MMODEL   --model=MODEL           Use HMM model file(s) MODEL.</pre>
 <pre>
  Format Options
     -IFORMAT  --input-format=FORMAT   Specify input file format for -no-scan mode
@@ -87,9 +99,10 @@
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
-<p>Low-level rule-based scanner stage for moot/WASTE HMM tokenizer.</p>
-<p>waste is a low-level rule-based scanner stage for the moot/WASTE HMM
-tokenizer system.  It takes as its input one or more 'raw' files, and produces
+<p>Low-level rule-based codec for moot/WASTE HMM tokenizer.</p>
+<p>waste is a low-level rule-based codec for the moot/WASTE HMM
+tokenizer system.
+It functions either as an encoder, taking as input one or more 'raw' files, and produces
 a 'medium' or 'medium-rare'  output file.
 See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot file formats.</p>
 <p>
@@ -201,13 +214,19 @@ indicates a sentence boundary.</p>
 </dl>
 <p>
 </p>
-<h2><a name="scanner_lexer_mode_options">Scanner/Lexer Mode Options</a></h2>
+<h2><a name="mode_options">Mode Options</a></h2>
 <dl>
+<dt><strong><a name="full_f" class="item"><code>--full</code> , <code>-f</code></a></strong></dt>
+
+<dd>
+<p>Alias for --scan --lex --tag --decode (default)</p>
+<p>Default: '0'</p>
+</dd>
 <dt><strong><a name="scan_s" class="item"><code>--scan</code> , <code>-s</code></a></strong></dt>
 
 <dd>
-<p>Enable raw text scanning stage (default).</p>
-<p>Default: '1'</p>
+<p>Enable raw text scanning stage.</p>
+<p>Default: '0'</p>
 </dd>
 <dt><strong><a name="no_scan_s" class="item"><code>--no-scan</code> , <code>-S</code></a></strong></dt>
 
@@ -218,8 +237,10 @@ indicates a sentence boundary.</p>
 <dt><strong><a name="lex_x" class="item"><code>--lex</code> , <code>-x</code></a></strong></dt>
 
 <dd>
-<p>Enable lexical classification stage (default).</p>
-<p>Default: '1'</p>
+<p>Enable lexical classification stage.</p>
+<p>Default: '0'</p>
+<p>If lexer stage is enabled, you should also specify --abbrevs, --conjunctions, and/or --stopwords
+as appropriate for your HMM.</p>
 </dd>
 <dt><strong><a name="no_lex_x" class="item"><code>--no-lex</code> , <code>-X</code></a></strong></dt>
 
@@ -227,13 +248,36 @@ indicates a sentence boundary.</p>
 <p>Disable lexical classification stage.</p>
 <p>Default: '0'</p>
 </dd>
-<dt><strong><a name="norm_hyph_y" class="item"><code>--norm-hyph</code> , <code>-y</code></a></strong></dt>
+<dt><strong><a name="tag_t" class="item"><code>--tag</code> , <code>-t</code></a></strong></dt>
 
 <dd>
-<p>Perform hyphenation normalization?</p>
+<p>Enable HMM Viterbi tagging stage.</p>
 <p>Default: '0'</p>
-<p>Only meaningful if --lex is enabled.</p>
+<p>Requires --model option.</p>
 </dd>
+<dt><strong><a name="no_tag_t" class="item"><code>--no-tag</code> , <code>-T</code></a></strong></dt>
+
+<dd>
+<p>Disable HMM Viterbi tagging stage.</p>
+<p>Default: '0'</p>
+</dd>
+<dt><strong><a name="decode_d" class="item"><code>--decode</code> , <code>-d</code></a></strong></dt>
+
+<dd>
+<p>Enable post-Viterbi decoding stage.</p>
+<p>Default: '0'</p>
+</dd>
+<dt><strong><a name="no_decode_d" class="item"><code>--no-decode</code> , <code>-D</code></a></strong></dt>
+
+<dd>
+<p>Disable post-Viterbi decoding stage.</p>
+<p>Default: '0'</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="lexer_only_options">Lexer-Only Options</a></h2>
+<dl>
 <dt><strong><a name="abbrevs_file_afile" class="item"><code>--abbrevs=FILE</code> , <code>-aFILE</code></a></strong></dt>
 
 <dd>
@@ -254,6 +298,32 @@ indicates a sentence boundary.</p>
 <p>Load stopword lexicon from FILE (1 word/line)</p>
 <p>Default: 'NULL'</p>
 <p>Only meaningful if --lex is enabled.</p>
+</dd>
+<dt><strong><a name="norm_hyph_y" class="item"><code>--norm-hyph</code> , <code>-y</code></a></strong></dt>
+
+<dd>
+<p>Enable hyphenation normalization in lexer</p>
+<p>Default: '0'</p>
+<p>Only meaningful if --lex is enabled.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="hmm_options">HMM Options</a></h2>
+<dl>
+<dt><strong><a name="model_model_mmodel" class="item"><code>--model=MODEL</code> , <code>-MMODEL</code></a></strong></dt>
+
+<dd>
+<p>Use HMM model file(s) MODEL.</p>
+<p>Default: 'waste.hmm'</p>
+<p>See 'HMM MODEL FILE FORMATS' in <a href="././mootfiles.html">the mootfiles manpage</a> for details on model file formats.
+This option is intended to be used with a pre-compiled binary model.  If you
+need to set addtitional runtime options, you should call <code>moot</code> directly
+in a pipeline, e.g.</p>
+<pre>
+  waste --scan --lex --aabbr.lex -jconj.lex -wstop.lex INFILE.txt -Owd,loc \\
+  | moot -Iwd,loc --stream --model=MODEL --beam-width=100 - \\
+  | waste --decode -Iwd,loc -Owd,loc -o OUTFILE.wd</pre>
 </dd>
 </dl>
 <p>

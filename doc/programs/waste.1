@@ -124,13 +124,13 @@
 .\" ========================================================================
 .\"
 .IX Title "WASTE 1"
-.TH WASTE 1 "2013-11-05" "moot v2.0.10-pre1" "moot PoS Tagger"
+.TH WASTE 1 "2013-11-08" "moot v2.0.10-pre1" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
 .nh
 .SH "NAME"
-waste \- Low\-level rule\-based scanner stage for moot/WASTE HMM tokenizer.
+waste \- Low\-level rule\-based codec for moot/WASTE HMM tokenizer.
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
 waste [\s-1OPTIONS\s0] \s-1FILE\s0(s)
@@ -149,15 +149,25 @@ waste [\s-1OPTIONS\s0] \s-1FILE\s0(s)
 \&    \-r        \-\-recover               Attempt to recover from minor errors.
 \&    \-oFILE    \-\-output=FILE           Write output to FILE.
 \&
-\& Scanner/Lexer Mode Options
-\&    \-s        \-\-scan                  Enable raw text scanning stage (default).
+\& Mode Options
+\&    \-f        \-\-full                  Alias for \-\-scan \-\-lex \-\-tag \-\-decode (default)
+\&    \-s        \-\-scan                  Enable raw text scanning stage.
 \&    \-S        \-\-no\-scan               Disable raw text scanning stage.
-\&    \-x        \-\-lex                   Enable lexical classification stage (default).
+\&    \-x        \-\-lex                   Enable lexical classification stage.
 \&    \-X        \-\-no\-lex                Disable lexical classification stage.
-\&    \-y        \-\-norm\-hyph             Perform hyphenation normalization?
+\&    \-t        \-\-tag                   Enable HMM Viterbi tagging stage.
+\&    \-T        \-\-no\-tag                Disable HMM Viterbi tagging stage.
+\&    \-d        \-\-decode                Enable post\-Viterbi decoding stage.
+\&    \-D        \-\-no\-decode             Disable post\-Viterbi decoding stage.
+\&
+\& Lexer\-Only Options
 \&    \-aFILE    \-\-abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
 \&    \-jFILE    \-\-conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)
 \&    \-wFILE    \-\-stopwords=FILE        Load stopword lexicon from FILE (1 word/line)
+\&    \-y        \-\-norm\-hyph             Enable hyphenation normalization in lexer
+\&
+\& HMM Options
+\&    \-MMODEL   \-\-model=MODEL           Use HMM model file(s) MODEL.
 \&
 \& Format Options
 \&    \-IFORMAT  \-\-input\-format=FORMAT   Specify input file format for \-no\-scan mode
@@ -165,10 +175,11 @@ waste [\s-1OPTIONS\s0] \s-1FILE\s0(s)
 .Ve
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-Low-level rule-based scanner stage for moot/WASTE \s-1HMM\s0 tokenizer.
+Low-level rule-based codec for moot/WASTE \s-1HMM\s0 tokenizer.
 .PP
-waste is a low-level rule-based scanner stage for the moot/WASTE \s-1HMM\s0
-tokenizer system.  It takes as its input one or more 'raw' files, and produces
+waste is a low-level rule-based codec for the moot/WASTE \s-1HMM\s0
+tokenizer system.
+It functions either as an encoder, taking as input one or more 'raw' files, and produces
 a 'medium' or 'medium\-rare'  output file.
 See mootfiles for details on moot file formats.
 .SH "ARGUMENTS"
@@ -270,14 +281,20 @@ Default: '\-'
 .Sp
 Output files are in 'rare' format: one token per line, a blank line
 indicates a sentence boundary.
-.SS "Scanner/Lexer Mode Options"
-.IX Subsection "Scanner/Lexer Mode Options"
+.SS "Mode Options"
+.IX Subsection "Mode Options"
+.ie n .IP """\-\-full"" , ""\-f""" 4
+.el .IP "\f(CW\-\-full\fR , \f(CW\-f\fR" 4
+.IX Item "--full , -f"
+Alias for \-\-scan \-\-lex \-\-tag \-\-decode (default)
+.Sp
+Default: '0'
 .ie n .IP """\-\-scan"" , ""\-s""" 4
 .el .IP "\f(CW\-\-scan\fR , \f(CW\-s\fR" 4
 .IX Item "--scan , -s"
-Enable raw text scanning stage (default).
+Enable raw text scanning stage.
 .Sp
-Default: '1'
+Default: '0'
 .ie n .IP """\-\-no\-scan"" , ""\-S""" 4
 .el .IP "\f(CW\-\-no\-scan\fR , \f(CW\-S\fR" 4
 .IX Item "--no-scan , -S"
@@ -287,23 +304,46 @@ Default: '0'
 .ie n .IP """\-\-lex"" , ""\-x""" 4
 .el .IP "\f(CW\-\-lex\fR , \f(CW\-x\fR" 4
 .IX Item "--lex , -x"
-Enable lexical classification stage (default).
+Enable lexical classification stage.
 .Sp
-Default: '1'
+Default: '0'
+.Sp
+If lexer stage is enabled, you should also specify \-\-abbrevs, \-\-conjunctions, and/or \-\-stopwords
+as appropriate for your \s-1HMM\s0.
 .ie n .IP """\-\-no\-lex"" , ""\-X""" 4
 .el .IP "\f(CW\-\-no\-lex\fR , \f(CW\-X\fR" 4
 .IX Item "--no-lex , -X"
 Disable lexical classification stage.
 .Sp
 Default: '0'
-.ie n .IP """\-\-norm\-hyph"" , ""\-y""" 4
-.el .IP "\f(CW\-\-norm\-hyph\fR , \f(CW\-y\fR" 4
-.IX Item "--norm-hyph , -y"
-Perform hyphenation normalization?
+.ie n .IP """\-\-tag"" , ""\-t""" 4
+.el .IP "\f(CW\-\-tag\fR , \f(CW\-t\fR" 4
+.IX Item "--tag , -t"
+Enable \s-1HMM\s0 Viterbi tagging stage.
 .Sp
 Default: '0'
 .Sp
-Only meaningful if \-\-lex is enabled.
+Requires \-\-model option.
+.ie n .IP """\-\-no\-tag"" , ""\-T""" 4
+.el .IP "\f(CW\-\-no\-tag\fR , \f(CW\-T\fR" 4
+.IX Item "--no-tag , -T"
+Disable \s-1HMM\s0 Viterbi tagging stage.
+.Sp
+Default: '0'
+.ie n .IP """\-\-decode"" , ""\-d""" 4
+.el .IP "\f(CW\-\-decode\fR , \f(CW\-d\fR" 4
+.IX Item "--decode , -d"
+Enable post-Viterbi decoding stage.
+.Sp
+Default: '0'
+.ie n .IP """\-\-no\-decode"" , ""\-D""" 4
+.el .IP "\f(CW\-\-no\-decode\fR , \f(CW\-D\fR" 4
+.IX Item "--no-decode , -D"
+Disable post-Viterbi decoding stage.
+.Sp
+Default: '0'
+.SS "Lexer-Only Options"
+.IX Subsection "Lexer-Only Options"
 .ie n .IP """\-\-abbrevs=FILE"" , ""\-aFILE""" 4
 .el .IP "\f(CW\-\-abbrevs=FILE\fR , \f(CW\-aFILE\fR" 4
 .IX Item "--abbrevs=FILE , -aFILE"
@@ -328,6 +368,33 @@ Load stopword lexicon from \s-1FILE\s0 (1 word/line)
 Default: '\s-1NULL\s0'
 .Sp
 Only meaningful if \-\-lex is enabled.
+.ie n .IP """\-\-norm\-hyph"" , ""\-y""" 4
+.el .IP "\f(CW\-\-norm\-hyph\fR , \f(CW\-y\fR" 4
+.IX Item "--norm-hyph , -y"
+Enable hyphenation normalization in lexer
+.Sp
+Default: '0'
+.Sp
+Only meaningful if \-\-lex is enabled.
+.SS "\s-1HMM\s0 Options"
+.IX Subsection "HMM Options"
+.ie n .IP """\-\-model=MODEL"" , ""\-MMODEL""" 4
+.el .IP "\f(CW\-\-model=MODEL\fR , \f(CW\-MMODEL\fR" 4
+.IX Item "--model=MODEL , -MMODEL"
+Use \s-1HMM\s0 model file(s) \s-1MODEL\s0.
+.Sp
+Default: 'waste.hmm'
+.Sp
+See '\s-1HMM\s0 \s-1MODEL\s0 \s-1FILE\s0 \s-1FORMATS\s0' in mootfiles for details on model file formats.
+This option is intended to be used with a pre-compiled binary model.  If you
+need to set addtitional runtime options, you should call \f(CW\*(C`moot\*(C'\fR directly
+in a pipeline, e.g.
+.Sp
+.Vb 3
+\&  waste \-\-scan \-\-lex \-\-aabbr.lex \-jconj.lex \-wstop.lex INFILE.txt \-Owd,loc \e\e
+\&  | moot \-Iwd,loc \-\-stream \-\-model=MODEL \-\-beam\-width=100 \- \e\e
+\&  | waste \-\-decode \-Iwd,loc \-Owd,loc \-o OUTFILE.wd
+.Ve
 .SS "Format Options"
 .IX Subsection "Format Options"
 .ie n .IP """\-\-input\-format=FORMAT"" , ""\-IFORMAT""" 4

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-waste - Low-level rule-based scanner stage for moot/WASTE HMM tokenizer.
+waste - Low-level rule-based codec for moot/WASTE HMM tokenizer.
 
 
 
@@ -24,15 +24,25 @@ waste [OPTIONS] FILE(s)
     -r        --recover               Attempt to recover from minor errors.
     -oFILE    --output=FILE           Write output to FILE.
 
- Scanner/Lexer Mode Options
-    -s        --scan                  Enable raw text scanning stage (default).
+ Mode Options
+    -f        --full                  Alias for --scan --lex --tag --decode (default)
+    -s        --scan                  Enable raw text scanning stage.
     -S        --no-scan               Disable raw text scanning stage.
-    -x        --lex                   Enable lexical classification stage (default).
+    -x        --lex                   Enable lexical classification stage.
     -X        --no-lex                Disable lexical classification stage.
-    -y        --norm-hyph             Perform hyphenation normalization?
+    -t        --tag                   Enable HMM Viterbi tagging stage.
+    -T        --no-tag                Disable HMM Viterbi tagging stage.
+    -d        --decode                Enable post-Viterbi decoding stage.
+    -D        --no-decode             Disable post-Viterbi decoding stage.
+
+ Lexer-Only Options
     -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
     -jFILE    --conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)
     -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)
+    -y        --norm-hyph             Enable hyphenation normalization in lexer
+
+ HMM Options
+    -MMODEL   --model=MODEL           Use HMM model file(s) MODEL.
 
  Format Options
     -IFORMAT  --input-format=FORMAT   Specify input file format for -no-scan mode
@@ -47,11 +57,12 @@ waste [OPTIONS] FILE(s)
 
 =head1 DESCRIPTION
 
-Low-level rule-based scanner stage for moot/WASTE HMM tokenizer.
+Low-level rule-based codec for moot/WASTE HMM tokenizer.
 
 
-waste is a low-level rule-based scanner stage for the moot/WASTE HMM
-tokenizer system.  It takes as its input one or more 'raw' files, and produces
+waste is a low-level rule-based codec for the moot/WASTE HMM
+tokenizer system.
+It functions either as an encoder, taking as input one or more 'raw' files, and produces
 a 'medium' or 'medium-rare'  output file.
 See L<mootfiles> for details on moot file formats.
 
@@ -221,19 +232,28 @@ indicates a sentence boundary.
 =cut
 
 #--------------------------------------------------------------
-# Option-Group Scanner/Lexer Mode Options
+# Option-Group Mode Options
 #--------------------------------------------------------------
 =pod
 
-=head2 Scanner/Lexer Mode Options
+=head2 Mode Options
 
 =over 4
 
+=item C<--full> , C<-f>
+
+Alias for --scan --lex --tag --decode (default)
+
+Default: '0'
+
+
+
+
 =item C<--scan> , C<-s>
 
-Enable raw text scanning stage (default).
+Enable raw text scanning stage.
 
-Default: '1'
+Default: '0'
 
 
 
@@ -249,9 +269,14 @@ Default: '0'
 
 =item C<--lex> , C<-x>
 
-Enable lexical classification stage (default).
+Enable lexical classification stage.
 
-Default: '1'
+Default: '0'
+
+
+If lexer stage is enabled, you should also specify --abbrevs, --conjunctions, and/or --stopwords
+as appropriate for your HMM.
+
 
 
 
@@ -265,18 +290,58 @@ Default: '0'
 
 
 
-=item C<--norm-hyph> , C<-y>
+=item C<--tag> , C<-t>
 
-Perform hyphenation normalization?
+Enable HMM Viterbi tagging stage.
 
 Default: '0'
 
 
-Only meaningful if --lex is enabled.
+Requires --model option.
 
 
 
 
+
+=item C<--no-tag> , C<-T>
+
+Disable HMM Viterbi tagging stage.
+
+Default: '0'
+
+
+
+
+=item C<--decode> , C<-d>
+
+Enable post-Viterbi decoding stage.
+
+Default: '0'
+
+
+
+
+=item C<--no-decode> , C<-D>
+
+Disable post-Viterbi decoding stage.
+
+Default: '0'
+
+
+
+
+=back
+
+=cut
+
+#--------------------------------------------------------------
+# Option-Group Lexer-Only Options
+#--------------------------------------------------------------
+=pod
+
+=head2 Lexer-Only Options
+
+=over 4
 
 =item C<--abbrevs=FILE> , C<-aFILE>
 
@@ -312,6 +377,53 @@ Default: 'NULL'
 
 
 Only meaningful if --lex is enabled.
+
+
+
+
+
+=item C<--norm-hyph> , C<-y>
+
+Enable hyphenation normalization in lexer
+
+Default: '0'
+
+
+Only meaningful if --lex is enabled.
+
+
+
+
+
+=back
+
+=cut
+
+#--------------------------------------------------------------
+# Option-Group HMM Options
+#--------------------------------------------------------------
+=pod
+
+=head2 HMM Options
+
+=over 4
+
+=item C<--model=MODEL> , C<-MMODEL>
+
+Use HMM model file(s) MODEL.
+
+Default: 'waste.hmm'
+
+
+See 'HMM MODEL FILE FORMATS' in L<mootfiles> for details on model file formats.
+This option is intended to be used with a pre-compiled binary model.  If you
+need to set addtitional runtime options, you should call C<moot> directly
+in a pipeline, e.g.
+
+  waste --scan --lex --aabbr.lex -jconj.lex -wstop.lex INFILE.txt -Owd,loc \\
+  | moot -Iwd,loc --stream --model=MODEL --beam-width=100 - \\
+  | waste --decode -Iwd,loc -Owd,loc -o OUTFILE.wd
+
 
 
 

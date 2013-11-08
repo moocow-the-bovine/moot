@@ -62,7 +62,7 @@ wasteLexer::wasteLexer(int fmt, const std::string &myname)
           wl_tagset[i][j][k][l].resize(n_binary);
           for (int m = 0; m < n_binary; ++m)
           {
-            wl_tagset[i][j][k][l][m].resize(7);
+            wl_tagset[i][j][k][l][m].resize(n_hidden);
             std::ostringstream tag;
             tag << cls_strings[i]
               << ',' << cas_strings[j]
@@ -320,12 +320,12 @@ void wasteLexer::set_token(mootToken &token, const std::string &tok_text, cls wl
   token.tok_text = wl_tagset[wl_cls][wl_cas][wl_abbr][wl_length][wl_blanked][0];
   if ( wl_cls == stop )
   {
-    token.tok_text += ':';
-    token.tok_text += utf8ToLower( tok_text );
+    token.tok_text.push_back(':');
+    token.tok_text.append( wl_cas==lo ? tok_text : utf8ToLower(tok_text) );
   }
 
   // analyses + real token text
-  for ( int i = 1; i <= 6; ++i ) {
+  for ( int i = 1; i < n_hidden; ++i ) {
     token.insert( wl_tagset[wl_cls][wl_cas][wl_abbr][wl_length][wl_blanked][i],
                   std::string("[") + wl_tagset[wl_cls][wl_cas][wl_abbr][wl_length][wl_blanked][i] + " " + tok_text + "]" );
   }

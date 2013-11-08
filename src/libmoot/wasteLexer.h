@@ -132,6 +132,9 @@ namespace moot
         longer   = 4,
         n_len    = 5
       };
+
+      /** hidden features: s[01],S[01],w[01] (except s1,*,w0) */
+      static const int n_hidden = 7;
       //@}
 
       /*--------------------------------------------------------------------
