@@ -251,6 +251,9 @@ if test -n "$DISTCHECK" ; then
    test -z "$FLEXXX" && FLEXXX=no
    test -z "$BISONXX" && BISONXX=no
    test -z "$OSFCN_H" && OSFCN_H=no
+   test -z "$PERL" && PERL=no
+   test -z "$PYTHON" && PYTHON=no
+   test -z "$RE2C" && RE2C=no
 fi
 ## /DISTCHECK
 ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

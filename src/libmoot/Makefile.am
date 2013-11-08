@@ -446,13 +446,15 @@ EXTRA_DIST = \
 	$(FLEXXX_DEPS) \
 	$(BISONXX_DEPS) \
 	myosfcn.h \
+	re2c_ucl.py \
+	Scripts.txt \
 	wasteScannerScan.re \
 	wasteScannerScan.re.skel \
 	wasteLexerTypes.re \
 	wasteLexerTypes.re.skel \
+	re2c_case.perl \
 	wasteCase.re \
 	wasteCase.re.skel \
-	Scripts.txt \
 	gnulib/config.h
 
 dist_old = \
