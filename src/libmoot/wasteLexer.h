@@ -44,6 +44,36 @@
 
 namespace moot
 {
+
+  /*============================================================================
+   * wasteLexerToken
+   */
+  class wasteLexerToken : public mootToken
+  {
+    public:
+      /*------------------------------------------------------------*/
+      /** \name extra data */
+      //@{
+      wasteLexerType  wlt_type;    /**< fine grained token type, as returned by waste_lexertype */
+      bool            wlt_blanked; /**< token has ws to its left, maybe as 'packed bitfield':1; */
+      bool            s;
+      bool            S;
+      bool            w;
+      //@}
+
+      /** \name Constructors etc. */
+      //@{
+      /** Default constructor */
+      wasteLexerToken(wasteLexerType type=wLexerTypeOther, bool blanked=true, bool bos=true, bool eos=false, bool bow=true)
+        : wlt_type(type),
+          wlt_blanked(blanked),
+          s(bos),
+          S(eos),
+          w(bow)
+    {}
+      //@}
+  };
+
   /*============================================================================
    * wasteLexer
    */
@@ -61,19 +91,21 @@ namespace moot
       typedef std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::string> > > > > > wasteTagset;
 
       /** List of mootToken for buffering while dehyphenating */
-      typedef std::list<mootToken> wasteTokenBuffer;
+      typedef std::list<wasteLexerToken> wasteTokenBuffer;
       
       /** bitmask flags for possible lexer states (mainly used for dehyphenation) */
       enum wasteLexer_state
       {
-        ls_flush   = 0x01,
-        ls_hyph    = 0x02,
-        ls_head    = 0x04,
-        ls_tail    = 0x08,
-        ls_nl      = 0x10,
-        ls_exclude = 0x20,
-        ls_blanked = 0x40,
+        ls_flush   = 0x0001,
+        ls_hyph    = 0x0002,
+        ls_head    = 0x0004,
+        ls_tail    = 0x0008,
+        ls_nl      = 0x0010,
+        ls_sb_bw   = 0x0020,
+        ls_wb      = 0x0040,
+        ls_blanked = 0x0080,
       };
+      static const int ls_init = (ls_wb | ls_blanked); /**< initial state of the lexer*/
       //@}
 
       //--------------------------------------------------------------------
@@ -135,6 +167,7 @@ namespace moot
 
       /** hidden features: s[01],S[01],w[01] (except s1,*,w0) */
       static const int n_hidden = 7;
+
       //@}
 
       /*--------------------------------------------------------------------
@@ -148,7 +181,9 @@ namespace moot
       mootSentence      wl_sentence;      /**< Local sentence */
       wasteTagset       wl_tagset;        /**< Token feature bundles */
       int               wl_state;         /**< Current state of the lexer */
+      bool              wl_sb_fw;         /**< Indicates forward bos feature */
       wasteTokenBuffer  wl_tokbuf;        /**< Buffer for dehyphenation */
+      mootToken        *wl_current_tok;   /** current token under construction (NULL for none), pointer into wl_tokbuf */
       bool              wl_dehyph_mode;   /**< Dehyphenation switch */
       //@}
 
@@ -240,7 +275,7 @@ namespace moot
       void from_reader(TokenReader *reader);
 
       /** Set token features (token.tok_analyses) w.r.t. model features **/
-      void set_token(mootToken &token, const std::string &tok_text, cls wl_cls, cas wl_cas, binary wl_abbr, size_t length, binary wl_blanked);
+      void set_token(mootToken &token, wasteLexerToken &lex_token);
 
       /** Turn on/off dehyphenation mode **/
       inline void dehyph_mode(bool on)
@@ -249,10 +284,10 @@ namespace moot
       };
 
       /**
-       * Grabs the next token from internal scanner.
-       * If wl_dehyph_mode is true, seeks and removes hyphenations before setting wl_token.
+       * MOves the next token(s) from internal scanner to internal buffer.
+       * If wl_dehyph_mode is true, seeks and removes hyphenations.
        */
-      mootTokenType next_token(void);
+      void buffer_token(void);
       //@}
   };
 
