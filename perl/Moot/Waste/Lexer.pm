@@ -47,6 +47,8 @@ Moot::Waste::Lexer - libmoot : WASTE tokenizer : mid-level lexer
   $wl->scanner();	              ##-- get underlying scanner or undef
   $wl->close();                       ##-- close current input source (unsets scanner)
 
+  $wl->dehyphenate($bool);	      ##-- enable/disable automatic dehyhpenation
+
   $tok = $wl->get_token();            ##-- read next token
   $buf = $wl->get_sentence();         ##-- read all remaining tokens as a list
 
