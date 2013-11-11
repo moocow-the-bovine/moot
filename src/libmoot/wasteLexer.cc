@@ -124,33 +124,49 @@ void wasteLexer::buffer_token(void)
       lextype = waste_lexertype(local_token.tok_text);
       switch (lextype)
       {
+        // -- store blanked feature for upcoming token
         case wLexerTypeSpace:
         case wLexerTypeNewline:
           wl_state |= ls_blanked;
           return;
+
         default:
+          // -- set token features according to lexer state and reset
           local_token.wlt_type = lextype;
           local_token.wlt_blanked = (wl_state & ls_blanked) ? true : false;
-          local_token.s = wl_sb_fw;
-          local_token.S = (wl_state & ls_sb_bw) ? true : false;
-          local_token.w = (wl_state & ls_wb) ? true : false;
+          local_token.s = (wl_state & ls_sb_fw) ? true : false;
+          local_token.w = (wl_state & ls_wb_fw) ? true : false;
           wl_state &= ~(ls_blanked);
-          wl_sb_fw = false;
-          wl_state &= ~(ls_sb_bw);
-          wl_state &= ~(ls_wb);
-          break;
+          wl_state &= ~(ls_sb_fw);
+          wl_state &= ~(ls_wb_fw);
+
+          // -- store token
+          wl_tokbuf.push_back(local_token);
+          wl_current_tok = &(wl_tokbuf.back());
+          return;
       }
       break;
     case TokTypeSB:
       local_token.tok_text = scanner->token()->text();
-      wl_state |= ls_sb_bw;
-      wl_sb_fw = true;
+
+      // -- set bos and bow for upcoming token
+      wl_state |= ls_sb_fw;
+      wl_state |= ls_wb_fw;
+
+      // -- set eos for last alnum token
+      if(wl_current_tok)
+      {
+        wl_current_tok->S = true;
+        wl_current_tok = NULL;
+      }
+
+      // -- output possible
       wl_state |= ls_flush;
       // breaks hyphenation
       break;
     case TokTypeWB:
       local_token.tok_text = scanner->token()->text();
-      wl_state |= ls_wb;
+      wl_state |= ls_wb_fw;
       wl_state |= ls_flush;
       // breaks hyphenation
       break;
@@ -191,6 +207,9 @@ mootTokenType wasteLexer::get_token(void)
     case TokTypeVanilla:
     case TokTypeLibXML:
       set_token(wl_token, wl_tokbuf.front());
+      break;
+    case TokTypeComment:
+      wl_token.tok_text = wl_tokbuf.front().tok_text;
     default:
       break;
   }
@@ -366,11 +385,12 @@ void wasteLexer::set_token(mootToken &token, wasteLexerToken &lex_token)
       default:
         break;
     }
-    token.insert( wl_tagset[tok_class][tok_case][tok_abbr][tok_length][tok_blanked][i],
-        std::string("[") + wl_tagset[tok_class][tok_case][tok_abbr][tok_length][tok_blanked][i]
-        + " "
-        + lex_token.tok_text
-        + "]" );
+    std::string analysis = "[";
+    analysis.append(wl_tagset[tok_class][tok_case][tok_abbr][tok_length][tok_blanked][i]);
+    analysis.push_back(' ');
+    analysis.append(lex_token.tok_text);
+    analysis.push_back(']');
+    token.insert(wl_tagset[tok_class][tok_case][tok_abbr][tok_length][tok_blanked][i], analysis);
   }
 }
 

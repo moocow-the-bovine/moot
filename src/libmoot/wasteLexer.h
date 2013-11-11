@@ -101,11 +101,11 @@ namespace moot
         ls_head    = 0x0004,
         ls_tail    = 0x0008,
         ls_nl      = 0x0010,
-        ls_sb_bw   = 0x0020,
-        ls_wb      = 0x0040,
+        ls_sb_fw   = 0x0020,
+        ls_wb_fw   = 0x0040,
         ls_blanked = 0x0080,
       };
-      static const int ls_init = (ls_wb | ls_blanked); /**< initial state of the lexer*/
+      static const int ls_init = (ls_wb_fw | ls_sb_fw | ls_blanked); /**< initial state of the lexer*/
       //@}
 
       //--------------------------------------------------------------------
@@ -183,7 +183,7 @@ namespace moot
       int               wl_state;         /**< Current state of the lexer */
       bool              wl_sb_fw;         /**< Indicates forward bos feature */
       wasteTokenBuffer  wl_tokbuf;        /**< Buffer for dehyphenation */
-      mootToken        *wl_current_tok;   /** current token under construction (NULL for none), pointer into wl_tokbuf */
+      wasteLexerToken  *wl_current_tok;   /** current token under construction (NULL for none), pointer into wl_tokbuf */
       bool              wl_dehyph_mode;   /**< Dehyphenation switch */
       //@}
 
