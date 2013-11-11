@@ -48,10 +48,14 @@ namespace moot
   /*============================================================================
    * wasteLexerToken
    */
-  class wasteLexerToken : public mootToken
+  class wasteLexerToken
   {
     public:
       /*------------------------------------------------------------*/
+      /** \name standard mootToken */
+      //@{
+      mootToken       wlt_token;   /**< standard data as text, type location etc. */
+      //@}
       /** \name extra data */
       //@{
       wasteLexerType  wlt_type;    /**< fine grained token type, as returned by waste_lexertype */
@@ -90,7 +94,7 @@ namespace moot
       /** Multi-dimensional vector for constant access on feature bundles */
       typedef std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::string> > > > > > wasteTagset;
 
-      /** List of mootToken for buffering while dehyphenating */
+      /** List of wasteLexerToken for buffering while dehyphenating */
       typedef std::list<wasteLexerToken> wasteTokenBuffer;
       
       /** bitmask flags for possible lexer states (mainly used for dehyphenation) */
