@@ -185,7 +185,6 @@ namespace moot
       mootSentence      wl_sentence;      /**< Local sentence */
       wasteTagset       wl_tagset;        /**< Token feature bundles */
       int               wl_state;         /**< Current state of the lexer */
-      bool              wl_sb_fw;         /**< Indicates forward bos feature */
       wasteTokenBuffer  wl_tokbuf;        /**< Buffer for dehyphenation */
       wasteLexerToken  *wl_current_tok;   /** current token under construction (NULL for none), pointer into wl_tokbuf */
       bool              wl_dehyph_mode;   /**< Dehyphenation switch */

@@ -33,7 +33,6 @@ wasteLexer::wasteLexer(int fmt, const std::string &myname)
   : TokenReader(fmt, myname),
     scanner(NULL),
     wl_state(ls_init),
-    wl_sb_fw(true),
     wl_current_tok(NULL),
     wl_dehyph_mode(false)
 {
@@ -107,6 +106,8 @@ void wasteLexer::close(void)
 {
   //if (scanner) scanner->close(); //-- moo: dangerous: this is probably NOT a good idea (the user sets scanner, so he/she is responsible!)
   scanner = NULL;
+  wl_state = ls_init;
+  wl_current_tok = NULL;
 }
 
 //----------------------------------------------------------------------
