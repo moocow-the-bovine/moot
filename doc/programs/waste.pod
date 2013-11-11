@@ -39,7 +39,8 @@ waste [OPTIONS] FILE(s)
     -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
     -jFILE    --conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)
     -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)
-    -y        --norm-hyph             Enable hyphenation normalization in lexer
+    -y        --dehyphenate           Enable automatic dehyphenation in lexer (default)
+    -Y        --no-dehyphenate        Disable automatic dehyphenation in lexer
 
  HMM Options
     -MMODEL   --model=MODEL           Use HMM tokenizer model MODEL.
@@ -386,9 +387,22 @@ Only meaningful if --lex is enabled.
 
 
 
-=item C<--norm-hyph> , C<-y>
+=item C<--dehyphenate> , C<-y>
 
-Enable hyphenation normalization in lexer
+Enable automatic dehyphenation in lexer (default)
+
+Default: '1'
+
+
+Only meaningful if --lex is enabled.
+
+
+
+
+
+=item C<--no-dehyphenate> , C<-Y>
+
+Disable automatic dehyphenation in lexer
 
 Default: '0'
 

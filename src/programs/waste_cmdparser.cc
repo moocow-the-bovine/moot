@@ -107,7 +107,8 @@ cmdline_parser_print_help (void)
   printf("   -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)\n");
   printf("   -jFILE    --conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)\n");
   printf("   -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)\n");
-  printf("   -y        --norm-hyph             Enable hyphenation normalization in lexer\n");
+  printf("   -y        --dehyphenate           Enable automatic dehyphenation in lexer (default)\n");
+  printf("   -Y        --no-dehyphenate        Disable automatic dehyphenation in lexer\n");
   printf("\n");
   printf(" HMM Options:\n");
   printf("   -MMODEL   --model=MODEL           Use HMM tokenizer model MODEL.\n");
@@ -155,7 +156,8 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->abbrevs_arg = NULL; 
   args_info->conjunctions_arg = NULL; 
   args_info->stopwords_arg = NULL; 
-  args_info->norm_hyph_flag = 0; 
+  args_info->dehyphenate_flag = 1; 
+  args_info->no_dehyphenate_flag = 0; 
   args_info->model_arg = gog_strdup("waste.hmm"); 
   args_info->input_format_arg = NULL; 
   args_info->output_format_arg = NULL; 
@@ -188,7 +190,8 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->abbrevs_given = 0;
   args_info->conjunctions_given = 0;
   args_info->stopwords_given = 0;
-  args_info->norm_hyph_given = 0;
+  args_info->dehyphenate_given = 0;
+  args_info->no_dehyphenate_given = 0;
   args_info->model_given = 0;
   args_info->input_format_given = 0;
   args_info->output_format_given = 0;
@@ -228,7 +231,8 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "abbrevs", 1, NULL, 'a' },
 	{ "conjunctions", 1, NULL, 'j' },
 	{ "stopwords", 1, NULL, 'w' },
-	{ "norm-hyph", 0, NULL, 'y' },
+	{ "dehyphenate", 0, NULL, 'y' },
+	{ "no-dehyphenate", 0, NULL, 'Y' },
 	{ "model", 1, NULL, 'M' },
 	{ "input-format", 1, NULL, 'I' },
 	{ "output-format", 1, NULL, 'O' },
@@ -256,6 +260,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'j', ':',
 	'w', ':',
 	'y',
+	'Y',
 	'M', ':',
 	'I', ':',
 	'O', ':',
@@ -499,13 +504,26 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->stopwords_arg = gog_strdup(val);
           break;
         
-        case 'y':	 /* Enable hyphenation normalization in lexer */
-          if (args_info->norm_hyph_given) {
-            fprintf(stderr, "%s: `--norm-hyph' (`-y') option given more than once\n", PROGRAM);
+        case 'y':	 /* Enable automatic dehyphenation in lexer (default) */
+          if (args_info->dehyphenate_given) {
+            fprintf(stderr, "%s: `--dehyphenate' (`-y') option given more than once\n", PROGRAM);
           }
-          args_info->norm_hyph_given++;
-         if (args_info->norm_hyph_given <= 1)
-           args_info->norm_hyph_flag = !(args_info->norm_hyph_flag);
+          args_info->dehyphenate_given++;
+         if (args_info->dehyphenate_given <= 1)
+           args_info->dehyphenate_flag = !(args_info->dehyphenate_flag);
+          /* user code */
+          
+          break;
+        
+        case 'Y':	 /* Disable automatic dehyphenation in lexer */
+          if (args_info->no_dehyphenate_given) {
+            fprintf(stderr, "%s: `--no-dehyphenate' (`-Y') option given more than once\n", PROGRAM);
+          }
+          args_info->no_dehyphenate_given++;
+         if (args_info->no_dehyphenate_given <= 1)
+           args_info->no_dehyphenate_flag = !(args_info->no_dehyphenate_flag);
+          /* user code */
+          
           break;
         
         case 'M':	 /* Use HMM tokenizer model MODEL. */
@@ -753,14 +771,28 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->stopwords_arg = gog_strdup(val);
           }
           
-          /* Enable hyphenation normalization in lexer */
-          else if (strcmp(olong, "norm-hyph") == 0) {
-            if (args_info->norm_hyph_given) {
-              fprintf(stderr, "%s: `--norm-hyph' (`-y') option given more than once\n", PROGRAM);
+          /* Enable automatic dehyphenation in lexer (default) */
+          else if (strcmp(olong, "dehyphenate") == 0) {
+            if (args_info->dehyphenate_given) {
+              fprintf(stderr, "%s: `--dehyphenate' (`-y') option given more than once\n", PROGRAM);
             }
-            args_info->norm_hyph_given++;
-           if (args_info->norm_hyph_given <= 1)
-             args_info->norm_hyph_flag = !(args_info->norm_hyph_flag);
+            args_info->dehyphenate_given++;
+           if (args_info->dehyphenate_given <= 1)
+             args_info->dehyphenate_flag = !(args_info->dehyphenate_flag);
+            /* user code */
+            
+          }
+          
+          /* Disable automatic dehyphenation in lexer */
+          else if (strcmp(olong, "no-dehyphenate") == 0) {
+            if (args_info->no_dehyphenate_given) {
+              fprintf(stderr, "%s: `--no-dehyphenate' (`-Y') option given more than once\n", PROGRAM);
+            }
+            args_info->no_dehyphenate_given++;
+           if (args_info->no_dehyphenate_given <= 1)
+             args_info->no_dehyphenate_flag = !(args_info->no_dehyphenate_flag);
+            /* user code */
+            
           }
           
           /* Use HMM tokenizer model MODEL. */

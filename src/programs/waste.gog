@@ -129,7 +129,14 @@ string "stopwords" w  "Load stopword lexicon from FILE (1 word/line)" \
 Only meaningful if --lex is enabled.
 "
 
-flag "norm-hyph" y  "Enable hyphenation normalization in lexer" \
+flag "dehyphenate" y  "Enable automatic dehyphenation in lexer (default)" \
+    default="1" \
+    code="args_info->dehyphenate_flag=1;'" \
+    details="
+Only meaningful if --lex is enabled.
+"
+flag "no-dehyphenate" Y  "Disable automatic dehyphenation in lexer" \
+    code="args_info->dehyphenate_flag=0;'" \
     details="
 Only meaningful if --lex is enabled.
 "

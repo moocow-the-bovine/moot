@@ -37,7 +37,8 @@ struct gengetopt_args_info {
   char * abbrevs_arg;	 /* Load abbreviation lexicon from FILE (1 word/line) (default=NULL). */
   char * conjunctions_arg;	 /* Load conjunction lexicon from FILE (1 word/line) (default=NULL). */
   char * stopwords_arg;	 /* Load stopword lexicon from FILE (1 word/line) (default=NULL). */
-  int norm_hyph_flag;	 /* Enable hyphenation normalization in lexer (default=0). */
+  int dehyphenate_flag;	 /* Enable automatic dehyphenation in lexer (default) (default=1). */
+  int no_dehyphenate_flag;	 /* Disable automatic dehyphenation in lexer (default=0). */
   char * model_arg;	 /* Use HMM tokenizer model MODEL. (default=waste.hmm). */
   char * input_format_arg;	 /* Specify input file format for -no-scan mode (default=NULL). */
   char * output_format_arg;	 /* Specify output file format. (default=NULL). */
@@ -62,7 +63,8 @@ struct gengetopt_args_info {
   int abbrevs_given;	 /* Whether abbrevs was given */
   int conjunctions_given;	 /* Whether conjunctions was given */
   int stopwords_given;	 /* Whether stopwords was given */
-  int norm_hyph_given;	 /* Whether norm-hyph was given */
+  int dehyphenate_given;	 /* Whether dehyphenate was given */
+  int no_dehyphenate_given;	 /* Whether no-dehyphenate was given */
   int model_given;	 /* Whether model was given */
   int input_format_given;	 /* Whether input-format was given */
   int output_format_given;	 /* Whether output-format was given */

@@ -87,7 +87,8 @@
     -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
     -jFILE    --conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)
     -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)
-    -y        --norm-hyph             Enable hyphenation normalization in lexer</pre>
+    -y        --dehyphenate           Enable automatic dehyphenation in lexer (default)
+    -Y        --no-dehyphenate        Disable automatic dehyphenation in lexer</pre>
 <pre>
  HMM Options
     -MMODEL   --model=MODEL           Use HMM tokenizer model MODEL.</pre>
@@ -303,10 +304,17 @@ as appropriate for your HMM.</p>
 <p>Default: 'NULL'</p>
 <p>Only meaningful if --lex is enabled.</p>
 </dd>
-<dt><strong><a name="norm_hyph_y" class="item"><code>--norm-hyph</code> , <code>-y</code></a></strong></dt>
+<dt><strong><a name="dehyphenate_y" class="item"><code>--dehyphenate</code> , <code>-y</code></a></strong></dt>
 
 <dd>
-<p>Enable hyphenation normalization in lexer</p>
+<p>Enable automatic dehyphenation in lexer (default)</p>
+<p>Default: '1'</p>
+<p>Only meaningful if --lex is enabled.</p>
+</dd>
+<dt><strong><a name="no_dehyphenate_y" class="item"><code>--no-dehyphenate</code> , <code>-Y</code></a></strong></dt>
+
+<dd>
+<p>Disable automatic dehyphenation in lexer</p>
 <p>Default: '0'</p>
 <p>Only meaningful if --lex is enabled.</p>
 </dd>

@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "WASTE 1"
-.TH WASTE 1 "2013-11-08" "moot v2.0.10-pre1" "moot PoS Tagger"
+.TH WASTE 1 "2013-11-11" "moot v2.0.10-pre1" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -164,7 +164,8 @@ waste [\s-1OPTIONS\s0] \s-1FILE\s0(s)
 \&    \-aFILE    \-\-abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
 \&    \-jFILE    \-\-conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)
 \&    \-wFILE    \-\-stopwords=FILE        Load stopword lexicon from FILE (1 word/line)
-\&    \-y        \-\-norm\-hyph             Enable hyphenation normalization in lexer
+\&    \-y        \-\-dehyphenate           Enable automatic dehyphenation in lexer (default)
+\&    \-Y        \-\-no\-dehyphenate        Disable automatic dehyphenation in lexer
 \&
 \& HMM Options
 \&    \-MMODEL   \-\-model=MODEL           Use HMM tokenizer model MODEL.
@@ -372,10 +373,18 @@ Load stopword lexicon from \s-1FILE\s0 (1 word/line)
 Default: '\s-1NULL\s0'
 .Sp
 Only meaningful if \-\-lex is enabled.
-.ie n .IP """\-\-norm\-hyph"" , ""\-y""" 4
-.el .IP "\f(CW\-\-norm\-hyph\fR , \f(CW\-y\fR" 4
-.IX Item "--norm-hyph , -y"
-Enable hyphenation normalization in lexer
+.ie n .IP """\-\-dehyphenate"" , ""\-y""" 4
+.el .IP "\f(CW\-\-dehyphenate\fR , \f(CW\-y\fR" 4
+.IX Item "--dehyphenate , -y"
+Enable automatic dehyphenation in lexer (default)
+.Sp
+Default: '1'
+.Sp
+Only meaningful if \-\-lex is enabled.
+.ie n .IP """\-\-no\-dehyphenate"" , ""\-Y""" 4
+.el .IP "\f(CW\-\-no\-dehyphenate\fR , \f(CW\-Y\fR" 4
+.IX Item "--no-dehyphenate , -Y"
+Disable automatic dehyphenation in lexer
 .Sp
 Default: '0'
 .Sp

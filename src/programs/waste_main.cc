@@ -266,7 +266,7 @@ wasteLexer *get_lexer(int lexfmt=tiofUnknown, TokenReader *reader=NULL)
 {
   wasteLexer *lexer = new wasteLexer(lexfmt);
 
-  lexer->dehyph_mode(args.norm_hyph_flag > 0);
+  lexer->dehyph_mode(args.dehyphenate_flag > 0);
 
   if (args.abbrevs_given && !lexer->wl_abbrevs.load(args.abbrevs_arg))
     moot_croak("%s: ERROR: can't load abbreviation lexicon from '%s': %s\n", PROGNAME, args.abbrevs_arg, strerror(errno));
