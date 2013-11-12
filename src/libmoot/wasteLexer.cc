@@ -180,7 +180,9 @@ void wasteLexer::buffer_token(void)
             }
             while(&(*it_tail) != wl_current_tok);
 
-            // -- TODO: delete dehyphenated tokens
+            // -- breaks hyphenation
+            wl_state &= ~(ls_hyph);
+            wl_state &= ~(ls_nl);
 
             // -- now wl_head_tok points to the last text token in buffer
             wl_current_tok = wl_head_tok;
