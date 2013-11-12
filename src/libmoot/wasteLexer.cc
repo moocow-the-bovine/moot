@@ -175,10 +175,12 @@ void wasteLexer::buffer_token(void)
                 if (it_tail->wlt_type != wLexerTypeHyph) {
                   it_head->wlt_token.tok_text.append ( it_tail->wlt_token.tok_text );
                 }
-                it_tail->wlt_token.tok_type = TokTypeComment;
+                it_tail->wlt_token.tok_type = TokTypeUnknown;
               }
             }
             while(&(*it_tail) != wl_current_tok);
+
+            // -- TODO: delete dehyphenated tokens
 
             // -- now wl_head_tok points to the last text token in buffer
             wl_current_tok = wl_head_tok;
@@ -242,9 +244,7 @@ void wasteLexer::buffer_token(void)
       wl_state |= ls_flush;
       // -- breaks hyphenation
       wl_head_tok = NULL;
-      wl_state &= ~(ls_head);
-      wl_state &= ~(ls_hyph);
-      wl_state &= ~(ls_nl);
+      wl_state &= ~(ls_head|ls_hyph|ls_nl);
       break;
 
     case TokTypeWB:
@@ -255,8 +255,6 @@ void wasteLexer::buffer_token(void)
       wl_state |= ls_flush;
       // breaks hyphenation
       wl_state &= ~(ls_head|ls_hyph|ls_nl);
-      wl_state &= ~(ls_hyph);
-      wl_state &= ~(ls_nl);
       break;
     case TokTypeComment:
       // does not break hyphenation
@@ -281,16 +279,21 @@ mootTokenType wasteLexer::get_token(void)
     buffer_token ();
   }
 
+  while(wl_tokbuf.front().wlt_token.tok_type ==  TokTypeUnknown) // skip unknown tokens
+  {
+    wl_tokbuf.pop_front();
+  }
+
   wl_token = wl_tokbuf.front().wlt_token;
   switch (wl_token.tok_type)
   {
     case TokTypeVanilla:
     case TokTypeLibXML:
       set_token(wl_token, wl_tokbuf.front());
-      break;
     default:
       break;
   }
+
   wl_tokbuf.pop_front();
   return wl_token.toktype();
 }
