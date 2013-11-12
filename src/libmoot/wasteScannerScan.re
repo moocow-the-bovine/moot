@@ -310,7 +310,6 @@ Any = Any1|Any2|Any3;
 	//-- Additional helpers
 	/*!re2c
         WS                     = [ \r\n\t\f];
-        SEP                    = [^ \r\n\t\f,;\.:?!\"\'`()%$/\[\]{}];
         ANY_CHARACTER          = Any;
 	*/
 

@@ -109,7 +109,9 @@ namespace moot
         ls_wb_fw   = 0x0040,
         ls_blanked = 0x0080,
       };
-      static const int ls_init = (ls_wb_fw | ls_sb_fw | ls_blanked); /**< initial state of the lexer*/
+      static const int ls_init         = (ls_wb_fw | ls_sb_fw | ls_blanked); /**< initial state of the lexer*/
+      static const int ls_head_hyph    = ( ls_head | ls_hyph ); /**< lexer has seen some word followed by a hyphen */
+      static const int ls_head_hyph_nl = ( ls_head_hyph | ls_nl ); /**< lexer has seen some word followed by a hyphen and a newline */
       //@}
 
       //--------------------------------------------------------------------
@@ -187,6 +189,7 @@ namespace moot
       int               wl_state;         /**< Current state of the lexer */
       wasteTokenBuffer  wl_tokbuf;        /**< Buffer for dehyphenation */
       wasteLexerToken  *wl_current_tok;   /** current token under construction (NULL for none), pointer into wl_tokbuf */
+      wasteLexerToken  *wl_head_tok;      /** head of hyphenation sequence (NULL for none), pointer into wl_tokbuf */
       bool              wl_dehyph_mode;   /**< Dehyphenation switch */
       //@}
 
@@ -285,6 +288,25 @@ namespace moot
       {
         wl_dehyph_mode = on;
       };
+
+      inline len length_attr(size_t length) const
+      {
+        switch (length)
+        {
+          case 0:
+            return le_null;
+          case 1:
+            return le_one;
+          case 2:
+          case 3:
+            return le_three;
+          case 4:
+          case 5:
+            return le_five;
+          default:
+            return longer;
+        }
+      }
 
       /**
        * MOves the next token(s) from internal scanner to internal buffer.

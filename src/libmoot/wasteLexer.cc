@@ -34,7 +34,8 @@ wasteLexer::wasteLexer(int fmt, const std::string &myname)
     scanner(NULL),
     wl_state(ls_init),
     wl_current_tok(NULL),
-    wl_dehyph_mode(false)
+    wl_head_tok(NULL),
+    wl_dehyph_mode(true)
 {
   // wasteLexer has local contents
   tr_token = &wl_token;
@@ -108,6 +109,7 @@ void wasteLexer::close(void)
   scanner = NULL;
   wl_state = ls_init;
   wl_current_tok = NULL;
+  wl_head_tok = NULL;
 }
 
 //----------------------------------------------------------------------
@@ -133,9 +135,9 @@ void wasteLexer::buffer_token(void)
           return;
 
         case wLexerTypeHyph:
-          wl_state |= ls_hyph;
-
-        default:
+          // -- some hyphen is a hyphenating hyphen
+          if((wl_state & ls_head) && ((wl_state & ls_blanked) == 0))
+            wl_state |= ls_hyph;
           // -- set token features according to lexer state and reset
           local_token.wlt_type = lextype;
           local_token.wlt_blanked = (wl_state & ls_blanked) ? true : false;
@@ -144,13 +146,87 @@ void wasteLexer::buffer_token(void)
           wl_state &= ~(ls_blanked);
           wl_state &= ~(ls_sb_fw);
           wl_state &= ~(ls_wb_fw);
-
           // -- store token
           wl_tokbuf.push_back(local_token);
+          // -- update pointers into buffer
+          wl_current_tok = &(wl_tokbuf.back());
+          return;
+
+        case wLexerTypeAlphaLower:
+          if( wl_dehyph_mode && ((wl_state & ls_head_hyph_nl) == ls_head_hyph_nl) && !wl_conjunctions.lookup(local_token.wlt_token.tok_text))
+          {
+            wl_tokbuf.push_back(local_token);
+            wl_current_tok = &(wl_tokbuf.back());
+            wasteTokenBuffer::iterator it_head = wl_tokbuf.begin ();
+            // -- find head of hyphenation in buffer
+            while(&(*it_head) != wl_head_tok)
+            {
+              ++it_head;
+            }
+            wasteTokenBuffer::iterator it_tail = it_head;
+            // -- merge tokens until tail is reached
+            do
+            {
+              ++it_tail;
+              // -- update length of the dehyphenated token
+              it_head->wlt_token.tok_location.length += it_tail->wlt_token.tok_location.offset + it_tail->wlt_token.tok_location.length - it_head->wlt_token.tok_location.offset - it_head->wlt_token.tok_location.length;
+              // -- only text tokens are deleted from buffer
+              if(it_tail->wlt_token.tok_type == TokTypeVanilla || it_tail->wlt_token.tok_type == TokTypeLibXML) {
+                if (it_tail->wlt_type != wLexerTypeHyph) {
+                  it_head->wlt_token.tok_text.append ( it_tail->wlt_token.tok_text );
+                }
+                it_tail->wlt_token.tok_type = TokTypeComment;
+              }
+            }
+            while(&(*it_tail) != wl_current_tok);
+
+            // -- now wl_head_tok points to the last text token in buffer
+            wl_current_tok = wl_head_tok;
+            wl_state &= ~(ls_blanked);
+            wl_state &= ~(ls_sb_fw);
+            wl_state &= ~(ls_wb_fw);
+            return;
+          }
+        case wLexerTypeAlphaUpper:
+        case wLexerTypeAlphaCaps:
+          wl_state |= ls_head;
+          // -- breaks hyphenation
+          wl_state &= ~(ls_hyph);
+          wl_state &= ~(ls_nl);
+          // -- set token features according to lexer state and reset
+          local_token.wlt_type = lextype;
+          local_token.wlt_blanked = (wl_state & ls_blanked) ? true : false;
+          local_token.s = (wl_state & ls_sb_fw) ? true : false;
+          local_token.w = (wl_state & ls_wb_fw) ? true : false;
+          wl_state &= ~(ls_blanked);
+          wl_state &= ~(ls_sb_fw);
+          wl_state &= ~(ls_wb_fw);
+          // -- store token
+          wl_tokbuf.push_back(local_token);
+          // -- update pointers into buffer
+          wl_current_tok = wl_head_tok = &(wl_tokbuf.back());
+          return;
+
+        default:
+          // -- breaks hyphenation
+          wl_state &= ~(ls_hyph);
+          wl_state &= ~(ls_nl);
+          // -- set token features according to lexer state and reset
+          local_token.wlt_type = lextype;
+          local_token.wlt_blanked = (wl_state & ls_blanked) ? true : false;
+          local_token.s = (wl_state & ls_sb_fw) ? true : false;
+          local_token.w = (wl_state & ls_wb_fw) ? true : false;
+          wl_state &= ~(ls_blanked);
+          wl_state &= ~(ls_sb_fw);
+          wl_state &= ~(ls_wb_fw);
+          // -- store token
+          wl_tokbuf.push_back(local_token);
+          // -- update pointers into buffer
           wl_current_tok = &(wl_tokbuf.back());
           return;
       }
-      break;
+      return;
+
     case TokTypeSB:
       // -- set bos and bow for upcoming token
       wl_state |= ls_sb_fw;
@@ -162,22 +238,25 @@ void wasteLexer::buffer_token(void)
         wl_current_tok->S = true;
         wl_current_tok = NULL;
       }
+      // -- output possible
+      wl_state |= ls_flush;
+      // -- breaks hyphenation
+      wl_head_tok = NULL;
+      wl_state &= ~(ls_head);
+      wl_state &= ~(ls_hyph);
+      wl_state &= ~(ls_nl);
+      break;
 
+    case TokTypeWB:
+      wl_state |= ls_wb_fw;
+    case TokTypeEOS:
+    case TokTypeEOF:
       // -- output possible
       wl_state |= ls_flush;
       // breaks hyphenation
-      break;
-    case TokTypeWB:
-      wl_state |= ls_wb_fw;
-      wl_state |= ls_flush;
-      // breaks hyphenation
-      break;
-    case TokTypeEOS:
-      // breaks hyphenation
-      break;
-    case TokTypeEOF:
-      // breaks hyphenation
-      wl_state |= ls_flush;
+      wl_state &= ~(ls_head|ls_hyph|ls_nl);
+      wl_state &= ~(ls_hyph);
+      wl_state &= ~(ls_nl);
       break;
     case TokTypeComment:
       // does not break hyphenation
@@ -230,27 +309,8 @@ mootTokenType wasteLexer::get_sentence(void)
 //----------------------------------------------------------------------
 void wasteLexer::set_token(mootToken &token, wasteLexerToken &lex_token)
 {
-  //-- length classification
-  len tok_length;
-  switch (lex_token.wlt_token.tok_text.length())
-  {
-    case 0:
-      tok_length = le_null;
-      break;
-    case 1:
-      tok_length = le_one;
-      break;
-    case 2:
-    case 3:
-      tok_length = le_three;
-      break;
-    case 4:
-    case 5:
-      tok_length = le_five;
-      break;
-    default:
-      tok_length = longer;
-  }
+  //-- default length setting
+  len tok_length = le_null;
 
   //-- class selection (based on waste_lexertype)
   cls tok_class = other;
@@ -310,16 +370,19 @@ void wasteLexer::set_token(mootToken &token, wasteLexerToken &lex_token)
       tok_class = (wl_stopwords.lookup(lex_token.wlt_token.tok_text)) ? stop : alpha;
       tok_case = lo;
       tok_abbr = (wl_abbrevs.lookup(lex_token.wlt_token.tok_text)) ? kn : uk;
+      tok_length = length_attr(lex_token.wlt_token.tok_text.length());
       break;
     case wLexerTypeAlphaUpper:
       tok_class = (wl_stopwords.lookup(lex_token.wlt_token.tok_text)) ? stop : alpha;
       tok_case = up;
       tok_abbr = (wl_abbrevs.lookup(lex_token.wlt_token.tok_text)) ? kn : uk;
+      tok_length = length_attr(lex_token.wlt_token.tok_text.length());
       break;
     case wLexerTypeAlphaCaps:
       tok_class = (wl_stopwords.lookup(lex_token.wlt_token.tok_text)) ? stop : alpha;
       tok_case = cap;
       tok_abbr = (wl_abbrevs.lookup(lex_token.wlt_token.tok_text)) ? kn : uk;
+      tok_length = length_attr(lex_token.wlt_token.tok_text.length());
       break;
 
       //
@@ -327,10 +390,12 @@ void wasteLexer::set_token(mootToken &token, wasteLexerToken &lex_token)
       //
     case wLexerTypeNumber:
       tok_class = num;
+      tok_length = length_attr(lex_token.wlt_token.tok_text.length());
       break;
     case wLexerTypeRoman:
       tok_class = (wl_stopwords.lookup(lex_token.wlt_token.tok_text)) ? stop : rom;
       tok_case = (wl_stopwords.lookup(lex_token.wlt_token.tok_text)) ? cap : non;
+      tok_length = length_attr(lex_token.wlt_token.tok_text.length());
       break;
 
       //

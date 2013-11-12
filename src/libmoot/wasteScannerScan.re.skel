@@ -49,7 +49,6 @@ int moot::wasteScanner::yylex ( )
 	//-- Additional helpers
 	/*!re2c
         WS                     = [ \r\n\t\f];
-        SEP                    = [^ \r\n\t\f,;\.:?!\"\'`()%$/\[\]{}];
         ANY_CHARACTER          = Any;
 	*/
 

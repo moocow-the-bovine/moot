@@ -512,7 +512,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
          if (args_info->dehyphenate_given <= 1)
            args_info->dehyphenate_flag = !(args_info->dehyphenate_flag);
           /* user code */
-          
+          args_info->dehyphenate_flag=1;
           break;
         
         case 'Y':	 /* Disable automatic dehyphenation in lexer */
@@ -523,7 +523,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
          if (args_info->no_dehyphenate_given <= 1)
            args_info->no_dehyphenate_flag = !(args_info->no_dehyphenate_flag);
           /* user code */
-          
+          args_info->dehyphenate_flag=0;
           break;
         
         case 'M':	 /* Use HMM tokenizer model MODEL. */
@@ -780,7 +780,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
            if (args_info->dehyphenate_given <= 1)
              args_info->dehyphenate_flag = !(args_info->dehyphenate_flag);
             /* user code */
-            
+            args_info->dehyphenate_flag=1;
           }
           
           /* Disable automatic dehyphenation in lexer */
@@ -792,7 +792,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
            if (args_info->no_dehyphenate_given <= 1)
              args_info->no_dehyphenate_flag = !(args_info->no_dehyphenate_flag);
             /* user code */
-            
+            args_info->dehyphenate_flag=0;
           }
           
           /* Use HMM tokenizer model MODEL. */
