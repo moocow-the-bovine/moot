@@ -23,6 +23,7 @@ require Moot::HMM::Dyn;
 require Moot::HMM::DynLex;
 require Moot::HMM::Boltzmann;
 require Moot::TokenIO;
+require Moot::TokPP;
 require Moot::Waste;
 
 # Autoload methods go after =cut, and are processed by the autosplit program.

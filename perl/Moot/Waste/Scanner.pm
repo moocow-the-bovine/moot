@@ -17,7 +17,7 @@ __END__
 
 =head1 NAME
 
-Moot::Waste:Scanner - libmoot : WASTE tokenizer : low-level scanner
+Moot::Waste::Scanner - libmoot : WASTE tokenizer : low-level scanner
 
 =head1 SYNOPSIS
 
