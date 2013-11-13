@@ -40,7 +40,7 @@ sub analyze_text {
 ## $w = CLASS_OR_OBJECT->analyze_token($w)
 sub analyze_token {
   return $_[1] if (!defined(my $as = $_[0]->analyze_text($_[1]{text})));
-  push(@{$_[1]{analyses}}, {hi=>$_}) foreach (split(/\t/,$as));
+  push(@{$_[1]{analyses}}, {tag=>$_,details=>$_}) foreach (map {/^\[(.*)\]$/ ? $1 : $_} split(/\t/,$as));
   return $_[1];
 }
 
