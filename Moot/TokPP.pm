@@ -77,7 +77,7 @@ sub analyze_buffer {
   }
   open(my $infh,  "<", $iref);
   open(my $outfh, ">", $oref);
-  $that->analyze_buffer($infh,$outfh);
+  $that->analyze_stream($infh,$outfh);
   $infh->close;
   $outfh->close;
   return $oref;
