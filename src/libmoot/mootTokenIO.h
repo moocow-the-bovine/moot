@@ -42,9 +42,9 @@
 /*moot_BEGIN_NAMESPACE*/
 namespace moot {
 
-/*==========================================================================
- * TokenIO
- *==========================================================================*/
+//==========================================================================
+// Globals
+
 /** Enum for I/O format flags */
 enum TokenIOFormatE {
   tiofNone      = 0x00000000,  ///< no format
@@ -77,6 +77,8 @@ static const int tiofMedium = tiofText|tiofTagged;
 /** Format alias for 'Cooked Well Done' files. */
 static const int tiofWellDone = tiofText|tiofAnalyzed|tiofTagged; //|tiofCost
 
+//==========================================================================
+// TokenIO
 
 /** \brief Abstract class for token I/O */
 class TokenIO {
@@ -176,9 +178,8 @@ public:
   //@}
 };
 
-/*==========================================================================
- * TokenReader
- *==========================================================================*/
+//==========================================================================
+// TokenReader
 
 /** \brief Abstract class for token input */
 class TokenReader : public TokenIO {
@@ -469,10 +470,9 @@ public:
   //@}
 };
 
+//==========================================================================
+// TokenReaderNative
 
-/*------------------------------------------------------------
- * TokenReaderNative
- */
 /**
  * \brief Class for native "cooked" text-format token input.
  */
@@ -654,13 +654,9 @@ public:
 };
 
 
-/*==========================================================================
- * TokenWriter
- *==========================================================================*/
+//==========================================================================
+// TokenWriter
 
-/*------------------------------------------------------------
- * TokenWriter
- */
 /** \brief Abstract class for token output */
 class TokenWriter : public TokenIO {
 public:
@@ -953,9 +949,9 @@ public:
   //@}
 };
 
-/*------------------------------------------------------------
- * TokenWriterNative
- */
+//==========================================================================
+// TokenWriterNative
+
 /**
  * \brief Class for native "cooked" text-format token output.
  */
@@ -1065,6 +1061,141 @@ public:
     _put_sentence(sentence,&twn_tmpbuf);
     return std::string(twn_tmpbuf.data(), twn_tmpbuf.size());
   };
+  //@}
+};
+
+
+//==========================================================================
+// TokenBuffer
+
+/**
+ * \brief Class for in-memory token buffers using mootSentence
+ *
+ * \detail Data must be written e.g. with put_token() before it
+ *  it is read with get_token() and its ilk, otherwise EOF
+ *  will be returned.
+ */
+class TokenBuffer : public TokenReader, public TokenWriter {
+public:
+  //------------------------------------------------------------
+  // Buffer: typedefs
+  typedef mootSentence Buffer;
+
+public:
+  //------------------------------------------------------------
+  // Buffer: Data
+  Buffer tb_buffer;		/**< underlying data buffer */
+  mootSentence tb_sentence;	/**< secondary buffer for get_sentence() */
+
+public:
+  //------------------------------------------------------------
+  /// \name Constructors etc.
+  //@{
+  /**
+   * Default constructor
+   * @param fmt bitmask of moot::TokenIOFormat flags
+   * @param name symbolic name for the object
+   */
+  TokenBuffer(int fmt=tiofUnknown, const std::string name="TokenBuffer")
+    : TokenReader(fmt,name),
+      TokenWriter(fmt,name)
+  {
+    tr_sentence = &tb_sentence;
+  };
+
+  /** destructor override in descendant classes */
+  virtual ~TokenBuffer(void);
+  //@}
+
+  //------------------------------------------------------------
+  /// \name I/O Selection
+  //@{
+  /** TokenReader method from_mstream() just throws an error */
+  virtual void from_mstream(mootio::mistream *mistreamp)
+  {
+    throw domain_error("from_mstream(): not implemented for class moot::TokenBuffer");
+  };
+
+  /** TokenWriter method to_mstream() just throws an error */
+  virtual void to_mstream(mootio::mostream *mostreamp)
+  {
+    throw domain_error("to_mstream(): not implemented for class moot::TokenBuffer");
+  };
+
+  /** close() override does nothing */
+  virtual void close()
+  {};
+
+  /** buffers are always "opened" */
+  virtual bool opened()
+  { return true; };
+
+  /** Append all remaining tokens from \a reader th buffer */
+  virtual void from_reader(TokenReader *reader);
+
+  /** Flush buffer contents to \a writer ; wraps TokenWriter::put_tokens() */
+  virtual void to_writer(TokenWriter *writer);
+
+  /** clears internal buffer */
+  virtual void clear_buffer();
+  //@}
+
+  //------------------------------------------------------------
+  /// \name Token-Level Access: Input
+  //@{
+
+  /**
+   * Get the next token from the buffer.
+   * On completion, current token (if any) is in *tr_token.
+   */
+  virtual mootTokenType get_token(void);
+
+  /**
+   * Read in next sentence.
+   * On completion, current sentence (if any) is in *tr_sentence.
+   * Descendants may override this method for sentence-wise input.
+   */
+  virtual mootTokenType get_sentence(void);
+  //@}
+
+  //------------------------------------------------------------
+  /// \name Token-Level Access: Output
+  //@{
+  /**
+   * Write a single token to the currently selected output sink.
+   * Descendants \b must override this method.
+   */
+  virtual void put_token(const mootToken &token);
+
+  /**
+   * Write a single (partial) sentence to the currently selected output sink.
+   * Descendants may override this method.
+   * Default implementation just calls put_token() for every element of sentence.
+   */
+  virtual void put_tokens(const mootSentence &tokens);
+
+  /**
+   * Write a single sentence to the currently selected output sink.
+   * Descendants may override this method.
+   * Default implementation just calls put_sentence().
+   */
+  virtual void put_sentence(const mootSentence &sentence);
+  //@}
+
+  //------------------------------------------------------------
+  /// \name Raw Output
+  //@{
+  /**
+   * Write a single comment to the currently selected output sink
+   * Descendants may override this method.
+   */
+  virtual void put_comment_buffer(const char *buf, size_t len);
+
+  /**
+   * Write some data to the currently selected output sink
+   * Descendants may override this method.
+   */
+  virtual void put_raw_buffer(const char *buf, size_t len);
   //@}
 };
 

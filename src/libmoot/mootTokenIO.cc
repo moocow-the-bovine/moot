@@ -1,4 +1,4 @@
-/* -*- Mode: C++ -*- */
+/* -*- Mode: C++; c-basic-offset: 2; -*- */
 
 /*
    libmoot : moocow's part-of-speech tagging library
@@ -606,6 +606,65 @@ void TokenWriterNative::_put_raw_buffer(const char *buf, size_t len, mootio::mos
   else
     os->write(buf,len);
 }
+
+
+//==========================================================================
+// TokenBuffer
+
+//--------------------------------------------------------------
+TokenBuffer::~TokenBuffer(void)
+{
+  this->close();
+}
+
+//--------------------------------------------------------------
+void TokenBuffer::clear_buffer(void)
+{
+  tb_buffer.clear();
+  tr_token = NULL;
+}
+
+
+//--------------------------------------------------------------
+void TokenBuffer::from_reader(TokenReader *reader)
+{
+  mootTokenType toktyp;
+  while (reader && (toktyp=reader->get_token()) != TokTypeEOF) {
+    tb_buffer.push_back( *(reader->token()) );
+  }
+}
+
+//--------------------------------------------------------------
+void TokenBuffer::to_writer(TokenWriter *writer)
+{
+  if (!writer) return;
+  writer->put_tokens( tb_buffer );
+  this->clear_buffer();
+}
+
+//--------------------------------------------------------------
+mootTokenType TokenBuffer::get_token(void)
+{
+  if (tb_buffer.empty()) return TokTypeEOF;
+  if (tr_token != NULL)  tb_buffer.pop_front();
+  if (tb_buffer.empty()) {
+    tr_token = NULL;
+    return TokTypeEOF;
+  }
+  tr_token = &( tb_buffer.front() );
+  return tr_token->tok_type;
+}
+
+//--------------------------------------------------------------
+mootTokenType TokenBuffer::get_sentence(void)
+{
+  mootTokenType toktyp = TokenReader::get_sentence();
+  tr_token = NULL;
+  return toktyp;
+}
+
+//--------------------------------------------------------------
+//... TODO: CONTINUE HERE
 
 
 }; /*moot_END_NAMESPACE*/
