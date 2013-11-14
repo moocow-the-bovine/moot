@@ -160,7 +160,7 @@ namespace moot
         n_cls    = 18
       };
 
-      /** leter-case */
+      /** letter-case */
       enum cas
       {
         non      = 0,
@@ -249,25 +249,6 @@ namespace moot
       //@}
 
       /*------------------------------------------------------------
-       * TokenReader: Token-Level Access
-       */
-      /** \name Token-Level Access */
-      //@{
-      /**
-       * Get the next token from the buffer.
-       * On completion, current token (if any) is in *tr_token.
-       */
-      virtual mootTokenType get_token(void);
-
-      /**
-       * Buffer the remaining tokens from the currently selected input
-       * stream as a mootSentence.
-       * On completion, buffered tokens (if any) are in *tr_sentence.
-       */
-      virtual mootTokenType get_sentence(void);
-      //@}
-
-      /*------------------------------------------------------------
        * TokenReader: Diagnostics
        */
       /** \name Diagnostics */
@@ -298,15 +279,7 @@ namespace moot
       /** Set token source (usually some wasteScanner) */
       void from_reader(TokenReader *reader);
 
-      /** Set token features (token.tok_analyses) w.r.t. model features **/
-      void set_token(mootToken &token, wasteLexerToken &lex_token);
-
-      /** Turn on/off dehyphenation mode **/
-      inline void dehyph_mode(bool on)
-      {
-        wl_dehyph_mode = on;
-      };
-
+      /** Length to length attribute conversion */
       inline len length_attr(size_t length) const
       {
         switch (length)
@@ -326,11 +299,39 @@ namespace moot
         }
       }
 
+      /** Set token features (token.tok_analyses) w.r.t. model features **/
+      void set_token(mootToken &token, wasteLexerToken &lex_token);
+
       /**
        * MOves the next token(s) from internal scanner to internal buffer.
        * If wl_dehyph_mode is true, seeks and removes hyphenations.
        */
       void buffer_token(void);
+
+      /** Turn on/off dehyphenation mode **/
+      inline void dehyph_mode(bool on)
+      {
+        wl_dehyph_mode = on;
+      };
+      //@}
+
+      /*------------------------------------------------------------
+       * TokenReader: Token-Level Access
+       */
+      /** \name Token-Level Access */
+      //@{
+      /**
+       * Get the next token from the buffer.
+       * On completion, current token (if any) is in *tr_token.
+       */
+      virtual mootTokenType get_token(void);
+
+      /**
+       * Buffer the remaining tokens from the currently selected input
+       * stream as a mootSentence.
+       * On completion, buffered tokens (if any) are in *tr_sentence.
+       */
+      virtual mootTokenType get_sentence(void);
       //@}
   };
 
