@@ -143,9 +143,7 @@ void wasteLexer::buffer_token(void)
           local_token.wlt_blanked = (wl_state & ls_blanked) ? true : false;
           local_token.s = (wl_state & ls_sb_fw) ? true : false;
           local_token.w = (wl_state & ls_wb_fw) ? true : false;
-          wl_state &= ~(ls_blanked);
-          wl_state &= ~(ls_sb_fw);
-          wl_state &= ~(ls_wb_fw);
+          wl_state &= ~(ls_blanked|ls_sb_fw|ls_wb_fw);
           // -- store token
           wl_tokbuf.push_back(local_token);
           // -- update pointers into buffer
@@ -181,30 +179,24 @@ void wasteLexer::buffer_token(void)
             while(&(*it_tail) != wl_current_tok);
 
             // -- breaks hyphenation
-            wl_state &= ~(ls_hyph);
-            wl_state &= ~(ls_nl);
+            wl_state &= ~(ls_hyph|ls_nl);
 
             // -- now wl_head_tok points to the last text token in buffer
             wl_current_tok = wl_head_tok;
-            wl_state &= ~(ls_blanked);
-            wl_state &= ~(ls_sb_fw);
-            wl_state &= ~(ls_wb_fw);
+            wl_state &= ~(ls_blanked|ls_sb_fw|ls_wb_fw);
             return;
           }
         case wLexerTypeAlphaUpper:
         case wLexerTypeAlphaCaps:
           wl_state |= ls_head;
           // -- breaks hyphenation
-          wl_state &= ~(ls_hyph);
-          wl_state &= ~(ls_nl);
+          wl_state &= ~(ls_hyph|ls_nl);
           // -- set token features according to lexer state and reset
           local_token.wlt_type = lextype;
           local_token.wlt_blanked = (wl_state & ls_blanked) ? true : false;
           local_token.s = (wl_state & ls_sb_fw) ? true : false;
           local_token.w = (wl_state & ls_wb_fw) ? true : false;
-          wl_state &= ~(ls_blanked);
-          wl_state &= ~(ls_sb_fw);
-          wl_state &= ~(ls_wb_fw);
+          wl_state &= ~(ls_blanked|ls_sb_fw|ls_wb_fw);
           // -- store token
           wl_tokbuf.push_back(local_token);
           // -- update pointers into buffer
@@ -213,16 +205,13 @@ void wasteLexer::buffer_token(void)
 
         default:
           // -- breaks hyphenation
-          wl_state &= ~(ls_hyph);
-          wl_state &= ~(ls_nl);
+          wl_state &= ~(ls_hyph|ls_nl);
           // -- set token features according to lexer state and reset
           local_token.wlt_type = lextype;
           local_token.wlt_blanked = (wl_state & ls_blanked) ? true : false;
           local_token.s = (wl_state & ls_sb_fw) ? true : false;
           local_token.w = (wl_state & ls_wb_fw) ? true : false;
-          wl_state &= ~(ls_blanked);
-          wl_state &= ~(ls_sb_fw);
-          wl_state &= ~(ls_wb_fw);
+          wl_state &= ~(ls_blanked|ls_sb_fw|ls_wb_fw);
           // -- store token
           wl_tokbuf.push_back(local_token);
           // -- update pointers into buffer

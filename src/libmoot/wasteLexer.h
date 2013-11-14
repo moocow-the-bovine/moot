@@ -65,6 +65,10 @@ namespace moot
       bool            w;
       //@}
 
+      /*--------------------------------------------------------------------
+       * wasteLexer: Methods
+       */
+      /*------------------------------------------------------------*/
       /** \name Constructors etc. */
       //@{
       /** Default constructor */
@@ -75,6 +79,20 @@ namespace moot
           S(eos),
           w(bow)
     {}
+      //@}
+
+      /** \name Functions */
+      //@{
+
+      /** Set token's extra data */
+      inline void set_wlt_data(wasteLexerType lextype, bool blanked, bool s, bool S, bool w)
+      {
+        this->wlt_type    = lextype;
+        this->wlt_blanked = blanked;
+        this->s           = s;
+        this->S           = S;
+        this->w           = w;
+      }
       //@}
   };
 
