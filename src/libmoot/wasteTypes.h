@@ -1,4 +1,4 @@
-/* -*- Mode: C++ -*- */
+/* -*- Mode: C++; coding: utf-8; c-basic-offset: 2; -*- */
 /*
    libmoot : moocow's part-of-speech tagging library
    Copyright (C) 2013 by Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner
@@ -100,8 +100,46 @@ typedef wasteLexerTypeE wasteLexerType;
 /** Useful for debugging old dwdsScanner types */
 extern const char *wasteLexerTypeNames[NwLexerTypes];
 
+//--------------------------------------------------------------------------
+///\name waste tag attribute access
+//@{
+
+/**< waste tag hidden attribute positions, relative to end-of-tag */
+enum wasteTagAttrPosE {
+  wtap_w = 1, //-- 'w': beginning-of-word
+  wtap_S = 4, //-- 'S': end-of-sentence
+  wtap_s = 7  //-- 's': beginning-of-sentence
+};
+typedef wasteTagAttrPosE wasteTagAttrPos;
+
+/**
+ * Get a boolean WASTE tag attribute by position relative to end-of-string
+ */
+inline bool waste_tag_attr_get(const mootTagString &tagstr, size_t rpos, bool mydefault=false)
+{
+  return tagstr.size() > rpos ? (tagstr[tagstr.size()-rpos]!='0') : mydefault;
+};
+
+/**
+ * Set a boolean WASTE tag attribute position relative to end-of-string
+ */
+inline void waste_tag_attr_set(mootTagString &tagstr, size_t rpos, bool val)
+{
+  tagstr[tagstr.size()-rpos] = (val ? '1' : '0');
+};
+
+//@}
+
+//--------------------------------------------------------------------------
+///\name lexer re2c wrappers, from wasteLexerTypes.cc
+//@{
+
+/** Get waste case-type for tok_text */
 wasteLexerTypeE waste_casetype(const std::string &tok_text);
+
+/** Get waste kexer-type for tok_text */
 wasteLexerTypeE waste_lexertype(const std::string &tok_text);
+//@}
 
 }; /*--/namespace moot --*/
 

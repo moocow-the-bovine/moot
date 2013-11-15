@@ -1,3 +1,4 @@
+//-*- Mode: C++; coding: utf-8; c-basic-offset: 2; -*-
 /*
    moot-utils : moocow's part-of-speech tagger
    Copyright (C) 2013 by Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner <wuerzner@bbaw.de>
@@ -89,7 +90,7 @@ cmdutil_file_churner churner;
 
 //-- stats
 int nfiles = 0;
-int ntokens = 0;
+fint ntokens = 0;
 
 //-- mode bitmask flags
 const int wmNone   = 0;
@@ -248,11 +249,7 @@ void churn_io(TokenReader *reader, TokenWriter *writer=main_writer, mootHMM *hmm
       ntokens += hmm->ntokens;
     }
     else {
-      mootTokenType toktyp;
-      while ( (toktyp=reader->get_token()) != TokTypeEOF ) {
-	writer->put_token( *(reader->token()) );
-	++ntokens;
-      }
+      ntokens += TokenIO::pipe_tokens( reader, writer );
     }
     if (vlevel >= vlInfo)
       writer->printf_comment("$EOF\t%lu 0\tEOF\n", reader->byte_number() );

@@ -83,7 +83,7 @@ static const int tiofWellDone = tiofText|tiofAnalyzed|tiofTagged; //|tiofCost
 /** \brief Abstract class for token I/O */
 class TokenIO {
 public:
-  /*--------------------------------------------------------------------*/
+  //--------------------------------------------------------------------
   ///\name Format String <-> Bitmask Utilities
   //@{
   /**
@@ -135,7 +135,7 @@ public:
   static std::string format_canonical_string(int fmt);
   //@}
 
-  /*--------------------------------------------------------------------*/
+  //--------------------------------------------------------------------
   ///\name Format-Based Reader/Writer Creation
   //@{
   /**
@@ -175,6 +175,22 @@ public:
    * @warning Caller is responsible for deleting the object returned.
    */
   static class TokenWriter *file_writer(const char *filename, const char *fmt_request=NULL, int fmt_implied=tiofNone, int fmt_default=tiofNone);
+  //@}
+
+  //--------------------------------------------------------------------
+  ///\name Token-Stream Pipeline Utilities
+  //@{
+  /**
+   * Pipes tokens from \a reader to \a writer using reader->get_token() and writer->put_token().
+   * \returns number of tokens copied.
+   */
+  static size_t pipe_tokens(class TokenReader *reader, class TokenWriter *writer);
+
+  /**
+   * Pipes sentences from \a reader to \a writer using reader->get_sentence() and writer->put_sentence()
+   * \returns number of sentences copied.
+   */
+  static size_t pipe_sentences(class TokenReader *reader, class TokenWriter *writer);
   //@}
 };
 
@@ -1163,34 +1179,26 @@ public:
   //@{
   /**
    * Write a single token to the currently selected output sink.
-   * Descendants \b must override this method.
+   * Local override just appends \a token to \a tb_buffer
    */
   virtual void put_token(const mootToken &token);
 
   /**
    * Write a single (partial) sentence to the currently selected output sink.
-   * Descendants may override this method.
-   * Default implementation just calls put_token() for every element of sentence.
+   * Local override just appends \a tokens \a tb_buffer
    */
   virtual void put_tokens(const mootSentence &tokens);
 
   /**
    * Write a single sentence to the currently selected output sink.
-   * Descendants may override this method.
-   * Default implementation just calls put_sentence().
+   * Local override appends \a tokens and an EOS-token to \a tb_buffer
    */
-  virtual void put_sentence(const mootSentence &sentence);
+  virtual void put_sentence(const mootSentence &tokens);
   //@}
 
   //------------------------------------------------------------
   /// \name Raw Output
   //@{
-  /**
-   * Write a single comment to the currently selected output sink
-   * Descendants may override this method.
-   */
-  virtual void put_comment_buffer(const char *buf, size_t len);
-
   /**
    * Write some data to the currently selected output sink
    * Descendants may override this method.

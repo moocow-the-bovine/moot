@@ -318,6 +318,34 @@ class TokenWriter *TokenIO::file_writer(const char *filename, const char *reques
   return tw;
 }
 
+//------------------------------------------------------------
+size_t TokenIO::pipe_tokens(class TokenReader *reader, class TokenWriter *writer)
+{
+  size_t ntok = 0;
+  if (!reader) return ntok;
+  if (!writer) throw domain_error("moot::TokenIO::pipe_tokens(): writer must be non-NULL");
+
+  while (reader->get_token() != TokTypeEOF) {
+    writer->put_token( *(reader->token()) );
+    ++ntok;
+  }
+  return ntok;
+}
+
+//------------------------------------------------------------
+size_t TokenIO::pipe_sentences(class TokenReader *reader, class TokenWriter *writer)
+{
+  size_t nsent = 0;
+  if (!reader) return nsent;
+  if (!writer) throw domain_error("moot::TokenIO::pipe_sentences(): writer must be non-NULL");
+
+  while (reader->get_sentence() != TokTypeEOF) {
+    writer->put_sentence( *(reader->sentence()) );
+    ++nsent;
+  }
+  return nsent;
+}
+
 /*==========================================================================
  * TokenReader
  *==========================================================================*/
@@ -664,7 +692,30 @@ mootTokenType TokenBuffer::get_sentence(void)
 }
 
 //--------------------------------------------------------------
-//... TODO: CONTINUE HERE
+void TokenBuffer::put_token(const mootToken &token)
+{
+  tb_buffer.push_back(token);
+}
 
+//--------------------------------------------------------------
+void TokenBuffer::put_tokens(const mootSentence &tokens)
+{
+  tb_buffer.insert(tb_buffer.end(), tokens.begin(), tokens.end());
+}
+
+//--------------------------------------------------------------
+void TokenBuffer::put_sentence(const mootSentence &tokens)
+{
+  tb_buffer.insert(tb_buffer.end(), tokens.begin(), tokens.end());
+  tb_buffer.push_back( mootToken(TokTypeEOS) );
+}
+
+//--------------------------------------------------------------
+void TokenBuffer::put_raw_buffer(const char *buf, size_t len)
+{
+  tb_buffer.push_back( mootToken(tw_is_comment_block ? TokTypeComment : TokTypeVanilla) );
+  mootToken &tok = tb_buffer.back();
+  tok.text(buf,len);
+}
 
 }; /*moot_END_NAMESPACE*/

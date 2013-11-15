@@ -4,7 +4,7 @@
 program "waste"
 #program_version "0.01"
 
-purpose	"Low-level rule-based codec for moot/WASTE HMM tokenizer."
+purpose	"Word- and Sentence-Token Extractor using a Hidden Markov Model"
 author  "Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner <wuerzner@bbaw.de>"
 on_reparse "warn"
 
@@ -14,9 +14,9 @@ on_reparse "warn"
 details "
 waste is the top-level command-line interface to the moot/WASTE HMM tokenizer system.
 It can be used as a complete tokenization pipeline (--full, the default),
-as a standalone scanner (--scan), lexical encoder (--lex), HMM disambiguator (--tag) or lexical decoder (--decode),
-or as (almost) any combination  of the above components.
-Input and output formats depend on the chosen mode of operation; in the default mode,
+a standalone scanner (--scan), a lexical encoder (--lex), HMM disambiguator (--tag) or lexical decoder (--decode),
+or as (almost) any coherent combination  of the above components.
+Input and output formats depend on the chosen mode of operation; in the default (--full) mode,
 it takes as input one or more 'raw' files, and produces a 'medium' output file whose 'best-tag' fields
 are strings of space-separated segment attribute bundles (i.e. probably not interesting unless you are
 trying to debug a WASTE tokenizer model).
@@ -85,11 +85,10 @@ flag "lex"	  x  "Enable lexical classification stage." \
     code="'args_info->lex_flag=1;'" \
     details="
 If lexer stage is enabled, you should also specify --abbrevs, --conjunctions, and/or --stopwords
-as appropriate for your HMM.
+as appropriate for your model.
 "
 flag "no-lex"	  X  "Disable lexical classification stage." \
     code="'args_info->lex_flag=0;'"
-
 
 #-------------------------------------------------------
 flag "tag"        t   "Enable HMM Viterbi tagging stage." \
@@ -109,7 +108,7 @@ flag "no-decode"  D  "Disable post-Viterbi decoding stage." \
 
 #-----------------------------------------------------------------------------
 # lexer options
-group "Lexer-Only Options"
+group "Lexer Options"
 
 string "abbrevs" a  "Load abbreviation lexicon from FILE (1 word/line)" \
     arg="FILE" \
@@ -135,7 +134,7 @@ flag "dehyphenate" y  "Enable automatic dehyphenation in lexer (default)" \
     details="
 Only meaningful if --lex is enabled.
 "
-flag "no-dehyphenate" Y  "Disable automatic dehyphenation in lexer" \
+flag "no-dehyphenate" Y  "Disable automatic dehyphenation in lexer." \
     code="'args_info->dehyphenate_flag=0;'" \
     details="
 Only meaningful if --lex is enabled.
@@ -165,7 +164,7 @@ in a pipeline, e.g.
 # I/O
 group "Format Options"
 
-string "input-format" I "Specify input file format for -no-scan mode" \
+string "input-format" I "Specify input or --scan mode format" \
   arg="FORMAT" \
   details="
 Value should be a comma-separated list of format flag names,
@@ -173,7 +172,12 @@ optionally prefixed with an exclamation point (!) to indicate
 negation.  Only meaningful if the scanner stage has been
 disabled with the -no-scan (-S) option.
 
-Default='Text,Location'
+Default value depends on the B<first> enabled processing module:
+
+ --scan   : 'None'
+ --lex    : 'Text'
+ --tag    : 'Text,Analyzed'
+ --decode : 'Text,Analyzed,Tagged'
 
 See 'I/O Format Flags' in L<mootfiles> for details.
 "
@@ -185,7 +189,12 @@ Value should be a comma-separated list of format flag names,
 optionally prefixed with an exclamation point (!) to indicate
 negation.
 
-Default='MediumRare,Location'
+Default value depends on the B<last> enabled processing module:
+
+ --scan   : 'Text'
+ --lex    : 'Text,Analyzed'
+ --tag    : 'Text,Tagged'
+ --decode : 'Text'
 
 See 'I/O Format Flags' in L<mootfiles> for details.
 "
@@ -197,8 +206,7 @@ addenda "
 
 =head2 Caveats
 
-When writing in XML format, you should first ensure that your input data
-is properly encoded in UTF-8.
+The --scan and --lex modules require that text data is encoded in UTF-8.
 
 "
 
@@ -215,3 +223,4 @@ L<mootfiles>,
 L<moot>,
 L<mootchurn>
 "
+

@@ -40,30 +40,24 @@ moot_BEGIN_NAMESPACE
 /*============================================================================
  * wasteDecoder
  */
-/** \brief   */
+/** \brief waste decoder component converts hidden tag attributes 's','S','w' to sentence- and token-boundaries */
 class wasteDecoder : public TokenWriter
 {
 public:
   //------------------------------------------------------------
   /// \name static methods
   //@{
-  /** get a boolean tag attribute by relative position \a rpos to end-of-tag string */
-  inline static bool tag_attr(const mootTagString &tagstr, size_t rpos, bool mydefault=false)
-  {
-    return tagstr.size() > rpos ? (tagstr[tagstr.size()-rpos]!='0') : mydefault;
-  };
-
   /** get boolean tag attribute 's' (beginning-of-sentence) */
   inline static bool tag_attr_s(const mootTagString &tagstr)
-  { return tag_attr(tagstr,7,false); }
+  { return waste_tag_attr_get(tagstr,wtap_s,false); }
 
   /** get boolean tag attribute 'S' (wnd-of-sentence) */
   inline static bool tag_attr_S(const mootTagString &tagstr)
-  { return tag_attr(tagstr,4,false); }
+  { return waste_tag_attr_get(tagstr,wtap_S,false); }
 
   /** get boolean tag attribute 'w' (beginning-of-word) */
   inline static bool tag_attr_w(const mootTagString &tagstr)
-  { return tag_attr(tagstr,1,true); }
+  { return waste_tag_attr_get(tagstr,wtap_w,true); }
 
 public:
   //------------------------------------------------------------
@@ -94,11 +88,12 @@ public:
   //------------------------------------------------------------
   /// \name TokenWriter API: Output Selection
   //@{
-
   /** Select output to a mootio::mostream pointer; just wraps sink->to_mstream() */
   virtual void to_mstream(mootio::mostream *mostreamp);
 
-  /* Finish output to currently selected sink & perform any required cleanup operations. */
+  /** Finish output to currently selected sink & perform any required cleanup operations.
+   *  wasteDecoder override force-fluses buffer and unsets sink.
+   */
   virtual void close(void);
   //@}
 

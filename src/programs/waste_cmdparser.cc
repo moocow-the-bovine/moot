@@ -72,7 +72,7 @@ cmdline_parser_print_help (void)
   cmdline_parser_print_version ();
   printf("\n");
   printf("Purpose:\n");
-  printf("  Low-level rule-based codec for moot/WASTE HMM tokenizer.\n");
+  printf("  Word- and Sentence-Token Extractor using a Hidden Markov Model\n");
   printf("\n");
   
   printf("Usage: %s [OPTIONS]... FILE(s)\n", "waste");
@@ -108,13 +108,13 @@ cmdline_parser_print_help (void)
   printf("   -jFILE    --conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)\n");
   printf("   -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)\n");
   printf("   -y        --dehyphenate           Enable automatic dehyphenation in lexer (default)\n");
-  printf("   -Y        --no-dehyphenate        Disable automatic dehyphenation in lexer\n");
+  printf("   -Y        --no-dehyphenate        Disable automatic dehyphenation in lexer.\n");
   printf("\n");
   printf(" HMM Options:\n");
   printf("   -MMODEL   --model=MODEL           Use HMM tokenizer model MODEL.\n");
   printf("\n");
   printf(" Format Options:\n");
-  printf("   -IFORMAT  --input-format=FORMAT   Specify input file format for -no-scan mode\n");
+  printf("   -IFORMAT  --input-format=FORMAT   Specify input or --scan mode format\n");
   printf("   -OFORMAT  --output-format=FORMAT  Specify output file format.\n");
 }
 
@@ -515,7 +515,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->dehyphenate_flag=1;
           break;
         
-        case 'Y':	 /* Disable automatic dehyphenation in lexer */
+        case 'Y':	 /* Disable automatic dehyphenation in lexer. */
           if (args_info->no_dehyphenate_given) {
             fprintf(stderr, "%s: `--no-dehyphenate' (`-Y') option given more than once\n", PROGRAM);
           }
@@ -535,7 +535,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->model_arg = gog_strdup(val);
           break;
         
-        case 'I':	 /* Specify input file format for -no-scan mode */
+        case 'I':	 /* Specify input or --scan mode format */
           if (args_info->input_format_given) {
             fprintf(stderr, "%s: `--input-format' (`-I') option given more than once\n", PROGRAM);
           }
@@ -783,7 +783,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->dehyphenate_flag=1;
           }
           
-          /* Disable automatic dehyphenation in lexer */
+          /* Disable automatic dehyphenation in lexer. */
           else if (strcmp(olong, "no-dehyphenate") == 0) {
             if (args_info->no_dehyphenate_given) {
               fprintf(stderr, "%s: `--no-dehyphenate' (`-Y') option given more than once\n", PROGRAM);
@@ -805,7 +805,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->model_arg = gog_strdup(val);
           }
           
-          /* Specify input file format for -no-scan mode */
+          /* Specify input or --scan mode format */
           else if (strcmp(olong, "input-format") == 0) {
             if (args_info->input_format_given) {
               fprintf(stderr, "%s: `--input-format' (`-I') option given more than once\n", PROGRAM);
