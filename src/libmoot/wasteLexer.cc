@@ -117,8 +117,8 @@ void wasteLexer::buffer_token(void)
 {
   wl_state &= ~(ls_flush);
   wasteLexerToken local_token;
-  scanner->get_token();
-  local_token.wlt_token = *(scanner->token ());
+  int stoktype = scanner->get_token();
+  local_token.wlt_token = (stoktype!=TokTypeEOF ? *(scanner->token ()) : mootToken(TokTypeEOF));
   wasteLexerType lextype;
   switch (local_token.wlt_token.tok_type) {
     case TokTypeVanilla:
@@ -270,11 +270,12 @@ mootTokenType wasteLexer::get_token(void)
     buffer_token ();
   }
 
-  while(wl_tokbuf.front().wlt_token.tok_type ==  TokTypeUnknown) // skip unknown tokens
+  while (!wl_tokbuf.empty() && wl_tokbuf.front().wlt_token.tok_type ==  TokTypeUnknown) // skip unknown tokens
   {
     wl_tokbuf.pop_front();
   }
 
+  if (wl_tokbuf.empty()) return TokTypeEOF;
   wl_token = wl_tokbuf.front().wlt_token;
   switch (wl_token.tok_type)
   {

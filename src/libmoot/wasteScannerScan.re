@@ -326,7 +326,7 @@ Any = Any1|Any2|Any3;
         IP                      = IPv4|IPv6;
 
 
-        MAILPART                = ([A-z0-9]|[\._\-])+;
+        MAILPART                = [A-Za-z0-9\._\-]+;
         
         URI1a                   = (MAILPART "@")?([a-z] MAILPART ":" ("/"{1,3}|[a-z0-9%]));
         URI1b                   = ([^ \n\t\r\(\)<>]+|"("([^ \t\n\r\(\)<>]+|("("[^ \n\t\r\(\)<>]+")"))*")")*;
@@ -338,7 +338,7 @@ Any = Any1|Any2|Any3;
         URI1                    = URI1a URI1b URI1c;
         URI2                    = URI2a URI2b;
 
-        LINK                    = ([A-z]+"://")?([A-z0-9]+[\.])+[A-z0-9]{2,6}[/A-z0-9?:~\.]*;
+        LINK                    = ([A-Za-z]+"://")?([A-Za-z0-9]+[\.])+[A-Za-z0-9]{2,6}[/A-Za-z0-9?:~\.]*;
         LINK2                   = IP|URI1|URI2;
 	*/
 

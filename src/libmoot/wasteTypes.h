@@ -33,6 +33,7 @@
 #define _WASTE_TYPES_H
 
 #include <string>
+#include <stdexcept>
 
 namespace moot {
 
@@ -115,7 +116,7 @@ typedef wasteTagAttrPosE wasteTagAttrPos;
 /**
  * Get a boolean WASTE tag attribute by position relative to end-of-string
  */
-inline bool waste_tag_attr_get(const mootTagString &tagstr, size_t rpos, bool mydefault=false)
+inline bool waste_tag_attr_get(const std::string &tagstr, size_t rpos, bool mydefault=false)
 {
   return tagstr.size() > rpos ? (tagstr[tagstr.size()-rpos]!='0') : mydefault;
 };
@@ -123,8 +124,9 @@ inline bool waste_tag_attr_get(const mootTagString &tagstr, size_t rpos, bool my
 /**
  * Set a boolean WASTE tag attribute position relative to end-of-string
  */
-inline void waste_tag_attr_set(mootTagString &tagstr, size_t rpos, bool val)
+inline void waste_tag_attr_set(std::string &tagstr, size_t rpos, bool val)
 {
+  if (tagstr.size() <= rpos) throw std::overflow_error("waste_tag_attr_set(): tag string too short");
   tagstr[tagstr.size()-rpos] = (val ? '1' : '0');
 };
 

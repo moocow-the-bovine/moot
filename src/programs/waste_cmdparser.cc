@@ -94,6 +94,7 @@ cmdline_parser_print_help (void)
   printf("\n");
   printf(" Mode Options:\n");
   printf("   -f        --full                  Alias for --scan --lex --tag --decode (default)\n");
+  printf("             --train                 Training mode (similar to --lex)\n");
   printf("   -s        --scan                  Enable raw text scanning stage.\n");
   printf("   -S        --no-scan               Disable raw text scanning stage.\n");
   printf("   -x        --lex                   Enable lexical classification stage.\n");
@@ -103,7 +104,7 @@ cmdline_parser_print_help (void)
   printf("   -d        --decode                Enable post-Viterbi decoding stage.\n");
   printf("   -D        --no-decode             Disable post-Viterbi decoding stage.\n");
   printf("\n");
-  printf(" Lexer-Only Options:\n");
+  printf(" Lexer Options:\n");
   printf("   -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)\n");
   printf("   -jFILE    --conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)\n");
   printf("   -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)\n");
@@ -145,6 +146,7 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->recover_flag = 0; 
   args_info->output_arg = gog_strdup("-"); 
   args_info->full_flag = 0; 
+  args_info->train_flag = 0; 
   args_info->scan_flag = 0; 
   args_info->no_scan_flag = 0; 
   args_info->lex_flag = 0; 
@@ -179,6 +181,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->recover_given = 0;
   args_info->output_given = 0;
   args_info->full_given = 0;
+  args_info->train_given = 0;
   args_info->scan_given = 0;
   args_info->no_scan_given = 0;
   args_info->lex_given = 0;
@@ -220,6 +223,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "recover", 0, NULL, 'r' },
 	{ "output", 1, NULL, 'o' },
 	{ "full", 0, NULL, 'f' },
+	{ "train", 0, NULL, 0 },
 	{ "scan", 0, NULL, 's' },
 	{ "no-scan", 0, NULL, 'S' },
 	{ "lex", 0, NULL, 'x' },
@@ -643,6 +647,16 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
              args_info->full_flag = !(args_info->full_flag);
             /* user code */
             args_info->full_flag = args_info->scan_flag = args_info->lex_flag = args_info->tag_flag = args_info->decode_flag = 1;
+          }
+          
+          /* Training mode (similar to --lex) */
+          else if (strcmp(olong, "train") == 0) {
+            if (args_info->train_given) {
+              fprintf(stderr, "%s: `--train' option given more than once\n", PROGRAM);
+            }
+            args_info->train_given++;
+           if (args_info->train_given <= 1)
+             args_info->train_flag = !(args_info->train_flag);
           }
           
           /* Enable raw text scanning stage. */

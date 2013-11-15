@@ -303,7 +303,7 @@ namespace moot
       void set_token(mootToken &token, wasteLexerToken &lex_token);
 
       /**
-       * MOves the next token(s) from internal scanner to internal buffer.
+       * Mpves the next token(s) from internal scanner to internal buffer.
        * If wl_dehyph_mode is true, seeks and removes hyphenations.
        */
       void buffer_token(void);

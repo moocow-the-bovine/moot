@@ -44,6 +44,7 @@
 #include <wasteScanner.h>
 #include <wasteLexer.h>
 #include <wasteDecoder.h>
+#include <wasteTrainWriter.h>
 
 #include <mootUtils.h>
 #include <mootCIO.h>
@@ -72,6 +73,7 @@ wasteTokenScanner *scanner=NULL;
 wasteLexer   *lexer=NULL;
 mootHMM      *tagger=NULL;
 wasteDecoder *decoder=NULL;
+wasteTrainWriter *trainwriter=NULL;
 
 //-- Token I/O: reader; see GetMyOptions() for mode-dependent hacks
 int ifmt = tiofNone;
@@ -90,7 +92,7 @@ cmdutil_file_churner churner;
 
 //-- stats
 int nfiles = 0;
-fint ntokens = 0;
+int ntokens = 0;
 
 //-- mode bitmask flags
 const int wmNone   = 0;
@@ -98,6 +100,7 @@ const int wmScan   = 0x01;
 const int wmLex    = 0x02;
 const int wmTag    = 0x04;
 const int wmDecode = 0x08;
+const int wmTrain  = 0x10;
 
 const int wmFull = wmScan|wmLex|wmTag|wmDecode;
 int mode = wmNone;
@@ -122,10 +125,12 @@ inline int modeFirst(int m) {
   else if (m&wmLex)  return wmLex;
   else if (m&wmTag)  return wmTag;
   else if (m&wmDecode) return wmDecode;
+  else if (m&wmTrain) return wmTrain;
   return wmNone;
 }
 inline int modeLast(int m) {
-  if      (m&wmDecode) return wmDecode;
+  if      (m&wmTrain) return wmTrain;
+  else if (m&wmDecode) return wmDecode;
   else if (m&wmTag)  return wmTag;
   else if (m&wmLex)  return wmLex;
   else if (m&wmScan) return wmScan;
@@ -137,6 +142,7 @@ inline std::string modeString(int m) {
   if (m&wmLex) s += "Lex,";
   if (m&wmTag) s += "Tag,";
   if (m&wmDecode) s += "Decode,";
+  if (m&wmTrain) s += "Train,";
   if (s.empty()) { s = "None"; }
   else { s.erase(s.size()-1); }
   return s;
@@ -155,19 +161,23 @@ void GetMyOptions(int argc, char **argv)
   vlevel = args.verbose_arg;
 
   //-- operation mode
-  if ( !args.full_given && !args.scan_given && !args.lex_given && !args.tag_given && !args.decode_given ) {
+  if ( !args.train_given && !args.full_given && !args.scan_given && !args.lex_given && !args.tag_given && !args.decode_given ) {
     args.full_flag = args.scan_flag = args.lex_flag = args.tag_flag = args.decode_flag = 1;
   }
   modeSet(mode, wmScan, args.scan_flag);
   modeSet(mode, wmLex,  args.lex_flag);
   modeSet(mode, wmTag,  args.tag_flag);
   modeSet(mode, wmDecode, args.decode_flag);
+  modeSet(mode, wmTrain,  args.train_flag);
   modestr = modeString(mode);
   //fprintf(stderr, "%s: DEBUG: mode=%s\n", PROGNAME, modestr.c_str());
 
   //-- sanity check(s)
   if ( mode==wmNone ) {
-    moot_croak("%s: ERROR: you must enable at least one of --scan, --lex, --tag, or --decode\n", PROGNAME);
+    moot_croak("%s: ERROR: you must enable at least one of --scan, --lex, --tag, --decode, or --train\n", PROGNAME);
+  }
+  else if ( (mode&wmTrain) && (mode&(~wmTrain)) ) {
+    moot_croak("%s: ERROR: cannot combine --train with any other operation mode\n", PROGNAME);
   }
   else if ( (mode&wmScan) && !(mode&wmLex) && (mode&(wmTag|wmDecode)) )  {
     moot_croak("%s: ERROR: cannot combine --scan and --decode/--tag without --lex\n", PROGNAME);
@@ -200,12 +210,14 @@ void GetMyOptions(int argc, char **argv)
   case wmLex:		ifmt_implied |= tiofText; break;
   case wmTag:		ifmt_implied |= tiofText|tiofAnalyzed; break;
   case wmDecode:	ifmt_implied |= tiofText|tiofTagged|tiofAnalyzed; break;
+  case wmTrain:		ifmt_implied |= tiofText; break;
   default: break;
   }
 
   //-- i/o formats: mode-dependent hacks: output
   switch (modeLast(mode)) {
-  case wmDecode:	ofmt_default |= tiofTagged; break;
+  case wmTrain:		ofmt_implied |= tiofText|tiofTagged|tiofAnalyzed; break;
+  case wmDecode:	ofmt_implied |= tiofTagged; break;
   case wmTag:		ofmt_implied |= tiofTagged; break;
   case wmLex:		ofmt_implied |= tiofAnalyzed; break;
   case wmScan:		break;
@@ -259,12 +271,8 @@ void churn_io(TokenReader *reader, TokenWriter *writer=main_writer, mootHMM *hmm
 /*--------------------------------------------------------------------------
  * guts: scanner/lexer: setup lexer
  */
-wasteLexer *get_lexer(int lexfmt=tiofUnknown, TokenReader *reader=NULL)
+void setup_lexer(wasteLexer *lexer, TokenReader *reader=NULL)
 {
-  wasteLexer *lexer = new wasteLexer(lexfmt);
-
-  lexer->dehyph_mode(args.dehyphenate_flag > 0);
-
   if (args.abbrevs_given && !lexer->wl_abbrevs.load(args.abbrevs_arg))
     moot_croak("%s: ERROR: can't load abbreviation lexicon from '%s': %s\n", PROGNAME, args.abbrevs_arg, strerror(errno));
 
@@ -276,7 +284,14 @@ wasteLexer *get_lexer(int lexfmt=tiofUnknown, TokenReader *reader=NULL)
 
   if (reader)
     lexer->from_reader(reader);
+}
 
+//--------------------------------------------------------------------------
+wasteLexer *get_lexer(int lexfmt=tiofUnknown, TokenReader *reader=NULL)
+{
+  wasteLexer *lexer = new wasteLexer(lexfmt);
+  lexer->dehyph_mode(args.dehyphenate_flag > 0);
+  setup_lexer(lexer,reader);
   return lexer;
 }
 
@@ -312,11 +327,18 @@ int main (int argc, char **argv)
     decoder->to_writer(churn_writer);
     churn_writer = decoder;
   }
+  if (mode&wmTrain) {
+    trainwriter = new wasteTrainWriter( ofmt );
+    setup_lexer( &trainwriter->wt_lexer, churn_reader );
+    trainwriter->to_writer(churn_writer);
+    churn_writer = trainwriter;
+  }
 
   //-- churn
   churn_io(churn_reader, churn_writer, tagger);
 
   //-- cleanup
+  if (trainwriter) delete trainwriter;
   if (decoder) delete decoder;
   if (tagger)  delete tagger;
   if (lexer)   delete lexer;

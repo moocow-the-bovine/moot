@@ -73,6 +73,16 @@ group "Mode Options"
 #-------------------------------------------------------
 flag "full"       f  "Alias for --scan --lex --tag --decode (default)" \
     code="'args_info->full_flag = args_info->scan_flag = args_info->lex_flag = args_info->tag_flag = args_info->decode_flag = 1;'"
+flag "train"      -  "Training mode (similar to --lex)" \
+    details="
+Runs the WASTE scanner and lexer on pre-tokenized input,
+which must contain token text, with leading whitespace where appropriate.
+embedded special characters can be escaped with backslashes
+(e.g. C<\n>, C<\r>, C<\t>, C<\f>, C<\v>, C<\\>, and C<\\ >),
+and any input tokens are truncated at a C< $= > substring.
+Output is 'well-done', suitable for passing to L<mootrain>.
+"
+
 
 #-------------------------------------------------------
 flag "scan"	  s  "Enable raw text scanning stage." \
@@ -178,6 +188,7 @@ Default value depends on the B<first> enabled processing module:
  --lex    : 'Text'
  --tag    : 'Text,Analyzed'
  --decode : 'Text,Analyzed,Tagged'
+ --recode : 'Text'
 
 See 'I/O Format Flags' in L<mootfiles> for details.
 "
@@ -195,6 +206,7 @@ Default value depends on the B<last> enabled processing module:
  --lex    : 'Text,Analyzed'
  --tag    : 'Text,Tagged'
  --decode : 'Text'
+ --recode : 'Text,Analyzed,Tagged'
 
 See 'I/O Format Flags' in L<mootfiles> for details.
 "

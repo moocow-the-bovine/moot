@@ -26,6 +26,7 @@ struct gengetopt_args_info {
   int recover_flag;	 /* Attempt to recover from minor errors. (default=0). */
   char * output_arg;	 /* Write output to FILE. (default=-). */
   int full_flag;	 /* Alias for --scan --lex --tag --decode (default) (default=0). */
+  int train_flag;	 /* Training mode (similar to --lex) (default=0). */
   int scan_flag;	 /* Enable raw text scanning stage. (default=0). */
   int no_scan_flag;	 /* Disable raw text scanning stage. (default=0). */
   int lex_flag;	 /* Enable lexical classification stage. (default=0). */
@@ -52,6 +53,7 @@ struct gengetopt_args_info {
   int recover_given;	 /* Whether recover was given */
   int output_given;	 /* Whether output was given */
   int full_given;	 /* Whether full was given */
+  int train_given;	 /* Whether train was given */
   int scan_given;	 /* Whether scan was given */
   int no_scan_given;	 /* Whether no-scan was given */
   int lex_given;	 /* Whether lex was given */
