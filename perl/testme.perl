@@ -537,7 +537,90 @@ sub test_waste_decoder_buf {
 
   print STDERR "$0: test_waste_decoder() done\n"; exit 0;
 }
-test_waste_decoder_buf(@ARGV);
+#test_waste_decoder_buf(@ARGV);
+
+##--------------------------------------------------------------
+sub rtt_unescape {
+  my $s = shift;
+  return $s if (!defined($s));
+  $s =~ s/\\ / /g;
+  $s =~ s/\\r/\r/g;
+  $s =~ s/\\n/\n/g;
+  $s =~ s/\\t/\t/g;
+  $s =~ s/\\v/\x{0b}/g;
+  $s =~ s/\\f/\f/g;
+  return $s;
+}
+
+sub test_rttz_train {
+  my $file = shift || 'wtrain.rttz';
+
+  my $reader  = Moot::TokenReader::Native->new( Moot::tiofText() );
+  $reader->from_file($file);
+
+  my $scanner = Moot::Waste::Scanner->new( Moot::tiofText() );
+
+  my $lexer   = Moot::Waste::Lexer ->new( $scanner->format()|Moot::tiofAnalyzed() );
+  $lexer->dehyphenate(0);
+  $lexer->stopwords->from_array([qw(a an the der die das)]);
+  $lexer->scanner($scanner);
+
+  my $writer  = Moot::TokenWriter::Native->new( Moot::tiofWellDone() );
+  $writer->to_fh(\*STDOUT);
+
+  my $at_eos = 1;
+  my ($tok,$text, $ptok,@psegs);
+  my $cbuf = "\n";
+
+  my $flush_psegs = sub {
+    $writer->put_tokens(\@psegs) if (@psegs);
+    $ptok = undef;
+    @psegs = qw();
+  };
+
+  while (defined($tok=$reader->get_token())) {
+    if ($tok->{type} == $Moot::TokType{eos}) {
+      #-- eos: save it
+      $at_eos = 1;
+      if ($ptok) {
+	$ptok->{tag} =~ s/,S0,/,S1,/;
+	$flush_psegs->();
+      }
+      $writer->put_comment("!EOS");
+      next;
+    }
+    elsif ($tok->{type} == $Moot::TokType{comment} && $tok->{text} =~ /^\$c=(.*)/) {
+      ##-- comment: rtt-style raw character data: save it
+      $cbuf .= rtt_unescape($1);
+      push(@psegs,$tok);
+    }
+    elsif ($tok->{type} != $Moot::TokType{vanilla}) {
+      ##-- non-vanilla: pass through
+      push(@psegs,$tok);
+      next;
+    }
+    else {
+      ##-- vanilla token: scan into segments
+      $flush_psegs->();
+      $text = ($cbuf//'').rtt_unescape( $tok->{text} );
+      $tok->{text} =~ s/ \$= .*$//; ##-- rttz unescap-ing
+      $cbuf = '';
+      $scanner->from_string($text);
+      $is_bow = 1;
+      while (defined($_=$lexer->get_token)) {
+	($_->{tag} = $_->{text}) =~ s/:[^:]+$//;
+	$_->{tag} .= ",s".($at_eos ? 1 : 0).",S0,w${is_bow}";
+	push(@psegs,$_);
+	$is_bow = $at_eos = 0;
+      }
+      $ptok = $psegs[$#psegs] if (@psegs);
+    }
+  }
+  $flush_psegs->();
+
+  print STDERR "%% $0: test_rttz_train(): done\n";
+}
+test_rttz_train(@ARGV);
 
 ##--------------------------------------------------------------
 ## MAIN
