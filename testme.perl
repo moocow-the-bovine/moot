@@ -603,7 +603,7 @@ sub test_rttz_train {
       ##-- vanilla token: scan into segments
       $flush_psegs->();
       $text = ($cbuf//'').rtt_unescape( $tok->{text} );
-      $tok->{text} =~ s/ \$= .*$//; ##-- rttz unescap-ing
+      $tok->{text} =~ s/ \$= .*$//; ##-- rttz unescape-ing
       $cbuf = '';
       $scanner->from_string($text);
       $is_bow = 1;
