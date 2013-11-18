@@ -409,7 +409,7 @@ strangeness.
 =head1 ACKNOWLEDGEMENTS
 
 
-Development of this package was supported by the project
+Initial development of the this was supported by the project
 'Kollokationen im WE<ouml>rterbuch'
 ( "collocations in the dictionary", http://www.bbaw.de/forschung/kollokationen )
 in association with the project
@@ -420,21 +420,25 @@ with funding from
 the Alexander von Humboldt Stiftung ( http://www.avh.de )
 and from the Zukunftsinvestitionsprogramm of the
 German federal government.
+Development of the DynHMM and WASTE extensions was
+supported by the DFG-funded projects
+'Deutsches Textarchiv' ( "German text archive", http://www.deutschestextarchiv.de )
+and 'DLEX'
+at the Berlin-Brandenburgische Akademie der Wissenschaften.
 
-I am grateful to Christiane Fellbaum, Alexander Geyken,
+The authors are grateful to Christiane Fellbaum, Alexander Geyken,
 Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
 for offering useful insights in the course of development
 of this package.
-
 Thomas Hanneforth wrote and maintains the libFSM C++ library
 for finite-state device operations used by the
 class-based HMM tagger / disambiguator, without which
-this package could not have been built.
-
+moot could not have been built.
 Alexander Geyken and Thomas Hanneforth developed the
 rule-based morphological analysis system for German
 which was used in the development and testing of the
 class-based HMM tagger / disambiguator.
+
 
 
 =head1 AUTHOR

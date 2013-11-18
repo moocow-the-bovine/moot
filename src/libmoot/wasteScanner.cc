@@ -94,7 +94,7 @@ bool wasteScanner::fill( size_t n )
     yylimit = yybuffer + restSize;
   }
 
-  // fill the buffer
+  //-- fill the buffer
   size_t read_size = buffer_size - restSize;
   yylimit += mglin->read ( yylimit, read_size-1 );
   if ( mglin->eof() ) {

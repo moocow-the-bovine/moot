@@ -399,7 +399,7 @@ Any = Any1|Any2|Any3;
 
 	/*!re2c
 	[\x00]     		 { return wScanTypeEOF; /*-- EOF simulation with NUL-byte --*/}
-	"%%"[^%\n]+"%%"          { add_columns( yyleng() ); return wScanTypeComment; }
+	"%%"[^%\r\n]*"%%"        { add_columns( yyleng() ); return wScanTypeComment; }
 
 	"$WB$"                   { add_columns( yyleng() ); return wScanTypeWB; }
 	"$SB$"                   { add_columns( yyleng() ); return wScanTypeSB; }
