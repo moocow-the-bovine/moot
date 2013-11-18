@@ -110,6 +110,11 @@ void wasteTrainWriter::put_token(const mootToken &token)
     }
     break;
 
+  case TokTypeSB:
+  case TokTypeWB:
+    wt_txtbuf.append(token.text());
+    break;
+   
   case TokTypeComment:
     //-- comment: check for rtt-style raw character data
     if (token.text().substr(0,3) == "$c=") {
