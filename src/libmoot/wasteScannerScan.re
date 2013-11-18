@@ -367,7 +367,7 @@ Any = Any1|Any2|Any3;
 	URI_QUERY		= ( URI_PATH_CHAR | [/?] )* ;
 	URI_FRAGMENT		= ( URI_PATH_CHAR | [/?] )* ;
 
-	URI			=  URI_SCHEME ":" "//" URI_AUTHORITY URI_PATH ("?" URI_QUERY)?  ("#" URI_FRAGMENT)? ;
+	URI			=  (URI_SCHEME ":" "//")? URI_AUTHORITY URI_PATH ("?" URI_QUERY)?  ("#" URI_FRAGMENT)? ;
 	*/
 
         //-- old link rules (pre-2013-11-18; ultimate target: LINK2) -- ought to work again with NUL sentinel
