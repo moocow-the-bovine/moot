@@ -59,7 +59,7 @@ wasteScanner::~wasteScanner()
 bool wasteScanner::fill( size_t n )
 {
   if ( !mglin || mglin->eof() ) {
-    return  (yycursor >= yylimit) ? false : true;
+    return  (yycursor >= yylimit) ? false : true; //-- moo: beware of (yytoken < yycursor) -- require NUL EOF sentinel!
   }
 
   ptrdiff_t restSize = yylimit - yytoken;

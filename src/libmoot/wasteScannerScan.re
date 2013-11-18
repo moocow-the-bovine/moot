@@ -319,32 +319,82 @@ Any = Any1|Any2|Any3;
 	ALPHA                  = (Lu | Ll | Lt | Lo) ( Lm | Mn )*;
 	*/
 
-	//-- LINKS
+	//-- LINKS / URIs; cf http://tools.ietf.org/html/rfc3986
 	/*!re2c
-        IPv6                    = ((([0-9A-Fa-f]{1,4}":"){7}([0-9A-Fa-f]{1,4}|":"))|(([0-9A-Fa-f]{1,4}":"){6}(":"[0-9A-Fa-f]{1,4}|(([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])([\.]([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])){3})|":"))|(([0-9A-Fa-f]{1,4}":"){5}(((":"[0-9A-Fa-f]{1,4}){1,2})|":"(([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])([\.]([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])){3})|":"))|(([0-9A-Fa-f]{1,4}":"){4}(((":"[0-9A-Fa-f]{1,4}){1,3})|((":"[0-9A-Fa-f]{1,4})?":"(([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])([\.]([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])){3}))|":"))|(([0-9A-Fa-f]{1,4}":"){3}(((":"[0-9A-Fa-f]{1,4}){1,4})|((":"[0-9A-Fa-f]{1,4}){0,2}":"(([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])([\.]([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])){3}))|":"))|(([0-9A-Fa-f]{1,4}":"){2}(((":"[0-9A-Fa-f]{1,4}){1,5})|((":"[0-9A-Fa-f]{1,4}){0,3}":"(([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])([\.]([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])){3}))|":"))|(([0-9A-Fa-f]{1,4}":"){1}(((":"[0-9A-Fa-f]{1,4}){1,6})|((":"[0-9A-Fa-f]{1,4}){0,4}":"(([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])([\.]([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])){3}))|":"))|(":"(((":"[0-9A-Fa-f]{1,4}){1,7})|((":"[0-9A-Fa-f]{1,4}){0,5}":"(([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])([\.]([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9])){3}))|":")))([%][.]+)?;
+	XDIGIT			= [0-9A-Fa-f];
+	DBYTE                   = ([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9]);
+
+        IPv6                    = (((XDIGIT{1,4}":"){7}(XDIGIT{1,4}|":"))|((XDIGIT{1,4}":"){6}(":"XDIGIT{1,4}|(DBYTE([\.]DBYTE){3})|":"))|((XDIGIT{1,4}":"){5}(((":"XDIGIT{1,4}){1,2})|":"(DBYTE([\.]DBYTE){3})|":"))|((XDIGIT{1,4}":"){4}(((":"XDIGIT{1,4}){1,3})|((":"XDIGIT{1,4})?":"(DBYTE([\.]DBYTE){3}))|":"))|((XDIGIT{1,4}":"){3}(((":"XDIGIT{1,4}){1,4})|((":"XDIGIT{1,4}){0,2}":"(DBYTE([\.]DBYTE){3}))|":"))|((XDIGIT{1,4}":"){2}(((":"XDIGIT{1,4}){1,5})|((":"XDIGIT{1,4}){0,3}":"(DBYTE([\.]DBYTE){3}))|":"))|((XDIGIT{1,4}":"){1}(((":"XDIGIT{1,4}){1,6})|((":"XDIGIT{1,4}){0,4}":"(DBYTE([\.]DBYTE){3}))|":"))|(":"(((":"XDIGIT{1,4}){1,7})|((":"XDIGIT{1,4}){0,5}":"(DBYTE([\.]DBYTE){3}))|":")))([%][.]+)?;
         IPv4                    = ((([0]?[1-9]|"00")?[0-9]|"1"[0-9][0-9]|"2"[0-4][0-9]|"25"[0-5])"."){3}(([0]?[1-9]|"00")?[0-9]|"1"[0-9][0-9]|"2"[0-4][0-9]|"25"[0-5]);
         IP                      = IPv4|IPv6;
 
+	URI_ESCAPE 		= "%" XDIGIT{2} ;
 
+	URI_GEN_DELIMS		= [:/?#\[\]@] ;
+	URI_SUB_DELIMS		= [!&'\(\)\*\+,;=\$] ;
+	URI_RESERVED		= URI_GEN_DELIMS | URI_SUB_DELIMS ;
+	URI_FREE		= [A-Za-z0-9\.\_\-~] ;
+	URI_SUBFREE		= URI_FREE | URI_ESCAPE | URI_SUB_DELIMS ;
+
+	URI_SCHEME		= [A-Za-z][A-Za-z0-9\+\-\.]* ;
+
+	URI_IP_FUTURE		= "v" (XDIGIT)+ "." ( URI_FREE | URI_SUB_DELIMS | ":" )+ ;
+	URI_IP_LITERAL		= "[" (IPv6 | URI_IP_FUTURE) "]" ;
+	URI_HOSTNAME            = ( URI_SUBFREE )+ ;
+	URI_PORT		= [0-9]* ;
+	URI_HOST        	= URI_IP_LITERAL | IPv4 | URI_HOSTNAME ;
+	URI_USERINFO		= ( URI_SUBFREE | ":" )* ;
+	URI_AUTHORITY           = (URI_USERINFO "@")? URI_HOST (":" URI_PORT)? ;
+
+	URI_PATH_CHAR__rfc3986	= ( URI_SUBFREE | [:@] );
+	URI_PATH_CHAR__link	= ( URI_SUBFREE | [:@%<>{}\[\]`|] );
+	URI_PATH_CHAR		= URI_PATH_CHAR__link ;
+
+	URI_SEGMENT		= URI_PATH_CHAR* ;
+	URI_SEGMENT_NZ		= URI_PATH_CHAR+ ;
+	URI_SEGMENT_NZ_NC	= ( URI_SUBFREE | [@] )+ ;
+
+	URI_PATH_ABEMPTY	= ("/" URI_SEGMENT)* ;
+	URI_PATH_ABSOLUTE	= "/" (URI_SEGMENT_NZ ("/" URI_SEGMENT)*)? ;
+	URI_PATH_NOSCHEME	= URI_SEGMENT_NZ_NC ( "/" URI_SEGMENT )* ;
+	URI_PATH_ROOTLESS       = URI_SEGMENT_NZ ( "/" URI_SEGMENT )* ;
+	URI_PATH_EMPTY		= "" ;
+
+	URI_PATH__rfc3986	= URI_PATH_ABEMPTY | URI_PATH_ABSOLUTE | URI_PATH_NOSCHEME | URI_PATH_ROOTLESS | URI_PATH_EMPTY ;
+	URI_PATH__link		= URI_PATH_ABEMPTY | URI_PATH_ABSOLUTE ;
+	URI_PATH		= URI_PATH__link ;
+
+	URI_QUERY		= ( URI_PATH_CHAR | [/?] )* ;
+	URI_FRAGMENT		= ( URI_PATH_CHAR | [/?] )* ;
+
+	URI			=  URI_SCHEME ":" "//" URI_AUTHORITY URI_PATH ("?" URI_QUERY)?  ("#" URI_FRAGMENT)? ;
+	*/
+
+        //-- old link rules (pre-2013-11-18; ultimate target: LINK2) -- ought to work again with NUL sentinel
+        /*!re2c
         MAILPART                = [A-Za-z0-9\._\-]+;
-        
         URI1a                   = (MAILPART "@")?([a-z] MAILPART ":" ("/"{1,3}|[a-z0-9%]));
-        URI1b                   = ([^ \n\t\r\(\)<>]+|"("([^ \t\n\r\(\)<>]+|("("[^ \n\t\r\(\)<>]+")"))*")")*;
-        URI1c                   = ("("([^ \t\n\r\(\)<>]+|("("[^ \n\t\r\(\)<>]+")"))*")"|[^ \n\t\r`!\(\)\[\]{};:'\"\.,<>?«»“”‘’]);
+        URI1b                   = ([^ \x00\n\t\r\(\)<>]+|"("([^ \x00\t\n\r\(\)<>]+|("("[^ \x00\n\t\r\(\)<>]+")"))*")")*;
+        URI1c                   = ("("([^ \x00\t\n\r\(\)<>]+|("("[^ \x00\n\t\r\(\)<>]+")"))*")"|[^ \x00\n\t\r`!\(\)\[\]{};:'\"\.,<>?«»“”‘’]);
 
-        URI2a                   = (MAILPART "@")?[a-z0-9\.\-]+[\.][a-z]{2,6};
-        URI2b                   = ([^ \t\n\r\(\)<>]*[^ \n\t\r`!\(\)\[\]{};:'\"\.,<>?«»“”‘’]|"("([^ \t\n\r\(\)<>]+|("("[^ \n\t\r\(\)<>]+")"))*")")*;
+        URI2a                   = (MAILPART "@")?[a-z0-9\.\-]+[\.][a-zA-z]{2,6};
+        URI2b                   = ([^ \x00\t\n\r\(\)<>]*[^ \x00\n\t\r`!\(\)\[\]{};:'\"\.,<>?«»“”‘’]|"("([^ \x00\t\n\r\(\)<>]+|("("[^ \x00\n\t\r\(\)<>]+")"))*")")*;
         
         URI1                    = URI1a URI1b URI1c;
         URI2                    = URI2a URI2b;
 
-        LINK                    = ([A-Za-z]+"://")?([A-Za-z0-9]+[\.])+[A-Za-z0-9]{2,6}[/A-Za-z0-9?:~\.]*;
+        LINK1                   = ([A-Za-z]+"://")?([A-Za-z0-9]+[\.])+[A-Za-z0-9]{2,6}[/A-Za-z0-9?:~\.]*;
         LINK2                   = IP|URI1|URI2;
-	*/
+	 */
 
 	//-- XML
 	/*NOT_re2c
 	XML                     = "<"[/]?[a-zA-Z_\.?][^<>\n]*">";
+	*/
+
+	//-- links
+	/*NOT_re2c
+        LINK2                    { add_columns( yyleng() ); return wScanTypeLink; }
 	*/
 
 	/*!re2c
@@ -354,7 +404,7 @@ Any = Any1|Any2|Any3;
 	"$WB$"                   { add_columns( yyleng() ); return wScanTypeWB; }
 	"$SB$"                   { add_columns( yyleng() ); return wScanTypeSB; }
 
-        LINK2                    { add_columns( yyleng() ); return wScanTypeLink; }
+	URI                      { add_columns( yyleng() ); return wScanTypeLink; }
 
 	ROMAN                    { add_columns( yyleng() ); return wScanTypeRoman; }
 

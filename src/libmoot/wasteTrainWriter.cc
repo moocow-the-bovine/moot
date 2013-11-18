@@ -26,36 +26,36 @@ moot_BEGIN_NAMESPACE
 // wasteTrainWriter
 
 //----------------------------------------------------------------------
-void wasteTrainWriter::rtt_unescape( const std::string &s, std::string &os )
+void wasteTrainWriter::rtt_unescape(std::string &s)
 {
-  os.clear();
-  for (std::string::const_iterator si=s.begin(); si != s.end(); ++si) {
+  std::string::iterator si=s.begin(), oi=si;
+  for ( ; si != s.end(); ++si,++oi) {
     if ( *si=='\\' && (si+1) < s.end() ) {
       //-- rtt-style backslash escapes
       ++si;
       switch (*si) {
-      case 'n': os.push_back('\n'); break;
-      case 'r': os.push_back('\r'); break;
-      case 't': os.push_back('\t'); break;
-      case 'f': os.push_back('\f'); break;
-      case 'v': os.push_back('\v'); break;
-      case ' ': os.push_back(' '); break;
-      case '\\': os.push_back('\\'); break;
-      default:
-	os.push_back('\\');
-	os.push_back(*si);
+      case 'n': *oi = '\n'; break;
+      case 'r': *oi = '\r'; break;
+      case 't': *oi = '\t'; break;
+      case 'f': *oi = '\f'; break;
+      case 'v': *oi = '\v'; break;
+      case ' ': *oi = ' '; break;
+      case '\\': *oi = '\\'; break;
+      default: 
+	*oi++ = '\\';
+	*oi   = *si;
 	break;
       }
+      continue;
     }
     else if ( *si==' ' && (si+2) < s.end() && *(si+1)=='$' && *(si+2)=='=' ) {
       //-- rttz-style "RAW $= TOK" : return just 'raw' part
-      return;
+      break;
     }
-    else {
-      //-- usual case: just copy
-      os.push_back( *si );
-    }
+    //-- usual case: just copy
+    *oi = *si;
   }
+  s.erase(oi, s.end());
 }
 
 //----------------------------------------------------------------------
@@ -64,7 +64,6 @@ wasteTrainWriter::wasteTrainWriter(int fmt, const std::string &myname)
     wt_writer(NULL),
     wt_pseg(NULL),
     wt_txtbuf("\\n"),
-    wt_rawbuf(""),
     wt_at_eos(true)
 {
   wt_lexer.dehyph_mode(false);
@@ -90,7 +89,6 @@ void wasteTrainWriter::close(void)
   wt_writer = NULL;
   wt_pseg   = NULL;
   wt_txtbuf = "\\n";
-  wt_rawbuf.clear();
   wt_at_eos = true;
   wt_lexer.from_reader( &wt_scanner );
 }
@@ -127,8 +125,9 @@ void wasteTrainWriter::put_token(const mootToken &token)
     //-- vanilla token: scan into segments
     flush_buffer(false);
     wt_txtbuf.append( token.text() );
-    rtt_unescape( wt_txtbuf, wt_rawbuf );
-    wt_scanner.from_buffer( wt_rawbuf.data(), wt_rawbuf.size() );
+    wt_txtbuf.push_back('\0');
+    rtt_unescape( wt_txtbuf );
+    wt_scanner.from_buffer( wt_txtbuf.data(), wt_txtbuf.size() );
     while ((toktyp=wt_lexer.get_token()) != TokTypeEOF) {
       mootToken *ltok = wt_lexer.token();
       if ( !ltok->analyses().empty() ) {
@@ -143,7 +142,6 @@ void wasteTrainWriter::put_token(const mootToken &token)
     }
     //-- cleanup
     wt_txtbuf.clear();
-    wt_rawbuf.clear();
     break;
   }
 }

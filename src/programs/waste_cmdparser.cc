@@ -94,7 +94,7 @@ cmdline_parser_print_help (void)
   printf("\n");
   printf(" Mode Options:\n");
   printf("   -f        --full                  Alias for --scan --lex --tag --decode (default)\n");
-  printf("             --train                 Training mode (similar to --lex)\n");
+  printf("   -R        --train                 Training mode (similar to --lex)\n");
   printf("   -s        --scan                  Enable raw text scanning stage.\n");
   printf("   -S        --no-scan               Disable raw text scanning stage.\n");
   printf("   -x        --lex                   Enable lexical classification stage.\n");
@@ -223,7 +223,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "recover", 0, NULL, 'r' },
 	{ "output", 1, NULL, 'o' },
 	{ "full", 0, NULL, 'f' },
-	{ "train", 0, NULL, 0 },
+	{ "train", 0, NULL, 'R' },
 	{ "scan", 0, NULL, 's' },
 	{ "no-scan", 0, NULL, 'S' },
 	{ "lex", 0, NULL, 'x' },
@@ -252,6 +252,7 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'r',
 	'o', ':',
 	'f',
+	'R',
 	's',
 	'S',
 	'x',
@@ -391,6 +392,15 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
            args_info->full_flag = !(args_info->full_flag);
           /* user code */
           args_info->full_flag = args_info->scan_flag = args_info->lex_flag = args_info->tag_flag = args_info->decode_flag = 1;
+          break;
+        
+        case 'R':	 /* Training mode (similar to --lex) */
+          if (args_info->train_given) {
+            fprintf(stderr, "%s: `--train' (`-R') option given more than once\n", PROGRAM);
+          }
+          args_info->train_given++;
+         if (args_info->train_given <= 1)
+           args_info->train_flag = !(args_info->train_flag);
           break;
         
         case 's':	 /* Enable raw text scanning stage. */
@@ -652,7 +662,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           /* Training mode (similar to --lex) */
           else if (strcmp(olong, "train") == 0) {
             if (args_info->train_given) {
-              fprintf(stderr, "%s: `--train' option given more than once\n", PROGRAM);
+              fprintf(stderr, "%s: `--train' (`-R') option given more than once\n", PROGRAM);
             }
             args_info->train_given++;
            if (args_info->train_given <= 1)

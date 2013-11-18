@@ -15,7 +15,7 @@ STATICLIBS ?= ../.libs/libmoot.a
 LIBS       ?= -lz -lrecode -lexpat
 
 KNOWN_TARGETS = toklex tokio hmm+exit dummyhmm kmwio dummyhmm linetag taster streamio wastescan wastelc wastesetlex wastelexer
-TARGETS = wastelexer
+TARGETS = wastescan wastelexer
 
 all: $(TARGETS)
 

@@ -1,0 +1,4 @@
+das ist ein test 123.456, usw.
+$SB$
+%% a comment %%
+bar

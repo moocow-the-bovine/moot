@@ -52,8 +52,8 @@ public:
   //----------------------------------------------------------------------
   /// \name local static methods
   //@{
-  /** perform Lingua::TT::TextAlignment (*.rtt) style un-escaping */
-  static void rtt_unescape(const std::string &s, std::string &outbuf);
+  /** perform Lingua::TT::TextAlignment (*.rtt) style un-escaping in-place on \a s */
+  static void rtt_unescape(std::string &s);
   //@}
 
 public:
@@ -67,8 +67,7 @@ public:
   mootSentence       wt_segbuf;    /**< local segment buffer */
   mootToken         *wt_pseg;      /**< last vanilla segment (for 'S' attribute), point into wt_buffer */
 
-  std::string        wt_txtbuf;    /**< token text buffer (escaped) */
-  std::string        wt_rawbuf;    /**< token text buffer (un-escaped) */
+  std::string        wt_txtbuf;    /**< token text buffer */
   bool               wt_at_eos;    /**< whether we've seen an EOS and no vanilla token since */
   //@}
 
