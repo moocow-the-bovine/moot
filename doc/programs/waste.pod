@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-waste - Low-level rule-based codec for moot/WASTE HMM tokenizer.
+waste - Word- and Sentence-Token Extractor using a Hidden Markov Model
 
 
 
@@ -26,6 +26,7 @@ waste [OPTIONS] FILE(s)
 
  Mode Options
     -f        --full                  Alias for --scan --lex --tag --decode (default)
+    -R        --train                 Training mode (similar to --lex)
     -s        --scan                  Enable raw text scanning stage.
     -S        --no-scan               Disable raw text scanning stage.
     -x        --lex                   Enable lexical classification stage.
@@ -35,18 +36,18 @@ waste [OPTIONS] FILE(s)
     -d        --decode                Enable post-Viterbi decoding stage.
     -D        --no-decode             Disable post-Viterbi decoding stage.
 
- Lexer-Only Options
+ Lexer Options
     -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
     -jFILE    --conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)
     -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)
     -y        --dehyphenate           Enable automatic dehyphenation in lexer (default)
-    -Y        --no-dehyphenate        Disable automatic dehyphenation in lexer
+    -Y        --no-dehyphenate        Disable automatic dehyphenation in lexer.
 
  HMM Options
     -MMODEL   --model=MODEL           Use HMM tokenizer model MODEL.
 
  Format Options
-    -IFORMAT  --input-format=FORMAT   Specify input file format for -no-scan mode
+    -IFORMAT  --input-format=FORMAT   Specify input or --scan mode format
     -OFORMAT  --output-format=FORMAT  Specify output file format.
 
 =cut
@@ -58,14 +59,18 @@ waste [OPTIONS] FILE(s)
 
 =head1 DESCRIPTION
 
-Low-level rule-based codec for moot/WASTE HMM tokenizer.
+Word- and Sentence-Token Extractor using a Hidden Markov Model
 
 
 waste is the top-level command-line interface to the moot/WASTE HMM tokenizer system.
 It can be used as a complete tokenization pipeline (--full, the default),
-as a standalone scanner (--scan), lexical encoder (--lex), HMM disambiguator (--tag) or lexical decoder (--decode),
-or as (almost) any combination  of the above components.
-Input and output formats depend on the chosen mode of operation; in the default mode,
+as an annotator for pre-tokenized training corpora (--train),
+or as a standalone scanner (--scan),
+lexical encoder (--lex),
+HMM disambiguator (--tag),
+lexical decoder (--decode),
+or as (almost) any coherent combination  of the above components.
+Input and output formats depend on the chosen mode of operation; in the default (--full) mode,
 it takes as input one or more 'raw' files, and produces a 'medium' output file whose 'best-tag' fields
 are strings of space-separated segment attribute bundles (i.e. probably not interesting unless you are
 trying to debug a WASTE tokenizer model).
@@ -254,6 +259,25 @@ Default: '0'
 
 
 
+=item C<--train> , C<-R>
+
+Training mode (similar to --lex)
+
+Default: '0'
+
+
+Runs the WASTE scanner and lexer item-wise on pre-tokenized input,
+which must contain token text with leading whitespace where appropriate.
+Embedded special characters can be escaped with backslashes
+(e.g. C<\n>, C<\r>, C<\t>, C<\f>, C<\v>, C<\\>, and C<\\ >),
+and any input tokens are truncated at a C< $= > substring if present.
+Output is in 'well-done' format suitable for passing to L<mootrain>.
+Overrides any other other runtime mode options.
+
+
+
+
+
 =item C<--scan> , C<-s>
 
 Enable raw text scanning stage.
@@ -280,7 +304,7 @@ Default: '0'
 
 
 If lexer stage is enabled, you should also specify --abbrevs, --conjunctions, and/or --stopwords
-as appropriate for your HMM.
+as appropriate for your model.
 
 
 
@@ -340,11 +364,11 @@ Default: '0'
 =cut
 
 #--------------------------------------------------------------
-# Option-Group Lexer-Only Options
+# Option-Group Lexer Options
 #--------------------------------------------------------------
 =pod
 
-=head2 Lexer-Only Options
+=head2 Lexer Options
 
 =over 4
 
@@ -402,7 +426,7 @@ Only meaningful if --lex is enabled.
 
 =item C<--no-dehyphenate> , C<-Y>
 
-Disable automatic dehyphenation in lexer
+Disable automatic dehyphenation in lexer.
 
 Default: '0'
 
@@ -463,7 +487,7 @@ in a pipeline, e.g.
 
 =item C<--input-format=FORMAT> , C<-IFORMAT>
 
-Specify input file format for -no-scan mode
+Specify input or --scan mode format
 
 Default: 'NULL'
 
@@ -473,7 +497,13 @@ optionally prefixed with an exclamation point (!) to indicate
 negation.  Only meaningful if the scanner stage has been
 disabled with the -no-scan (-S) option.
 
-Default='Text,Location'
+Default value depends on the B<first> enabled processing module:
+
+ --scan   : 'None'
+ --lex    : 'Text'
+ --tag    : 'Text,Analyzed'
+ --decode : 'Text,Analyzed,Tagged'
+ --train  : 'Text'
 
 See 'I/O Format Flags' in L<mootfiles> for details.
 
@@ -492,7 +522,13 @@ Value should be a comma-separated list of format flag names,
 optionally prefixed with an exclamation point (!) to indicate
 negation.
 
-Default='MediumRare,Location'
+Default value depends on the B<last> enabled processing module:
+
+ --scan   : 'Text'
+ --lex    : 'Text,Analyzed'
+ --tag    : 'Text,Tagged'
+ --decode : 'Text'
+ --train  : 'Text,Analyzed,Tagged'
 
 See 'I/O Format Flags' in L<mootfiles> for details.
 
@@ -541,8 +577,7 @@ No configuration files are read by default.
 
 =head2 Caveats
 
-When writing in XML format, you should first ensure that your input data
-is properly encoded in UTF-8.
+The --scan and --lex modules require that text data is encoded in UTF-8.
 
 
 
@@ -577,7 +612,7 @@ Unknown.
 =head1 ACKNOWLEDGEMENTS
 
 
-Development of this package was supported by the project
+Initial development of the this was supported by the project
 'Kollokationen im WE<ouml>rterbuch'
 ( "collocations in the dictionary", http://www.bbaw.de/forschung/kollokationen )
 in association with the project
@@ -588,21 +623,25 @@ with funding from
 the Alexander von Humboldt Stiftung ( http://www.avh.de )
 and from the Zukunftsinvestitionsprogramm of the
 German federal government.
+Development of the DynHMM and WASTE extensions was
+supported by the DFG-funded projects
+'Deutsches Textarchiv' ( "German text archive", http://www.deutschestextarchiv.de )
+and 'DLEX'
+at the Berlin-Brandenburgische Akademie der Wissenschaften.
 
-I am grateful to Christiane Fellbaum, Alexander Geyken,
+The authors are grateful to Christiane Fellbaum, Alexander Geyken,
 Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
 for offering useful insights in the course of development
 of this package.
-
 Thomas Hanneforth wrote and maintains the libFSM C++ library
 for finite-state device operations used by the
 class-based HMM tagger / disambiguator, without which
-this package could not have been built.
-
+moot could not have been built.
 Alexander Geyken and Thomas Hanneforth developed the
 rule-based morphological analysis system for German
 which was used in the development and testing of the
 class-based HMM tagger / disambiguator.
+
 
 
 =head1 AUTHOR

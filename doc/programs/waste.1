@@ -124,13 +124,13 @@
 .\" ========================================================================
 .\"
 .IX Title "WASTE 1"
-.TH WASTE 1 "2013-11-11" "moot v2.0.10-pre1" "moot PoS Tagger"
+.TH WASTE 1 "2013-11-18" "moot v2.0.10-pre1" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
 .nh
 .SH "NAME"
-waste \- Low\-level rule\-based codec for moot/WASTE HMM tokenizer.
+waste \- Word\- and Sentence\-Token Extractor using a Hidden Markov Model
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
 waste [\s-1OPTIONS\s0] \s-1FILE\s0(s)
@@ -151,6 +151,7 @@ waste [\s-1OPTIONS\s0] \s-1FILE\s0(s)
 \&
 \& Mode Options
 \&    \-f        \-\-full                  Alias for \-\-scan \-\-lex \-\-tag \-\-decode (default)
+\&    \-R        \-\-train                 Training mode (similar to \-\-lex)
 \&    \-s        \-\-scan                  Enable raw text scanning stage.
 \&    \-S        \-\-no\-scan               Disable raw text scanning stage.
 \&    \-x        \-\-lex                   Enable lexical classification stage.
@@ -160,29 +161,33 @@ waste [\s-1OPTIONS\s0] \s-1FILE\s0(s)
 \&    \-d        \-\-decode                Enable post\-Viterbi decoding stage.
 \&    \-D        \-\-no\-decode             Disable post\-Viterbi decoding stage.
 \&
-\& Lexer\-Only Options
+\& Lexer Options
 \&    \-aFILE    \-\-abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
 \&    \-jFILE    \-\-conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)
 \&    \-wFILE    \-\-stopwords=FILE        Load stopword lexicon from FILE (1 word/line)
 \&    \-y        \-\-dehyphenate           Enable automatic dehyphenation in lexer (default)
-\&    \-Y        \-\-no\-dehyphenate        Disable automatic dehyphenation in lexer
+\&    \-Y        \-\-no\-dehyphenate        Disable automatic dehyphenation in lexer.
 \&
 \& HMM Options
 \&    \-MMODEL   \-\-model=MODEL           Use HMM tokenizer model MODEL.
 \&
 \& Format Options
-\&    \-IFORMAT  \-\-input\-format=FORMAT   Specify input file format for \-no\-scan mode
+\&    \-IFORMAT  \-\-input\-format=FORMAT   Specify input or \-\-scan mode format
 \&    \-OFORMAT  \-\-output\-format=FORMAT  Specify output file format.
 .Ve
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-Low-level rule-based codec for moot/WASTE \s-1HMM\s0 tokenizer.
+Word\- and Sentence-Token Extractor using a Hidden Markov Model
 .PP
 waste is the top-level command-line interface to the moot/WASTE \s-1HMM\s0 tokenizer system.
 It can be used as a complete tokenization pipeline (\-\-full, the default),
-as a standalone scanner (\-\-scan), lexical encoder (\-\-lex), \s-1HMM\s0 disambiguator (\-\-tag) or lexical decoder (\-\-decode),
-or as (almost) any combination  of the above components.
-Input and output formats depend on the chosen mode of operation; in the default mode,
+as an annotator for pre-tokenized training corpora (\-\-train),
+or as a standalone scanner (\-\-scan),
+lexical encoder (\-\-lex),
+\&\s-1HMM\s0 disambiguator (\-\-tag),
+lexical decoder (\-\-decode),
+or as (almost) any coherent combination  of the above components.
+Input and output formats depend on the chosen mode of operation; in the default (\-\-full) mode,
 it takes as input one or more 'raw' files, and produces a 'medium' output file whose 'best\-tag' fields
 are strings of space-separated segment attribute bundles (i.e. probably not interesting unless you are
 trying to debug a \s-1WASTE\s0 tokenizer model).
@@ -294,6 +299,20 @@ indicates a sentence boundary.
 Alias for \-\-scan \-\-lex \-\-tag \-\-decode (default)
 .Sp
 Default: '0'
+.ie n .IP """\-\-train"" , ""\-R""" 4
+.el .IP "\f(CW\-\-train\fR , \f(CW\-R\fR" 4
+.IX Item "--train , -R"
+Training mode (similar to \-\-lex)
+.Sp
+Default: '0'
+.Sp
+Runs the \s-1WASTE\s0 scanner and lexer item-wise on pre-tokenized input,
+which must contain token text with leading whitespace where appropriate.
+Embedded special characters can be escaped with backslashes
+(e.g. \f(CW\*(C`\en\*(C'\fR, \f(CW\*(C`\er\*(C'\fR, \f(CW\*(C`\et\*(C'\fR, \f(CW\*(C`\ef\*(C'\fR, \f(CW\*(C`\ev\*(C'\fR, \f(CW\*(C`\e\e\*(C'\fR, and \f(CW\*(C`\e\e \*(C'\fR),
+and any input tokens are truncated at a \f(CW $= \fR substring if present.
+Output is in 'well\-done' format suitable for passing to mootrain.
+Overrides any other other runtime mode options.
 .ie n .IP """\-\-scan"" , ""\-s""" 4
 .el .IP "\f(CW\-\-scan\fR , \f(CW\-s\fR" 4
 .IX Item "--scan , -s"
@@ -314,7 +333,7 @@ Enable lexical classification stage.
 Default: '0'
 .Sp
 If lexer stage is enabled, you should also specify \-\-abbrevs, \-\-conjunctions, and/or \-\-stopwords
-as appropriate for your \s-1HMM\s0.
+as appropriate for your model.
 .ie n .IP """\-\-no\-lex"" , ""\-X""" 4
 .el .IP "\f(CW\-\-no\-lex\fR , \f(CW\-X\fR" 4
 .IX Item "--no-lex , -X"
@@ -347,8 +366,8 @@ Default: '0'
 Disable post-Viterbi decoding stage.
 .Sp
 Default: '0'
-.SS "Lexer-Only Options"
-.IX Subsection "Lexer-Only Options"
+.SS "Lexer Options"
+.IX Subsection "Lexer Options"
 .ie n .IP """\-\-abbrevs=FILE"" , ""\-aFILE""" 4
 .el .IP "\f(CW\-\-abbrevs=FILE\fR , \f(CW\-aFILE\fR" 4
 .IX Item "--abbrevs=FILE , -aFILE"
@@ -384,7 +403,7 @@ Only meaningful if \-\-lex is enabled.
 .ie n .IP """\-\-no\-dehyphenate"" , ""\-Y""" 4
 .el .IP "\f(CW\-\-no\-dehyphenate\fR , \f(CW\-Y\fR" 4
 .IX Item "--no-dehyphenate , -Y"
-Disable automatic dehyphenation in lexer
+Disable automatic dehyphenation in lexer.
 .Sp
 Default: '0'
 .Sp
@@ -414,7 +433,7 @@ in a pipeline, e.g.
 .ie n .IP """\-\-input\-format=FORMAT"" , ""\-IFORMAT""" 4
 .el .IP "\f(CW\-\-input\-format=FORMAT\fR , \f(CW\-IFORMAT\fR" 4
 .IX Item "--input-format=FORMAT , -IFORMAT"
-Specify input file format for \-no\-scan mode
+Specify input or \-\-scan mode format
 .Sp
 Default: '\s-1NULL\s0'
 .Sp
@@ -423,7 +442,15 @@ optionally prefixed with an exclamation point (!) to indicate
 negation.  Only meaningful if the scanner stage has been
 disabled with the \-no\-scan (\-S) option.
 .Sp
-Default='Text,Location'
+Default value depends on the \fBfirst\fR enabled processing module:
+.Sp
+.Vb 5
+\& \-\-scan   : \*(AqNone\*(Aq
+\& \-\-lex    : \*(AqText\*(Aq
+\& \-\-tag    : \*(AqText,Analyzed\*(Aq
+\& \-\-decode : \*(AqText,Analyzed,Tagged\*(Aq
+\& \-\-train  : \*(AqText\*(Aq
+.Ve
 .Sp
 See 'I/O Format Flags' in mootfiles for details.
 .ie n .IP """\-\-output\-format=FORMAT"" , ""\-OFORMAT""" 4
@@ -437,7 +464,15 @@ Value should be a comma-separated list of format flag names,
 optionally prefixed with an exclamation point (!) to indicate
 negation.
 .Sp
-Default='MediumRare,Location'
+Default value depends on the \fBlast\fR enabled processing module:
+.Sp
+.Vb 5
+\& \-\-scan   : \*(AqText\*(Aq
+\& \-\-lex    : \*(AqText,Analyzed\*(Aq
+\& \-\-tag    : \*(AqText,Tagged\*(Aq
+\& \-\-decode : \*(AqText\*(Aq
+\& \-\-train  : \*(AqText,Analyzed,Tagged\*(Aq
+.Ve
 .Sp
 See 'I/O Format Flags' in mootfiles for details.
 .SH "CONFIGURATION FILES"
@@ -459,8 +494,7 @@ No configuration files are read by default.
 .IX Header "ADDENDA"
 .SS "Caveats"
 .IX Subsection "Caveats"
-When writing in \s-1XML\s0 format, you should first ensure that your input data
-is properly encoded in \s-1UTF\-8\s0.
+The \-\-scan and \-\-lex modules require that text data is encoded in \s-1UTF\-8\s0.
 .SS "About this Document"
 .IX Subsection "About this Document"
 Documentation file auto-generated by optgen.perl version 0.07
@@ -476,7 +510,7 @@ as:
 Unknown.
 .SH "ACKNOWLEDGEMENTS"
 .IX Header "ACKNOWLEDGEMENTS"
-Development of this package was supported by the project
+Initial development of the this was supported by the project
 \&'Kollokationen im Wo\*:rterbuch'
 ( \*(L"collocations in the dictionary\*(R", http://www.bbaw.de/forschung/kollokationen )
 in association with the project
@@ -487,17 +521,20 @@ with funding from
 the Alexander von Humboldt Stiftung ( http://www.avh.de )
 and from the Zukunftsinvestitionsprogramm of the
 German federal government.
+Development of the DynHMM and \s-1WASTE\s0 extensions was
+supported by the DFG-funded projects
+\&'Deutsches Textarchiv' ( \*(L"German text archive\*(R", http://www.deutschestextarchiv.de )
+and '\s-1DLEX\s0'
+at the Berlin-Brandenburgische Akademie der Wissenschaften.
 .PP
-I am grateful to Christiane Fellbaum, Alexander Geyken,
+The authors are grateful to Christiane Fellbaum, Alexander Geyken,
 Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
 for offering useful insights in the course of development
 of this package.
-.PP
 Thomas Hanneforth wrote and maintains the libFSM \*(C+ library
 for finite-state device operations used by the
 class-based \s-1HMM\s0 tagger / disambiguator, without which
-this package could not have been built.
-.PP
+moot could not have been built.
 Alexander Geyken and Thomas Hanneforth developed the
 rule-based morphological analysis system for German
 which was used in the development and testing of the

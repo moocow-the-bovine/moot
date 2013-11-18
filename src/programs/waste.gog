@@ -14,7 +14,11 @@ on_reparse "warn"
 details "
 waste is the top-level command-line interface to the moot/WASTE HMM tokenizer system.
 It can be used as a complete tokenization pipeline (--full, the default),
-a standalone scanner (--scan), a lexical encoder (--lex), HMM disambiguator (--tag) or lexical decoder (--decode),
+as an annotator for pre-tokenized training corpora (--train),
+or as a standalone scanner (--scan),
+lexical encoder (--lex),
+HMM disambiguator (--tag),
+lexical decoder (--decode),
 or as (almost) any coherent combination  of the above components.
 Input and output formats depend on the chosen mode of operation; in the default (--full) mode,
 it takes as input one or more 'raw' files, and produces a 'medium' output file whose 'best-tag' fields
@@ -75,12 +79,13 @@ flag "full"       f  "Alias for --scan --lex --tag --decode (default)" \
     code="'args_info->full_flag = args_info->scan_flag = args_info->lex_flag = args_info->tag_flag = args_info->decode_flag = 1;'"
 flag "train"      R  "Training mode (similar to --lex)" \
     details="
-Runs the WASTE scanner and lexer on pre-tokenized input,
-which must contain token text, with leading whitespace where appropriate.
-embedded special characters can be escaped with backslashes
+Runs the WASTE scanner and lexer item-wise on pre-tokenized input,
+which must contain token text with leading whitespace where appropriate.
+Embedded special characters can be escaped with backslashes
 (e.g. C<\n>, C<\r>, C<\t>, C<\f>, C<\v>, C<\\>, and C<\\ >),
-and any input tokens are truncated at a C< $= > substring.
-Output is 'well-done', suitable for passing to L<mootrain>.
+and any input tokens are truncated at a C< $= > substring if present.
+Output is in 'well-done' format suitable for passing to L<mootrain>.
+Overrides any other other runtime mode options.
 "
 
 
@@ -188,7 +193,7 @@ Default value depends on the B<first> enabled processing module:
  --lex    : 'Text'
  --tag    : 'Text,Analyzed'
  --decode : 'Text,Analyzed,Tagged'
- --recode : 'Text'
+ --train  : 'Text'
 
 See 'I/O Format Flags' in L<mootfiles> for details.
 "
@@ -206,7 +211,7 @@ Default value depends on the B<last> enabled processing module:
  --lex    : 'Text,Analyzed'
  --tag    : 'Text,Tagged'
  --decode : 'Text'
- --recode : 'Text,Analyzed,Tagged'
+ --train  : 'Text,Analyzed,Tagged'
 
 See 'I/O Format Flags' in L<mootfiles> for details.
 "
