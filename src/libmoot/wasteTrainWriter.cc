@@ -144,6 +144,9 @@ void wasteTrainWriter::put_token(const mootToken &token)
 	wt_pseg = &(wt_segbuf.back());
 	wt_at_eos = at_bow = false;
       }
+      else {
+        wt_segbuf.push_back( *ltok );
+      }
     }
     //-- cleanup
     wt_txtbuf.clear();
