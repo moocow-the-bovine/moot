@@ -72,41 +72,47 @@ int moot::wasteScanner::yylex ( )
 	URI_GEN_DELIMS		= [:/?#\[\]@] ;
 	URI_SUB_DELIMS		= [!&'\(\)\*\+,;=\$] ;
 	URI_RESERVED		= URI_GEN_DELIMS | URI_SUB_DELIMS ;
-	URI_FREE		= [A-Za-z0-9\.\_\-~] ;
-	URI_SUBFREE		= URI_FREE | URI_ESCAPE | URI_SUB_DELIMS ;
+	URI_FREE		= [A-Za-z0-9\x80-\xff_\-\.~] ;
+	URI_SUBFREE		= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%] ;
+	URI_USERCHAR		= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:] ;
+	URI_HOSTCHAR		= [A-Za-z0-9\x80-\xff_\-~!&'\(\)\*\+,;=\$%@]  ;
+	URI_PATHCHAR__rfc3986	= ( URI_SUBFREE | [:@] );
+	URI_PATHCHAR		= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`];
+	URI_PATHCHAR__ext	= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/];
+	URI_QUERYCHAR		= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/?];
+	URI_FRAGMENTCHAR	= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/?#];
 
 	URI_SCHEME		= [A-Za-z][A-Za-z0-9\+\-\.]* ;
 
 	URI_IP_FUTURE		= "v" (XDIGIT)+ "." ( URI_FREE | URI_SUB_DELIMS | ":" )+ ;
 	URI_IP_LITERAL		= "[" (IPv6 | URI_IP_FUTURE) "]" ;
 	URI_HOSTNAME            = ( URI_SUBFREE )+ ;
+	URI_HOSTNAME__dots	= URI_HOSTCHAR+ ("." URI_HOSTCHAR+)+ ;
 	URI_PORT		= [0-9]* ;
-	URI_HOST        	= URI_IP_LITERAL | IPv4 | URI_HOSTNAME ;
-	URI_USERINFO		= ( URI_SUBFREE | ":" )* ;
-	URI_AUTHORITY           = (URI_USERINFO "@")? URI_HOST (":" URI_PORT)? ;
+	URI_HOST_ADDR		= URI_IP_LITERAL | IPv4;
+	URI_HOST        	= URI_HOST_ADDR | URI_HOSTNAME       ;
+	URI_HOST__dots        	= URI_HOST_ADDR | URI_HOSTNAME__dots ;
+	URI_USERINFO		= URI_USERCHAR* ;
+	URI_AUTHORITY           = (URI_USERINFO "@")? URI_HOST       (":" URI_PORT)? ;
+	URI_AUTHORITY__udots	= (URI_USERINFO "@")? URI_HOST__dots (":" URI_PORT)? ;
+	URI_AUTHORITY__dots	= 	              URI_HOST__dots (":" URI_PORT)? ;
+	URI_AUTHORITY__safe1    = URI_USERINFO ("@"|"www.") URI_HOSTCHAR+ ("." URI_HOSTCHAR+)* (":" URI_PORT)? ;
+	URI_AUTHORITY__safe2    = URI_HOSTCHAR+ ("." URI_HOSTCHAR+)* ("." [a-zA-Z]{2,4}) (":" URI_PORT)? ;
+	URI_AUTHORITY__safe     = URI_AUTHORITY__safe1 | URI_AUTHORITY__dots | "#" ;
 
-	URI_PATH_CHAR__rfc3986	= ( URI_SUBFREE | [:@] );
-	URI_PATH_CHAR__link	= ( URI_SUBFREE | [:@%<>{}\[\]`|] );
-	URI_PATH_CHAR		= URI_PATH_CHAR__link ;
+	URI_SEGMENT		= URI_PATHCHAR* ;
+	URI_PATH_NONEMPTY	= URI_PATHCHAR__ext+ ;
+	URI_PATH 		= ("/" URI_SEGMENT)* ;
+	URI_PATH__abs		= "/" URI_PATHCHAR__ext+ ;
 
-	URI_SEGMENT		= URI_PATH_CHAR* ;
-	URI_SEGMENT_NZ		= URI_PATH_CHAR+ ;
-	URI_SEGMENT_NZ_NC	= ( URI_SUBFREE | [@] )+ ;
+	URI_QUERY		= URI_QUERYCHAR* ;
+	URI_FRAGMENT		= URI_FRAGMENTCHAR* ;
 
-	URI_PATH_ABEMPTY	= ("/" URI_SEGMENT)* ;
-	URI_PATH_ABSOLUTE	= "/" (URI_SEGMENT_NZ ("/" URI_SEGMENT)*)? ;
-	URI_PATH_NOSCHEME	= URI_SEGMENT_NZ_NC ( "/" URI_SEGMENT )* ;
-	URI_PATH_ROOTLESS       = URI_SEGMENT_NZ ( "/" URI_SEGMENT )* ;
-	URI_PATH_EMPTY		= "" ;
-
-	URI_PATH__rfc3986	= URI_PATH_ABEMPTY | URI_PATH_ABSOLUTE | URI_PATH_NOSCHEME | URI_PATH_ROOTLESS | URI_PATH_EMPTY ;
-	URI_PATH__link		= URI_PATH_ABEMPTY | URI_PATH_ABSOLUTE ;
-	URI_PATH		= URI_PATH__link ;
-
-	URI_QUERY		= ( URI_PATH_CHAR | [/?] )* ;
-	URI_FRAGMENT		= ( URI_PATH_CHAR | [/?] )* ;
-
-	URI			=  (URI_SCHEME ":" "//")? URI_AUTHORITY URI_PATH ("?" URI_QUERY)?  ("#" URI_FRAGMENT)? ;
+	URI__rfc3986	        = URI_SCHEME ":" "//"        URI_AUTHORITY        URI_PATH       ("?" URI_QUERY)?  ("#" URI_FRAGMENT)? ;
+	URI__schemed	        = URI_SCHEME ":" "/"{1,3}    URI_FRAGMENTCHAR{2,} ;
+	URI__link_dots		=                            URI_AUTHORITY__udots URI_FRAGMENTCHAR* ;
+	URI__link_safe		=                            URI_AUTHORITY__safe  URI_FRAGMENTCHAR* ;
+	LINK			= URI__schemed | URI__link_safe ;
 	*/
 
         //-- old link rules (pre-2013-11-18; ultimate target: LINK2) -- ought to work again with NUL sentinel
@@ -143,7 +149,7 @@ int moot::wasteScanner::yylex ( )
 	"$WB$"                   { add_columns( yyleng() ); return wScanTypeWB; }
 	"$SB$"                   { add_columns( yyleng() ); return wScanTypeSB; }
 
-	URI                      { add_columns( yyleng() ); return wScanTypeLink; }
+	LINK                     { add_columns( yyleng() ); return wScanTypeLink; }
 
 	ROMAN                    { add_columns( yyleng() ); return wScanTypeRoman; }
 
