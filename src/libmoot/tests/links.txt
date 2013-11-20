@@ -1,8 +1,11 @@
 ab;
 ab.an
 ab.initio
+N.T.lichen
 http://foo.bar/baz?bonk=boffo
 http:/foo.bar/baz?bonk=boffo
+http:///foo.bar/baz?bonk=boffo
+http://föö.bär/bäz?bönk=böffo
 skronk://blap:8080#%20=%30
 foo.bar/baz
 foo.bar
@@ -16,4 +19,5 @@ moocow@cpan
 moocow@cpan.org
 @blap
 @bar.org
+@Hänsel_und_Gretl
 #this_is_a_fragment

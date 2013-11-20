@@ -2,17 +2,17 @@
 
 CXX ?= g++
 
-OFLAGS   ?= -ggdb -g3 -O0
-IFLAGS   ?= -I..
-DEFS     ?= -DHAVE_CONFIG_H
-WFLAGS   ?= -Wall -Wno-deprecated
-CFLAGS   ?= $(WFLAGS) $(IFLAGS) $(DEFS) $(OFLAGS)
-CXXFLAGS ?= $(CFLAGS)
+OFLAGS   = -ggdb -g3 -O0
+IFLAGS   = -I..
+DEFS     = -DHAVE_CONFIG_H
+WFLAGS   = -Wall -Wno-deprecated
+CFLAGS   = $(WFLAGS) $(IFLAGS) $(DEFS) $(OFLAGS)
+CXXFLAGS = $(CFLAGS)
 
-LD          = $(CXX)
-LDFLAGS    ?= $(OFLAGS) -L..
-STATICLIBS ?= ../.libs/libmoot.a
-LIBS       ?= -lz -lrecode -lexpat
+LD         = $(CXX)
+LDFLAGS    = $(OFLAGS) -L..
+STATICLIBS = ../.libs/libmoot.a
+LIBS       = -lz -lrecode -lexpat
 
 KNOWN_TARGETS = toklex tokio hmm+exit dummyhmm kmwio dummyhmm linetag taster streamio wastescan wastelc wastesetlex wastelexer
 TARGETS = wastescan wastelexer

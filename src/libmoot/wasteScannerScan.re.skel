@@ -98,6 +98,7 @@ int moot::wasteScanner::yylex ( )
 	URI_AUTHORITY__dots	= 	              URI_HOST__dots (":" URI_PORT)? ;
 	URI_AUTHORITY__safe1    = URI_USERINFO ("@"|"www.") URI_HOSTCHAR{2,} ("." URI_HOSTCHAR{2,})* (":" URI_PORT)? ;
 	URI_AUTHORITY__safe2    = URI_HOSTCHAR+ ("." URI_HOSTCHAR+)* ("." [a-zA-Z]{2,4}) (":" URI_PORT)? ;
+
 	URI_AUTHORITY__safe     = URI_AUTHORITY__safe1 | URI_AUTHORITY__dots | "#" ;
 
 	URI_SEGMENT		= URI_PATHCHAR* ;
