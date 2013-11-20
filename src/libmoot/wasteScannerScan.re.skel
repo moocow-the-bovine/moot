@@ -87,7 +87,7 @@ int moot::wasteScanner::yylex ( )
 	URI_IP_FUTURE		= "v" (XDIGIT)+ "." ( URI_FREE | URI_SUB_DELIMS | ":" )+ ;
 	URI_IP_LITERAL		= "[" (IPv6 | URI_IP_FUTURE) "]" ;
 	URI_HOSTNAME            = ( URI_SUBFREE )+ ;
-	URI_HOSTNAME__dots	= URI_HOSTCHAR+ ("." URI_HOSTCHAR+)+ ;
+	URI_HOSTNAME__dots	= URI_HOSTCHAR{2,} ("." URI_HOSTCHAR{2,})+ ;
 	URI_PORT		= [0-9]* ;
 	URI_HOST_ADDR		= URI_IP_LITERAL | IPv4;
 	URI_HOST        	= URI_HOST_ADDR | URI_HOSTNAME       ;
@@ -96,7 +96,7 @@ int moot::wasteScanner::yylex ( )
 	URI_AUTHORITY           = (URI_USERINFO "@")? URI_HOST       (":" URI_PORT)? ;
 	URI_AUTHORITY__udots	= (URI_USERINFO "@")? URI_HOST__dots (":" URI_PORT)? ;
 	URI_AUTHORITY__dots	= 	              URI_HOST__dots (":" URI_PORT)? ;
-	URI_AUTHORITY__safe1    = URI_USERINFO ("@"|"www.") URI_HOSTCHAR+ ("." URI_HOSTCHAR+)* (":" URI_PORT)? ;
+	URI_AUTHORITY__safe1    = URI_USERINFO ("@"|"www.") URI_HOSTCHAR{2,} ("." URI_HOSTCHAR{2,})* (":" URI_PORT)? ;
 	URI_AUTHORITY__safe2    = URI_HOSTCHAR+ ("." URI_HOSTCHAR+)* ("." [a-zA-Z]{2,4}) (":" URI_PORT)? ;
 	URI_AUTHORITY__safe     = URI_AUTHORITY__safe1 | URI_AUTHORITY__dots | "#" ;
 
