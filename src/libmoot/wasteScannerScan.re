@@ -82,7 +82,7 @@ Sk2 = ([\xcb][\x82-\x85\x92-\x9f\xa5-\xab\xad\xaf-\xbf])|([\xc2][\xa8\xaf\xb4\xb
 Sk3 = ([\xe1][\xbf][\x80-\x81\x8d-\x8f\x9d-\x9f\xad-\xaf\xbd-\xbe])|([\xe1][\xbe][\xbd\xbf])|([\xe3][\x82][\x9b-\x9c])|([\xea][\x9c][\x80-\x96\xa0-\xa1])|([\xea][\x9e][\x89-\x8a])|([\xef][\xbd][\x80])|([\xef][\xbc][\xbe])|([\xef][\xbf][\xa3]);
 Sk = Sk1|Sk2|Sk3;
 So2 = ([\xd8][\x8e-\x8f])|([\xdb][\xa9\xbd-\xbe])|([\xc2][\xa6-\xa7\xa9\xae\xb0\xb6])|([\xdf][\xb6])|([\xd2][\x82]);
-So3 = ([\xe1][\x82][\x9e-\x9f])|([\xe1][\xa5][\x80])|([\xe1][\xa7][\xa0-\xbf])|([\xe1][\x8d][\xa0])|([\xe1][\xad][\xa1-\xaa\xb4-\xbc])|([\xe1][\x8e][\x90-\x99])|([\xe0][\xa7][\xba])|([\xe0][\xad][\xb0])|([\xe0][\xaf][\xb3-\xb8\xba])|([\xe0][\xb1][\xbf])|([\xe0][\xb3][\xb1-\xb2])|([\xe0][\xb5][\xb9])|([\xe0][\xbc][\x81-\x83\x93-\x97\x9a-\x9f\xb4\xb6\xb8])|([\xe0][\xbf][\x80-\x85\x87-\x8c\x8e-\x8f\x95-\x98])|([\xe0][\xbe][\xbe-\xbf])|([\xe3][\x80][\x84\x92-\x93\xa0\xb6-\xb7\xbe-\xbf])|([\xe3][\x87][\x80-\xa3])|([\xe3][\x86][\x90-\x91\x96-\x9f])|([\xe3][\x89][\x80-\x90\xa0-\xbf])|([\xe3][\x88][\x80-\x9e\xaa-\xbf])|([\xe3][\x8b][\x80-\xbe])|([\xe3][\x8a][\x8a-\xb0])|([\xe3][\x8d][\x80-\xbf])|([\xe3][\x8c][\x80-\xbf])|([\xe3][\x8f][\x80-\xbf])|([\xe3][\x8e][\x80-\xbf])|([\xe2][\x85][\x8a\x8c-\x8d\x8f])|([\xe2][\x84][\x80-\x81\x83-\x86\x88-\x89\x94\x96-\x98\x9e-\xa3\xa5\xa7\xa9\xae\xba-\xbb])|([\xe2][\x87][\x80-\x8d\x90-\x91\x93\x95-\xb3])|([\xe2][\x86][\x95-\x99\x9c-\x9f\xa1-\xa2\xa4-\xa5\xa7-\xad\xaf-\xbf])|([\xe2][\x8d][\x80-\xbb\xbd-\xbf])|([\xe2][\x8c][\x80-\x87\x8c-\x9f\xa2-\xa8\xab-\xbf])|([\xe2][\x8f][\x80-\x9b\xa2-\xa8])|([\xe2][\x8e][\x80-\x9a\xb4-\xbf])|([\xe2][\x91][\x80-\x8a])|([\xe2][\x90][\x80-\xa6])|([\xe2][\x93][\x80-\xa9])|([\xe2][\x92][\x9c-\xbf])|([\xe2][\x95][\x80-\xbf])|([\xe2][\x94][\x80-\xbf])|([\xe2][\x97][\x80\x82-\xb7])|([\xe2][\x96][\x80-\xb6\xb8-\xbf])|([\xe2][\x99][\x80-\xae\xb0-\xbf])|([\xe2][\x98][\x80-\xbf])|([\xe2][\x9b][\x80-\x8d\x8f-\xa1\xa3\xa8-\xbf])|([\xe2][\x9a][\x80-\xbf])|([\xe2][\x9d][\x80-\x8b\x8d\x8f-\x92\x96-\x9e\xa1-\xa7])|([\xe2][\x9c][\x81-\x84\x86-\x89\x8c-\xa7\xa9-\xbf])|([\xe2][\x9e][\x94\x98-\xaf\xb1-\xbe])|([\xe2][\xa1][\x80-\xbf])|([\xe2][\xa0][\x80-\xbf])|([\xe2][\xa3][\x80-\xbf])|([\xe2][\xa2][\x80-\xbf])|([\xe2][\xad][\x85-\x86\x90-\x99])|([\xe2][\xac][\x80-\xaf])|([\xe2][\xb3][\xa5-\xaa])|([\xe2][\xbb][\x80-\xb3])|([\xe2][\xba][\x80-\x99\x9b-\xbf])|([\xe2][\xbd][\x80-\xbf])|([\xe2][\xbc][\x80-\xbf])|([\xe2][\xbf][\x80-\x95\xb0-\xbb])|([\xe2][\xbe][\x80-\xbf])|([\xe4][\xb7][\x80-\xbf])|([\xea][\xa9][\xb7-\xb9])|([\xea][\xa0][\xa8-\xab\xb6-\xb7\xb9])|([\xea][\x93][\x80-\x86])|([\xea][\x92][\x90-\xbf])|([\xef][\xbf][\xa4\xa8\xad-\xae\xbc-\xbd])|([\xef][\xb7][\xbd]);
+So3 = ([\xe1][\x82][\x9e-\x9f])|([\xe1][\xa5][\x80])|([\xe1][\xa7][\xa0-\xbf])|([\xe1][\xad][\xa1-\xaa\xb4-\xbc])|([\xe1][\x8d][\xa0])|([\xe1][\x8e][\x90-\x99])|([\xe0][\xa7][\xba])|([\xe0][\xad][\xb0])|([\xe0][\xaf][\xb3-\xb8\xba])|([\xe0][\xb1][\xbf])|([\xe0][\xb3][\xb1-\xb2])|([\xe0][\xb5][\xb9])|([\xe0][\xbc][\x81-\x83\x93-\x97\x9a-\x9f\xb4\xb6\xb8])|([\xe0][\xbf][\x80-\x85\x87-\x8c\x8e-\x8f\x95-\x98])|([\xe0][\xbe][\xbe-\xbf])|([\xe3][\x80][\x84\x92-\x93\xa0\xb6-\xb7\xbe-\xbf])|([\xe3][\x87][\x80-\xa3])|([\xe3][\x86][\x90-\x91\x96-\x9f])|([\xe3][\x89][\x80-\x90\xa0-\xbf])|([\xe3][\x88][\x80-\x9e\xaa-\xbf])|([\xe3][\x8b][\x80-\xbe])|([\xe3][\x8a][\x8a-\xb0])|([\xe3][\x8d][\x80-\xbf])|([\xe3][\x8c][\x80-\xbf])|([\xe3][\x8f][\x80-\xbf])|([\xe3][\x8e][\x80-\xbf])|([\xe2][\x85][\x8a\x8c-\x8d\x8f])|([\xe2][\x84][\x80-\x81\x83-\x86\x88-\x89\x94\x96-\x98\x9e-\xa3\xa5\xa7\xa9\xae\xba-\xbb])|([\xe2][\x87][\x80-\x8d\x90-\x91\x93\x95-\xb3])|([\xe2][\x86][\x95-\x99\x9c-\x9f\xa1-\xa2\xa4-\xa5\xa7-\xad\xaf-\xbf])|([\xe2][\x8d][\x80-\xbb\xbd-\xbf])|([\xe2][\x8c][\x80-\x87\x8c-\x9f\xa2-\xa8\xab-\xbf])|([\xe2][\x8f][\x80-\x9b\xa2-\xa8])|([\xe2][\x8e][\x80-\x9a\xb4-\xbf])|([\xe2][\x91][\x80-\x8a])|([\xe2][\x90][\x80-\xa6])|([\xe2][\x93][\x80-\xa9])|([\xe2][\x92][\x9c-\xbf])|([\xe2][\x95][\x80-\xbf])|([\xe2][\x94][\x80-\xbf])|([\xe2][\x97][\x80\x82-\xb7])|([\xe2][\x96][\x80-\xb6\xb8-\xbf])|([\xe2][\x99][\x80-\xae\xb0-\xbf])|([\xe2][\x98][\x80-\xbf])|([\xe2][\x9b][\x80-\x8d\x8f-\xa1\xa3\xa8-\xbf])|([\xe2][\x9a][\x80-\xbf])|([\xe2][\x9d][\x80-\x8b\x8d\x8f-\x92\x96-\x9e\xa1-\xa7])|([\xe2][\x9c][\x81-\x84\x86-\x89\x8c-\xa7\xa9-\xbf])|([\xe2][\x9e][\x94\x98-\xaf\xb1-\xbe])|([\xe2][\xa1][\x80-\xbf])|([\xe2][\xa0][\x80-\xbf])|([\xe2][\xa3][\x80-\xbf])|([\xe2][\xa2][\x80-\xbf])|([\xe2][\xad][\x85-\x86\x90-\x99])|([\xe2][\xac][\x80-\xaf])|([\xe2][\xb3][\xa5-\xaa])|([\xe2][\xbb][\x80-\xb3])|([\xe2][\xba][\x80-\x99\x9b-\xbf])|([\xe2][\xbd][\x80-\xbf])|([\xe2][\xbc][\x80-\xbf])|([\xe2][\xbf][\x80-\x95\xb0-\xbb])|([\xe2][\xbe][\x80-\xbf])|([\xe4][\xb7][\x80-\xbf])|([\xea][\xa9][\xb7-\xb9])|([\xea][\xa0][\xa8-\xab\xb6-\xb7\xb9])|([\xea][\x93][\x80-\x86])|([\xea][\x92][\x90-\xbf])|([\xef][\xbf][\xa4\xa8\xad-\xae\xbc-\xbd])|([\xef][\xb7][\xbd]);
 So = So2|So3;
 Sm1 = [\x2b\x3c-\x3e\x7c\x7e];
 Sm2 = ([\xd8][\x86-\x88])|([\xc3][\x97\xb7])|([\xc2][\xac\xb1])|([\xcf][\xb6]);
@@ -325,83 +325,60 @@ Any = Any1|Any2|Any3;
 	DBYTE                   = ([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9]);
 
         IPv6                    = (((XDIGIT{1,4}":"){7}(XDIGIT{1,4}|":"))|((XDIGIT{1,4}":"){6}(":"XDIGIT{1,4}|(DBYTE([\.]DBYTE){3})|":"))|((XDIGIT{1,4}":"){5}(((":"XDIGIT{1,4}){1,2})|":"(DBYTE([\.]DBYTE){3})|":"))|((XDIGIT{1,4}":"){4}(((":"XDIGIT{1,4}){1,3})|((":"XDIGIT{1,4})?":"(DBYTE([\.]DBYTE){3}))|":"))|((XDIGIT{1,4}":"){3}(((":"XDIGIT{1,4}){1,4})|((":"XDIGIT{1,4}){0,2}":"(DBYTE([\.]DBYTE){3}))|":"))|((XDIGIT{1,4}":"){2}(((":"XDIGIT{1,4}){1,5})|((":"XDIGIT{1,4}){0,3}":"(DBYTE([\.]DBYTE){3}))|":"))|((XDIGIT{1,4}":"){1}(((":"XDIGIT{1,4}){1,6})|((":"XDIGIT{1,4}){0,4}":"(DBYTE([\.]DBYTE){3}))|":"))|(":"(((":"XDIGIT{1,4}){1,7})|((":"XDIGIT{1,4}){0,5}":"(DBYTE([\.]DBYTE){3}))|":")))([%][.]+)?;
-        IPv4                    = ((([0]?[1-9]|"00")?[0-9]|"1"[0-9][0-9]|"2"[0-4][0-9]|"25"[0-5])"."){3}(([0]?[1-9]|"00")?[0-9]|"1"[0-9][0-9]|"2"[0-4][0-9]|"25"[0-5]);
-        IP                      = IPv4|IPv6;
 
+        IPv4                    = ((([0]?[1-9]|"00")?[0-9]|"1"[0-9][0-9]|"2"[0-4][0-9]|"25"[0-5])"."){3}(([0]?[1-9]|"00")?[0-9]|"1"[0-9][0-9]|"2"[0-4][0-9]|"25"[0-5]);
+
+	URI_IP_FUTURE		= "v" (XDIGIT)+ "." [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$:]+ ;
+	URI_IP_LITERAL		= "[" (IPv6 | URI_IP_FUTURE) "]" ;
+
+        IP                      = IPv4 | IPv6 | URI_IP_LITERAL;
+	*/
+
+/*!re2c
 	URI_ESCAPE 		= "%" XDIGIT{2} ;
 
 	URI_GEN_DELIMS		= [:/?#\[\]@] ;
 	URI_SUB_DELIMS		= [!&'\(\)\*\+,;=\$] ;
 	URI_RESERVED		= URI_GEN_DELIMS | URI_SUB_DELIMS ;
-	URI_FREE		= [A-Za-z0-9\x80-\xff_\-\.~] ;
-	URI_SUBFREE		= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%] ;
-	URI_USERCHAR		= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:] ;
-	URI_HOSTCHAR		= [A-Za-z0-9\x80-\xff_\-~!&'\(\)\*\+,;=\$%@]  ;
+	URI_FREE		= [A-Za-z0-9_\-\.~] ;
+	URI_SUBFREE		= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%] ;
+	URI_USERCHAR		= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%:] ;
+	URI_HOSTCHAR__ext	= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%@:]  ;
+	URI_HOSTCHAR		= [A-Za-z0-9_\-~!&'\(\)\*\+,;=\$%@]  ;
 	URI_PATHCHAR__rfc3986	= ( URI_SUBFREE | [:@] );
-	URI_PATHCHAR		= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`];
-	URI_PATHCHAR__ext	= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/];
-	URI_QUERYCHAR		= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/?];
-	URI_FRAGMENTCHAR	= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/?#];
+	URI_PATHCHAR		= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`];
+	URI_PATHCHAR__ext	= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/];
+	URI_QUERYCHAR		= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/?];
+	URI_FRAGMENTCHAR	= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/?#];
+	URI_FINALCHAR		= URI_FRAGMENTCHAR \ [\.\,\:\;\!\?%];
 
 	URI_SCHEME		= [A-Za-z][A-Za-z0-9\+\-\.]* ;
 
-	URI_IP_FUTURE		= "v" (XDIGIT)+ "." ( URI_FREE | URI_SUB_DELIMS | ":" )+ ;
-	URI_IP_LITERAL		= "[" (IPv6 | URI_IP_FUTURE) "]" ;
 	URI_HOSTNAME            = ( URI_SUBFREE )+ ;
-	URI_HOSTNAME__dots	= URI_HOSTCHAR{2,} ("." URI_HOSTCHAR{2,})+ ;
 	URI_PORT		= [0-9]* ;
 	URI_HOST_ADDR		= URI_IP_LITERAL | IPv4;
 	URI_HOST        	= URI_HOST_ADDR | URI_HOSTNAME       ;
-	URI_HOST__dots        	= URI_HOST_ADDR | URI_HOSTNAME__dots ;
 	URI_USERINFO		= URI_USERCHAR* ;
-	URI_AUTHORITY           = (URI_USERINFO "@")? URI_HOST       (":" URI_PORT)? ;
-	URI_AUTHORITY__udots	= (URI_USERINFO "@")? URI_HOST__dots (":" URI_PORT)? ;
-	URI_AUTHORITY__dots	= 	              URI_HOST__dots (":" URI_PORT)? ;
-	URI_AUTHORITY__safe1    = URI_USERINFO ("@"|"www.") URI_HOSTCHAR{2,} ("." URI_HOSTCHAR{2,})* (":" URI_PORT)? ;
-	URI_AUTHORITY__safe2    = URI_HOSTCHAR+ ("." URI_HOSTCHAR+)* ("." [a-zA-Z]{2,4}) (":" URI_PORT)? ;
-
-	URI_AUTHORITY__safe     = URI_AUTHORITY__safe1 | URI_AUTHORITY__dots | "#" ;
+	URI_USERINFO__nz	= URI_USERCHAR+ ;
+	URI_AUTHORITY           = (URI_USERINFO "@")? URI_HOST (":" URI_PORT)? ;
 
 	URI_SEGMENT		= URI_PATHCHAR* ;
 	URI_PATH_NONEMPTY	= URI_PATHCHAR__ext+ ;
 	URI_PATH 		= ("/" URI_SEGMENT)* ;
-	URI_PATH__abs		= "/" URI_PATHCHAR__ext+ ;
 
 	URI_QUERY		= URI_QUERYCHAR* ;
 	URI_FRAGMENT		= URI_FRAGMENTCHAR* ;
 
-	URI__rfc3986	        = URI_SCHEME ":" "//"        URI_AUTHORITY        URI_PATH       ("?" URI_QUERY)?  ("#" URI_FRAGMENT)? ;
-	URI__schemed	        = URI_SCHEME ":" "/"{1,3}    URI_FRAGMENTCHAR{2,} ;
-	URI__link_dots		=                            URI_AUTHORITY__udots URI_FRAGMENTCHAR* ;
-	URI__link_safe		=                            URI_AUTHORITY__safe  URI_FRAGMENTCHAR* ;
-	LINK			= URI__schemed | URI__link_safe ;
+	URI__rfc3986	        = URI_SCHEME "://" URI_AUTHORITY URI_PATH ("?" URI_QUERY)? ("#" URI_FRAGMENT)? ;
+	URI__schemed	        = URI_SCHEME ":" "/"{1,3}    URI_FRAGMENTCHAR+ URI_FINALCHAR ;
+	URI__link_user		= URI_USERINFO__nz "@"       URI_FRAGMENTCHAR+ URI_FINALCHAR ;
+				  
+	LINK			= URI__schemed | URI__link_user ;
 	*/
 
-        //-- old link rules (pre-2013-11-18; ultimate target: LINK2) -- ought to work again with NUL sentinel
-        /*!re2c
-        MAILPART                = [A-Za-z0-9\._\-]+;
-        URI1a                   = (MAILPART "@")?([a-z] MAILPART ":" ("/"{1,3}|[a-z0-9%]));
-        URI1b                   = ([^ \x00\n\t\r\(\)<>]+|"("([^ \x00\t\n\r\(\)<>]+|("("[^ \x00\n\t\r\(\)<>]+")"))*")")*;
-        URI1c                   = ("("([^ \x00\t\n\r\(\)<>]+|("("[^ \x00\n\t\r\(\)<>]+")"))*")"|[^ \x00\n\t\r`!\(\)\[\]{};:'\"\.,<>?«»“”‘’]);
-
-        URI2a                   = (MAILPART "@")?[a-z0-9\.\-]+[\.][a-zA-z]{2,6};
-        URI2b                   = ([^ \x00\t\n\r\(\)<>]*[^ \x00\n\t\r`!\(\)\[\]{};:'\"\.,<>?«»“”‘’]|"("([^ \x00\t\n\r\(\)<>]+|("("[^ \x00\n\t\r\(\)<>]+")"))*")")*;
-        
-        URI1                    = URI1a URI1b URI1c;
-        URI2                    = URI2a URI2b;
-
-        LINK1                   = ([A-Za-z]+"://")?([A-Za-z0-9]+[\.])+[A-Za-z0-9]{2,6}[/A-Za-z0-9?:~\.]*;
-        LINK2                   = IP|URI1|URI2;
-	 */
-
-	//-- XML
+	//-- XML (DISABLED)
 	/*NOT_re2c
 	XML                     = "<"[/]?[a-zA-Z_\.?][^<>\n]*">";
-	*/
-
-	//-- links
-	/*NOT_re2c
-        LINK2                    { add_columns( yyleng() ); return wScanTypeLink; }
 	*/
 
 	/*!re2c
@@ -411,7 +388,7 @@ Any = Any1|Any2|Any3;
 	"$WB$"                   { add_columns( yyleng() ); return wScanTypeWB; }
 	"$SB$"                   { add_columns( yyleng() ); return wScanTypeSB; }
 
-	LINK                     { add_columns( yyleng() ); return wScanTypeLink; }
+	LINK			 { add_columns( yyleng() ); return wScanTypeLink; }
 
 	ROMAN                    { add_columns( yyleng() ); return wScanTypeRoman; }
 

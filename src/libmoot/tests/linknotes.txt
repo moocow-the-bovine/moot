@@ -1,0 +1,197 @@
+##-- old link rules (LINK2)
+sizes:
+ 1.3M	../wasteScannerScan.cc
+ 1.2M	../wasteScannerScan.o 
+tests: [-ab.an, -user@short, -@x, -#x]
++ ab ; 
+- ab.an 
+- ab.initio 
++ N . T . lichen 
++ http://foo.bar/baz?bonk=boffo 
++ http:/foo.bar/baz?bonk=boffo 
++ http:///foo.bar/baz?bonk=boffo 
++ http://föö.bär/bäz?bönk=böffo 
++ skronk://blap:8080#%20=%30 
++ foo.bar/baz 
++ foo.bar 
++ foo.bar/ 
++ foo.bar?baz=bonk 
++ foo.bar#blop 
++ 192.168.1.42 
+- 192.168.1.42 / foo 
++ google.de 
+- moocow @ cpan 
++ moocow@cpan.org 
+- @ blap 
+- @ bar.org 
+- @ Hänsel _ und _ Gretl 
+- # test _ fragment 
++ 115 — 122 . )
+
+##-- modified LINK2 rules
+	URI1			= URI_HOST  URI_PATH PATHCHAR_SAFE ;
+	URI2			= URI2_HOST URI2_PATH ;
+        LINK2                   = IP | URI1 | URI2;
+sizes:
+ 1.7M	../wasteScannerScan.cc
+ 1.4M	../wasteScannerScan.o
+tests: (-ab.an, -ab.initio, ...)
++ ab ; 
+- ab.an 
+- ab.initio 
++ N . T . lichen 
++ http://foo.bar/baz?bonk=boffo 
++ http:/foo.bar/baz?bonk=boffo 
++ http:///foo.bar/baz?bonk=boffo 
++ http://föö.bär/bäz?bönk=böffo 
++ skronk://blap:8080#%20=%30 
++ foo.bar/baz 
++ foo.bar 
++ foo.bar/ 
++ foo.bar?baz=bonk 
++ foo.bar#blop 
++ 192.168.1.42 
+- 192.168.1.42 / foo 
++ google.de 
++ moocow @ cpan 
++ moocow@cpan.org 
+- @ blap 
++ @bar.org 
+- @ Hänsel _ und _ Gretl 
+- # test _ fragment 
++ 115 — 122 . ) 
+
+##-- new link rules, scheme-only
+	URI__schemed	        = URI_SCHEME ":" "/"{1,3}    URI_FRAGMENTCHAR{2,} ;
+	LINK			= URI__schemed ;
+sizes:
+ 652K	../wasteScannerScan.cc
+ 852K	../wasteScannerScan.o
+tests: [-noscheme, -user@any, -@x, -#x]
++ ab ; 
++ ab . an 
++ ab . initio 
++ N . T . lichen 
++ http://foo.bar/baz?bonk=boffo 
++ http:/foo.bar/baz?bonk=boffo 
++ http:///foo.bar/baz?bonk=boffo 
++ http://föö.bär/bäz?bönk=böffo 
++ skronk://blap:8080#%20=%30 
+- foo . bar / baz 
+- foo . bar 
+- foo . bar / 
+- foo . bar ? baz = bonk 
+- foo . bar # blop 
+- 192 . 168 . 1 . 42 
+- 192 . 168 . 1 . 42 / foo 
+- google . de 
+- moocow @ cpan 
+- moocow @ cpan . org 
+- @ blap 
+- @ bar . org 
+- @ Hänsel _ und _ Gretl 
+- # test _ fragment 
++ 115 — 122 . )
+
+##-- new link rules, scheme + link_user
+	URI__schemed	        = URI_SCHEME ":" "/"{1,3}    URI_FRAGMENTCHAR{2,} ;
+	URI__link_user		= URI_USERINFO "@" URI_HOSTCHAR__ext+ ;
+	URI__link_www		= URI_USERINFO URI__link_host_www URI__link_suffix? ;
+	URI__link_safe		= URI_USERINFO URI__link_host URI__link_suffix? ;
+	LINK			= URI__schemed | URI__link_user ;
+size:
+ 1.8M	../wasteScannerScan.cc
+ 1.2M	../wasteScannerScan.o
+tests: [-noscheme, -#x]
++ ab ; 
++ ab . an 
++ ab . initio 
++ N . T . lichen 
++ http://foo.bar/baz?bonk=boffo 
++ http:/foo.bar/baz?bonk=boffo 
++ http:///foo.bar/baz?bonk=boffo 
++ http://föö.bär/bäz?bönk=böffo 
++ skronk://blap:8080#%20=%30 
+- foo . bar / baz 
+- foo . bar 
+- foo . bar / 
+- foo . bar ? baz = bonk 
+- foo . bar # blop 
+- 192 . 168 . 1 . 42 
+- 192 . 168 . 1 . 42 / foo 
+- google . de 
++ moocow@cpan 
++ moocow@cpan.org 
++ @blap 
++ @bar.org 
++ @Hänsel_und_Gretl 
+- # test _ fragment 
++ 115 — 122 . )
+
+##-- new link rules, scheme + link_user (separate rules)
+	URI__schemed	        = URI_SCHEME ":" "/"{1,3}    URI_FRAGMENTCHAR{2,} ;
+	URI__link_user		= URI_USERINFO "@" URI_HOSTCHAR__ext+ ;
+	...
+	URI__schemed		 { add_columns( yyleng() ); return wScanTypeLink; }
+	URI__link_user		 { add_columns( yyleng() ); return wScanTypeLink; }
+sizes:
+ 1.8M	../wasteScannerScan.cc
+ 1.2M	../wasteScannerScan.o
+tests:
++ ab ; 
++ ab . an 
++ ab . initio 
++ N . T . lichen 
++ http://foo.bar/baz?bonk=boffo 
++ http:/foo.bar/baz?bonk=boffo 
++ http:///foo.bar/baz?bonk=boffo 
++ http://föö.bär/bäz?bönk=böffo 
++ skronk://blap:8080#%20=%30 
+- foo . bar / baz 
+- foo . bar 
+- foo . bar / 
+- foo . bar ? baz = bonk 
+- foo . bar # blop 
+- 192 . 168 . 1 . 42 
+- 192 . 168 . 1 . 42 / foo 
+- google . de 
++ moocow@cpan 
++ moocow@cpan.org 
++ @blap 
++ @bar.org 
++ @Hänsel_und_Gretl 
+- # test _ fragment 
++ 115 — 122 . )
+
+##-- new link rules, scheme + link_at(~link_user) + link_hash
+	URI__link_at		= URI_USERINFO "@" URI_FRAGMENTCHAR+ ;
+	URI__link_hash		= "#" ALPHA (URI_FRAGMENTCHAR*) (ALPHA|DIGIT) ;
+	LINK			= URI__schemed | URI__link_at | URI__link_hash ;
+sizes:
+ 5.6M	../wasteScannerScan.cc
+
+tests:
++ ab ; 
++ ab . an 
++ ab . initio 
++ N . T . lichen 
++ http://foo.bar/baz?bonk=boffo 
++ http:/foo.bar/baz?bonk=boffo 
++ http:///foo.bar/baz?bonk=boffo 
++ http://föö.bär/bäz?bönk=böffo 
++ skronk://blap:8080#%20=%30 
+- foo . bar / baz 
+- foo . bar 
+- foo . bar / 
+- foo . bar ? baz = bonk 
+- foo . bar # blop 
+- 192 . 168 . 1 . 42 
+- 192 . 168 . 1 . 42 / foo 
+- google . de 
++ moocow@cpan 
++ moocow@cpan.org 
++ @blap 
++ @bar.org 
++ @Hänsel_und_Gretl 
+- # test _ fragment 
++ 115 — 122 . )

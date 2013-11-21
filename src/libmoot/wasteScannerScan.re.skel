@@ -64,83 +64,60 @@ int moot::wasteScanner::yylex ( )
 	DBYTE                   = ([2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[1-9]?[0-9]);
 
         IPv6                    = (((XDIGIT{1,4}":"){7}(XDIGIT{1,4}|":"))|((XDIGIT{1,4}":"){6}(":"XDIGIT{1,4}|(DBYTE([\.]DBYTE){3})|":"))|((XDIGIT{1,4}":"){5}(((":"XDIGIT{1,4}){1,2})|":"(DBYTE([\.]DBYTE){3})|":"))|((XDIGIT{1,4}":"){4}(((":"XDIGIT{1,4}){1,3})|((":"XDIGIT{1,4})?":"(DBYTE([\.]DBYTE){3}))|":"))|((XDIGIT{1,4}":"){3}(((":"XDIGIT{1,4}){1,4})|((":"XDIGIT{1,4}){0,2}":"(DBYTE([\.]DBYTE){3}))|":"))|((XDIGIT{1,4}":"){2}(((":"XDIGIT{1,4}){1,5})|((":"XDIGIT{1,4}){0,3}":"(DBYTE([\.]DBYTE){3}))|":"))|((XDIGIT{1,4}":"){1}(((":"XDIGIT{1,4}){1,6})|((":"XDIGIT{1,4}){0,4}":"(DBYTE([\.]DBYTE){3}))|":"))|(":"(((":"XDIGIT{1,4}){1,7})|((":"XDIGIT{1,4}){0,5}":"(DBYTE([\.]DBYTE){3}))|":")))([%][.]+)?;
-        IPv4                    = ((([0]?[1-9]|"00")?[0-9]|"1"[0-9][0-9]|"2"[0-4][0-9]|"25"[0-5])"."){3}(([0]?[1-9]|"00")?[0-9]|"1"[0-9][0-9]|"2"[0-4][0-9]|"25"[0-5]);
-        IP                      = IPv4|IPv6;
 
+        IPv4                    = ((([0]?[1-9]|"00")?[0-9]|"1"[0-9][0-9]|"2"[0-4][0-9]|"25"[0-5])"."){3}(([0]?[1-9]|"00")?[0-9]|"1"[0-9][0-9]|"2"[0-4][0-9]|"25"[0-5]);
+
+	URI_IP_FUTURE		= "v" (XDIGIT)+ "." [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$:]+ ;
+	URI_IP_LITERAL		= "[" (IPv6 | URI_IP_FUTURE) "]" ;
+
+        IP                      = IPv4 | IPv6 | URI_IP_LITERAL;
+	*/
+
+/*!re2c
 	URI_ESCAPE 		= "%" XDIGIT{2} ;
 
 	URI_GEN_DELIMS		= [:/?#\[\]@] ;
 	URI_SUB_DELIMS		= [!&'\(\)\*\+,;=\$] ;
 	URI_RESERVED		= URI_GEN_DELIMS | URI_SUB_DELIMS ;
-	URI_FREE		= [A-Za-z0-9\x80-\xff_\-\.~] ;
-	URI_SUBFREE		= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%] ;
-	URI_USERCHAR		= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:] ;
-	URI_HOSTCHAR		= [A-Za-z0-9\x80-\xff_\-~!&'\(\)\*\+,;=\$%@]  ;
+	URI_FREE		= [A-Za-z0-9_\-\.~] ;
+	URI_SUBFREE		= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%] ;
+	URI_USERCHAR		= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%:] ;
+	URI_HOSTCHAR__ext	= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%@:]  ;
+	URI_HOSTCHAR		= [A-Za-z0-9_\-~!&'\(\)\*\+,;=\$%@]  ;
 	URI_PATHCHAR__rfc3986	= ( URI_SUBFREE | [:@] );
-	URI_PATHCHAR		= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`];
-	URI_PATHCHAR__ext	= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/];
-	URI_QUERYCHAR		= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/?];
-	URI_FRAGMENTCHAR	= [A-Za-z0-9\x80-\xff_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/?#];
+	URI_PATHCHAR		= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`];
+	URI_PATHCHAR__ext	= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/];
+	URI_QUERYCHAR		= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/?];
+	URI_FRAGMENTCHAR	= [A-Za-z0-9_\-\.~!&'\(\)\*\+,;=\$%:@<>{}\[\]`/?#];
+	URI_FINALCHAR		= URI_FRAGMENTCHAR \ [\.\,\:\;\!\?%];
 
 	URI_SCHEME		= [A-Za-z][A-Za-z0-9\+\-\.]* ;
 
-	URI_IP_FUTURE		= "v" (XDIGIT)+ "." ( URI_FREE | URI_SUB_DELIMS | ":" )+ ;
-	URI_IP_LITERAL		= "[" (IPv6 | URI_IP_FUTURE) "]" ;
 	URI_HOSTNAME            = ( URI_SUBFREE )+ ;
-	URI_HOSTNAME__dots	= URI_HOSTCHAR{2,} ("." URI_HOSTCHAR{2,})+ ;
 	URI_PORT		= [0-9]* ;
 	URI_HOST_ADDR		= URI_IP_LITERAL | IPv4;
 	URI_HOST        	= URI_HOST_ADDR | URI_HOSTNAME       ;
-	URI_HOST__dots        	= URI_HOST_ADDR | URI_HOSTNAME__dots ;
 	URI_USERINFO		= URI_USERCHAR* ;
-	URI_AUTHORITY           = (URI_USERINFO "@")? URI_HOST       (":" URI_PORT)? ;
-	URI_AUTHORITY__udots	= (URI_USERINFO "@")? URI_HOST__dots (":" URI_PORT)? ;
-	URI_AUTHORITY__dots	= 	              URI_HOST__dots (":" URI_PORT)? ;
-	URI_AUTHORITY__safe1    = URI_USERINFO ("@"|"www.") URI_HOSTCHAR{2,} ("." URI_HOSTCHAR{2,})* (":" URI_PORT)? ;
-	URI_AUTHORITY__safe2    = URI_HOSTCHAR+ ("." URI_HOSTCHAR+)* ("." [a-zA-Z]{2,4}) (":" URI_PORT)? ;
-
-	URI_AUTHORITY__safe     = URI_AUTHORITY__safe1 | URI_AUTHORITY__dots | "#" ;
+	URI_USERINFO__nz	= URI_USERCHAR+ ;
+	URI_AUTHORITY           = (URI_USERINFO "@")? URI_HOST (":" URI_PORT)? ;
 
 	URI_SEGMENT		= URI_PATHCHAR* ;
 	URI_PATH_NONEMPTY	= URI_PATHCHAR__ext+ ;
 	URI_PATH 		= ("/" URI_SEGMENT)* ;
-	URI_PATH__abs		= "/" URI_PATHCHAR__ext+ ;
 
 	URI_QUERY		= URI_QUERYCHAR* ;
 	URI_FRAGMENT		= URI_FRAGMENTCHAR* ;
 
-	URI__rfc3986	        = URI_SCHEME ":" "//"        URI_AUTHORITY        URI_PATH       ("?" URI_QUERY)?  ("#" URI_FRAGMENT)? ;
-	URI__schemed	        = URI_SCHEME ":" "/"{1,3}    URI_FRAGMENTCHAR{2,} ;
-	URI__link_dots		=                            URI_AUTHORITY__udots URI_FRAGMENTCHAR* ;
-	URI__link_safe		=                            URI_AUTHORITY__safe  URI_FRAGMENTCHAR* ;
-	LINK			= URI__schemed | URI__link_safe ;
+	URI__rfc3986	        = URI_SCHEME "://" URI_AUTHORITY URI_PATH ("?" URI_QUERY)? ("#" URI_FRAGMENT)? ;
+	URI__schemed	        = URI_SCHEME ":" "/"{1,3}    URI_FRAGMENTCHAR+ URI_FINALCHAR ;
+	URI__link_user		= URI_USERINFO__nz "@"       URI_FRAGMENTCHAR+ URI_FINALCHAR ;
+				  
+	LINK			= URI__schemed | URI__link_user ;
 	*/
 
-        //-- old link rules (pre-2013-11-18; ultimate target: LINK2) -- ought to work again with NUL sentinel
-        /*!re2c
-        MAILPART                = [A-Za-z0-9\._\-]+;
-        URI1a                   = (MAILPART "@")?([a-z] MAILPART ":" ("/"{1,3}|[a-z0-9%]));
-        URI1b                   = ([^ \x00\n\t\r\(\)<>]+|"("([^ \x00\t\n\r\(\)<>]+|("("[^ \x00\n\t\r\(\)<>]+")"))*")")*;
-        URI1c                   = ("("([^ \x00\t\n\r\(\)<>]+|("("[^ \x00\n\t\r\(\)<>]+")"))*")"|[^ \x00\n\t\r`!\(\)\[\]{};:'\"\.,<>?«»“”‘’]);
-
-        URI2a                   = (MAILPART "@")?[a-z0-9\.\-]+[\.][a-zA-z]{2,6};
-        URI2b                   = ([^ \x00\t\n\r\(\)<>]*[^ \x00\n\t\r`!\(\)\[\]{};:'\"\.,<>?«»“”‘’]|"("([^ \x00\t\n\r\(\)<>]+|("("[^ \x00\n\t\r\(\)<>]+")"))*")")*;
-        
-        URI1                    = URI1a URI1b URI1c;
-        URI2                    = URI2a URI2b;
-
-        LINK1                   = ([A-Za-z]+"://")?([A-Za-z0-9]+[\.])+[A-Za-z0-9]{2,6}[/A-Za-z0-9?:~\.]*;
-        LINK2                   = IP|URI1|URI2;
-	 */
-
-	//-- XML
+	//-- XML (DISABLED)
 	/*NOT_re2c
 	XML                     = "<"[/]?[a-zA-Z_\.?][^<>\n]*">";
-	*/
-
-	//-- links
-	/*NOT_re2c
-        LINK2                    { add_columns( yyleng() ); return wScanTypeLink; }
 	*/
 
 	/*!re2c
@@ -150,7 +127,7 @@ int moot::wasteScanner::yylex ( )
 	"$WB$"                   { add_columns( yyleng() ); return wScanTypeWB; }
 	"$SB$"                   { add_columns( yyleng() ); return wScanTypeSB; }
 
-	LINK                     { add_columns( yyleng() ); return wScanTypeLink; }
+	LINK			 { add_columns( yyleng() ); return wScanTypeLink; }
 
 	ROMAN                    { add_columns( yyleng() ); return wScanTypeRoman; }
 

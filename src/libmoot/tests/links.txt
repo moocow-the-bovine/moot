@@ -7,6 +7,7 @@ http:/foo.bar/baz?bonk=boffo
 http:///foo.bar/baz?bonk=boffo
 http://föö.bär/bäz?bönk=böffo
 skronk://blap:8080#%20=%30
+http://blap:8080.
 foo.bar/baz
 foo.bar
 foo.bar/
@@ -20,4 +21,5 @@ moocow@cpan.org
 @blap
 @bar.org
 @Hänsel_und_Gretl
-#this_is_a_fragment
+#test_fragment
+115—122.)
