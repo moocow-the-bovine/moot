@@ -45,6 +45,22 @@
 namespace moot
 {
 
+  /** bitmask flags for possible lexer states (mainly used for dehyphenation) */
+  enum wasteLexer_state
+  {
+    ls_flush   = 0x0001,
+    ls_hyph    = 0x0002,
+    ls_head    = 0x0004,
+    ls_tail    = 0x0008,
+    ls_nl      = 0x0010,
+    ls_sb_fw   = 0x0020,
+    ls_wb_fw   = 0x0040,
+    ls_blanked = 0x0080,
+  };
+  static const int ls_init         = (ls_wb_fw | ls_sb_fw | ls_blanked); /**< initial state of the lexer*/
+  static const int ls_head_hyph    = ( ls_head | ls_hyph ); /**< lexer has seen some word followed by a hyphen */
+  static const int ls_head_hyph_nl = ( ls_head_hyph | ls_nl ); /**< lexer has seen some word followed by a hyphen and a newline */
+
   /*============================================================================
    * wasteLexerToken
    */
@@ -102,7 +118,7 @@ namespace moot
   /** \brief Mid-level TokenReader scanner stage
    *  \detail performs (optional) hyphenation normalization and text classification
    */
-  class wasteLexer : public TokenReader
+  class wasteLexer
   {
     public:
       //--------------------------------------------------------------------
@@ -114,22 +130,6 @@ namespace moot
 
       /** List of wasteLexerToken for buffering while dehyphenating */
       typedef std::list<wasteLexerToken> wasteTokenBuffer;
-      
-      /** bitmask flags for possible lexer states (mainly used for dehyphenation) */
-      enum wasteLexer_state
-      {
-        ls_flush   = 0x0001,
-        ls_hyph    = 0x0002,
-        ls_head    = 0x0004,
-        ls_tail    = 0x0008,
-        ls_nl      = 0x0010,
-        ls_sb_fw   = 0x0020,
-        ls_wb_fw   = 0x0040,
-        ls_blanked = 0x0080,
-      };
-      static const int ls_init         = (ls_wb_fw | ls_sb_fw | ls_blanked); /**< initial state of the lexer*/
-      static const int ls_head_hyph    = ( ls_head | ls_hyph ); /**< lexer has seen some word followed by a hyphen */
-      static const int ls_head_hyph_nl = ( ls_head_hyph | ls_nl ); /**< lexer has seen some word followed by a hyphen and a newline */
       //@}
 
       //--------------------------------------------------------------------
@@ -200,9 +200,6 @@ namespace moot
       /*------------------------------------------------------------*/
       /** \name Low-level data */
       //@{
-      TokenReader      *scanner;          /**< Input source */
-      mootToken         wl_token;         /**< Local token */
-      mootSentence      wl_sentence;      /**< Local sentence */
       wasteTagset       wl_tagset;        /**< Token feature bundles */
       int               wl_state;         /**< Current state of the lexer */
       wasteTokenBuffer  wl_tokbuf;        /**< Buffer for dehyphenation */
@@ -226,58 +223,15 @@ namespace moot
       /** \name Constructors etc. */
       //@{
       /** Default constructor */
-      wasteLexer(int fmt=tiofUnknown, const std::string &myname="wasteLexer");
+      wasteLexer();
 
       /** Destructor */
       virtual ~wasteLexer();
       //@}
 
-      /*------------------------------------------------------------
-       * TokenReader: Input Selection
-       */
-      /** \name Input Selection */
-      //@{
-
-      /** Select input from a mootio::mistream pointer; just wraps scanner->from_mstream() */
-      virtual void from_mstream(mootio::mistream *mistreamp);
-
-      /**
-       * Finish input from currently selected source & perform any required cleanup operations.
-       * Currently just sets scanner=NULL and user is responsible for closing the scanner.
-       */
-      virtual void close();
-      //@}
-
-      /*------------------------------------------------------------
-       * TokenReader: Diagnostics
-       */
-      /** \name Diagnostics */
-      //@{
-
-      /** Get current line number. Descendants may override this method. */
-      virtual size_t line_number(void) { return scanner ? scanner->line_number() : 0; };
-
-      /** Set current line number. Descendants may override this method. */
-      virtual size_t line_number(size_t n) { return scanner ? scanner->line_number(n) : 0; };
-
-      /** Get current column number. Descendants may override this method. */
-      virtual size_t column_number(void) { return scanner ? scanner->column_number() : 0; };
-
-      /** Set current column number. Descendants may override this method. */
-      virtual size_t column_number(size_t n) { return scanner ? scanner->column_number(n) : 0; };
-
-      /** Get current byte number. Descendants may override this method. */
-      virtual mootio::ByteOffset byte_number(void) { return scanner ? scanner->byte_number() : 0; };
-
-      /** Get current byte number. Descendants may override this method. */
-      virtual mootio::ByteOffset byte_number(size_t n) { return scanner ? scanner->byte_number(n) : 0; };
-      //@}
-
       /*------------------------------------------------------------*/
-      /** \name wasteLexer's own functions */
+      /** \name Lexing functions */
       //@{
-      /** Set token source (usually some wasteScanner) */
-      void from_reader(TokenReader *reader);
 
       /** Length to length attribute conversion */
       inline len length_attr(size_t length) const
@@ -303,37 +257,123 @@ namespace moot
       void set_token(mootToken &token, wasteLexerToken &lex_token);
 
       /**
-       * Mpves the next token(s) from internal scanner to internal buffer.
+       * Moves stok to internal buffer.
        * If wl_dehyph_mode is true, seeks and removes hyphenations.
        */
-      void buffer_token(void);
+      void buffer_token(mootToken& stok);
 
-      /** Turn on/off dehyphenation mode **/
-      inline void dehyph_mode(bool on)
-      {
-        wl_dehyph_mode = on;
-      };
-      //@}
-
-      /*------------------------------------------------------------
-       * TokenReader: Token-Level Access
-       */
-      /** \name Token-Level Access */
-      //@{
-      /**
-       * Get the next token from the buffer.
-       * On completion, current token (if any) is in *tr_token.
-       */
-      virtual mootTokenType get_token(void);
-
-      /**
-       * Buffer the remaining tokens from the currently selected input
-       * stream as a mootSentence.
-       * On completion, buffered tokens (if any) are in *tr_sentence.
-       */
-      virtual mootTokenType get_sentence(void);
+      void reset(void);
       //@}
   };
+
+  /*============================================================================
+   * wasteLexerReader
+   */
+  /** \brief Raw text scanner class returning mootToken; wraps wasteLexer */
+  class wasteLexerReader : public TokenReader {
+  public:
+    /*----------------------------------------
+     * LexerReader: Data
+     */
+    /** underlying lexer object */
+    wasteLexer lexer;
+
+    /** data source */
+    TokenReader *scanner;
+
+    /** token buffer for get_token() */
+    mootToken wlr_token;
+
+    /** sentence/document buffer for get_sentence() */
+    mootSentence wlr_sentence;
+
+  public:
+    //------------------------------------------------------------
+    /** \name Constructors etc. */
+    //@{
+    /**
+     * Default constructor
+     * @param fmt bitmask of moot::TokenIOFormat flags.
+     *  \li set moot::tiofTagged to assign token tags to wasteLexerTypeNames[]
+     *  \li set moot::tiofAnalyzed to assign single analysis-strings to wasteLexerTypeNames[]
+     * @param name name of current input source
+     */
+    wasteLexerReader(int                fmt  =tiofText,
+		     const std::string &name ="wasteLexerReader");
+
+    /** Default destructor */
+    virtual ~wasteLexerReader(void);
+    //@}
+
+    /*------------------------------------------------------------
+     * TokenReader: Input Selection
+     */
+    /** \name Input Selection */
+    //@{
+    /** Set token source (usually some wasteScanner) */
+    void from_reader(TokenReader *reader);
+
+    /** Select input from a mootio::mistream pointer. */
+    virtual void from_mstream(mootio::mistream *mistreamp);
+
+    /**
+     * Finish input from currently selected source & perform any required cleanup operations.
+     * Currently just sets scanner=NULL and user is responsible for closing the scanner.
+     */
+    virtual void close(void);
+
+    /** Turn on/off dehyphenation mode **/
+    inline void dehyph_mode(bool on)
+    {
+      lexer.wl_dehyph_mode = on;
+    };
+    //@}
+
+    /*------------------------------------------------------------
+     * TokenReader: Token-Level Access
+     */
+    /** \name Token-Level Access */
+    //@{
+    /**
+     * Get the next token from the buffer.
+     * On completion, current token (if any) is in *tr_token.
+     */
+    virtual mootTokenType get_token(void);
+    
+    /**
+     * Buffer the remaining tokens from the currently selected input
+     * stream as a mootSentence.
+     * On completion, buffered tokens (if any) are in *tr_sentence.
+     */
+    virtual mootTokenType get_sentence(void);
+    //@}
+
+    /*------------------------------------------------------------
+     * TokenReader: Diagnostics
+     */
+    /** \name Diagnostics */
+    //@{
+
+    /** Get current line number. Descendants may override this method. */
+    virtual size_t line_number(void) { return scanner ? scanner->line_number() : 0; };
+
+    /** Set current line number. Descendants may override this method. */
+    virtual size_t line_number(size_t n) { return scanner ? scanner->line_number(n) : 0; };
+
+    /** Get current column number. Descendants may override this method. */
+    virtual size_t column_number(void) { return scanner ? scanner->column_number() : 0; };
+
+    /** Set current column number. Descendants may override this method. */
+    virtual size_t column_number(size_t n) { return scanner ? scanner->column_number(n) : 0; };
+
+    /** Get current byte number. Descendants may override this method. */
+    virtual mootio::ByteOffset byte_number(void) { return scanner ? scanner->byte_number() : 0; };
+
+    /** Get current byte number. Descendants may override this method. */
+    virtual mootio::ByteOffset byte_number(size_t n) { return scanner ? scanner->byte_number(n) : 0; };
+    //@}
+  };
+
 
 } // namespace moot
 

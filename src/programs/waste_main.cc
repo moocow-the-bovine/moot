@@ -70,7 +70,7 @@ mofstream out;
 //-- optional objects
 TokenReader  *reader=NULL;
 wasteTokenScanner *scanner=NULL;
-wasteLexer   *lexer=NULL;
+wasteLexerReader   *lexer=NULL;
 mootHMM      *tagger=NULL;
 wasteDecoder *decoder=NULL;
 wasteTrainWriter *trainwriter=NULL;
@@ -271,15 +271,15 @@ void churn_io(TokenReader *reader, TokenWriter *writer=main_writer, mootHMM *hmm
 /*--------------------------------------------------------------------------
  * guts: scanner/lexer: setup lexer
  */
-void setup_lexer(wasteLexer *lexer, TokenReader *reader=NULL)
+void setup_lexer(wasteLexerReader *lexer, TokenReader *reader=NULL)
 {
-  if (args.abbrevs_given && !lexer->wl_abbrevs.load(args.abbrevs_arg))
+  if (args.abbrevs_given && !lexer->lexer.wl_abbrevs.load(args.abbrevs_arg))
     moot_croak("%s: ERROR: can't load abbreviation lexicon from '%s': %s\n", PROGNAME, args.abbrevs_arg, strerror(errno));
 
-  if (args.conjunctions_given && !lexer->wl_conjunctions.load(args.conjunctions_arg))
+  if (args.conjunctions_given && !lexer->lexer.wl_conjunctions.load(args.conjunctions_arg))
     moot_croak("%s: ERROR: can't load conjunction lexicon from '%s': %s\n", PROGNAME, args.conjunctions_arg, strerror(errno));
 
-  if (args.stopwords_given && !lexer->wl_stopwords.load(args.stopwords_arg))
+  if (args.stopwords_given && !lexer->lexer.wl_stopwords.load(args.stopwords_arg))
     moot_croak("%s: ERROR: can't load stopword lexicon from '%s': %s\n", PROGNAME, args.stopwords_arg, strerror(errno));
 
   if (reader)
@@ -287,9 +287,9 @@ void setup_lexer(wasteLexer *lexer, TokenReader *reader=NULL)
 }
 
 //--------------------------------------------------------------------------
-wasteLexer *get_lexer(int lexfmt=tiofUnknown, TokenReader *reader=NULL)
+wasteLexerReader *get_lexer(int lexfmt=tiofUnknown, TokenReader *reader=NULL)
 {
-  wasteLexer *lexer = new wasteLexer(lexfmt);
+  wasteLexerReader *lexer = new wasteLexerReader(lexfmt);
   lexer->dehyph_mode(args.dehyphenate_flag > 0);
   setup_lexer(lexer,reader);
   return lexer;

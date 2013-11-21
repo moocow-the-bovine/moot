@@ -29,18 +29,12 @@ moot_BEGIN_NAMESPACE
  */
 
 //----------------------------------------------------------------------
-wasteLexer::wasteLexer(int fmt, const std::string &myname)
-  : TokenReader(fmt, myname),
-    scanner(NULL),
-    wl_state(ls_init),
+wasteLexer::wasteLexer()
+  : wl_state(ls_init),
     wl_current_tok(NULL),
     wl_head_tok(NULL),
     wl_dehyph_mode(true)
 {
-  // wasteLexer has local contents
-  tr_token = &wl_token;
-  tr_sentence = &wl_sentence;
-
   // build the tagset
   const char* cls_strings[n_cls] = {"stop","rom","alpha","num","$.","$,","$:","$;","$?","$(","$)","$-","$+","$/","$\"","$\'","$~","other"};
   const char* cas_strings[n_cas] = {"*","lo","up","cap"};
@@ -90,35 +84,19 @@ wasteLexer::~wasteLexer()
 }
 
 //----------------------------------------------------------------------
-void wasteLexer::from_reader(TokenReader *reader)
+void wasteLexer::reset(void)
 {
-  scanner = reader;
-}
-
-//----------------------------------------------------------------------
-void wasteLexer::from_mstream(mootio::mistream *mistreamp)
-{
-  if (scanner)
-    scanner->from_mstream(mistreamp);
-}
-
-//----------------------------------------------------------------------
-void wasteLexer::close(void)
-{
-  //if (scanner) scanner->close(); //-- moo: dangerous: this is probably NOT a good idea (the user sets scanner, so he/she is responsible!)
-  scanner = NULL;
   wl_state = ls_init;
   wl_current_tok = NULL;
   wl_head_tok = NULL;
 }
 
 //----------------------------------------------------------------------
-void wasteLexer::buffer_token(void)
+void wasteLexer::buffer_token(mootToken& stok)
 {
   wl_state &= ~(ls_flush);
   wasteLexerToken local_token;
-  int stoktype = scanner->get_token();
-  local_token.wlt_token = (stoktype!=TokTypeEOF ? *(scanner->token ()) : mootToken(TokTypeEOF));
+  local_token.wlt_token = stok;
   wasteLexerType lextype;
   switch (local_token.wlt_token.tok_type) {
     case TokTypeVanilla:
@@ -253,52 +231,6 @@ void wasteLexer::buffer_token(void)
       break;
   }
   wl_tokbuf.push_back(local_token);
-}
-
-//----------------------------------------------------------------------
-mootTokenType wasteLexer::get_token(void)
-{
-  wl_token.clear();
-
-  //-- if scanner has not been set return EOF
-  if (!scanner)
-    return wl_token.toktype(TokTypeEOF);
-
-  //-- fill internal token buffer, calls scanner::get_token
-  while (wl_tokbuf.empty() || ((wl_state & ls_flush) == 0))
-  {
-    buffer_token ();
-  }
-
-  while (!wl_tokbuf.empty() && wl_tokbuf.front().wlt_token.tok_type ==  TokTypeUnknown) // skip unknown tokens
-  {
-    wl_tokbuf.pop_front();
-  }
-
-  if (wl_tokbuf.empty()) return TokTypeEOF;
-  wl_token = wl_tokbuf.front().wlt_token;
-  switch (wl_token.tok_type)
-  {
-    case TokTypeVanilla:
-    case TokTypeLibXML:
-      set_token(wl_token, wl_tokbuf.front());
-    default:
-      break;
-  }
-
-  wl_tokbuf.pop_front();
-  return wl_token.toktype();
-}
-
-//----------------------------------------------------------------------
-mootTokenType wasteLexer::get_sentence(void)
-{
-  wl_sentence.clear();
-  mootTokenType toktyp;
-  for (toktyp=get_token(); toktyp != TokTypeEOF; toktyp=get_token()) {
-    wl_sentence.push_back( wl_token );
-  }
-  return toktyp;
 }
 
 //----------------------------------------------------------------------
@@ -452,5 +384,95 @@ void wasteLexer::set_token(mootToken &token, wasteLexerToken &lex_token)
     token.insert(wl_tagset[tok_class][tok_case][tok_abbr][tok_length][tok_blanked][i], analysis);
   }
 }
+
+/*==========================================================================
+ * wasteLexerReader
+ */
+
+//----------------------------------------------------------------------
+wasteLexerReader::wasteLexerReader(int fmt, const std::string &name)
+  : TokenReader(fmt,name),
+    scanner(NULL)
+{
+  tr_token = &wlr_token;
+  tr_sentence = &wlr_sentence;
+}
+
+//----------------------------------------------------------------------
+wasteLexerReader::~wasteLexerReader(void)
+{}
+
+//----------------------------------------------------------------------
+void wasteLexerReader::from_mstream(mootio::mistream *mistreamp)
+{
+  tr_istream         = mistreamp;
+  tr_istream_created = false;
+  if (scanner)
+    scanner->from_mstream(mistreamp);
+}
+
+//----------------------------------------------------------------------
+void wasteLexerReader::from_reader(TokenReader *reader)
+{
+  scanner = reader;
+}
+
+//----------------------------------------------------------------------
+void wasteLexerReader::close(void)
+{
+  wlr_token.clear();
+  wlr_sentence.clear();
+  scanner = NULL;
+  lexer.reset();
+  TokenReader::close();
+}
+
+//----------------------------------------------------------------------
+mootTokenType wasteLexerReader::get_token(void)
+{
+  wlr_token.clear();
+
+  //-- if scanner has not been set return EOF
+  if (!scanner)
+    return wlr_token.toktype(TokTypeEOF);
+
+  //-- fill internal token buffer, calls scanner::get_token
+  while (lexer.wl_tokbuf.empty() || ((lexer.wl_state & ls_flush) == 0))
+  {
+    scanner->get_token();
+    lexer.buffer_token (*(scanner->token()));
+  }
+
+  while (!lexer.wl_tokbuf.empty() && lexer.wl_tokbuf.front().wlt_token.tok_type ==  TokTypeUnknown) // skip unknown tokens
+  {
+    lexer.wl_tokbuf.pop_front();
+  }
+
+  if (lexer.wl_tokbuf.empty()) return TokTypeEOF;
+  wlr_token = lexer.wl_tokbuf.front().wlt_token;
+  switch (wlr_token.tok_type)
+  {
+    case TokTypeVanilla:
+    case TokTypeLibXML:
+      lexer.set_token(wlr_token, lexer.wl_tokbuf.front());
+    default:
+      break;
+  }
+
+  lexer.wl_tokbuf.pop_front();
+  return wlr_token.toktype();
+}
+
+//----------------------------------------------------------------------
+mootTokenType wasteLexerReader::get_sentence(void)
+{
+  wlr_sentence.clear();
+  mootTokenType toktyp;
+  for (toktyp=get_token(); toktyp != TokTypeEOF; toktyp=get_token()) {
+    wlr_sentence.push_back( wlr_token );
+  }
+  return toktyp;
+}
+
 
 moot_END_NAMESPACE

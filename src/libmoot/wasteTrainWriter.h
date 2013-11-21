@@ -61,7 +61,7 @@ public:
   /// \name local data
   //@{
   wasteTokenScanner  wt_scanner;   /**< scanner for token-internalsegmentation */
-  wasteLexer         wt_lexer;     /**< lexer for classification */
+  wasteLexerReader   wt_lexer;     /**< lexer for classification */
   TokenWriter       *wt_writer;    /**< subordinate writer, sink for "well-done" segments */
 
   mootSentence       wt_segbuf;    /**< local segment buffer */
