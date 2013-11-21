@@ -189,7 +189,6 @@ sub scanner_pump {
   $Data::Dumper::Pair = '=>';
   $Data::Dumper::Sortkeys = 1;
   $|=1;
-
   my ($w);
   while (defined($w=$tr->get_token)) {
     $w->{type} .= ' '.$Moot::TokType[$w->{type}];
@@ -213,7 +212,7 @@ sub test_wscan {
   print STDERR "test_wscan() done\n"; exit 0;
 }
 #test_wscan(file=>'scanme.txt');
-#test_wscan(fh=>\*STDIN);
+test_wscan(fh=>\*STDIN);
 #test_wscan(string=>"Test 123\nfoo bar.");
 #test_wscan(stringfh=>"Test 123\nfoo bar.");
 #test_wscan(file=>'argh.txt');
@@ -620,7 +619,7 @@ sub test_rttz_train {
 
   print STDERR "%% $0: test_rttz_train(): done\n";
 }
-test_rttz_train(@ARGV);
+#test_rttz_train(@ARGV);
 
 ##--------------------------------------------------------------
 ## MAIN
