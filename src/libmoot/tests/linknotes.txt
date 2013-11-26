@@ -96,8 +96,6 @@ tests: [-noscheme, -user@any, -@x, -#x]
 ##-- new link rules, scheme + link_user
 	URI__schemed	        = URI_SCHEME ":" "/"{1,3}    URI_FRAGMENTCHAR{2,} ;
 	URI__link_user		= URI_USERINFO "@" URI_HOSTCHAR__ext+ ;
-	URI__link_www		= URI_USERINFO URI__link_host_www URI__link_suffix? ;
-	URI__link_safe		= URI_USERINFO URI__link_host URI__link_suffix? ;
 	LINK			= URI__schemed | URI__link_user ;
 size:
  1.8M	../wasteScannerScan.cc

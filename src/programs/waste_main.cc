@@ -217,7 +217,7 @@ void GetMyOptions(int argc, char **argv)
   //-- i/o formats: mode-dependent hacks: output
   switch (modeLast(mode)) {
   case wmTrain:		ofmt_implied |= tiofText|tiofTagged|tiofAnalyzed; break;
-  case wmDecode:	ofmt_implied |= tiofTagged; break;
+  case wmDecode:	ofmt_implied |= tiofText; break;
   case wmTag:		ofmt_implied |= tiofTagged; break;
   case wmLex:		ofmt_implied |= tiofAnalyzed; break;
   case wmScan:		break;
