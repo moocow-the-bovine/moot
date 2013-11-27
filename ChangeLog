@@ -1,5 +1,18 @@
 ChangeLog for package moot
 
+v2.0.10 Wed, 27 Nov 2013 09:57:22 +0100 moocow and kmw
+	+ added "waste" tokenizer support classes and command-line utility
+	  * merged into moot sources from dwds_tomasotath v0.5.x
+	+ added perl support for TokenReader/TokenWriter classes
+	  * still missing: pure-perl Token(Reader|Writer) subclassing
+	+ improved hint and comment passing in TokenIO
+	  * tokenizer hints "$WB$", "$SB$" are now passed through as pseudo-comments
+	+ TokenReaderNative no longer trims intial or final token whitespace
+	+ Token(Reader|Writer)Native format change: location is now BEFORE 'besttag'
+	  * this corresponds to formats used by dwds_tomasotath and DTA::CAB, but
+	    is not actually what Token(Reader|Writer)Native had been using
+	  * change makes no difference for 'rare' or 'medium-rare' formats
+
 v2.0.9 Thu, 11 Aug 2011 15:04:19 +0200
 	+ fixed mootHMM::estimate_lambdas() bug resulting in nan smoothing constants
 	  if no trigrams were present in the training data

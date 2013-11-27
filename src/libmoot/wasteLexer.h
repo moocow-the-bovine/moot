@@ -115,7 +115,7 @@ namespace moot
   /*============================================================================
    * wasteLexer
    */
-  /** \brief Mid-level TokenReader scanner stage
+  /** \brief Mid-level scanner stage
    *  \detail performs (optional) hyphenation normalization and text classification
    */
   class wasteLexer
@@ -269,11 +269,11 @@ namespace moot
   /*============================================================================
    * wasteLexerReader
    */
-  /** \brief Raw text scanner class returning mootToken; wraps wasteLexer */
+  /** \brief Mid-level scanner stage, wraps moot::wasteLexer in moot::TokenReader API */
   class wasteLexerReader : public TokenReader {
   public:
     /*----------------------------------------
-     * LexerReader: Data
+     * wasteLexerReader: Data
      */
     /** underlying lexer object */
     wasteLexer lexer;
