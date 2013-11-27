@@ -30,17 +30,17 @@ CODE:
 MODULE = Moot		PACKAGE = Moot::Waste::Lexer
 
 ##--------------------------------------------------------------
-wasteLexer*
+wasteLexerReader*
 new(char *CLASS, TokenIOFormatMask fmt=tiofUnknown)
 CODE:
- RETVAL=new wasteLexer(fmt, CLASS);
+ RETVAL=new wasteLexerReader(fmt, CLASS);
  //fprintf(stderr, "%s::new() --> %p=%i\n", CLASS,RETVAL,RETVAL);
 OUTPUT:
  RETVAL
 
 ##-------------------------------------------------------------
 void
-close(wasteLexer *wl)
+close(wasteLexerReader *wl)
 CODE:
  wl->close();  
  if (wl->tr_data) {
@@ -50,7 +50,7 @@ CODE:
 
 ##-------------------------------------------------------------
 ##int
-##_scanner_refcnt(wasteLexer *wl)
+##_scanner_refcnt(wasteLexerReader *wl)
 ##CODE:
 ## if (wl->tr_data) {
 ##   RETVAL = SvREFCNT((SV*)SvRV((SV*)wl->tr_data));
@@ -62,7 +62,7 @@ CODE:
 
 ##-------------------------------------------------------------
 SV*
-_get_scanner(wasteLexer *wl)
+_get_scanner(wasteLexerReader *wl)
 CODE:
  if (!wl->tr_data || !wl->scanner) { XSRETURN_UNDEF; }
  RETVAL = newSVsv((SV*)wl->tr_data);
@@ -71,7 +71,7 @@ OUTPUT:
 
 ##-------------------------------------------------------------
 void
-_set_scanner(wasteLexer *wl, SV *scanner_sv)
+_set_scanner(wasteLexerReader *wl, SV *scanner_sv)
 PREINIT:
   TokenReader *tr;
 CODE:
@@ -86,50 +86,50 @@ CODE:
 
 ##--------------------------------------------------------------
 bool
-dehyphenate(wasteLexer* wl, ...)
+dehyphenate(wasteLexerReader* wl, ...)
 CODE:
  if (items > 1) {
    bool on = (bool)SvTRUE( ST(1) );
    wl->dehyph_mode(on);
  }
- RETVAL = wl->wl_dehyph_mode;
+ RETVAL = wl->lexer.wl_dehyph_mode;
 OUTPUT:
  RETVAL
 
 ##--------------------------------------------------------------
 wasteLexicon*
-stopwords(wasteLexer* wl)
+stopwords(wasteLexerReader* wl)
 PREINIT:
  const char *CLASS="Moot::Waste::Lexicon";
 CODE:
- RETVAL = &wl->wl_stopwords;
+ RETVAL = &wl->lexer.wl_stopwords;
 OUTPUT:
  RETVAL
 
 ##--------------------------------------------------------------
 wasteLexicon*
-abbrevs(wasteLexer* wl)
+abbrevs(wasteLexerReader* wl)
 PREINIT:
  const char *CLASS="Moot::Waste::Lexicon";
 CODE:
- RETVAL = &wl->wl_abbrevs;
+ RETVAL = &wl->lexer.wl_abbrevs;
 OUTPUT:
  RETVAL
 
 ##--------------------------------------------------------------
 wasteLexicon*
-conjunctions(wasteLexer* wl)
+conjunctions(wasteLexerReader* wl)
 PREINIT:
  const char *CLASS="Moot::Waste::Lexicon";
 CODE:
- RETVAL = &wl->wl_conjunctions;
+ RETVAL = &wl->lexer.wl_conjunctions;
 OUTPUT:
  RETVAL
 
 
 ##=====================================================================
 ## Moot::Waste::Lexicon
-## - NO standalone objects allowed: always accessed via wasteLexer (so we can skip ref-counting)
+## - NO standalone objects allowed: always accessed via wasteLexerReader (so we can skip ref-counting)
 ##=====================================================================
 
 MODULE = Moot		PACKAGE = Moot::Waste::Lexicon

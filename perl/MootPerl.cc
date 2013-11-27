@@ -151,6 +151,7 @@ const char *TokenReaderClass(const TokenReader *tr)
   else if (tr->tr_name == "TokenReaderExpat")  return "Moot::TokenReader::XML";
   else if (tr->tr_name == "wasteTokenScanner") return "Moot::Waste::Scanner";
   else if (tr->tr_name == "wasteLexer")        return "Moot::Waste::Lexer";
+  else if (tr->tr_name == "wasteLexerReader")  return "Moot::Waste::Lexer";
   return tr->tr_name.c_str();
 }
 

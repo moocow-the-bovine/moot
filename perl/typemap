@@ -15,7 +15,7 @@ TokenWriterNative*  O_OBJECT
 TokenReaderExpat*   O_OBJECT
 TokenWriterExpat*   O_OBJECT
 wasteTokenScanner*  O_OBJECT
-wasteLexer* 	    O_OBJECT
+wasteLexerReader*   O_OBJECT
 wasteDecoder* 	    O_OBJECT
 
 #mootSentence*     T_AV
