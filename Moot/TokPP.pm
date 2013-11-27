@@ -77,8 +77,8 @@ sub analyze_buffer {
     my $obuf = '';
     $oref = \$obuf;
   }
-  open(my $infh,  "<", $iref);
-  open(my $outfh, ">", $oref);
+  open(my $infh,  "<:utf8", $iref);
+  open(my $outfh, ">:utf8", $oref);
   $that->analyze_stream($infh,$outfh);
   $infh->close;
   $outfh->close;
