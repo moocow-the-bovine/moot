@@ -5,6 +5,7 @@ use Moot::TokPP;
 use Getopt::Long;
 use File::Basename qw(basename);
 use Pod::Usage;
+use utf8;
 
 use open ':std',':utf8';
 

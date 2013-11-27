@@ -1,3 +1,6 @@
+§
+42
+¶
 Test
 ,
 and
@@ -9,6 +12,8 @@ and
 IV.
 .
 http://foo.bar
+www.foo.bar
+user@somewhere.else
 usw.
 4:3
 

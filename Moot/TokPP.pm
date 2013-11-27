@@ -1,6 +1,7 @@
 package Moot::TokPP;
 use Carp;
 use strict;
+use utf8;
 
 our @ISA = qw();
 
@@ -9,17 +10,18 @@ our %literal = (
 	       '.' => "\t[\$.]",
 	       '%' => "\t[NN]\t[\$PERCENT]",
 	       '§' => "\t[NN]\t[XY]\t[\$PARAGRAPH]",
+	       '¶' => "\t[NN]\t[XY]\t[\$PARAGRAPH]",
 	      );
 our @rules = (
 	     [qr{^[\:\.]+$},			 "\t[\$(]\t[\$.]"],
 	     [qr{^[\?\!]+$},			 "\t[\$.]"],
-	     [qr{^[[:punct:]]+$},		 "\t[\$(]"],
+	     [qr{^[[:punct:]\p{Symbol}]+$},	 "\t[\$(]"],
 	     [qr{^[\+\-]?\d+(?:[\.\s:,_]\d+)*$}, "\t[CARD]"],
 	     [qr{^[\+\-]?\d+(?:[\.\s:,_]\d+)*\.$}, "\t[ORD]"],
 	     [qr{^[ivxlcdm]+\.$},		  "\t[ORD]\t[XY]\t[\$ABBREV]"],
 	     [qr{\.$},				  "\t[XY]\t[\$ABBREV]"],
 	     [qr{^\-},				  "\t[TRUNC]"],
-	     [qr{^[[:alpha:]]+:/},		  "\t[NN]\t[NE]\t[XY]\t[\$LINK]"],
+	     [qr{^(?:www\.|[a-zA-Z]+(?:@|:/))},	  "\t[NN]\t[NE]\t[XY]\t[\$LINK]"],
 	    );
 
 ## $obj = CLASS->new
