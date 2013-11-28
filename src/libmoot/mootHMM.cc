@@ -1064,9 +1064,12 @@ void mootHMM::viterbi_flush(TokenWriter *writer, mootSentence &toks, ViterbiNode
   ViterbiPathNode *pnod = viterbi_node_path(nod);
 
   tag_mark_best(pnod, toks);
-  //toks.back().insert("FLUSHED", "", 1); //-- DEBUG
   if (writer) {
-    if ((writer->tw_format & tiofTrace)) tag_dump_trace(toks);
+    if ((writer->tw_format & tiofTrace)) {
+      tag_dump_trace(toks);
+      toks.push_back( mootToken("%%moot:trace FLUSH") );
+      toks.back().insert("","",nod->lprob);
+    }
     writer->put_tokens(toks);
   }
 
@@ -1607,8 +1610,8 @@ mootHMM::ViterbiNode* mootHMM::viterbi_flushable_node(void)
   size_t n_nodes=0;
   for (ViterbiRow *vrow=vtable->rows; vrow != NULL; vrow=vrow->row_next) {
     for (ViterbiNode *vnod=vrow->nodes; vnod != NULL; vnod=vnod->nod_next) {
-      if (vnod->lprob < minpr)	continue;
-      if (++n_nodes > 1)	return NULL;
+      if (vnod->lprob < minpr) continue;
+      if (MOOT_PROB_SAFE(minpr) && ++n_nodes > 1) return NULL; //-- allow flushing if we're nearing datatype underflow
       if (vnod->lprob > bestpr) {
 	bestpr  = vnod->lprob;
 	bestnod = vnod;

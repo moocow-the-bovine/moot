@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "MOOTUTILS 1"
-.TH MOOTUTILS 1 "2013-11-27" "moot v2.0.10" "moot PoS Tagger"
+.TH MOOTUTILS 1 "2013-11-28" "moot v2.0.10-1" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -164,6 +164,8 @@ moocow's dynamic \s-1HMM\s0 part-of-speech tagger/disambiguator.
 .IX Item "mooteval"
 Output evaluator for moocow's PoS tagger.
 (mooteval)
+.IP "" 4
+(L<>)
 .IP "mootpp" 4
 .IX Item "mootpp"
 Rudimentary tokenizer for moocow's part-of-speech tagger.
@@ -176,8 +178,6 @@ moocow's part-of-speech tagger : \s-1HMM\s0 trainer
 .IX Item "moottaste"
 moocow's \s-1HMM\s0 part-of-speech tagger: heuristic token classifier.
 (moottaste)
-.IP "" 4
-(L<>)
 .IP "waste" 4
 .IX Item "waste"
 Word\- and Sentence-Token Extractor using a Hidden Markov Model
@@ -246,10 +246,10 @@ class-based \s-1HMM\s0 tagger / disambiguator.
 \&\fImootdump\fR\|(1),
 \&\fImootdyn\fR\|(1),
 \&\fImooteval\fR\|(1),
+(1),
 \&\fImootpp\fR\|(1),
 \&\fImootrain\fR\|(1),
 \&\fImoottaste\fR\|(1),
-(1),
 \&\fIwaste\fR\|(1),
 \&\fImootm\fR\|(1)
 .SH "AUTHOR"
@@ -258,6 +258,6 @@ Bryan Jurish <moocow@ling.uni\-potsdam.de>
 .SH "POD ERRORS"
 .IX Header "POD ERRORS"
 Hey! \fBThe above document had some coding errors, which are explained below:\fR
-.IP "Around line 79:" 4
-.IX Item "Around line 79:"
+.IP "Around line 61:" 4
+.IX Item "Around line 61:"
 An empty L<>

@@ -139,11 +139,15 @@ typedef BinUInt  Size;
  *
  * \def MOOT_PROB_NONE
  * Impossible probability, used as a default flag.
+ *
+ * \def MOOT_PROB_SAFE(p)
+ * True iff probability p is considered "safe"
  */
 #define MOOT_PROB_NEG  -3E+38
 #define MOOT_PROB_ZERO -1E+38
 #define MOOT_PROB_ONE   0.0
 #define MOOT_PROB_NONE  1.0
+#define MOOT_PROB_SAFE(p) (p > -1E+37)
 /*
 #ifdef FLT_MAX
 #  define MOOT_PROB_NEG  -FLT_MAX
