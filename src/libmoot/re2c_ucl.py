@@ -154,7 +154,8 @@ def main ( argv ):
 			scripts = {}
 			intersects = {}
 
-			for i in range ( 0x02, 65536 ):
+			i = 2
+			while (i < 4294967296): #65536
 				c = unichr ( i )
 				cat = unicodedata.category ( c )
 				scr = script ( c )
@@ -165,6 +166,7 @@ def main ( argv ):
 				cats[cat].append ( c )
 				scripts[scr].append ( c )
 				any_char["Any"].append ( c )
+				i += 1
 			
 			# manually generate important intersects
 			intersects["Latin_Ll"] = list ( set ( cats["Ll"] ) & set ( scripts["Latin"] ) )
