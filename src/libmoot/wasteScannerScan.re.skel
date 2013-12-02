@@ -46,11 +46,24 @@ int moot::wasteScanner::yylex ( )
 	HYPH                    = HYPH1|HYPH2;
 	*/
 
+	//-- UTF-8Catch-all
+	/*!re2c
+	UTF8_ASCII		= [\x01-\x7F];
+	UTF8_REST		= [\x80-\xBF];
+	UTF8_L2			= [\xC0-\xDF] UTF8_REST;
+	UTF8_L3			= [\xE0-\xEF] UTF8_REST{2};
+	UTF8_L4			= [\xF0-\xF7] UTF8_REST{3};
+	UTF8_L5			= [\xF8-\xFB] UTF8_REST{4};
+	UTF8_L6			= [\xFC-\xFD] UTF8_REST{5};
+	NON_UTF8_BYTE		= [\x01-\xFF];
+	 */
+
 	//-- Additional helpers
 	/*!re2c
         WS                     = [ \r\n\t\f];
-        ANY_CHARACTER          = Any;
+        ANY_CHARACTER          = UTF8_ASCII | UTF8_L2 | UTF8_L3 | UTF8_L4 | UTF8_L5 | UTF8_L6 | NON_UTF8_BYTE ;
 	*/
+
 
 	//-- Combine alphabet and modifiers
 	/*!re2c

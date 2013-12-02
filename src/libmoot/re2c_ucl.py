@@ -155,7 +155,7 @@ def main ( argv ):
 			intersects = {}
 
 			i = 2
-			while (i < 4294967296): #65536
+			while (i < 65536):
 				c = unichr ( i )
 				cat = unicodedata.category ( c )
 				scr = script ( c )
