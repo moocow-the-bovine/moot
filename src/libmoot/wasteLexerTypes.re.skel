@@ -91,7 +91,7 @@ wasteLexerTypeE waste_lexertype(const std::string &s)
     RBR                                 { return wLexerTypeRBR; }
     SLASH                               { return wLexerTypeSlash; }
     HYPH                                { return wLexerTypeHyph; }
-    DASH                                { return wLexerTypeHyph; /*-- moo: maybe differentiate from HYPH to avoid joining on e.g. en- or em-dash? --*/ }
+    DASH                                { return wLexerTypeHyph; }
     SC                                  { return wLexerTypePunct; }
     TRUNC                               { return wLexerTypeAlphaTrunc; }
     CARD [\000]                         { return wLexerTypeNumber; }

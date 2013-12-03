@@ -89,7 +89,9 @@ libmoot_la_SOURCES = \
 	wasteLexer.cc \
 	wasteCase.cc \
 	wasteDecoder.cc \
-	wasteTrainWriter.cc
+	wasteTrainWriter.cc \
+	wasteAnnotator.cc \
+	wasteAnnotatorAnnotate.cc
 
 #	mootCHMM.cc
 #	mootEvent.cc
@@ -198,6 +200,9 @@ wasteScannerScan.re: wasteScannerScan.re.skel re2c_ucl.py Scripts.txt
 	$(PYTHON) $(srcdir)/re2c_ucl.py -s $(srcdir)/Scripts.txt -o $@ $<
 
 wasteLexerTypes.re: wasteLexerTypes.re.skel re2c_ucl.py Scripts.txt
+	$(PYTHON) $(srcdir)/re2c_ucl.py -s $(srcdir)/Scripts.txt -o $@ $<
+
+wasteAnnotatorAnnotate.re: wasteAnnotatorAnnotate.re.skel re2c_ucl.py Scripts.txt
 	$(PYTHON) $(srcdir)/re2c_ucl.py -s $(srcdir)/Scripts.txt -o $@ $<
 
 wasteCase.re: wasteCase.re.skel re2c_case.perl

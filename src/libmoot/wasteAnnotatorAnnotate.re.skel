@@ -1,0 +1,58 @@
+#include "wasteAnnotator.h"
+
+namespace moot {
+
+  void wasteAnnotator::annotate_token(mootToken& token)
+  {
+    const unsigned char *sp  = (const unsigned char*)token.tok_text.c_str();
+    const unsigned char *m   = sp;
+
+    /*!re2c
+      re2c:define:YYCTYPE = "unsigned char";
+      re2c:define:YYCURSOR = sp;
+      re2c:define:YYMARKER = m;
+      re2c:yyfill:enable   = 0;
+      re2c:indent:top = 6;
+      re2c:indent:string = "  ";
+    */
+
+    //-- Auto-generated property rules go here
+    /*!re2c
+      %%UCL%%
+    */
+
+    //-- Manual definitions
+    /*!re2c
+	QUOTE_L                 = ([`\"])|([`][`])|([\xE2][\x80][\x98\x9A\x9B\x9C\x9E\x9F]);
+	QUOTE_R                 = (['\"])|([\'][\'])|([\xE2][\x80][\x99\x9D]);
+	QUOTE_G1                = ([\xC2][\xAB])|([\xE2][\x80][\xB9]);
+	QUOTE_G2                = ([\xC2][\xBB])|([\xE2][\x80][\xBA]);
+	QUOTE_G                 = QUOTE_G1|QUOTE_G2;
+        QUOTE                   = QUOTE_L|QUOTE_R|QUOTE_G;
+        PUNCT                   = Pc|Pd|Pe|Pf|Pi|Po|Ps|Sk|Sm|So|QUOTE;
+    */
+
+    /*!re2c
+
+      [,]    [\000]   { token.insert("$,",""); }
+      [%]    [\000]   {
+                        token.insert("NN","");
+                        token.insert("$(","");
+                        token.insert("$PERCENT","");
+                      }
+      [§]    [\000]   {
+                        token.insert("NN","");
+                        token.insert("$(","");
+                        token.insert("$PARAGRAPH","");
+                      }
+      Sc     [\000]   {
+                        token.insert("NN","");
+                        token.insert("$(","");
+                        token.insert("$CURRENCY","");
+                      }
+      PUNCT  [\000]   { token.insert("$(",""); }
+
+    */
+  }
+
+} // namespace moot
