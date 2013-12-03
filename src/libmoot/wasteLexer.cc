@@ -146,6 +146,9 @@ void wasteLexer::buffer_token(mootToken& stok)
               ++it_tail;
               // -- update length of the dehyphenated token
               it_head->wlt_token.tok_location.length += it_tail->wlt_token.tok_location.offset + it_tail->wlt_token.tok_location.length - it_head->wlt_token.tok_location.offset - it_head->wlt_token.tok_location.length;
+              // -- head may have been a roman number, now we know it is not
+              if (it_head->wlt_type == wLexerTypeRoman)
+                it_head->wlt_type = wLexerTypeAlphaUpper;
               // -- only text tokens are deleted from buffer
               if(it_tail->wlt_token.tok_type == TokTypeVanilla || it_tail->wlt_token.tok_type == TokTypeLibXML) {
                 if (it_tail->wlt_type != wLexerTypeHyph) {
@@ -166,6 +169,7 @@ void wasteLexer::buffer_token(mootToken& stok)
           }
         case wLexerTypeAlphaUpper:
         case wLexerTypeAlphaCaps:
+	case wLexerTypeRoman:
           wl_state |= ls_head;
           // -- breaks hyphenation
           wl_state &= ~(ls_hyph|ls_nl);

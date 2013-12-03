@@ -71,6 +71,11 @@ def compact_range ( data, nbyte ):
 			for i in data:
 				for j in data[i]:
 					result += "([%s][%s][%s])|" % (convert_hex ( i ), convert_hex ( j ), list2string ( data[i][j] ))
+		elif nbyte == 4:
+			for i in data:
+				for j in data[i]:
+					for k in data[i][j]:
+						result += "([%s][%s][%s][%s])|" % (convert_hex ( i ), convert_hex ( j ), convert_hex ( k ), list2string ( data[i][j][k] ))
 					
 			
 		return result.rstrip ( "|" )
@@ -89,6 +94,14 @@ def compact_insert ( mapping, seq ):
 		if not mapping[3][seq[0]].has_key ( seq[1] ):
 			mapping[3][seq[0]][seq[1]] = []
 		mapping[3][seq[0]][seq[1]].append ( seq[2] )
+	elif len ( seq ) == 4:
+		if not mapping[4].has_key ( seq[0] ):
+			mapping[4][seq[0]] = {}
+		if not mapping[4][seq[0]].has_key ( seq[1] ):
+			mapping[4][seq[0]][seq[1]] = {}
+		if not mapping[4][seq[0]][seq[1]].has_key ( seq[2] ):
+			mapping[4][seq[0]][seq[1]][seq[2]] = []
+		mapping[4][seq[0]][seq[1]][seq[2]].append ( seq[3] )
 
 def print_re2c ( data, dest ):
 
@@ -99,20 +112,24 @@ def print_re2c ( data, dest ):
 		DATA[2] = {}
 		DATA[3] = {}
 		DATA[4] = {}
+		DATA[5] = {}
 
+		# iterate over codepoints and store byte sequences
 		for c in data[dat]:
 			x = c.encode ( "utf-8" )
 			compact_insert ( DATA, x )
 
-		dat_out = "%s = " % dat
-		for i in range ( 1, 5 ):
+		# print byte sequences
+		dat_out = ""
+		for i in range ( 1, 6 ):
 			if len ( DATA[i] ):
 				cur_range = compact_range ( DATA[i], i )
 				if cur_range:
 					dest.write ( "%s%i = %s;\n" % (dat, i, cur_range) )
 					dat_out += dat + str ( i ) + "|"
 
-		dest.write ( "%s;\n" % dat_out.rstrip ( "|" ) )
+		if dat_out: # omit empty scripts
+			dest.write ( "%s = %s;\n" % ( dat, dat_out.rstrip ( "|" ) ) )
 
 
 def main ( argv ):
@@ -155,8 +172,12 @@ def main ( argv ):
 			intersects = {}
 
 			i = 2
-			while (i < 65536):
-				c = unichr ( i )
+			while (i < 65536): #4294967296
+				try:
+					c = unichr ( i )
+				except:
+					print i
+					break
 				cat = unicodedata.category ( c )
 				scr = script ( c )
 				if not cats.has_key ( cat ):
