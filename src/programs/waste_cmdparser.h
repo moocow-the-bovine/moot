@@ -25,7 +25,7 @@ struct gengetopt_args_info {
   int list_flag;	 /* Arguments are input-file lists. (default=0). */
   int recover_flag;	 /* Attempt to recover from minor errors. (default=0). */
   char * output_arg;	 /* Write output to FILE. (default=-). */
-  int full_flag;	 /* Alias for --scan --lex --tag --decode (default) (default=0). */
+  int full_flag;	 /* Alias for --scan --lex --tag --decode --annotate (default) (default=0). */
   int train_flag;	 /* Training mode (similar to --lex) (default=0). */
   int scan_flag;	 /* Enable raw text scanning stage. (default=0). */
   int no_scan_flag;	 /* Disable raw text scanning stage. (default=0). */
@@ -35,6 +35,8 @@ struct gengetopt_args_info {
   int no_tag_flag;	 /* Disable HMM Viterbi tagging stage. (default=0). */
   int decode_flag;	 /* Enable post-Viterbi decoding stage. (default=0). */
   int no_decode_flag;	 /* Disable post-Viterbi decoding stage. (default=0). */
+  int annotate_flag;	 /* Enable text-based annotation stage. (default=0). */
+  int no_annotate_flag;	 /* Disable text-based annotation stage. (default=0). */
   char * abbrevs_arg;	 /* Load abbreviation lexicon from FILE (1 word/line) (default=NULL). */
   char * conjunctions_arg;	 /* Load conjunction lexicon from FILE (1 word/line) (default=NULL). */
   char * stopwords_arg;	 /* Load stopword lexicon from FILE (1 word/line) (default=NULL). */
@@ -62,6 +64,8 @@ struct gengetopt_args_info {
   int no_tag_given;	 /* Whether no-tag was given */
   int decode_given;	 /* Whether decode was given */
   int no_decode_given;	 /* Whether no-decode was given */
+  int annotate_given;	 /* Whether annotate was given */
+  int no_annotate_given;	 /* Whether no-annotate was given */
   int abbrevs_given;	 /* Whether abbrevs was given */
   int conjunctions_given;	 /* Whether conjunctions was given */
   int stopwords_given;	 /* Whether stopwords was given */

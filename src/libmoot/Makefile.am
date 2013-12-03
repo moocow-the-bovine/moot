@@ -214,7 +214,7 @@ if HAVE_RE2C
 SUFFIXES: .re
 .re.cc:
 	$(RE2C) -i -s -o $@ $<
-RE2C_OUT += wasteScannerScan.cc wasteLexerTypes.cc wasteCase.cc
+RE2C_OUT += wasteScannerScan.cc wasteLexerTypes.cc wasteAnnotatorAnnotate.cc wasteCase.cc
 endif
 
 ##-----------------------------------------------------------------------
@@ -295,6 +295,7 @@ pkginclude_HEADERS = \
 	wasteCase.h \
 	wasteDecoder.h \
 	wasteTrainWriter.h \
+	wasteAnnotator.h \
 	\
 	@INSTALL_OSFCN_H@
 
@@ -459,6 +460,8 @@ EXTRA_DIST = \
 	wasteScannerScan.re.skel \
 	wasteLexerTypes.re \
 	wasteLexerTypes.re.skel \
+	wasteAnnotatorAnnotate.re \
+	wasteAnnotatorAnnotate.re.skel \
 	re2c_case.perl \
 	wasteCase.re \
 	wasteCase.re.skel \

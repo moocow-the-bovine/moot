@@ -88,7 +88,7 @@ namespace moot
     /// \name Constructors etc.
     //@{
     /** Default constructor */
-    wasteAnnotatorWriter(int fmt=tiofWellDone, const std::string &name="wasteAnnotatorWriter")
+    wasteAnnotatorWriter(int fmt=tiofMediumRare, const std::string &name="wasteAnnotatorWriter")
       : TokenWriter(fmt,name)
     {};
 

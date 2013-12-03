@@ -93,7 +93,7 @@ cmdline_parser_print_help (void)
   printf("   -oFILE    --output=FILE           Write output to FILE.\n");
   printf("\n");
   printf(" Mode Options:\n");
-  printf("   -f        --full                  Alias for --scan --lex --tag --decode (default)\n");
+  printf("   -f        --full                  Alias for --scan --lex --tag --decode --annotate (default)\n");
   printf("   -R        --train                 Training mode (similar to --lex)\n");
   printf("   -s        --scan                  Enable raw text scanning stage.\n");
   printf("   -S        --no-scan               Disable raw text scanning stage.\n");
@@ -103,6 +103,8 @@ cmdline_parser_print_help (void)
   printf("   -T        --no-tag                Disable HMM Viterbi tagging stage.\n");
   printf("   -d        --decode                Enable post-Viterbi decoding stage.\n");
   printf("   -D        --no-decode             Disable post-Viterbi decoding stage.\n");
+  printf("   -n        --annotate              Enable text-based annotation stage.\n");
+  printf("   -N        --no-annotate           Disable text-based annotation stage.\n");
   printf("\n");
   printf(" Lexer Options:\n");
   printf("   -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)\n");
@@ -155,6 +157,8 @@ clear_args(struct gengetopt_args_info *args_info)
   args_info->no_tag_flag = 0; 
   args_info->decode_flag = 0; 
   args_info->no_decode_flag = 0; 
+  args_info->annotate_flag = 0; 
+  args_info->no_annotate_flag = 0; 
   args_info->abbrevs_arg = NULL; 
   args_info->conjunctions_arg = NULL; 
   args_info->stopwords_arg = NULL; 
@@ -190,6 +194,8 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
   args_info->no_tag_given = 0;
   args_info->decode_given = 0;
   args_info->no_decode_given = 0;
+  args_info->annotate_given = 0;
+  args_info->no_annotate_given = 0;
   args_info->abbrevs_given = 0;
   args_info->conjunctions_given = 0;
   args_info->stopwords_given = 0;
@@ -232,6 +238,8 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	{ "no-tag", 0, NULL, 'T' },
 	{ "decode", 0, NULL, 'd' },
 	{ "no-decode", 0, NULL, 'D' },
+	{ "annotate", 0, NULL, 'n' },
+	{ "no-annotate", 0, NULL, 'N' },
 	{ "abbrevs", 1, NULL, 'a' },
 	{ "conjunctions", 1, NULL, 'j' },
 	{ "stopwords", 1, NULL, 'w' },
@@ -261,6 +269,8 @@ cmdline_parser (int argc, char * const *argv, struct gengetopt_args_info *args_i
 	'T',
 	'd',
 	'D',
+	'n',
+	'N',
 	'a', ':',
 	'j', ':',
 	'w', ':',
@@ -383,7 +393,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
           args_info->output_arg = gog_strdup(val);
           break;
         
-        case 'f':	 /* Alias for --scan --lex --tag --decode (default) */
+        case 'f':	 /* Alias for --scan --lex --tag --decode --annotate (default) */
           if (args_info->full_given) {
             fprintf(stderr, "%s: `--full' (`-f') option given more than once\n", PROGRAM);
           }
@@ -391,7 +401,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
          if (args_info->full_given <= 1)
            args_info->full_flag = !(args_info->full_flag);
           /* user code */
-          args_info->full_flag = args_info->scan_flag = args_info->lex_flag = args_info->tag_flag = args_info->decode_flag = 1;
+          args_info->full_flag = args_info->scan_flag = args_info->lex_flag = args_info->tag_flag = args_info->decode_flag = args_info->annotate_flag = 1;
           break;
         
         case 'R':	 /* Training mode (similar to --lex) */
@@ -489,6 +499,28 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
            args_info->no_decode_flag = !(args_info->no_decode_flag);
           /* user code */
           args_info->decode_flag=0;
+          break;
+        
+        case 'n':	 /* Enable text-based annotation stage. */
+          if (args_info->annotate_given) {
+            fprintf(stderr, "%s: `--annotate' (`-n') option given more than once\n", PROGRAM);
+          }
+          args_info->annotate_given++;
+         if (args_info->annotate_given <= 1)
+           args_info->annotate_flag = !(args_info->annotate_flag);
+          /* user code */
+          args_info->annotate_flag=1;
+          break;
+        
+        case 'N':	 /* Disable text-based annotation stage. */
+          if (args_info->no_annotate_given) {
+            fprintf(stderr, "%s: `--no-annotate' (`-N') option given more than once\n", PROGRAM);
+          }
+          args_info->no_annotate_given++;
+         if (args_info->no_annotate_given <= 1)
+           args_info->no_annotate_flag = !(args_info->no_annotate_flag);
+          /* user code */
+          args_info->annotate_flag=0;
           break;
         
         case 'a':	 /* Load abbreviation lexicon from FILE (1 word/line) */
@@ -647,7 +679,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
             args_info->output_arg = gog_strdup(val);
           }
           
-          /* Alias for --scan --lex --tag --decode (default) */
+          /* Alias for --scan --lex --tag --decode --annotate (default) */
           else if (strcmp(olong, "full") == 0) {
             if (args_info->full_given) {
               fprintf(stderr, "%s: `--full' (`-f') option given more than once\n", PROGRAM);
@@ -656,7 +688,7 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
            if (args_info->full_given <= 1)
              args_info->full_flag = !(args_info->full_flag);
             /* user code */
-            args_info->full_flag = args_info->scan_flag = args_info->lex_flag = args_info->tag_flag = args_info->decode_flag = 1;
+            args_info->full_flag = args_info->scan_flag = args_info->lex_flag = args_info->tag_flag = args_info->decode_flag = args_info->annotate_flag = 1;
           }
           
           /* Training mode (similar to --lex) */
@@ -763,6 +795,30 @@ cmdline_parser_parse_option(char oshort, const char *olong, const char *val,
              args_info->no_decode_flag = !(args_info->no_decode_flag);
             /* user code */
             args_info->decode_flag=0;
+          }
+          
+          /* Enable text-based annotation stage. */
+          else if (strcmp(olong, "annotate") == 0) {
+            if (args_info->annotate_given) {
+              fprintf(stderr, "%s: `--annotate' (`-n') option given more than once\n", PROGRAM);
+            }
+            args_info->annotate_given++;
+           if (args_info->annotate_given <= 1)
+             args_info->annotate_flag = !(args_info->annotate_flag);
+            /* user code */
+            args_info->annotate_flag=1;
+          }
+          
+          /* Disable text-based annotation stage. */
+          else if (strcmp(olong, "no-annotate") == 0) {
+            if (args_info->no_annotate_given) {
+              fprintf(stderr, "%s: `--no-annotate' (`-N') option given more than once\n", PROGRAM);
+            }
+            args_info->no_annotate_given++;
+           if (args_info->no_annotate_given <= 1)
+             args_info->no_annotate_flag = !(args_info->no_annotate_flag);
+            /* user code */
+            args_info->annotate_flag=0;
           }
           
           /* Load abbreviation lexicon from FILE (1 word/line) */

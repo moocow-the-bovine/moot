@@ -44,6 +44,7 @@
 #include <wasteScanner.h>
 #include <wasteLexer.h>
 #include <wasteDecoder.h>
+#include <wasteAnnotator.h>
 #include <wasteTrainWriter.h>
 
 #include <mootUtils.h>
@@ -73,6 +74,7 @@ wasteTokenScanner *scanner=NULL;
 wasteLexerReader   *lexer=NULL;
 mootHMM      *tagger=NULL;
 wasteDecoder *decoder=NULL;
+wasteAnnotatorWriter *annoter=NULL;
 wasteTrainWriter *trainwriter=NULL;
 
 //-- Token I/O: reader; see GetMyOptions() for mode-dependent hacks
@@ -100,9 +102,10 @@ const int wmScan   = 0x01;
 const int wmLex    = 0x02;
 const int wmTag    = 0x04;
 const int wmDecode = 0x08;
-const int wmTrain  = 0x10;
+const int wmAnnot  = 0x10;
+const int wmTrain  = 0x20;
 
-const int wmFull = wmScan|wmLex|wmTag|wmDecode;
+const int wmFull = wmScan|wmLex|wmTag|wmDecode|wmAnnot;
 int mode = wmNone;
 std::string modestr("none");
 
@@ -125,11 +128,13 @@ inline int modeFirst(int m) {
   else if (m&wmLex)  return wmLex;
   else if (m&wmTag)  return wmTag;
   else if (m&wmDecode) return wmDecode;
+  else if (m&wmAnnot) return wmAnnot;
   else if (m&wmTrain) return wmTrain;
   return wmNone;
 }
 inline int modeLast(int m) {
   if      (m&wmTrain) return wmTrain;
+  else if (m&wmAnnot) return wmAnnot;
   else if (m&wmDecode) return wmDecode;
   else if (m&wmTag)  return wmTag;
   else if (m&wmLex)  return wmLex;
@@ -142,6 +147,7 @@ inline std::string modeString(int m) {
   if (m&wmLex) s += "Lex,";
   if (m&wmTag) s += "Tag,";
   if (m&wmDecode) s += "Decode,";
+  if (m&wmAnnot) s += "Annotate,";
   if (m&wmTrain) s += "Train,";
   if (s.empty()) { s = "None"; }
   else { s.erase(s.size()-1); }
@@ -161,29 +167,33 @@ void GetMyOptions(int argc, char **argv)
   vlevel = args.verbose_arg;
 
   //-- operation mode
-  if ( !args.train_given && !args.full_given && !args.scan_given && !args.lex_given && !args.tag_given && !args.decode_given ) {
-    args.full_flag = args.scan_flag = args.lex_flag = args.tag_flag = args.decode_flag = 1;
+  if ( !args.train_given && !args.full_given && !args.scan_given && !args.lex_given && !args.tag_given && !args.decode_given && !args.annotate_given ) {
+    args.full_flag = args.scan_flag = args.lex_flag = args.tag_flag = args.decode_flag = args.annotate_flag = 1;
   }
   modeSet(mode, wmScan, args.scan_flag);
   modeSet(mode, wmLex,  args.lex_flag);
   modeSet(mode, wmTag,  args.tag_flag);
   modeSet(mode, wmDecode, args.decode_flag);
+  modeSet(mode, wmAnnot, args.annotate_flag);
   modeSet(mode, wmTrain,  args.train_flag);
   modestr = modeString(mode);
   //fprintf(stderr, "%s: DEBUG: mode=%s\n", PROGNAME, modestr.c_str());
 
   //-- sanity check(s)
   if ( mode==wmNone ) {
-    moot_croak("%s: ERROR: you must enable at least one of --scan, --lex, --tag, --decode, or --train\n", PROGNAME);
+    moot_croak("%s: ERROR: you must enable at least one of --scan, --lex, --tag, --decode, --annotate, or --train\n", PROGNAME);
   }
   else if ( (mode&wmTrain) && (mode&(~wmTrain)) ) {
     moot_croak("%s: ERROR: cannot combine --train with any other operation mode\n", PROGNAME);
   }
-  else if ( (mode&wmScan) && !(mode&wmLex) && (mode&(wmTag|wmDecode)) )  {
-    moot_croak("%s: ERROR: cannot combine --scan and --decode/--tag without --lex\n", PROGNAME);
+  else if ( (mode&wmScan) && !(mode&wmLex) && (mode&(wmTag|wmDecode|wmAnnot)) )  {
+    moot_croak("%s: ERROR: cannot combine --scan and --decode/--tag/--annotate without --lex\n", PROGNAME);
   }
-  else if ( (mode&(wmScan|wmLex)) && !(mode&wmTag) && (mode&wmDecode) ) {
-    moot_croak("%s: ERROR: cannot combine --scan/--lex and --decode without --tag\n", PROGNAME);
+  else if ( (mode&(wmScan|wmLex)) && !(mode&wmTag) && (mode&(wmDecode|wmAnnot)) ) {
+    moot_croak("%s: ERROR: cannot combine --scan/--lex and --decode/--annotate without --tag\n", PROGNAME);
+  }
+  else if ( (mode&wmTag) && !(mode&wmDecode) && (mode&wmAnnot) ) {
+    moot_croak("%s: ERROR: cannot combine --tag and --annotate without --decode\n", PROGNAME);
   }
   else if ( (mode&wmTag) && !args.model_given ) {
     moot_croak("%s: ERROR: --tag mode requires --model option\n", PROGNAME);
@@ -210,6 +220,7 @@ void GetMyOptions(int argc, char **argv)
   case wmLex:		ifmt_implied |= tiofText; break;
   case wmTag:		ifmt_implied |= tiofText|tiofAnalyzed; break;
   case wmDecode:	ifmt_implied |= tiofText|tiofTagged|tiofAnalyzed; break;
+  case wmAnnot:		ifmt_implied |= tiofText; break;
   case wmTrain:		ifmt_implied |= tiofText; break;
   default: break;
   }
@@ -217,6 +228,7 @@ void GetMyOptions(int argc, char **argv)
   //-- i/o formats: mode-dependent hacks: output
   switch (modeLast(mode)) {
   case wmTrain:		ofmt_implied |= tiofText|tiofTagged|tiofAnalyzed; break;
+  case wmAnnot:		ofmt_implied |= tiofText|tiofAnalyzed; break;
   case wmDecode:	ofmt_implied |= tiofText; break;
   case wmTag:		ofmt_implied |= tiofTagged; break;
   case wmLex:		ofmt_implied |= tiofAnalyzed; break;
@@ -322,6 +334,11 @@ int main (int argc, char **argv)
     if (!tagger->load_model(args.model_arg))
       moot_croak("%s: ERROR: failed to load model from `%s'\n", PROGNAME, args.model_arg);
   }
+  if (mode&wmAnnot) {
+    annoter = new wasteAnnotatorWriter( ofmt );
+    annoter->to_writer(churn_writer);
+    churn_writer = annoter;
+  }
   if (mode&wmDecode) {
     decoder = new wasteDecoder();
     decoder->to_writer(churn_writer);
@@ -340,6 +357,7 @@ int main (int argc, char **argv)
   //-- cleanup
   if (trainwriter) delete trainwriter;
   if (decoder) delete decoder;
+  if (annoter) delete annoter;
   if (tagger)  delete tagger;
   if (lexer)   delete lexer;
   if (scanner) delete scanner;

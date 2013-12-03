@@ -111,6 +111,7 @@
 #include <wasteLexicon.h>
 #include <wasteLexer.h>
 #include <wasteDecoder.h>
+#include <wasteAnnotator.h>
 #include <wasteTrainWriter.h>
 
 #endif /* _MOOT_H */
