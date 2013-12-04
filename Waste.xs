@@ -312,3 +312,66 @@ CODE:
  sv_2mortal((SV*)RETVAL);
 OUTPUT:
  RETVAL
+
+
+##=====================================================================
+## Moot::Waste::Annotator
+## + uses TokenWriter::tw_data to hold SV* of underlying writer
+##=====================================================================
+
+MODULE = Moot		PACKAGE = Moot::Waste::Annotator
+
+##--------------------------------------------------------------
+wasteAnnotatorWriter*
+new(char *CLASS, TokenIOFormatMask fmt=tiofMediumRare)
+CODE:
+ RETVAL=new wasteAnnotatorWriter(fmt, CLASS);
+OUTPUT:
+ RETVAL
+
+##-------------------------------------------------------------
+void
+close(wasteAnnotatorWriter *waw)
+CODE:
+ waw->close();  
+ if (waw->tw_data) {
+   SvREFCNT_dec( (SV*)waw->tw_data );
+   waw->tw_data = NULL;
+ }
+
+##-------------------------------------------------------------
+SV*
+_get_sink(wasteAnnotatorWriter *waw)
+CODE:
+ if (!waw->tw_data || !waw->waw_sink) { XSRETURN_UNDEF; }
+ RETVAL = newSVsv((SV*)waw->tw_data);
+OUTPUT:
+ RETVAL
+
+##-------------------------------------------------------------
+void
+_set_sink(wasteAnnotatorWriter *waw, SV *sink_sv)
+PREINIT:
+  TokenWriter *tw;
+CODE:
+  if( sv_isobject(sink_sv) && (SvTYPE(SvRV(sink_sv)) == SVt_PVMG) )
+    tw = (TokenWriter*)SvIV((SV*)SvRV( sink_sv ));
+  else {
+    warn("Moot::Waste::AnnotatorWriter::_set_sink() -- sink_sv is not a blessed SV reference");
+    XSRETURN_UNDEF;
+  }
+  waw->to_writer(tw);
+  waw->tw_data = newSVsv(sink_sv);
+
+##-------------------------------------------------------------
+HV*
+annotate(wasteAnnotatorWriter *waw, HV *tokhv)
+PREINIT:
+ mootToken mtok;
+CODE:
+ hv2token(tokhv, &mtok);
+ waw->waw_annotator.annotate_token(mtok);
+ RETVAL = token2hv(&mtok);
+OUTPUT:
+ RETVAL
+

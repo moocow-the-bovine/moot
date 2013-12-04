@@ -2,6 +2,7 @@ package Moot::Waste;
 use Moot::Waste::Scanner;
 use Moot::Waste::Lexer;
 use Moot::Waste::Decoder;
+use Moot::Waste::Annotator;
 use strict;
 
 

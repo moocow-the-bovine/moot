@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 
 use lib qw(./blib/lib ./blib/arch);
-use Moot::TokPP;
+use Moot;
+use Moot::Waste;
 use Getopt::Long;
 use File::Basename qw(basename);
 use Pod::Usage;
@@ -20,7 +21,6 @@ our $outfile = '-';
 ##------------------------------------------------------------------------------
 GetOptions(##-- General
 	   'help|h' => \$help,
-
 	   'output|o=s' => \$outfile,
 	  );
 
@@ -29,14 +29,27 @@ pod2usage({-exitval=>0, -verbose=>0}) if ($help);
 ##------------------------------------------------------------------------------
 ## MAIN
 
-my $pp = Moot::TokPP->new();
+my $wa = Moot::Waste::Annotator->new();
 push(@ARGV,'-') if (!@ARGV);
 
 open(OUT,">$outfile") or die("$prog: open failed for output file $outfile: $!");
 
 foreach my $file (@ARGV) {
   open(IN,"<$file") or die("$prog: open failed for input file $file: $!");
-  $pp->analyze_stream(\*IN,\*OUT);
+
+  my ($txt,$rest,$atok);
+  my $tok = {};
+  while (defined($_=<IN>)) {
+    if (/^%%/ || /^\s*$/) {
+      print OUT $_;
+      next;
+    }
+    chomp;
+    ($txt,$rest) = split(/\t/,$_,2);
+    $tok->{text} = $txt;
+    $atok = $wa->annotate($tok);
+    print OUT join("\t",$txt, (defined($rest) ? $rest :qw()), map {$_->{tag}} @{$atok->{analyses}}), "\n";
+  }
   close(IN);
 }
 
