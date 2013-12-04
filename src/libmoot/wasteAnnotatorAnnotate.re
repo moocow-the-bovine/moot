@@ -295,31 +295,50 @@ Any = Any1|Any2|Any3;
 
     /*!re2c
 
-      "."                          [\000]  { token.insert("$.",""); return; }
-      [?!]+                        [\000]  { token.insert("$.",""); return; }
-      [,]                          [\000]  { token.insert("$,",""); return; }
-      [%]                          [\000]  {
-                                             token.insert("NN","");
-                                             token.insert("$(","");
-                                             token.insert("$PERCENT","");
-                                             return;
-                                           }
-      [§]                          [\000]  {
-                                            token.insert("NN","");
-                                            token.insert("$(","");
-                                            token.insert("$PARAGRAPH","");
-                                            return;
-                                           }
-      Sc                           [\000]  {
-                                            token.insert("NN","");
-                                            token.insert("$(","");
-                                            token.insert("$CURRENCY","");
-                                            return;
-                                           }
-      PUNCT                        [\000]  { token.insert("$(",""); return; }
+      "."                             [\000]     { token.insert("$.",""); return; }
+      [\.:]+                          [\000]     {
+                                                   token.insert("$.","");
+                                                   token.insert("$(","");
+                                                   return;
+                                                 }
+      [?!]+                           [\000]     { token.insert("$.",""); return; }
+      [,]                             [\000]     { token.insert("$,",""); return; }
+      [;]                             [\000]     { token.insert("$.",""); return; }
+      [%]                             [\000]     {
+                                                   token.insert("NN","");
+                                                   token.insert("$(","");
+                                                   token.insert("$PERCENT","");
+                                                   return;
+                                                 }
+      [§]                             [\000]     {
+                                                   token.insert("NN","");
+                                                   token.insert("$(","");
+                                                   token.insert("$PARAGRAPH","");
+                                                   return;
+                                                 }
+      Sc                              [\000]     {
+                                                   token.insert("NN","");
+                                                   token.insert("$(","");
+                                                   token.insert("$CURRENCY","");
+                                                   return;
+                                                 }
+      PUNCT                           [\000]     { token.insert("$(",""); return; }
 
-      [+-]?[0-9]+([\. :,_][0-9]+)* [\000]  { token.insert("CARD",""); return; }
-      [-]                                  { token.insert("TRUNC", ""); return; }
+      [+-]?[0-9]+([\. :,_][0-9]+)*    [\000]     { token.insert("CARD",""); return; }
+      [+-]?[0-9]+([\. :,_][0-9]+)*"." [\000]     { token.insert("ORD",""); return; }
+      [.]* "."                        [\000]     {
+                                                   token.insert("XY","");
+                                                   token.insert("$ABBREV","");
+                                                   return;
+                                                 }
+      [-]                                        { token.insert("TRUNC", ""); return; }
+      ("www.")|[a-zA-Z]+("@"|":/")               {
+                                                   token.insert("NN","");
+                                                   token.insert("NE","");
+                                                   token.insert("XY","");
+                                                   token.insert("$LINK","");
+                                                   return;
+                                                 }
 
 
       [^]             { return; }
