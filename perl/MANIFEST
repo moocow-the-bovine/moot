@@ -37,6 +37,7 @@ Moot/TokenWriter/XML.pm
 Moot/TokPP.pm
 Moot/Waste.pm
 Moot/Waste/Decoder.pm
+Moot/Waste/Annotator.pm
 Moot/Waste/Lexer.pm
 Moot/Waste/Lexicon.pm
 Moot/Waste/Scanner.pm

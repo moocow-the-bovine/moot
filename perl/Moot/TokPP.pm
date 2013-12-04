@@ -1,48 +1,34 @@
 package Moot::TokPP;
+use Moot::Waste::Annotator;
 use Carp;
 use strict;
 use utf8;
 
 our @ISA = qw();
 
-our %literal = (
-	       ',' => "\t[\$,]",
-	       '.' => "\t[\$.]",
-	       '%' => "\t[NN]\t[\$PERCENT]",
-	       '§' => "\t[NN]\t[XY]\t[\$PARAGRAPH]",
-	       '¶' => "\t[NN]\t[XY]\t[\$PARAGRAPH]",
-	      );
-our @rules = (
-	     [qr{^[\:\.]+$},			 "\t[\$(]\t[\$.]"],
-	     [qr{^[\?\!]+$},			 "\t[\$.]"],
-	     [qr{^[[:punct:]\p{Symbol}]+$},	 "\t[\$(]"],
-	     [qr{^[\+\-]?\d+(?:[\.\s:,_]\d+)*$}, "\t[CARD]"],
-	     [qr{^[\+\-]?\d+(?:[\.\s:,_]\d+)*\.$}, "\t[ORD]"],
-	     [qr{^[ivxlcdm]+\.$},		  "\t[ORD]\t[XY]\t[\$ABBREV]"],
-	     [qr{\.$},				  "\t[XY]\t[\$ABBREV]"],
-	     [qr{^\-},				  "\t[TRUNC]"],
-	     [qr{^(?:www\.|[a-zA-Z]+(?:@|:/))},	  "\t[NN]\t[NE]\t[XY]\t[\$LINK]"],
-	    );
+our $ANNOTATOR = undef;
 
 ## $obj = CLASS->new
 sub new {
   my $that = shift;
-  return bless({},ref($that)||$that);
+  return bless({wa=>Moot::Waste::Annotator->new()},ref($that)||$that)
+}
+
+## $annotator = CLASS_OR_OBJECT->annotator()
+sub annotator {
+  return ref($_[0]) && $_[0]{wa} ? $_[0]{wa} : ($ANNOTATOR // ($ANNOTATOR=Moot::Waste::Annotator->new()));
 }
 
 ## $str = CLASS_OR_OBJECT->analyze_text($str)
 sub analyze_text {
-  return $literal{$_[1]} if (exists($literal{$_[1]}));
-  foreach (@rules) {
-    return $_->[1] if ($_[1] =~ $_->[0]);
-  }
+  my $a = $_[0]->annotator->annotate({text=>$_[1]})->{analyses};
+  return join("\t", '', map {$_->{tag}} @$a) if ($a && @$a);
   return undef;
 }
 
 ## $w = CLASS_OR_OBJECT->analyze_token($w)
 sub analyze_token {
-  return $_[1] if (!defined(my $as = $_[0]->analyze_text($_[1]{text})));
-  push(@{$_[1]{analyses}}, {tag=>$_,details=>$_}) foreach (map {/^\[(.*)\]$/ ? $1 : $_} split(/\t/,$as));
+  %{$_[1]} = %{$_[0]->annotator->annotate($_[1])};
   return $_[1];
 }
 
@@ -93,7 +79,7 @@ __END__
 
 =head1 NAME
 
-Moot::TokPP - libmoot : heuristic token analyzer (pseudo-morphology)
+Moot::TokPP - libmoot : heuristic token analyzer (pseudo-morphology, wraps for Moot::Waste::Annotator)
 
 =head1 SYNOPSIS
 
@@ -114,6 +100,8 @@ Moot::TokPP - libmoot : heuristic token analyzer (pseudo-morphology)
 
 The Moot::TokPP module provides a drop-in replacement for dwds_tomasotath-style tokenizer-supplied
 pseudo-morphological analyses.
+
+This module is currently implemented as a thin wrapper around L<Moot::Waste::Annotator|Moot::Waste::Annotator>, which see.
 
 =head1 SEE ALSO
 

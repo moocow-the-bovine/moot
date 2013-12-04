@@ -31,16 +31,16 @@ Moot::Waste::Decoder - libmoot : WASTE tokenizer : post-Viterbi decoder
 
 =head1 SYNOPSIS
 
-  use Moot::Waste::Lexer;
+  use Moot::Waste::Decoder;
 
   ##=====================================================================
   ## Usage
 
-  $wd = Moot::Waste::Decoder->new();    ##-- create a new lexer
+  $wd = Moot::Waste::Decoder->new();    ##-- create a new decoder
 
-  $wd->sink($scanner);                  ##-- set low-level TokenWriter object (e.g. Moot::TokenWriterNative)
+  $wd->sink($writer);                   ##-- set low-level TokenWriter object (e.g. Moot::TokenWriterNative)
   $wd->sink();                          ##-- get underlying TokenWriter or undef
-  $wd->close();                         ##-- close current input source (unsets sink, clears buffer)
+  $wd->close();                         ##-- close current output channel (unsets sink, clears buffer)
 
   $wd->put_token($tok);                 ##-- decode next token
 

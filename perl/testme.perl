@@ -212,7 +212,7 @@ sub test_wscan {
   print STDERR "test_wscan() done\n"; exit 0;
 }
 #test_wscan(file=>'scanme.txt');
-test_wscan(fh=>\*STDIN);
+#test_wscan(fh=>\*STDIN);
 #test_wscan(string=>"Test 123\nfoo bar.");
 #test_wscan(stringfh=>"Test 123\nfoo bar.");
 #test_wscan(file=>'argh.txt');
@@ -537,6 +537,28 @@ sub test_waste_decoder_buf {
   print STDERR "$0: test_waste_decoder() done\n"; exit 0;
 }
 #test_waste_decoder_buf(@ARGV);
+
+##--------------------------------------------------------------
+## waste annotator
+sub test_wannot {
+  my $file = shift || 'test-tokpp.t';
+  my $reader = Moot::TokenIO::file_reader($file, 'text');
+  my $writer = Moot::TokenIO::file_writer('-',   'mr,loc');
+  my $annot  = Moot::Waste::Annotator->new();
+  $annot->sink($writer),
+
+  my ($tok);
+  while (defined($tok=$reader->get_token)) {
+    $annot->put_token($tok);
+  }
+  $annot->close() if ($annot);
+  $writer->close() if ($writer);
+  $reader->close() if ($reader);
+
+  print STDERR "$0: test_waste_annotator() done\n"; exit 0;
+}
+test_wannot(@ARGV);
+
 
 ##--------------------------------------------------------------
 sub rtt_unescape {
