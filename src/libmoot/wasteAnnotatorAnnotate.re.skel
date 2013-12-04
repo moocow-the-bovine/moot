@@ -1,10 +1,11 @@
 #include "wasteAnnotator.h"
 
 /*-- moo: useful shortcuts for re2c actions --*/
-#define annot1(a1) 		token.insert(a1,""); return
-#define annot2(a1,a2)		token.insert(a1,""); token.insert(a2,""); return
-#define annot3(a1,a2,a3)	token.insert(a1,""); token.insert(a2,""); token.insert(a3,""); return
-#define annot4(a1,a2,a3,a4)	token.insert(a1,""); token.insert(a2,""); token.insert(a3,""); token.insert(a4,""); return
+#define annot0(a)		token.insert(a,"[" a "]")
+#define annot1(a1) 		annot0(a1); return
+#define annot2(a1,a2)		annot0(a1); annot0(a2); return
+#define annot3(a1,a2,a3)	annot0(a1); annot0(a2); annot0(a3); return
+#define annot4(a1,a2,a3,a4)	annot0(a1); annot0(a2); annot0(a3); annot0(a4); return
 
 namespace moot {
 
@@ -69,6 +70,7 @@ namespace moot {
     */
   }
 
+#undef annot0
 #undef annot1
 #undef annot2
 #undef annot3
