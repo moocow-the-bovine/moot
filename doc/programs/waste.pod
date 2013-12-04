@@ -25,7 +25,7 @@ waste [OPTIONS] FILE(s)
     -oFILE    --output=FILE           Write output to FILE.
 
  Mode Options
-    -f        --full                  Alias for --scan --lex --tag --decode (default)
+    -f        --full                  Alias for --scan --lex --tag --decode --annotate (default)
     -R        --train                 Training mode (similar to --lex)
     -s        --scan                  Enable raw text scanning stage.
     -S        --no-scan               Disable raw text scanning stage.
@@ -35,6 +35,8 @@ waste [OPTIONS] FILE(s)
     -T        --no-tag                Disable HMM Viterbi tagging stage.
     -d        --decode                Enable post-Viterbi decoding stage.
     -D        --no-decode             Disable post-Viterbi decoding stage.
+    -n        --annotate              Enable text-based annotation stage.
+    -N        --no-annotate           Disable text-based annotation stage.
 
  Lexer Options
     -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
@@ -69,11 +71,11 @@ or as a standalone scanner (--scan),
 lexical encoder (--lex),
 HMM disambiguator (--tag),
 lexical decoder (--decode),
+lexical annotator (--annotate),
 or as (almost) any coherent combination  of the above components.
 Input and output formats depend on the chosen mode of operation; in the default (--full) mode,
-it takes as input one or more 'raw' files, and produces a 'medium' output file whose 'best-tag' fields
-are strings of space-separated segment attribute bundles (i.e. probably not interesting unless you are
-trying to debug a WASTE tokenizer model).
+it takes as input one or more 'raw' files, and produces a 'medium-rare' output file whose analyses
+correspond to those returned by the dwds_tomasotath v0.4.x series of tokenizers.
 See L<mootfiles> for details on moot file formats.
 
 
@@ -252,7 +254,7 @@ indicates a sentence boundary.
 
 =item C<--full> , C<-f>
 
-Alias for --scan --lex --tag --decode (default)
+Alias for --scan --lex --tag --decode --annotate (default)
 
 Default: '0'
 
@@ -353,6 +355,24 @@ Default: '0'
 =item C<--no-decode> , C<-D>
 
 Disable post-Viterbi decoding stage.
+
+Default: '0'
+
+
+
+
+=item C<--annotate> , C<-n>
+
+Enable text-based annotation stage.
+
+Default: '0'
+
+
+
+
+=item C<--no-annotate> , C<-N>
+
+Disable text-based annotation stage.
 
 Default: '0'
 
@@ -465,7 +485,8 @@ in a pipeline, e.g.
   waste --scan -Or,loc INFILE.txt \\
   | waste --lex -aabbr.lex -jconj.lex -wstop.lex -Ir,loc -Omr,loc - \\
   | moot  --stream --model=MODEL --beam-width=100 -Imr,loc -Owd,loc - \\
-  | waste --decode -Iwd,loc -Om,loc -o OUTFILE.wd
+  | waste --decode -Iwd,loc -Om,loc \\
+  | waste --annotate -Im,loc -Omr,loc -o OUTFILE.mr
 
 
 
@@ -499,11 +520,12 @@ disabled with the -no-scan (-S) option.
 
 Default value depends on the B<first> enabled processing module:
 
- --scan   : 'None'
- --lex    : 'Text'
- --tag    : 'Text,Analyzed'
- --decode : 'Text,Analyzed,Tagged'
- --train  : 'Text'
+ --scan     : 'None'
+ --lex      : 'Text'
+ --tag      : 'Text,Analyzed'
+ --decode   : 'Text,Analyzed,Tagged'
+ --annotate : 'Text'
+ --train    : 'Text'
 
 See 'I/O Format Flags' in L<mootfiles> for details.
 
@@ -524,11 +546,12 @@ negation.
 
 Default value depends on the B<last> enabled processing module:
 
- --scan   : 'Text'
- --lex    : 'Text,Analyzed'
- --tag    : 'Text,Tagged'
- --decode : 'Text'
- --train  : 'Text,Analyzed,Tagged'
+ --scan     : 'Text'
+ --lex      : 'Text,Analyzed'
+ --tag      : 'Text,Tagged'
+ --decode   : 'Text'
+ --annotate : 'Text,Analyzed'
+ --train    : 'Text,Analyzed,Tagged'
 
 See 'I/O Format Flags' in L<mootfiles> for details.
 

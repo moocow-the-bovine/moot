@@ -134,7 +134,7 @@ namespace moot
     void _put_token(const mootToken &token);
     void _put_tokens(const mootSentence &tokens);
     void _put_sentence(const mootSentence &sentence);
-    void _put_raw_buffer(const char *buf, size_t len); //-- not supported
+    void _put_raw_buffer(const char *buf, size_t len); //-- passed through to sink
     //@}
 
   };

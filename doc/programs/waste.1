@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "WASTE 1"
-.TH WASTE 1 "2013-12-02" "moot v2.0.10-2" "moot PoS Tagger"
+.TH WASTE 1 "2013-12-04" "moot v2.0.10-3" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -150,7 +150,7 @@ waste [\s-1OPTIONS\s0] \s-1FILE\s0(s)
 \&    \-oFILE    \-\-output=FILE           Write output to FILE.
 \&
 \& Mode Options
-\&    \-f        \-\-full                  Alias for \-\-scan \-\-lex \-\-tag \-\-decode (default)
+\&    \-f        \-\-full                  Alias for \-\-scan \-\-lex \-\-tag \-\-decode \-\-annotate (default)
 \&    \-R        \-\-train                 Training mode (similar to \-\-lex)
 \&    \-s        \-\-scan                  Enable raw text scanning stage.
 \&    \-S        \-\-no\-scan               Disable raw text scanning stage.
@@ -160,6 +160,8 @@ waste [\s-1OPTIONS\s0] \s-1FILE\s0(s)
 \&    \-T        \-\-no\-tag                Disable HMM Viterbi tagging stage.
 \&    \-d        \-\-decode                Enable post\-Viterbi decoding stage.
 \&    \-D        \-\-no\-decode             Disable post\-Viterbi decoding stage.
+\&    \-n        \-\-annotate              Enable text\-based annotation stage.
+\&    \-N        \-\-no\-annotate           Disable text\-based annotation stage.
 \&
 \& Lexer Options
 \&    \-aFILE    \-\-abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
@@ -186,11 +188,11 @@ or as a standalone scanner (\-\-scan),
 lexical encoder (\-\-lex),
 \&\s-1HMM\s0 disambiguator (\-\-tag),
 lexical decoder (\-\-decode),
+lexical annotator (\-\-annotate),
 or as (almost) any coherent combination  of the above components.
 Input and output formats depend on the chosen mode of operation; in the default (\-\-full) mode,
-it takes as input one or more 'raw' files, and produces a 'medium' output file whose 'best\-tag' fields
-are strings of space-separated segment attribute bundles (i.e. probably not interesting unless you are
-trying to debug a \s-1WASTE\s0 tokenizer model).
+it takes as input one or more 'raw' files, and produces a 'medium\-rare' output file whose analyses
+correspond to those returned by the dwds_tomasotath v0.4.x series of tokenizers.
 See mootfiles for details on moot file formats.
 .SH "ARGUMENTS"
 .IX Header "ARGUMENTS"
@@ -296,7 +298,7 @@ indicates a sentence boundary.
 .ie n .IP """\-\-full"" , ""\-f""" 4
 .el .IP "\f(CW\-\-full\fR , \f(CW\-f\fR" 4
 .IX Item "--full , -f"
-Alias for \-\-scan \-\-lex \-\-tag \-\-decode (default)
+Alias for \-\-scan \-\-lex \-\-tag \-\-decode \-\-annotate (default)
 .Sp
 Default: '0'
 .ie n .IP """\-\-train"" , ""\-R""" 4
@@ -366,6 +368,18 @@ Default: '0'
 Disable post-Viterbi decoding stage.
 .Sp
 Default: '0'
+.ie n .IP """\-\-annotate"" , ""\-n""" 4
+.el .IP "\f(CW\-\-annotate\fR , \f(CW\-n\fR" 4
+.IX Item "--annotate , -n"
+Enable text-based annotation stage.
+.Sp
+Default: '0'
+.ie n .IP """\-\-no\-annotate"" , ""\-N""" 4
+.el .IP "\f(CW\-\-no\-annotate\fR , \f(CW\-N\fR" 4
+.IX Item "--no-annotate , -N"
+Disable text-based annotation stage.
+.Sp
+Default: '0'
 .SS "Lexer Options"
 .IX Subsection "Lexer Options"
 .ie n .IP """\-\-abbrevs=FILE"" , ""\-aFILE""" 4
@@ -422,11 +436,12 @@ This option is intended to be used with a pre-compiled binary model.  If you
 need to set addtitional runtime options, you should call \f(CW\*(C`moot\*(C'\fR directly
 in a pipeline, e.g.
 .Sp
-.Vb 4
+.Vb 5
 \&  waste \-\-scan \-Or,loc INFILE.txt \e\e
 \&  | waste \-\-lex \-aabbr.lex \-jconj.lex \-wstop.lex \-Ir,loc \-Omr,loc \- \e\e
 \&  | moot  \-\-stream \-\-model=MODEL \-\-beam\-width=100 \-Imr,loc \-Owd,loc \- \e\e
-\&  | waste \-\-decode \-Iwd,loc \-Om,loc \-o OUTFILE.wd
+\&  | waste \-\-decode \-Iwd,loc \-Om,loc \e\e
+\&  | waste \-\-annotate \-Im,loc \-Omr,loc \-o OUTFILE.mr
 .Ve
 .SS "Format Options"
 .IX Subsection "Format Options"
@@ -444,12 +459,13 @@ disabled with the \-no\-scan (\-S) option.
 .Sp
 Default value depends on the \fBfirst\fR enabled processing module:
 .Sp
-.Vb 5
-\& \-\-scan   : \*(AqNone\*(Aq
-\& \-\-lex    : \*(AqText\*(Aq
-\& \-\-tag    : \*(AqText,Analyzed\*(Aq
-\& \-\-decode : \*(AqText,Analyzed,Tagged\*(Aq
-\& \-\-train  : \*(AqText\*(Aq
+.Vb 6
+\& \-\-scan     : \*(AqNone\*(Aq
+\& \-\-lex      : \*(AqText\*(Aq
+\& \-\-tag      : \*(AqText,Analyzed\*(Aq
+\& \-\-decode   : \*(AqText,Analyzed,Tagged\*(Aq
+\& \-\-annotate : \*(AqText\*(Aq
+\& \-\-train    : \*(AqText\*(Aq
 .Ve
 .Sp
 See 'I/O Format Flags' in mootfiles for details.
@@ -466,12 +482,13 @@ negation.
 .Sp
 Default value depends on the \fBlast\fR enabled processing module:
 .Sp
-.Vb 5
-\& \-\-scan   : \*(AqText\*(Aq
-\& \-\-lex    : \*(AqText,Analyzed\*(Aq
-\& \-\-tag    : \*(AqText,Tagged\*(Aq
-\& \-\-decode : \*(AqText\*(Aq
-\& \-\-train  : \*(AqText,Analyzed,Tagged\*(Aq
+.Vb 6
+\& \-\-scan     : \*(AqText\*(Aq
+\& \-\-lex      : \*(AqText,Analyzed\*(Aq
+\& \-\-tag      : \*(AqText,Tagged\*(Aq
+\& \-\-decode   : \*(AqText\*(Aq
+\& \-\-annotate : \*(AqText,Analyzed\*(Aq
+\& \-\-train    : \*(AqText,Analyzed,Tagged\*(Aq
 .Ve
 .Sp
 See 'I/O Format Flags' in mootfiles for details.

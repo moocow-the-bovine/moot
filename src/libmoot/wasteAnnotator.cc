@@ -101,7 +101,8 @@ namespace moot {
   //----------------------------------------------------------------------
   void wasteAnnotatorWriter::_put_raw_buffer(const char *buf, size_t len)
   {
-    //-- not supported
+    if ( waw_sink )
+      waw_sink->put_raw_buffer(buf,len);
   }
 
 } // namespace moot

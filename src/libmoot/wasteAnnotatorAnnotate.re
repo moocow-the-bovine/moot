@@ -1,5 +1,11 @@
 #include "wasteAnnotator.h"
 
+/*-- moo: useful shortcuts for re2c actions --*/
+#define annot1(a1) 		token.insert(a1,""); return
+#define annot2(a1,a2)		token.insert(a1,""); token.insert(a2,""); return
+#define annot3(a1,a2,a3)	token.insert(a1,""); token.insert(a2,""); token.insert(a3,""); return
+#define annot4(a1,a2,a3,a4)	token.insert(a1,""); token.insert(a2,""); token.insert(a3,""); token.insert(a4,""); return
+
 namespace moot {
 
   void wasteAnnotator::annotate_token(mootToken& token)
@@ -290,60 +296,43 @@ Any = Any1|Any2|Any3;
 	QUOTE_G2                = ([\xC2][\xBB])|([\xE2][\x80][\xBA]);
 	QUOTE_G                 = QUOTE_G1|QUOTE_G2;
         QUOTE                   = QUOTE_L|QUOTE_R|QUOTE_G;
-        PUNCT                   = Pc|Pd|Pe|Pf|Pi|Po|Ps|Sk|Sm|So|QUOTE;
+	HYPHEN			= "-" | "¬" | "­" | "⸗" | "–" | "—" ;
+        PUNCT                   = Pc|Pd|Pe|Pf|Pi|Po|Ps|Sk|Sm|So|QUOTE|HYPHEN;
+	BYTE			= [\x01-\xFF];
     */
 
     /*!re2c
 
-      "."                             [\000]     { token.insert("$.",""); return; }
-      [\.:]+                          [\000]     {
-                                                   token.insert("$.","");
-                                                   token.insert("$(","");
-                                                   return;
-                                                 }
-      [?!]+                           [\000]     { token.insert("$.",""); return; }
-      [,]                             [\000]     { token.insert("$,",""); return; }
-      [;]                             [\000]     { token.insert("$.",""); return; }
-      [%]                             [\000]     {
-                                                   token.insert("NN","");
-                                                   token.insert("$(","");
-                                                   token.insert("$PERCENT","");
-                                                   return;
-                                                 }
-      [§]                             [\000]     {
-                                                   token.insert("NN","");
-                                                   token.insert("$(","");
-                                                   token.insert("$PARAGRAPH","");
-                                                   return;
-                                                 }
-      Sc                              [\000]     {
-                                                   token.insert("NN","");
-                                                   token.insert("$(","");
-                                                   token.insert("$CURRENCY","");
-                                                   return;
-                                                 }
-      PUNCT                           [\000]     { token.insert("$(",""); return; }
+      "."                             [\000]     { annot1("$."); }
+      [\.:]+                          [\000]     { annot2("$.","$("); }
+      [?!]+                           [\000]     { annot1("$."); }
+      [,]                             [\000]     { annot1("$,"); }
+      [;]                             [\000]     { annot1("$."); }
 
-      [+-]?[0-9]+([\. :,_][0-9]+)*    [\000]     { token.insert("CARD",""); return; }
-      [+-]?[0-9]+([\. :,_][0-9]+)*"." [\000]     { token.insert("ORD",""); return; }
-      [.]* "."                        [\000]     {
-                                                   token.insert("XY","");
-                                                   token.insert("$ABBREV","");
-                                                   return;
-                                                 }
-      [-]                                        { token.insert("TRUNC", ""); return; }
-      ("www.")|[a-zA-Z]+("@"|":/")               {
-                                                   token.insert("NN","");
-                                                   token.insert("NE","");
-                                                   token.insert("XY","");
-                                                   token.insert("$LINK","");
-                                                   return;
-                                                 }
+      [%]                             [\000]     { annot3("NN","$(","$PERCENT"); }
+      "§"                             [\000]     { annot3("NN","$(","$PARAGRAPH"); /*-- use double quotes and not [] in pattern for non-ascii symbols! --*/ }
+      Sc                              [\000]     { annot3("NN","$(","$CURRENCY"); }
+      PUNCT                           [\000]     { annot1("$("); }
+
+      [+-]?[0-9]+([\. :,_][0-9]+)*    [\000]     { annot1("CARD"); }
+      [+-]?[0-9]+([\. :,_][0-9]+)*"." [\000]     { annot2("ADJA","$ORD"); }
+      [IXVLMDCixvlmdc]+"."	      [\000]	 { annot3("ADJA","$ABBREV","$ORD"); }
+      BYTE+ "."                       [\000]     { annot2("XY","$ABBREV"); }
+
+      HYPHEN BYTE                                { annot1("TRUNC"); }
+      BYTE* HYPHEN                    [\000]     { annot1("TRUNC"); }
+
+      ("www.")|[a-zA-Z]+("@"|":/")               { annot4("NN","NE","XY","$LINK"); }
 
 
       [^]             { return; }
 
     */
   }
+
+#undef annot1
+#undef annot2
+#undef annot3
+#undef annot4
 
 } // namespace moot

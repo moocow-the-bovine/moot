@@ -73,7 +73,7 @@
     -oFILE    --output=FILE           Write output to FILE.</pre>
 <pre>
  Mode Options
-    -f        --full                  Alias for --scan --lex --tag --decode (default)
+    -f        --full                  Alias for --scan --lex --tag --decode --annotate (default)
     -R        --train                 Training mode (similar to --lex)
     -s        --scan                  Enable raw text scanning stage.
     -S        --no-scan               Disable raw text scanning stage.
@@ -82,7 +82,9 @@
     -t        --tag                   Enable HMM Viterbi tagging stage.
     -T        --no-tag                Disable HMM Viterbi tagging stage.
     -d        --decode                Enable post-Viterbi decoding stage.
-    -D        --no-decode             Disable post-Viterbi decoding stage.</pre>
+    -D        --no-decode             Disable post-Viterbi decoding stage.
+    -n        --annotate              Enable text-based annotation stage.
+    -N        --no-annotate           Disable text-based annotation stage.</pre>
 <pre>
  Lexer Options
     -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
@@ -109,11 +111,11 @@ or as a standalone scanner (--scan),
 lexical encoder (--lex),
 HMM disambiguator (--tag),
 lexical decoder (--decode),
+lexical annotator (--annotate),
 or as (almost) any coherent combination  of the above components.
 Input and output formats depend on the chosen mode of operation; in the default (--full) mode,
-it takes as input one or more 'raw' files, and produces a 'medium' output file whose 'best-tag' fields
-are strings of space-separated segment attribute bundles (i.e. probably not interesting unless you are
-trying to debug a WASTE tokenizer model).
+it takes as input one or more 'raw' files, and produces a 'medium-rare' output file whose analyses
+correspond to those returned by the dwds_tomasotath v0.4.x series of tokenizers.
 See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot file formats.</p>
 <p>
 </p>
@@ -229,7 +231,7 @@ indicates a sentence boundary.</p>
 <dt><strong><a name="full_f" class="item"><code>--full</code> , <code>-f</code></a></strong></dt>
 
 <dd>
-<p>Alias for --scan --lex --tag --decode (default)</p>
+<p>Alias for --scan --lex --tag --decode --annotate (default)</p>
 <p>Default: '0'</p>
 </dd>
 <dt><strong><a name="train_r" class="item"><code>--train</code> , <code>-R</code></a></strong></dt>
@@ -296,6 +298,18 @@ as appropriate for your model.</p>
 <p>Disable post-Viterbi decoding stage.</p>
 <p>Default: '0'</p>
 </dd>
+<dt><strong><a name="annotate_n" class="item"><code>--annotate</code> , <code>-n</code></a></strong></dt>
+
+<dd>
+<p>Enable text-based annotation stage.</p>
+<p>Default: '0'</p>
+</dd>
+<dt><strong><a name="no_annotate_n" class="item"><code>--no-annotate</code> , <code>-N</code></a></strong></dt>
+
+<dd>
+<p>Disable text-based annotation stage.</p>
+<p>Default: '0'</p>
+</dd>
 </dl>
 <p>
 </p>
@@ -354,7 +368,8 @@ in a pipeline, e.g.</p>
   waste --scan -Or,loc INFILE.txt \\
   | waste --lex -aabbr.lex -jconj.lex -wstop.lex -Ir,loc -Omr,loc - \\
   | moot  --stream --model=MODEL --beam-width=100 -Imr,loc -Owd,loc - \\
-  | waste --decode -Iwd,loc -Om,loc -o OUTFILE.wd</pre>
+  | waste --decode -Iwd,loc -Om,loc \\
+  | waste --annotate -Im,loc -Omr,loc -o OUTFILE.mr</pre>
 </dd>
 </dl>
 <p>
@@ -372,11 +387,12 @@ negation.  Only meaningful if the scanner stage has been
 disabled with the -no-scan (-S) option.</p>
 <p>Default value depends on the <strong>first</strong> enabled processing module:</p>
 <pre>
- --scan   : 'None'
- --lex    : 'Text'
- --tag    : 'Text,Analyzed'
- --decode : 'Text,Analyzed,Tagged'
- --train  : 'Text'</pre>
+ --scan     : 'None'
+ --lex      : 'Text'
+ --tag      : 'Text,Analyzed'
+ --decode   : 'Text,Analyzed,Tagged'
+ --annotate : 'Text'
+ --train    : 'Text'</pre>
 <p>See 'I/O Format Flags' in <a href="././mootfiles.html">the mootfiles manpage</a> for details.</p>
 </dd>
 <dt><strong><a name="output_format_format_oformat" class="item"><code>--output-format=FORMAT</code> , <code>-OFORMAT</code></a></strong></dt>
@@ -389,11 +405,12 @@ optionally prefixed with an exclamation point (!) to indicate
 negation.</p>
 <p>Default value depends on the <strong>last</strong> enabled processing module:</p>
 <pre>
- --scan   : 'Text'
- --lex    : 'Text,Analyzed'
- --tag    : 'Text,Tagged'
- --decode : 'Text'
- --train  : 'Text,Analyzed,Tagged'</pre>
+ --scan     : 'Text'
+ --lex      : 'Text,Analyzed'
+ --tag      : 'Text,Tagged'
+ --decode   : 'Text'
+ --annotate : 'Text,Analyzed'
+ --train    : 'Text,Analyzed,Tagged'</pre>
 <p>See 'I/O Format Flags' in <a href="././mootfiles.html">the mootfiles manpage</a> for details.</p>
 </dd>
 </dl>

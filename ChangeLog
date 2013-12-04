@@ -1,6 +1,6 @@
 ChangeLog for package moot
 
-v2.0.10 Wed, 27 Nov 2013 09:57:22 +0100 moocow and kmw
+v2.0.10 Wed, 04 Dec 2013 14:28:31 +0100 moocow and kmw
 	+ added "waste" tokenizer support classes and command-line utility
 	  * merged into moot sources from dwds_tomasotath v0.5.x
 	+ added perl support for TokenReader/TokenWriter classes
@@ -12,6 +12,7 @@ v2.0.10 Wed, 27 Nov 2013 09:57:22 +0100 moocow and kmw
 	  * this corresponds to formats used by dwds_tomasotath and DTA::CAB, but
 	    is not actually what Token(Reader|Writer)Native had been using
 	  * change makes no difference for 'rare' or 'medium-rare' formats
+	+ added wasteAnnotator as drop-in replacement for dwds_tomasotath-style tokenizer-side analysis
 
 v2.0.9 Thu, 11 Aug 2011 15:04:19 +0200
 	+ fixed mootHMM::estimate_lambdas() bug resulting in nan smoothing constants
