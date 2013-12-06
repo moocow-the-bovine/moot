@@ -22,7 +22,7 @@ sub annotator {
 ## $str = CLASS_OR_OBJECT->analyze_text($str)
 sub analyze_text {
   my $a = $_[0]->annotator->annotate({text=>$_[1]})->{analyses};
-  return join("\t", '', map {$_->{tag}} @$a) if ($a && @$a);
+  return join("\t", '', map {$_->{details}//$_->{tag}} @$a) if ($a && @$a);
   return undef;
 }
 
