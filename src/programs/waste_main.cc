@@ -168,7 +168,12 @@ void GetMyOptions(int argc, char **argv)
 
   //-- operation mode
   if ( !args.train_given && !args.full_given && !args.scan_given && !args.lex_given && !args.tag_given && !args.decode_given && !args.annotate_given ) {
-    args.full_flag = args.scan_flag = args.lex_flag = args.tag_flag = args.decode_flag = args.annotate_flag = 1;
+    args.full_flag = 1;
+    args.scan_flag = !args.no_scan_flag;
+    args.lex_flag = !args.no_lex_flag;
+    args.tag_flag = !args.no_tag_flag;
+    args.decode_flag = !args.no_decode_flag;
+    args.annotate_flag = !args.no_annotate_flag;
   }
   modeSet(mode, wmScan, args.scan_flag);
   modeSet(mode, wmLex,  args.lex_flag);
