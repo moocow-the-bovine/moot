@@ -70,7 +70,9 @@ wasteLexerTypeE waste_lexertype(const std::string &s)
 
     SLASH                   = [\\/];
     
-    WS                      = [ \r\n\t\f];
+    WS_ASCII                = [ \r\n\t\f];
+    WS_EXTRA	       	    = ([\xC2][\xA0]);
+    WS		            = WS_ASCII | WS_EXTRA;
 
     SC                      = Pc|Pd|Pe|Pf|Pi|Po|Ps|Sk|Sm|So|QUOTE;
 
