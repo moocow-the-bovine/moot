@@ -1,11 +1,12 @@
 package Moot::TokenWriter;
+use Carp;
 use strict;
 
 ##=====================================================================
 ## TokenWriter: Constructors etc.
 
 sub new {
-  confesss(__PACKAGE__, "::new(): abstract method called");
+  confess(__PACKAGE__, "::new(): abstract method called");
 }
 
 ##=====================================================================
