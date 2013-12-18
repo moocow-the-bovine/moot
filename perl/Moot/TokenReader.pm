@@ -1,11 +1,12 @@
 package Moot::TokenReader;
+use Carp;
 use strict;
 
 ##=====================================================================
 ## TokenReader: Constructors etc.
 
 sub new {
-  confesss(__PACKAGE__, "::new(): abstract method called");
+  confess(__PACKAGE__, "::new(): abstract method called");
 }
 
 1; ##-- be happy
