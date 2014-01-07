@@ -391,15 +391,21 @@ Any = Any1|Any2|Any3;
 	LINK			= URI__schemed | URI__link_user ;
 	*/
 
+/*!re2c
+        CMTCHAR_SAFE		= [^%\r\n\x00];
+        CMTCHAR                 = CMTCHAR_SAFE | ("%" CMTCHAR_SAFE);
+*/
+
 	//-- XML (DISABLED)
 	/*NOT_re2c
 	XML                     = "<"[/]?[a-zA-Z_\.?][^<>\n]*">";
+
+	"%%"[^%\r\n\x00]*"%%"    { add_columns( yyleng() ); return wScanTypeComment; }
 	*/
 
 	/*!re2c
 	[\x00]     		 { return wScanTypeEOF; /*-- EOF simulation with NUL-byte --*/}
-	"%%"[^%\r\n]*"%%"        { add_columns( yyleng() ); return wScanTypeComment; }
-
+	"%%" CMTCHAR* "%%"       { add_columns( yyleng() ); return wScanTypeComment; }
 	"$WB$"                   { add_columns( yyleng() ); return wScanTypeWB; }
 	"$SB$"                   { add_columns( yyleng() ); return wScanTypeSB; }
 
