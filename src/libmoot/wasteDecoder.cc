@@ -48,6 +48,7 @@ void wasteDecoder::close(void)
   wd_sink = NULL;
   wd_tok = NULL;
   wd_sb = false;
+  wd_eos = false;
 }
 
 //============================================================================
@@ -90,12 +91,12 @@ void wasteDecoder::_put_token(const mootToken &token)
 	wd_tok->tok_besttag.push_back(' ');
 	wd_tok->tok_besttag += token.besttag();
 	wd_tok->tok_location.length = (token.tok_location.offset + token.tok_location.length - wd_tok->tok_location.offset);
+	wd_eos = tag_attr_S(token.besttag());
 	return;
       }
-      else if (wd_tok) {
-	//-- we have a buffered wd_tok: check for EOS
-	if (!wd_sb && tag_attr_S(wd_tok->besttag()) && tag_attr_s(token.besttag()))
-	  wd_buf.push_back( mootToken(TokTypeEOS) );
+      else if (!wd_sb && wd_eos && tag_attr_s(token.besttag())) {
+	//-- we have a buffered EOS attribute
+	wd_buf.push_back( mootToken(TokTypeEOS) );
 
 	//-- spit out old wd_tok and update
 	wd_tok = NULL;
@@ -108,6 +109,7 @@ void wasteDecoder::_put_token(const mootToken &token)
       wd_tok->text(rawtext);
       wd_tok->tok_analyses.clear();
       wd_sb  = false;
+      wd_eos = tag_attr_S(token.besttag());
       break;
     }
 
@@ -123,14 +125,14 @@ void wasteDecoder::_put_token(const mootToken &token)
     wd_buf.push_back(token);
     if (!wd_sb) {
       wd_buf.push_back( mootToken(TokTypeEOS) );
-      wd_sb = true;
+      wd_sb  = true;
     }
     break;
 
   case TokTypeEOS:
     //-- EOS: pass through (unless we've just inserted one)
     if (wd_sb) break;
-    wd_sb = true;
+    wd_sb  = true;
     wd_buf.push_back( token );
     break;
   

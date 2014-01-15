@@ -64,6 +64,7 @@ public:
   /// \name public data
   //@{
   bool		wd_sb;    /** whether an SB has been seen */
+  bool		wd_eos;	  /** whether an EOS attribute has been seen */
   mootSentence  wd_buf;   /** intermediate token buffer */
   mootToken    *wd_tok;   /** current token under construction (NULL for none), pointer into wd_buf */
   TokenWriter  *wd_sink;  /** underlying data sink */
@@ -77,6 +78,7 @@ public:
   wasteDecoder(int fmt=tiofWellDone, const std::string &name="wasteDecoder")
     : TokenWriter(fmt,name),
       wd_sb(false),
+      wd_eos(false),
       wd_tok(NULL),
       wd_sink(NULL)
   {};
