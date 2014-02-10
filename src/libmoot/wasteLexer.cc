@@ -187,7 +187,7 @@ void wasteLexer::buffer_token(mootToken& stok)
 
         default:
           // -- breaks hyphenation
-          wl_state &= ~(ls_hyph|ls_nl);
+          wl_state &= ~(ls_hyph|ls_nl|ls_head);
           // -- set token features according to lexer state and reset
           local_token.wlt_type = lextype;
           local_token.wlt_blanked = (wl_state & ls_blanked) ? true : false;
