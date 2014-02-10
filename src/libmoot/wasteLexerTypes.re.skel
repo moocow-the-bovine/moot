@@ -63,7 +63,7 @@ wasteLexerTypeE waste_lexertype(const std::string &s)
     INT                     = Nd+ | (Nd{1,3} ([ \.\,] Nd{3})+);
     FLOAT                   = INT ([,] INT)?;
     CARD                    = FLOAT;
-    ROMAN                   = [IXVLMDC]+;
+    ROMAN                   = [IJXVLMDC]+;
 
     LBR                     = [\(\[\{];
     RBR                     = [\)\]\}];
