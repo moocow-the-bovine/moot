@@ -129,6 +129,7 @@ void wasteLexer::buffer_token(mootToken& stok)
           return;
 
         case wLexerTypeAlphaLower:
+	case wLexerTypeRomanLower:
           if( wl_dehyph_mode && ((wl_state & ls_head_hyph_nl) == ls_head_hyph_nl) && !wl_conjunctions.lookup(local_token.wlt_token.tok_text))
           {
             wl_tokbuf.push_back(local_token);
@@ -147,8 +148,10 @@ void wasteLexer::buffer_token(mootToken& stok)
               // -- update length of the dehyphenated token
               it_head->wlt_token.tok_location.length += it_tail->wlt_token.tok_location.offset + it_tail->wlt_token.tok_location.length - it_head->wlt_token.tok_location.offset - it_head->wlt_token.tok_location.length;
               // -- head may have been a roman number, now we know it is not
-              if (it_head->wlt_type == wLexerTypeRoman)
+              if (it_head->wlt_type == wLexerTypeRomanCaps)
                 it_head->wlt_type = wLexerTypeAlphaUpper;
+              else if (it_head->wlt_type == wLexerTypeRomanLower)
+                it_head->wlt_type = wLexerTypeAlphaLower;
               // -- only text tokens are deleted from buffer
               if(it_tail->wlt_token.tok_type == TokTypeVanilla || it_tail->wlt_token.tok_type == TokTypeLibXML) {
                 if (it_tail->wlt_type != wLexerTypeHyph) {
@@ -169,7 +172,7 @@ void wasteLexer::buffer_token(mootToken& stok)
           }
         case wLexerTypeAlphaUpper:
         case wLexerTypeAlphaCaps:
-	case wLexerTypeRoman:
+	case wLexerTypeRomanCaps:
           wl_state |= ls_head;
           // -- breaks hyphenation
           wl_state &= ~(ls_hyph|ls_nl);
@@ -323,9 +326,14 @@ void wasteLexer::set_token(mootToken &token, wasteLexerToken &lex_token)
       tok_class = num;
       tok_length = length_attr(lex_token.wlt_token.tok_text.length());
       break;
-    case wLexerTypeRoman:
+    case wLexerTypeRomanCaps:
       tok_class = (wl_stopwords.lookup(lex_token.wlt_token.tok_text)) ? stop : rom;
       tok_case = (wl_stopwords.lookup(lex_token.wlt_token.tok_text)) ? cap : non;
+      tok_length = length_attr(lex_token.wlt_token.tok_text.length());
+      break;
+    case wLexerTypeRomanLower:
+      tok_class = (wl_stopwords.lookup(lex_token.wlt_token.tok_text)) ? stop : rom;
+      tok_case = (wl_stopwords.lookup(lex_token.wlt_token.tok_text)) ? lo : non;
       tok_length = length_attr(lex_token.wlt_token.tok_text.length());
       break;
 

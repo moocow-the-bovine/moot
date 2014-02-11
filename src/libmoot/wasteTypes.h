@@ -85,7 +85,8 @@ enum wasteLexerTypeE {
   wLexerTypeNewline,    /**< newline */
 
   wLexerTypeNumber,     /**< number string */
-  wLexerTypeRoman,      /**< roman numeral string */
+  wLexerTypeRomanCaps,  /**< roman numeral string in caps*/
+  wLexerTypeRomanLower, /**< roman numeral string in lower case */
 
   wLexerTypeAlphaLower, /**< alphabetic string, any script, lower case */
   wLexerTypeAlphaUpper, /**< alphabetic string, any script, first character in upper case */

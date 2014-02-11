@@ -27,7 +27,7 @@ int moot::wasteScanner::yylex ( )
 	//-- Numbers
 	/*!re2c
 	DIGIT		      = [0-9];
-	ROMAN                 = [IJXVLMDC]+;
+	ROMAN                 = [IJVXLCDMijvxlcdm]+;
 	NUMBER                = (DIGIT | No | Nd | Nl)+;
 	*/
 
