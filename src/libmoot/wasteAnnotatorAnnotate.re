@@ -317,7 +317,7 @@ Any = Any1|Any2|Any3;
 
       [+-]?[0-9]+([\. :,_][0-9]+)*    [\000]     { annot1("CARD"); }
       [+-]?[0-9]+([\. :,_][0-9]+)*"." [\000]     { annot2("ADJA","$ORD"); }
-      [IXVLMDCixvlmdc]+"."	      [\000]	 { annot3("ADJA","$ABBREV","$ORD"); }
+      [IJXVLMDCijxvlmdc]+"."	      [\000]	 { annot3("ADJA","$ABBREV","$ORD"); }
       BYTE+ "."                       [\000]     { annot2("XY","$ABBREV"); }
 
       HYPHEN BYTE                                { annot1("TRUNC"); }
