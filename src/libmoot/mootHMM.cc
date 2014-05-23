@@ -2292,8 +2292,8 @@ bool mootHMM::load(mootio::mistream *ibs, const char *filename)
     }
   else if (hi.magic != hi_magic.magic)
     {
-      carp("mootHMM::load(): bad magic 0x%x%s%s\n",
-	   hi.magic,
+      carp("mootHMM::load(): bad magic 0x%x (expected 0x%x)%s%s\n",
+	   hi.magic, hi_magic.magic,
 	   (filename ? " in file " : ""), (filename ? filename : ""));
       return false;
     }

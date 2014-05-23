@@ -1,0 +1,14 @@
+## magic data for binary moot HMMs, for use with file(1).
+## Add the contents of this file to /etc/magic or equivalent.
+
+##--BEGIN moot.magic
+## - Bryan Jurish <moocow@cpan.org>
+
+## stored binary gfsm automata
+0       ulong   0x49c32b81		moot binary hmm
+>4      ulong   x                       (version v%u
+>8      ulong   x                       \b.%u
+>16     ulong   x                       min %u
+>20     ulong   x                       \b.%u)
+
+##--END moot.magic
