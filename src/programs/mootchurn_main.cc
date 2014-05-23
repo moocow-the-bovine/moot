@@ -1,6 +1,6 @@
 /*
    moot-utils : moocow's part-of-speech tagger
-   Copyright (C) 2004-2012 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2004-2014 Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public
