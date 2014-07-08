@@ -55,12 +55,6 @@ Output evaluator for moocow's PoS tagger.
 (L<mooteval>)
 
 
-=item 
-
-
-(L<>)
-
-
 =item mootpp
 
 Rudimentary tokenizer for moocow's part-of-speech tagger.
@@ -182,7 +176,6 @@ mootconfig(1),
 mootdump(1),
 mootdyn(1),
 mooteval(1),
-(1),
 mootpp(1),
 mootrain(1),
 moottaste(1),
@@ -191,6 +184,6 @@ mootm(1)
 
 =head1 AUTHOR
 
-Bryan Jurish E<lt>moocow@ling.uni-potsdam.deE<gt>
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =cut

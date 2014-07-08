@@ -995,7 +995,7 @@ public:
    * Calling this method will add verbose trace information as comments to \c sentence.
    * Same caveats as for tag_mark_best().
    */
-  void tag_dump_trace(mootSentence &sentence);
+  void tag_dump_trace(mootSentence &sentence, bool dumpPredict=false);
 
   //@}
 

@@ -626,18 +626,35 @@ Useful if you need to refer back to earlier stages of a token processing pipelin
 <p>Read/write analysis &quot;costs&quot; from/to analysis &quot;&lt;<em>NUMBER</em>&gt;&quot; suffixes.
 This flag may be set by default in future versions.</p>
 </dd>
-<dt><strong><a name="trace" class="item">Trace</a></strong></dt>
-
-<dd>
-<p>If set as an output format flag, causes a verbose dump of the Viterbi trellis
-to be spliced into every tagged sentence as post-token comments.  Does nothing
-as an input flag (yet).</p>
-</dd>
 <dt><strong><a name="pruned" class="item">Pruned</a></strong></dt>
 
 <dd>
 <p>For 'well done' formats, ignore analyses which do
 not correspond to the 'best' tag.</p>
+</dd>
+<dt><strong><a name="trace" class="item">Trace</a></strong></dt>
+
+<dd>
+<p>If set as an output format flag, causes a verbose dump of the Viterbi trellis
+to be spliced into every tagged sentence as post-token comments.
+Does nothing as an input flag (yet).
+Implies &quot;Flush&quot;.</p>
+</dd>
+<dt><strong><a name="predict" class="item">Predict</a></strong></dt>
+
+<dd>
+<p>If set as an output flag, cases a verbose dump of Viterbi trellis-based predictions
+to be spliced into every tagged sentence as post-token comments.
+Does nothing as an input flag (yet).
+Implies both &quot;Trace&quot; and &quot;Flush&quot;.</p>
+</dd>
+<dt><strong><a name="flush" class="item">Flush</a></strong></dt>
+
+<dd>
+<p>If set as an output flag, causes the underlying output stream to be implicitly flushed after
+each write operation.
+Currently only meaningful for native output mode.
+Does nothing as an input flag (yet).</p>
 </dd>
 </dl>
 </dd>
@@ -1016,7 +1033,7 @@ class-based HMM tagger / disambiguator.</p>
 </p>
 <hr />
 <h1><a name="author">AUTHOR</a></h1>
-<p>Bryan Jurish &lt;<a href="mailto:jurish@uni-potsdam.de">jurish@uni-potsdam.de</a>&gt;</p>
+<p>Bryan Jurish &lt;<a href="mailto:moocow@cpan.org">moocow@cpan.org</a>&gt;</p>
 <p>
 </p>
 <hr />

@@ -1014,7 +1014,7 @@ void mootHMM::tag_io(TokenReader *reader, TokenWriter *writer)
     tag_sentence(*sent);
     
     if (writer) {
-      if ((writer->tw_format & tiofTrace)) tag_dump_trace(*sent);
+      if ((writer->tw_format & tiofTrace)) tag_dump_trace(*sent, (writer->tw_format&tiofPredict)!=0);
       writer->put_sentence(*sent);
     }
   }
@@ -1066,7 +1066,7 @@ void mootHMM::viterbi_flush(TokenWriter *writer, mootSentence &toks, ViterbiNode
   tag_mark_best(pnod, toks);
   if (writer) {
     if ((writer->tw_format & tiofTrace)) {
-      tag_dump_trace(toks);
+      tag_dump_trace(toks, (writer->tw_format & tiofPredict)!=0);
       toks.push_back( mootToken("%%moot:trace FLUSH") );
       toks.back().insert("","",nod->lprob);
     }
@@ -1153,10 +1153,6 @@ void mootHMM::viterbi_step(TokID tokid, const mootTokString &toktext)
 
   //-- info: check for "unknown" token
   if (tokid==0) ++nnewtokens;
-
-  //-- Update beam-pruning variable(s)
-  //bpprmin = vtable->bbestpr - beamwd;
-  //bbestpr = MOOT_PROB_NEG;
 
   //-- get map of possible tags
 #ifndef MOOT_ENABLE_SUFFIX_TRIE
@@ -1257,10 +1253,6 @@ void mootHMM::viterbi_step(TokID tokid,
   //-- Get next column
   ViterbiColumn *col = NULL;
 
-  //-- Update beam-pruning variables
-  //bpprmin = vtable->bbestpr - beamwd;
-  //bbestpr = MOOT_PROB_NEG;
-
   //-- for each possible destination tag 'vtagid'
   if (relax) {
     /*
@@ -1336,9 +1328,6 @@ void mootHMM::viterbi_step(TokID tokid, TagID tagid, ViterbiColumn *col)
   //vwordpr = wordp(tokid,tagid);
   vwordpr = MOOT_PROB_ONE;
 
-  //-- hack: disable beam-pruning cutoff
-  //bpprmin = MOOT_PROB_NEG;
-
   //-- populate a new row for this tag
   col = viterbi_populate_row(vtagid, vwordpr, col, MOOT_PROB_NEG);
 
@@ -1362,11 +1351,11 @@ void mootHMM::_viterbi_step_fallback(TokID tokid, ViterbiColumn *col)
   const LexProbSubTable           &lps = lexprobs[tokid];
   LexProbSubTable::const_iterator  lpsi;
 
-  //-- hack: disable beam-pruning cutoff
-  //bpprmin = MOOT_PROB_NEG;
-
   //-- for each possible destination tag 'vtagid' (except "UNKNOWN")
   for (vtagid = 1; vtagid < n_tags; ++vtagid) {
+
+    //-- skip BOS,EOS tags for fallback
+    if (vtagid==start_tagid) continue;
 
     //-- get lexical probability: p(tok|tag) 
     lpsi = lps.find(vtagid);
@@ -1471,7 +1460,7 @@ void mootHMM::tag_mark_best(ViterbiPathNode *pnod, mootSentence &sentence)
 /*--------------------------------------------------------------------------
  * Trace: in-sentence Viterbi trace
  */
-void mootHMM::tag_dump_trace(mootSentence &sentence)
+void mootHMM::tag_dump_trace(mootSentence &sentence, bool dumpPredict)
 {
   ViterbiColumn *vcol;
   std::list<ViterbiColumn*> vcols;
@@ -1537,7 +1526,7 @@ void mootHMM::tag_dump_trace(mootSentence &sentence)
 			       );
 
 	//-- iteratate: tag ids (next tags)
-	for (TagID nxtid=0; nxtid < tagids.size(); ++nxtid) {
+	for (TagID nxtid=0; dumpPredict && nxtid < tagids.size(); ++nxtid) {
 	  ProbT vnxtpr = tagp(vnod->ptagid, vrow->tagid, nxtid);
 	  sentence_printf_append(s, TokTypeComment, "moot:trace\t  NEXT %d:%s\t%d:%s\t%d:%s\tntxtprob=%g",
 				 vnod->ptagid, tagids.id2name(vnod->ptagid).c_str(),
@@ -1608,6 +1597,12 @@ mootHMM::ViterbiNode* mootHMM::viterbi_flushable_node(void)
   ProbT bestpr         = MOOT_PROB_NEG;
   ViterbiNode *bestnod = NULL;
   size_t n_nodes=0;
+
+  //-- use bpprmin as underflow-indicator if less than beam-pruning cutoff
+  //   + this catches trellis explosions due to fallbacks, which leave vtable->bpprmin==MOOT_PROB_NEG
+  if (vtable->bpprmin < minpr)
+    minpr = vtable->bpprmin; 
+
   for (ViterbiRow *vrow=vtable->rows; vrow != NULL; vrow=vrow->row_next) {
     for (ViterbiNode *vnod=vrow->nodes; vnod != NULL; vnod=vnod->nod_next) {
       if (vnod->lprob < minpr) continue;

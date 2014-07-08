@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2013 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2014 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -61,7 +61,9 @@ enum TokenIOFormatE {
   tiofPruned    = 0x00000400,  ///< pruned output
   tiofLocation  = 0x00000800,  ///< locations appear as first non-tag analysis
   tiofCost      = 0x00001000,  ///< parse/output analysis 'prob' field
-  tiofTrace     = 0x00002000   ///< save full Viterbi trellis trace?
+  tiofTrace     = 0x00002000,  ///< save full Viterbi trellis trace?
+  tiofPredict   = 0x00004000,  ///< include Viterbi trellis predictions in trace?
+  tiofFlush     = 0x00008000   ///< autoflush output stream after write (native i/o only)?
 };
 typedef TokenIOFormatE TokenIOFormat;
 
@@ -825,12 +827,24 @@ public:
     tw_ostream = NULL;
   };
 
-  /** Test whether this reader is currently opened.
+  /** Test whether this writer is currently opened.
    *  Default just checks <code>tr_istream && tr_istream->valid()</code>
    */
   virtual bool opened(void)
   {
     return tw_ostream!=NULL && tw_ostream->valid();
+  };
+
+  /** Flush currently selected output stream (wrapper for tw_ostream->flush()) . */
+  virtual bool flush(void)
+  {
+    return this->opened() && tw_ostream->flush();
+  };
+
+  /** Flush stream \a os just in case moot::tiofFlush flag is set; \a os should be valid and non-NULL */
+  inline bool autoflush(mootio::mostream *os)
+  {
+    return (tw_format&tiofFlush)==0 || os->flush();
   };
   //@}
 

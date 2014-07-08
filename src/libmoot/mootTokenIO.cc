@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2010 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2014 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -94,7 +94,9 @@ int TokenIO::parse_format_string(const std::string &fmtString)
       else if (s=="pruned") flag = tiofPruned;
       else if (s=="location" || s=="loc") flag =tiofLocation;
       else if (s=="cost") flag =tiofCost;
-      else if (s=="trace") flag =tiofTrace;
+      else if (s=="trace") flag =tiofTrace|tiofFlush;
+      else if (s=="predict") flag =tiofPredict|tiofTrace|tiofFlush;
+      else if (s=="flush" || s=="autoflush") flag =tiofFlush;
       //-- aliases
       else if (s=="rare" || s=="r") flag = tiofRare;
       else if (s=="mediumrare" || s=="mr") flag = tiofMediumRare;
@@ -221,6 +223,8 @@ std::string TokenIO::format_canonical_string(int fmt)
   if (fmt & tiofLocation) s.append("Location,");
   if (fmt & tiofCost) s.append("Cost,");
   if (fmt & tiofTrace) s.append("Trace,");
+  if (fmt & tiofPredict) s.append("Predict,");
+  if (fmt & tiofFlush) s.append("Flush,");
   if (fmt & tiofPruned) s.append("Pruned,");
   if (fmt & tiofUser) s.append("User,");
 
@@ -515,12 +519,12 @@ void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
   switch (token.toktype()) {
 
   case TokTypeSB:
-    if (token.text().empty()) { put_comment_buffer("$SB$", 4); return; } //-- convenience hack for perl wrappers 
+    if (token.text().empty()) { put_comment_buffer("$SB$", 4); break; } //-- convenience hack for perl wrappers 
   case TokTypeWB:
-    if (token.text().empty()) { put_comment_buffer("$WB$", 4); return; } //-- convenience hack for perl wrappers
+    if (token.text().empty()) { put_comment_buffer("$WB$", 4); break; } //-- convenience hack for perl wrappers
   case TokTypeComment:
     put_comment_buffer(token.text().data(), token.text().size());
-    return;
+    break;
 
   case TokTypeVanilla:
   case TokTypeLibXML:
@@ -572,6 +576,7 @@ void TokenWriterNative::_put_token(const mootToken &token, mootio::mostream *os)
     //-- ignore
     break;
   }
+  autoflush(os);
 }
 
 /*------------------------------------------------------------
@@ -597,6 +602,7 @@ void TokenWriterNative::_put_sentence(const mootSentence &sentence, mootio::most
   if (!sentence.empty() || sentence.back().toktype() != TokTypeEOS) {
     os->putbyte('\n');
   }
+  autoflush(os);
 }
 
 
@@ -620,6 +626,8 @@ void TokenWriterNative::_put_comment(const char *buf, size_t len, mootio::mostre
     os->write(buf+i, j-i);
     os->putbyte('\n');
   }
+
+  autoflush(os);
 }
 
 /*------------------------------------------------------------
@@ -633,6 +641,7 @@ void TokenWriterNative::_put_raw_buffer(const char *buf, size_t len, mootio::mos
     _put_comment(buf, len, os);
   else
     os->write(buf,len);
+  autoflush(os);
 }
 
 

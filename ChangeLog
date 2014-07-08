@@ -1,5 +1,10 @@
 ChangeLog for package moot
 
+v2.0.11 Tue, 08 Jul 2014 11:29:11 +0200 moocow
+	+ fixed trellis-explosion bug on multiple fallbacks
+	+ decomposed 'trace' i/o-format flag into 'trace' and 'predict'
+	+ added i/o format flag 'flush' for auto-flush (native output only)
+
 v2.0.10 Wed, 04 Dec 2013 14:28:31 +0100 moocow and kmw
 	+ added "waste" tokenizer support classes and command-line utility
 	  * merged into moot sources from dwds_tomasotath v0.5.x
