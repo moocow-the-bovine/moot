@@ -329,11 +329,13 @@ void wasteLexer::set_token(mootToken &token, wasteLexerToken &lex_token)
     case wLexerTypeRomanCaps:
       tok_class = (wl_stopwords.lookup(lex_token.wlt_token.tok_text)) ? stop : rom;
       tok_case = (wl_stopwords.lookup(lex_token.wlt_token.tok_text)) ? cap : non;
+      tok_abbr = (wl_abbrevs.lookup(lex_token.wlt_token.tok_text)) ? kn : uk;
       tok_length = length_attr(lex_token.wlt_token.tok_text.length());
       break;
     case wLexerTypeRomanLower:
       tok_class = (wl_stopwords.lookup(lex_token.wlt_token.tok_text)) ? stop : rom;
       tok_case = (wl_stopwords.lookup(lex_token.wlt_token.tok_text)) ? lo : non;
+      tok_abbr = (wl_abbrevs.lookup(lex_token.wlt_token.tok_text)) ? kn : uk;
       tok_length = length_attr(lex_token.wlt_token.tok_text.length());
       break;
 
