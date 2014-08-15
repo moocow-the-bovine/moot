@@ -1,5 +1,8 @@
 ChangeLog for package moot
 
+v2.0.12 Fri, 15 Aug 2014 13:20:51 +0200 kmw
+	+ [r12621] added abbreviation lookup for roman numerals, fixes mantis bug #657
+
 v2.0.11 Tue, 08 Jul 2014 11:29:11 +0200 moocow
 	+ fixed trellis-explosion bug on multiple fallbacks
 	+ decomposed 'trace' i/o-format flag into 'trace' and 'predict'
