@@ -1,5 +1,9 @@
 ChangeLog for package moot
 
+v2.0.13 Fri, 19 Sep 2014 16:58:57 +0200 kmw
+	+ wasteScannerScan.re.skel: Changed definitions of SPACE
+          to use unicode property 'Z'
+
 v2.0.12 Fri, 15 Aug 2014 13:20:51 +0200 kmw
 	+ [r12621] added abbreviation lookup for roman numerals, fixes mantis bug #657
 
