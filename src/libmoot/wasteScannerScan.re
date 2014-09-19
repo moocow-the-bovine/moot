@@ -321,9 +321,8 @@ Any = Any1|Any2|Any3;
 
 	//-- Additional helpers
 	/*!re2c
-        WS_ASCII               = [ \r\n\t\f] ;
-	WS_EXTRA	       = ([\xC2][\xA0]) ;
-	WS		       = WS_ASCII | WS_EXTRA ;
+        WS_ASCII               = [ \r\n\t\f\v\b] ;
+	WS		       = WS_ASCII | Zs | Zl | Zp ;
         ANY_CHARACTER          = UTF8_ASCII | UTF8_L2 | UTF8_L3 | UTF8_L4 | UTF8_L5 | UTF8_L6 | NON_UTF8_BYTE ;
 	*/
 
