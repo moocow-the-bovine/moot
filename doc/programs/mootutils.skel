@@ -3,7 +3,7 @@
    @subogs = qw();
    foreach my $gog (sort(@gogs)) {
      my $subog = Getopt::Gen->new(handle_rcfile=>0);
-     $subog->parse($gog);
+     $subog->parse($gog) || next;
      push(@subogs, $subog);
    }
 @]

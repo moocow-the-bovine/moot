@@ -72,7 +72,8 @@ defaults from a program configuration file.
 A "raw" text file is just that: any file consiting of (8-bit or variable-width encoded)
 characters.  Such files may be processed by the L<mootpp>
 preprocessor to produce "rare cooked" (-tagged, -analyzed)
-text files.  An example "raw" text file is:
+text files, or by the L<waste> tokenizer with an appropriate tokenization model.
+An example "raw" text file is:
 
  This is a test.  This too.
 
