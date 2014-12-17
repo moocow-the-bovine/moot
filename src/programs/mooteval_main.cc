@@ -131,10 +131,11 @@ void GetMyOptions(int argc, char **argv)
 
   //-- show banner
   if (args.verbose_arg > 0)
-    fprintf(stderr,
-	    moot_program_banner(PROGNAME,
-				PACKAGE_VERSION,
-				"Bryan Jurish <moocow@cpan.org>").c_str());
+    fputs(moot_program_banner(PROGNAME,
+			      PACKAGE_VERSION,
+			      "Bryan Jurish <moocow@cpan.org>").c_str(),
+	  stderr);
+
   //-- options: verbosity
   if (args.verbose_arg <= 0)      vlevel = evlSilent;
   else if (args.verbose_arg <= 1) vlevel = evlBasic;

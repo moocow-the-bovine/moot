@@ -8,6 +8,8 @@ purpose	"Word- and Sentence-Token Extractor using a Hidden Markov Model"
 author  "Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner <wuerzner@bbaw.de>"
 on_reparse "warn"
 
+podpreamble "=encoding utf8"
+
 #-----------------------------------------------------------------------------
 # Details
 #-----------------------------------------------------------------------------
@@ -248,4 +250,3 @@ L<mootfiles>,
 L<moot>,
 L<mootchurn>
 "
-

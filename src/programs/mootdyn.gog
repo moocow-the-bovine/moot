@@ -51,31 +51,32 @@ Be more or less verbose.  Recognized values are in the range 0..5:
 
 =over 4
 
-=item 0
+=item -v0
 
 Be silent.
 
-=item 1
+=item -v1
 
 Print error messages to stderr.
 
-=item 2
+=item -v2
 
 Print warnings to stderr.
 
-=item 3
+=item -v3
 
 Print summary information to stderr.
 
-=item 4
+=item -v4
 
 Print progress information to stderr.
 
-=item 5
+=item -v5
 
 Print everything.
 
 =back
+
 "
 
 flag "no-banner" - "Suppress initial banner message (implied at verbosity levels <= 2)" \

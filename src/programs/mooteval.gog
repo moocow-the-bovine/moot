@@ -37,24 +37,24 @@ Valid values are in the the range [0..4].
 
 =over 4
 
-=item 0
+=item -v0
 
 Silent operation.
 
-=item 1
+=item -v1
 
 Report basic summary information.
 
-=item 2
+=item -v2
 
 Report extended summary information.
 
-=item 3
+=item -v3
 
 Print a verbose listing of all tokens associated with
 any mismatch condition.
 
-=item 4
+=item -v4
 
 Print a verbose listing of all tokens in the input files.
 
