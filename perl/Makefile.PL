@@ -17,7 +17,8 @@ $MOOT_LIBS   = join(' ', map { $s=`pkg-config --libs-only-l $_`; chomp($s); $s }
 WriteMakefile
   (
    NAME		=> 'Moot',
-   DISTNAME	=> 'moot-perl',
+   #DISTNAME	=> 'moot-perl',
+   DISTNAME     => 'Moot',
    AUTHOR       => 'Bryan Jurish <moocow@cpan.org>',
    ABSTRACT	=> 'Perl interface to the libmoot HMM tagger library',
    VERSION_FROM	=> 'Moot.pm',
