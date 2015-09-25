@@ -79,9 +79,53 @@ sub MY::depend {
 		 ."\n"
 		 ."MootPerl.o: MootPerl.h MootPerl.cc\n"
 		 ."\n"
+		 ###-- depends -> README.txt
+		 ."dist: README.txt\n"
+		 ."\n"
+		 ."create_distdir: README.txt\n"
+		 #."distdir_am: README.txt\n"
+		 ."\n"
+		 ."distcheck: README.txt\n"
+		 ."\n"
+		 ."manicheck: README.txt\n"
+		 ."\n"
 		 ## -- more here
 		 ."\n"
 		);
   $inherited;
 }
 
+
+##---------------------------------------------------------------
+sub MY::special_targets {
+  package MY;
+  my $inherited = shift->SUPER::special_targets(@_);
+  $inherited .=
+"
+.SUFFIXES: .pm .pod .rpod .man .txt .html
+
+##-- pod2xxx
+.pm.html:
+\tpod2html --title=\$@ --infile=\$< --outfile=\$@
+
+.pm.txt:
+\tpod2text \$< \$@
+
+.pod.html:
+\tpod2html --title=\$@ --infile=\$< --outfile=\$@
+
+.pod.txt:
+\tpod2text \$< \$@
+
+##-- readme
+.rpod.html:
+\tpod2html --title=\$@ --infile=\$< --outfile=\$@
+
+.rpod.txt:
+\tpod2text \$< \$@
+
+readme: README.txt
+
+";
+  return $inherited;
+}

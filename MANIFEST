@@ -1,6 +1,8 @@
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
+README.txt
+README.rpod
 Changes
 
 MootPerl.cc
