@@ -2,6 +2,9 @@
 ##
 ## Change Log for Perl module Moot (formerly moot-perl)
 
+v2.0.12 Mon, 22 Feb 2016 15:48:01 +0100 moocow
+	* fixed missing PREREQ_PM for Alien::Moot
+
 v2.0.11 Mon, 22 Feb 2016 14:41:57 +0100 moocow
 	* use new Alien::Moot for c++ library dependency
 
