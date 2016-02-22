@@ -29,7 +29,7 @@ my $builder = Alien::Base::ModuleBuild->new
 		       },
    alien_build_commands => [
 			    '%c --prefix=%s --disable-doc --enable-shared --enable-static',
-			    'make -j4',
+			    'make',
 			   ],
    ##
    alien_isolate_dynamic => 0, ##-- 'share'-mode builds don't work for Moot module with alien_isolate_dynamic=>1

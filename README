@@ -1,17 +1,17 @@
 NAME
-    Alien::Gfsm - install the libgfsm C library on your system
+    Alien::Moot - install the libmoot C++ library on your system
 
 SYNOPSIS
        use 5.010;
        use strict;
-       use Alien::Gfsm;
+       use Alien::Moot;
    
-       my $alien = Alien::Gfsm->new;
+       my $alien = Alien::Moot->new;
        say $alien->libs;
        say $alien->cflags;
 
 DESCRIPTION
-    Ensures that the libgfsm C library is installed on your system.
+    Ensures that the libmoot C++ library is installed on your system.
 
 AUTHOR
     Bryan Jurish <moocow@cpan.org>.
