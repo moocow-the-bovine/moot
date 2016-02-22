@@ -32,7 +32,7 @@ WriteMakefile
    AUTHOR       => 'Bryan Jurish <moocow@cpan.org>',
    ABSTRACT	=> 'Perl interface to the libmoot HMM tagger library',
    VERSION_FROM	=> 'Moot.pm',
-
+   LICENSE      => 'perl',
 
    ##-- user variables
    CC           => 'c++',   ##-- your c++ compiler
