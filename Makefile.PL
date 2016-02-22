@@ -34,6 +34,9 @@ WriteMakefile
    VERSION_FROM	=> 'Moot.pm',
    LICENSE      => 'perl',
 
+   ##-- prerequisites
+   PREREQ_PM => \%prereq,
+
    ##-- user variables
    CC           => 'c++',   ##-- your c++ compiler
    DEFINE       => '-DHAVE_CONFIG_H',     ##-- additional defines
