@@ -1,5 +1,5 @@
 {
-   "abstract" : "install the libgfsm C library on your system",
+   "abstract" : "install the libmoot C++ library on your system",
    "author" : [
       "Bryan Jurish <moocow@cpan.org>"
    ],
@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
-   "name" : "Alien-Gfsm",
+   "name" : "Alien-Moot",
    "prereqs" : {
       "configure" : {
          "requires" : {
@@ -29,8 +29,8 @@
       }
    },
    "provides" : {
-      "Alien::Gfsm" : {
-         "file" : "lib/Alien/Gfsm.pm",
+      "Alien::Moot" : {
+         "file" : "lib/Alien/Moot.pm",
          "version" : "0.001"
       }
    },
