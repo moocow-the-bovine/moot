@@ -9,7 +9,7 @@ use Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '2.0.10_006';
+our $VERSION = '2.0.11';
 
 require XSLoader;
 XSLoader::load('Moot', $VERSION);
@@ -85,7 +85,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2013 by Bryan Jurish
+Copyright (C) 2011-2016 by Bryan Jurish
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,
