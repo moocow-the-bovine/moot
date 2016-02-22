@@ -3,13 +3,23 @@ use ExtUtils::MakeMaker;
 ##----------------------------------------------------------------------
 ## Configuration
 ##----------------------------------------------------------------------
-if (system("pkg-config --atleast-version=2.0.10 moot") != 0) {
-  die("Required module moot >= v2.0.10 not found!\n");
-}
+use Alien::Moot;
+my %prereq = (
+	      'ExtUtils::MakeMaker' => 0,
+	      'Alien::Moot' => 0.001,
+	     );
 
-$MOOT_IFLAGS = join(' ', map { $s=`pkg-config --cflags-only-I $_`; chomp($s); $s } qw(moot)).' -Wno-deprecated';
-$MOOT_LDFLAGS= join(' ', map { $s=`pkg-config --libs-only-L $_`; chomp($s); $s } qw(moot));
-$MOOT_LIBS   = join(' ', map { $s=`pkg-config --libs-only-l $_`; chomp($s); $s } qw(moot));
+##-- ensure mininum libmoot version
+my $moot_min_version = "2.0.10";
+if (Alien::Moot->install_type ne 'system') {
+  my $moot_alien_version = Alien::Moot->pkgconfig('moot')->keyword('Version');
+  (my $v_alien = $moot_alien_version) =~ s/\-/_/g;
+  die("Required library libmoot >= v$moot_min_version not found; we have v$moot_alien_version\n")
+    if (version->parse($v_alien) < version->parse($moot_min_version));
+}
+elsif (system("pkg-config --atleast-version=${moot_min_version} moot") != 0) {
+  die("Required library libmoot >= v$moot_min_version not found; we have v", `pkg-config --modversion moot`);
+}
 
 ##----------------------------------------------------------------------
 ## MAIN
@@ -26,10 +36,10 @@ WriteMakefile
 
    ##-- user variables
    CC           => 'c++',   ##-- your c++ compiler
-   LIBS         => "$MOOT_LDFLAGS $MOOT_LIBS",      ##-- additional libraries
    DEFINE       => '-DHAVE_CONFIG_H',     ##-- additional defines
-   INC          => $MOOT_IFLAGS,      ##-- additional includes
-   #CCFLAGS      => '',                ##-- additional(?) flags ... DynaLoader refuses to load on perl v5.14 / 32-bit i686 / debian wheezy if this is set!
+   LIBS         => Alien::Moot->libs,     ##-- additional libraries
+   INC          => Alien::Moot->cflags,   ##-- additional includes
+   #CCFLAGS      => '',                   ##-- additional(?) flags ... DynaLoader refuses to load on perl v5.14 / 32-bit i686 / debian wheezy if this is set!
    OPTIMIZE    => '-O2 -pipe -Wno-deprecated', ##-- optimization flags
    OBJECT       => 'Moot.o MootPerl.o',
 

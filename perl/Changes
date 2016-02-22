@@ -2,6 +2,9 @@
 ##
 ## Change Log for Perl module Moot (formerly moot-perl)
 
+v2.0.11 Mon, 22 Feb 2016 14:41:57 +0100 moocow
+	* use new Alien::Moot for c++ library dependency
+
 v2.0.10_006 Fri, 25 Sep 2015 13:14:14 +0200 moocow
 	* renamed distribution to 'Moot' for CPAN-friendliness
 
