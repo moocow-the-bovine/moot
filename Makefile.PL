@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 ##----------------------------------------------------------------------
 use Alien::Moot;
 my %prereq = (
-	      'ExtUtils::MakeMaker' => 0,
+	      'ExtUtils::MakeMaker' => 6.52, ##-- for CONFIGURE_REQUIRES
 	      'Alien::Moot' => 0.001,
 	     );
 
@@ -35,6 +35,7 @@ WriteMakefile
    LICENSE      => 'perl',
 
    ##-- prerequisites
+   CONFIGURE_REQUIRES => \%prereq,
    PREREQ_PM => \%prereq,
 
    ##-- user variables

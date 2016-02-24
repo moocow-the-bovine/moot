@@ -9,7 +9,7 @@ use Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.13';
 
 require XSLoader;
 XSLoader::load('Moot', $VERSION);

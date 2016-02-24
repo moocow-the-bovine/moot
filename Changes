@@ -2,6 +2,9 @@
 ##
 ## Change Log for Perl module Moot (formerly moot-perl)
 
+v2.0.13 Wed, 24 Feb 2016 09:01:15 +0100 moocow
+	* added CONFIGURE_REQUIRES to fix RT bug #112321
+
 v2.0.12 Mon, 22 Feb 2016 15:48:01 +0100 moocow
 	* fixed missing PREREQ_PM for Alien::Moot
 
