@@ -9,11 +9,13 @@ my $builder = Alien::Base::ModuleBuild->new
    module_name => 'Alien::Moot',
    license => 'perl',
    configure_requires => {
-			  'Alien::Base'   => '0.001',
+			  'Alien::Base::ModuleBuild'  => '0.027',
 			  'Module::Build' => '0.38',
 			 },
    test_requires => {
 		     #'File::Which'   => 0,
+		     'Test::More' => 0, ##-- 1.001002
+		     'Text::ParseWords' => 0, ##-- 3.29
 		    },
    requires => {
 		'perl'        => '5.8.9',
