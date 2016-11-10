@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>mootconfig - moocow's part-of-speech tagger: report configuration</title>
+<title></title>
 <link rel="stylesheet" href="mootprogs.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
@@ -11,167 +11,137 @@
 <body>
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
-
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#options">OPTIONS</a></li>
-	<li><a href="#addenda">ADDENDA</a></li>
-	<ul>
-
-		<li><a href="#about_this_document">About this Document</a></li>
-	</ul>
-
-	<li><a href="#bugs_and_limitations">BUGS AND LIMITATIONS</a></li>
-	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#OPTIONS">OPTIONS</a></li>
+  <li><a href="#ADDENDA">ADDENDA</a>
+    <ul>
+      <li><a href="#About-this-Document">About this Document</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
 </ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<h1 id="NAME">NAME</h1>
 
-<p>
-</p>
-<hr />
-<h1><a name="name">NAME</a></h1>
-<p>mootconfig - moocow's part-of-speech tagger: report configuration</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>mootconfig - moocow&#39;s part-of-speech tagger: report configuration</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
 <p>mootconfig [OPTIONS]</p>
-<pre>
- Options
+
+<pre><code> Options
     -V  --version   Display package version
         --cflags    Display C compiler flags
         --cppflags  Display C/C++ preprocessor flags
         --cxxflags  Display C++ compiler flags
         --ldflags   Display linker flags
         --libs      Display required linker libraries
-        --options   Display compile-time options</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>moocow's part-of-speech tagger: report configuration</p>
-<p>'mootconfig' allows easy access to the options with which
-the 'libmoot' library was built (on systems with a /bin/sh).</p>
-<p>
-</p>
-<hr />
-<h1><a name="options">OPTIONS</a></h1>
+        --options   Display compile-time options</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>moocow&#39;s part-of-speech tagger: report configuration</p>
+
+<p>&#39;mootconfig&#39; allows easy access to the options with which the &#39;libmoot&#39; library was built (on systems with a /bin/sh).</p>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
 <dl>
-<dt><strong><a name="version_v" class="item"><code>--version</code> , <code>-V</code></a></strong></dt>
 
+<dt id="version--V"><code>--version</code> , <code>-V</code></dt>
 <dd>
+
 <p>Display package version</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="cflags" class="item"><code>--cflags</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="cflags"><code>--cflags</code></dt>
 <dd>
+
 <p>Display C compiler flags</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="cppflags" class="item"><code>--cppflags</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="cppflags"><code>--cppflags</code></dt>
 <dd>
+
 <p>Display C/C++ preprocessor flags</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="cxxflags" class="item"><code>--cxxflags</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="cxxflags"><code>--cxxflags</code></dt>
 <dd>
+
 <p>Display C++ compiler flags</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="ldflags" class="item"><code>--ldflags</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="ldflags"><code>--ldflags</code></dt>
 <dd>
+
 <p>Display linker flags</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="libs" class="item"><code>--libs</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="libs"><code>--libs</code></dt>
 <dd>
+
 <p>Display required linker libraries</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="options" class="item"><code>--options</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="options"><code>--options</code></dt>
 <dd>
+
 <p>Display compile-time options</p>
-<p>Default: '0'</p>
+
+<p>Default: &#39;0&#39;</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="addenda">ADDENDA</a></h1>
-<p>
-</p>
-<h2><a name="about_this_document">About this Document</a></h2>
-<p>Documentation file auto-generated by optgen.perl version 0.07
-using Getopt::Gen version 0.13.
-Translation was initiated
-as:</p>
-<pre>
-   optgen.perl -l --nocfile --nohfile --no-handle-help --no-handle-version --no-handle-rcfile --no-handle-error --notimestamp -F mootconfig mootconfig.gog</pre>
-<p>
-</p>
-<hr />
-<h1><a name="bugs_and_limitations">BUGS AND LIMITATIONS</a></h1>
+
+<h1 id="ADDENDA">ADDENDA</h1>
+
+<h2 id="About-this-Document">About this Document</h2>
+
+<p>Documentation file auto-generated by optgen.perl version 0.07 using Getopt::Gen version 0.14. Translation was initiated as:</p>
+
+<pre><code>   optgen.perl -l --nocfile --nohfile --no-handle-help --no-handle-version --no-handle-rcfile --no-handle-error --notimestamp -F mootconfig mootconfig.gog</code></pre>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
 <p>Unknown.</p>
-<p>
-</p>
-<hr />
-<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
-<p>Initial development of the this was supported by the project
-'Kollokationen im W&ouml;rterbuch'
-( &quot;collocations in the dictionary&quot;, <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
-in association with the project
-'Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
-( &quot;digital dictionary of the German language of the 20th century&quot;, <a href="http://www.dwds.de">http://www.dwds.de</a> )
-at the Berlin-Brandenburgische Akademie der Wissenschaften ( <a href="http://www.bbaw.de">http://www.bbaw.de</a> )
-with funding from
-the Alexander von Humboldt Stiftung ( <a href="http://www.avh.de">http://www.avh.de</a> )
-and from the Zukunftsinvestitionsprogramm of the
-German federal government.
-Development of the DynHMM and WASTE extensions was
-supported by the DFG-funded projects
-'Deutsches Textarchiv' ( &quot;German text archive&quot;, <a href="http://www.deutschestextarchiv.de">http://www.deutschestextarchiv.de</a> )
-and 'DLEX'
-at the Berlin-Brandenburgische Akademie der Wissenschaften.</p>
-<p>The authors are grateful to Christiane Fellbaum, Alexander Geyken,
-Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
-for offering useful insights in the course of development
-of this package.
-Thomas Hanneforth wrote and maintains the libFSM C++ library
-for finite-state device operations used by the
-class-based HMM tagger / disambiguator, without which
-moot could not have been built.
-Alexander Geyken and Thomas Hanneforth developed the
-rule-based morphological analysis system for German
-which was used in the development and testing of the
-class-based HMM tagger / disambiguator.</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Bryan Jurish &lt;<a href="mailto:moocow@cpan.org">moocow@cpan.org</a>&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p><code>mootutils(1)</code></p>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Initial development of the this was supported by the project &#39;Kollokationen im W&ouml;rterbuch&#39; ( &quot;collocations in the dictionary&quot;, http://www.bbaw.de/forschung/kollokationen ) in association with the project &#39;Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)&#39; ( &quot;digital dictionary of the German language of the 20th century&quot;, http://www.dwds.de ) at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de ) with funding from the Alexander von Humboldt Stiftung ( http://www.avh.de ) and from the Zukunftsinvestitionsprogramm of the German federal government. Development of the DynHMM and WASTE extensions was supported by the DFG-funded projects &#39;Deutsches Textarchiv&#39; ( &quot;German text archive&quot;, http://www.deutschestextarchiv.de ) and &#39;DLEX&#39; at the Berlin-Brandenburgische Akademie der Wissenschaften.</p>
+
+<p>The authors are grateful to Christiane Fellbaum, Alexander Geyken, Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others for offering useful insights in the course of development of this package. Thomas Hanneforth wrote and maintains the libFSM C++ library for finite-state device operations used by the class-based HMM tagger / disambiguator, without which moot could not have been built. Alexander Geyken and Thomas Hanneforth developed the rule-based morphological analysis system for German which was used in the development and testing of the class-based HMM tagger / disambiguator.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>mootutils(1)</p>
+
 
 </body>
 
 </html>
+
+

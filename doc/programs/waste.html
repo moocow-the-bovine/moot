@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>waste - Word- and Sentence-Token Extractor using a Hidden Markov Model</title>
+<title></title>
 <link rel="stylesheet" href="mootprogs.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
@@ -11,57 +11,44 @@
 <body>
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
-
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#arguments">ARGUMENTS</a></li>
-	<li><a href="#options">OPTIONS</a></li>
-	<ul>
-
-		<li><a href="#mode_options">Mode Options</a></li>
-		<li><a href="#lexer_options">Lexer Options</a></li>
-		<li><a href="#hmm_options">HMM Options</a></li>
-		<li><a href="#format_options">Format Options</a></li>
-	</ul>
-
-	<li><a href="#configuration_files">CONFIGURATION FILES</a></li>
-	<li><a href="#addenda">ADDENDA</a></li>
-	<ul>
-
-		<li><a href="#caveats">Caveats</a></li>
-		<li><a href="#about_this_document">About this Document</a></li>
-	</ul>
-
-	<li><a href="#bugs_and_limitations">BUGS AND LIMITATIONS</a></li>
-	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#ARGUMENTS">ARGUMENTS</a></li>
+  <li><a href="#OPTIONS">OPTIONS</a>
+    <ul>
+      <li><a href="#Mode-Options">Mode Options</a></li>
+      <li><a href="#Lexer-Options">Lexer Options</a></li>
+      <li><a href="#HMM-Options">HMM Options</a></li>
+      <li><a href="#Format-Options">Format Options</a></li>
+    </ul>
+  </li>
+  <li><a href="#CONFIGURATION-FILES">CONFIGURATION FILES</a></li>
+  <li><a href="#ADDENDA">ADDENDA</a>
+    <ul>
+      <li><a href="#Caveats">Caveats</a></li>
+      <li><a href="#About-this-Document">About this Document</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
 </ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<h1 id="NAME">NAME</h1>
 
-<p>
-</p>
-<hr />
-<h1><a name="name">NAME</a></h1>
 <p>waste - Word- and Sentence-Token Extractor using a Hidden Markov Model</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
 <p>waste [OPTIONS] FILE(s)</p>
-<pre>
- Arguments:
-    FILE(s)  Input files</pre>
-<pre>
+
+<pre><code> Arguments:
+    FILE(s)  Input files
+
  Options
     -h        --help                  Print help and exit.
     -V        --version               Print version and exit.
@@ -70,8 +57,8 @@
     -B        --no-banner             Suppress initial banner message (implied at verbosity levels &lt;= 2)
     -l        --list                  Arguments are input-file lists.
     -r        --recover               Attempt to recover from minor errors.
-    -oFILE    --output=FILE           Write output to FILE.</pre>
-<pre>
+    -oFILE    --output=FILE           Write output to FILE.
+
  Mode Options
     -f        --full                  Alias for --scan --lex --tag --decode --annotate (default)
     -R        --train                 Training mode (similar to --lex)
@@ -84,419 +71,445 @@
     -d        --decode                Enable post-Viterbi decoding stage.
     -D        --no-decode             Disable post-Viterbi decoding stage.
     -n        --annotate              Enable text-based annotation stage.
-    -N        --no-annotate           Disable text-based annotation stage.</pre>
-<pre>
+    -N        --no-annotate           Disable text-based annotation stage.
+
  Lexer Options
     -aFILE    --abbrevs=FILE          Load abbreviation lexicon from FILE (1 word/line)
     -jFILE    --conjunctions=FILE     Load conjunction lexicon from FILE (1 word/line)
     -wFILE    --stopwords=FILE        Load stopword lexicon from FILE (1 word/line)
     -y        --dehyphenate           Enable automatic dehyphenation in lexer (default)
-    -Y        --no-dehyphenate        Disable automatic dehyphenation in lexer.</pre>
-<pre>
+    -Y        --no-dehyphenate        Disable automatic dehyphenation in lexer.
+
  HMM Options
-    -MMODEL   --model=MODEL           Use HMM tokenizer model MODEL.</pre>
-<pre>
+    -MMODEL   --model=MODEL           Use HMM tokenizer model MODEL.
+
  Format Options
     -IFORMAT  --input-format=FORMAT   Specify input or --scan mode format
-    -OFORMAT  --output-format=FORMAT  Specify output file format.</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>Word- and Sentence-Token Extractor using a Hidden Markov Model</p>
-<p>waste is the top-level command-line interface to the moot/WASTE HMM tokenizer system.
-It can be used as a complete tokenization pipeline (--full, the default),
-as an annotator for pre-tokenized training corpora (--train),
-or as a standalone scanner (--scan),
-lexical encoder (--lex),
-HMM disambiguator (--tag),
-lexical decoder (--decode),
-lexical annotator (--annotate),
-or as (almost) any coherent combination  of the above components.
-Input and output formats depend on the chosen mode of operation; in the default (--full) mode,
-it takes as input one or more 'raw' files, and produces a 'medium-rare' output file whose analyses
-correspond to those returned by the dwds_tomasotath v0.4.x series of tokenizers.
-See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot file formats.</p>
-<p>
-</p>
-<hr />
-<h1><a name="arguments">ARGUMENTS</a></h1>
-<dl>
-<dt><strong><a name="file" class="item"><code>FILE(s)</code></a></strong></dt>
+    -OFORMAT  --output-format=FORMAT  Specify output file format.</code></pre>
 
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Word- and Sentence-Token Extractor using a Hidden Markov Model</p>
+
+<p>waste is the top-level command-line interface to the moot/WASTE HMM tokenizer system. It can be used as a complete tokenization pipeline (--full, the default), as an annotator for pre-tokenized training corpora (--train), or as a standalone scanner (--scan), lexical encoder (--lex), HMM disambiguator (--tag), lexical decoder (--decode), lexical annotator (--annotate), or as (almost) any coherent combination of the above components. Input and output formats depend on the chosen mode of operation; in the default (--full) mode, it takes as input one or more &#39;raw&#39; files, and produces a &#39;medium-rare&#39; output file whose analyses correspond to those returned by the dwds_tomasotath v0.4.x series of tokenizers. See <a href="./mootfiles.html">mootfiles</a> for details on moot file formats.</p>
+
+<h1 id="ARGUMENTS">ARGUMENTS</h1>
+
+<dl>
+
+<dt id="FILE-s"><code>FILE(s)</code></dt>
 <dd>
+
 <p>Input files</p>
+
 <p>See also the --list option.</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="options">OPTIONS</a></h1>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
 <dl>
-<dt><strong><a name="help_h" class="item"><code>--help</code> , <code>-h</code></a></strong></dt>
 
+<dt id="help--h"><code>--help</code> , <code>-h</code></dt>
 <dd>
+
 <p>Print help and exit.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="version_v" class="item"><code>--version</code> , <code>-V</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="version--V"><code>--version</code> , <code>-V</code></dt>
 <dd>
+
 <p>Print version and exit.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="rcfile_file_cfile" class="item"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="rcfile-FILE--cFILE"><code>--rcfile=FILE</code> , <code>-cFILE</code></dt>
 <dd>
+
 <p>Read an alternate configuration file.</p>
-<p>Default: 'NULL'</p>
-<p>See also: <a href="#configuration_files">CONFIGURATION FILES</a>.</p>
-</dd>
-<dt><strong><a name="verbose_level_vlevel" class="item"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>See also: <a href="#CONFIGURATION-FILES">&quot;CONFIGURATION FILES&quot;</a>.</p>
+
+</dd>
+<dt id="verbose-LEVEL--vLEVEL"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></dt>
 <dd>
+
 <p>Verbosity level.</p>
-<p>Default: '3'</p>
-<p>Be more or less verbose.  Recognized values are in the range 0..6:</p>
-<ol>
-<li><strong><a name="silent" class="item">(silent)</a></strong>
+
+<p>Default: &#39;3&#39;</p>
+
+<p>Be more or less verbose. Recognized values are in the range 0..6:</p>
+
+<dl>
+
+<dt id="silent">0 (silent)</dt>
+<dd>
 
 <p>Disable all diagnostic messages.</p>
-</li>
-<li><strong><a name="errors" class="item">(errors)</a></strong>
+
+</dd>
+<dt id="errors">1 (errors)</dt>
+<dd>
 
 <p>Print error messages to stderr.</p>
-</li>
-<li><strong><a name="warnings" class="item">(warnings)</a></strong>
+
+</dd>
+<dt id="warnings">2 (warnings)</dt>
+<dd>
 
 <p>Print warnings to stderr.</p>
-</li>
-<li><strong><a name="info" class="item">(info)</a></strong>
+
+</dd>
+<dt id="info">3 (info)</dt>
+<dd>
 
 <p>Print general diagnostic information to stderr.</p>
-</li>
-<li><strong><a name="progress" class="item">(progress)</a></strong>
+
+</dd>
+<dt id="progress">4 (progress)</dt>
+<dd>
 
 <p>Print progress information to stderr.</p>
-</li>
-<li><strong><a name="debug" class="item">(debug)</a></strong>
+
+</dd>
+<dt id="debug">5 (debug)</dt>
+<dd>
 
 <p>Print debugging information to stderr (if applicable).</p>
-</li>
-<li><strong><a name="trace" class="item">(trace)</a></strong>
+
+</dd>
+<dt id="trace">6 (trace)</dt>
+<dd>
 
 <p>Print execution trace information to stderr (if applicable).</p>
-</li>
-</ol>
-</dd>
-<dt><strong><a name="no_banner_b" class="item"><code>--no-banner</code> , <code>-B</code></a></strong></dt>
 
+</dd>
+</dl>
+
+</dd>
+<dt id="no-banner--B"><code>--no-banner</code> , <code>-B</code></dt>
 <dd>
+
 <p>Suppress initial banner message (implied at verbosity levels &lt;= 2)</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="list_l" class="item"><code>--list</code> , <code>-l</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="list--l"><code>--list</code> , <code>-l</code></dt>
 <dd>
+
 <p>Arguments are input-file lists.</p>
-<p>Default: '0'</p>
-<p>If this flag is given, the FILE(s) arguments should be lists
-of input filenames, one filename per line, which should be
-processed.  Otherwise, the FILE(s) arguments are interpreted
-as filenames of the input files themselves.</p>
-</dd>
-<dt><strong><a name="recover_r" class="item"><code>--recover</code> , <code>-r</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+<p>If this flag is given, the FILE(s) arguments should be lists of input filenames, one filename per line, which should be processed. Otherwise, the FILE(s) arguments are interpreted as filenames of the input files themselves.</p>
+
+</dd>
+<dt id="recover--r"><code>--recover</code> , <code>-r</code></dt>
 <dd>
+
 <p>Attempt to recover from minor errors.</p>
-<p>Default: '0'</p>
-<p>Minor errors such as missing files, etc. cause an error message to be
-emitted but do not cause the program to abort if this option is specified.
-Useful for large automated batch-processing jobs.</p>
-</dd>
-<dt><strong><a name="output_file_ofile" class="item"><code>--output=FILE</code> , <code>-oFILE</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+<p>Minor errors such as missing files, etc. cause an error message to be emitted but do not cause the program to abort if this option is specified. Useful for large automated batch-processing jobs.</p>
+
+</dd>
+<dt id="output-FILE--oFILE"><code>--output=FILE</code> , <code>-oFILE</code></dt>
 <dd>
+
 <p>Write output to FILE.</p>
-<p>Default: '-'</p>
-<p>Output files are in 'rare' format: one token per line, a blank line
-indicates a sentence boundary.</p>
+
+<p>Default: &#39;-&#39;</p>
+
+<p>Output files are in &#39;rare&#39; format: one token per line, a blank line indicates a sentence boundary.</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<h2><a name="mode_options">Mode Options</a></h2>
-<dl>
-<dt><strong><a name="full_f" class="item"><code>--full</code> , <code>-f</code></a></strong></dt>
 
+<h2 id="Mode-Options">Mode Options</h2>
+
+<dl>
+
+<dt id="full--f"><code>--full</code> , <code>-f</code></dt>
 <dd>
+
 <p>Alias for --scan --lex --tag --decode --annotate (default)</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="train_r" class="item"><code>--train</code> , <code>-R</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="train--R"><code>--train</code> , <code>-R</code></dt>
 <dd>
+
 <p>Training mode (similar to --lex)</p>
-<p>Default: '0'</p>
-<p>Runs the WASTE scanner and lexer item-wise on pre-tokenized input,
-which must contain token text with leading whitespace where appropriate.
-Embedded special characters can be escaped with backslashes
-(e.g. <code>\n</code>, <code>\r</code>, <code>\t</code>, <code>\f</code>, <code>\v</code>, <code>\\</code>, and <code>\\ </code>),
-and any input tokens are truncated at a <code> $= </code> substring if present.
-Output is in 'well-done' format suitable for passing to <a href="././mootrain.html">the mootrain manpage</a>.
-Overrides any other other runtime mode options.</p>
-</dd>
-<dt><strong><a name="scan_s" class="item"><code>--scan</code> , <code>-s</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+<p>Runs the WASTE scanner and lexer item-wise on pre-tokenized input, which must contain token text with leading whitespace where appropriate. Embedded special characters can be escaped with backslashes (e.g. <code>\n</code>, <code>\r</code>, <code>\t</code>, <code>\f</code>, <code>\v</code>, <code>\\</code>, and <code>\\ </code>), and any input tokens are truncated at a <code> $= </code> substring if present. Output is in &#39;well-done&#39; format suitable for passing to <a href="./mootrain.html">mootrain</a>. Overrides any other other runtime mode options.</p>
+
+</dd>
+<dt id="scan--s"><code>--scan</code> , <code>-s</code></dt>
 <dd>
+
 <p>Enable raw text scanning stage.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="no_scan_s" class="item"><code>--no-scan</code> , <code>-S</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="no-scan--S"><code>--no-scan</code> , <code>-S</code></dt>
 <dd>
+
 <p>Disable raw text scanning stage.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="lex_x" class="item"><code>--lex</code> , <code>-x</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="lex--x"><code>--lex</code> , <code>-x</code></dt>
 <dd>
+
 <p>Enable lexical classification stage.</p>
-<p>Default: '0'</p>
-<p>If lexer stage is enabled, you should also specify --abbrevs, --conjunctions, and/or --stopwords
-as appropriate for your model.</p>
-</dd>
-<dt><strong><a name="no_lex_x" class="item"><code>--no-lex</code> , <code>-X</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+<p>If lexer stage is enabled, you should also specify --abbrevs, --conjunctions, and/or --stopwords as appropriate for your model.</p>
+
+</dd>
+<dt id="no-lex--X"><code>--no-lex</code> , <code>-X</code></dt>
 <dd>
+
 <p>Disable lexical classification stage.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="tag_t" class="item"><code>--tag</code> , <code>-t</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="tag--t"><code>--tag</code> , <code>-t</code></dt>
 <dd>
+
 <p>Enable HMM Viterbi tagging stage.</p>
-<p>Default: '0'</p>
+
+<p>Default: &#39;0&#39;</p>
+
 <p>Requires --model option.</p>
-</dd>
-<dt><strong><a name="no_tag_t" class="item"><code>--no-tag</code> , <code>-T</code></a></strong></dt>
 
+</dd>
+<dt id="no-tag--T"><code>--no-tag</code> , <code>-T</code></dt>
 <dd>
+
 <p>Disable HMM Viterbi tagging stage.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="decode_d" class="item"><code>--decode</code> , <code>-d</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="decode--d"><code>--decode</code> , <code>-d</code></dt>
 <dd>
+
 <p>Enable post-Viterbi decoding stage.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="no_decode_d" class="item"><code>--no-decode</code> , <code>-D</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="no-decode--D"><code>--no-decode</code> , <code>-D</code></dt>
 <dd>
+
 <p>Disable post-Viterbi decoding stage.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="annotate_n" class="item"><code>--annotate</code> , <code>-n</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="annotate--n"><code>--annotate</code> , <code>-n</code></dt>
 <dd>
+
 <p>Enable text-based annotation stage.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="no_annotate_n" class="item"><code>--no-annotate</code> , <code>-N</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="no-annotate--N"><code>--no-annotate</code> , <code>-N</code></dt>
 <dd>
+
 <p>Disable text-based annotation stage.</p>
-<p>Default: '0'</p>
+
+<p>Default: &#39;0&#39;</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<h2><a name="lexer_options">Lexer Options</a></h2>
-<dl>
-<dt><strong><a name="abbrevs_file_afile" class="item"><code>--abbrevs=FILE</code> , <code>-aFILE</code></a></strong></dt>
 
+<h2 id="Lexer-Options">Lexer Options</h2>
+
+<dl>
+
+<dt id="abbrevs-FILE--aFILE"><code>--abbrevs=FILE</code> , <code>-aFILE</code></dt>
 <dd>
+
 <p>Load abbreviation lexicon from FILE (1 word/line)</p>
-<p>Default: 'NULL'</p>
-<p>Only meaningful if --lex is enabled.</p>
-</dd>
-<dt><strong><a name="conjunctions_file_jfile" class="item"><code>--conjunctions=FILE</code> , <code>-jFILE</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>Only meaningful if --lex is enabled.</p>
+
+</dd>
+<dt id="conjunctions-FILE--jFILE"><code>--conjunctions=FILE</code> , <code>-jFILE</code></dt>
 <dd>
+
 <p>Load conjunction lexicon from FILE (1 word/line)</p>
-<p>Default: 'NULL'</p>
-<p>Only meaningful if --lex is enabled.</p>
-</dd>
-<dt><strong><a name="stopwords_file_wfile" class="item"><code>--stopwords=FILE</code> , <code>-wFILE</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>Only meaningful if --lex is enabled.</p>
+
+</dd>
+<dt id="stopwords-FILE--wFILE"><code>--stopwords=FILE</code> , <code>-wFILE</code></dt>
 <dd>
+
 <p>Load stopword lexicon from FILE (1 word/line)</p>
-<p>Default: 'NULL'</p>
-<p>Only meaningful if --lex is enabled.</p>
-</dd>
-<dt><strong><a name="dehyphenate_y" class="item"><code>--dehyphenate</code> , <code>-y</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>Only meaningful if --lex is enabled.</p>
+
+</dd>
+<dt id="dehyphenate--y"><code>--dehyphenate</code> , <code>-y</code></dt>
 <dd>
+
 <p>Enable automatic dehyphenation in lexer (default)</p>
-<p>Default: '1'</p>
-<p>Only meaningful if --lex is enabled.</p>
-</dd>
-<dt><strong><a name="no_dehyphenate_y" class="item"><code>--no-dehyphenate</code> , <code>-Y</code></a></strong></dt>
 
-<dd>
-<p>Disable automatic dehyphenation in lexer.</p>
-<p>Default: '0'</p>
+<p>Default: &#39;1&#39;</p>
+
 <p>Only meaningful if --lex is enabled.</p>
+
+</dd>
+<dt id="no-dehyphenate--Y"><code>--no-dehyphenate</code> , <code>-Y</code></dt>
+<dd>
+
+<p>Disable automatic dehyphenation in lexer.</p>
+
+<p>Default: &#39;0&#39;</p>
+
+<p>Only meaningful if --lex is enabled.</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<h2><a name="hmm_options">HMM Options</a></h2>
-<dl>
-<dt><strong><a name="model_model_mmodel" class="item"><code>--model=MODEL</code> , <code>-MMODEL</code></a></strong></dt>
 
+<h2 id="HMM-Options">HMM Options</h2>
+
+<dl>
+
+<dt id="model-MODEL--MMODEL"><code>--model=MODEL</code> , <code>-MMODEL</code></dt>
 <dd>
+
 <p>Use HMM tokenizer model MODEL.</p>
-<p>Default: 'waste.hmm'</p>
-<p>See 'HMM MODEL FILE FORMATS' in <a href="././mootfiles.html">the mootfiles manpage</a> for details on model file formats.
-This option is intended to be used with a pre-compiled binary model.  If you
-need to set addtitional runtime options, you should call <code>moot</code> directly
-in a pipeline, e.g.</p>
-<pre>
-  waste --scan -Or,loc INFILE.txt \\
+
+<p>Default: &#39;waste.hmm&#39;</p>
+
+<p>See &#39;HMM MODEL FILE FORMATS&#39; in <a href="./mootfiles.html">mootfiles</a> for details on model file formats. This option is intended to be used with a pre-compiled binary model. If you need to set addtitional runtime options, you should call <code>moot</code> directly in a pipeline, e.g.</p>
+
+<pre><code>  waste --scan -Or,loc INFILE.txt \\
   | waste --lex -aabbr.lex -jconj.lex -wstop.lex -Ir,loc -Omr,loc - \\
   | moot  --stream --model=MODEL --beam-width=100 -Imr,loc -Owd,loc - \\
   | waste --decode -Iwd,loc -Om,loc \\
-  | waste --annotate -Im,loc -Omr,loc -o OUTFILE.mr</pre>
+  | waste --annotate -Im,loc -Omr,loc -o OUTFILE.mr</code></pre>
+
 </dd>
 </dl>
-<p>
-</p>
-<h2><a name="format_options">Format Options</a></h2>
+
+<h2 id="Format-Options">Format Options</h2>
+
 <dl>
-<dt><strong><a name="input_format_format_iformat" class="item"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></a></strong></dt>
 
+<dt id="input-format-FORMAT--IFORMAT"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></dt>
 <dd>
+
 <p>Specify input or --scan mode format</p>
-<p>Default: 'NULL'</p>
-<p>Value should be a comma-separated list of format flag names,
-optionally prefixed with an exclamation point (!) to indicate
-negation.  Only meaningful if the scanner stage has been
-disabled with the -no-scan (-S) option.</p>
-<p>Default value depends on the <strong>first</strong> enabled processing module:</p>
-<pre>
- --scan     : 'None'
- --lex      : 'Text'
- --tag      : 'Text,Analyzed'
- --decode   : 'Text,Analyzed,Tagged'
- --annotate : 'Text'
- --train    : 'Text'</pre>
-<p>See 'I/O Format Flags' in <a href="././mootfiles.html">the mootfiles manpage</a> for details.</p>
-</dd>
-<dt><strong><a name="output_format_format_oformat" class="item"><code>--output-format=FORMAT</code> , <code>-OFORMAT</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>Value should be a comma-separated list of format flag names, optionally prefixed with an exclamation point (!) to indicate negation. Only meaningful if the scanner stage has been disabled with the -no-scan (-S) option.</p>
+
+<p>Default value depends on the <b>first</b> enabled processing module:</p>
+
+<pre><code> --scan     : &#39;None&#39;
+ --lex      : &#39;Text&#39;
+ --tag      : &#39;Text,Analyzed&#39;
+ --decode   : &#39;Text,Analyzed,Tagged&#39;
+ --annotate : &#39;Text&#39;
+ --train    : &#39;Text&#39;</code></pre>
+
+<p>See &#39;I/O Format Flags&#39; in <a href="./mootfiles.html">mootfiles</a> for details.</p>
+
+</dd>
+<dt id="output-format-FORMAT--OFORMAT"><code>--output-format=FORMAT</code> , <code>-OFORMAT</code></dt>
 <dd>
+
 <p>Specify output file format.</p>
-<p>Default: 'NULL'</p>
-<p>Value should be a comma-separated list of format flag names,
-optionally prefixed with an exclamation point (!) to indicate
-negation.</p>
-<p>Default value depends on the <strong>last</strong> enabled processing module:</p>
-<pre>
- --scan     : 'Text'
- --lex      : 'Text,Analyzed'
- --tag      : 'Text,Tagged'
- --decode   : 'Text'
- --annotate : 'Text,Analyzed'
- --train    : 'Text,Analyzed,Tagged'</pre>
-<p>See 'I/O Format Flags' in <a href="././mootfiles.html">the mootfiles manpage</a> for details.</p>
+
+<p>Default: &#39;NULL&#39;</p>
+
+<p>Value should be a comma-separated list of format flag names, optionally prefixed with an exclamation point (!) to indicate negation.</p>
+
+<p>Default value depends on the <b>last</b> enabled processing module:</p>
+
+<pre><code> --scan     : &#39;Text&#39;
+ --lex      : &#39;Text,Analyzed&#39;
+ --tag      : &#39;Text,Tagged&#39;
+ --decode   : &#39;Text&#39;
+ --annotate : &#39;Text,Analyzed&#39;
+ --train    : &#39;Text,Analyzed,Tagged&#39;</code></pre>
+
+<p>See &#39;I/O Format Flags&#39; in <a href="./mootfiles.html">mootfiles</a> for details.</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="configuration_files">CONFIGURATION FILES</a></h1>
+
+<h1 id="CONFIGURATION-FILES">CONFIGURATION FILES</h1>
+
 <p>Configuration files are expected to contain lines of the form:</p>
-<pre>
-    LONG_OPTION_NAME    OPTION_VALUE</pre>
-<p>where LONG_OPTION_NAME is the long name of some option,
-without the leading '--', and OPTION_VALUE is the value for
-that option, if any.  Fields are whitespace-separated.
-Blank lines and comments (lines beginning with '#')
-are ignored.</p>
+
+<pre><code>    LONG_OPTION_NAME    OPTION_VALUE</code></pre>
+
+<p>where LONG_OPTION_NAME is the long name of some option, without the leading &#39;--&#39;, and OPTION_VALUE is the value for that option, if any. Fields are whitespace-separated. Blank lines and comments (lines beginning with &#39;#&#39;) are ignored.</p>
+
 <p>No configuration files are read by default.</p>
-<p>
-</p>
-<hr />
-<h1><a name="addenda">ADDENDA</a></h1>
-<p>
-</p>
-<h2><a name="caveats">Caveats</a></h2>
+
+<h1 id="ADDENDA">ADDENDA</h1>
+
+<h2 id="Caveats">Caveats</h2>
+
 <p>The --scan and --lex modules require that text data is encoded in UTF-8.</p>
-<p>
-</p>
-<h2><a name="about_this_document">About this Document</a></h2>
-<p>Documentation file auto-generated by optgen.perl version 0.07
-using Getopt::Gen version 0.13.
-Translation was initiated
-as:</p>
-<pre>
-   optgen.perl -l --nocfile --nohfile --notimestamp -F waste waste.gog</pre>
-<p>
-</p>
-<hr />
-<h1><a name="bugs_and_limitations">BUGS AND LIMITATIONS</a></h1>
+
+<h2 id="About-this-Document">About this Document</h2>
+
+<p>Documentation file auto-generated by optgen.perl version 0.07 using Getopt::Gen version 0.14. Translation was initiated as:</p>
+
+<pre><code>   optgen.perl -l --nocfile --nohfile --notimestamp -F waste waste.gog</code></pre>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
 <p>Unknown.</p>
-<p>
-</p>
-<hr />
-<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
-<p>Initial development of the this was supported by the project
-'Kollokationen im W&ouml;rterbuch'
-( &quot;collocations in the dictionary&quot;, <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
-in association with the project
-'Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
-( &quot;digital dictionary of the German language of the 20th century&quot;, <a href="http://www.dwds.de">http://www.dwds.de</a> )
-at the Berlin-Brandenburgische Akademie der Wissenschaften ( <a href="http://www.bbaw.de">http://www.bbaw.de</a> )
-with funding from
-the Alexander von Humboldt Stiftung ( <a href="http://www.avh.de">http://www.avh.de</a> )
-and from the Zukunftsinvestitionsprogramm of the
-German federal government.
-Development of the DynHMM and WASTE extensions was
-supported by the DFG-funded projects
-'Deutsches Textarchiv' ( &quot;German text archive&quot;, <a href="http://www.deutschestextarchiv.de">http://www.deutschestextarchiv.de</a> )
-and 'DLEX'
-at the Berlin-Brandenburgische Akademie der Wissenschaften.</p>
-<p>The authors are grateful to Christiane Fellbaum, Alexander Geyken,
-Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
-for offering useful insights in the course of development
-of this package.
-Thomas Hanneforth wrote and maintains the libFSM C++ library
-for finite-state device operations used by the
-class-based HMM tagger / disambiguator, without which
-moot could not have been built.
-Alexander Geyken and Thomas Hanneforth developed the
-rule-based morphological analysis system for German
-which was used in the development and testing of the
-class-based HMM tagger / disambiguator.</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Bryan Jurish &lt;<a href="mailto:moocow@cpan.org">moocow@cpan.org</a>&gt; and Kay-Michael Würzner &lt;<a href="mailto:wuerzner@bbaw.de">wuerzner@bbaw.de</a>&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p><code>moot(1)</code>,
-<code>mootrain(1)</code>,
-<code>mootcompile(1)</code>,
-<a href="././mootfiles.html">the mootfiles manpage</a>,
-<a href="././moot.html">the moot manpage</a>,
-<a href="././mootchurn.html">the mootchurn manpage</a></p>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Initial development of the this was supported by the project &#39;Kollokationen im W&ouml;rterbuch&#39; ( &quot;collocations in the dictionary&quot;, http://www.bbaw.de/forschung/kollokationen ) in association with the project &#39;Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)&#39; ( &quot;digital dictionary of the German language of the 20th century&quot;, http://www.dwds.de ) at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de ) with funding from the Alexander von Humboldt Stiftung ( http://www.avh.de ) and from the Zukunftsinvestitionsprogramm of the German federal government. Development of the DynHMM and WASTE extensions was supported by the DFG-funded projects &#39;Deutsches Textarchiv&#39; ( &quot;German text archive&quot;, http://www.deutschestextarchiv.de ) and &#39;DLEX&#39; at the Berlin-Brandenburgische Akademie der Wissenschaften.</p>
+
+<p>The authors are grateful to Christiane Fellbaum, Alexander Geyken, Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others for offering useful insights in the course of development of this package. Thomas Hanneforth wrote and maintains the libFSM C++ library for finite-state device operations used by the class-based HMM tagger / disambiguator, without which moot could not have been built. Alexander Geyken and Thomas Hanneforth developed the rule-based morphological analysis system for German which was used in the development and testing of the class-based HMM tagger / disambiguator.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt; and Kay-Michael W&uuml;rzner &lt;wuerzner@bbaw.de&gt;</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>moot(1), mootrain(1), mootcompile(1), <a href="./mootfiles.html">mootfiles</a>, <a href="./moot.html">moot</a>, <a href="./mootchurn.html">mootchurn</a></p>
+
 
 </body>
 
 </html>
+
+

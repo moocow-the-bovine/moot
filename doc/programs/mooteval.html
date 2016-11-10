@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>mooteval - Output evaluator for moocow's PoS tagger.</title>
+<title></title>
 <link rel="stylesheet" href="mootprogs.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
@@ -11,50 +11,38 @@
 <body>
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
-
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#arguments">ARGUMENTS</a></li>
-	<li><a href="#options">OPTIONS</a></li>
-	<li><a href="#configuration_files">CONFIGURATION FILES</a></li>
-	<li><a href="#addenda">ADDENDA</a></li>
-	<ul>
-
-		<li><a href="#summary_information">Summary Information</a></li>
-		<li><a href="#caveats">Caveats</a></li>
-		<li><a href="#about_this_document">About this Document</a></li>
-	</ul>
-
-	<li><a href="#bugs_and_limitations">BUGS AND LIMITATIONS</a></li>
-	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#ARGUMENTS">ARGUMENTS</a></li>
+  <li><a href="#OPTIONS">OPTIONS</a></li>
+  <li><a href="#CONFIGURATION-FILES">CONFIGURATION FILES</a></li>
+  <li><a href="#ADDENDA">ADDENDA</a>
+    <ul>
+      <li><a href="#Summary-Information">Summary Information</a></li>
+      <li><a href="#Caveats">Caveats</a></li>
+      <li><a href="#About-this-Document">About this Document</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
 </ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<h1 id="NAME">NAME</h1>
 
-<p>
-</p>
-<hr />
-<h1><a name="name">NAME</a></h1>
-<p>mooteval - Output evaluator for moocow's PoS tagger.</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>mooteval - Output evaluator for moocow&#39;s PoS tagger.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
 <p>mooteval [OPTIONS] FILE1 FILE2</p>
-<pre>
- Arguments:
-    FILE1 FILE2  Files to compare.</pre>
-<pre>
+
+<pre><code> Arguments:
+    FILE1 FILE2  Files to compare.
+
  Options
     -h          --help                     Print help and exit.
     -V          --version                  Print version and exit.
@@ -64,298 +52,290 @@
     -2          --eval-second              Evaluate FILE2 vs. baseline FILE1
     -oFILE      --output=FILE              Write output to FILE.
     -IFORMAT    --input-format=FORMAT      Specify input file formats.
-                --input-encoding=ENCODING  Override XML document input encoding.</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>Output evaluator for moocow's PoS tagger.</p>
-<p>mooteval compares two  'medium' (+tagged,-analyzed) and/or
-'well done' (+tagged,+analyzed) input files, and summarizes
-the differences between them.
-See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot file formats.
-See below for more details on the summary information printed.</p>
-<p>
-</p>
-<hr />
-<h1><a name="arguments">ARGUMENTS</a></h1>
-<dl>
-<dt><strong><a name="file1_file2" class="item"><code>FILE1 FILE2</code></a></strong></dt>
+                --input-encoding=ENCODING  Override XML document input encoding.</code></pre>
 
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Output evaluator for moocow&#39;s PoS tagger.</p>
+
+<p>mooteval compares two &#39;medium&#39; (+tagged,-analyzed) and/or &#39;well done&#39; (+tagged,+analyzed) input files, and summarizes the differences between them. See <a href="./mootfiles.html">mootfiles</a> for details on moot file formats. See below for more details on the summary information printed.</p>
+
+<h1 id="ARGUMENTS">ARGUMENTS</h1>
+
+<dl>
+
+<dt id="FILE1-FILE2"><code>FILE1 FILE2</code></dt>
 <dd>
+
 <p>Files to compare.</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="options">OPTIONS</a></h1>
-<dl>
-<dt><strong><a name="help_h" class="item"><code>--help</code> , <code>-h</code></a></strong></dt>
 
+<h1 id="OPTIONS">OPTIONS</h1>
+
+<dl>
+
+<dt id="help--h"><code>--help</code> , <code>-h</code></dt>
 <dd>
+
 <p>Print help and exit.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="version_v" class="item"><code>--version</code> , <code>-V</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="version--V"><code>--version</code> , <code>-V</code></dt>
 <dd>
+
 <p>Print version and exit.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="rcfile_file_cfile" class="item"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="rcfile-FILE--cFILE"><code>--rcfile=FILE</code> , <code>-cFILE</code></dt>
 <dd>
+
 <p>Read an alternate configuration file.</p>
-<p>Default: 'NULL'</p>
-<p>See also: <a href="#configuration_files">CONFIGURATION FILES</a>.</p>
-</dd>
-<dt><strong><a name="verbose_level_vlevel" class="item"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>See also: <a href="#CONFIGURATION-FILES">&quot;CONFIGURATION FILES&quot;</a>.</p>
+
+</dd>
+<dt id="verbose-LEVEL--vLEVEL"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></dt>
 <dd>
+
 <p>Verbosity level.</p>
-<p>Default: '2'</p>
+
+<p>Default: &#39;2&#39;</p>
+
 <p>Valid values are in the the range [0..4].</p>
-<ol>
-<li>
+
+<dl>
+
+<dt id="v0">-v0</dt>
+<dd>
+
 <p>Silent operation.</p>
-</li>
-<li>
+
+</dd>
+<dt id="v1">-v1</dt>
+<dd>
+
 <p>Report basic summary information.</p>
-</li>
-<li>
+
+</dd>
+<dt id="v2">-v2</dt>
+<dd>
+
 <p>Report extended summary information.</p>
-</li>
-<li>
-<p>Print a verbose listing of all tokens associated with
-any mismatch condition.</p>
-</li>
-<li>
+
+</dd>
+<dt id="v3">-v3</dt>
+<dd>
+
+<p>Print a verbose listing of all tokens associated with any mismatch condition.</p>
+
+</dd>
+<dt id="v4">-v4</dt>
+<dd>
+
 <p>Print a verbose listing of all tokens in the input files.</p>
-</li>
-</ol>
-</dd>
-<dt><strong><a name="eval_first_1" class="item"><code>--eval-first</code> , <code>-1</code></a></strong></dt>
 
-<dd>
-<p>Evaluate FILE1 vs. baseline FILE2</p>
-<p>Default: '0'</p>
-<p>Only useful if --verbose &gt;= 2.</p>
-<p>If neither --eval-first nor --eval-second
-is given, both input files are evaluated against one another.</p>
-</dd>
-<dt><strong><a name="eval_second_2" class="item"><code>--eval-second</code> , <code>-2</code></a></strong></dt>
-
-<dd>
-<p>Evaluate FILE2 vs. baseline FILE1</p>
-<p>Default: '0'</p>
-<p>Only useful if --verbose &gt;= 2.</p>
-<p>If neither --eval-first nor --eval-second
-is given, both input files are evaluated against one another.</p>
-</dd>
-<dt><strong><a name="output_file_ofile" class="item"><code>--output=FILE</code> , <code>-oFILE</code></a></strong></dt>
-
-<dd>
-<p>Write output to FILE.</p>
-<p>Default: '-'</p>
-<p>If --verbose &gt;= 1, a summary will always be printed to stderr.</p>
-</dd>
-<dt><strong><a name="input_format_format_iformat" class="item"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></a></strong></dt>
-
-<dd>
-<p>Specify input file formats.</p>
-<p>Default: 'NULL'</p>
-<p>Value should be a comma-separated list of format flag names,
-optionally prefixed with an exclamation point (!) to indicate
-negation.  Both input files should have the same format.</p>
-<p>Default='WellDone'</p>
-<p>See 'I/O Format Flags' in <a href="././mootfiles.html">the mootfiles manpage</a> for details.</p>
-</dd>
-<dt><strong><a name="input_encoding_encoding" class="item"><code>--input-encoding=ENCODING</code></a></strong></dt>
-
-<dd>
-<p>Override XML document input encoding.</p>
-<p>Default: 'NULL'</p>
-<p>Potentially useful for XML documents without encoding declarations.</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="configuration_files">CONFIGURATION FILES</a></h1>
+
+</dd>
+<dt id="eval-first--1"><code>--eval-first</code> , <code>-1</code></dt>
+<dd>
+
+<p>Evaluate FILE1 vs. baseline FILE2</p>
+
+<p>Default: &#39;0&#39;</p>
+
+<p>Only useful if --verbose &gt;= 2.</p>
+
+<p>If neither --eval-first nor --eval-second is given, both input files are evaluated against one another.</p>
+
+</dd>
+<dt id="eval-second--2"><code>--eval-second</code> , <code>-2</code></dt>
+<dd>
+
+<p>Evaluate FILE2 vs. baseline FILE1</p>
+
+<p>Default: &#39;0&#39;</p>
+
+<p>Only useful if --verbose &gt;= 2.</p>
+
+<p>If neither --eval-first nor --eval-second is given, both input files are evaluated against one another.</p>
+
+</dd>
+<dt id="output-FILE--oFILE"><code>--output=FILE</code> , <code>-oFILE</code></dt>
+<dd>
+
+<p>Write output to FILE.</p>
+
+<p>Default: &#39;-&#39;</p>
+
+<p>If --verbose &gt;= 1, a summary will always be printed to stderr.</p>
+
+</dd>
+<dt id="input-format-FORMAT--IFORMAT"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></dt>
+<dd>
+
+<p>Specify input file formats.</p>
+
+<p>Default: &#39;NULL&#39;</p>
+
+<p>Value should be a comma-separated list of format flag names, optionally prefixed with an exclamation point (!) to indicate negation. Both input files should have the same format.</p>
+
+<p>Default=&#39;WellDone&#39;</p>
+
+<p>See &#39;I/O Format Flags&#39; in <a href="./mootfiles.html">mootfiles</a> for details.</p>
+
+</dd>
+<dt id="input-encoding-ENCODING"><code>--input-encoding=ENCODING</code></dt>
+<dd>
+
+<p>Override XML document input encoding.</p>
+
+<p>Default: &#39;NULL&#39;</p>
+
+<p>Potentially useful for XML documents without encoding declarations.</p>
+
+</dd>
+</dl>
+
+<h1 id="CONFIGURATION-FILES">CONFIGURATION FILES</h1>
+
 <p>Configuration files are expected to contain lines of the form:</p>
-<pre>
-    LONG_OPTION_NAME    OPTION_VALUE</pre>
-<p>where LONG_OPTION_NAME is the long name of some option,
-without the leading '--', and OPTION_VALUE is the value for
-that option, if any.  Fields are whitespace-separated.
-Blank lines and comments (lines beginning with '#')
-are ignored.</p>
+
+<pre><code>    LONG_OPTION_NAME    OPTION_VALUE</code></pre>
+
+<p>where LONG_OPTION_NAME is the long name of some option, without the leading &#39;--&#39;, and OPTION_VALUE is the value for that option, if any. Fields are whitespace-separated. Blank lines and comments (lines beginning with &#39;#&#39;) are ignored.</p>
+
 <p>No configuration files are read by default.</p>
-<p>
-</p>
-<hr />
-<h1><a name="addenda">ADDENDA</a></h1>
-<p>
-</p>
-<h2><a name="summary_information">Summary Information</a></h2>
-<p>The summary data printed by mooteval for each evaluated file
-(E-file) is interpreted with respect to the other file specified
-on the command line (the &quot;truth&quot;, or T-file) as follows:</p>
+
+<h1 id="ADDENDA">ADDENDA</h1>
+
+<h2 id="Summary-Information">Summary Information</h2>
+
+<p>The summary data printed by mooteval for each evaluated file (E-file) is interpreted with respect to the other file specified on the command line (the &quot;truth&quot;, or T-file) as follows:</p>
+
 <dl>
-<dt><strong><a name="average_class_size" class="item">Average Class Size</a></strong></dt>
 
+<dt id="Average-Class-Size">Average Class Size</dt>
 <dd>
-<p>The average number
-of distinct tags in the set of (morphological) analyses assigned to a token
-in the E-file.
-Only meaningful for well-done E-files:</p>
-<pre>
- avg_class_size() := sum(class_size(tok,Efile)) / |Efile|</pre>
-<pre>
- class_size(tok)  := card(class(tok,Efile))</pre>
+
+<p>The average number of distinct tags in the set of (morphological) analyses assigned to a token in the E-file. Only meaningful for well-done E-files:</p>
+
+<pre><code> avg_class_size() := sum(class_size(tok,Efile)) / |Efile|
+
+ class_size(tok)  := card(class(tok,Efile))</code></pre>
+
 </dd>
-<dt><strong><a name="class_given" class="item">Class Given</a></strong></dt>
-
+<dt id="Class-Given">Class Given</dt>
 <dd>
-<p>The total number of
-tokens in the E-file for which an analysis (a non-empty ambiguity class)
-was supplied.
-Only meaningful for well-done E-files.</p>
-<pre>
- class_given(Toks,Efile) := sum(class_given(tok,Efile)) / |Efile|</pre>
-<pre>
+
+<p>The total number of tokens in the E-file for which an analysis (a non-empty ambiguity class) was supplied. Only meaningful for well-done E-files.</p>
+
+<pre><code> class_given(Toks,Efile) := sum(class_given(tok,Efile)) / |Efile|
+
  class_given(tok,Efile)   = / 1 if class(tok,Efile) != {}
-                            \ 0 otherwise</pre>
-</dd>
-<dt><strong><a name="saves" class="item">Saves</a></strong></dt>
+                            \ 0 otherwise</code></pre>
 
+</dd>
+<dt id="Saves">Saves</dt>
 <dd>
-<p>The number of unanalyzed tokens in the E-file (-&quot;Class Given&quot;)
-whose best-tag matched that of the corresponding token in the T-file (+&quot;Tags Equal&quot;).</p>
-<pre>
- saves(Toks,Efile)  := sum(save(tok,Efile)) / sum(!class_given(tok,Efile))</pre>
-<pre>
+
+<p>The number of unanalyzed tokens in the E-file (-&quot;Class Given&quot;) whose best-tag matched that of the corresponding token in the T-file (+&quot;Tags Equal&quot;).</p>
+
+<pre><code> saves(Toks,Efile)  := sum(save(tok,Efile)) / sum(!class_given(tok,Efile))
+
  save(tok,Efile)     = / 1 if !class_given(tok,Efile) and tag(tok,Efile)==tag(tok,Tfile)
-                       \ 0 otherwise</pre>
-</dd>
-<dt><strong><a name="internal_coverage" class="item">Internal Coverage</a></strong></dt>
+                       \ 0 otherwise</code></pre>
 
+</dd>
+<dt id="Internal-Coverage">Internal Coverage</dt>
 <dd>
-<p>The number of analyzed tokens in the E-file (+&quot;Class Given&quot;)
-whose tag according to the <strong>E-file</strong> is associated with some analysis
-assigned to that token in the <strong>E-file</strong> (a &quot;possible&quot; or &quot;coherent&quot; analysis,tag pair
-internal to the E-file itself):</p>
-<pre>
- internal_coverage(Toks,Efile) := sum(covers(tok,Efile,Efile)) / |Efile|</pre>
-<pre>
+
+<p>The number of analyzed tokens in the E-file (+&quot;Class Given&quot;) whose tag according to the <b>E-file</b> is associated with some analysis assigned to that token in the <b>E-file</b> (a &quot;possible&quot; or &quot;coherent&quot; analysis,tag pair internal to the E-file itself):</p>
+
+<pre><code> internal_coverage(Toks,Efile) := sum(covers(tok,Efile,Efile)) / |Efile|
+
                                    / 1 if class_given(tok,AnFile)
  covers(tok,AnFile,TagFile)    := &lt;       and tag(tok,TagFile) in class(tok,AnFile)
-                                   \ 0 otherwise</pre>
-</dd>
-<dt><strong><a name="external_coverage" class="item">External Coverage</a></strong></dt>
+                                   \ 0 otherwise</code></pre>
 
-<dd>
-<p>The number of analyzed tokens in the E-file (+&quot;Class Given&quot;),
-whose tag according to the <strong>T-file</strong> is associated with some analysis
-assigned to that token in the <strong>E-file</strong> (a &quot;possible&quot; or &quot;coherent&quot; analysis,tag
-pair; where the analyses are drawn from the E-file and the tags from the T-file):</p>
-<pre>
- external_coverage(Toks,Efile) := sum(covers(tok,Efile,Tfile)) / |Efile|</pre>
 </dd>
-<dt><strong><a name="disambiguation_rate" class="item">Disambiguation Rate</a></strong></dt>
-
+<dt id="External-Coverage">External Coverage</dt>
 <dd>
-<p>The number of cross-coherent tokens in the E-file whose best tag matches that
-of the corresponding token in the T-file:</p>
-<pre>
- disambigutation_rate(Efile,Tfile) := sum(disambig(tok,Efile,Tfile))
-                                      / (|Efile|-sum(covers(tok,Efile,Tfile)))</pre>
-<pre>
+
+<p>The number of analyzed tokens in the E-file (+&quot;Class Given&quot;), whose tag according to the <b>T-file</b> is associated with some analysis assigned to that token in the <b>E-file</b> (a &quot;possible&quot; or &quot;coherent&quot; analysis,tag pair; where the analyses are drawn from the E-file and the tags from the T-file):</p>
+
+<pre><code> external_coverage(Toks,Efile) := sum(covers(tok,Efile,Tfile)) / |Efile|</code></pre>
+
+</dd>
+<dt id="Disambiguation-Rate">Disambiguation Rate</dt>
+<dd>
+
+<p>The number of cross-coherent tokens in the E-file whose best tag matches that of the corresponding token in the T-file:</p>
+
+<pre><code> disambigutation_rate(Efile,Tfile) := sum(disambig(tok,Efile,Tfile))
+                                      / (|Efile|-sum(covers(tok,Efile,Tfile)))
+
                                        / 1 if covers(tok,Efile,Tfile)
  disambig(tok,Efile,Tfile)         := &lt;      and tag(tok,Efile)==tag(tok,Tfile)
-                                       \ 0 otherwise</pre>
-</dd>
-<dt><strong><a name="tokens_equal" class="item">Tokens Equal</a></strong></dt>
+                                       \ 0 otherwise</code></pre>
 
-<dd>
-<p>The number of tokens in the E-file whose text matched that of
-the corresponding token in the T-file.  Any value other than 100%
-here is usually indicative of a format error.</p>
 </dd>
-<dt><strong><a name="tags_equal" class="item">Tags Equal</a></strong></dt>
-
+<dt id="Tokens-Equal">Tokens Equal</dt>
 <dd>
-<p>The number of tokens in the E-file whose best tag matched that
-of the corresponding token in the T-file.
-Indicative of overall tagging precision.</p>
+
+<p>The number of tokens in the E-file whose text matched that of the corresponding token in the T-file. Any value other than 100% here is usually indicative of a format error.</p>
+
+</dd>
+<dt id="Tags-Equal">Tags Equal</dt>
+<dd>
+
+<p>The number of tokens in the E-file whose best tag matched that of the corresponding token in the T-file. Indicative of overall tagging precision.</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<h2><a name="caveats">Caveats</a></h2>
-<p>Both input files should be in compatible formats (either
-native text or XML).</p>
-<p>Output is always in native text 'refried' format.</p>
-<p>
-</p>
-<h2><a name="about_this_document">About this Document</a></h2>
-<p>Documentation file auto-generated by optgen.perl version 0.07
-using Getopt::Gen version 0.13.
-Translation was initiated
-as:</p>
-<pre>
-   optgen.perl -l --nocfile --nohfile --notimestamp -F mooteval mooteval.gog</pre>
-<p>
-</p>
-<hr />
-<h1><a name="bugs_and_limitations">BUGS AND LIMITATIONS</a></h1>
+
+<h2 id="Caveats">Caveats</h2>
+
+<p>Both input files should be in compatible formats (either native text or XML).</p>
+
+<p>Output is always in native text &#39;refried&#39; format.</p>
+
+<h2 id="About-this-Document">About this Document</h2>
+
+<p>Documentation file auto-generated by optgen.perl version 0.07 using Getopt::Gen version 0.14. Translation was initiated as:</p>
+
+<pre><code>   optgen.perl -l --nocfile --nohfile --notimestamp -F mooteval mooteval.gog</code></pre>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
 <p>Unknown.</p>
-<p>
-</p>
-<hr />
-<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
-<p>Initial development of the this was supported by the project
-'Kollokationen im W&ouml;rterbuch'
-( &quot;collocations in the dictionary&quot;, <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
-in association with the project
-'Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
-( &quot;digital dictionary of the German language of the 20th century&quot;, <a href="http://www.dwds.de">http://www.dwds.de</a> )
-at the Berlin-Brandenburgische Akademie der Wissenschaften ( <a href="http://www.bbaw.de">http://www.bbaw.de</a> )
-with funding from
-the Alexander von Humboldt Stiftung ( <a href="http://www.avh.de">http://www.avh.de</a> )
-and from the Zukunftsinvestitionsprogramm of the
-German federal government.
-Development of the DynHMM and WASTE extensions was
-supported by the DFG-funded projects
-'Deutsches Textarchiv' ( &quot;German text archive&quot;, <a href="http://www.deutschestextarchiv.de">http://www.deutschestextarchiv.de</a> )
-and 'DLEX'
-at the Berlin-Brandenburgische Akademie der Wissenschaften.</p>
-<p>The authors are grateful to Christiane Fellbaum, Alexander Geyken,
-Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
-for offering useful insights in the course of development
-of this package.
-Thomas Hanneforth wrote and maintains the libFSM C++ library
-for finite-state device operations used by the
-class-based HMM tagger / disambiguator, without which
-moot could not have been built.
-Alexander Geyken and Thomas Hanneforth developed the
-rule-based morphological analysis system for German
-which was used in the development and testing of the
-class-based HMM tagger / disambiguator.</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Bryan Jurish &lt;<a href="mailto:moocow@cpan.org">moocow@cpan.org</a>&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p><a href="././mootfiles.html">the mootfiles manpage</a>,
-<code>mootm(1)</code>,
-<a href="././moot.html">the moot manpage</a></p>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Initial development of the this was supported by the project &#39;Kollokationen im W&ouml;rterbuch&#39; ( &quot;collocations in the dictionary&quot;, http://www.bbaw.de/forschung/kollokationen ) in association with the project &#39;Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)&#39; ( &quot;digital dictionary of the German language of the 20th century&quot;, http://www.dwds.de ) at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de ) with funding from the Alexander von Humboldt Stiftung ( http://www.avh.de ) and from the Zukunftsinvestitionsprogramm of the German federal government. Development of the DynHMM and WASTE extensions was supported by the DFG-funded projects &#39;Deutsches Textarchiv&#39; ( &quot;German text archive&quot;, http://www.deutschestextarchiv.de ) and &#39;DLEX&#39; at the Berlin-Brandenburgische Akademie der Wissenschaften.</p>
+
+<p>The authors are grateful to Christiane Fellbaum, Alexander Geyken, Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others for offering useful insights in the course of development of this package. Thomas Hanneforth wrote and maintains the libFSM C++ library for finite-state device operations used by the class-based HMM tagger / disambiguator, without which moot could not have been built. Alexander Geyken and Thomas Hanneforth developed the rule-based morphological analysis system for German which was used in the development and testing of the class-based HMM tagger / disambiguator.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="./mootfiles.html">mootfiles</a>, mootm(1), <a href="./moot.html">moot</a></p>
+
 
 </body>
 
 </html>
+
+

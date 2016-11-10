@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>mootdump - moocow's HMM part-of-speech tagger/disambiguator: model dumper.</title>
+<title></title>
 <link rel="stylesheet" href="mootprogs.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
@@ -11,48 +11,36 @@
 <body>
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
-
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#arguments">ARGUMENTS</a></li>
-	<li><a href="#options">OPTIONS</a></li>
-	<li><a href="#configuration_files">CONFIGURATION FILES</a></li>
-	<li><a href="#addenda">ADDENDA</a></li>
-	<ul>
-
-		<li><a href="#about_this_document">About this Document</a></li>
-	</ul>
-
-	<li><a href="#bugs_and_limitations">BUGS AND LIMITATIONS</a></li>
-	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#ARGUMENTS">ARGUMENTS</a></li>
+  <li><a href="#OPTIONS">OPTIONS</a></li>
+  <li><a href="#CONFIGURATION-FILES">CONFIGURATION FILES</a></li>
+  <li><a href="#ADDENDA">ADDENDA</a>
+    <ul>
+      <li><a href="#About-this-Document">About this Document</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
 </ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<h1 id="NAME">NAME</h1>
 
-<p>
-</p>
-<hr />
-<h1><a name="name">NAME</a></h1>
-<p>mootdump - moocow's HMM part-of-speech tagger/disambiguator: model dumper.</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>mootdump - moocow&#39;s HMM part-of-speech tagger/disambiguator: model dumper.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
 <p>mootdump [OPTIONS] MODEL</p>
-<pre>
- Arguments:
-    MODEL  Input model.</pre>
-<pre>
+
+<pre><code> Arguments:
+    MODEL  Input model.
+
  Options
     -h       --help              Print help and exit.
     -V       --version           Print version and exit.
@@ -65,233 +53,247 @@
     -C       --class             Enable lexical-class probability dump
     -s       --suffix            Enable suffix-trie dump
     -n       --ngrams            Enable tag n-gram probability dump
-    -oFILE   --output=FILE       Specify output file (default=stdout).</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>moocow's HMM part-of-speech tagger/disambiguator: model dumper.</p>
-<p>'mootdump' creates text-dumps of compile HMM models for debugging.</p>
-<p>See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot model file formats.</p>
-<p>
-</p>
-<hr />
-<h1><a name="arguments">ARGUMENTS</a></h1>
-<dl>
-<dt><strong><a name="model" class="item"><code>MODEL</code></a></strong></dt>
+    -oFILE   --output=FILE       Specify output file (default=stdout).</code></pre>
 
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>moocow&#39;s HMM part-of-speech tagger/disambiguator: model dumper.</p>
+
+<p>&#39;mootdump&#39; creates text-dumps of compile HMM models for debugging.</p>
+
+<p>See <a href="./mootfiles.html">mootfiles</a> for details on moot model file formats.</p>
+
+<h1 id="ARGUMENTS">ARGUMENTS</h1>
+
+<dl>
+
+<dt id="MODEL"><code>MODEL</code></dt>
 <dd>
+
 <p>Input model.</p>
+
 <p>MODEL may be either a binary or a text model.</p>
-<p>For details on moot file formats, see <a href="././mootfiles.html">the mootfiles manpage</a>.</p>
+
+<p>For details on moot file formats, see <a href="./mootfiles.html">mootfiles</a>.</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="options">OPTIONS</a></h1>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
 <dl>
-<dt><strong><a name="help_h" class="item"><code>--help</code> , <code>-h</code></a></strong></dt>
 
+<dt id="help--h"><code>--help</code> , <code>-h</code></dt>
 <dd>
+
 <p>Print help and exit.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="version_v" class="item"><code>--version</code> , <code>-V</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="version--V"><code>--version</code> , <code>-V</code></dt>
 <dd>
+
 <p>Print version and exit.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="rcfile_file_cfile" class="item"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="rcfile-FILE--cFILE"><code>--rcfile=FILE</code> , <code>-cFILE</code></dt>
 <dd>
+
 <p>Read an alternate configuration file.</p>
-<p>Default: 'NULL'</p>
-<p>See also: <a href="#configuration_files">CONFIGURATION FILES</a>.</p>
-</dd>
-<dt><strong><a name="verbose_level_vlevel" class="item"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>See also: <a href="#CONFIGURATION-FILES">&quot;CONFIGURATION FILES&quot;</a>.</p>
+
+</dd>
+<dt id="verbose-LEVEL--vLEVEL"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></dt>
 <dd>
+
 <p>Verbosity level.</p>
-<p>Default: '3'</p>
-<p>Be more or less verbose.  Recognized values are in the range 0..6:</p>
-<ol>
-<li><strong><a name="silent" class="item">(silent)</a></strong>
+
+<p>Default: &#39;3&#39;</p>
+
+<p>Be more or less verbose. Recognized values are in the range 0..6:</p>
+
+<dl>
+
+<dt id="silent">0 (silent)</dt>
+<dd>
 
 <p>Disable all diagnostic messages.</p>
-</li>
-<li><strong><a name="errors" class="item">(errors)</a></strong>
+
+</dd>
+<dt id="errors">1 (errors)</dt>
+<dd>
 
 <p>Print error messages to stderr.</p>
-</li>
-<li><strong><a name="warnings" class="item">(warnings)</a></strong>
+
+</dd>
+<dt id="warnings">2 (warnings)</dt>
+<dd>
 
 <p>Print warnings to stderr.</p>
-</li>
-<li><strong><a name="info" class="item">(info)</a></strong>
+
+</dd>
+<dt id="info">3 (info)</dt>
+<dd>
 
 <p>Print general diagnostic information to stderr.</p>
-</li>
-<li><strong><a name="progress" class="item">(progress)</a></strong>
+
+</dd>
+<dt id="progress">4 (progress)</dt>
+<dd>
 
 <p>Print progress information to stderr.</p>
-</li>
-<li><strong><a name="debug" class="item">(debug)</a></strong>
+
+</dd>
+<dt id="debug">5 (debug)</dt>
+<dd>
 
 <p>Print debugging information to stderr (if applicable).</p>
-</li>
-<li><strong><a name="trace" class="item">(trace)</a></strong>
+
+</dd>
+<dt id="trace">6 (trace)</dt>
+<dd>
 
 <p>Print execution trace information to stderr (if applicable).</p>
-</li>
-</ol>
-</dd>
-<dt><strong><a name="no_banner_b" class="item"><code>--no-banner</code> , <code>-B</code></a></strong></dt>
 
-<dd>
-<p>Suppress initial banner message (implied at verbosity levels &lt;= 2)</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="hash_ngrams_bool_gbool" class="item"><code>--hash-ngrams=BOOL</code> , <code>-gBOOL</code></a></strong></dt>
-
-<dd>
-<p>Whether to hash stored n-grams (default=yes)</p>
-<p>Default: '1'</p>
-<p>If specified and true, tag n-grams will be stored in a slow but memory-friendly
-hash.  Otherwise, a fast but large array will be used (only useful for implicit compilation).</p>
-</dd>
-<dt><strong><a name="const_k" class="item"><code>--const</code> , <code>-k</code></a></strong></dt>
-
-<dd>
-<p>Enable dump of scalar model constants</p>
-<p>Default: '0'</p>
-<p>If none of the --(const|lex|class|suffix|ngrams) options are specified, a full dump is
-produced (as if all of the above options had been specified).  If any of these
-options <strong>are</strong> specified, only the model properties indicated by the specified
-flag(s) are dumped.</p>
-</dd>
-<dt><strong><a name="lex_l" class="item"><code>--lex</code> , <code>-l</code></a></strong></dt>
-
-<dd>
-<p>Enable lexical probability dump</p>
-<p>Default: '0'</p>
-<p>See <a href="#__const____k">--const , -k</a></p>
-</dd>
-<dt><strong><a name="class_c" class="item"><code>--class</code> , <code>-C</code></a></strong></dt>
-
-<dd>
-<p>Enable lexical-class probability dump</p>
-<p>Default: '0'</p>
-<p>See <a href="#__const____k">--const , -k</a></p>
-</dd>
-<dt><strong><a name="suffix_s" class="item"><code>--suffix</code> , <code>-s</code></a></strong></dt>
-
-<dd>
-<p>Enable suffix-trie dump</p>
-<p>Default: '0'</p>
-<p>See <a href="#__const____k">--const , -k</a></p>
-</dd>
-<dt><strong><a name="ngrams_n" class="item"><code>--ngrams</code> , <code>-n</code></a></strong></dt>
-
-<dd>
-<p>Enable tag n-gram probability dump</p>
-<p>Default: '0'</p>
-<p>See <a href="#__const____k">--const , -k</a></p>
-</dd>
-<dt><strong><a name="output_file_ofile" class="item"><code>--output=FILE</code> , <code>-oFILE</code></a></strong></dt>
-
-<dd>
-<p>Specify output file (default=stdout).</p>
-<p>Default: '-'</p>
-<p>Text dump will be written to FILE.</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="configuration_files">CONFIGURATION FILES</a></h1>
+
+</dd>
+<dt id="no-banner--B"><code>--no-banner</code> , <code>-B</code></dt>
+<dd>
+
+<p>Suppress initial banner message (implied at verbosity levels &lt;= 2)</p>
+
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="hash-ngrams-BOOL--gBOOL"><code>--hash-ngrams=BOOL</code> , <code>-gBOOL</code></dt>
+<dd>
+
+<p>Whether to hash stored n-grams (default=yes)</p>
+
+<p>Default: &#39;1&#39;</p>
+
+<p>If specified and true, tag n-grams will be stored in a slow but memory-friendly hash. Otherwise, a fast but large array will be used (only useful for implicit compilation).</p>
+
+</dd>
+<dt id="const--k"><code>--const</code> , <code>-k</code></dt>
+<dd>
+
+<p>Enable dump of scalar model constants</p>
+
+<p>Default: &#39;0&#39;</p>
+
+<p>If none of the --(const|lex|class|suffix|ngrams) options are specified, a full dump is produced (as if all of the above options had been specified). If any of these options <b>are</b> specified, only the model properties indicated by the specified flag(s) are dumped.</p>
+
+</dd>
+<dt id="lex--l"><code>--lex</code> , <code>-l</code></dt>
+<dd>
+
+<p>Enable lexical probability dump</p>
+
+<p>Default: &#39;0&#39;</p>
+
+<p>See <a href="#const--k">&quot;--const , -k&quot;</a></p>
+
+</dd>
+<dt id="class--C"><code>--class</code> , <code>-C</code></dt>
+<dd>
+
+<p>Enable lexical-class probability dump</p>
+
+<p>Default: &#39;0&#39;</p>
+
+<p>See <a href="#const--k">&quot;--const , -k&quot;</a></p>
+
+</dd>
+<dt id="suffix--s"><code>--suffix</code> , <code>-s</code></dt>
+<dd>
+
+<p>Enable suffix-trie dump</p>
+
+<p>Default: &#39;0&#39;</p>
+
+<p>See <a href="#const--k">&quot;--const , -k&quot;</a></p>
+
+</dd>
+<dt id="ngrams--n"><code>--ngrams</code> , <code>-n</code></dt>
+<dd>
+
+<p>Enable tag n-gram probability dump</p>
+
+<p>Default: &#39;0&#39;</p>
+
+<p>See <a href="#const--k">&quot;--const , -k&quot;</a></p>
+
+</dd>
+<dt id="output-FILE--oFILE"><code>--output=FILE</code> , <code>-oFILE</code></dt>
+<dd>
+
+<p>Specify output file (default=stdout).</p>
+
+<p>Default: &#39;-&#39;</p>
+
+<p>Text dump will be written to FILE.</p>
+
+</dd>
+</dl>
+
+<h1 id="CONFIGURATION-FILES">CONFIGURATION FILES</h1>
+
 <p>Configuration files are expected to contain lines of the form:</p>
-<pre>
-    LONG_OPTION_NAME    OPTION_VALUE</pre>
-<p>where LONG_OPTION_NAME is the long name of some option,
-without the leading '--', and OPTION_VALUE is the value for
-that option, if any.  Fields are whitespace-separated.
-Blank lines and comments (lines beginning with '#')
-are ignored.</p>
+
+<pre><code>    LONG_OPTION_NAME    OPTION_VALUE</code></pre>
+
+<p>where LONG_OPTION_NAME is the long name of some option, without the leading &#39;--&#39;, and OPTION_VALUE is the value for that option, if any. Fields are whitespace-separated. Blank lines and comments (lines beginning with &#39;#&#39;) are ignored.</p>
+
 <p>The following configuration files are read by default:</p>
+
 <ul>
-<li><strong><a name="etc_mootdumprc" class="item">/etc/mootdumprc</a></strong>
+
+<li><p>/etc/mootdumprc</p>
 
 </li>
-<li><strong><a name="mootdumprc" class="item">~/.mootdumprc</a></strong>
+<li><p>~/.mootdumprc</p>
 
 </li>
 </ul>
-<p>
-</p>
-<hr />
-<h1><a name="addenda">ADDENDA</a></h1>
-<p>
-</p>
-<h2><a name="about_this_document">About this Document</a></h2>
-<p>Documentation file auto-generated by optgen.perl version 0.07
-using Getopt::Gen version 0.13.
-Translation was initiated
-as:</p>
-<pre>
-   optgen.perl -l --nocfile --nohfile --notimestamp -F mootdump mootdump.gog</pre>
-<p>
-</p>
-<hr />
-<h1><a name="bugs_and_limitations">BUGS AND LIMITATIONS</a></h1>
+
+<h1 id="ADDENDA">ADDENDA</h1>
+
+<h2 id="About-this-Document">About this Document</h2>
+
+<p>Documentation file auto-generated by optgen.perl version 0.07 using Getopt::Gen version 0.14. Translation was initiated as:</p>
+
+<pre><code>   optgen.perl -l --nocfile --nohfile --notimestamp -F mootdump mootdump.gog</code></pre>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
 <p>None known.</p>
-<p>
-</p>
-<hr />
-<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
-<p>Initial development of the this was supported by the project
-'Kollokationen im W&ouml;rterbuch'
-( &quot;collocations in the dictionary&quot;, <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
-in association with the project
-'Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
-( &quot;digital dictionary of the German language of the 20th century&quot;, <a href="http://www.dwds.de">http://www.dwds.de</a> )
-at the Berlin-Brandenburgische Akademie der Wissenschaften ( <a href="http://www.bbaw.de">http://www.bbaw.de</a> )
-with funding from
-the Alexander von Humboldt Stiftung ( <a href="http://www.avh.de">http://www.avh.de</a> )
-and from the Zukunftsinvestitionsprogramm of the
-German federal government.
-Development of the DynHMM and WASTE extensions was
-supported by the DFG-funded projects
-'Deutsches Textarchiv' ( &quot;German text archive&quot;, <a href="http://www.deutschestextarchiv.de">http://www.deutschestextarchiv.de</a> )
-and 'DLEX'
-at the Berlin-Brandenburgische Akademie der Wissenschaften.</p>
-<p>The authors are grateful to Christiane Fellbaum, Alexander Geyken,
-Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
-for offering useful insights in the course of development
-of this package.
-Thomas Hanneforth wrote and maintains the libFSM C++ library
-for finite-state device operations used by the
-class-based HMM tagger / disambiguator, without which
-moot could not have been built.
-Alexander Geyken and Thomas Hanneforth developed the
-rule-based morphological analysis system for German
-which was used in the development and testing of the
-class-based HMM tagger / disambiguator.</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Bryan Jurish &lt;<a href="mailto:moocow@cpan.org">moocow@cpan.org</a>&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p><a href="././mootfiles.html">the mootfiles manpage</a>,
-<a href="././mootrain.html">the mootrain manpage</a>,
-<a href="././mootcompile.html">the mootcompile manpage</a>,
-<a href="././moot.html">the moot manpage</a></p>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Initial development of the this was supported by the project &#39;Kollokationen im W&ouml;rterbuch&#39; ( &quot;collocations in the dictionary&quot;, http://www.bbaw.de/forschung/kollokationen ) in association with the project &#39;Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)&#39; ( &quot;digital dictionary of the German language of the 20th century&quot;, http://www.dwds.de ) at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de ) with funding from the Alexander von Humboldt Stiftung ( http://www.avh.de ) and from the Zukunftsinvestitionsprogramm of the German federal government. Development of the DynHMM and WASTE extensions was supported by the DFG-funded projects &#39;Deutsches Textarchiv&#39; ( &quot;German text archive&quot;, http://www.deutschestextarchiv.de ) and &#39;DLEX&#39; at the Berlin-Brandenburgische Akademie der Wissenschaften.</p>
+
+<p>The authors are grateful to Christiane Fellbaum, Alexander Geyken, Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others for offering useful insights in the course of development of this package. Thomas Hanneforth wrote and maintains the libFSM C++ library for finite-state device operations used by the class-based HMM tagger / disambiguator, without which moot could not have been built. Alexander Geyken and Thomas Hanneforth developed the rule-based morphological analysis system for German which was used in the development and testing of the class-based HMM tagger / disambiguator.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="./mootfiles.html">mootfiles</a>, <a href="./mootrain.html">mootrain</a>, <a href="./mootcompile.html">mootcompile</a>, <a href="./moot.html">moot</a></p>
+
 
 </body>
 
 </html>
+
+
