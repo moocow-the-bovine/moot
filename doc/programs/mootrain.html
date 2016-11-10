@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>mootrain - moocow's part-of-speech tagger : HMM trainer</title>
+<title></title>
 <link rel="stylesheet" href="mootprogs.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
@@ -11,53 +11,40 @@
 <body>
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
-
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#arguments">ARGUMENTS</a></li>
-	<li><a href="#options">OPTIONS</a></li>
-	<ul>
-
-		<li><a href="#model_format_options">Model Format Options</a></li>
-	</ul>
-
-	<li><a href="#configuration_files">CONFIGURATION FILES</a></li>
-	<li><a href="#addenda">ADDENDA</a></li>
-	<ul>
-
-		<li><a href="#about_this_document">About this Document</a></li>
-	</ul>
-
-	<li><a href="#bugs_and_limitations">BUGS AND LIMITATIONS</a></li>
-	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#ARGUMENTS">ARGUMENTS</a></li>
+  <li><a href="#OPTIONS">OPTIONS</a>
+    <ul>
+      <li><a href="#Model-Format-Options">Model Format Options</a></li>
+    </ul>
+  </li>
+  <li><a href="#CONFIGURATION-FILES">CONFIGURATION FILES</a></li>
+  <li><a href="#ADDENDA">ADDENDA</a>
+    <ul>
+      <li><a href="#About-this-Document">About this Document</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
 </ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<h1 id="NAME">NAME</h1>
 
-<p>
-</p>
-<hr />
-<h1><a name="name">NAME</a></h1>
-<p>mootrain - moocow's part-of-speech tagger : HMM trainer</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>mootrain - moocow&#39;s part-of-speech tagger : HMM trainer</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
 <p>mootrain [OPTIONS] INPUT(s)</p>
-<pre>
- Arguments:
-    INPUT(s)  Tagged input corpus file(s).</pre>
-<pre>
+
+<pre><code> Arguments:
+    INPUT(s)  Tagged input corpus file(s).
+
  Options
     -h          --help                       Print help and exit.
     -V          --version                    Print version and exit.
@@ -66,8 +53,8 @@
     -B          --no-banner                  Suppress initial banner message (implied at verbosity levels &lt;= 1)
     -oSTRING    --output=STRING              Specify basename for output files (default=INPUT)
     -IFORMAT    --input-format=FORMAT        Specify input file(s) format(s).
-                --input-encoding=ENCODING    Override document encoding for XML input.</pre>
-<pre>
+                --input-encoding=ENCODING    Override document encoding for XML input.
+
  Model Format Options
     -l          --lex                        Generate only lexical frequency file.
     -n          --ngrams                     Generate only n-gram frequency file.
@@ -76,278 +63,287 @@
     -eTAG       --eos-tag=TAG                Specify boundary tag (default=__$)
     -N          --verbose-ngrams             Generate long-form ngrams (default=no)
     -fFILE      --flavors-from=FILE          Use flavor heuristics from FILE (default=built-in).
-    -tDOUBLE    --unknown-threshhold=DOUBLE  Freq. threshhold for 'unknown' lexical probabilities</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>moocow's part-of-speech tagger : HMM trainer</p>
-<p>'mootrain' gathers training data for the HMM part-of-speech tagger
-used by the 'moot' program  from a tagged training corpus.
-The training
-corpus should be in 'medium' (+tagged,-analyzed) or 'well done'
-(+tagged,+analyzed) format.  The output file(s) are text-format
-raw frequency models.</p>
-<p>See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot file formats.</p>
-<p>
-</p>
-<hr />
-<h1><a name="arguments">ARGUMENTS</a></h1>
-<dl>
-<dt><strong><a name="input" class="item"><code>INPUT(s)</code></a></strong></dt>
+    -tDOUBLE    --unknown-threshhold=DOUBLE  Freq. threshhold for &#39;unknown&#39; lexical probabilities</code></pre>
 
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>moocow&#39;s part-of-speech tagger : HMM trainer</p>
+
+<p>&#39;mootrain&#39; gathers training data for the HMM part-of-speech tagger used by the &#39;moot&#39; program from a tagged training corpus. The training corpus should be in &#39;medium&#39; (+tagged,-analyzed) or &#39;well done&#39; (+tagged,+analyzed) format. The output file(s) are text-format raw frequency models.</p>
+
+<p>See <a href="./mootfiles.html">mootfiles</a> for details on moot file formats.</p>
+
+<h1 id="ARGUMENTS">ARGUMENTS</h1>
+
+<dl>
+
+<dt id="INPUT-s"><code>INPUT(s)</code></dt>
 <dd>
+
 <p>Tagged input corpus file(s).</p>
-<p>Input files should be 'medium' (+tagged,-analyzed)
-or 'well done' (+tagged,-analyzed).</p>
-<p>See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot file formats.</p>
+
+<p>Input files should be &#39;medium&#39; (+tagged,-analyzed) or &#39;well done&#39; (+tagged,-analyzed).</p>
+
+<p>See <a href="./mootfiles.html">mootfiles</a> for details on moot file formats.</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="options">OPTIONS</a></h1>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
 <dl>
-<dt><strong><a name="help_h" class="item"><code>--help</code> , <code>-h</code></a></strong></dt>
 
+<dt id="help--h"><code>--help</code> , <code>-h</code></dt>
 <dd>
+
 <p>Print help and exit.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="version_v" class="item"><code>--version</code> , <code>-V</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="version--V"><code>--version</code> , <code>-V</code></dt>
 <dd>
+
 <p>Print version and exit.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="rcfile_file_cfile" class="item"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="rcfile-FILE--cFILE"><code>--rcfile=FILE</code> , <code>-cFILE</code></dt>
 <dd>
+
 <p>Read an alternate configuration file.</p>
-<p>Default: 'NULL'</p>
-<p>See also: <a href="#configuration_files">CONFIGURATION FILES</a>.</p>
-</dd>
-<dt><strong><a name="verbose_level_vlevel" class="item"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>See also: <a href="#CONFIGURATION-FILES">&quot;CONFIGURATION FILES&quot;</a>.</p>
+
+</dd>
+<dt id="verbose-LEVEL--vLEVEL"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></dt>
 <dd>
+
 <p>Verbosity level.</p>
-<p>Default: '3'</p>
-<p>Be more or less verbose.  Recognized values are in the range 0..6:</p>
-<ol>
-<li><strong><a name="silent" class="item">(silent)</a></strong>
+
+<p>Default: &#39;3&#39;</p>
+
+<p>Be more or less verbose. Recognized values are in the range 0..6:</p>
+
+<dl>
+
+<dt id="silent">0 (silent)</dt>
+<dd>
 
 <p>Disable all diagnostic messages.</p>
-</li>
-<li><strong><a name="errors" class="item">(errors)</a></strong>
+
+</dd>
+<dt id="errors">1 (errors)</dt>
+<dd>
 
 <p>Print error messages to stderr.</p>
-</li>
-<li><strong><a name="warnings" class="item">(warnings)</a></strong>
+
+</dd>
+<dt id="warnings">2 (warnings)</dt>
+<dd>
 
 <p>Print warnings to stderr.</p>
-</li>
-<li><strong><a name="info" class="item">(info)</a></strong>
+
+</dd>
+<dt id="info">3 (info)</dt>
+<dd>
 
 <p>Print general diagnostic information to stderr.</p>
-</li>
-<li><strong><a name="progress" class="item">(progress)</a></strong>
+
+</dd>
+<dt id="progress">4 (progress)</dt>
+<dd>
 
 <p>Print progress information to stderr.</p>
-</li>
-<li><strong><a name="debug" class="item">(debug)</a></strong>
+
+</dd>
+<dt id="debug">5 (debug)</dt>
+<dd>
 
 <p>Print debugging information to stderr (if applicable).</p>
-</li>
-<li><strong><a name="trace" class="item">(trace)</a></strong>
+
+</dd>
+<dt id="trace">6 (trace)</dt>
+<dd>
 
 <p>Print execution trace information to stderr (if applicable).</p>
-</li>
-</ol>
-</dd>
-<dt><strong><a name="no_banner_b" class="item"><code>--no-banner</code> , <code>-B</code></a></strong></dt>
 
+</dd>
+</dl>
+
+</dd>
+<dt id="no-banner--B"><code>--no-banner</code> , <code>-B</code></dt>
 <dd>
+
 <p>Suppress initial banner message (implied at verbosity levels &lt;= 1)</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="output_string_ostring" class="item"><code>--output=STRING</code> , <code>-oSTRING</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="output-STRING--oSTRING"><code>--output=STRING</code> , <code>-oSTRING</code></dt>
 <dd>
+
 <p>Specify basename for output files (default=INPUT)</p>
-<p>Default: 'NULL'</p>
-</dd>
-<dt><strong><a name="input_format_format_iformat" class="item"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+</dd>
+<dt id="input-format-FORMAT--IFORMAT"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></dt>
 <dd>
+
 <p>Specify input file(s) format(s).</p>
-<p>Default: 'NULL'</p>
-<p>Value should be a comma-separated list of format flag names,
-optionally prefixed with an exclamation point (!) to indicate
-negation.</p>
-<p>Default='WellDone'</p>
-<p>Implied='Tagged'</p>
-<p>See 'I/O Format Flags' in <a href="././mootfiles.html">the mootfiles manpage</a> for details.</p>
-</dd>
-<dt><strong><a name="input_encoding_encoding" class="item"><code>--input-encoding=ENCODING</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>Value should be a comma-separated list of format flag names, optionally prefixed with an exclamation point (!) to indicate negation.</p>
+
+<p>Default=&#39;WellDone&#39;</p>
+
+<p>Implied=&#39;Tagged&#39;</p>
+
+<p>See &#39;I/O Format Flags&#39; in <a href="./mootfiles.html">mootfiles</a> for details.</p>
+
+</dd>
+<dt id="input-encoding-ENCODING"><code>--input-encoding=ENCODING</code></dt>
 <dd>
+
 <p>Override document encoding for XML input.</p>
-<p>Default: 'NULL'</p>
+
+<p>Default: &#39;NULL&#39;</p>
+
 <p>Potentially useful for XML documents without encoding declarations.</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<h2><a name="model_format_options">Model Format Options</a></h2>
+
+<h2 id="Model-Format-Options">Model Format Options</h2>
+
 <dl>
-<dt><strong><a name="lex_l" class="item"><code>--lex</code> , <code>-l</code></a></strong></dt>
 
+<dt id="lex--l"><code>--lex</code> , <code>-l</code></dt>
 <dd>
+
 <p>Generate only lexical frequency file.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="ngrams_n" class="item"><code>--ngrams</code> , <code>-n</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="ngrams--n"><code>--ngrams</code> , <code>-n</code></dt>
 <dd>
+
 <p>Generate only n-gram frequency file.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="classes_c" class="item"><code>--classes</code> , <code>-C</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="classes--C"><code>--classes</code> , <code>-C</code></dt>
 <dd>
+
 <p>Generate only lexical-class frequency file.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="flavors_f" class="item"><code>--flavors</code> , <code>-F</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="flavors--F"><code>--flavors</code> , <code>-F</code></dt>
 <dd>
+
 <p>Generate only flavor heuristic file.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="eos_tag_tag_etag" class="item"><code>--eos-tag=TAG</code> , <code>-eTAG</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="eos-tag-TAG--eTAG"><code>--eos-tag=TAG</code> , <code>-eTAG</code></dt>
 <dd>
+
 <p>Specify boundary tag (default=__$)</p>
-<p>Default: '__$'</p>
-<p>This is the pseudo-tag used in the n-gram model file to represent
-sentence boundaries, both beginning- and end-of-sentence.  It should
-not be an element of the actual tag-set -- that is, it should not
-be a valid analysis for any token.</p>
-</dd>
-<dt><strong><a name="verbose_ngrams_n" class="item"><code>--verbose-ngrams</code> , <code>-N</code></a></strong></dt>
 
+<p>Default: &#39;__$&#39;</p>
+
+<p>This is the pseudo-tag used in the n-gram model file to represent sentence boundaries, both beginning- and end-of-sentence. It should not be an element of the actual tag-set -- that is, it should not be a valid analysis for any token.</p>
+
+</dd>
+<dt id="verbose-ngrams--N"><code>--verbose-ngrams</code> , <code>-N</code></dt>
 <dd>
+
 <p>Generate long-form ngrams (default=no)</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="flavors_from_file_ffile" class="item"><code>--flavors-from=FILE</code> , <code>-fFILE</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="flavors-from-FILE--fFILE"><code>--flavors-from=FILE</code> , <code>-fFILE</code></dt>
 <dd>
+
 <p>Use flavor heuristics from FILE (default=built-in).</p>
-<p>Default: 'NULL'</p>
-<p>If specified, FILE should be a flavor definition file containing a list of regular-expression based token classification rules
-to be used in computing special entries for the lexical frequency file.
-See <a href="././mootfiles.html">mootfiles(5)</a> for a full specification of the moot flavor definition file format.
-If unspecified, the default behavior is to use a built-in set of classification heuristics.
-If FILE is an empty string, no flavor heuristics at all will be applied.</p>
-</dd>
-<dt><strong><a name="unknown_threshhold_double_tdouble" class="item"><code>--unknown-threshhold=DOUBLE</code> , <code>-tDOUBLE</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>If specified, FILE should be a flavor definition file containing a list of regular-expression based token classification rules to be used in computing special entries for the lexical frequency file. See <a href="./mootfiles.html">mootfiles(5)</a> for a full specification of the moot flavor definition file format. If unspecified, the default behavior is to use a built-in set of classification heuristics. If FILE is an empty string, no flavor heuristics at all will be applied.</p>
+
+</dd>
+<dt id="unknown-threshhold-DOUBLE--tDOUBLE"><code>--unknown-threshhold=DOUBLE</code> , <code>-tDOUBLE</code></dt>
 <dd>
-<p>Freq. threshhold for 'unknown' lexical probabilities</p>
-<p>Default: '1.0'</p>
-<p>Setting this option to a non-zero value will case a special @UKNOWN entry to be added to the
-lexical frequency model file.  Note that such an entry will be overridden
-during model compilation if you specify a non-zero unknown lexical threshhold
-to <a href="././moot.html">moot(1)</a> or <a href="././mootcompile.html">mootcompile(1)</a>.</p>
+
+<p>Freq. threshhold for &#39;unknown&#39; lexical probabilities</p>
+
+<p>Default: &#39;1.0&#39;</p>
+
+<p>Setting this option to a non-zero value will case a special @UKNOWN entry to be added to the lexical frequency model file. Note that such an entry will be overridden during model compilation if you specify a non-zero unknown lexical threshhold to <a href="./moot.html">moot(1)</a> or <a href="./mootcompile.html">mootcompile(1)</a>.</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="configuration_files">CONFIGURATION FILES</a></h1>
+
+<h1 id="CONFIGURATION-FILES">CONFIGURATION FILES</h1>
+
 <p>Configuration files are expected to contain lines of the form:</p>
-<pre>
-    LONG_OPTION_NAME    OPTION_VALUE</pre>
-<p>where LONG_OPTION_NAME is the long name of some option,
-without the leading '--', and OPTION_VALUE is the value for
-that option, if any.  Fields are whitespace-separated.
-Blank lines and comments (lines beginning with '#')
-are ignored.</p>
+
+<pre><code>    LONG_OPTION_NAME    OPTION_VALUE</code></pre>
+
+<p>where LONG_OPTION_NAME is the long name of some option, without the leading &#39;--&#39;, and OPTION_VALUE is the value for that option, if any. Fields are whitespace-separated. Blank lines and comments (lines beginning with &#39;#&#39;) are ignored.</p>
+
 <p>The following configuration files are read by default:</p>
+
 <ul>
-<li><strong><a name="etc_mootrainrc" class="item">/etc/mootrainrc</a></strong>
+
+<li><p>/etc/mootrainrc</p>
 
 </li>
-<li><strong><a name="mootrainrc" class="item">~/.mootrainrc</a></strong>
+<li><p>~/.mootrainrc</p>
 
 </li>
 </ul>
-<p>
-</p>
-<hr />
-<h1><a name="addenda">ADDENDA</a></h1>
-<p>
-</p>
-<h2><a name="about_this_document">About this Document</a></h2>
-<p>Documentation file auto-generated by optgen.perl version 0.07
-using Getopt::Gen version 0.13.
-Translation was initiated
-as:</p>
-<pre>
-   optgen.perl -l --nocfile --nohfile --notimestamp -F mootrain mootrain.gog</pre>
-<p>
-</p>
-<hr />
-<h1><a name="bugs_and_limitations">BUGS AND LIMITATIONS</a></h1>
-<p>Only ca. 99.998% compatible with tnt-para(1), due to token-typification
-strangeness.</p>
-<p>
-</p>
-<hr />
-<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
-<p>Initial development of the this was supported by the project
-'Kollokationen im W&ouml;rterbuch'
-( &quot;collocations in the dictionary&quot;, <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
-in association with the project
-'Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
-( &quot;digital dictionary of the German language of the 20th century&quot;, <a href="http://www.dwds.de">http://www.dwds.de</a> )
-at the Berlin-Brandenburgische Akademie der Wissenschaften ( <a href="http://www.bbaw.de">http://www.bbaw.de</a> )
-with funding from
-the Alexander von Humboldt Stiftung ( <a href="http://www.avh.de">http://www.avh.de</a> )
-and from the Zukunftsinvestitionsprogramm of the
-German federal government.
-Development of the DynHMM and WASTE extensions was
-supported by the DFG-funded projects
-'Deutsches Textarchiv' ( &quot;German text archive&quot;, <a href="http://www.deutschestextarchiv.de">http://www.deutschestextarchiv.de</a> )
-and 'DLEX'
-at the Berlin-Brandenburgische Akademie der Wissenschaften.</p>
-<p>The authors are grateful to Christiane Fellbaum, Alexander Geyken,
-Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
-for offering useful insights in the course of development
-of this package.
-Thomas Hanneforth wrote and maintains the libFSM C++ library
-for finite-state device operations used by the
-class-based HMM tagger / disambiguator, without which
-moot could not have been built.
-Alexander Geyken and Thomas Hanneforth developed the
-rule-based morphological analysis system for German
-which was used in the development and testing of the
-class-based HMM tagger / disambiguator.</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Bryan Jurish &lt;<a href="mailto:moocow@cpan.org">moocow@cpan.org</a>&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p><a href="././mootfiles.html">the mootfiles manpage</a>,
-<code>mootm(1)</code>,
-<a href="././mootcompile.html">the mootcompile manpage</a>,
-<a href="././moot.html">the moot manpage</a></p>
+
+<h1 id="ADDENDA">ADDENDA</h1>
+
+<h2 id="About-this-Document">About this Document</h2>
+
+<p>Documentation file auto-generated by optgen.perl version 0.07 using Getopt::Gen version 0.14. Translation was initiated as:</p>
+
+<pre><code>   optgen.perl -l --nocfile --nohfile --notimestamp -F mootrain mootrain.gog</code></pre>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
+<p>Only ca. 99.998% compatible with tnt-para(1), due to token-typification strangeness.</p>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Initial development of the this was supported by the project &#39;Kollokationen im W&ouml;rterbuch&#39; ( &quot;collocations in the dictionary&quot;, http://www.bbaw.de/forschung/kollokationen ) in association with the project &#39;Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)&#39; ( &quot;digital dictionary of the German language of the 20th century&quot;, http://www.dwds.de ) at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de ) with funding from the Alexander von Humboldt Stiftung ( http://www.avh.de ) and from the Zukunftsinvestitionsprogramm of the German federal government. Development of the DynHMM and WASTE extensions was supported by the DFG-funded projects &#39;Deutsches Textarchiv&#39; ( &quot;German text archive&quot;, http://www.deutschestextarchiv.de ) and &#39;DLEX&#39; at the Berlin-Brandenburgische Akademie der Wissenschaften.</p>
+
+<p>The authors are grateful to Christiane Fellbaum, Alexander Geyken, Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others for offering useful insights in the course of development of this package. Thomas Hanneforth wrote and maintains the libFSM C++ library for finite-state device operations used by the class-based HMM tagger / disambiguator, without which moot could not have been built. Alexander Geyken and Thomas Hanneforth developed the rule-based morphological analysis system for German which was used in the development and testing of the class-based HMM tagger / disambiguator.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="./mootfiles.html">mootfiles</a>, mootm(1), <a href="./mootcompile.html">mootcompile</a>, <a href="./moot.html">moot</a></p>
+
 
 </body>
 
 </html>
+
+

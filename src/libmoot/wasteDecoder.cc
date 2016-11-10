@@ -66,6 +66,7 @@ void wasteDecoder::flush_buffer(bool force)
 {
   if (!wd_sink) return;
   for (; !wd_buf.empty() && (force || buffer_can_shift()); wd_buf.pop_front()) {
+    TOKDEBUG(wd_buf.front().dump("DECODE:PUT"));
     wd_sink->put_token(wd_buf.front());
   }
 } 

@@ -469,11 +469,13 @@ mootTokenType wasteLexerReader::get_token(void)
     case TokTypeVanilla:
     case TokTypeLibXML:
       lexer.set_token(wlr_token, lexer.wl_tokbuf.front());
+      break;
     default:
       break;
   }
 
   lexer.wl_tokbuf.pop_front();
+  TOKDEBUG(wlr_token.dump("LEXER:GET"));
   return wlr_token.toktype();
 }
 

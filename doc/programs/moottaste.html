@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>moottaste - moocow's HMM part-of-speech tagger: heuristic token classifier.</title>
+<title></title>
 <link rel="stylesheet" href="mootprogs.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
@@ -11,53 +11,40 @@
 <body>
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
-
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#arguments">ARGUMENTS</a></li>
-	<li><a href="#options">OPTIONS</a></li>
-	<ul>
-
-		<li><a href="#format_options">Format Options</a></li>
-	</ul>
-
-	<li><a href="#configuration_files">CONFIGURATION FILES</a></li>
-	<li><a href="#addenda">ADDENDA</a></li>
-	<ul>
-
-		<li><a href="#about_this_document">About this Document</a></li>
-	</ul>
-
-	<li><a href="#bugs_and_limitations">BUGS AND LIMITATIONS</a></li>
-	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#ARGUMENTS">ARGUMENTS</a></li>
+  <li><a href="#OPTIONS">OPTIONS</a>
+    <ul>
+      <li><a href="#Format-Options">Format Options</a></li>
+    </ul>
+  </li>
+  <li><a href="#CONFIGURATION-FILES">CONFIGURATION FILES</a></li>
+  <li><a href="#ADDENDA">ADDENDA</a>
+    <ul>
+      <li><a href="#About-this-Document">About this Document</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
 </ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<h1 id="NAME">NAME</h1>
 
-<p>
-</p>
-<hr />
-<h1><a name="name">NAME</a></h1>
-<p>moottaste - moocow's HMM part-of-speech tagger: heuristic token classifier.</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>moottaste - moocow&#39;s HMM part-of-speech tagger: heuristic token classifier.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
 <p>moottaste [OPTIONS] INPUT(s)</p>
-<pre>
- Arguments:
-    INPUT(s)  Input files / file-lists.</pre>
-<pre>
+
+<pre><code> Arguments:
+    INPUT(s)  Input files / file-lists.
+
  Options
     -h          --help                      Print help and exit.
     -V          --version                   Print version and exit.
@@ -67,268 +54,275 @@
     -fFILE      --flavors=FILE              Use flavor heuristics from FILE (default=built-in).
     -FLABEL     --default-flavor=LABEL      Use LABEL as the default flavor (default=empty string or from flavor-file).
     -l          --list                      INPUTs are file-lists, not filenames.
-    -oFILE      --output=FILE               Specify output file (default=stdout).</pre>
-<pre>
+    -oFILE      --output=FILE               Specify output file (default=stdout).
+
  Format Options
     -IFORMAT    --input-format=FORMAT       Specify input file(s) format(s).
     -OFORMAT    --output-format=FORMAT      Specify output file format.
                 --input-encoding=ENCODING   Override XML document input encoding.
-                --output-encoding=ENCODING  Set default XML output encoding.</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>moocow's HMM part-of-speech tagger: heuristic token classifier.</p>
-<p>'moottaste' shows the 'flavors' of its input tokens, as determined
-by heuristic regular-expression-based rules.  Mainly useful for debugging.</p>
-<p>It takes as its input one or more 'rare' (-tagged,-analyzed)
-or 'medium rare' (-tagged,+analyzed) files and produces a
-'medium' (+tagged,-analyzed) or 'well done' (+tagged,+analyzed)
-file, respectively.  See <a href="././mootfiles.html">the mootfiles manpage</a> for details on moot file
-formats.</p>
-<p>
-</p>
-<hr />
-<h1><a name="arguments">ARGUMENTS</a></h1>
-<dl>
-<dt><strong><a name="input" class="item"><code>INPUT(s)</code></a></strong></dt>
+                --output-encoding=ENCODING  Set default XML output encoding.</code></pre>
 
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>moocow&#39;s HMM part-of-speech tagger: heuristic token classifier.</p>
+
+<p>&#39;moottaste&#39; shows the &#39;flavors&#39; of its input tokens, as determined by heuristic regular-expression-based rules. Mainly useful for debugging.</p>
+
+<p>It takes as its input one or more &#39;rare&#39; (-tagged,-analyzed) or &#39;medium rare&#39; (-tagged,+analyzed) files and produces a &#39;medium&#39; (+tagged,-analyzed) or &#39;well done&#39; (+tagged,+analyzed) file, respectively. See <a href="./mootfiles.html">mootfiles</a> for details on moot file formats.</p>
+
+<h1 id="ARGUMENTS">ARGUMENTS</h1>
+
+<dl>
+
+<dt id="INPUT-s"><code>INPUT(s)</code></dt>
 <dd>
+
 <p>Input files / file-lists.</p>
-<p>Input files should be 'cooked' text files
-of either the 'rare' (-tagged,-analyzed) or
-'medium rare' (-tagged,+analyzed) variety.</p>
-<p>See also the '--list' option.</p>
-<p>For details on moot file formats, see <a href="././mootfiles.html">the mootfiles manpage</a>.</p>
+
+<p>Input files should be &#39;cooked&#39; text files of either the &#39;rare&#39; (-tagged,-analyzed) or &#39;medium rare&#39; (-tagged,+analyzed) variety.</p>
+
+<p>See also the &#39;--list&#39; option.</p>
+
+<p>For details on moot file formats, see <a href="./mootfiles.html">mootfiles</a>.</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="options">OPTIONS</a></h1>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
 <dl>
-<dt><strong><a name="help_h" class="item"><code>--help</code> , <code>-h</code></a></strong></dt>
 
+<dt id="help--h"><code>--help</code> , <code>-h</code></dt>
 <dd>
+
 <p>Print help and exit.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="version_v" class="item"><code>--version</code> , <code>-V</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="version--V"><code>--version</code> , <code>-V</code></dt>
 <dd>
+
 <p>Print version and exit.</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="rcfile_file_cfile" class="item"><code>--rcfile=FILE</code> , <code>-cFILE</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="rcfile-FILE--cFILE"><code>--rcfile=FILE</code> , <code>-cFILE</code></dt>
 <dd>
+
 <p>Read an alternate configuration file.</p>
-<p>Default: 'NULL'</p>
-<p>See also: <a href="#configuration_files">CONFIGURATION FILES</a>.</p>
-</dd>
-<dt><strong><a name="verbose_level_vlevel" class="item"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>See also: <a href="#CONFIGURATION-FILES">&quot;CONFIGURATION FILES&quot;</a>.</p>
+
+</dd>
+<dt id="verbose-LEVEL--vLEVEL"><code>--verbose=LEVEL</code> , <code>-vLEVEL</code></dt>
 <dd>
+
 <p>Verbosity level.</p>
-<p>Default: '3'</p>
-<p>Be more or less verbose.  Recognized values are in the range 0..6:</p>
-<ol>
-<li><strong><a name="silent" class="item">(silent)</a></strong>
+
+<p>Default: &#39;3&#39;</p>
+
+<p>Be more or less verbose. Recognized values are in the range 0..6:</p>
+
+<dl>
+
+<dt id="silent">0 (silent)</dt>
+<dd>
 
 <p>Disable all diagnostic messages.</p>
-</li>
-<li><strong><a name="errors" class="item">(errors)</a></strong>
+
+</dd>
+<dt id="errors">1 (errors)</dt>
+<dd>
 
 <p>Print error messages to stderr.</p>
-</li>
-<li><strong><a name="warnings" class="item">(warnings)</a></strong>
+
+</dd>
+<dt id="warnings">2 (warnings)</dt>
+<dd>
 
 <p>Print warnings to stderr.</p>
-</li>
-<li><strong><a name="info" class="item">(info)</a></strong>
+
+</dd>
+<dt id="info">3 (info)</dt>
+<dd>
 
 <p>Print general diagnostic information to stderr.</p>
-</li>
-<li><strong><a name="progress" class="item">(progress)</a></strong>
+
+</dd>
+<dt id="progress">4 (progress)</dt>
+<dd>
 
 <p>Print progress information to stderr.</p>
-</li>
-<li><strong><a name="debug" class="item">(debug)</a></strong>
+
+</dd>
+<dt id="debug">5 (debug)</dt>
+<dd>
 
 <p>Print debugging information to stderr (if applicable).</p>
-</li>
-<li><strong><a name="trace" class="item">(trace)</a></strong>
+
+</dd>
+<dt id="trace">6 (trace)</dt>
+<dd>
 
 <p>Print execution trace information to stderr (if applicable).</p>
-</li>
-</ol>
-</dd>
-<dt><strong><a name="no_banner_b" class="item"><code>--no-banner</code> , <code>-B</code></a></strong></dt>
 
+</dd>
+</dl>
+
+</dd>
+<dt id="no-banner--B"><code>--no-banner</code> , <code>-B</code></dt>
 <dd>
+
 <p>Suppress initial banner message (implied at verbosity levels &lt;= 2)</p>
-<p>Default: '0'</p>
-</dd>
-<dt><strong><a name="flavors_file_ffile" class="item"><code>--flavors=FILE</code> , <code>-fFILE</code></a></strong></dt>
 
+<p>Default: &#39;0&#39;</p>
+
+</dd>
+<dt id="flavors-FILE--fFILE"><code>--flavors=FILE</code> , <code>-fFILE</code></dt>
 <dd>
+
 <p>Use flavor heuristics from FILE (default=built-in).</p>
-<p>Default: 'NULL'</p>
-<p>If specified, FILE should be a list of token classification rules, one rule per line,
-in order of decreasing precedence.
-Each line is a TAB-separated list whose first field is a symbolic flavor label (conventionally
-beginning with the character '@'), and whose second field is a regular expression.</p>
-</dd>
-<dt><strong><a name="default_flavor_label_flabel" class="item"><code>--default-flavor=LABEL</code> , <code>-FLABEL</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>If specified, FILE should be a list of token classification rules, one rule per line, in order of decreasing precedence. Each line is a TAB-separated list whose first field is a symbolic flavor label (conventionally beginning with the character &#39;@&#39;), and whose second field is a regular expression.</p>
+
+</dd>
+<dt id="default-flavor-LABEL--FLABEL"><code>--default-flavor=LABEL</code> , <code>-FLABEL</code></dt>
 <dd>
+
 <p>Use LABEL as the default flavor (default=empty string or from flavor-file).</p>
-<p>Default: 'NULL'</p>
-</dd>
-<dt><strong><a name="list_l" class="item"><code>--list</code> , <code>-l</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+</dd>
+<dt id="list--l"><code>--list</code> , <code>-l</code></dt>
 <dd>
+
 <p>INPUTs are file-lists, not filenames.</p>
-<p>Default: '0'</p>
+
+<p>Default: &#39;0&#39;</p>
+
 <p>Useful for large batch-processing jobs.</p>
-</dd>
-<dt><strong><a name="output_file_ofile" class="item"><code>--output=FILE</code> , <code>-oFILE</code></a></strong></dt>
 
+</dd>
+<dt id="output-FILE--oFILE"><code>--output=FILE</code> , <code>-oFILE</code></dt>
 <dd>
+
 <p>Specify output file (default=stdout).</p>
-<p>Default: '-'</p>
+
+<p>Default: &#39;-&#39;</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<h2><a name="format_options">Format Options</a></h2>
+
+<h2 id="Format-Options">Format Options</h2>
+
 <dl>
-<dt><strong><a name="input_format_format_iformat" class="item"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></a></strong></dt>
 
+<dt id="input-format-FORMAT--IFORMAT"><code>--input-format=FORMAT</code> , <code>-IFORMAT</code></dt>
 <dd>
+
 <p>Specify input file(s) format(s).</p>
-<p>Default: 'NULL'</p>
-<p>Value should be a comma-separated list of format flag names,
-optionally prefixed with an exclamation point (!) to indicate
-negation.</p>
-<p>Default='MediumRare'</p>
-<p>See 'I/O Format Flags' in <a href="././mootfiles.html">the mootfiles manpage</a> for details.</p>
-</dd>
-<dt><strong><a name="output_format_format_oformat" class="item"><code>--output-format=FORMAT</code> , <code>-OFORMAT</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>Value should be a comma-separated list of format flag names, optionally prefixed with an exclamation point (!) to indicate negation.</p>
+
+<p>Default=&#39;MediumRare&#39;</p>
+
+<p>See &#39;I/O Format Flags&#39; in <a href="./mootfiles.html">mootfiles</a> for details.</p>
+
+</dd>
+<dt id="output-format-FORMAT--OFORMAT"><code>--output-format=FORMAT</code> , <code>-OFORMAT</code></dt>
 <dd>
+
 <p>Specify output file format.</p>
-<p>Default: 'NULL'</p>
-<p>Value should be a comma-separated list of format flag names,
-optionally prefixed with an exclamation point (!) to indicate
-negation.</p>
-<p>Default='WellDone'</p>
-<p>See 'I/O Format Flags' in <a href="././mootfiles.html">the mootfiles manpage</a> for details.</p>
-</dd>
-<dt><strong><a name="input_encoding_encoding" class="item"><code>--input-encoding=ENCODING</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>Value should be a comma-separated list of format flag names, optionally prefixed with an exclamation point (!) to indicate negation.</p>
+
+<p>Default=&#39;WellDone&#39;</p>
+
+<p>See &#39;I/O Format Flags&#39; in <a href="./mootfiles.html">mootfiles</a> for details.</p>
+
+</dd>
+<dt id="input-encoding-ENCODING"><code>--input-encoding=ENCODING</code></dt>
 <dd>
+
 <p>Override XML document input encoding.</p>
-<p>Default: 'NULL'</p>
-<p>Potentially useful for XML documents without encoding declarations.</p>
-</dd>
-<dt><strong><a name="output_encoding_encoding" class="item"><code>--output-encoding=ENCODING</code></a></strong></dt>
 
+<p>Default: &#39;NULL&#39;</p>
+
+<p>Potentially useful for XML documents without encoding declarations.</p>
+
+</dd>
+<dt id="output-encoding-ENCODING"><code>--output-encoding=ENCODING</code></dt>
 <dd>
+
 <p>Set default XML output encoding.</p>
-<p>Default: 'NULL'</p>
+
+<p>Default: &#39;NULL&#39;</p>
+
 <p>Slower, but potentially useful for human-readable XML output.</p>
+
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="configuration_files">CONFIGURATION FILES</a></h1>
+
+<h1 id="CONFIGURATION-FILES">CONFIGURATION FILES</h1>
+
 <p>Configuration files are expected to contain lines of the form:</p>
-<pre>
-    LONG_OPTION_NAME    OPTION_VALUE</pre>
-<p>where LONG_OPTION_NAME is the long name of some option,
-without the leading '--', and OPTION_VALUE is the value for
-that option, if any.  Fields are whitespace-separated.
-Blank lines and comments (lines beginning with '#')
-are ignored.</p>
+
+<pre><code>    LONG_OPTION_NAME    OPTION_VALUE</code></pre>
+
+<p>where LONG_OPTION_NAME is the long name of some option, without the leading &#39;--&#39;, and OPTION_VALUE is the value for that option, if any. Fields are whitespace-separated. Blank lines and comments (lines beginning with &#39;#&#39;) are ignored.</p>
+
 <p>The following configuration files are read by default:</p>
+
 <ul>
-<li><strong><a name="etc_moottasterc" class="item">/etc/moottasterc</a></strong>
+
+<li><p>/etc/moottasterc</p>
 
 </li>
-<li><strong><a name="moottasterc" class="item">~/.moottasterc</a></strong>
+<li><p>~/.moottasterc</p>
 
 </li>
 </ul>
-<p>
-</p>
-<hr />
-<h1><a name="addenda">ADDENDA</a></h1>
-<p>
-</p>
-<h2><a name="about_this_document">About this Document</a></h2>
-<p>Documentation file auto-generated by optgen.perl version 0.07
-using Getopt::Gen version 0.13.
-Translation was initiated
-as:</p>
-<pre>
-   optgen.perl -l --nocfile --nohfile --notimestamp -F moottaste moottaste.gog</pre>
-<p>
-</p>
-<hr />
-<h1><a name="bugs_and_limitations">BUGS AND LIMITATIONS</a></h1>
+
+<h1 id="ADDENDA">ADDENDA</h1>
+
+<h2 id="About-this-Document">About this Document</h2>
+
+<p>Documentation file auto-generated by optgen.perl version 0.07 using Getopt::Gen version 0.14. Translation was initiated as:</p>
+
+<pre><code>   optgen.perl -l --nocfile --nohfile --notimestamp -F moottaste moottaste.gog</code></pre>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
 <p>None known.</p>
-<p>
-</p>
-<hr />
-<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
-<p>Initial development of the this was supported by the project
-'Kollokationen im W&ouml;rterbuch'
-( &quot;collocations in the dictionary&quot;, <a href="http://www.bbaw.de/forschung/kollokationen">http://www.bbaw.de/forschung/kollokationen</a> )
-in association with the project
-'Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)'
-( &quot;digital dictionary of the German language of the 20th century&quot;, <a href="http://www.dwds.de">http://www.dwds.de</a> )
-at the Berlin-Brandenburgische Akademie der Wissenschaften ( <a href="http://www.bbaw.de">http://www.bbaw.de</a> )
-with funding from
-the Alexander von Humboldt Stiftung ( <a href="http://www.avh.de">http://www.avh.de</a> )
-and from the Zukunftsinvestitionsprogramm of the
-German federal government.
-Development of the DynHMM and WASTE extensions was
-supported by the DFG-funded projects
-'Deutsches Textarchiv' ( &quot;German text archive&quot;, <a href="http://www.deutschestextarchiv.de">http://www.deutschestextarchiv.de</a> )
-and 'DLEX'
-at the Berlin-Brandenburgische Akademie der Wissenschaften.</p>
-<p>The authors are grateful to Christiane Fellbaum, Alexander Geyken,
-Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others
-for offering useful insights in the course of development
-of this package.
-Thomas Hanneforth wrote and maintains the libFSM C++ library
-for finite-state device operations used by the
-class-based HMM tagger / disambiguator, without which
-moot could not have been built.
-Alexander Geyken and Thomas Hanneforth developed the
-rule-based morphological analysis system for German
-which was used in the development and testing of the
-class-based HMM tagger / disambiguator.</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Bryan Jurish &lt;<a href="mailto:moocow@cpan.org">moocow@cpan.org</a>&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p><a href="././moot.html">the moot manpage</a>
-<a href="././mootfiles.html">the mootfiles manpage</a>
-<a href="././mootpp.html">the mootpp manpage</a>,
-<code>mootm(1)</code>,
-<a href="././mootrain.html">the mootrain manpage</a>,
-<a href="././mootcompile.html">the mootcompile manpage</a>,
-<a href="././mootdump.html">the mootdump manpage</a>,
-<a href="././mooteval.html">the mooteval manpage</a>,</p>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Initial development of the this was supported by the project &#39;Kollokationen im W&ouml;rterbuch&#39; ( &quot;collocations in the dictionary&quot;, http://www.bbaw.de/forschung/kollokationen ) in association with the project &#39;Digitales W&ouml;rterbuch der deutschen Sprache des 20. Jahrhunderts (DWDS)&#39; ( &quot;digital dictionary of the German language of the 20th century&quot;, http://www.dwds.de ) at the Berlin-Brandenburgische Akademie der Wissenschaften ( http://www.bbaw.de ) with funding from the Alexander von Humboldt Stiftung ( http://www.avh.de ) and from the Zukunftsinvestitionsprogramm of the German federal government. Development of the DynHMM and WASTE extensions was supported by the DFG-funded projects &#39;Deutsches Textarchiv&#39; ( &quot;German text archive&quot;, http://www.deutschestextarchiv.de ) and &#39;DLEX&#39; at the Berlin-Brandenburgische Akademie der Wissenschaften.</p>
+
+<p>The authors are grateful to Christiane Fellbaum, Alexander Geyken, Gerald Neumann, Edmund Pohl, Alexey Sokirko, and others for offering useful insights in the course of development of this package. Thomas Hanneforth wrote and maintains the libFSM C++ library for finite-state device operations used by the class-based HMM tagger / disambiguator, without which moot could not have been built. Alexander Geyken and Thomas Hanneforth developed the rule-based morphological analysis system for German which was used in the development and testing of the class-based HMM tagger / disambiguator.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="./moot.html">moot</a> <a href="./mootfiles.html">mootfiles</a> <a href="./mootpp.html">mootpp</a>, mootm(1), <a href="./mootrain.html">mootrain</a>, <a href="./mootcompile.html">mootcompile</a>, <a href="./mootdump.html">mootdump</a>, <a href="./mooteval.html">mooteval</a>,</p>
+
 
 </body>
 
 </html>
+
+

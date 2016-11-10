@@ -50,6 +50,44 @@ const char* mootTokenTypeNames[NTokTypes] =
   };
 
 /*--------------------------------------------------------------------------
+ * mootToken::Analysis
+ */
+void mootToken::Analysis::dump(const char *label, FILE *f) const
+{
+  if (f==NULL) f=stderr;
+  fputs(" + ",f);
+  if (label) {
+    fputs(label,f);
+    fputc(' ',f);
+  }
+  fprintf(f, "ANALYSIS %p <%f>: tag=", this, prob);
+  fwrite(tag.data(), 1, tag.size(), f);
+  fprintf(f, " ; details=");
+  fwrite(details.data(), 1, details.size(), f);
+  fputc('\n', f);
+  fflush(f);
+}
+  
+/*--------------------------------------------------------------------------
+ * mootToken
+ */
+void mootToken::dump(const char *label, FILE *f) const
+{
+  if (f==NULL) f=stderr;
+  if (label) {
+    fputs(label,f);
+    fputc(' ',f);
+  }
+  fprintf(f, "TOKEN:%s %p [%lu %lu]: ", mootTokenTypeNames[tok_type], this, tok_location.offset, tok_location.length);
+  fwrite(tok_text.data(), 1, tok_text.size(), f);
+  fputc('\n',f);
+  for (mootToken::Analyses::const_iterator ai=tok_analyses.begin(); ai != tok_analyses.end(); ++ai) {
+    ai->dump(NULL,f);
+  }
+  fflush(f);
+}
+
+/*--------------------------------------------------------------------------
  * mootSentence
  */
 mootToken &sentence_printf_append(mootSentence &s, mootTokenType typ, const char *fmt, ...)

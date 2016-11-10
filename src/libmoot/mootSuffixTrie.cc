@@ -165,7 +165,7 @@ bool SuffixTrie::build(const mootLexfreqs &lf,
     fprintf(stderr, "\nSuffixTrie::build(): insertion FAILED.\n");
     return false;
   }
-  DEBUG(fprintf(stderr, "\n->DEBUG: post-insert: pending size=%u\n", trie_pending.size()));
+  DEBUG(fprintf(stderr, "\n->DEBUG: post-insert: pending size=%zu\n", trie_pending.size()));
 
 
   //-- compile: populate adjaceny table
@@ -184,7 +184,7 @@ bool SuffixTrie::build(const mootLexfreqs &lf,
     fprintf(stderr, "\nSuffixTrie::build(): empty trie -- aborting build.\n");
     return false;
   }
-  DEBUG(fprintf(stderr, "\n->DEBUG: begin()->data.size()=%u\n", begin()->data.size()));
+  DEBUG(fprintf(stderr, "\n->DEBUG: begin()->data.size()=%zu\n", begin()->data.size()));
 
 
   //-- smooth: theta: compute smoothing constants
@@ -320,7 +320,7 @@ bool SuffixTrie::_build_compute_theta(const mootLexfreqs &lf,
   //---------------------------------------------------------------
 
   DEBUG(fprintf(stderr, \
-		"\n-> DEBUG[Brants]: size=%u; lextotal=%g ; ugtotal=%g ; ntags=%g; pavg=%g; theta=%g\n",\
+		"\n-> DEBUG[Brants]: size=%zu; lextotal=%g ; ugtotal=%g ; ntags=%g; pavg=%g; theta=%g\n",\
 		size(), lf.n_tokens, ugtotal, ntags, pavg, theta));
 
 #elif defined(SMOOTH_ALA_STDDEV)

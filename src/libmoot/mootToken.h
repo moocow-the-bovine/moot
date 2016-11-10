@@ -47,6 +47,19 @@
 #define MOOT_TNT_COMPAT 1
 //#undef MOOT_TNT_COMPAT
 
+/**
+ * \def MOOT_TOKEN_DEBUG
+ * include token debugging code?
+ */
+#define MOOT_TOKEN_DEBUG 1
+#undef MOOT_TOKEN_DEBUG
+
+#ifdef MOOT_TOKEN_DEBUG
+# define TOKDEBUG(x) x
+#else
+# define TOKDEBUG(x)
+#endif
+
 namespace moot {
   using namespace std;
 
@@ -159,6 +172,14 @@ public:
 	data(NULL)
     {};
 
+    /** copy constructor */
+    Analysis(const Analysis &x)
+      : tag(x.tag),
+	details(x.details),
+	prob(x.prob),
+	data(x.data)
+    {};
+
     /** Clear this object (except for data) */
     inline void clear(void) {
       tag.clear();
@@ -188,7 +209,9 @@ public:
     {
       return x.prob == y.prob && x.tag == y.tag && x.details == y.details;
     }
-    
+
+    /** debug */
+    void dump(const char *label=NULL, FILE *f=NULL) const;
   }; //-- /mootToken::Analysis
 
 
@@ -208,6 +231,13 @@ public:
       : offset(my_offset),
 	length(my_length)
     {};
+
+    /** copy constructor */
+    inline Location(const Location &x)
+      : offset(x.offset),
+	length(x.length)
+    {};
+    
     /** Clear this object (reset to defaults) */
     inline void clear(void)
     {
@@ -289,6 +319,16 @@ public:
       tok_data(NULL)
   {};
 
+  /** copy constructor */
+  mootToken(const mootToken& x)
+    : tok_type(x.tok_type),
+      tok_text(x.tok_text),
+      tok_besttag(x.tok_besttag),
+      tok_analyses(x.tok_analyses),
+      tok_location(x.tok_location),
+      tok_data(x.tok_data)
+  {};
+
   /** Constructor for text-only tokens from C buffer of known length */
   /*
   mootToken(mootTokenType type=TokTypeVanilla, const char *text, size_t len)
@@ -299,7 +339,13 @@ public:
   */
 
   /* Destructor */
-  ~mootToken(void) {};
+  ~mootToken(void) {
+#if 0
+    if (tok_location.offset>=680307 && tok_location.offset<=680400) {
+      dump();	//-- debug
+    }
+#endif
+  };
 
   /*------------------------------------------------------------
    * Operators
@@ -322,7 +368,18 @@ public:
       || x.tok_besttag < y.tok_besttag
       || x.tok_analyses < y.tok_analyses;
   };
- 
+
+  /** assignment operator */
+  inline mootToken& operator =(const mootToken &x)
+  {
+    tok_type = x.tok_type;
+    tok_text = x.tok_text;
+    tok_besttag = x.tok_besttag;
+    tok_analyses = x.tok_analyses;
+    tok_location = x.tok_location;
+    tok_data = x.tok_data;
+    return *this;
+  };
 
   /*------------------------------------------------------------
    * Manipulators: General
@@ -535,7 +592,13 @@ public:
 	dst_tagset->insert(tok_besttag);
     }
   };
-  
+
+  /*------------------------------------------------------------
+   * Debugging
+   */
+  /** dump token data in human-readable format to file f (default=stderr) */
+  void dump(const char *label=NULL, FILE *f=NULL) const;
+
 }; //-- /mootToken
 
 

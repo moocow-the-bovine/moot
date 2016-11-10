@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>moot TUTORIAL</title>
+<title></title>
 <link rel="stylesheet" href="moottut.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
@@ -11,214 +11,129 @@
 <body>
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
-
-	<li><a href="#moot_tutorial">moot TUTORIAL</a></li>
-	<li><a href="#the_big_idea">The Big Idea</a></li>
-	<li><a href="#training">Training</a></li>
-	<ul>
-
-		<li><a href="#training_from_a_tagged_corpus">Training from a Tagged Corpus</a></li>
-		<li><a href="#training_from_a_tagged_and_analyzed_corpus">Training from a Tagged and Analyzed Corpus</a></li>
-		<ul>
-
-			<li><a href="#caveat_praeceptor">Caveat Praeceptor</a></li>
-		</ul>
-
-	</ul>
-
-	<li><a href="#tokenization">Tokenization</a></li>
-	<li><a href="#analysis__optional_">Analysis (Optional)</a></li>
-	<li><a href="#tagging">Tagging</a></li>
-	<ul>
-
-		<li><a href="#tagging__rare_cooked_input">Tagging: Rare Cooked Input</a></li>
-		<li><a href="#tagging__medium_rare_cooked_input">Tagging: Medium Rare Cooked Input</a></li>
-	</ul>
-
-	<li><a href="#evaluation">Evaluation</a></li>
-	<li><a href="#example_files">Example Files</a></li>
-	<ul>
-
-		<li><a href="#corpus_ttt___medium_cooked_file">corpus.ttt : medium cooked file</a></li>
-		<li><a href="#corpus_wdt___well_done_cooked_file">corpus.wdt : well done cooked file</a></li>
-		<li><a href="#test_txt___raw_text_file">test.txt : raw text file</a></li>
-		<li><a href="#test_t___rare_cooked_file">test.t : rare cooked file</a></li>
-		<li><a href="#test_mr___medium_rare_cooked_file">test.mr : medium-rare cooked file</a></li>
-	</ul>
-
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
+<ul id="index">
+  <li><a href="#moot-TUTORIAL">moot TUTORIAL</a></li>
+  <li><a href="#The-Big-Idea">The Big Idea</a></li>
+  <li><a href="#Training">Training</a>
+    <ul>
+      <li><a href="#Training-from-a-Tagged-Corpus">Training from a Tagged Corpus</a></li>
+      <li><a href="#Training-from-a-Tagged-and-Analyzed-Corpus">Training from a Tagged and Analyzed Corpus</a>
+        <ul>
+          <li><a href="#Caveat-Praeceptor">Caveat Praeceptor</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#Tokenization">Tokenization</a></li>
+  <li><a href="#Analysis-Optional">Analysis (Optional)</a></li>
+  <li><a href="#Tagging">Tagging</a>
+    <ul>
+      <li><a href="#Tagging:-Rare-Cooked-Input">Tagging: Rare Cooked Input</a></li>
+      <li><a href="#Tagging:-Medium-Rare-Cooked-Input">Tagging: Medium Rare Cooked Input</a></li>
+    </ul>
+  </li>
+  <li><a href="#Evaluation">Evaluation</a></li>
+  <li><a href="#Example-Files">Example Files</a>
+    <ul>
+      <li><a href="#corpus.ttt-:-medium-cooked-file">corpus.ttt : medium cooked file</a></li>
+      <li><a href="#corpus.wdt-:-well-done-cooked-file">corpus.wdt : well done cooked file</a></li>
+      <li><a href="#test.txt-:-raw-text-file">test.txt : raw text file</a></li>
+      <li><a href="#test.t-:-rare-cooked-file">test.t : rare cooked file</a></li>
+      <li><a href="#test.mr-:-medium-rare-cooked-file">test.mr : medium-rare cooked file</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
 </ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<h1 id="moot-TUTORIAL">moot TUTORIAL</h1>
 
-<p>
-</p>
-<h1><a name="moot_tutorial">moot TUTORIAL</a></h1>
-<p>This document provides a rudimentary introduction to the
-moot PoS tagging utilities.  It should under no circumstances
-be considered a substitute for the individual program
-documentation.</p>
-<p>
-</p>
-<hr />
-<h1><a name="the_big_idea">The Big Idea</a></h1>
-<p>The moot utilities are designed for Part-of-Speech Tagging:
-assigning a single univocal <em>tag</em> to each input token.
-The runtime tagger (moot) determines which tags to assign
-by (sequence) maximization of uni-, bi-, and trigram probabilities,
-as well as lexical probabilties and optional lexical-class
-probabilities.  Probability data is passed to the runtime tagger
-in a <em>model</em>.  Runtime data to the tagger must be tokenized
-(&quot;cooked&quot;), and may optionally include for each input token a set
-of possible analyses (a <em>lexical class</em>) for that token.</p>
-<p>
-</p>
-<hr />
-<h1><a name="training">Training</a></h1>
-<p>Before an input file can be tagged, statistical data in the
-form of a <strong>model</strong> must first be provided.
-The easiest way to produce such a model is by using the
-<a href="././../programs/mootrain.html">mootrain</a> utility to gather frequency
-data from a pre-tagged corpus, thus inducing a maximum-likelihood
-model.</p>
-<p>
-</p>
-<h2><a name="training_from_a_tagged_corpus">Training from a Tagged Corpus</a></h2>
-<p>If you have a text-format corpus in the file
-&quot;corpus.ttt&quot; which is pre-tagged with the &quot;correct&quot;
-part-of-speech tags, then the incantation:</p>
-<pre>
- mootrain --lex --ngrams corpus.ttt</pre>
-<p>will produce the model files &quot;corpus.lex&quot; and &quot;corpus.123&quot;
-required for runtime tagging of tokens cooked &quot;rare&quot;.</p>
-<p>
-</p>
-<h2><a name="training_from_a_tagged_and_analyzed_corpus">Training from a Tagged and Analyzed Corpus</a></h2>
-<p>If you have a text-format corpus in the file
-&quot;corpus.wdt&quot; which is pre-tagged with the &quot;correct&quot;
-part-of-speech tags as well as lexical classes,
-then the incantation:</p>
-<pre>
- mootrain --lex --ngrams --classes corpus.wdt</pre>
-<p>will produce the model files &quot;corpus.lex&quot;, &quot;corpus.123&quot;,
-and &quot;corpus.clx&quot; required for runtime tagging of
-tokens cooked &quot;medium rare&quot;.</p>
-<p>If you are using <code>mootm(1)</code> to analyze incoming tokens,
-but your training corpus &quot;corpus.ttt&quot; contains only
-tags (and not analyses), you may generate an appropriate
-&quot;well done&quot; corpus file &quot;corpus.wdt&quot; from &quot;corpus.ttt&quot;
-by calling:</p>
-<pre>
- mootm -12 -m morph.gfst -s morph.lab -a -o corpus.wdt corpus.ttt</pre>
-<p>before calling &quot;mootrain&quot;.  See the <code>mootm(1)</code> manpage for details.</p>
-<p>
-</p>
-<h3><a name="caveat_praeceptor">Caveat Praeceptor</a></h3>
-<p>Note that training a model from a &quot;well-done&quot; corpus in the manner
-described above
-<strong>only</strong> makes sense if you plan to pass &quot;medium-rare&quot; files
-produced by <strong>exactly the same analyzer</strong> to &quot;moot&quot;
-when tagging new texts.
-In particular, if not all of the analyses to be passed in &quot;medium-rare&quot; files
-to the runtime tagger &quot;moot&quot; are encoded in the analysis fst &quot;morph.gfst&quot;
-(e.g. if some analyses are produced by a preprocessing stage), then such
-&quot;extra&quot; analyses should also be included in the &quot;well-done&quot; training corpus.
-Such an incompatibility between training and runtime analysis formats may
-seriously degrade tagger performance.
-Optionally, you can disregard the analysis information
-present in the model (if any) at tagger runtime by specifying the <code>--use-classes=0</code>
-option to &quot;moot&quot;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="tokenization">Tokenization</a></h1>
-<p>Assume you have some raw (unformatted) text to be tagged in the file
-&quot;test.txt&quot;.  Before the text can be tagged, it must first be
-split into indivdual tokens.  The moot utilities contain a
-rudimentary preprocessor, <a href="././../programs/mootpp.html">mootpp</a>, to perform
-this task.  The incantation:</p>
-<pre>
- mootpp -o test.t test.txt</pre>
-<p>will produce a &quot;rare&quot; cooked file &quot;test.t&quot; suitable for passing
-to the tagger or to an external analysis program.</p>
-<p>
-</p>
-<hr />
-<h1><a name="analysis__optional_">Analysis (Optional)</a></h1>
-<p>If you have an external analysis program such as <code>mootm(1)</code>
-which assigns (possibly empty) lexical classes to input tokens,
-and if your model contains lexical class information (i.e. if
-you trained from a &quot;well done&quot; corpus analyzed by the same program,
-and if the file &quot;corpus.clx&quot;
-contains entries for more than one lexical class), then you
-may at this point wish to filter &quot;test.t&quot; through your analysis
-program, yielding a 'medium-rare' file &quot;test.mr&quot;.</p>
-<p>For analyzing incoming tokens with the &quot;mootm&quot; program built
-with libgfsm support, using an analysis
-transducer &quot;morph.gfst&quot; and analysis labels &quot;morph.lab&quot;,
-the appropriate incantation is:</p>
-<pre>
- mootm -m morph.gfst -s morph.lab -a -o test.mr test.t</pre>
-<p>See the <code>mootm(1)</code> manpage for details.</p>
-<p>
-</p>
-<hr />
-<h1><a name="tagging">Tagging</a></h1>
-<p>Having trained a model, as well as tokenized (and optionally analyzed)
-your input file, you are now ready to call the runtime tagger,
-<a href="././../programs/moot.html">moot</a>.</p>
-<p>
-</p>
-<h2><a name="tagging__rare_cooked_input">Tagging: Rare Cooked Input</a></h2>
-<p>If you are not using an external analysis program,
-and if you have a trained model in the files &quot;corpus.lex&quot;
-and &quot;corpus.123&quot;, as well as a rare cooked file &quot;test.t&quot;
-to be tagged, then:</p>
-<pre>
- moot --model=corpus --use-classes=0 -o test.tt test.t</pre>
-<p>will produce a &quot;medium cooked&quot; (tagged) output file
-&quot;test.tt&quot;.</p>
-<p>
-</p>
-<h2><a name="tagging__medium_rare_cooked_input">Tagging: Medium Rare Cooked Input</a></h2>
-<p>If you are using an external analysis program such as <code>mootm(1)</code>,
-and if you have a trained model in the files &quot;corpus.lex&quot;,
-&quot;corpus.123&quot;, and &quot;corpus.clx&quot;, as well as a medium-rare cooked file &quot;test.mr&quot;
-to be tagged, then:</p>
-<pre>
- moot --model=corpus --use-classes=1 -o test.wd test.mr</pre>
-<p>will produce a &quot;well done&quot; (+tagged,+analyzed) output file
-&quot;test.wd&quot;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="evaluation">Evaluation</a></h1>
-<p>In the course of model development, it is customary to
-reserve a small portion of the hand-tagged training
-corpus for testing.  If you have such a medium cooked
-file &quot;test.ttt&quot; tagged with the &quot;truth&quot;, as well as
-a moot output file &quot;test.tt&quot; for the same tokens, you
-can check the accuracy of the tagger
-with the program <a href="././../programs/mooteval.html">mooteval</a>.</p>
-<pre>
- mooteval -2 test.ttt test.tt</pre>
-<p>
-</p>
-<hr />
-<h1><a name="example_files">Example Files</a></h1>
-<p>
-</p>
-<h2><a name="corpus_ttt___medium_cooked_file">corpus.ttt : medium cooked file</a></h2>
-<pre>
- %% File       : corpus.ttt
+<p>This document provides a rudimentary introduction to the moot PoS tagging utilities. It should under no circumstances be considered a substitute for the individual program documentation.</p>
+
+<h1 id="The-Big-Idea">The Big Idea</h1>
+
+<p>The moot utilities are designed for Part-of-Speech Tagging: assigning a single univocal <i>tag</i> to each input token. The runtime tagger (moot) determines which tags to assign by (sequence) maximization of uni-, bi-, and trigram probabilities, as well as lexical probabilties and optional lexical-class probabilities. Probability data is passed to the runtime tagger in a <i>model</i>. Runtime data to the tagger must be tokenized (&quot;cooked&quot;), and may optionally include for each input token a set of possible analyses (a <i>lexical class</i>) for that token.</p>
+
+<h1 id="Training">Training</h1>
+
+<p>Before an input file can be tagged, statistical data in the form of a <b>model</b> must first be provided. The easiest way to produce such a model is by using the <a href="./../programs/mootrain.html">mootrain</a> utility to gather frequency data from a pre-tagged corpus, thus inducing a maximum-likelihood model.</p>
+
+<h2 id="Training-from-a-Tagged-Corpus">Training from a Tagged Corpus</h2>
+
+<p>If you have a text-format corpus in the file &quot;corpus.ttt&quot; which is pre-tagged with the &quot;correct&quot; part-of-speech tags, then the incantation:</p>
+
+<pre><code> mootrain --lex --ngrams corpus.ttt</code></pre>
+
+<p>will produce the model files &quot;corpus.lex&quot; and &quot;corpus.123&quot; required for runtime tagging of tokens cooked &quot;rare&quot;.</p>
+
+<h2 id="Training-from-a-Tagged-and-Analyzed-Corpus">Training from a Tagged and Analyzed Corpus</h2>
+
+<p>If you have a text-format corpus in the file &quot;corpus.wdt&quot; which is pre-tagged with the &quot;correct&quot; part-of-speech tags as well as lexical classes, then the incantation:</p>
+
+<pre><code> mootrain --lex --ngrams --classes corpus.wdt</code></pre>
+
+<p>will produce the model files &quot;corpus.lex&quot;, &quot;corpus.123&quot;, and &quot;corpus.clx&quot; required for runtime tagging of tokens cooked &quot;medium rare&quot;.</p>
+
+<p>If you are using mootm(1) to analyze incoming tokens, but your training corpus &quot;corpus.ttt&quot; contains only tags (and not analyses), you may generate an appropriate &quot;well done&quot; corpus file &quot;corpus.wdt&quot; from &quot;corpus.ttt&quot; by calling:</p>
+
+<pre><code> mootm -12 -m morph.gfst -s morph.lab -a -o corpus.wdt corpus.ttt</code></pre>
+
+<p>before calling &quot;mootrain&quot;. See the mootm(1) manpage for details.</p>
+
+<h3 id="Caveat-Praeceptor">Caveat Praeceptor</h3>
+
+<p>Note that training a model from a &quot;well-done&quot; corpus in the manner described above <b>only</b> makes sense if you plan to pass &quot;medium-rare&quot; files produced by <b>exactly the same analyzer</b> to &quot;moot&quot; when tagging new texts. In particular, if not all of the analyses to be passed in &quot;medium-rare&quot; files to the runtime tagger &quot;moot&quot; are encoded in the analysis fst &quot;morph.gfst&quot; (e.g. if some analyses are produced by a preprocessing stage), then such &quot;extra&quot; analyses should also be included in the &quot;well-done&quot; training corpus. Such an incompatibility between training and runtime analysis formats may seriously degrade tagger performance. Optionally, you can disregard the analysis information present in the model (if any) at tagger runtime by specifying the <code>--use-classes=0</code> option to &quot;moot&quot;.</p>
+
+<h1 id="Tokenization">Tokenization</h1>
+
+<p>Assume you have some raw (unformatted) text to be tagged in the file &quot;test.txt&quot;. Before the text can be tagged, it must first be split into indivdual tokens. The moot utilities contain a rudimentary preprocessor, <a href="./../programs/mootpp.html">mootpp</a>, to perform this task. The incantation:</p>
+
+<pre><code> mootpp -o test.t test.txt</code></pre>
+
+<p>will produce a &quot;rare&quot; cooked file &quot;test.t&quot; suitable for passing to the tagger or to an external analysis program.</p>
+
+<h1 id="Analysis-Optional">Analysis (Optional)</h1>
+
+<p>If you have an external analysis program such as mootm(1) which assigns (possibly empty) lexical classes to input tokens, and if your model contains lexical class information (i.e. if you trained from a &quot;well done&quot; corpus analyzed by the same program, and if the file &quot;corpus.clx&quot; contains entries for more than one lexical class), then you may at this point wish to filter &quot;test.t&quot; through your analysis program, yielding a &#39;medium-rare&#39; file &quot;test.mr&quot;.</p>
+
+<p>For analyzing incoming tokens with the &quot;mootm&quot; program built with libgfsm support, using an analysis transducer &quot;morph.gfst&quot; and analysis labels &quot;morph.lab&quot;, the appropriate incantation is:</p>
+
+<pre><code> mootm -m morph.gfst -s morph.lab -a -o test.mr test.t</code></pre>
+
+<p>See the mootm(1) manpage for details.</p>
+
+<h1 id="Tagging">Tagging</h1>
+
+<p>Having trained a model, as well as tokenized (and optionally analyzed) your input file, you are now ready to call the runtime tagger, <a href="./../programs/moot.html">moot</a>.</p>
+
+<h2 id="Tagging:-Rare-Cooked-Input">Tagging: Rare Cooked Input</h2>
+
+<p>If you are not using an external analysis program, and if you have a trained model in the files &quot;corpus.lex&quot; and &quot;corpus.123&quot;, as well as a rare cooked file &quot;test.t&quot; to be tagged, then:</p>
+
+<pre><code> moot --model=corpus --use-classes=0 -o test.tt test.t</code></pre>
+
+<p>will produce a &quot;medium cooked&quot; (tagged) output file &quot;test.tt&quot;.</p>
+
+<h2 id="Tagging:-Medium-Rare-Cooked-Input">Tagging: Medium Rare Cooked Input</h2>
+
+<p>If you are using an external analysis program such as mootm(1), and if you have a trained model in the files &quot;corpus.lex&quot;, &quot;corpus.123&quot;, and &quot;corpus.clx&quot;, as well as a medium-rare cooked file &quot;test.mr&quot; to be tagged, then:</p>
+
+<pre><code> moot --model=corpus --use-classes=1 -o test.wd test.mr</code></pre>
+
+<p>will produce a &quot;well done&quot; (+tagged,+analyzed) output file &quot;test.wd&quot;.</p>
+
+<h1 id="Evaluation">Evaluation</h1>
+
+<p>In the course of model development, it is customary to reserve a small portion of the hand-tagged training corpus for testing. If you have such a medium cooked file &quot;test.ttt&quot; tagged with the &quot;truth&quot;, as well as a moot output file &quot;test.tt&quot; for the same tokens, you can check the accuracy of the tagger with the program <a href="./../programs/mooteval.html">mooteval</a>.</p>
+
+<pre><code> mooteval -2 test.ttt test.tt</code></pre>
+
+<h1 id="Example-Files">Example Files</h1>
+
+<h2 id="corpus.ttt-:-medium-cooked-file">corpus.ttt : medium cooked file</h2>
+
+<pre><code> %% File       : corpus.ttt
  %% Description: demonstration corpus for moot tutorial: +tagged,-analyzed
  
  %% Sentence 1
@@ -242,12 +157,11 @@ with the program <a href="././../programs/mooteval.html">mooteval</a>.</p>
  3rd            MD
  sentence       NN
  also           RR
- .              $.</pre>
-<p>
-</p>
-<h2><a name="corpus_wdt___well_done_cooked_file">corpus.wdt : well done cooked file</a></h2>
-<pre>
- %% File       : corpus.mttt
+ .              $.</code></pre>
+
+<h2 id="corpus.wdt-:-well-done-cooked-file">corpus.wdt : well done cooked file</h2>
+
+<pre><code> %% File       : corpus.mttt
  %% Description: demonstration corpus for moot tutorial: +tagged,+analyzed
  
  %% Sentence 1
@@ -271,17 +185,15 @@ with the program <a href="././../programs/mooteval.html">mooteval</a>.</p>
  3rd            MD
  sentence       NN      [NN]    [VBZ]
  also           RR      [RR]
- .              $.      [$.]</pre>
-<p>
-</p>
-<h2><a name="test_txt___raw_text_file">test.txt : raw text file</a></h2>
-<pre>
- This is a test.  This is ONLY a test.</pre>
-<p>
-</p>
-<h2><a name="test_t___rare_cooked_file">test.t : rare cooked file</a></h2>
-<pre>
- This
+ .              $.      [$.]</code></pre>
+
+<h2 id="test.txt-:-raw-text-file">test.txt : raw text file</h2>
+
+<pre><code> This is a test.  This is ONLY a test.</code></pre>
+
+<h2 id="test.t-:-rare-cooked-file">test.t : rare cooked file</h2>
+
+<pre><code> This
  is
  a
  test
@@ -292,12 +204,11 @@ with the program <a href="././../programs/mooteval.html">mooteval</a>.</p>
  ONLY
  a
  test
- .</pre>
-<p>
-</p>
-<h2><a name="test_mr___medium_rare_cooked_file">test.mr : medium-rare cooked file</a></h2>
-<pre>
- This   [AT]    [DD]
+ .</code></pre>
+
+<h2 id="test.mr-:-medium-rare-cooked-file">test.mr : medium-rare cooked file</h2>
+
+<pre><code> This   [AT]    [DD]
  is     [VBZ]
  a      [AT]
  test   [NN]    [VBZ]
@@ -308,18 +219,19 @@ with the program <a href="././../programs/mooteval.html">mooteval</a>.</p>
  ONLY
  a      [AT]
  test   [NN]    [VBZ]
- .      [$.]</pre>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Bryan Jurish &lt;<a href="mailto:jurish@uni-potsdam.de">jurish@uni-potsdam.de</a>&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p><code>mootutils(1)</code></p>
+ .      [$.]</code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;jurish@uni-potsdam.de&gt;</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>mootutils(1)</p>
+
 
 </body>
 
 </html>
+
+
