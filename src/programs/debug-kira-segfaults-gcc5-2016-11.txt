@@ -128,3 +128,27 @@ REPRODUCE:
     ~ wikipedia: ABI usually responsible for e.g.
       "the sizes, layouts, and alignments of data types"
       ... resonates with the mis-alignment by 128 bytes we're seeing
+  : CPPFLAGS=-D_GLIBCXX_USE_CXX11_ABI=0 also works on kira with gcc5
+    ~ interesting discussion at https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53646
+    ~ discussion on strings +/- copy-on-write at http://stackoverflow.com/questions/34571583/understanding-gcc-5s-glibcxx-use-cxx11-abi-or-the-new-abi
+      * problem description looks similar (failing only w/ c++11 abi)
+      * passing around (temporary) strings and c_str() is something moot does a lot of
+
+CHECK BINARY:
+- you can check which C++ABI a binary (library) uses by calling nm and looking for the '__cxx11' pseudo-namespace, e.g.
+    $ nm -C waste.g++-5-oldabi | grep -P '\bmootToken\b' | head ##-- g++ v5.x, old ABI, static [ok]
+    000000000041bf28 T moot::TokenBuffer::put_tokens(std::list<moot::mootToken, std::allocator<moot::mootToken> > const&)
+    000000000041bf92 T moot::TokenBuffer::put_sentence(std::list<moot::mootToken, std::allocator<moot::mootToken> > const&)
+  vs.
+    $ nm -C waste.g++-5 | grep -P '\bmootToken\b' | head ##-- g++ v5.x, default new ABI, static [crashes]
+    000000000041dc30 T moot::TokenBuffer::put_tokens(std::__cxx11::list<moot::mootToken, std::allocator<moot::mootToken> > const&)
+    000000000041dc9e T moot::TokenBuffer::put_sentence(std::__cxx11::list<moot::mootToken, std::allocator<moot::mootToken> > const&)
+  vs.
+    $ nm -C waste.g++-5 | grep -P '\bmootToken\b' | head ##-- g++ v4.9, default old ABI, static [ok]
+    000000000041b3d8 T moot::TokenBuffer::put_tokens(std::list<moot::mootToken, std::allocator<moot::mootToken> > const&)
+    000000000041b444 T moot::TokenBuffer::put_sentence(std::list<moot::mootToken, std::allocator<moot::mootToken> > const&)
+  vs.
+    $ nm -C /usr/local/lib/libmoot.so | grep -P '\bmootToken\b' | head ##-- g++ v4.9, default old ABI, dynamic [ok]
+    00000000000443f0 T moot::TokenBuffer::put_tokens(std::list<moot::mootToken, std::allocator<moot::mootToken> > const&)
+    0000000000043df0 T moot::TokenBuffer::put_sentence(std::list<moot::mootToken, std::allocator<moot::mootToken> > const&)
+
