@@ -119,3 +119,12 @@ SYMTPOMS:
   : dpkg-list.sh g++ = 4:5.3.1-1ubuntu1
 
 QUICK-FIX: use g++-4.9 build on kira for now
+
+REPRODUCE:
+- errors occur on ubuntu-16.04-64but virtual box @plato
+  : NO errors if configured with CPPFLAGS=-D_GLIBCXX_USE_CXX11_ABI=0
+    ~ flag switches off use of default c++11 ABI
+    ~ see https://developerblog.redhat.com/2015/02/05/gcc5-and-the-c11-abi/
+    ~ wikipedia: ABI usually responsible for e.g.
+      "the sizes, layouts, and alignments of data types"
+      ... resonates with the mis-alignment by 128 bytes we're seeing
