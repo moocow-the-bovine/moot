@@ -743,7 +743,7 @@ public:
   {
     this->close();
     tw_ostream = mostreamp;
-    if (!(tw_format&tiofNull) && (!tw_ostream || !tw_ostream->valid())) {
+    if ( !(tw_format&tiofNull) && (!tw_ostream || !tw_ostream->valid())) {
       this->carp("Warning: selecting output to invalid stream");
     }
     tw_ostream_created = false;
@@ -1004,7 +1004,7 @@ public:
 		    const std::string name="TokenWriterNative")
     : TokenWriter(fmt,name)
   {
-    if (! tw_format&tiofNative ) tw_format |= tiofNative;
+    if (! (tw_format&tiofNative) ) tw_format |= tiofNative;
   };
 
   /** Default destructor */

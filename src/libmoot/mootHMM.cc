@@ -1070,6 +1070,7 @@ void mootHMM::viterbi_flush(TokenWriter *writer, mootSentence &toks, ViterbiNode
       toks.push_back( mootToken("%%moot:trace FLUSH") );
       toks.back().insert("","",nod->lprob);
     }
+    TOKDEBUG(for (mootSentence::const_iterator si=toks.begin(); si!=toks.end(); ++si) { si->dump("VITERBI_FLUSH:PUT"); });
     writer->put_tokens(toks);
   }
 

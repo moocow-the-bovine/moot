@@ -321,6 +321,13 @@ int main (int argc, char **argv)
   TokenReader *churn_reader = NULL;
   TokenWriter *churn_writer = main_writer;
 
+#if 0
+  //-- debug: sizes
+  fprintf(stderr, "sizeof(mootToken) = %zu\n", sizeof(mootToken));
+  fprintf(stderr, "sizeof(mootToken::Analysis) = %zu\n", sizeof(mootToken::Analysis));
+  fprintf(stderr, "sizeof(wasteLexerToken) = %zu\n", sizeof(wasteLexerToken));
+#endif
+
   //-- setup: globals
   if (mode&wmScan) {
     churn_reader = scanner = new wasteTokenScanner( ifmt|(ofmt&tiofLocation) );

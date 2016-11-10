@@ -80,6 +80,7 @@ namespace moot {
     if (!waw_sink) return;
     mootToken alter_token = token;
     waw_annotator.annotate_token(alter_token);
+    TOKDEBUG(alter_token.dump("ANNOT:PUT"));
     waw_sink->put_token(alter_token);
   } 
 

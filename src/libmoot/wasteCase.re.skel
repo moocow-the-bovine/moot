@@ -1,6 +1,8 @@
 /*-*- Mode: C++; coding: utf-8; c-basic-offset: 2; -*-*/
 #include "wasteCase.h"
 
+#define UNUSED(x) {(void)(x);} /* avoid 'variable yych set but unused' warning for variable x */
+
 namespace moot {
 
 std::string utf8ToLower(const std::string &s)
@@ -25,7 +27,10 @@ std::string utf8ToLower(const std::string &s)
 
     //-- Explicit rules
     /*!re2c
-     (.|"\n")  { ls.push_back(*(sp-1)); continue; /* explicit last-dicth effort byte-identity fallback */ }
+     (.|"\n") {
+		UNUSED(yych);			 //-- avoid 'variable yych set but unused' warning
+		ls.push_back(*(sp-1)); continue; //-- explicit last-dicth effort byte-identity fallback
+              }
     */
   }
 
@@ -33,3 +38,5 @@ std::string utf8ToLower(const std::string &s)
 }
 
 }; /*-- /namespace moot */
+
+
