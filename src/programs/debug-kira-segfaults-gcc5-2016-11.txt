@@ -107,3 +107,15 @@ double-free	$cmd -sxtd --annotate			# *** Error in `./waste': double free or cor
 
 CONTINUE: print debugging readers/writers ?
 
+SYMTPOMS:
+- OK: waste built statically on www.dwds.de --> NO crash running on kira
+  : g++ --version    = g++ (Debian 4.9.2-10) 4.9.2
+  : dpkg-list.sh g++ = g++ 4:4.9.2-2
+- OK: waste built statically on kira with g++-4.9 --> NO crash on kira
+  : g++-4.9 --version    = g++-4.9 (Ubuntu 4.9.3-13ubuntu2) 4.9.3
+  : dpkg-list.sh g++-4.9 = g++-4.9 4.9.3-13ubuntu2")
+- BAD: on kira using default g++
+  : g++ --version    = Ubuntu 5.4.0-6ubuntu1~16.04.2) 5.4.0 20160609
+  : dpkg-list.sh g++ = 4:5.3.1-1ubuntu1
+
+QUICK-FIX: use g++-4.9 build on kira for now
