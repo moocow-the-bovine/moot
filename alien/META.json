@@ -16,7 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Alien::Base" : "0.001",
+            "Alien::Base::ModuleBuild" : "0.027",
             "Module::Build" : "0.38"
          }
       },
@@ -26,12 +26,18 @@
             "File::ShareDir" : "1.00",
             "perl" : "v5.8.9"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Text::ParseWords" : "0"
+         }
       }
    },
    "provides" : {
       "Alien::Moot" : {
          "file" : "lib/Alien/Moot.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -40,5 +46,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.001"
+   "version" : "0.002"
 }
