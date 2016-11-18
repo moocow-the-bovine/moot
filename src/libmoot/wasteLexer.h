@@ -280,7 +280,7 @@ namespace moot
 	  if (wl_current_tok==front) wl_current_tok=NULL; 
 	  if (wl_head_tok==front)    wl_head_tok=NULL;
 	  wl_lexbuf.pop_front();
-      }
+      };
       //@}
   };
 
