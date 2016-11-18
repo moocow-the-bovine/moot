@@ -79,7 +79,7 @@
 
 <h2 id="Raw-Text-Files">Raw Text Files</h2>
 
-<p>A &quot;raw&quot; text file is just that: any file consiting of (8-bit or variable-width encoded) characters. Such files may be processed by the <a href="./mootpp.html">mootpp</a> preprocessor to produce &quot;rare cooked&quot; (-tagged, -analyzed) text files, or by the <a>waste</a> tokenizer with an appropriate tokenization model. An example &quot;raw&quot; text file is:</p>
+<p>A &quot;raw&quot; text file is just that: any file consiting of (8-bit or variable-width encoded) characters. Such files may be processed by the <a href="./mootpp.html">mootpp</a> preprocessor to produce &quot;rare cooked&quot; (-tagged, -analyzed) text files, or by the <a href="./waste.html">waste</a> tokenizer with an appropriate tokenization model. An example &quot;raw&quot; text file is:</p>
 
 <pre><code> This is a test.  This too.</code></pre>
 
@@ -824,7 +824,7 @@
 
 <p>Note that the process locale settings (see locale(1), setlocale(3), locale(7)) -- in particular the value of <code>LC_CTYPE</code> -- can and do influence the behavior of the regular expression matching engine. The command-line moot utilities initialize the locale according to the user&#39;s environment variables on start-up. Expect the unexpected if your runtime locale settings differ from those used when training the model, however. For reference, the value of LC_CTYPE at training time is written as a comment to the flavor definition files produced by <a href="./mootrain.html">mootrain</a>, but this comment in and of itself has <b>no effect</b> on the operation of the runtime tagger; the user is responsible for ensuring that his or her locale settings are compatible with those expected by the model.</p>
 
-<p>The program <a>moottaste(1)</a> can be used to test and debug flavor definition files.</p>
+<p>The program <a href="./moottaste.html">moottaste(1)</a> can be used to test and debug flavor definition files.</p>
 
 </ul>
 

@@ -1,10 +1,11 @@
 ChangeLog for package moot
 
 v2.0.14 Thu, 10 Nov 2016 10:00:46 +0100 moocow
-	+ debugging crashes on kira (ubuntu 16.04.1 LTS / g++ 5.4.0-6ubuntu1~16.04.2 5.4.0 20160609 / deb 4:5.3.1-1ubuntu1)
+	+ fixed ugly crashes on kira (ubuntu 16.04.1 LTS / g++ 5.4.0-6ubuntu1~16.04.2 5.4.0 20160609 / deb 4:5.3.1-1ubuntu1)
 	  - bizarre "double free or corruption" errors, segfaults, and other strangeness on grenzboten, dta sources
 	  - only occurs when compiled with default gcc-5 (using package g++-4.9 for now)
-	  - merged svn+ssh://moocow@odo.dwds.de/home/svn/dev/moot/branches/moot-2.0.13-1+ubuntu-16-crash-debug -r 16689:16690 into trunk
+	  - workaround: new wasteLexer method lexbuf_pop_front() checks & clears buffer-pointers
+	    wl_current_tok, wl_head tok if they're popped from the token-buffer: seems to work
 	+ fixed some gcc warnings (unused variables, size_t printf formats, suggested parentheses)
 
 v2.0.13 Fri, 19 Sep 2014 16:58:57 +0200 kmw
