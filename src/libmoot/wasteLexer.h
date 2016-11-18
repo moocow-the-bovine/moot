@@ -1,7 +1,7 @@
-/* -*- Mode: C++; coding: utf-8; c-basic-offset: 2; -*- */
+/* -*- Mode: C++; coding: utf-8; c-basic-offset: 4; -*- */
 /*
    libmoot : moot part-of-speech tagging library
-   Copyright (C) 2013 by Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner
+   Copyright (C) 2013-2016 by Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -129,7 +129,7 @@ namespace moot
       typedef std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::string> > > > > > wasteTagset;
 
       /** List of wasteLexerToken for buffering while dehyphenating */
-      typedef std::list<wasteLexerToken> wasteTokenBuffer;
+      typedef std::list<wasteLexerToken> wasteLexerBuffer;
       //@}
 
       //--------------------------------------------------------------------
@@ -202,9 +202,9 @@ namespace moot
       //@{
       wasteTagset       wl_tagset;        /**< Token feature bundles */
       int               wl_state;         /**< Current state of the lexer */
-      wasteTokenBuffer  wl_tokbuf;        /**< Buffer for dehyphenation */
-      wasteLexerToken  *wl_current_tok;   /** current token under construction (NULL for none), pointer into wl_tokbuf */
-      wasteLexerToken  *wl_head_tok;      /** head of hyphenation sequence (NULL for none), pointer into wl_tokbuf */
+      wasteLexerBuffer  wl_lexbuf;        /**< Buffer for dehyphenation: list of wasteLexerToken */
+      wasteLexerToken  *wl_current_tok;   /**< current token under construction (NULL for none), pointer into wl_lexbuf */
+      wasteLexerToken  *wl_head_tok;      /**< head of hyphenation sequence (NULL for none), pointer into wl_lexbuf */
       bool              wl_dehyph_mode;   /**< Dehyphenation switch */
       //@}
 
@@ -253,16 +253,34 @@ namespace moot
         }
       }
 
-      /** Set token features (token.tok_analyses) w.r.t. model features **/
-      void set_token(mootToken &token, wasteLexerToken &lex_token);
+      /** Set token features (token.tok_analyses) w.r.t. model features from source lex_token **/
+      void set_token(mootToken &token, const wasteLexerToken &lex_token);
 
       /**
-       * Moves stok to internal buffer.
+       * copies stok to internal buffer.
        * If wl_dehyph_mode is true, seeks and removes hyphenations.
        */
-      void buffer_token(mootToken& stok);
+      void buffer_token(const mootToken& stok);
 
       void reset(void);
+      //@}
+
+      /*------------------------------------------------------------*/
+      /** \name low-level utilities */
+      //@{
+      /**
+       * wrapper for wl_lexbuf.pop_front() which may clear wl_current_tok, wl_head_tok
+       * \note calling this method may break auto-magic de-hyphenation
+       * \note workaround for crashes (segfault, double-free, heap corruption) on kira (g++5, ubuntu-16.04), 2016-11-18 (moocow);
+       *       see wasteLexer::get_token() at wasteLexer.cc:477
+       */
+      inline void lexbuf_pop_front(void)
+      {
+	  wasteLexerToken *front = &(wl_lexbuf.front());
+	  if (wl_current_tok==front) wl_current_tok=NULL; 
+	  if (wl_head_tok==front)    wl_head_tok=NULL;
+	  wl_lexbuf.pop_front();
+      }
       //@}
   };
 
