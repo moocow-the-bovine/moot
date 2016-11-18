@@ -87,6 +87,16 @@ Program received signal SIGABRT, Aborted.
 ###  + naming the file *.txt which build/xml_tok/Makefile deletes
 ###  + shit; see emails to Kay for summary information
 
+###  valgrind errors say "Invalid write of size 1 at 0x46B51F: moot::wasteLexer::buffer_token(moot::mootToken&) (wasteLexer.cc:216)"
+### code is:
+###    wl_current_tok->S = true;
+###  in switch() case TokTypeSB
+###
+### https://web.stanford.edu/class/cs107/guide_valgrind.html says about this kind of valgrind error:
+###   "Invalid read/write of size X" The program was observed to read/write X bytes of memory that was invalid.
+###   Common causes include accessing beyond the end of a heap block, accessing memory that has been freed, or
+###   accessing into an unallocated region such as from use of a uninitialized pointer.
+
 ### glibc MALLOC_CHECK_ set to anything at all: no errors
 ### compile with -D_GLIBCXX_DEBUG: no errors
 ###  -> see https://en.wikibooks.org/wiki/Linux_Applications_Debugging_Techniques/Heap_corruption
@@ -151,4 +161,454 @@ CHECK BINARY:
     $ nm -C /usr/local/lib/libmoot.so | grep -P '\bmootToken\b' | head ##-- g++ v4.9, default old ABI, dynamic [ok]
     00000000000443f0 T moot::TokenBuffer::put_tokens(std::list<moot::mootToken, std::allocator<moot::mootToken> > const&)
     0000000000043df0 T moot::TokenBuffer::put_sentence(std::list<moot::mootToken, std::allocator<moot::mootToken> > const&)
+
+
+##--- 2016-11-17: crashes in gb-debug for FILE(s):
+# cmdline = waste -v2 -Owd,loc --abbrevs=/home/ddc-dstar/dstar/resources/waste/abbr.lex --stopwords=/home/ddc-dstar/dstar/resources/waste/stop.lex --conjunctions=/home/ddc-dstar/dstar/resources/waste/conj.lex --model=/home/ddc-dstar/dstar/resources/waste/model.hmm in/FILE.txt.txt -o out/FILE.txt.t0
+grenzboten_341578_97779	: Segmentation fault      (core dumped) "${cmd[@]}"
+grenzboten_341867_228301 : double free or corruption (out): 0x0000000000c25810 ***
+grenzboten_341871_290410 : double free or corruption (out): 0x0000000000a44d50 ***
+grenzboten_341578_281149 : double free or corruption (out): 0x0000000002a41080 ***
+grenzboten_341811_124705 : malloc(): memory corruption: 0x0000000001277420 ***
+grenzboten_341793_111431 : free(): invalid next size (normal): 0x0000000000b56430 ***
+grenzboten_341833_157968 : free(): invalid next size (normal): 0x0000000000a93730 ***
+grenzboten_341855_211167 : free(): invalid next size (normal): 0x0000000002214500 ***
+grenzboten_341813_125781 : free(): invalid next size (normal): 0x0000000002883c10 ***
+grenzboten_341563_279547 : double free or corruption (out): 0x00000000008bc900 ***
+grenzboten_341873_235171 : malloc(): memory corruption: 0x0000000000d58140 ***
+grenzboten_341853_209866 : free(): invalid next size (fast): 0x000000000181f420 ***
+
+
+##======================================================================
+## TASK: compare crash behavior of different files
+
+## + valgrind always reports "invalid write of size 1" @ wasteLExer.cc:216
+##   - even for files which run through ok
+
+##--------------------------------------------------------------
+## NOCRASH: grenzboten_grenzboten_341568_92288 (ok)
+(gdb) n/a
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## VALGRIND: grenzboten_341578_97779 (segfault)
+==109508== Memcheck, a memory error detector
+==109508== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
+==109508== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
+==109508== Command: ./waste -v2 -Owd,loc --abbrevs=/home/ddc-dstar/dstar/resources/waste/abbr.lex --stopwords=/home/ddc-dstar/dstar/resources/waste/stop.lex --conjunctions=/home/ddc-dstar/dstar/resources/waste/conj.lex --model=/home/ddc-dstar/dstar/resources/waste/model.hmm in/grenzboten_341568_92288.txt.txt -o out/grenzboten_341568_92288.txt.t0
+==109508== 
+==109508== Invalid write of size 1
+==109508==    at 0x46B51F: moot::wasteLexer::buffer_token(moot::mootToken&) (wasteLexer.cc:216)
+==109508==    by 0x46C295: moot::wasteLexerReader::get_token() (wasteLexer.cc:457)
+==109508==    by 0x427E19: moot::mootHMM::tag_stream(moot::TokenReader*, moot::TokenWriter*) (mootHMM.cc:1033)
+==109508==    by 0x405508: churn_io(moot::TokenReader*, moot::TokenWriter*, moot::mootHMM*) (waste_main.cc:277)
+==109508==    by 0x405CB0: main (waste_main.cc:367)
+==109508==  Address 0x6489e2e is 142 bytes inside a block of size 144 free'd
+==109508==    at 0x4C2F24B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==109508==    by 0x47207D: __gnu_cxx::new_allocator<std::_List_node<moot::wasteLexerToken> >::deallocate(std::_List_node<moot::wasteLexerToken>*, unsigned long) (new_allocator.h:110)
+==109508==    by 0x46F7A5: std::__cxx11::_List_base<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_put_node(std::_List_node<moot::wasteLexerToken>*) (stl_list.h:396)
+==109508==    by 0x46F242: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_erase(std::_List_iterator<moot::wasteLexerToken>) (stl_list.h:1781)
+==109508==    by 0x46DA9B: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::pop_front() (stl_list.h:1075)
+==109508==    by 0x46C385: moot::wasteLexerReader::get_token() (wasteLexer.cc:477)
+==109508==    by 0x427E19: moot::mootHMM::tag_stream(moot::TokenReader*, moot::TokenWriter*) (mootHMM.cc:1033)
+==109508==    by 0x405508: churn_io(moot::TokenReader*, moot::TokenWriter*, moot::mootHMM*) (waste_main.cc:277)
+==109508==    by 0x405CB0: main (waste_main.cc:367)
+==109508==  Block was alloc'd at
+==109508==    at 0x4C2E0EF: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==109508==    by 0x474987: __gnu_cxx::new_allocator<std::_List_node<moot::wasteLexerToken> >::allocate(unsigned long, void const*) (new_allocator.h:104)
+==109508==    by 0x4735CF: std::__cxx11::_List_base<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_get_node() (stl_list.h:392)
+==109508==    by 0x471B87: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_create_node(moot::wasteLexerToken const&) (stl_list.h:553)
+==109508==    by 0x46F136: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_insert(std::_List_iterator<moot::wasteLexerToken>, moot::wasteLexerToken const&) (stl_list.h:1754)
+==109508==    by 0x46D905: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::push_back(moot::wasteLexerToken const&) (stl_list.h:1089)
+==109508==    by 0x46B4A6: moot::wasteLexer::buffer_token(moot::mootToken&) (wasteLexer.cc:201)
+==109508==    by 0x46C295: moot::wasteLexerReader::get_token() (wasteLexer.cc:457)
+==109508==    by 0x427E19: moot::mootHMM::tag_stream(moot::TokenReader*, moot::TokenWriter*) (mootHMM.cc:1033)
+==109508==    by 0x405508: churn_io(moot::TokenReader*, moot::TokenWriter*, moot::mootHMM*) (waste_main.cc:277)
+==109508==    by 0x405CB0: main (waste_main.cc:367)
+==109508== 
+==109508== 
+==109508== HEAP SUMMARY:
+==109508==     in use at exit: 122,490 bytes in 18 blocks
+==109508==   total heap usage: 21,502,052 allocs, 21,502,034 frees, 1,139,195,425 bytes allocated
+==109508== 
+==109508== 40 bytes in 1 blocks are definitely lost in loss record 7 of 18
+==109508==    at 0x4C2DB8F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==109508==    by 0x48E81A: mootTokenLexer::yy_create_buffer(_IO_FILE*, int) (flexskel.cc:941)
+==109508==    by 0x48C55D: mootTokenLexer::yylex() (flexskel.cc:414)
+==109508==    by 0x41BC36: moot::TokenReaderNative::get_token() (mootTokenIO.cc:425)
+==109508==    by 0x468A1C: moot::wasteLexicon::load(moot::TokenReader*) (wasteLexicon.cc:33)
+==109508==    by 0x468B23: moot::wasteLexicon::load(mootio::mistream*) (wasteLexicon.cc:45)
+==109508==    by 0x468C23: moot::wasteLexicon::load(char const*) (wasteLexicon.cc:53)
+==109508==    by 0x4056BE: setup_lexer(moot::wasteLexerReader*, moot::TokenReader*) (waste_main.cc:299)
+==109508==    by 0x4057D1: get_lexer(int, moot::TokenReader*) (waste_main.cc:311)
+==109508==    by 0x405987: main (waste_main.cc:340)
+==109508== 
+==109508== 16,386 bytes in 1 blocks are possibly lost in loss record 13 of 18
+==109508==    at 0x4C2DB8F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==109508==    by 0x48E861: mootTokenLexer::yy_create_buffer(_IO_FILE*, int) (flexskel.cc:951)
+==109508==    by 0x48C55D: mootTokenLexer::yylex() (flexskel.cc:414)
+==109508==    by 0x41BC36: moot::TokenReaderNative::get_token() (mootTokenIO.cc:425)
+==109508==    by 0x468A1C: moot::wasteLexicon::load(moot::TokenReader*) (wasteLexicon.cc:33)
+==109508==    by 0x468B23: moot::wasteLexicon::load(mootio::mistream*) (wasteLexicon.cc:45)
+==109508==    by 0x468C23: moot::wasteLexicon::load(char const*) (wasteLexicon.cc:53)
+==109508==    by 0x4056BE: setup_lexer(moot::wasteLexerReader*, moot::TokenReader*) (waste_main.cc:299)
+==109508==    by 0x4057D1: get_lexer(int, moot::TokenReader*) (waste_main.cc:311)
+==109508==    by 0x405987: main (waste_main.cc:340)
+==109508== 
+==109508== 16,426 (40 direct, 16,386 indirect) bytes in 1 blocks are definitely lost in loss record 16 of 18
+==109508==    at 0x4C2DB8F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==109508==    by 0x48E81A: mootTokenLexer::yy_create_buffer(_IO_FILE*, int) (flexskel.cc:941)
+==109508==    by 0x48C55D: mootTokenLexer::yylex() (flexskel.cc:414)
+==109508==    by 0x41BC36: moot::TokenReaderNative::get_token() (mootTokenIO.cc:425)
+==109508==    by 0x468A1C: moot::wasteLexicon::load(moot::TokenReader*) (wasteLexicon.cc:33)
+==109508==    by 0x468B23: moot::wasteLexicon::load(mootio::mistream*) (wasteLexicon.cc:45)
+==109508==    by 0x468C23: moot::wasteLexicon::load(char const*) (wasteLexicon.cc:53)
+==109508==    by 0x4055E0: setup_lexer(moot::wasteLexerReader*, moot::TokenReader*) (waste_main.cc:293)
+==109508==    by 0x4057D1: get_lexer(int, moot::TokenReader*) (waste_main.cc:311)
+==109508==    by 0x405987: main (waste_main.cc:340)
+==109508== 
+==109508== 16,426 (40 direct, 16,386 indirect) bytes in 1 blocks are definitely lost in loss record 17 of 18
+==109508==    at 0x4C2DB8F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==109508==    by 0x48E81A: mootTokenLexer::yy_create_buffer(_IO_FILE*, int) (flexskel.cc:941)
+==109508==    by 0x48C55D: mootTokenLexer::yylex() (flexskel.cc:414)
+==109508==    by 0x41BC36: moot::TokenReaderNative::get_token() (mootTokenIO.cc:425)
+==109508==    by 0x468A1C: moot::wasteLexicon::load(moot::TokenReader*) (wasteLexicon.cc:33)
+==109508==    by 0x468B23: moot::wasteLexicon::load(mootio::mistream*) (wasteLexicon.cc:45)
+==109508==    by 0x468C23: moot::wasteLexicon::load(char const*) (wasteLexicon.cc:53)
+==109508==    by 0x40564F: setup_lexer(moot::wasteLexerReader*, moot::TokenReader*) (waste_main.cc:296)
+==109508==    by 0x4057D1: get_lexer(int, moot::TokenReader*) (waste_main.cc:311)
+==109508==    by 0x405987: main (waste_main.cc:340)
+==109508== 
+==109508== LEAK SUMMARY:
+==109508==    definitely lost: 120 bytes in 3 blocks
+==109508==    indirectly lost: 32,772 bytes in 2 blocks
+==109508==      possibly lost: 16,386 bytes in 1 blocks
+==109508==    still reachable: 73,212 bytes in 12 blocks
+==109508==         suppressed: 0 bytes in 0 blocks
+==109508== Reachable blocks (those to which a pointer was found) are not shown.
+==109508== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==109508== 
+==109508== For counts of detected and suppressed errors, rerun with: -v
+==109508== ERROR SUMMARY: 28 errors from 5 contexts (suppressed: 0 from 0)
+
+
+##--------------------------------------------------------------
+## CRASH: grenzboten_341578_97779 (segfault)
+(gdb) bt
+#0  __memcpy_sse2_unaligned () at ../sysdeps/x86_64/multiarch/memcpy-sse2-unaligned.S:168
+#1  0x000000000044878e in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*> (this=0xa1abb8, __beg=0x1000000a0f7e8 <error: Cannot access memory at address 0x1000000a0f7e8>, __end=0x1000000a0f7ec <error: Cannot access memory at address 0x1000000a0f7ec>) at /usr/include/c++/5/bits/basic_string.tcc:229
+#2  0x00007ffff7b769cf in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+#3  0x000000000041d33c in moot::mootToken::mootToken (this=0xa1abb0, x=...) at ./mootToken.h:329
+#4  0x0000000000422b97 in __gnu_cxx::new_allocator<moot::mootToken>::construct (this=0x7fffffffd9ef, __p=0xa1abb0, __val=...) at /usr/include/c++/5/ext/new_allocator.h:130
+#5  0x0000000000422735 in std::__cxx11::list<moot::mootToken, std::allocator<moot::mootToken> >::_M_create_node (this=0x864ac0, __x=...) at /usr/include/c++/5/bits/stl_list.h:556
+#6  0x0000000000421fa9 in std::__cxx11::list<moot::mootToken, std::allocator<moot::mootToken> >::_M_insert (this=0x864ac0, __position=..., __x=...) at /usr/include/c++/5/bits/stl_list.h:1754
+#7  0x00000000004216b2 in std::__cxx11::list<moot::mootToken, std::allocator<moot::mootToken> >::push_back (this=0x864ac0, __x=...) at /usr/include/c++/5/bits/stl_list.h:1089
+#8  0x000000000048105d in moot::wasteDecoder::_put_token (this=0x864a70, token=...) at wasteDecoder.cc:120
+--> crashing call wd_buf.push_back() for token of type TokTypeWB (=word-break)
+    : crashing token = (const moot::mootToken &) @0xa0f7d0: {tok_type = moot::TokTypeWB, tok_text = <error: Cannot access memory at address 0x1000000a0f7e8>, ..., tok_location = {offset = 208226, length = 4}, tok_data = 0x0}
+--- BEGIN crashing token i/o dump:
+...
+LEXER:GET TOKEN:Vanilla 0x1f04720 [208223 1]: alpha,cap,a1,l1,b0
+ + ANALYSIS 0x21f32f0 <0.000000>: tag=alpha,cap,a1,l1,b0,s0,S0,w0 ; details=[alpha,cap,a1,l1,b0,s0,S0,w0 U]
+ + ANALYSIS 0x21f3f20 <0.000000>: tag=alpha,cap,a1,l1,b0,s0,S1,w0 ; details=[alpha,cap,a1,l1,b0,s0,S1,w0 U]
+ + ANALYSIS 0x220fda0 <0.000000>: tag=alpha,cap,a1,l1,b0,s0,S0,w1 ; details=[alpha,cap,a1,l1,b0,s0,S0,w1 U]
+ + ANALYSIS 0x21eefa0 <0.000000>: tag=alpha,cap,a1,l1,b0,s0,S1,w1 ; details=[alpha,cap,a1,l1,b0,s0,S1,w1 U]
+ + ANALYSIS 0x21fdc30 <0.000000>: tag=alpha,cap,a1,l1,b0,s1,S0,w1 ; details=[alpha,cap,a1,l1,b0,s1,S0,w1 U]
+ + ANALYSIS 0x220fcd0 <0.000000>: tag=alpha,cap,a1,l1,b0,s1,S1,w1 ; details=[alpha,cap,a1,l1,b0,s1,S1,w1 U]
+LEXER:GET TOKEN:Vanilla 0x1f04720 [208224 1]: $.,*,a0,l0,b0
+ + ANALYSIS 0x220fcd0 <0.000000>: tag=$.,*,a0,l0,b0,s0,S0,w0 ; details=[$.,*,a0,l0,b0,s0,S0,w0 .]
+ + ANALYSIS 0x21fdc30 <0.000000>: tag=$.,*,a0,l0,b0,s0,S1,w0 ; details=[$.,*,a0,l0,b0,s0,S1,w0 .]
+ + ANALYSIS 0x21eefa0 <0.000000>: tag=$.,*,a0,l0,b0,s0,S0,w1 ; details=[$.,*,a0,l0,b0,s0,S0,w1 .]
+ + ANALYSIS 0x220fda0 <0.000000>: tag=$.,*,a0,l0,b0,s0,S1,w1 ; details=[$.,*,a0,l0,b0,s0,S1,w1 .]
+ + ANALYSIS 0x21f3f20 <0.000000>: tag=$.,*,a0,l0,b0,s1,S0,w1 ; details=[$.,*,a0,l0,b0,s1,S0,w1 .]
+ + ANALYSIS 0x21f32f0 <0.000000>: tag=$.,*,a0,l0,b0,s1,S1,w1 ; details=[$.,*,a0,l0,b0,s1,S1,w1 .]
+LEXER:GET TOKEN:WB 0x1f04720 [208226 4]: $WB$
+LEXER:GET TOKEN:SB 0x1f04720 [208235 4]: $SB$
+  !!!!!!!!!!!!!!!! ^^^^^^^^^ !!!!!!!!!!!!!!!! DUPLICATE ADDRESS
+  - ok(?) : wasteScanner uses a single token buffer
+  - the dump call is on local method variable wlr_token from wasteLexerReader::get_token()
+  - ought to be ok
+LEXER:GET TOKEN:Vanilla 0x1f04720 [208240 4]: stop,up,a0,l5,b1:für
+ + ANALYSIS 0x21f32f0 <0.000000>: tag=stop,up,a0,l5,b1,s1,S0,w1 ; details=[stop,up,a0,l5,b1,s1,S0,w1 Für]
+ + ANALYSIS 0x21f3f20 <0.000000>: tag=stop,up,a0,l5,b1,s1,S1,w1 ; details=[stop,up,a0,l5,b1,s1,S1,w1 Für]
+...
+VITERBI_FLUSH:PUT TOKEN:Vanilla 0x21f8380 [208223 1]: alpha,cap,a1,l1,b0
+ + ANALYSIS 0x21f1df0 <0.000000>: tag=alpha,cap,a1,l1,b0,s0,S0,w0 ; details=[alpha,cap,a1,l1,b0,s0,S0,w0 U]
+ + ANALYSIS 0x21fd3d0 <0.000000>: tag=alpha,cap,a1,l1,b0,s0,S1,w0 ; details=[alpha,cap,a1,l1,b0,s0,S1,w0 U]
+ + ANALYSIS 0x21fd440 <0.000000>: tag=alpha,cap,a1,l1,b0,s0,S0,w1 ; details=[alpha,cap,a1,l1,b0,s0,S0,w1 U]
+ + ANALYSIS 0x21f7bb0 <0.000000>: tag=alpha,cap,a1,l1,b0,s0,S1,w1 ; details=[alpha,cap,a1,l1,b0,s0,S1,w1 U]
+ + ANALYSIS 0x21f7c20 <0.000000>: tag=alpha,cap,a1,l1,b0,s1,S0,w1 ; details=[alpha,cap,a1,l1,b0,s1,S0,w1 U]
+ + ANALYSIS 0x21f7c90 <0.000000>: tag=alpha,cap,a1,l1,b0,s1,S1,w1 ; details=[alpha,cap,a1,l1,b0,s1,S1,w1 U]
+VITERBI_FLUSH:PUT TOKEN:Vanilla 0x21f7d00 [208224 1]: $.,*,a0,l0,b0
+ + ANALYSIS 0x21f8760 <0.000000>: tag=$.,*,a0,l0,b0,s0,S0,w0 ; details=[$.,*,a0,l0,b0,s0,S0,w0 .]
+ + ANALYSIS 0x21f88a0 <0.000000>: tag=$.,*,a0,l0,b0,s0,S1,w0 ; details=[$.,*,a0,l0,b0,s0,S1,w0 .]
+ + ANALYSIS 0x21f8910 <0.000000>: tag=$.,*,a0,l0,b0,s0,S0,w1 ; details=[$.,*,a0,l0,b0,s0,S0,w1 .]
+ + ANALYSIS 0x21f8980 <0.000000>: tag=$.,*,a0,l0,b0,s0,S1,w1 ; details=[$.,*,a0,l0,b0,s0,S1,w1 .]
+ + ANALYSIS 0x21f89f0 <0.000000>: tag=$.,*,a0,l0,b0,s1,S0,w1 ; details=[$.,*,a0,l0,b0,s1,S0,w1 .]
+ + ANALYSIS 0x21f8a60 <0.000000>: tag=$.,*,a0,l0,b0,s1,S1,w1 ; details=[$.,*,a0,l0,b0,s1,S1,w1 .]
+VITERBI_FLUSH:PUT TOKEN:WB 0x21f87d0 [208226 4]: 
+VITERBI_FLUSH:PUT TOKEN:SB 0x21f8ad0 [208235 4]: $SB$
+VITERBI_FLUSH:PUT TOKEN:Vanilla 0x21f8b60 [208240 4]: stop,up,a0,l5,b1:für
+ + ANALYSIS 0x220fda0 <0.000000>: tag=stop,up,a0,l5,b1,s1,S0,w1 ; details=[stop,up,a0,l5,b1,s1,S0,w1 Für]
+ + ANALYSIS 0x21eefa0 <0.000000>: tag=stop,up,a0,l5,b1,s1,S1,w1 ; details=[stop,up,a0,l5,b1,s1,S1,w1 Für]
+...
+DECODE:PUT TOKEN:Vanilla 0x2203bb0 [208223 1]: U
+ANNOT:PUT TOKEN:Vanilla 0x7fffbd8ed110 [208223 1]: U
+[CRASH]
+--- END token i/o dump
+
+#9  0x0000000000481292 in moot::wasteDecoder::_put_tokens (this=0x864a70, tokens=...) at wasteDecoder.cc:152
+#10 0x000000000048150b in moot::wasteDecoder::put_tokens (this=0x864a70, tokens=...) at wasteDecoder.h:109
+#11 0x0000000000428213 in moot::mootHMM::viterbi_flush (this=0x7f8cc0, writer=0x864a70, toks=..., nod=0xa27130) at mootHMM.cc:1074
+#12 0x0000000000427ed1 in moot::mootHMM::tag_stream (this=0x7f8cc0, reader=0x71b5f0, writer=0x864a70) at mootHMM.cc:1040
+#13 0x0000000000405509 in churn_io (reader=0x71b5f0, writer=0x864a70, hmm=0x7f8cc0) at waste_main.cc:277
+#14 0x0000000000405cb1 in main (argc=10, argv=0x7fffffffe048) at waste_main.cc:367
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## VALGRIND: grenzboten_341578_97779 (segfault)
+export MALLOC_CHECK_=0
+valgrind --leak-check=yes --track-origins=yes --keep-stacktraces=alloc-and-free --error-limit=no --num-callers=40 CMDLINE...
+==80626== Memcheck, a memory error detector
+==80626== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
+==80626== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
+==80626== Command: ././waste -v2 -Owd,loc --abbrevs=/home/ddc-dstar/dstar/resources/waste/abbr.lex --stopwords=/home/ddc-dstar/dstar/resources/waste/stop.lex --conjunctions=/home/ddc-dstar/dstar/resources/waste/conj.lex --model=/home/ddc-dstar/dstar/resources/waste/model.hmm in/grenzboten_341578_97779.txt.txt -o out/grenzboten_341578_97779.txt.t0
+==80626== 
+==80626== Invalid write of size 1
+==80626==    at 0x46B51F: moot::wasteLexer::buffer_token(moot::mootToken&) (wasteLexer.cc:216)
+==80626==    by 0x46C295: moot::wasteLexerReader::get_token() (wasteLexer.cc:457)
+==80626==    by 0x427E19: moot::mootHMM::tag_stream(moot::TokenReader*, moot::TokenWriter*) (mootHMM.cc:1033)
+==80626==    by 0x405508: churn_io(moot::TokenReader*, moot::TokenWriter*, moot::mootHMM*) (waste_main.cc:277)
+==80626==    by 0x405CB0: main (waste_main.cc:367)
+==80626==  Address 0x7d5439e is 142 bytes inside a block of size 144 free'd
+==80626==    at 0x4C2F24B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==80626==    by 0x47207D: __gnu_cxx::new_allocator<std::_List_node<moot::wasteLexerToken> >::deallocate(std::_List_node<moot::wasteLexerToken>*, unsigned long) (new_allocator.h:110)
+==80626==    by 0x46F7A5: std::__cxx11::_List_base<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_put_node(std::_List_node<moot::wasteLexerToken>*) (stl_list.h:396)
+==80626==    by 0x46F242: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_erase(std::_List_iterator<moot::wasteLexerToken>) (stl_list.h:1781)
+==80626==    by 0x46DA9B: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::pop_front() (stl_list.h:1075)
+==80626==    by 0x46C385: moot::wasteLexerReader::get_token() (wasteLexer.cc:477)
+==80626==    by 0x427E19: moot::mootHMM::tag_stream(moot::TokenReader*, moot::TokenWriter*) (mootHMM.cc:1033)
+==80626==    by 0x405508: churn_io(moot::TokenReader*, moot::TokenWriter*, moot::mootHMM*) (waste_main.cc:277)
+==80626==    by 0x405CB0: main (waste_main.cc:367)
+==80626==  Block was alloc'd at
+==80626==    at 0x4C2E0EF: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==80626==    by 0x474987: __gnu_cxx::new_allocator<std::_List_node<moot::wasteLexerToken> >::allocate(unsigned long, void const*) (new_allocator.h:104)
+==80626==    by 0x4735CF: std::__cxx11::_List_base<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_get_node() (stl_list.h:392)
+==80626==    by 0x471B87: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_create_node(moot::wasteLexerToken const&) (stl_list.h:553)
+==80626==    by 0x46F136: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_insert(std::_List_iterator<moot::wasteLexerToken>, moot::wasteLexerToken const&) (stl_list.h:1754)
+==80626==    by 0x46D905: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::push_back(moot::wasteLexerToken const&) (stl_list.h:1089)
+==80626==    by 0x46B4A6: moot::wasteLexer::buffer_token(moot::mootToken&) (wasteLexer.cc:201)
+==80626==    by 0x46C295: moot::wasteLexerReader::get_token() (wasteLexer.cc:457)
+==80626==    by 0x427E19: moot::mootHMM::tag_stream(moot::TokenReader*, moot::TokenWriter*) (mootHMM.cc:1033)
+==80626==    by 0x405508: churn_io(moot::TokenReader*, moot::TokenWriter*, moot::mootHMM*) (waste_main.cc:277)
+==80626==    by 0x405CB0: main (waste_main.cc:367)
+==80626== 
+
+##--------------------------------------------------------------
+## CRASH: grenzboten_341867_228301 : segfault (was: double-free)
+
+Program received signal SIGSEGV, Segmentation fault.
+__GI___libc_free (mem=0x17ffff0002a38) at malloc.c:2949
+(gdb) bt
+#0  __GI___libc_free (mem=0x17ffff0002a38) at malloc.c:2949
+#1  0x000000000041d407 in moot::mootToken::~mootToken (this=0x7ffff0002a00, __in_chrg=<optimized out>) at ./mootToken.h:342
+--> crashing token = (moot::mootToken * const) 0x7ffff0002a00 = {tok_type = moot::TokTypeWB, tok_text = "$WB$", tok_besttag = "", ... tok_location = {offset = 583553, length = 4}, tok_data = 0x0}
+
+    : tok-debug output
+--- BEGIN dump
+...
+LEXER:GET TOKEN:Vanilla 0x1c78720 [583542 2]: stop,lo,a1,l3,b1:in
+ + ANALYSIS 0x7f32b400c830 <0.000000>: tag=stop,lo,a1,l3,b1,s0,S0,w0 ; details=[stop,lo,a1,l3,b1,s0,S0,w0 in]
+ + ANALYSIS 0x7f32b4001a20 <0.000000>: tag=stop,lo,a1,l3,b1,s0,S1,w0 ; details=[stop,lo,a1,l3,b1,s0,S1,w0 in]
+ + ANALYSIS 0x7f32b400e140 <0.000000>: tag=stop,lo,a1,l3,b1,s0,S0,w1 ; details=[stop,lo,a1,l3,b1,s0,S0,w1 in]
+ + ANALYSIS 0x7f32b400c5c0 <0.000000>: tag=stop,lo,a1,l3,b1,s0,S1,w1 ; details=[stop,lo,a1,l3,b1,s0,S1,w1 in]
+ + ANALYSIS 0x7f32b4007c90 <0.000000>: tag=stop,lo,a1,l3,b1,s1,S0,w1 ; details=[stop,lo,a1,l3,b1,s1,S0,w1 in]
+ + ANALYSIS 0x7f32b4011260 <0.000000>: tag=stop,lo,a1,l3,b1,s1,S1,w1 ; details=[stop,lo,a1,l3,b1,s1,S1,w1 in]
+LEXER:GET TOKEN:Vanilla 0x1c78720 [583545 7]: alpha,up,a0,lN,b1
+ + ANALYSIS 0x7f32b4011260 <0.000000>: tag=alpha,up,a0,lN,b1,s0,S0,w0 ; details=[alpha,up,a0,lN,b1,s0,S0,w0 Leipzig]
+ + ANALYSIS 0x7f32b4007c90 <0.000000>: tag=alpha,up,a0,lN,b1,s0,S1,w0 ; details=[alpha,up,a0,lN,b1,s0,S1,w0 Leipzig]
+ + ANALYSIS 0x7f32b400c5c0 <0.000000>: tag=alpha,up,a0,lN,b1,s0,S0,w1 ; details=[alpha,up,a0,lN,b1,s0,S0,w1 Leipzig]
+ + ANALYSIS 0x7f32b400e140 <0.000000>: tag=alpha,up,a0,lN,b1,s0,S1,w1 ; details=[alpha,up,a0,lN,b1,s0,S1,w1 Leipzig]
+ + ANALYSIS 0x7f32b4001a20 <0.000000>: tag=alpha,up,a0,lN,b1,s1,S0,w1 ; details=[alpha,up,a0,lN,b1,s1,S0,w1 Leipzig]
+ + ANALYSIS 0x7f32b400c830 <0.000000>: tag=alpha,up,a0,lN,b1,s1,S1,w1 ; details=[alpha,up,a0,lN,b1,s1,S1,w1 Leipzig]
+LEXER:GET TOKEN:WB 0x1c78720 [583553 4]: $WB$   !!!!! crashes here !!!!
+LEXER:GET TOKEN:SB 0x1c78720 [583565 4]: $SB$
+LEXER:GET TOKEN:SB 0x1c78720 [583571 4]: $SB$
+LEXER:GET TOKEN:SB 0x1c78720 [583577 4]: $SB$
+LEXER:GET TOKEN:SB 0x1c78720 [583586 4]: $SB$
+LEXER:GET TOKEN:Vanilla 0x1c78720 [583591 1]: rom,*,a1,l1,b1
+ + ANALYSIS 0x7f32b400c830 <0.000000>: tag=rom,*,a1,l1,b1,s1,S0,w1 ; details=[rom,*,a1,l1,b1,s1,S0,w1 l]
+ + ANALYSIS 0x7f32b4001a20 <0.000000>: tag=rom,*,a1,l1,b1,s1,S1,w1 ; details=[rom,*,a1,l1,b1,s1,S1,w1 l]
+LEXER:GET TOKEN:Vanilla 0x1c78720 [583594 3]: alpha,lo,a0,l3,b1
+ + ANALYSIS 0x7f32b4001a20 <0.000000>: tag=alpha,lo,a0,l3,b1,s0,S0,w0 ; details=[alpha,lo,a0,l3,b1,s0,S0,w0 ese]
+ + ANALYSIS 0x7f32b400c830 <0.000000>: tag=alpha,lo,a0,l3,b1,s0,S1,w0 ; details=[alpha,lo,a0,l3,b1,s0,S1,w0 ese]
+ + ANALYSIS 0x7f32b4007c90 <0.000000>: tag=alpha,lo,a0,l3,b1,s0,S0,w1 ; details=[alpha,lo,a0,l3,b1,s0,S0,w1 ese]
+ + ANALYSIS 0x7f32b4011260 <0.000000>: tag=alpha,lo,a0,l3,b1,s0,S1,w1 ; details=[alpha,lo,a0,l3,b1,s0,S1,w1 ese]
+ + ANALYSIS 0x7f32b400c380 <0.000000>: tag=alpha,lo,a0,l3,b1,s1,S0,w1 ; details=[alpha,lo,a0,l3,b1,s1,S0,w1 ese]
+ + ANALYSIS 0x7f32b4006a80 <0.000000>: tag=alpha,lo,a0,l3,b1,s1,S1,w1 ; details=[alpha,lo,a0,l3,b1,s1,S1,w1 ese]
+...
+VITERBI_FLUSH:PUT TOKEN:Vanilla 0x7f32b4002ca0 [583542 2]: stop,lo,a1,l3,b1:in
+ + ANALYSIS 0x7f32b40024b0 <0.000000>: tag=stop,lo,a1,l3,b1,s0,S0,w0 ; details=[stop,lo,a1,l3,b1,s0,S0,w0 in]
+ + ANALYSIS 0x7f32b4002520 <0.000000>: tag=stop,lo,a1,l3,b1,s0,S1,w0 ; details=[stop,lo,a1,l3,b1,s0,S1,w0 in]
+ + ANALYSIS 0x7f32b4002590 <0.000000>: tag=stop,lo,a1,l3,b1,s0,S0,w1 ; details=[stop,lo,a1,l3,b1,s0,S0,w1 in]
+ + ANALYSIS 0x7f32b4002600 <0.000000>: tag=stop,lo,a1,l3,b1,s0,S1,w1 ; details=[stop,lo,a1,l3,b1,s0,S1,w1 in]
+ + ANALYSIS 0x7f32b4002670 <0.000000>: tag=stop,lo,a1,l3,b1,s1,S0,w1 ; details=[stop,lo,a1,l3,b1,s1,S0,w1 in]
+ + ANALYSIS 0x7f32b4002710 <0.000000>: tag=stop,lo,a1,l3,b1,s1,S1,w1 ; details=[stop,lo,a1,l3,b1,s1,S1,w1 in]
+VITERBI_FLUSH:PUT TOKEN:Vanilla 0x7f32b4002900 [583545 7]: alpha,up,a0,lN,b1
+ + ANALYSIS 0x7f32b4002990 <0.000000>: tag=alpha,up,a0,lN,b1,s0,S0,w0 ; details=[alpha,up,a0,lN,b1,s0,S0,w0 Leipzig]
+ + ANALYSIS 0x7f32b4009fb0 <0.000000>: tag=alpha,up,a0,lN,b1,s0,S1,w0 ; details=[alpha,up,a0,lN,b1,s0,S1,w0 Leipzig]
+ + ANALYSIS 0x7f32b400a020 <0.000000>: tag=alpha,up,a0,lN,b1,s0,S0,w1 ; details=[alpha,up,a0,lN,b1,s0,S0,w1 Leipzig]
+ + ANALYSIS 0x7f32b400a090 <0.000000>: tag=alpha,up,a0,lN,b1,s0,S1,w1 ; details=[alpha,up,a0,lN,b1,s0,S1,w1 Leipzig]
+ + ANALYSIS 0x7f32b400a160 <0.000000>: tag=alpha,up,a0,lN,b1,s1,S0,w1 ; details=[alpha,up,a0,lN,b1,s1,S0,w1 Leipzig]
+ + ANALYSIS 0x7f32b400a230 <0.000000>: tag=alpha,up,a0,lN,b1,s1,S1,w1 ; details=[alpha,up,a0,lN,b1,s1,S1,w1 Leipzig]
+VITERBI_FLUSH:PUT TOKEN:WB 0x7f32b4002a00 [583553 4]: $WB$
+VITERBI_FLUSH:PUT TOKEN:SB 0x7f32b400a420 [583565 4]: $SB$
+VITERBI_FLUSH:PUT TOKEN:SB 0x7f32b400a4b0 [583571 4]: $SB$
+VITERBI_FLUSH:PUT TOKEN:SB 0x7f32b400a540 [583577 4]: $SB$
+VITERBI_FLUSH:PUT TOKEN:SB 0x7f32b400c8d0 [583586 4]: $SB$
+VITERBI_FLUSH:PUT TOKEN:Vanilla 0x7f32b400c960 [583591 1]: rom,*,a1,l1,b1
+ + ANALYSIS 0x7f32b400e140 <0.000000>: tag=rom,*,a1,l1,b1,s1,S0,w1 ; details=[rom,*,a1,l1,b1,s1,S0,w1 l]
+ + ANALYSIS 0x7f32b400c5c0 <0.000000>: tag=rom,*,a1,l1,b1,s1,S1,w1 ; details=[rom,*,a1,l1,b1,s1,S1,w1 l]
+VITERBI_FLUSH:PUT TOKEN:Vanilla 0x7f32b400ca00 [583594 3]: alpha,lo,a0,l3,b1
+ + ANALYSIS 0x7f32b400f430 <0.000000>: tag=alpha,lo,a0,l3,b1,s0,S0,w0 ; details=[alpha,lo,a0,l3,b1,s0,S0,w0 ese]
+ + ANALYSIS 0x7f32b400f4a0 <0.000000>: tag=alpha,lo,a0,l3,b1,s0,S1,w0 ; details=[alpha,lo,a0,l3,b1,s0,S1,w0 ese]
+ + ANALYSIS 0x7f32b400f510 <0.000000>: tag=alpha,lo,a0,l3,b1,s0,S0,w1 ; details=[alpha,lo,a0,l3,b1,s0,S0,w1 ese]
+ + ANALYSIS 0x7f32b400f5e0 <0.000000>: tag=alpha,lo,a0,l3,b1,s0,S1,w1 ; details=[alpha,lo,a0,l3,b1,s0,S1,w1 ese]
+ + ANALYSIS 0x7f32b400f6b0 <0.000000>: tag=alpha,lo,a0,l3,b1,s1,S0,w1 ; details=[alpha,lo,a0,l3,b1,s1,S0,w1 ese]
+ + ANALYSIS 0x7f32b400f780 <0.000000>: tag=alpha,lo,a0,l3,b1,s1,S1,w1 ; details=[alpha,lo,a0,l3,b1,s1,S1,w1 ese]
+...
+DECODE:PUT TOKEN:Vanilla 0x7f32b4010d30 [583542 2]: in
+ANNOT:PUT TOKEN:Vanilla 0x7ffc09a23d30 [583542 2]: in
+DECODE:PUT TOKEN:Vanilla 0x7f32b400e0b0 [583545 7]: Leipzig
+ANNOT:PUT TOKEN:Vanilla 0x7ffc09a23d30 [583545 7]: Leipzig
+DECODE:PUT TOKEN:WB 0x7f32b4010c70 [583553 4]: $WB$
+ANNOT:PUT TOKEN:WB 0x7ffc09a23d30 [583553 4]: $WB$
+DECODE:PUT TOKEN:SB 0x7f32b4010d30 [583565 4]: $SB$
+ANNOT:PUT TOKEN:SB 0x7ffc09a23d30 [583565 4]: $SB$
+DECODE:PUT TOKEN:EOS 0x7f32b400e0b0 [0 0]: 
+ANNOT:PUT TOKEN:EOS 0x7ffc09a23d30 [0 0]: 
+DECODE:PUT TOKEN:SB 0x7f32b4010c70 [583571 4]: $SB$
+ANNOT:PUT TOKEN:SB 0x7ffc09a23d30 [583571 4]: $SB$
+DECODE:PUT TOKEN:SB 0x7f32b4010d30 [583577 4]: $SB$
+ANNOT:PUT TOKEN:SB 0x7ffc09a23d30 [583577 4]: $SB$
+DECODE:PUT TOKEN:SB 0x7f32b400e0b0 [583586 4]: $SB$
+ANNOT:PUT TOKEN:SB 0x7ffc09a23d30 [583586 4]: $SB$
+DECODE:PUT TOKEN:Vanilla 0x7f32b4010c70 [583591 1]: l
+ANNOT:PUT TOKEN:Vanilla 0x7ffc09a23d30 [583591 1]: l
+DECODE:PUT TOKEN:Vanilla 0x7f32b4010d30 [583594 3]: ese
+ANNOT:PUT TOKEN:Vanilla 0x7ffc09a23d30 [583594 3]: ese
+DECODE:PUT TOKEN:Vanilla 0x7f32b400e0b0 [583598 8]: Blätter
+ANNOT:PUT TOKEN:Vanilla 0x7ffc09a23d30 [583598 8]: Blätter
+DECODE:PUT TOKEN:Vanilla 0x7f32b4010c70 [583607 5]: haben
+ANNOT:PUT TOKEN:Vanilla 0x7ffc09a23d30 [583607 5]: haben
+[CRASH]
+--- END dump
+
+#2  0x00000000004225fc in __gnu_cxx::new_allocator<moot::mootToken>::destroy (this=0x7fffffffdb67, __p=0x7ffff0002a00) at /usr/include/c++/5/ext/new_allocator.h:133
+#3  0x0000000000421d1b in std::__cxx11::_List_base<moot::mootToken, std::allocator<moot::mootToken> >::_M_clear (this=0x7fffffffdd10) at /usr/include/c++/5/bits/list.tcc:77
+#4  0x000000000042115e in std::__cxx11::list<moot::mootToken, std::allocator<moot::mootToken> >::clear (this=0x7fffffffdd10) at /usr/include/c++/5/bits/stl_list.h:1368
+#5  0x0000000000428222 in moot::mootHMM::viterbi_flush (this=0x7f8cc0, writer=0x864a70, toks=..., nod=0xa11900) at mootHMM.cc:1078
+#6  0x0000000000427ed1 in moot::mootHMM::tag_stream (this=0x7f8cc0, reader=0x71b5f0, writer=0x864a70) at mootHMM.cc:1040
+#7  0x0000000000405509 in churn_io (reader=0x71b5f0, writer=0x864a70, hmm=0x7f8cc0) at waste_main.cc:277
+#8  0x0000000000405cb1 in main (argc=10, argv=0x7fffffffe018) at waste_main.cc:367
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## VALGRIND: grenzboten_341867_228301 : segfault (was: double-free)
+ Memcheck, a memory error detector
+==107759== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
+==107759== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
+==107759== Command: ./waste -v2 -Owd,loc --abbrevs=/home/ddc-dstar/dstar/resources/waste/abbr.lex --stopwords=/home/ddc-dstar/dstar/resources/waste/stop.lex --conjunctions=/home/ddc-dstar/dstar/resources/waste/conj.lex --model=/home/ddc-dstar/dstar/resources/waste/model.hmm in/grenzboten_341867_228301.txt.txt -o out/grenzboten_341867_228301.txt.t0
+==107759== 
+==107759== Invalid write of size 1
+==107759==    at 0x46B51F: moot::wasteLexer::buffer_token(moot::mootToken&) (wasteLexer.cc:216)
+==107759==    by 0x46C295: moot::wasteLexerReader::get_token() (wasteLexer.cc:457)
+==107759==    by 0x427E19: moot::mootHMM::tag_stream(moot::TokenReader*, moot::TokenWriter*) (mootHMM.cc:1033)
+==107759==    by 0x405508: churn_io(moot::TokenReader*, moot::TokenWriter*, moot::mootHMM*) (waste_main.cc:277)
+==107759==    by 0x405CB0: main (waste_main.cc:367)
+==107759==  Address 0x6a7cfee is 142 bytes inside a block of size 144 free'd
+==107759==    at 0x4C2F24B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==107759==    by 0x47207D: __gnu_cxx::new_allocator<std::_List_node<moot::wasteLexerToken> >::deallocate(std::_List_node<moot::wasteLexerToken>*, unsigned long) (new_allocator.h:110)
+==107759==    by 0x46F7A5: std::__cxx11::_List_base<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_put_node(std::_List_node<moot::wasteLexerToken>*) (stl_list.h:396)
+==107759==    by 0x46F242: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_erase(std::_List_iterator<moot::wasteLexerToken>) (stl_list.h:1781)
+==107759==    by 0x46DA9B: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::pop_front() (stl_list.h:1075)
+==107759==    by 0x46C385: moot::wasteLexerReader::get_token() (wasteLexer.cc:477)
+==107759==    by 0x427E19: moot::mootHMM::tag_stream(moot::TokenReader*, moot::TokenWriter*) (mootHMM.cc:1033)
+==107759==    by 0x405508: churn_io(moot::TokenReader*, moot::TokenWriter*, moot::mootHMM*) (waste_main.cc:277)
+==107759==    by 0x405CB0: main (waste_main.cc:367)
+==107759==  Block was alloc'd at
+==107759==    at 0x4C2E0EF: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==107759==    by 0x474987: __gnu_cxx::new_allocator<std::_List_node<moot::wasteLexerToken> >::allocate(unsigned long, void const*) (new_allocator.h:104)
+==107759==    by 0x4735CF: std::__cxx11::_List_base<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_get_node() (stl_list.h:392)
+==107759==    by 0x471B87: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_create_node(moot::wasteLexerToken const&) (stl_list.h:553)
+==107759==    by 0x46F136: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::_M_insert(std::_List_iterator<moot::wasteLexerToken>, moot::wasteLexerToken const&) (stl_list.h:1754)
+==107759==    by 0x46D905: std::__cxx11::list<moot::wasteLexerToken, std::allocator<moot::wasteLexerToken> >::push_back(moot::wasteLexerToken const&) (stl_list.h:1089)
+==107759==    by 0x46B4A6: moot::wasteLexer::buffer_token(moot::mootToken&) (wasteLexer.cc:201)
+==107759==    by 0x46C295: moot::wasteLexerReader::get_token() (wasteLexer.cc:457)
+==107759==    by 0x427E19: moot::mootHMM::tag_stream(moot::TokenReader*, moot::TokenWriter*) (mootHMM.cc:1033)
+==107759==    by 0x405508: churn_io(moot::TokenReader*, moot::TokenWriter*, moot::mootHMM*) (waste_main.cc:277)
+==107759==    by 0x405CB0: main (waste_main.cc:367)
+==107759== 
+==107759== 
+==107759== HEAP SUMMARY:
+==107759==     in use at exit: 122,492 bytes in 18 blocks
+==107759==   total heap usage: 26,107,694 allocs, 26,107,676 frees, 1,384,937,887 bytes allocated
+==107759== 
+==107759== 40 bytes in 1 blocks are definitely lost in loss record 7 of 18
+==107759==    at 0x4C2DB8F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==107759==    by 0x48E81A: mootTokenLexer::yy_create_buffer(_IO_FILE*, int) (flexskel.cc:941)
+==107759==    by 0x48C55D: mootTokenLexer::yylex() (flexskel.cc:414)
+==107759==    by 0x41BC36: moot::TokenReaderNative::get_token() (mootTokenIO.cc:425)
+==107759==    by 0x468A1C: moot::wasteLexicon::load(moot::TokenReader*) (wasteLexicon.cc:33)
+==107759==    by 0x468B23: moot::wasteLexicon::load(mootio::mistream*) (wasteLexicon.cc:45)
+==107759==    by 0x468C23: moot::wasteLexicon::load(char const*) (wasteLexicon.cc:53)
+==107759==    by 0x4056BE: setup_lexer(moot::wasteLexerReader*, moot::TokenReader*) (waste_main.cc:299)
+==107759==    by 0x4057D1: get_lexer(int, moot::TokenReader*) (waste_main.cc:311)
+==107759==    by 0x405987: main (waste_main.cc:340)
+==107759== 
+==107759== 16,386 bytes in 1 blocks are possibly lost in loss record 13 of 18
+==107759==    at 0x4C2DB8F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==107759==    by 0x48E861: mootTokenLexer::yy_create_buffer(_IO_FILE*, int) (flexskel.cc:951)
+==107759==    by 0x48C55D: mootTokenLexer::yylex() (flexskel.cc:414)
+==107759==    by 0x41BC36: moot::TokenReaderNative::get_token() (mootTokenIO.cc:425)
+==107759==    by 0x468A1C: moot::wasteLexicon::load(moot::TokenReader*) (wasteLexicon.cc:33)
+==107759==    by 0x468B23: moot::wasteLexicon::load(mootio::mistream*) (wasteLexicon.cc:45)
+==107759==    by 0x468C23: moot::wasteLexicon::load(char const*) (wasteLexicon.cc:53)
+==107759==    by 0x4056BE: setup_lexer(moot::wasteLexerReader*, moot::TokenReader*) (waste_main.cc:299)
+==107759==    by 0x4057D1: get_lexer(int, moot::TokenReader*) (waste_main.cc:311)
+==107759==    by 0x405987: main (waste_main.cc:340)
+==107759== 
+==107759== 16,426 (40 direct, 16,386 indirect) bytes in 1 blocks are definitely lost in loss record 16 of 18
+==107759==    at 0x4C2DB8F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==107759==    by 0x48E81A: mootTokenLexer::yy_create_buffer(_IO_FILE*, int) (flexskel.cc:941)
+==107759==    by 0x48C55D: mootTokenLexer::yylex() (flexskel.cc:414)
+==107759==    by 0x41BC36: moot::TokenReaderNative::get_token() (mootTokenIO.cc:425)
+==107759==    by 0x468A1C: moot::wasteLexicon::load(moot::TokenReader*) (wasteLexicon.cc:33)
+==107759==    by 0x468B23: moot::wasteLexicon::load(mootio::mistream*) (wasteLexicon.cc:45)
+==107759==    by 0x468C23: moot::wasteLexicon::load(char const*) (wasteLexicon.cc:53)
+==107759==    by 0x4055E0: setup_lexer(moot::wasteLexerReader*, moot::TokenReader*) (waste_main.cc:293)
+==107759==    by 0x4057D1: get_lexer(int, moot::TokenReader*) (waste_main.cc:311)
+==107759==    by 0x405987: main (waste_main.cc:340)
+==107759== 
+==107759== 16,426 (40 direct, 16,386 indirect) bytes in 1 blocks are definitely lost in loss record 17 of 18
+==107759==    at 0x4C2DB8F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==107759==    by 0x48E81A: mootTokenLexer::yy_create_buffer(_IO_FILE*, int) (flexskel.cc:941)
+==107759==    by 0x48C55D: mootTokenLexer::yylex() (flexskel.cc:414)
+==107759==    by 0x41BC36: moot::TokenReaderNative::get_token() (mootTokenIO.cc:425)
+==107759==    by 0x468A1C: moot::wasteLexicon::load(moot::TokenReader*) (wasteLexicon.cc:33)
+==107759==    by 0x468B23: moot::wasteLexicon::load(mootio::mistream*) (wasteLexicon.cc:45)
+==107759==    by 0x468C23: moot::wasteLexicon::load(char const*) (wasteLexicon.cc:53)
+==107759==    by 0x40564F: setup_lexer(moot::wasteLexerReader*, moot::TokenReader*) (waste_main.cc:296)
+==107759==    by 0x4057D1: get_lexer(int, moot::TokenReader*) (waste_main.cc:311)
+==107759==    by 0x405987: main (waste_main.cc:340)
+==107759== 
+==107759== LEAK SUMMARY:
+==107759==    definitely lost: 120 bytes in 3 blocks
+==107759==    indirectly lost: 32,772 bytes in 2 blocks
+==107759==      possibly lost: 16,386 bytes in 1 blocks
+==107759==    still reachable: 73,214 bytes in 12 blocks
+==107759==         suppressed: 0 bytes in 0 blocks
+==107759== Reachable blocks (those to which a pointer was found) are not shown.
+==107759== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==107759== 
+==107759== For counts of detected and suppressed errors, rerun with: -v
+==107759== ERROR SUMMARY: 27 errors from 5 contexts (suppressed: 0 from 0)
+
 

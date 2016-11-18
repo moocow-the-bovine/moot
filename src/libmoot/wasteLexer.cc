@@ -92,7 +92,7 @@ void wasteLexer::reset(void)
 }
 
 //----------------------------------------------------------------------
-void wasteLexer::buffer_token(mootToken& stok)
+void wasteLexer::buffer_token(const mootToken& stok)
 {
   wl_state &= ~(ls_flush);
   wasteLexerToken local_token;
@@ -123,24 +123,24 @@ void wasteLexer::buffer_token(mootToken& stok)
           local_token.w = (wl_state & ls_wb_fw) ? true : false;
           wl_state &= ~(ls_blanked|ls_sb_fw|ls_wb_fw);
           // -- store token
-          wl_tokbuf.push_back(local_token);
+          wl_lexbuf.push_back(local_token);
           // -- update pointers into buffer
-          wl_current_tok = &(wl_tokbuf.back());
+          wl_current_tok = &(wl_lexbuf.back());
           return;
 
         case wLexerTypeAlphaLower:
 	case wLexerTypeRomanLower:
           if( wl_dehyph_mode && ((wl_state & ls_head_hyph_nl) == ls_head_hyph_nl) && !wl_conjunctions.lookup(local_token.wlt_token.tok_text))
           {
-            wl_tokbuf.push_back(local_token);
-            wl_current_tok = &(wl_tokbuf.back());
-            wasteTokenBuffer::iterator it_head = wl_tokbuf.begin ();
+            wl_lexbuf.push_back(local_token);
+            wl_current_tok = &(wl_lexbuf.back());
+            wasteLexerBuffer::iterator it_head = wl_lexbuf.begin ();
             // -- find head of hyphenation in buffer
             while(&(*it_head) != wl_head_tok)
             {
               ++it_head;
             }
-            wasteTokenBuffer::iterator it_tail = it_head;
+            wasteLexerBuffer::iterator it_tail = it_head;
             // -- merge tokens until tail is reached
             do
             {
@@ -183,9 +183,9 @@ void wasteLexer::buffer_token(mootToken& stok)
           local_token.w = (wl_state & ls_wb_fw) ? true : false;
           wl_state &= ~(ls_blanked|ls_sb_fw|ls_wb_fw);
           // -- store token
-          wl_tokbuf.push_back(local_token);
+          wl_lexbuf.push_back(local_token);
           // -- update pointers into buffer
-          wl_current_tok = wl_head_tok = &(wl_tokbuf.back());
+          wl_current_tok = wl_head_tok = &(wl_lexbuf.back());
           return;
 
         default:
@@ -198,9 +198,9 @@ void wasteLexer::buffer_token(mootToken& stok)
           local_token.w = (wl_state & ls_wb_fw) ? true : false;
           wl_state &= ~(ls_blanked|ls_sb_fw|ls_wb_fw);
           // -- store token
-          wl_tokbuf.push_back(local_token);
+          wl_lexbuf.push_back(local_token);
           // -- update pointers into buffer
-          wl_current_tok = &(wl_tokbuf.back());
+          wl_current_tok = &(wl_lexbuf.back());
           return;
       }
       return;
@@ -237,11 +237,11 @@ void wasteLexer::buffer_token(mootToken& stok)
     default:
       break;
   }
-  wl_tokbuf.push_back(local_token);
+  wl_lexbuf.push_back(local_token);
 }
 
 //----------------------------------------------------------------------
-void wasteLexer::set_token(mootToken &token, wasteLexerToken &lex_token)
+void wasteLexer::set_token(mootToken &token, const wasteLexerToken &lex_token)
 {
   //-- default length setting
   len tok_length = le_null;
@@ -451,30 +451,31 @@ mootTokenType wasteLexerReader::get_token(void)
     return wlr_token.toktype(TokTypeEOF);
 
   //-- fill internal token buffer, calls scanner::get_token
-  while (lexer.wl_tokbuf.empty() || ((lexer.wl_state & ls_flush) == 0))
+  while (lexer.wl_lexbuf.empty() || ((lexer.wl_state & ls_flush) == 0))
   {
     scanner->get_token();
     lexer.buffer_token (*(scanner->token()));
   }
 
-  while (!lexer.wl_tokbuf.empty() && lexer.wl_tokbuf.front().wlt_token.tok_type ==  TokTypeUnknown) // skip unknown tokens
+  while (!lexer.wl_lexbuf.empty() && lexer.wl_lexbuf.front().wlt_token.tok_type ==  TokTypeUnknown) // skip unknown tokens
   {
-    lexer.wl_tokbuf.pop_front();
+    lexer.lexbuf_pop_front();
   }
 
-  if (lexer.wl_tokbuf.empty()) return TokTypeEOF;
-  wlr_token = lexer.wl_tokbuf.front().wlt_token;
+  if (lexer.wl_lexbuf.empty()) return TokTypeEOF;
+  wlr_token = lexer.wl_lexbuf.front().wlt_token;
   switch (wlr_token.tok_type)
   {
     case TokTypeVanilla:
     case TokTypeLibXML:
-      lexer.set_token(wlr_token, lexer.wl_tokbuf.front());
+      lexer.set_token(wlr_token, lexer.wl_lexbuf.front());
       break;
     default:
       break;
   }
 
-  lexer.wl_tokbuf.pop_front();
+  //lexer.wl_lexbuf.pop_front(); //-- moocow 2016-11-18: UNSAFE: crashes on kira (g++5, ubuntu-16.04)
+  lexer.lexbuf_pop_front();      //-- moocow 2016-11-18: paranoia: list pop might invalidate pointers wl_current_tok, wl_head_tok!
   TOKDEBUG(wlr_token.dump("LEXER:GET"));
   return wlr_token.toktype();
 }
