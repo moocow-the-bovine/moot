@@ -303,7 +303,7 @@ wasteLexerTypeE waste_lexertype(const std::string &s)
 
 
     EOS                     = ([?!]|([\xE2][\x80][\xA6]))+|[\.]{2,};
-    APOS                    = ['`]|([\xCA][\xBC\xBD])|([\xD9][\xAC])|([\xE2][\x80][\x98\x99\x9A\x9B]);
+    APOS                    = ['`]|([\xCA][\xBC\xBD])|([\xD9][\xAC])|([\xE2][\x80][\x98\x99\x9B]);
     PERCENT                 = [%§] | ([\xe2] [\x80] [\xb0\xb1]);
     MONEY                   = Sc;
     

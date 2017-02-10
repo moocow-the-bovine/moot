@@ -7,6 +7,7 @@ v2.0.14 Thu, 10 Nov 2016 10:00:46 +0100 moocow
 	  - workaround: new wasteLexer method lexbuf_pop_front() checks & clears buffer-pointers
 	    wl_current_tok, wl_head tok if they're popped from the token-buffer: seems to work
 	+ fixed some gcc warnings (unused variables, size_t printf formats, suggested parentheses)
+	+ 2016-02-10[kmw]: removed U+201A (SINGLE LOW-9 QUOTATION MARK) from 'APOS' lexer class
 
 v2.0.13 Fri, 19 Sep 2014 16:58:57 +0200 kmw
 	+ wasteScannerScan.re.skel: Changed definitions of SPACE

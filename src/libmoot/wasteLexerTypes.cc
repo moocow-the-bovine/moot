@@ -12679,28 +12679,31 @@ yy1260:
           }
 yy1261:
           yych = *++sp;
-          if (yych <= 0xA5) {
-            if (yych <= 0x94) {
+          if (yych <= 0x9F) {
+            if (yych <= 0x97) {
               if (yych <= 0x8F) goto yy135;
               if (yych <= 0x92) goto yy1162;
-              goto yy1313;
-            } else {
-              if (yych <= 0x97) goto yy1162;
-              if (yych <= 0x9B) goto yy1312;
-              if (yych <= 0x9F) goto yy1179;
+              if (yych <= 0x94) goto yy1313;
               goto yy1162;
+            } else {
+              if (yych == 0x9A) goto yy1179;
+              if (yych <= 0x9B) goto yy1312;
+              goto yy1179;
             }
           } else {
-            if (yych <= 0xB1) {
-              if (yych <= 0xA6) goto yy1310;
+            if (yych <= 0xAF) {
+              if (yych == 0xA6) goto yy1310;
               if (yych <= 0xA7) goto yy1162;
-              if (yych <= 0xAF) goto yy135;
-              goto yy1311;
-            } else {
-              if (yych <= 0xB8) goto yy1162;
-              if (yych <= 0xBA) goto yy1179;
-              if (yych <= 0xBF) goto yy1162;
               goto yy135;
+            } else {
+              if (yych <= 0xB8) {
+                if (yych <= 0xB1) goto yy1311;
+                goto yy1162;
+              } else {
+                if (yych <= 0xBA) goto yy1179;
+                if (yych <= 0xBF) goto yy1162;
+                goto yy135;
+              }
             }
           }
 yy1262:
