@@ -1,5 +1,11 @@
 ChangeLog for package moot
 
+v2.0.15 Tue, 21 Mar 2017 13:16:08 +0100 moocow
+	+ added waste scanner support for doubled "%" signs
+	  - input "$%$" now scans as a single "%" (scanner type wScanTypePercent)
+	  - literal "%%" should be encoded in the input as "$%$$%$" (2 adjacent "$%$" tokens)
+	  - literl "$%$" can be encoded as "$$%$$"
+
 v2.0.14 Thu, 10 Nov 2016 10:00:46 +0100 moocow
 	+ fixed ugly crashes on kira (ubuntu 16.04.1 LTS / g++ 5.4.0-6ubuntu1~16.04.2 5.4.0 20160609 / deb 4:5.3.1-1ubuntu1)
 	  - bizarre "double free or corruption" errors, segfaults, and other strangeness on grenzboten, dta sources

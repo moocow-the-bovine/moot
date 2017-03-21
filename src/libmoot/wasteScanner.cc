@@ -2,7 +2,7 @@
 
 /*
    libmoot : moot part-of-speech tagging library
-   Copyright (C) 2013 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2013-2017 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -170,6 +170,7 @@ mootTokenType wasteTokenScanner::get_token(void)
   case wScanTypeNewline:	wts_token.text("\\n"); break;
   case wScanTypeWB:		wts_token.toktype(TokTypeWB); break;
   case wScanTypeSB:		wts_token.toktype(TokTypeSB); break;
+  case wScanTypePercent:	wts_token.text("%"); break;    
   case wScanTypeComment:
     wts_token.toktype(TokTypeComment);
     wts_token.text( scanner.yytext().substr(2, scanner.yytext().size()-4) );

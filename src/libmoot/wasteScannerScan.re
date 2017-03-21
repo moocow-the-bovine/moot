@@ -391,8 +391,10 @@ Any = Any1|Any2|Any3;
 	*/
 
 /*!re2c
-        CMTCHAR_SAFE		= [^%\r\n\x00];
-        CMTCHAR                 = CMTCHAR_SAFE | ("%" CMTCHAR_SAFE);
+        CMTCHAR_SAFE		= [^\r\n\x00%];
+        CMTCHAR_NEWLINE		= [\r\n];
+        CMTCHAR			= (CMTCHAR_SAFE | ("%" CMTCHAR_NEWLINE));
+	CMTTEXT			= ((CMTCHAR+ "%"?)* CMTCHAR)?;
 */
 
 	//-- XML (DISABLED)
@@ -404,9 +406,10 @@ Any = Any1|Any2|Any3;
 
 	/*!re2c
 	[\x00]     		 { return wScanTypeEOF; /*-- EOF simulation with NUL-byte --*/}
-	"%%" CMTCHAR* "%%"       { add_columns( yyleng() ); return wScanTypeComment; }
+	"%%" CMTTEXT "%%"     	 { add_columns( yyleng() ); return wScanTypeComment; }
 	"$WB$"                   { add_columns( yyleng() ); return wScanTypeWB; }
 	"$SB$"                   { add_columns( yyleng() ); return wScanTypeSB; }
+	"$%$"			 { add_columns( yyleng() ); return wScanTypePercent; }
 
 	LINK			 { add_columns( yyleng() ); return wScanTypeLink; }
 

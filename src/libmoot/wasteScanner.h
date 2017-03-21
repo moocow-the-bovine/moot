@@ -1,7 +1,7 @@
 /* -*- Mode: C++; coding: utf-8; c-basic-offset: 2; -*- */
 /*
    libmoot : moot part-of-speech tagging library
-   Copyright (C) 2013 by Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner
+   Copyright (C) 2013-2017 by Bryan Jurish <moocow@cpan.org> and Kay-Michael Würzner
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -26,9 +26,9 @@
  *
  *
  *
- * \author kmw
+ * \author kmw, moocow
  *
- * \date 2013
+ * \date 2013-2016
  * 
  */
 
