@@ -38,7 +38,6 @@
   <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
   <li><a href="#AUTHOR">AUTHOR</a></li>
   <li><a href="#SEE-ALSO">SEE ALSO</a></li>
-  <li><a href="#POD-ERRORS">POD ERRORS</a></li>
 </ul>
 
 <h1 id="moot-FILE-FORMATS">moot FILE FORMATS</h1>
@@ -83,6 +82,31 @@
 
 <pre><code> This is a test.  This too.</code></pre>
 
+<p>Raw text files passed to the <a href="./waste.html">waste</a> scanner may additionally contain comments, escapes, and word- and sentence-break hints:</p>
+
+<pre><code> %% COMMENT %%      /* an inline comment string */
+ $%$                /* literal percent sign (escape) */
+ $WB$               /* word-break hint */
+ $SB$               /* sentence-break hint */</code></pre>
+
+<p>An example input file for the <a href="./waste.html">waste</a> scanner is:</p>
+
+<pre><code> This is a %% comment %% text.
+ %% comments can contain embedded newlines, %
+    provided that they&#39;re escaped by a single &#39;%&#39; sign. %%
+ This is an escaped percent sign $%$.
+ This is a word-break hint: word-$WB$break.
+ This is a sentence-break hint: sentence-$SB$break.</code></pre>
+
+<p>... which should be tokenized as:</p>
+
+<pre><code> This is a text.
+ This an escaped percent sign %.
+ This is a word-break hint: word-break.
+ This is a sentence-break hint: sentence-break.</code></pre>
+
+<p>With token- and sentence boundaries forced at the positions where the respective hints were found in the input.</p>
+
 <h2 id="Cooked-Text-Files">Cooked Text Files</h2>
 
 <p>A &quot;cooked&quot; text file is a text file which encodes information such as token boundaries, sentence boundaries, part-of-speech tag, and/or potential analyses. The moot utilities distinguish between several different types of cooked text file: in order of ascending informational content, these are:</p>
@@ -110,13 +134,18 @@
 
 <p>Native &quot;cooked&quot; text files are conventionally identified by the filename infix &quot;.moot&quot;.</p>
 
-<ul>
+<dl>
 
-<p>Rare</p>
+<dt id="Rare">Rare</dt>
+<dd>
 
-<p>(-tagged, -analyzed)</p>
+</dd>
+<dt id="tagged--analyzed">(-tagged, -analyzed)</dt>
+<dd>
 
-<p>Files: *.t, *.r, *.rt</p>
+</dd>
+<dt id="Files:-.t-.r-.rt">Files: *.t, *.r, *.rt</dt>
+<dd>
 
 <p>The most basic level of &quot;cookedness&quot;, a &quot;rare&quot; text file encodes only token- and sentence-boundaries. By convention, &quot;rare&quot; filenames carry the extension &quot;.t&quot;. The syntax is:</p>
 
@@ -145,11 +174,17 @@
  too
  .</code></pre>
 
-<p>Medium Rare</p>
+</dd>
+<dt id="Medium-Rare">Medium Rare</dt>
+<dd>
 
-<p>(-tagged, +analyzed)</p>
+</dd>
+<dt id="tagged-analyzed">(-tagged, +analyzed)</dt>
+<dd>
 
-<p>Files: *.mr, *.mrt</p>
+</dd>
+<dt id="Files:-.mr-.mrt">Files: *.mr, *.mrt</dt>
+<dd>
 
 <p>A &quot;medium rare&quot; file is at least as informative as a &quot;rare&quot; file -- that is, it encodes everything that a &quot;rare&quot; file encodes, and in exactly the same fashion. Additionally, a &quot;medium rare&quot; file may contain for each token a set of (TAB-separated) possible <i>analyses</i> for that token, where an &quot;analysis&quot; contains at least a part-of-speech tag, and possibly also a numeric cost and arbitrary analysis details. Somewhat counter-intuitively, every &quot;rare&quot; file is also a &quot;medium rare&quot; file for which every token is associated with an empty set of possible analyses. By convention, &quot;medium rare&quot; filenames carry the extension &quot;.mrt&quot;</p>
 
@@ -181,11 +216,17 @@
 
 <p>Tokens in &quot;medium rare&quot; files with empty analysis sets (i.e. <i>RARE_TOKEN</i>s) are called &quot;unrecognized&quot; tokens.</p>
 
-<p>Medium</p>
+</dd>
+<dt id="Medium">Medium</dt>
+<dd>
 
-<p>(+tagged, -analyzed)</p>
+</dd>
+<dt id="tagged--analyzed1">(+tagged, -analyzed)</dt>
+<dd>
 
-<p>Files: *.tt, *.ttt, *.m, *.mt</p>
+</dd>
+<dt id="Files:-.tt-.ttt-.m-.mt">Files: *.tt, *.ttt, *.m, *.mt</dt>
+<dd>
 
 <p>A &quot;medium&quot; file can be understood as a &quot;medium rare&quot; file which associates exactly one analysis with each token. The tag for this analysis is considered the &quot;best&quot; tag for the associated token. By convention, &quot;medium&quot; filenames carry the extension &quot;.tt&quot; (tagger output) or &quot;.ttt&quot; (gold standard).</p>
 
@@ -209,11 +250,17 @@
  too    &lt;0.0&gt; too [ADV]
  .      &lt;-42&gt; . [$.]</code></pre>
 
-<p>Well Done</p>
+</dd>
+<dt id="Well-Done">Well Done</dt>
+<dd>
 
-<p>(+tagged, +analyzed)</p>
+</dd>
+<dt id="tagged-analyzed1">(+tagged, +analyzed)</dt>
+<dd>
 
-<p>Files: *.wd, *.wdt</p>
+</dd>
+<dt id="Files:-.wd-.wdt">Files: *.wd, *.wdt</dt>
+<dd>
 
 <p>A &quot;well done&quot; file can be understood as the synthesis of a &quot;medium rare&quot; and a &quot;medium&quot; file: it contains a &quot;best&quot; analysis for each token (the first one), as well as a set of <i>a priori</i> potential analyses analyses for that token. By convention, &quot;well done&quot; filenames carry the extension &quot;.wd&quot; (tagger output) or &quot;.wdt&quot; (gold standard).</p>
 
@@ -236,9 +283,13 @@
  too    ADV     [ADV] too &lt;0.0&gt;
  .      $.      [$.] . &lt;-42&gt;</code></pre>
 
-<p>Refried</p>
+</dd>
+<dt id="Refried">Refried</dt>
+<dd>
 
-<p>(+tagged, +analyzed, +evaluated)</p>
+</dd>
+<dt id="tagged-analyzed-evaluated">(+tagged, +analyzed, +evaluated)</dt>
+<dd>
 
 <p>A &quot;refried&quot; file is basically the synthesis of a pair of &quot;medium&quot; or &quot;well done&quot; files. &quot;Refried&quot; files can be created by the <i>mooteval</i> program from a pair of parallel cooked files. Each line of a &quot;refried&quot; file contains an status code, and a pair of &quot;well-done&quot; style token analyses separated by tabs and a single slash &#39;/&#39;.</p>
 
@@ -325,7 +376,8 @@
  --:---:-ix     too     ADV     [ADV]   [PTKA]  /       too     ADV     [CONJ]
  --:---:e--     .       $.      [$.]            /       .       $.</code></pre>
 
-</ul>
+</dd>
+</dl>
 
 <h1 id="XML-FILE-FORMATS">XML FILE FORMATS</h1>
 
@@ -556,7 +608,7 @@
 
 <dl>
 
-<dt id="Rare">Rare</dt>
+<dt id="Rare1">Rare</dt>
 <dd>
 
 </dd>
@@ -576,7 +628,7 @@
 <p>Alias for &#39;Text,Analyzed&#39;.</p>
 
 </dd>
-<dt id="Medium">Medium</dt>
+<dt id="Medium1">Medium</dt>
 <dd>
 
 </dd>
@@ -645,9 +697,10 @@
 
 <p>When specifiying a text model name to a moot utility program, you may specify the model name as <i>TMODEL</i> in order to use the files <i>TMODEL</i>.lex , <i>TMODEL</i>.123 , <i>TMODEL</i>.clx , and <i>TMODEL</i>.fla (if present). Otherwise, you may specifiy a composite model name as a comma-separated list of the individual component filenames: <i>mylex.lex,myngrams.123,myclasses.clx,myclasses.fla</i>. Any positional field in the specification may be left blank to omit loading the associated data; e.g. to omit lexical classes but include flavor definitions, you can specify a model as <i>mylex.lex,myngrams.123,,myclasses.fla</i>.</p>
 
-<ul>
+<dl>
 
-<p><b>Lexical Frequency Files</b></p>
+<dt id="Lexical-Frequency-Files"><b>Lexical Frequency Files</b></dt>
+<dd>
 
 <p>Lexical frequency files store raw frequencies for known tokens and (token,tag) pairs. The format use is ca. 99.998% compatible with that generated by the tnt-para(1) program:</p>
 
@@ -683,7 +736,9 @@
  too    1       ADV     1
  .      42      $.      42</code></pre>
 
-<p><b>Ngram Frequency Files</b></p>
+</dd>
+<dt id="Ngram-Frequency-Files"><b>Ngram Frequency Files</b></dt>
+<dd>
 
 <p>An n-gram frequency file stores raw frequency counts for uni-, bi-, and tri-grams. An n-gram file may be in either &quot;long&quot; or &quot;short&quot; format, both of which are compatible with the respective formats produced by the tnt-para(1) program:</p>
 
@@ -752,7 +807,9 @@
         $.      1
                 __$     1</code></pre>
 
-<p><b>Lexical-Class Frequency Files</b></p>
+</dd>
+<dt id="Lexical-Class-Frequency-Files"><b>Lexical-Class Frequency Files</b></dt>
+<dd>
 
 <p>Lexical-class frequency files store raw frequencies for known lexical classes (read &quot;sets of possible part-of-speech tags&quot;) and (class,tag) pairs. The format is a direct extension of the format for lexical frequency files (see &quot;Lexical Frequency Files&quot;, above):</p>
 
@@ -777,7 +834,9 @@
  ADV            1       ADV     1
  $.             42      $.      42</code></pre>
 
-<p><b>Flavor Definition Files</b></p>
+</dd>
+<dt id="Flavor-Definition-Files"><b>Flavor Definition Files</b></dt>
+<dd>
 
 <p>A flavor definition file stores heuristic rules for surface-typographical classification of otherwise unknown tokens via the C++ <code>mootTaster</code> API. The syntax for flavor definition files is:</p>
 
@@ -826,7 +885,8 @@
 
 <p>The program <a href="./moottaste.html">moottaste(1)</a> can be used to test and debug flavor definition files.</p>
 
-</ul>
+</dd>
+</dl>
 
 <h2 id="HMM-Binary-Model-Files">HMM Binary Model Files</h2>
 
@@ -853,26 +913,6 @@
 <h1 id="SEE-ALSO">SEE ALSO</h1>
 
 <p><a href="./mootutils.html">mootutils</a></p>
-
-<h1 id="POD-ERRORS">POD ERRORS</h1>
-
-<p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
-
-<dl>
-
-<dt id="Around-line-126">Around line 126:</dt>
-<dd>
-
-<p>You can&#39;t have =items (as at line 134) unless the first thing after the =over is an =item</p>
-
-</dd>
-<dt id="Around-line-826">Around line 826:</dt>
-<dd>
-
-<p>You can&#39;t have =items (as at line 834) unless the first thing after the =over is an =item</p>
-
-</dd>
-</dl>
 
 
 </body>

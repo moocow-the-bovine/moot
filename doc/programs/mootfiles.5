@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "MOOTFILES 5"
-.TH MOOTFILES 5 "2014-12-19" "moot v2.0.15-1" "moot PoS Tagger"
+.TH MOOTFILES 5 "2017-03-21" "moot v2.0.15-1" "moot PoS Tagger"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -186,6 +186,39 @@ An example \*(L"raw\*(R" text file is:
 .Vb 1
 \& This is a test.  This too.
 .Ve
+.PP
+Raw text files passed to the waste scanner may additionally contain
+comments, escapes, and word\- and sentence-break hints:
+.PP
+.Vb 4
+\& %% COMMENT %%      /* an inline comment string */
+\& $%$                /* literal percent sign (escape) */
+\& $WB$               /* word\-break hint */
+\& $SB$               /* sentence\-break hint */
+.Ve
+.PP
+An example input file for the waste scanner is:
+.PP
+.Vb 6
+\& This is a %% comment %% text.
+\& %% comments can contain embedded newlines, %
+\&    provided that they\*(Aqre escaped by a single \*(Aq%\*(Aq sign. %%
+\& This is an escaped percent sign $%$.
+\& This is a word\-break hint: word\-$WB$break.
+\& This is a sentence\-break hint: sentence\-$SB$break.
+.Ve
+.PP
+\&... which should be tokenized as:
+.PP
+.Vb 4
+\& This is a text.
+\& This an escaped percent sign %.
+\& This is a word\-break hint: word\-break.
+\& This is a sentence\-break hint: sentence\-break.
+.Ve
+.PP
+With token\- and sentence boundaries forced at the positions
+where the respective hints were found in the input.
 .SS "Cooked Text Files"
 .IX Subsection "Cooked Text Files"
 A \*(L"cooked\*(R" text file is a text file which encodes information
@@ -210,14 +243,14 @@ utilities for details.
 .PP
 Native \*(L"cooked\*(R" text files are conventionally
 identified by the filename infix \*(L".moot\*(R".
-.Sp
-.RS 4
-Rare
-.Sp
-(\-tagged, \-analyzed)
-.Sp
-Files: *.t, *.r, *.rt
-.Sp
+.IP "Rare" 4
+.IX Item "Rare"
+.PD 0
+.IP "(\-tagged, \-analyzed)" 4
+.IX Item "(-tagged, -analyzed)"
+.IP "Files: *.t, *.r, *.rt" 4
+.IX Item "Files: *.t, *.r, *.rt"
+.PD
 The most basic level of \*(L"cookedness\*(R", a \*(L"rare\*(R" text file encodes
 only token\- and sentence-boundaries.
 By convention, \*(L"rare\*(R"
@@ -253,13 +286,14 @@ thus impossible to declare an \*(L"empty\*(R" token.  An example
 \& too
 \& .
 .Ve
-.Sp
-Medium Rare
-.Sp
-(\-tagged, +analyzed)
-.Sp
-Files: *.mr, *.mrt
-.Sp
+.IP "Medium Rare" 4
+.IX Item "Medium Rare"
+.PD 0
+.IP "(\-tagged, +analyzed)" 4
+.IX Item "(-tagged, +analyzed)"
+.IP "Files: *.mr, *.mrt" 4
+.IX Item "Files: *.mr, *.mrt"
+.PD
 A \*(L"medium rare\*(R" file is at least as informative as a \*(L"rare\*(R"
 file \*(-- that is, it encodes everything that a \*(L"rare\*(R" file
 encodes, and in exactly the same fashion.  Additionally,
@@ -314,13 +348,14 @@ An example \*(L"medium rare\*(R" file is:
 Tokens in \*(L"medium rare\*(R" files with empty analysis sets
 (i.e. \fI\s-1RARE_TOKEN\s0\fRs)
 are called \*(L"unrecognized\*(R" tokens.
-.Sp
-Medium
-.Sp
-(+tagged, \-analyzed)
-.Sp
-Files: *.tt, *.ttt, *.m, *.mt
-.Sp
+.IP "Medium" 4
+.IX Item "Medium"
+.PD 0
+.IP "(+tagged, \-analyzed)" 4
+.IX Item "(+tagged, -analyzed)"
+.IP "Files: *.tt, *.ttt, *.m, *.mt" 4
+.IX Item "Files: *.tt, *.ttt, *.m, *.mt"
+.PD
 A \*(L"medium\*(R" file can be understood as a \*(L"medium rare\*(R" file which
 associates exactly one analysis with each token.  The tag for this
 analysis is considered the \*(L"best\*(R" tag for the associated token.
@@ -353,13 +388,14 @@ An example \*(L"medium\*(R" file is:
 \& too    <0.0> too [ADV]
 \& .      <\-42> . [$.]
 .Ve
-.Sp
-Well Done
-.Sp
-(+tagged, +analyzed)
-.Sp
-Files: *.wd, *.wdt
-.Sp
+.IP "Well Done" 4
+.IX Item "Well Done"
+.PD 0
+.IP "(+tagged, +analyzed)" 4
+.IX Item "(+tagged, +analyzed)"
+.IP "Files: *.wd, *.wdt" 4
+.IX Item "Files: *.wd, *.wdt"
+.PD
 A \*(L"well done\*(R" file can be understood as the synthesis of
 a \*(L"medium rare\*(R" and a \*(L"medium\*(R" file: it contains a \*(L"best\*(R"
 analysis for each token (the first one), as well as a set of
@@ -392,11 +428,12 @@ An example \*(L"well done\*(R" file is:
 \& too    ADV     [ADV] too <0.0>
 \& .      $.      [$.] . <\-42>
 .Ve
-.Sp
-Refried
-.Sp
-(+tagged, +analyzed, +evaluated)
-.Sp
+.IP "Refried" 4
+.IX Item "Refried"
+.PD 0
+.IP "(+tagged, +analyzed, +evaluated)" 4
+.IX Item "(+tagged, +analyzed, +evaluated)"
+.PD
 A \*(L"refried\*(R" file is basically the synthesis of a pair of
 \&\*(L"medium\*(R" or \*(L"well done\*(R" files.  \*(L"Refried\*(R" files can be
 created by the \fImooteval\fR program from a pair of
@@ -430,6 +467,7 @@ number of flags concerning which part (if any) of the
 tokens compared did not match.  The general convention
 is use of a '\-' character to indicate that the compared
 tokens matched (or at least were compatible).
+.RS 4
 .IP "\s-1TOKMATCH_FLAG\s0" 4
 .IX Item "TOKMATCH_FLAG"
 \&'\-' if token text components matched, otherwise 't'.
@@ -828,10 +866,8 @@ a comma-separated list of the individual component filenames:
 in the specification may be left blank to omit loading the associated data;
 e.g. to omit lexical classes but include flavor definitions, you can
 specify a model as \fImylex.lex,myngrams.123,,myclasses.fla\fR.
-.Sp
-.RS 4
-\&\fBLexical Frequency Files\fR
-.Sp
+.IP "\fBLexical Frequency Files\fR" 4
+.IX Item "Lexical Frequency Files"
 Lexical frequency files store raw frequencies for known tokens
 and (token,tag) pairs.  The format use is ca. 99.998% compatible
 with that generated by the \fItnt\-para\fR\|(1) program:
@@ -883,9 +919,8 @@ An example lexical frequency file is:
 \& too    1       ADV     1
 \& .      42      $.      42
 .Ve
-.Sp
-\&\fBNgram Frequency Files\fR
-.Sp
+.IP "\fBNgram Frequency Files\fR" 4
+.IX Item "Ngram Frequency Files"
 An n\-gram frequency file stores raw frequency counts for
 uni\-, bi\-, and tri-grams.  An n\-gram file may be in either
 \&\*(L"long\*(R" or \*(L"short\*(R" format, both of which are compatible
@@ -967,9 +1002,8 @@ The same data in \*(L"short\*(R" format:
 \&        $.      1
 \&                _\|_$     1
 .Ve
-.Sp
-\&\fBLexical-Class Frequency Files\fR
-.Sp
+.IP "\fBLexical-Class Frequency Files\fR" 4
+.IX Item "Lexical-Class Frequency Files"
 Lexical-class frequency files store raw frequencies for known
 lexical classes (read \*(L"sets of possible part-of-speech tags\*(R")
 and (class,tag) pairs.  The format is a direct extension
@@ -1007,9 +1041,8 @@ An example lexical class frequency file is:
 \& ADV            1       ADV     1
 \& $.             42      $.      42
 .Ve
-.Sp
-\&\fBFlavor Definition Files\fR
-.Sp
+.IP "\fBFlavor Definition Files\fR" 4
+.IX Item "Flavor Definition Files"
 A flavor definition file stores heuristic rules for
 surface-typographical classification of otherwise unknown
 tokens via the \*(C+ \f(CW\*(C`mootTaster\*(C'\fR \s-1API.\s0
@@ -1039,6 +1072,7 @@ contain only upper-case \s-1ASCII\s0 characters, but thse conventions are curren
 not enforced.  Flavor definitions are used by the runtime tagger to obtain
 lexical probability estimates for otherwise unknown input tokens in the following
 manner:
+.RS 4
 .IP "\(bu" 4
 If the token's input text literally matches an entry in the
 lexical frequency file, the probabilities

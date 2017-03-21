@@ -72,10 +72,37 @@ defaults from a program configuration file.
 A "raw" text file is just that: any file consiting of (8-bit or variable-width encoded)
 characters.  Such files may be processed by the L<mootpp>
 preprocessor to produce "rare cooked" (-tagged, -analyzed)
-text files, or by the L<waste> tokenizer with an appropriate tokenization model.
+text files, or by the L<waste|waste> tokenizer with an appropriate tokenization model.
 An example "raw" text file is:
 
  This is a test.  This too.
+
+Raw text files passed to the L<waste|waste> scanner may additionally contain
+comments, escapes, and word- and sentence-break hints:
+
+ %% COMMENT %%      /* an inline comment string */
+ $%$                /* literal percent sign (escape) */
+ $WB$               /* word-break hint */
+ $SB$               /* sentence-break hint */
+
+An example input file for the L<waste|waste> scanner is:
+
+ This is a %% comment %% text.
+ %% comments can contain embedded newlines, %
+    provided that they're escaped by a single '%' sign. %%
+ This is an escaped percent sign $%$.
+ This is a word-break hint: word-$WB$break.
+ This is a sentence-break hint: sentence-$SB$break.
+
+... which should be tokenized as:
+
+ This is a text.
+ This an escaped percent sign %.
+ This is a word-break hint: word-break.
+ This is a sentence-break hint: sentence-break.
+
+With token- and sentence boundaries forced at the positions
+where the respective hints were found in the input.
 
 =cut
 
@@ -123,13 +150,13 @@ utilities for details.
 Native "cooked" text files are conventionally
 identified by the filename infix ".moot".
 
-=over 4
-
 =cut
 
 ##--------------------------------------------------------------
 ## Input: Cooked: Rare (-tagged,-analyzed)
 =pod
+
+=over 4
 
 =item Rare
 
@@ -823,13 +850,13 @@ in the specification may be left blank to omit loading the associated data;
 e.g. to omit lexical classes but include flavor definitions, you can
 specify a model as F<mylex.lex,myngrams.123,,myclasses.fla>.
 
-=over 4
-
 =cut
 
 ##--------------------------------------------------------------
 ## HMM Models: Text: Lexical Frequencies
 =pod
+
+=over 4
 
 =item B<Lexical Frequency Files>
 
