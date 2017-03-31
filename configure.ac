@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.15-1])
+define([THE_PACKAGE_VERSION], [2.0.16-1])
 define([THE_PACKAGE_MAINTAINER],  [moocow@cpan.org])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -1139,6 +1139,7 @@ AC_SUBST(moot_LIBS)
 
 dnl v--- needed if Makefile.am uses _LTLIBRARIES targets
 AC_PROG_LIBTOOL
+dnl LT_INIT  dnl-- from kira
 
 dnl
 dnl output

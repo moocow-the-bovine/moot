@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2013 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2017 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -213,7 +213,7 @@ newline    (\r?[\n])
 tokchar    [^\t\n\r]
 /*detchar    [^ \t\n\r\<\>\[]*/
 detchar    [^ \t\n\r\[\<]
-tagchar    [^ \t\n\r\]]
+tagchar    [^ \t\n\r\]\<\>]
 anlchar    [^ \t\n\r]
 /*bestchar   [\/]*/
 costre     (([\+\-]?)([0-9]*)(\.?)([0-9]+)(([eE]([+\-]?)[0-9]+)?))

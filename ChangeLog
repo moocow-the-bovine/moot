@@ -1,5 +1,8 @@
 ChangeLog for package moot
 
+v2.0.16 Fri, 31 Mar 2017 14:35:45 +0200 moocow
+	+ update for taghm-v2.5: no "<" or ">" allowed in native mootTokenLexer tags
+
 v2.0.15 Tue, 21 Mar 2017 13:16:08 +0100 moocow
 	+ added waste scanner support for doubled "%" signs
 	  - input "$%$" now scans as a single "%" (scanner type wScanTypePercent)
