@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2017 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -63,7 +63,7 @@ public:
   public:
     inline size_t operator()(const LexClass &x) const {
       size_t hv = 0;
-      hash<mootTagString> hasher;
+      moot_hash<mootTagString> hasher;
       for (LexClass::const_iterator xi = x.begin(); xi != x.end(); xi++) {
 	hv = 5*hv + hasher(*xi);
       }

@@ -1,5 +1,12 @@
 ChangeLog for package moot
 
+v2.0.17 Mon, 24 Apr 2017 13:53:19 +0200 moocow
+	+ fixes for gcc-6 (debian stretch)
+	  - avoid irritating "reference to 'hash' is ambiguous" errors for hash<DATATYPE> types
+	  - mootNoConfig.h now generated at build time via sed
+	    * avoids bogus #undef of system macros (e.g. EOVERFLOW)
+	    * mootNoConfig.h now declared as BUILT_SOURCES in Makefile.am
+
 v2.0.16 Fri, 31 Mar 2017 14:35:45 +0200 moocow
 	+ update for taghm-v2.5: no "<" or ">" allowed in native mootTokenLexer tags
 
@@ -7,7 +14,7 @@ v2.0.15 Tue, 21 Mar 2017 13:16:08 +0100 moocow
 	+ added waste scanner support for doubled "%" signs
 	  - input "$%$" now scans as a single "%" (scanner type wScanTypePercent)
 	  - literal "%%" should be encoded in the input as "$%$$%$" (2 adjacent "$%$" tokens)
-	  - literl "$%$" can be encoded as "$$%$$"
+	  - literal "$%$" can be encoded as "$$%$$"
 
 v2.0.14 Thu, 10 Nov 2016 10:00:46 +0100 moocow
 	+ fixed ugly crashes on kira (ubuntu 16.04.1 LTS / g++ 5.4.0-6ubuntu1~16.04.2 5.4.0 20160609 / deb 4:5.3.1-1ubuntu1)

@@ -97,6 +97,13 @@ libmoot_la_SOURCES = \
 #	mootEvent.cc
 #	mootEventLexer.cc
 
+nodist_libmoot_la_SOURCES = \
+	mootNoConfig.h
+
+BUILT_SOURCES = \
+	mootNoConfig.h
+
+
 ##----------------------------------------------------
 ## gnulib sources (hack!)
 
@@ -188,9 +195,9 @@ mootEventLexer.o: mootEventLexer.h mootEvent.h $(fxx_cc_deps)
 ##----------------------------------------------------
 ## Additional rules
 
-mootNoConfig.h: mootAutoConfig.h.in
-	-rm -f "$@"
-	cp "$<" "$@"
+mootNoConfig.h: mootAutoConfig.h
+	echo "/* src/libgfsm/mootNoConfig.h. Generated from mootAutoConfig.h by make */" > $@
+	sed 's/^#define \([^ ]*\).*$$/#undef \1/;' $< >> $@
 
 osfcn.h: myosfcn.h
 	cp "$<" "$@"
@@ -405,7 +412,8 @@ libmoot_la_LIBADD = gnulib/libgnu.la
 CLEANFILES = osfcn.h *.re
 
 ## --- distclean: built by 'configure'
-#DISTCLEANFILES =
+DISTCLEANFILES = \
+	mootNoConfig.h
 
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = \
@@ -443,7 +451,6 @@ MAINTAINERCLEANFILES = \
 
 ## --- extra distribution files
 EXTRA_DIST = \
-	mootNoConfig.h \
 	mootPPLexer.ll \
 	mootTokenLexer.ll \
 	mootNgramsLexer.ll \

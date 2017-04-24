@@ -19,220 +19,290 @@ std::string utf8ToLower(const std::string &s)
     
         {
           unsigned char yych;
+
           yych = *sp;
-          if (yych <= 0xC1) {
-            if (yych <= 'M') {
-              if (yych <= 'F') {
-                if (yych <= 'B') {
-                  if (yych <= '@') goto yy3;
-                  if (yych <= 'A') goto yy5;
-                  goto yy7;
-                } else {
-                  if (yych <= 'C') goto yy9;
-                  if (yych <= 'D') goto yy11;
-                  if (yych <= 'E') goto yy13;
-                  goto yy15;
-                }
-              } else {
-                if (yych <= 'I') {
-                  if (yych <= 'G') goto yy17;
-                  if (yych <= 'H') goto yy19;
-                  goto yy21;
-                } else {
-                  if (yych <= 'J') goto yy23;
-                  if (yych <= 'K') goto yy25;
-                  if (yych <= 'L') goto yy27;
-                  goto yy29;
-                }
-              }
-            } else {
-              if (yych <= 'T') {
-                if (yych <= 'P') {
-                  if (yych <= 'N') goto yy31;
-                  if (yych <= 'O') goto yy33;
-                  goto yy35;
-                } else {
-                  if (yych <= 'Q') goto yy37;
-                  if (yych <= 'R') goto yy39;
-                  if (yych <= 'S') goto yy41;
-                  goto yy43;
-                }
-              } else {
-                if (yych <= 'X') {
-                  if (yych <= 'U') goto yy45;
-                  if (yych <= 'V') goto yy47;
-                  if (yych <= 'W') goto yy49;
-                  goto yy51;
-                } else {
-                  if (yych <= 'Y') goto yy53;
-                  if (yych <= 'Z') goto yy55;
-                  if (yych <= 0x7F) goto yy3;
-                }
-              }
-            }
-          } else {
-            if (yych <= 0xD1) {
-              if (yych <= 0xC8) {
-                if (yych <= 0xC4) {
-                  if (yych <= 0xC2) goto yy57;
-                  if (yych <= 0xC3) goto yy58;
-                  goto yy59;
-                } else {
-                  if (yych <= 0xC5) goto yy60;
-                  if (yych <= 0xC6) goto yy61;
-                  if (yych <= 0xC7) goto yy62;
-                  goto yy63;
-                }
-              } else {
-                if (yych <= 0xCD) {
-                  if (yych <= 0xC9) goto yy64;
-                  if (yych <= 0xCC) goto yy57;
-                  goto yy65;
-                } else {
-                  if (yych <= 0xCE) goto yy66;
-                  if (yych <= 0xCF) goto yy67;
-                  if (yych <= 0xD0) goto yy68;
-                  goto yy69;
-                }
-              }
-            } else {
-              if (yych <= 0xE1) {
-                if (yych <= 0xD4) {
-                  if (yych <= 0xD2) goto yy70;
-                  if (yych <= 0xD3) goto yy71;
-                  goto yy72;
-                } else {
-                  if (yych <= 0xD5) goto yy73;
-                  if (yych <= 0xDF) goto yy57;
-                  if (yych <= 0xE0) goto yy74;
-                  goto yy75;
-                }
-              } else {
-                if (yych <= 0xEC) {
-                  if (yych <= 0xE2) goto yy76;
-                  if (yych == 0xEA) goto yy78;
-                  goto yy77;
-                } else {
-                  if (yych <= 0xED) goto yy79;
-                  if (yych <= 0xEE) goto yy77;
-                  if (yych <= 0xEF) goto yy80;
-                }
-              }
-            }
+          switch (yych) {
+          case 0x00:
+          case 0x01:
+          case 0x02:
+          case 0x03:
+          case 0x04:
+          case 0x05:
+          case 0x06:
+          case 0x07:
+          case 0x08:
+          case '\t':
+          case '\n':
+          case '\v':
+          case '\f':
+          case '\r':
+          case 0x0E:
+          case 0x0F:
+          case 0x10:
+          case 0x11:
+          case 0x12:
+          case 0x13:
+          case 0x14:
+          case 0x15:
+          case 0x16:
+          case 0x17:
+          case 0x18:
+          case 0x19:
+          case 0x1A:
+          case 0x1B:
+          case 0x1C:
+          case 0x1D:
+          case 0x1E:
+          case 0x1F:
+          case ' ':
+          case '!':
+          case '"':
+          case '#':
+          case '$':
+          case '%':
+          case '&':
+          case '\'':
+          case '(':
+          case ')':
+          case '*':
+          case '+':
+          case ',':
+          case '-':
+          case '.':
+          case '/':
+          case '0':
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6':
+          case '7':
+          case '8':
+          case '9':
+          case ':':
+          case ';':
+          case '<':
+          case '=':
+          case '>':
+          case '?':
+          case '@':
+          case '[':
+          case '\\':
+          case ']':
+          case '^':
+          case '_':
+          case '`':
+          case 'a':
+          case 'b':
+          case 'c':
+          case 'd':
+          case 'e':
+          case 'f':
+          case 'g':
+          case 'h':
+          case 'i':
+          case 'j':
+          case 'k':
+          case 'l':
+          case 'm':
+          case 'n':
+          case 'o':
+          case 'p':
+          case 'q':
+          case 'r':
+          case 's':
+          case 't':
+          case 'u':
+          case 'v':
+          case 'w':
+          case 'x':
+          case 'y':
+          case 'z':
+          case '{':
+          case '|':
+          case '}':
+          case '~':
+          case 0x7F:  goto yy75;
+          case 'A':  goto yy3;
+          case 'B':  goto yy5;
+          case 'C':  goto yy7;
+          case 'D':  goto yy9;
+          case 'E':  goto yy11;
+          case 'F':  goto yy13;
+          case 'G':  goto yy15;
+          case 'H':  goto yy17;
+          case 'I':  goto yy19;
+          case 'J':  goto yy21;
+          case 'K':  goto yy23;
+          case 'L':  goto yy25;
+          case 'M':  goto yy27;
+          case 'N':  goto yy29;
+          case 'O':  goto yy31;
+          case 'P':  goto yy33;
+          case 'Q':  goto yy35;
+          case 'R':  goto yy37;
+          case 'S':  goto yy39;
+          case 'T':  goto yy41;
+          case 'U':  goto yy43;
+          case 'V':  goto yy45;
+          case 'W':  goto yy47;
+          case 'X':  goto yy49;
+          case 'Y':  goto yy51;
+          case 'Z':  goto yy53;
+          case 0xC2:  goto yy77;
+          case 0xC3:  goto yy55;
+          case 0xC4:  goto yy56;
+          case 0xC5:  goto yy57;
+          case 0xC6:  goto yy58;
+          case 0xC7:  goto yy59;
+          case 0xC8:  goto yy60;
+          case 0xC9:  goto yy61;
+          case 0xCA:  goto yy78;
+          case 0xCB:  goto yy79;
+          case 0xCC:  goto yy80;
+          case 0xCD:  goto yy62;
+          case 0xCE:  goto yy63;
+          case 0xCF:  goto yy64;
+          case 0xD0:  goto yy65;
+          case 0xD1:  goto yy66;
+          case 0xD2:  goto yy67;
+          case 0xD3:  goto yy68;
+          case 0xD4:  goto yy69;
+          case 0xD5:  goto yy70;
+          case 0xD6:  goto yy81;
+          case 0xD7:  goto yy82;
+          case 0xD8:  goto yy83;
+          case 0xD9:  goto yy84;
+          case 0xDA:  goto yy85;
+          case 0xDB:  goto yy86;
+          case 0xDC:  goto yy87;
+          case 0xDD:  goto yy88;
+          case 0xDE:  goto yy89;
+          case 0xDF:  goto yy90;
+          case 0xE0:  goto yy91;
+          case 0xE1:  goto yy71;
+          case 0xE2:  goto yy72;
+          case 0xE3:  goto yy92;
+          case 0xE4:  goto yy93;
+          case 0xE5:  goto yy94;
+          case 0xE6:  goto yy95;
+          case 0xE7:  goto yy96;
+          case 0xE8:  goto yy97;
+          case 0xE9:  goto yy98;
+          case 0xEA:  goto yy73;
+          case 0xEB:  goto yy99;
+          case 0xEC:  goto yy100;
+          case 0xED:  goto yy101;
+          case 0xEE:  goto yy102;
+          case 0xEF:  goto yy74;
+          default:  goto yy2;
           }
 yy2:
 yy3:
           ++sp;
-          { ls.append(sp-1, sp); continue; /* tolower() identity fallback, 1 byte(s)/char */ }
+          { ls += "\x61"; continue; 	/* A -> a == U+0041 -> U+0061 */ }
 yy5:
           ++sp;
-          { ls += "\x61"; continue; 	/* A -> a == U+0041 -> U+0061 */ }
+          { ls += "\x62"; continue; 	/* B -> b == U+0042 -> U+0062 */ }
 yy7:
           ++sp;
-          { ls += "\x62"; continue; 	/* B -> b == U+0042 -> U+0062 */ }
+          { ls += "\x63"; continue; 	/* C -> c == U+0043 -> U+0063 */ }
 yy9:
           ++sp;
-          { ls += "\x63"; continue; 	/* C -> c == U+0043 -> U+0063 */ }
+          { ls += "\x64"; continue; 	/* D -> d == U+0044 -> U+0064 */ }
 yy11:
           ++sp;
-          { ls += "\x64"; continue; 	/* D -> d == U+0044 -> U+0064 */ }
+          { ls += "\x65"; continue; 	/* E -> e == U+0045 -> U+0065 */ }
 yy13:
           ++sp;
-          { ls += "\x65"; continue; 	/* E -> e == U+0045 -> U+0065 */ }
+          { ls += "\x66"; continue; 	/* F -> f == U+0046 -> U+0066 */ }
 yy15:
           ++sp;
-          { ls += "\x66"; continue; 	/* F -> f == U+0046 -> U+0066 */ }
+          { ls += "\x67"; continue; 	/* G -> g == U+0047 -> U+0067 */ }
 yy17:
           ++sp;
-          { ls += "\x67"; continue; 	/* G -> g == U+0047 -> U+0067 */ }
+          { ls += "\x68"; continue; 	/* H -> h == U+0048 -> U+0068 */ }
 yy19:
           ++sp;
-          { ls += "\x68"; continue; 	/* H -> h == U+0048 -> U+0068 */ }
+          { ls += "\x69"; continue; 	/* I -> i == U+0049 -> U+0069 */ }
 yy21:
           ++sp;
-          { ls += "\x69"; continue; 	/* I -> i == U+0049 -> U+0069 */ }
+          { ls += "\x6a"; continue; 	/* J -> j == U+004A -> U+006A */ }
 yy23:
           ++sp;
-          { ls += "\x6a"; continue; 	/* J -> j == U+004A -> U+006A */ }
+          { ls += "\x6b"; continue; 	/* K -> k == U+004B -> U+006B */ }
 yy25:
           ++sp;
-          { ls += "\x6b"; continue; 	/* K -> k == U+004B -> U+006B */ }
+          { ls += "\x6c"; continue; 	/* L -> l == U+004C -> U+006C */ }
 yy27:
           ++sp;
-          { ls += "\x6c"; continue; 	/* L -> l == U+004C -> U+006C */ }
+          { ls += "\x6d"; continue; 	/* M -> m == U+004D -> U+006D */ }
 yy29:
           ++sp;
-          { ls += "\x6d"; continue; 	/* M -> m == U+004D -> U+006D */ }
+          { ls += "\x6e"; continue; 	/* N -> n == U+004E -> U+006E */ }
 yy31:
           ++sp;
-          { ls += "\x6e"; continue; 	/* N -> n == U+004E -> U+006E */ }
+          { ls += "\x6f"; continue; 	/* O -> o == U+004F -> U+006F */ }
 yy33:
           ++sp;
-          { ls += "\x6f"; continue; 	/* O -> o == U+004F -> U+006F */ }
+          { ls += "\x70"; continue; 	/* P -> p == U+0050 -> U+0070 */ }
 yy35:
           ++sp;
-          { ls += "\x70"; continue; 	/* P -> p == U+0050 -> U+0070 */ }
+          { ls += "\x71"; continue; 	/* Q -> q == U+0051 -> U+0071 */ }
 yy37:
           ++sp;
-          { ls += "\x71"; continue; 	/* Q -> q == U+0051 -> U+0071 */ }
+          { ls += "\x72"; continue; 	/* R -> r == U+0052 -> U+0072 */ }
 yy39:
           ++sp;
-          { ls += "\x72"; continue; 	/* R -> r == U+0052 -> U+0072 */ }
+          { ls += "\x73"; continue; 	/* S -> s == U+0053 -> U+0073 */ }
 yy41:
           ++sp;
-          { ls += "\x73"; continue; 	/* S -> s == U+0053 -> U+0073 */ }
+          { ls += "\x74"; continue; 	/* T -> t == U+0054 -> U+0074 */ }
 yy43:
           ++sp;
-          { ls += "\x74"; continue; 	/* T -> t == U+0054 -> U+0074 */ }
+          { ls += "\x75"; continue; 	/* U -> u == U+0055 -> U+0075 */ }
 yy45:
           ++sp;
-          { ls += "\x75"; continue; 	/* U -> u == U+0055 -> U+0075 */ }
+          { ls += "\x76"; continue; 	/* V -> v == U+0056 -> U+0076 */ }
 yy47:
           ++sp;
-          { ls += "\x76"; continue; 	/* V -> v == U+0056 -> U+0076 */ }
+          { ls += "\x77"; continue; 	/* W -> w == U+0057 -> U+0077 */ }
 yy49:
           ++sp;
-          { ls += "\x77"; continue; 	/* W -> w == U+0057 -> U+0077 */ }
+          { ls += "\x78"; continue; 	/* X -> x == U+0058 -> U+0078 */ }
 yy51:
           ++sp;
-          { ls += "\x78"; continue; 	/* X -> x == U+0058 -> U+0078 */ }
+          { ls += "\x79"; continue; 	/* Y -> y == U+0059 -> U+0079 */ }
 yy53:
           ++sp;
-          { ls += "\x79"; continue; 	/* Y -> y == U+0059 -> U+0079 */ }
-yy55:
-          ++sp;
           { ls += "\x7a"; continue; 	/* Z -> z == U+005A -> U+007A */ }
-yy57:
-          yych = *++sp;
-          if (yych <= 0x7F) goto yy2;
-          if (yych <= 0xBF) goto yy81;
-          goto yy2;
-yy58:
+yy55:
           yych = *++sp;
           switch (yych) {
-          case 0x80:  goto yy83;
-          case 0x81:  goto yy85;
-          case 0x82:  goto yy87;
-          case 0x83:  goto yy89;
-          case 0x84:  goto yy91;
-          case 0x85:  goto yy93;
-          case 0x86:  goto yy95;
-          case 0x87:  goto yy97;
-          case 0x88:  goto yy99;
-          case 0x89:  goto yy101;
-          case 0x8A:  goto yy103;
-          case 0x8B:  goto yy105;
-          case 0x8C:  goto yy107;
-          case 0x8D:  goto yy109;
-          case 0x8E:  goto yy111;
-          case 0x8F:  goto yy113;
-          case 0x90:  goto yy115;
-          case 0x91:  goto yy117;
-          case 0x92:  goto yy119;
-          case 0x93:  goto yy121;
-          case 0x94:  goto yy123;
-          case 0x95:  goto yy125;
-          case 0x96:  goto yy127;
+          case 0x80:  goto yy3019;
+          case 0x81:  goto yy3017;
+          case 0x82:  goto yy3015;
+          case 0x83:  goto yy3013;
+          case 0x84:  goto yy3011;
+          case 0x85:  goto yy3009;
+          case 0x86:  goto yy3007;
+          case 0x87:  goto yy3005;
+          case 0x88:  goto yy3003;
+          case 0x89:  goto yy3001;
+          case 0x8A:  goto yy2999;
+          case 0x8B:  goto yy2997;
+          case 0x8C:  goto yy2995;
+          case 0x8D:  goto yy2993;
+          case 0x8E:  goto yy2991;
+          case 0x8F:  goto yy2989;
+          case 0x90:  goto yy2987;
+          case 0x91:  goto yy2985;
+          case 0x92:  goto yy2983;
+          case 0x93:  goto yy2981;
+          case 0x94:  goto yy2979;
+          case 0x95:  goto yy2977;
+          case 0x96:  goto yy2975;
           case 0x97:
           case 0x9F:
           case 0xA0:
@@ -266,20 +336,20 @@ yy58:
           case 0xBC:
           case 0xBD:
           case 0xBE:
-          case 0xBF:  goto yy81;
-          case 0x98:  goto yy129;
-          case 0x99:  goto yy131;
-          case 0x9A:  goto yy133;
-          case 0x9B:  goto yy135;
-          case 0x9C:  goto yy137;
-          case 0x9D:  goto yy139;
-          case 0x9E:  goto yy141;
+          case 0xBF:  goto yy809;
+          case 0x98:  goto yy2973;
+          case 0x99:  goto yy2971;
+          case 0x9A:  goto yy2969;
+          case 0x9B:  goto yy2967;
+          case 0x9C:  goto yy2965;
+          case 0x9D:  goto yy2963;
+          case 0x9E:  goto yy2961;
           default:  goto yy2;
           }
-yy59:
+yy56:
           yych = *++sp;
           switch (yych) {
-          case 0x80:  goto yy143;
+          case 0x80:  goto yy2959;
           case 0x81:
           case 0x83:
           case 0x85:
@@ -311,41 +381,41 @@ yy59:
           case 0xB8:
           case 0xBA:
           case 0xBC:
-          case 0xBE:  goto yy81;
-          case 0x82:  goto yy145;
-          case 0x84:  goto yy147;
-          case 0x86:  goto yy149;
-          case 0x88:  goto yy151;
-          case 0x8A:  goto yy153;
-          case 0x8C:  goto yy155;
-          case 0x8E:  goto yy157;
-          case 0x90:  goto yy159;
-          case 0x92:  goto yy161;
-          case 0x94:  goto yy163;
-          case 0x96:  goto yy165;
-          case 0x98:  goto yy167;
-          case 0x9A:  goto yy169;
-          case 0x9C:  goto yy171;
-          case 0x9E:  goto yy173;
-          case 0xA0:  goto yy175;
-          case 0xA2:  goto yy177;
-          case 0xA4:  goto yy179;
-          case 0xA6:  goto yy181;
-          case 0xA8:  goto yy183;
-          case 0xAA:  goto yy185;
-          case 0xAC:  goto yy187;
-          case 0xAE:  goto yy189;
-          case 0xB0:  goto yy191;
-          case 0xB2:  goto yy193;
-          case 0xB4:  goto yy195;
-          case 0xB6:  goto yy197;
-          case 0xB9:  goto yy199;
-          case 0xBB:  goto yy201;
-          case 0xBD:  goto yy203;
-          case 0xBF:  goto yy205;
+          case 0xBE:  goto yy809;
+          case 0x82:  goto yy2957;
+          case 0x84:  goto yy2955;
+          case 0x86:  goto yy2953;
+          case 0x88:  goto yy2951;
+          case 0x8A:  goto yy2949;
+          case 0x8C:  goto yy2947;
+          case 0x8E:  goto yy2945;
+          case 0x90:  goto yy2943;
+          case 0x92:  goto yy2941;
+          case 0x94:  goto yy2939;
+          case 0x96:  goto yy2937;
+          case 0x98:  goto yy2935;
+          case 0x9A:  goto yy2933;
+          case 0x9C:  goto yy2931;
+          case 0x9E:  goto yy2929;
+          case 0xA0:  goto yy2927;
+          case 0xA2:  goto yy2925;
+          case 0xA4:  goto yy2923;
+          case 0xA6:  goto yy2921;
+          case 0xA8:  goto yy2919;
+          case 0xAA:  goto yy2917;
+          case 0xAC:  goto yy2915;
+          case 0xAE:  goto yy2913;
+          case 0xB0:  goto yy2911;
+          case 0xB2:  goto yy2909;
+          case 0xB4:  goto yy2907;
+          case 0xB6:  goto yy2905;
+          case 0xB9:  goto yy2903;
+          case 0xBB:  goto yy2901;
+          case 0xBD:  goto yy2899;
+          case 0xBF:  goto yy2897;
           default:  goto yy2;
           }
-yy60:
+yy57:
           yych = *++sp;
           switch (yych) {
           case 0x80:
@@ -380,41 +450,41 @@ yy60:
           case 0xBA:
           case 0xBC:
           case 0xBE:
-          case 0xBF:  goto yy81;
-          case 0x81:  goto yy207;
-          case 0x83:  goto yy209;
-          case 0x85:  goto yy211;
-          case 0x87:  goto yy213;
-          case 0x8A:  goto yy215;
-          case 0x8C:  goto yy217;
-          case 0x8E:  goto yy219;
-          case 0x90:  goto yy221;
-          case 0x92:  goto yy223;
-          case 0x94:  goto yy225;
-          case 0x96:  goto yy227;
-          case 0x98:  goto yy229;
-          case 0x9A:  goto yy231;
-          case 0x9C:  goto yy233;
-          case 0x9E:  goto yy235;
-          case 0xA0:  goto yy237;
-          case 0xA2:  goto yy239;
-          case 0xA4:  goto yy241;
-          case 0xA6:  goto yy243;
-          case 0xA8:  goto yy245;
-          case 0xAA:  goto yy247;
-          case 0xAC:  goto yy249;
-          case 0xAE:  goto yy251;
-          case 0xB0:  goto yy253;
-          case 0xB2:  goto yy255;
-          case 0xB4:  goto yy257;
-          case 0xB6:  goto yy259;
-          case 0xB8:  goto yy261;
-          case 0xB9:  goto yy263;
-          case 0xBB:  goto yy265;
-          case 0xBD:  goto yy267;
+          case 0xBF:  goto yy809;
+          case 0x81:  goto yy2895;
+          case 0x83:  goto yy2893;
+          case 0x85:  goto yy2891;
+          case 0x87:  goto yy2889;
+          case 0x8A:  goto yy2887;
+          case 0x8C:  goto yy2885;
+          case 0x8E:  goto yy2883;
+          case 0x90:  goto yy2881;
+          case 0x92:  goto yy2879;
+          case 0x94:  goto yy2877;
+          case 0x96:  goto yy2875;
+          case 0x98:  goto yy2873;
+          case 0x9A:  goto yy2871;
+          case 0x9C:  goto yy2869;
+          case 0x9E:  goto yy2867;
+          case 0xA0:  goto yy2865;
+          case 0xA2:  goto yy2863;
+          case 0xA4:  goto yy2861;
+          case 0xA6:  goto yy2859;
+          case 0xA8:  goto yy2857;
+          case 0xAA:  goto yy2855;
+          case 0xAC:  goto yy2853;
+          case 0xAE:  goto yy2851;
+          case 0xB0:  goto yy2849;
+          case 0xB2:  goto yy2847;
+          case 0xB4:  goto yy2845;
+          case 0xB6:  goto yy2843;
+          case 0xB8:  goto yy2841;
+          case 0xB9:  goto yy2839;
+          case 0xBB:  goto yy2837;
+          case 0xBD:  goto yy2835;
           default:  goto yy2;
           }
-yy61:
+yy58:
           yych = *++sp;
           switch (yych) {
           case 0x80:
@@ -444,46 +514,46 @@ yy61:
           case 0xBB:
           case 0xBD:
           case 0xBE:
-          case 0xBF:  goto yy81;
-          case 0x81:  goto yy269;
-          case 0x82:  goto yy271;
-          case 0x84:  goto yy273;
-          case 0x86:  goto yy275;
-          case 0x87:  goto yy277;
-          case 0x89:  goto yy279;
-          case 0x8A:  goto yy281;
-          case 0x8B:  goto yy283;
-          case 0x8E:  goto yy285;
-          case 0x8F:  goto yy287;
-          case 0x90:  goto yy289;
-          case 0x91:  goto yy291;
-          case 0x93:  goto yy293;
-          case 0x94:  goto yy295;
-          case 0x96:  goto yy297;
-          case 0x97:  goto yy299;
-          case 0x98:  goto yy301;
-          case 0x9C:  goto yy303;
-          case 0x9D:  goto yy305;
-          case 0x9F:  goto yy307;
-          case 0xA0:  goto yy309;
-          case 0xA2:  goto yy311;
-          case 0xA4:  goto yy313;
-          case 0xA6:  goto yy315;
-          case 0xA7:  goto yy317;
-          case 0xA9:  goto yy319;
-          case 0xAC:  goto yy321;
-          case 0xAE:  goto yy323;
-          case 0xAF:  goto yy325;
-          case 0xB1:  goto yy327;
-          case 0xB2:  goto yy329;
-          case 0xB3:  goto yy331;
-          case 0xB5:  goto yy333;
-          case 0xB7:  goto yy335;
-          case 0xB8:  goto yy337;
-          case 0xBC:  goto yy339;
+          case 0xBF:  goto yy809;
+          case 0x81:  goto yy2833;
+          case 0x82:  goto yy2831;
+          case 0x84:  goto yy2829;
+          case 0x86:  goto yy2827;
+          case 0x87:  goto yy2825;
+          case 0x89:  goto yy2823;
+          case 0x8A:  goto yy2821;
+          case 0x8B:  goto yy2819;
+          case 0x8E:  goto yy2817;
+          case 0x8F:  goto yy2815;
+          case 0x90:  goto yy2813;
+          case 0x91:  goto yy2811;
+          case 0x93:  goto yy2809;
+          case 0x94:  goto yy2807;
+          case 0x96:  goto yy2805;
+          case 0x97:  goto yy2803;
+          case 0x98:  goto yy2801;
+          case 0x9C:  goto yy2799;
+          case 0x9D:  goto yy2797;
+          case 0x9F:  goto yy2795;
+          case 0xA0:  goto yy2793;
+          case 0xA2:  goto yy2791;
+          case 0xA4:  goto yy2789;
+          case 0xA6:  goto yy2787;
+          case 0xA7:  goto yy2785;
+          case 0xA9:  goto yy2783;
+          case 0xAC:  goto yy2781;
+          case 0xAE:  goto yy2779;
+          case 0xAF:  goto yy2777;
+          case 0xB1:  goto yy2775;
+          case 0xB2:  goto yy2773;
+          case 0xB3:  goto yy2771;
+          case 0xB5:  goto yy2769;
+          case 0xB7:  goto yy2767;
+          case 0xB8:  goto yy2765;
+          case 0xBC:  goto yy2763;
           default:  goto yy2;
           }
-yy62:
+yy59:
           yych = *++sp;
           switch (yych) {
           case 0x80:
@@ -517,45 +587,45 @@ yy62:
           case 0xB9:
           case 0xBB:
           case 0xBD:
-          case 0xBF:  goto yy81;
-          case 0x84:  goto yy341;
-          case 0x85:  goto yy343;
-          case 0x87:  goto yy345;
-          case 0x88:  goto yy347;
-          case 0x8A:  goto yy349;
-          case 0x8B:  goto yy351;
-          case 0x8D:  goto yy353;
-          case 0x8F:  goto yy355;
-          case 0x91:  goto yy357;
-          case 0x93:  goto yy359;
-          case 0x95:  goto yy361;
-          case 0x97:  goto yy363;
-          case 0x99:  goto yy365;
-          case 0x9B:  goto yy367;
-          case 0x9E:  goto yy369;
-          case 0xA0:  goto yy371;
-          case 0xA2:  goto yy373;
-          case 0xA4:  goto yy375;
-          case 0xA6:  goto yy377;
-          case 0xA8:  goto yy379;
-          case 0xAA:  goto yy381;
-          case 0xAC:  goto yy383;
-          case 0xAE:  goto yy385;
-          case 0xB1:  goto yy387;
-          case 0xB2:  goto yy389;
-          case 0xB4:  goto yy391;
-          case 0xB6:  goto yy393;
-          case 0xB7:  goto yy395;
-          case 0xB8:  goto yy397;
-          case 0xBA:  goto yy399;
-          case 0xBC:  goto yy401;
-          case 0xBE:  goto yy403;
+          case 0xBF:  goto yy809;
+          case 0x84:  goto yy2761;
+          case 0x85:  goto yy2759;
+          case 0x87:  goto yy2757;
+          case 0x88:  goto yy2755;
+          case 0x8A:  goto yy2753;
+          case 0x8B:  goto yy2751;
+          case 0x8D:  goto yy2749;
+          case 0x8F:  goto yy2747;
+          case 0x91:  goto yy2745;
+          case 0x93:  goto yy2743;
+          case 0x95:  goto yy2741;
+          case 0x97:  goto yy2739;
+          case 0x99:  goto yy2737;
+          case 0x9B:  goto yy2735;
+          case 0x9E:  goto yy2733;
+          case 0xA0:  goto yy2731;
+          case 0xA2:  goto yy2729;
+          case 0xA4:  goto yy2727;
+          case 0xA6:  goto yy2725;
+          case 0xA8:  goto yy2723;
+          case 0xAA:  goto yy2721;
+          case 0xAC:  goto yy2719;
+          case 0xAE:  goto yy2717;
+          case 0xB1:  goto yy2715;
+          case 0xB2:  goto yy2713;
+          case 0xB4:  goto yy2711;
+          case 0xB6:  goto yy2709;
+          case 0xB7:  goto yy2707;
+          case 0xB8:  goto yy2705;
+          case 0xBA:  goto yy2703;
+          case 0xBC:  goto yy2701;
+          case 0xBE:  goto yy2699;
           default:  goto yy2;
           }
-yy63:
+yy60:
           yych = *++sp;
           switch (yych) {
-          case 0x80:  goto yy405;
+          case 0x80:  goto yy2697;
           case 0x81:
           case 0x83:
           case 0x85:
@@ -589,91 +659,293 @@ yy63:
           case 0xB8:
           case 0xB9:
           case 0xBC:
-          case 0xBF:  goto yy81;
-          case 0x82:  goto yy407;
-          case 0x84:  goto yy409;
-          case 0x86:  goto yy411;
-          case 0x88:  goto yy413;
-          case 0x8A:  goto yy415;
-          case 0x8C:  goto yy417;
-          case 0x8E:  goto yy419;
-          case 0x90:  goto yy421;
-          case 0x92:  goto yy423;
-          case 0x94:  goto yy425;
-          case 0x96:  goto yy427;
-          case 0x98:  goto yy429;
-          case 0x9A:  goto yy431;
-          case 0x9C:  goto yy433;
-          case 0x9E:  goto yy435;
-          case 0xA0:  goto yy437;
-          case 0xA2:  goto yy439;
-          case 0xA4:  goto yy441;
-          case 0xA6:  goto yy443;
-          case 0xA8:  goto yy445;
-          case 0xAA:  goto yy447;
-          case 0xAC:  goto yy449;
-          case 0xAE:  goto yy451;
-          case 0xB0:  goto yy453;
-          case 0xB2:  goto yy455;
-          case 0xBA:  goto yy457;
-          case 0xBB:  goto yy459;
-          case 0xBD:  goto yy461;
-          case 0xBE:  goto yy463;
+          case 0xBF:  goto yy809;
+          case 0x82:  goto yy2695;
+          case 0x84:  goto yy2693;
+          case 0x86:  goto yy2691;
+          case 0x88:  goto yy2689;
+          case 0x8A:  goto yy2687;
+          case 0x8C:  goto yy2685;
+          case 0x8E:  goto yy2683;
+          case 0x90:  goto yy2681;
+          case 0x92:  goto yy2679;
+          case 0x94:  goto yy2677;
+          case 0x96:  goto yy2675;
+          case 0x98:  goto yy2673;
+          case 0x9A:  goto yy2671;
+          case 0x9C:  goto yy2669;
+          case 0x9E:  goto yy2667;
+          case 0xA0:  goto yy2665;
+          case 0xA2:  goto yy2663;
+          case 0xA4:  goto yy2661;
+          case 0xA6:  goto yy2659;
+          case 0xA8:  goto yy2657;
+          case 0xAA:  goto yy2655;
+          case 0xAC:  goto yy2653;
+          case 0xAE:  goto yy2651;
+          case 0xB0:  goto yy2649;
+          case 0xB2:  goto yy2647;
+          case 0xBA:  goto yy2645;
+          case 0xBB:  goto yy2643;
+          case 0xBD:  goto yy2641;
+          case 0xBE:  goto yy2639;
           default:  goto yy2;
           }
-yy64:
+yy61:
           yych = *++sp;
           if (yych <= 0x87) {
             if (yych <= 0x82) {
               if (yych <= 0x7F) goto yy2;
-              if (yych == 0x81) goto yy465;
-              goto yy81;
+              if (yych == 0x81) goto yy2637;
+              goto yy809;
             } else {
               if (yych <= 0x84) {
-                if (yych <= 0x83) goto yy467;
-                goto yy469;
+                if (yych <= 0x83) goto yy2635;
+                goto yy2633;
               } else {
-                if (yych <= 0x85) goto yy471;
-                if (yych <= 0x86) goto yy473;
-                goto yy81;
+                if (yych <= 0x85) goto yy2631;
+                if (yych <= 0x86) goto yy2629;
+                goto yy809;
               }
             }
           } else {
             if (yych <= 0x8B) {
-              if (yych <= 0x88) goto yy475;
-              if (yych == 0x8A) goto yy477;
-              goto yy81;
+              if (yych <= 0x88) goto yy2627;
+              if (yych == 0x8A) goto yy2625;
+              goto yy809;
             } else {
               if (yych <= 0x8D) {
-                if (yych <= 0x8C) goto yy479;
-                goto yy81;
+                if (yych <= 0x8C) goto yy2623;
+                goto yy809;
               } else {
-                if (yych <= 0x8E) goto yy481;
-                if (yych <= 0xBF) goto yy81;
+                if (yych <= 0x8E) goto yy2621;
+                if (yych <= 0xBF) goto yy809;
                 goto yy2;
               }
             }
           }
-yy65:
+yy62:
           yych = *++sp;
-          if (yych <= 0xB2) {
-            if (yych <= 0xAF) {
-              if (yych <= 0x7F) goto yy2;
-              goto yy81;
-            } else {
-              if (yych <= 0xB0) goto yy483;
-              if (yych <= 0xB1) goto yy81;
-              goto yy485;
-            }
+          if (yych <= 0xB1) {
+            if (yych <= 0x7F) goto yy2;
+            if (yych == 0xB0) goto yy2619;
+            goto yy809;
           } else {
-            if (yych <= 0xB6) {
-              if (yych <= 0xB5) goto yy81;
-              goto yy487;
+            if (yych <= 0xB5) {
+              if (yych <= 0xB2) goto yy2617;
+              goto yy809;
             } else {
-              if (yych <= 0xBE) goto yy81;
-              if (yych <= 0xBF) goto yy489;
+              if (yych <= 0xB6) goto yy2615;
+              if (yych <= 0xBF) goto yy809;
               goto yy2;
             }
+          }
+yy63:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:
+          case 0x81:
+          case 0x82:
+          case 0x83:
+          case 0x84:
+          case 0x85:
+          case 0x87:
+          case 0x8B:
+          case 0x8D:
+          case 0x90:
+          case 0xA2:
+          case 0xAC:
+          case 0xAD:
+          case 0xAE:
+          case 0xAF:
+          case 0xB0:
+          case 0xB1:
+          case 0xB2:
+          case 0xB3:
+          case 0xB4:
+          case 0xB5:
+          case 0xB6:
+          case 0xB7:
+          case 0xB8:
+          case 0xB9:
+          case 0xBA:
+          case 0xBB:
+          case 0xBC:
+          case 0xBD:
+          case 0xBE:
+          case 0xBF:  goto yy809;
+          case 0x86:  goto yy2613;
+          case 0x88:  goto yy2611;
+          case 0x89:  goto yy2609;
+          case 0x8A:  goto yy2607;
+          case 0x8C:  goto yy2605;
+          case 0x8E:  goto yy2603;
+          case 0x8F:  goto yy2601;
+          case 0x91:  goto yy2599;
+          case 0x92:  goto yy2597;
+          case 0x93:  goto yy2595;
+          case 0x94:  goto yy2593;
+          case 0x95:  goto yy2591;
+          case 0x96:  goto yy2589;
+          case 0x97:  goto yy2587;
+          case 0x98:  goto yy2585;
+          case 0x99:  goto yy2583;
+          case 0x9A:  goto yy2581;
+          case 0x9B:  goto yy2579;
+          case 0x9C:  goto yy2577;
+          case 0x9D:  goto yy2575;
+          case 0x9E:  goto yy2573;
+          case 0x9F:  goto yy2571;
+          case 0xA0:  goto yy2569;
+          case 0xA1:  goto yy2567;
+          case 0xA3:  goto yy2565;
+          case 0xA4:  goto yy2563;
+          case 0xA5:  goto yy2561;
+          case 0xA6:  goto yy2559;
+          case 0xA7:  goto yy2557;
+          case 0xA8:  goto yy2555;
+          case 0xA9:  goto yy2553;
+          case 0xAA:  goto yy2551;
+          case 0xAB:  goto yy2549;
+          default:  goto yy2;
+          }
+yy64:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:
+          case 0x81:
+          case 0x82:
+          case 0x83:
+          case 0x84:
+          case 0x85:
+          case 0x86:
+          case 0x87:
+          case 0x88:
+          case 0x89:
+          case 0x8A:
+          case 0x8B:
+          case 0x8C:
+          case 0x8D:
+          case 0x8E:
+          case 0x90:
+          case 0x91:
+          case 0x92:
+          case 0x93:
+          case 0x94:
+          case 0x95:
+          case 0x96:
+          case 0x97:
+          case 0x99:
+          case 0x9B:
+          case 0x9D:
+          case 0x9F:
+          case 0xA1:
+          case 0xA3:
+          case 0xA5:
+          case 0xA7:
+          case 0xA9:
+          case 0xAB:
+          case 0xAD:
+          case 0xAF:
+          case 0xB0:
+          case 0xB1:
+          case 0xB2:
+          case 0xB3:
+          case 0xB5:
+          case 0xB6:
+          case 0xB8:
+          case 0xBB:
+          case 0xBC:  goto yy809;
+          case 0x8F:  goto yy2547;
+          case 0x98:  goto yy2545;
+          case 0x9A:  goto yy2543;
+          case 0x9C:  goto yy2541;
+          case 0x9E:  goto yy2539;
+          case 0xA0:  goto yy2537;
+          case 0xA2:  goto yy2535;
+          case 0xA4:  goto yy2533;
+          case 0xA6:  goto yy2531;
+          case 0xA8:  goto yy2529;
+          case 0xAA:  goto yy2527;
+          case 0xAC:  goto yy2525;
+          case 0xAE:  goto yy2523;
+          case 0xB4:  goto yy2521;
+          case 0xB7:  goto yy2519;
+          case 0xB9:  goto yy2517;
+          case 0xBA:  goto yy2515;
+          case 0xBD:  goto yy2513;
+          case 0xBE:  goto yy2511;
+          case 0xBF:  goto yy2509;
+          default:  goto yy2;
+          }
+yy65:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy2507;
+          case 0x81:  goto yy2505;
+          case 0x82:  goto yy2503;
+          case 0x83:  goto yy2501;
+          case 0x84:  goto yy2499;
+          case 0x85:  goto yy2497;
+          case 0x86:  goto yy2495;
+          case 0x87:  goto yy2493;
+          case 0x88:  goto yy2491;
+          case 0x89:  goto yy2489;
+          case 0x8A:  goto yy2487;
+          case 0x8B:  goto yy2485;
+          case 0x8C:  goto yy2483;
+          case 0x8D:  goto yy2481;
+          case 0x8E:  goto yy2479;
+          case 0x8F:  goto yy2477;
+          case 0x90:  goto yy2475;
+          case 0x91:  goto yy2473;
+          case 0x92:  goto yy2471;
+          case 0x93:  goto yy2469;
+          case 0x94:  goto yy2467;
+          case 0x95:  goto yy2465;
+          case 0x96:  goto yy2463;
+          case 0x97:  goto yy2461;
+          case 0x98:  goto yy2459;
+          case 0x99:  goto yy2457;
+          case 0x9A:  goto yy2455;
+          case 0x9B:  goto yy2453;
+          case 0x9C:  goto yy2451;
+          case 0x9D:  goto yy2449;
+          case 0x9E:  goto yy2447;
+          case 0x9F:  goto yy2445;
+          case 0xA0:  goto yy2443;
+          case 0xA1:  goto yy2441;
+          case 0xA2:  goto yy2439;
+          case 0xA3:  goto yy2437;
+          case 0xA4:  goto yy2435;
+          case 0xA5:  goto yy2433;
+          case 0xA6:  goto yy2431;
+          case 0xA7:  goto yy2429;
+          case 0xA8:  goto yy2427;
+          case 0xA9:  goto yy2425;
+          case 0xAA:  goto yy2423;
+          case 0xAB:  goto yy2421;
+          case 0xAC:  goto yy2419;
+          case 0xAD:  goto yy2417;
+          case 0xAE:  goto yy2415;
+          case 0xAF:  goto yy2413;
+          case 0xB0:
+          case 0xB1:
+          case 0xB2:
+          case 0xB3:
+          case 0xB4:
+          case 0xB5:
+          case 0xB6:
+          case 0xB7:
+          case 0xB8:
+          case 0xB9:
+          case 0xBA:
+          case 0xBB:
+          case 0xBC:
+          case 0xBD:
+          case 0xBE:
+          case 0xBF:  goto yy809;
+          default:  goto yy2;
           }
 yy66:
           yych = *++sp;
@@ -684,70 +956,70 @@ yy66:
           case 0x83:
           case 0x84:
           case 0x85:
+          case 0x86:
           case 0x87:
+          case 0x88:
+          case 0x89:
+          case 0x8A:
           case 0x8B:
+          case 0x8C:
           case 0x8D:
+          case 0x8E:
+          case 0x8F:
           case 0x90:
-          case 0xA2:
-          case 0xAC:
+          case 0x91:
+          case 0x92:
+          case 0x93:
+          case 0x94:
+          case 0x95:
+          case 0x96:
+          case 0x97:
+          case 0x98:
+          case 0x99:
+          case 0x9A:
+          case 0x9B:
+          case 0x9C:
+          case 0x9D:
+          case 0x9E:
+          case 0x9F:
+          case 0xA1:
+          case 0xA3:
+          case 0xA5:
+          case 0xA7:
+          case 0xA9:
+          case 0xAB:
           case 0xAD:
-          case 0xAE:
           case 0xAF:
-          case 0xB0:
           case 0xB1:
-          case 0xB2:
           case 0xB3:
-          case 0xB4:
           case 0xB5:
-          case 0xB6:
           case 0xB7:
-          case 0xB8:
           case 0xB9:
-          case 0xBA:
           case 0xBB:
-          case 0xBC:
           case 0xBD:
-          case 0xBE:
-          case 0xBF:  goto yy81;
-          case 0x86:  goto yy491;
-          case 0x88:  goto yy493;
-          case 0x89:  goto yy495;
-          case 0x8A:  goto yy497;
-          case 0x8C:  goto yy499;
-          case 0x8E:  goto yy501;
-          case 0x8F:  goto yy503;
-          case 0x91:  goto yy505;
-          case 0x92:  goto yy507;
-          case 0x93:  goto yy509;
-          case 0x94:  goto yy511;
-          case 0x95:  goto yy513;
-          case 0x96:  goto yy515;
-          case 0x97:  goto yy517;
-          case 0x98:  goto yy519;
-          case 0x99:  goto yy521;
-          case 0x9A:  goto yy523;
-          case 0x9B:  goto yy525;
-          case 0x9C:  goto yy527;
-          case 0x9D:  goto yy529;
-          case 0x9E:  goto yy531;
-          case 0x9F:  goto yy533;
-          case 0xA0:  goto yy535;
-          case 0xA1:  goto yy537;
-          case 0xA3:  goto yy539;
-          case 0xA4:  goto yy541;
-          case 0xA5:  goto yy543;
-          case 0xA6:  goto yy545;
-          case 0xA7:  goto yy547;
-          case 0xA8:  goto yy549;
-          case 0xA9:  goto yy551;
-          case 0xAA:  goto yy553;
-          case 0xAB:  goto yy555;
+          case 0xBF:  goto yy809;
+          case 0xA0:  goto yy2411;
+          case 0xA2:  goto yy2409;
+          case 0xA4:  goto yy2407;
+          case 0xA6:  goto yy2405;
+          case 0xA8:  goto yy2403;
+          case 0xAA:  goto yy2401;
+          case 0xAC:  goto yy2399;
+          case 0xAE:  goto yy2397;
+          case 0xB0:  goto yy2395;
+          case 0xB2:  goto yy2393;
+          case 0xB4:  goto yy2391;
+          case 0xB6:  goto yy2389;
+          case 0xB8:  goto yy2387;
+          case 0xBA:  goto yy2385;
+          case 0xBC:  goto yy2383;
+          case 0xBE:  goto yy2381;
           default:  goto yy2;
           }
 yy67:
           yych = *++sp;
           switch (yych) {
-          case 0x80:
+          case 0x80:  goto yy2379;
           case 0x81:
           case 0x82:
           case 0x83:
@@ -757,18 +1029,12 @@ yy67:
           case 0x87:
           case 0x88:
           case 0x89:
-          case 0x8A:
           case 0x8B:
-          case 0x8C:
           case 0x8D:
-          case 0x8E:
-          case 0x90:
+          case 0x8F:
           case 0x91:
-          case 0x92:
           case 0x93:
-          case 0x94:
           case 0x95:
-          case 0x96:
           case 0x97:
           case 0x99:
           case 0x9B:
@@ -782,408 +1048,5742 @@ yy67:
           case 0xAB:
           case 0xAD:
           case 0xAF:
-          case 0xB0:
           case 0xB1:
-          case 0xB2:
           case 0xB3:
           case 0xB5:
-          case 0xB6:
-          case 0xB8:
+          case 0xB7:
+          case 0xB9:
           case 0xBB:
-          case 0xBC:  goto yy81;
-          case 0x8F:  goto yy557;
-          case 0x98:  goto yy559;
-          case 0x9A:  goto yy561;
-          case 0x9C:  goto yy563;
-          case 0x9E:  goto yy565;
-          case 0xA0:  goto yy567;
-          case 0xA2:  goto yy569;
-          case 0xA4:  goto yy571;
-          case 0xA6:  goto yy573;
-          case 0xA8:  goto yy575;
-          case 0xAA:  goto yy577;
-          case 0xAC:  goto yy579;
-          case 0xAE:  goto yy581;
-          case 0xB4:  goto yy583;
-          case 0xB7:  goto yy585;
-          case 0xB9:  goto yy587;
-          case 0xBA:  goto yy589;
-          case 0xBD:  goto yy591;
-          case 0xBE:  goto yy593;
-          case 0xBF:  goto yy595;
+          case 0xBD:
+          case 0xBF:  goto yy809;
+          case 0x8A:  goto yy2377;
+          case 0x8C:  goto yy2375;
+          case 0x8E:  goto yy2373;
+          case 0x90:  goto yy2371;
+          case 0x92:  goto yy2369;
+          case 0x94:  goto yy2367;
+          case 0x96:  goto yy2365;
+          case 0x98:  goto yy2363;
+          case 0x9A:  goto yy2361;
+          case 0x9C:  goto yy2359;
+          case 0x9E:  goto yy2357;
+          case 0xA0:  goto yy2355;
+          case 0xA2:  goto yy2353;
+          case 0xA4:  goto yy2351;
+          case 0xA6:  goto yy2349;
+          case 0xA8:  goto yy2347;
+          case 0xAA:  goto yy2345;
+          case 0xAC:  goto yy2343;
+          case 0xAE:  goto yy2341;
+          case 0xB0:  goto yy2339;
+          case 0xB2:  goto yy2337;
+          case 0xB4:  goto yy2335;
+          case 0xB6:  goto yy2333;
+          case 0xB8:  goto yy2331;
+          case 0xBA:  goto yy2329;
+          case 0xBC:  goto yy2327;
+          case 0xBE:  goto yy2325;
           default:  goto yy2;
           }
 yy68:
           yych = *++sp;
           switch (yych) {
-          case 0x80:  goto yy597;
-          case 0x81:  goto yy599;
-          case 0x82:  goto yy601;
-          case 0x83:  goto yy603;
-          case 0x84:  goto yy605;
-          case 0x85:  goto yy607;
-          case 0x86:  goto yy609;
-          case 0x87:  goto yy611;
-          case 0x88:  goto yy613;
-          case 0x89:  goto yy615;
-          case 0x8A:  goto yy617;
-          case 0x8B:  goto yy619;
-          case 0x8C:  goto yy621;
-          case 0x8D:  goto yy623;
-          case 0x8E:  goto yy625;
-          case 0x8F:  goto yy627;
-          case 0x90:  goto yy629;
-          case 0x91:  goto yy631;
-          case 0x92:  goto yy633;
-          case 0x93:  goto yy635;
-          case 0x94:  goto yy637;
-          case 0x95:  goto yy639;
-          case 0x96:  goto yy641;
-          case 0x97:  goto yy643;
-          case 0x98:  goto yy645;
-          case 0x99:  goto yy647;
-          case 0x9A:  goto yy649;
-          case 0x9B:  goto yy651;
-          case 0x9C:  goto yy653;
-          case 0x9D:  goto yy655;
-          case 0x9E:  goto yy657;
-          case 0x9F:  goto yy659;
-          case 0xA0:  goto yy661;
-          case 0xA1:  goto yy663;
-          case 0xA2:  goto yy665;
-          case 0xA3:  goto yy667;
-          case 0xA4:  goto yy669;
-          case 0xA5:  goto yy671;
-          case 0xA6:  goto yy673;
-          case 0xA7:  goto yy675;
-          case 0xA8:  goto yy677;
-          case 0xA9:  goto yy679;
-          case 0xAA:  goto yy681;
-          case 0xAB:  goto yy683;
-          case 0xAC:  goto yy685;
-          case 0xAD:  goto yy687;
-          case 0xAE:  goto yy689;
-          case 0xAF:  goto yy691;
-          case 0xB0:
+          case 0x80:  goto yy2323;
+          case 0x81:  goto yy2321;
+          case 0x82:
+          case 0x84:
+          case 0x86:
+          case 0x88:
+          case 0x8A:
+          case 0x8C:
+          case 0x8E:
+          case 0x8F:
+          case 0x91:
+          case 0x93:
+          case 0x95:
+          case 0x97:
+          case 0x99:
+          case 0x9B:
+          case 0x9D:
+          case 0x9F:
+          case 0xA1:
+          case 0xA3:
+          case 0xA5:
+          case 0xA7:
+          case 0xA9:
+          case 0xAB:
+          case 0xAD:
+          case 0xAF:
           case 0xB1:
-          case 0xB2:
           case 0xB3:
-          case 0xB4:
           case 0xB5:
-          case 0xB6:
           case 0xB7:
-          case 0xB8:
           case 0xB9:
-          case 0xBA:
           case 0xBB:
-          case 0xBC:
           case 0xBD:
-          case 0xBE:
-          case 0xBF:  goto yy81;
+          case 0xBF:  goto yy809;
+          case 0x83:  goto yy2319;
+          case 0x85:  goto yy2317;
+          case 0x87:  goto yy2315;
+          case 0x89:  goto yy2313;
+          case 0x8B:  goto yy2311;
+          case 0x8D:  goto yy2309;
+          case 0x90:  goto yy2307;
+          case 0x92:  goto yy2305;
+          case 0x94:  goto yy2303;
+          case 0x96:  goto yy2301;
+          case 0x98:  goto yy2299;
+          case 0x9A:  goto yy2297;
+          case 0x9C:  goto yy2295;
+          case 0x9E:  goto yy2293;
+          case 0xA0:  goto yy2291;
+          case 0xA2:  goto yy2289;
+          case 0xA4:  goto yy2287;
+          case 0xA6:  goto yy2285;
+          case 0xA8:  goto yy2283;
+          case 0xAA:  goto yy2281;
+          case 0xAC:  goto yy2279;
+          case 0xAE:  goto yy2277;
+          case 0xB0:  goto yy2275;
+          case 0xB2:  goto yy2273;
+          case 0xB4:  goto yy2271;
+          case 0xB6:  goto yy2269;
+          case 0xB8:  goto yy2267;
+          case 0xBA:  goto yy2265;
+          case 0xBC:  goto yy2263;
+          case 0xBE:  goto yy2261;
           default:  goto yy2;
           }
 yy69:
           yych = *++sp;
           switch (yych) {
-          case 0x80:
+          case 0x80:  goto yy2259;
           case 0x81:
-          case 0x82:
           case 0x83:
-          case 0x84:
           case 0x85:
-          case 0x86:
           case 0x87:
-          case 0x88:
           case 0x89:
-          case 0x8A:
           case 0x8B:
-          case 0x8C:
           case 0x8D:
-          case 0x8E:
           case 0x8F:
-          case 0x90:
           case 0x91:
-          case 0x92:
           case 0x93:
-          case 0x94:
           case 0x95:
-          case 0x96:
           case 0x97:
-          case 0x98:
           case 0x99:
-          case 0x9A:
           case 0x9B:
-          case 0x9C:
           case 0x9D:
-          case 0x9E:
           case 0x9F:
           case 0xA1:
           case 0xA3:
           case 0xA5:
           case 0xA7:
+          case 0xA8:
           case 0xA9:
+          case 0xAA:
           case 0xAB:
+          case 0xAC:
           case 0xAD:
+          case 0xAE:
           case 0xAF:
-          case 0xB1:
-          case 0xB3:
-          case 0xB5:
-          case 0xB7:
-          case 0xB9:
-          case 0xBB:
-          case 0xBD:
-          case 0xBF:  goto yy81;
-          case 0xA0:  goto yy693;
-          case 0xA2:  goto yy695;
-          case 0xA4:  goto yy697;
-          case 0xA6:  goto yy699;
-          case 0xA8:  goto yy701;
-          case 0xAA:  goto yy703;
-          case 0xAC:  goto yy705;
-          case 0xAE:  goto yy707;
-          case 0xB0:  goto yy709;
-          case 0xB2:  goto yy711;
-          case 0xB4:  goto yy713;
-          case 0xB6:  goto yy715;
-          case 0xB8:  goto yy717;
-          case 0xBA:  goto yy719;
-          case 0xBC:  goto yy721;
-          case 0xBE:  goto yy723;
+          case 0xB0:  goto yy809;
+          case 0x82:  goto yy2257;
+          case 0x84:  goto yy2255;
+          case 0x86:  goto yy2253;
+          case 0x88:  goto yy2251;
+          case 0x8A:  goto yy2249;
+          case 0x8C:  goto yy2247;
+          case 0x8E:  goto yy2245;
+          case 0x90:  goto yy2243;
+          case 0x92:  goto yy2241;
+          case 0x94:  goto yy2239;
+          case 0x96:  goto yy2237;
+          case 0x98:  goto yy2235;
+          case 0x9A:  goto yy2233;
+          case 0x9C:  goto yy2231;
+          case 0x9E:  goto yy2229;
+          case 0xA0:  goto yy2227;
+          case 0xA2:  goto yy2225;
+          case 0xA4:  goto yy2223;
+          case 0xA6:  goto yy2221;
+          case 0xB1:  goto yy2219;
+          case 0xB2:  goto yy2217;
+          case 0xB3:  goto yy2215;
+          case 0xB4:  goto yy2213;
+          case 0xB5:  goto yy2211;
+          case 0xB6:  goto yy2209;
+          case 0xB7:  goto yy2207;
+          case 0xB8:  goto yy2205;
+          case 0xB9:  goto yy2203;
+          case 0xBA:  goto yy2201;
+          case 0xBB:  goto yy2199;
+          case 0xBC:  goto yy2197;
+          case 0xBD:  goto yy2195;
+          case 0xBE:  goto yy2193;
+          case 0xBF:  goto yy2191;
           default:  goto yy2;
           }
 yy70:
           yych = *++sp;
           switch (yych) {
-          case 0x80:  goto yy725;
-          case 0x81:
-          case 0x82:
-          case 0x83:
-          case 0x84:
-          case 0x85:
-          case 0x86:
-          case 0x87:
-          case 0x88:
-          case 0x89:
-          case 0x8B:
-          case 0x8D:
-          case 0x8F:
-          case 0x91:
-          case 0x93:
-          case 0x95:
+          case 0x80:  goto yy2189;
+          case 0x81:  goto yy2187;
+          case 0x82:  goto yy2185;
+          case 0x83:  goto yy2183;
+          case 0x84:  goto yy2181;
+          case 0x85:  goto yy2179;
+          case 0x86:  goto yy2177;
+          case 0x87:  goto yy2175;
+          case 0x88:  goto yy2173;
+          case 0x89:  goto yy2171;
+          case 0x8A:  goto yy2169;
+          case 0x8B:  goto yy2167;
+          case 0x8C:  goto yy2165;
+          case 0x8D:  goto yy2163;
+          case 0x8E:  goto yy2161;
+          case 0x8F:  goto yy2159;
+          case 0x90:  goto yy2157;
+          case 0x91:  goto yy2155;
+          case 0x92:  goto yy2153;
+          case 0x93:  goto yy2151;
+          case 0x94:  goto yy2149;
+          case 0x95:  goto yy2147;
+          case 0x96:  goto yy2145;
           case 0x97:
+          case 0x98:
           case 0x99:
+          case 0x9A:
           case 0x9B:
+          case 0x9C:
           case 0x9D:
+          case 0x9E:
           case 0x9F:
+          case 0xA0:
           case 0xA1:
+          case 0xA2:
           case 0xA3:
+          case 0xA4:
           case 0xA5:
+          case 0xA6:
           case 0xA7:
+          case 0xA8:
           case 0xA9:
+          case 0xAA:
           case 0xAB:
+          case 0xAC:
           case 0xAD:
+          case 0xAE:
           case 0xAF:
+          case 0xB0:
           case 0xB1:
+          case 0xB2:
           case 0xB3:
+          case 0xB4:
           case 0xB5:
+          case 0xB6:
           case 0xB7:
+          case 0xB8:
           case 0xB9:
+          case 0xBA:
           case 0xBB:
+          case 0xBC:
           case 0xBD:
-          case 0xBF:  goto yy81;
-          case 0x8A:  goto yy727;
-          case 0x8C:  goto yy729;
-          case 0x8E:  goto yy731;
-          case 0x90:  goto yy733;
-          case 0x92:  goto yy735;
-          case 0x94:  goto yy737;
-          case 0x96:  goto yy739;
-          case 0x98:  goto yy741;
-          case 0x9A:  goto yy743;
-          case 0x9C:  goto yy745;
-          case 0x9E:  goto yy747;
-          case 0xA0:  goto yy749;
-          case 0xA2:  goto yy751;
-          case 0xA4:  goto yy753;
-          case 0xA6:  goto yy755;
-          case 0xA8:  goto yy757;
-          case 0xAA:  goto yy759;
-          case 0xAC:  goto yy761;
-          case 0xAE:  goto yy763;
-          case 0xB0:  goto yy765;
-          case 0xB2:  goto yy767;
-          case 0xB4:  goto yy769;
-          case 0xB6:  goto yy771;
-          case 0xB8:  goto yy773;
-          case 0xBA:  goto yy775;
-          case 0xBC:  goto yy777;
-          case 0xBE:  goto yy779;
+          case 0xBE:
+          case 0xBF:  goto yy809;
           default:  goto yy2;
           }
 yy71:
           yych = *++sp;
           switch (yych) {
-          case 0x80:  goto yy781;
-          case 0x81:  goto yy783;
-          case 0x82:
-          case 0x84:
-          case 0x86:
-          case 0x88:
-          case 0x8A:
-          case 0x8C:
-          case 0x8E:
-          case 0x8F:
-          case 0x91:
-          case 0x93:
-          case 0x95:
-          case 0x97:
-          case 0x99:
-          case 0x9B:
-          case 0x9D:
-          case 0x9F:
-          case 0xA1:
-          case 0xA3:
-          case 0xA5:
-          case 0xA7:
-          case 0xA9:
-          case 0xAB:
-          case 0xAD:
-          case 0xAF:
-          case 0xB1:
-          case 0xB3:
-          case 0xB5:
-          case 0xB7:
-          case 0xB9:
-          case 0xBB:
-          case 0xBD:
-          case 0xBF:  goto yy81;
-          case 0x83:  goto yy785;
-          case 0x85:  goto yy787;
-          case 0x87:  goto yy789;
-          case 0x89:  goto yy791;
-          case 0x8B:  goto yy793;
-          case 0x8D:  goto yy795;
-          case 0x90:  goto yy797;
-          case 0x92:  goto yy799;
-          case 0x94:  goto yy801;
-          case 0x96:  goto yy803;
-          case 0x98:  goto yy805;
-          case 0x9A:  goto yy807;
-          case 0x9C:  goto yy809;
-          case 0x9E:  goto yy811;
-          case 0xA0:  goto yy813;
-          case 0xA2:  goto yy815;
-          case 0xA4:  goto yy817;
-          case 0xA6:  goto yy819;
-          case 0xA8:  goto yy821;
-          case 0xAA:  goto yy823;
-          case 0xAC:  goto yy825;
-          case 0xAE:  goto yy827;
-          case 0xB0:  goto yy829;
-          case 0xB2:  goto yy831;
-          case 0xB4:  goto yy833;
-          case 0xB6:  goto yy835;
-          case 0xB8:  goto yy837;
-          case 0xBA:  goto yy839;
-          case 0xBC:  goto yy841;
-          case 0xBE:  goto yy843;
+          case 0x80:  goto yy1624;
+          case 0x81:  goto yy1623;
+          case 0x82:  goto yy1622;
+          case 0x83:  goto yy1621;
+          case 0x84:  goto yy1620;
+          case 0x85:  goto yy1619;
+          case 0x86:  goto yy1618;
+          case 0x87:  goto yy1617;
+          case 0x88:  goto yy1616;
+          case 0x89:  goto yy1615;
+          case 0x8A:  goto yy1614;
+          case 0x8B:  goto yy1613;
+          case 0x8C:  goto yy1612;
+          case 0x8D:  goto yy1611;
+          case 0x8E:  goto yy1610;
+          case 0x8F:  goto yy1609;
+          case 0x90:  goto yy1608;
+          case 0x91:  goto yy1607;
+          case 0x92:  goto yy1606;
+          case 0x93:  goto yy1605;
+          case 0x94:  goto yy1604;
+          case 0x95:  goto yy1603;
+          case 0x96:  goto yy1602;
+          case 0x97:  goto yy1601;
+          case 0x98:  goto yy1600;
+          case 0x99:  goto yy1599;
+          case 0x9A:  goto yy1598;
+          case 0x9B:  goto yy1597;
+          case 0x9C:  goto yy1596;
+          case 0x9D:  goto yy1595;
+          case 0x9E:  goto yy1594;
+          case 0x9F:  goto yy1593;
+          case 0xA0:  goto yy1592;
+          case 0xA1:  goto yy1591;
+          case 0xA2:  goto yy1590;
+          case 0xA3:  goto yy1589;
+          case 0xA4:  goto yy1588;
+          case 0xA5:  goto yy1587;
+          case 0xA6:  goto yy1586;
+          case 0xA7:  goto yy1585;
+          case 0xA8:  goto yy1584;
+          case 0xA9:  goto yy1583;
+          case 0xAA:  goto yy1582;
+          case 0xAB:  goto yy1581;
+          case 0xAC:  goto yy1580;
+          case 0xAD:  goto yy1579;
+          case 0xAE:  goto yy1578;
+          case 0xAF:  goto yy1577;
+          case 0xB0:  goto yy1576;
+          case 0xB1:  goto yy1575;
+          case 0xB2:  goto yy1574;
+          case 0xB3:  goto yy1573;
+          case 0xB4:  goto yy1572;
+          case 0xB5:  goto yy1571;
+          case 0xB6:  goto yy1570;
+          case 0xB7:  goto yy1569;
+          case 0xB8:  goto yy1568;
+          case 0xB9:  goto yy1567;
+          case 0xBA:  goto yy1566;
+          case 0xBB:  goto yy1565;
+          case 0xBC:  goto yy1564;
+          case 0xBD:  goto yy1563;
+          case 0xBE:  goto yy1562;
+          case 0xBF:  goto yy1561;
           default:  goto yy2;
           }
 yy72:
           yych = *++sp;
           switch (yych) {
-          case 0x80:  goto yy845;
-          case 0x81:
-          case 0x83:
-          case 0x85:
-          case 0x87:
-          case 0x89:
-          case 0x8B:
-          case 0x8D:
-          case 0x8F:
-          case 0x91:
-          case 0x93:
-          case 0x95:
-          case 0x97:
-          case 0x99:
-          case 0x9B:
-          case 0x9D:
-          case 0x9F:
-          case 0xA1:
-          case 0xA3:
-          case 0xA5:
-          case 0xA7:
-          case 0xA9:
-          case 0xAB:
-          case 0xAD:
-          case 0xAF:
-          case 0xB0:  goto yy81;
-          case 0x82:  goto yy847;
-          case 0x84:  goto yy849;
-          case 0x86:  goto yy851;
-          case 0x88:  goto yy853;
-          case 0x8A:  goto yy855;
-          case 0x8C:  goto yy857;
-          case 0x8E:  goto yy859;
-          case 0x90:  goto yy861;
-          case 0x92:  goto yy863;
-          case 0x94:  goto yy865;
-          case 0x96:  goto yy867;
-          case 0x98:  goto yy869;
-          case 0x9A:  goto yy871;
-          case 0x9C:  goto yy873;
-          case 0x9E:  goto yy875;
-          case 0xA0:  goto yy877;
-          case 0xA2:  goto yy879;
-          case 0xA4:  goto yy881;
-          case 0xA6:  goto yy883;
-          case 0xA8:  goto yy885;
-          case 0xAA:  goto yy887;
-          case 0xAC:  goto yy889;
-          case 0xAE:  goto yy891;
-          case 0xB1:  goto yy893;
-          case 0xB2:  goto yy895;
-          case 0xB3:  goto yy897;
-          case 0xB4:  goto yy899;
-          case 0xB5:  goto yy901;
-          case 0xB6:  goto yy903;
-          case 0xB7:  goto yy905;
-          case 0xB8:  goto yy907;
-          case 0xB9:  goto yy909;
-          case 0xBA:  goto yy911;
-          case 0xBB:  goto yy913;
-          case 0xBC:  goto yy915;
-          case 0xBD:  goto yy917;
-          case 0xBE:  goto yy919;
-          case 0xBF:  goto yy921;
+          case 0x80:  goto yy1236;
+          case 0x81:  goto yy1235;
+          case 0x82:  goto yy1234;
+          case 0x83:  goto yy1233;
+          case 0x84:  goto yy1232;
+          case 0x85:  goto yy1231;
+          case 0x86:  goto yy1230;
+          case 0x87:  goto yy1229;
+          case 0x88:  goto yy1228;
+          case 0x89:  goto yy1227;
+          case 0x8A:  goto yy1226;
+          case 0x8B:  goto yy1225;
+          case 0x8C:  goto yy1224;
+          case 0x8D:  goto yy1223;
+          case 0x8E:  goto yy1222;
+          case 0x8F:  goto yy1221;
+          case 0x90:  goto yy1220;
+          case 0x91:  goto yy1219;
+          case 0x92:  goto yy1218;
+          case 0x93:  goto yy1217;
+          case 0x94:  goto yy1216;
+          case 0x95:  goto yy1215;
+          case 0x96:  goto yy1214;
+          case 0x97:  goto yy1213;
+          case 0x98:  goto yy1212;
+          case 0x99:  goto yy1211;
+          case 0x9A:  goto yy1210;
+          case 0x9B:  goto yy1209;
+          case 0x9C:  goto yy1208;
+          case 0x9D:  goto yy1207;
+          case 0x9E:  goto yy1206;
+          case 0x9F:  goto yy1205;
+          case 0xA0:  goto yy1204;
+          case 0xA1:  goto yy1203;
+          case 0xA2:  goto yy1202;
+          case 0xA3:  goto yy1201;
+          case 0xA4:  goto yy1200;
+          case 0xA5:  goto yy1199;
+          case 0xA6:  goto yy1198;
+          case 0xA7:  goto yy1197;
+          case 0xA8:  goto yy1196;
+          case 0xA9:  goto yy1195;
+          case 0xAA:  goto yy1194;
+          case 0xAB:  goto yy1193;
+          case 0xAC:  goto yy1192;
+          case 0xAD:  goto yy1191;
+          case 0xAE:  goto yy1190;
+          case 0xAF:  goto yy1189;
+          case 0xB0:  goto yy1188;
+          case 0xB1:  goto yy1187;
+          case 0xB2:  goto yy1186;
+          case 0xB3:  goto yy1185;
+          case 0xB4:  goto yy1184;
+          case 0xB5:  goto yy1183;
+          case 0xB6:  goto yy1182;
+          case 0xB7:  goto yy1181;
+          case 0xB8:  goto yy1180;
+          case 0xB9:  goto yy1179;
+          case 0xBA:  goto yy1178;
+          case 0xBB:  goto yy1177;
+          case 0xBC:  goto yy1176;
+          case 0xBD:  goto yy1175;
+          case 0xBE:  goto yy1174;
+          case 0xBF:  goto yy1173;
           default:  goto yy2;
           }
 yy73:
           yych = *++sp;
           switch (yych) {
-          case 0x80:  goto yy923;
-          case 0x81:  goto yy925;
-          case 0x82:  goto yy927;
-          case 0x83:  goto yy929;
-          case 0x84:  goto yy931;
-          case 0x85:  goto yy933;
-          case 0x86:  goto yy935;
-          case 0x87:  goto yy937;
-          case 0x88:  goto yy939;
-          case 0x89:  goto yy941;
-          case 0x8A:  goto yy943;
-          case 0x8B:  goto yy945;
-          case 0x8C:  goto yy947;
-          case 0x8D:  goto yy949;
-          case 0x8E:  goto yy951;
-          case 0x8F:  goto yy953;
-          case 0x90:  goto yy955;
-          case 0x91:  goto yy957;
-          case 0x92:  goto yy959;
-          case 0x93:  goto yy961;
-          case 0x94:  goto yy963;
-          case 0x95:  goto yy965;
-          case 0x96:  goto yy967;
+          case 0x80:  goto yy990;
+          case 0x81:  goto yy989;
+          case 0x82:  goto yy988;
+          case 0x83:  goto yy987;
+          case 0x84:  goto yy986;
+          case 0x85:  goto yy985;
+          case 0x86:  goto yy984;
+          case 0x87:  goto yy983;
+          case 0x88:  goto yy982;
+          case 0x89:  goto yy981;
+          case 0x8A:  goto yy980;
+          case 0x8B:  goto yy979;
+          case 0x8C:  goto yy978;
+          case 0x8D:  goto yy977;
+          case 0x8E:  goto yy976;
+          case 0x8F:  goto yy975;
+          case 0x90:  goto yy974;
+          case 0x91:  goto yy973;
+          case 0x92:  goto yy972;
+          case 0x93:  goto yy971;
+          case 0x94:  goto yy970;
+          case 0x95:  goto yy969;
+          case 0x96:  goto yy968;
+          case 0x97:  goto yy967;
+          case 0x98:  goto yy966;
+          case 0x99:  goto yy965;
+          case 0x9A:  goto yy964;
+          case 0x9B:  goto yy963;
+          case 0x9C:  goto yy962;
+          case 0x9D:  goto yy961;
+          case 0x9E:  goto yy960;
+          case 0x9F:  goto yy959;
+          case 0xA0:  goto yy958;
+          case 0xA1:  goto yy957;
+          case 0xA2:  goto yy956;
+          case 0xA3:  goto yy955;
+          case 0xA4:  goto yy954;
+          case 0xA5:  goto yy953;
+          case 0xA6:  goto yy952;
+          case 0xA7:  goto yy951;
+          case 0xA8:  goto yy950;
+          case 0xA9:  goto yy949;
+          case 0xAA:  goto yy948;
+          case 0xAB:  goto yy947;
+          case 0xAC:  goto yy946;
+          case 0xAD:  goto yy945;
+          case 0xAE:  goto yy944;
+          case 0xAF:  goto yy943;
+          case 0xB0:  goto yy942;
+          case 0xB1:  goto yy941;
+          case 0xB2:  goto yy940;
+          case 0xB3:  goto yy939;
+          case 0xB4:  goto yy938;
+          case 0xB5:  goto yy937;
+          case 0xB6:  goto yy936;
+          case 0xB7:  goto yy935;
+          case 0xB8:  goto yy934;
+          case 0xB9:  goto yy933;
+          case 0xBA:  goto yy932;
+          case 0xBB:  goto yy931;
+          case 0xBC:  goto yy930;
+          case 0xBD:  goto yy929;
+          case 0xBE:  goto yy928;
+          case 0xBF:  goto yy927;
+          default:  goto yy2;
+          }
+yy74:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy874;
+          case 0x81:  goto yy873;
+          case 0x82:  goto yy872;
+          case 0x83:  goto yy871;
+          case 0x84:  goto yy870;
+          case 0x85:  goto yy869;
+          case 0x86:  goto yy868;
+          case 0x87:  goto yy867;
+          case 0x88:  goto yy866;
+          case 0x89:  goto yy865;
+          case 0x8A:  goto yy864;
+          case 0x8B:  goto yy863;
+          case 0x8C:  goto yy862;
+          case 0x8D:  goto yy861;
+          case 0x8E:  goto yy860;
+          case 0x8F:  goto yy859;
+          case 0x90:  goto yy858;
+          case 0x91:  goto yy857;
+          case 0x92:  goto yy856;
+          case 0x93:  goto yy855;
+          case 0x94:  goto yy854;
+          case 0x95:  goto yy853;
+          case 0x96:  goto yy852;
+          case 0x97:  goto yy851;
+          case 0x98:  goto yy850;
+          case 0x99:  goto yy849;
+          case 0x9A:  goto yy848;
+          case 0x9B:  goto yy847;
+          case 0x9C:  goto yy846;
+          case 0x9D:  goto yy845;
+          case 0x9E:  goto yy844;
+          case 0x9F:  goto yy843;
+          case 0xA0:  goto yy842;
+          case 0xA1:  goto yy841;
+          case 0xA2:  goto yy840;
+          case 0xA3:  goto yy839;
+          case 0xA4:  goto yy838;
+          case 0xA5:  goto yy837;
+          case 0xA6:  goto yy836;
+          case 0xA7:  goto yy835;
+          case 0xA8:  goto yy834;
+          case 0xA9:  goto yy833;
+          case 0xAA:  goto yy832;
+          case 0xAB:  goto yy831;
+          case 0xAC:  goto yy830;
+          case 0xAD:  goto yy829;
+          case 0xAE:  goto yy828;
+          case 0xAF:  goto yy827;
+          case 0xB0:  goto yy826;
+          case 0xB1:  goto yy825;
+          case 0xB2:  goto yy824;
+          case 0xB3:  goto yy823;
+          case 0xB4:  goto yy822;
+          case 0xB5:  goto yy821;
+          case 0xB6:  goto yy820;
+          case 0xB7:  goto yy819;
+          case 0xB8:  goto yy818;
+          case 0xB9:  goto yy817;
+          case 0xBA:  goto yy816;
+          case 0xBB:  goto yy815;
+          case 0xBC:  goto yy814;
+          case 0xBD:  goto yy813;
+          case 0xBE:  goto yy812;
+          case 0xBF:  goto yy811;
+          default:  goto yy2;
+          }
+yy75:
+          ++sp;
+          { ls.append(sp-1, sp); continue; /* tolower() identity fallback, 1 byte(s)/char */ }
+yy77:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy78:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy79:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy80:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy81:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy82:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy83:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy84:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy85:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy86:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy87:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy88:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy89:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy90:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy809;
+          goto yy2;
+yy91:
+          yych = *++sp;
+          switch (yych) {
+          case 0xA0:  goto yy808;
+          case 0xA1:  goto yy807;
+          case 0xA2:  goto yy806;
+          case 0xA3:  goto yy805;
+          case 0xA4:  goto yy804;
+          case 0xA5:  goto yy803;
+          case 0xA6:  goto yy802;
+          case 0xA7:  goto yy801;
+          case 0xA8:  goto yy800;
+          case 0xA9:  goto yy799;
+          case 0xAA:  goto yy798;
+          case 0xAB:  goto yy797;
+          case 0xAC:  goto yy796;
+          case 0xAD:  goto yy795;
+          case 0xAE:  goto yy794;
+          case 0xAF:  goto yy793;
+          case 0xB0:  goto yy792;
+          case 0xB1:  goto yy791;
+          case 0xB2:  goto yy790;
+          case 0xB3:  goto yy789;
+          case 0xB4:  goto yy788;
+          case 0xB5:  goto yy787;
+          case 0xB6:  goto yy786;
+          case 0xB7:  goto yy785;
+          case 0xB8:  goto yy784;
+          case 0xB9:  goto yy783;
+          case 0xBA:  goto yy782;
+          case 0xBB:  goto yy781;
+          case 0xBC:  goto yy780;
+          case 0xBD:  goto yy779;
+          case 0xBE:  goto yy778;
+          case 0xBF:  goto yy777;
+          default:  goto yy2;
+          }
+yy92:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy776;
+          case 0x81:  goto yy775;
+          case 0x82:  goto yy774;
+          case 0x83:  goto yy773;
+          case 0x84:  goto yy772;
+          case 0x85:  goto yy771;
+          case 0x86:  goto yy770;
+          case 0x87:  goto yy769;
+          case 0x88:  goto yy768;
+          case 0x89:  goto yy767;
+          case 0x8A:  goto yy766;
+          case 0x8B:  goto yy765;
+          case 0x8C:  goto yy764;
+          case 0x8D:  goto yy763;
+          case 0x8E:  goto yy762;
+          case 0x8F:  goto yy761;
+          case 0x90:  goto yy760;
+          case 0x91:  goto yy759;
+          case 0x92:  goto yy758;
+          case 0x93:  goto yy757;
+          case 0x94:  goto yy756;
+          case 0x95:  goto yy755;
+          case 0x96:  goto yy754;
+          case 0x97:  goto yy753;
+          case 0x98:  goto yy752;
+          case 0x99:  goto yy751;
+          case 0x9A:  goto yy750;
+          case 0x9B:  goto yy749;
+          case 0x9C:  goto yy748;
+          case 0x9D:  goto yy747;
+          case 0x9E:  goto yy746;
+          case 0x9F:  goto yy745;
+          case 0xA0:  goto yy744;
+          case 0xA1:  goto yy743;
+          case 0xA2:  goto yy742;
+          case 0xA3:  goto yy741;
+          case 0xA4:  goto yy740;
+          case 0xA5:  goto yy739;
+          case 0xA6:  goto yy738;
+          case 0xA7:  goto yy737;
+          case 0xA8:  goto yy736;
+          case 0xA9:  goto yy735;
+          case 0xAA:  goto yy734;
+          case 0xAB:  goto yy733;
+          case 0xAC:  goto yy732;
+          case 0xAD:  goto yy731;
+          case 0xAE:  goto yy730;
+          case 0xAF:  goto yy729;
+          case 0xB0:  goto yy728;
+          case 0xB1:  goto yy727;
+          case 0xB2:  goto yy726;
+          case 0xB3:  goto yy725;
+          case 0xB4:  goto yy724;
+          case 0xB5:  goto yy723;
+          case 0xB6:  goto yy722;
+          case 0xB7:  goto yy721;
+          case 0xB8:  goto yy720;
+          case 0xB9:  goto yy719;
+          case 0xBA:  goto yy718;
+          case 0xBB:  goto yy717;
+          case 0xBC:  goto yy716;
+          case 0xBD:  goto yy715;
+          case 0xBE:  goto yy714;
+          case 0xBF:  goto yy713;
+          default:  goto yy2;
+          }
+yy93:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy712;
+          case 0x81:  goto yy711;
+          case 0x82:  goto yy710;
+          case 0x83:  goto yy709;
+          case 0x84:  goto yy708;
+          case 0x85:  goto yy707;
+          case 0x86:  goto yy706;
+          case 0x87:  goto yy705;
+          case 0x88:  goto yy704;
+          case 0x89:  goto yy703;
+          case 0x8A:  goto yy702;
+          case 0x8B:  goto yy701;
+          case 0x8C:  goto yy700;
+          case 0x8D:  goto yy699;
+          case 0x8E:  goto yy698;
+          case 0x8F:  goto yy697;
+          case 0x90:  goto yy696;
+          case 0x91:  goto yy695;
+          case 0x92:  goto yy694;
+          case 0x93:  goto yy693;
+          case 0x94:  goto yy692;
+          case 0x95:  goto yy691;
+          case 0x96:  goto yy690;
+          case 0x97:  goto yy689;
+          case 0x98:  goto yy688;
+          case 0x99:  goto yy687;
+          case 0x9A:  goto yy686;
+          case 0x9B:  goto yy685;
+          case 0x9C:  goto yy684;
+          case 0x9D:  goto yy683;
+          case 0x9E:  goto yy682;
+          case 0x9F:  goto yy681;
+          case 0xA0:  goto yy680;
+          case 0xA1:  goto yy679;
+          case 0xA2:  goto yy678;
+          case 0xA3:  goto yy677;
+          case 0xA4:  goto yy676;
+          case 0xA5:  goto yy675;
+          case 0xA6:  goto yy674;
+          case 0xA7:  goto yy673;
+          case 0xA8:  goto yy672;
+          case 0xA9:  goto yy671;
+          case 0xAA:  goto yy670;
+          case 0xAB:  goto yy669;
+          case 0xAC:  goto yy668;
+          case 0xAD:  goto yy667;
+          case 0xAE:  goto yy666;
+          case 0xAF:  goto yy665;
+          case 0xB0:  goto yy664;
+          case 0xB1:  goto yy663;
+          case 0xB2:  goto yy662;
+          case 0xB3:  goto yy661;
+          case 0xB4:  goto yy660;
+          case 0xB5:  goto yy659;
+          case 0xB6:  goto yy658;
+          case 0xB7:  goto yy657;
+          case 0xB8:  goto yy656;
+          case 0xB9:  goto yy655;
+          case 0xBA:  goto yy654;
+          case 0xBB:  goto yy653;
+          case 0xBC:  goto yy652;
+          case 0xBD:  goto yy651;
+          case 0xBE:  goto yy650;
+          case 0xBF:  goto yy649;
+          default:  goto yy2;
+          }
+yy94:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy648;
+          case 0x81:  goto yy647;
+          case 0x82:  goto yy646;
+          case 0x83:  goto yy645;
+          case 0x84:  goto yy644;
+          case 0x85:  goto yy643;
+          case 0x86:  goto yy642;
+          case 0x87:  goto yy641;
+          case 0x88:  goto yy640;
+          case 0x89:  goto yy639;
+          case 0x8A:  goto yy638;
+          case 0x8B:  goto yy637;
+          case 0x8C:  goto yy636;
+          case 0x8D:  goto yy635;
+          case 0x8E:  goto yy634;
+          case 0x8F:  goto yy633;
+          case 0x90:  goto yy632;
+          case 0x91:  goto yy631;
+          case 0x92:  goto yy630;
+          case 0x93:  goto yy629;
+          case 0x94:  goto yy628;
+          case 0x95:  goto yy627;
+          case 0x96:  goto yy626;
+          case 0x97:  goto yy625;
+          case 0x98:  goto yy624;
+          case 0x99:  goto yy623;
+          case 0x9A:  goto yy622;
+          case 0x9B:  goto yy621;
+          case 0x9C:  goto yy620;
+          case 0x9D:  goto yy619;
+          case 0x9E:  goto yy618;
+          case 0x9F:  goto yy617;
+          case 0xA0:  goto yy616;
+          case 0xA1:  goto yy615;
+          case 0xA2:  goto yy614;
+          case 0xA3:  goto yy613;
+          case 0xA4:  goto yy612;
+          case 0xA5:  goto yy611;
+          case 0xA6:  goto yy610;
+          case 0xA7:  goto yy609;
+          case 0xA8:  goto yy608;
+          case 0xA9:  goto yy607;
+          case 0xAA:  goto yy606;
+          case 0xAB:  goto yy605;
+          case 0xAC:  goto yy604;
+          case 0xAD:  goto yy603;
+          case 0xAE:  goto yy602;
+          case 0xAF:  goto yy601;
+          case 0xB0:  goto yy600;
+          case 0xB1:  goto yy599;
+          case 0xB2:  goto yy598;
+          case 0xB3:  goto yy597;
+          case 0xB4:  goto yy596;
+          case 0xB5:  goto yy595;
+          case 0xB6:  goto yy594;
+          case 0xB7:  goto yy593;
+          case 0xB8:  goto yy592;
+          case 0xB9:  goto yy591;
+          case 0xBA:  goto yy590;
+          case 0xBB:  goto yy589;
+          case 0xBC:  goto yy588;
+          case 0xBD:  goto yy587;
+          case 0xBE:  goto yy586;
+          case 0xBF:  goto yy585;
+          default:  goto yy2;
+          }
+yy95:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy584;
+          case 0x81:  goto yy583;
+          case 0x82:  goto yy582;
+          case 0x83:  goto yy581;
+          case 0x84:  goto yy580;
+          case 0x85:  goto yy579;
+          case 0x86:  goto yy578;
+          case 0x87:  goto yy577;
+          case 0x88:  goto yy576;
+          case 0x89:  goto yy575;
+          case 0x8A:  goto yy574;
+          case 0x8B:  goto yy573;
+          case 0x8C:  goto yy572;
+          case 0x8D:  goto yy571;
+          case 0x8E:  goto yy570;
+          case 0x8F:  goto yy569;
+          case 0x90:  goto yy568;
+          case 0x91:  goto yy567;
+          case 0x92:  goto yy566;
+          case 0x93:  goto yy565;
+          case 0x94:  goto yy564;
+          case 0x95:  goto yy563;
+          case 0x96:  goto yy562;
+          case 0x97:  goto yy561;
+          case 0x98:  goto yy560;
+          case 0x99:  goto yy559;
+          case 0x9A:  goto yy558;
+          case 0x9B:  goto yy557;
+          case 0x9C:  goto yy556;
+          case 0x9D:  goto yy555;
+          case 0x9E:  goto yy554;
+          case 0x9F:  goto yy553;
+          case 0xA0:  goto yy552;
+          case 0xA1:  goto yy551;
+          case 0xA2:  goto yy550;
+          case 0xA3:  goto yy549;
+          case 0xA4:  goto yy548;
+          case 0xA5:  goto yy547;
+          case 0xA6:  goto yy546;
+          case 0xA7:  goto yy545;
+          case 0xA8:  goto yy544;
+          case 0xA9:  goto yy543;
+          case 0xAA:  goto yy542;
+          case 0xAB:  goto yy541;
+          case 0xAC:  goto yy540;
+          case 0xAD:  goto yy539;
+          case 0xAE:  goto yy538;
+          case 0xAF:  goto yy537;
+          case 0xB0:  goto yy536;
+          case 0xB1:  goto yy535;
+          case 0xB2:  goto yy534;
+          case 0xB3:  goto yy533;
+          case 0xB4:  goto yy532;
+          case 0xB5:  goto yy531;
+          case 0xB6:  goto yy530;
+          case 0xB7:  goto yy529;
+          case 0xB8:  goto yy528;
+          case 0xB9:  goto yy527;
+          case 0xBA:  goto yy526;
+          case 0xBB:  goto yy525;
+          case 0xBC:  goto yy524;
+          case 0xBD:  goto yy523;
+          case 0xBE:  goto yy522;
+          case 0xBF:  goto yy521;
+          default:  goto yy2;
+          }
+yy96:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy520;
+          case 0x81:  goto yy519;
+          case 0x82:  goto yy518;
+          case 0x83:  goto yy517;
+          case 0x84:  goto yy516;
+          case 0x85:  goto yy515;
+          case 0x86:  goto yy514;
+          case 0x87:  goto yy513;
+          case 0x88:  goto yy512;
+          case 0x89:  goto yy511;
+          case 0x8A:  goto yy510;
+          case 0x8B:  goto yy509;
+          case 0x8C:  goto yy508;
+          case 0x8D:  goto yy507;
+          case 0x8E:  goto yy506;
+          case 0x8F:  goto yy505;
+          case 0x90:  goto yy504;
+          case 0x91:  goto yy503;
+          case 0x92:  goto yy502;
+          case 0x93:  goto yy501;
+          case 0x94:  goto yy500;
+          case 0x95:  goto yy499;
+          case 0x96:  goto yy498;
+          case 0x97:  goto yy497;
+          case 0x98:  goto yy496;
+          case 0x99:  goto yy495;
+          case 0x9A:  goto yy494;
+          case 0x9B:  goto yy493;
+          case 0x9C:  goto yy492;
+          case 0x9D:  goto yy491;
+          case 0x9E:  goto yy490;
+          case 0x9F:  goto yy489;
+          case 0xA0:  goto yy488;
+          case 0xA1:  goto yy487;
+          case 0xA2:  goto yy486;
+          case 0xA3:  goto yy485;
+          case 0xA4:  goto yy484;
+          case 0xA5:  goto yy483;
+          case 0xA6:  goto yy482;
+          case 0xA7:  goto yy481;
+          case 0xA8:  goto yy480;
+          case 0xA9:  goto yy479;
+          case 0xAA:  goto yy478;
+          case 0xAB:  goto yy477;
+          case 0xAC:  goto yy476;
+          case 0xAD:  goto yy475;
+          case 0xAE:  goto yy474;
+          case 0xAF:  goto yy473;
+          case 0xB0:  goto yy472;
+          case 0xB1:  goto yy471;
+          case 0xB2:  goto yy470;
+          case 0xB3:  goto yy469;
+          case 0xB4:  goto yy468;
+          case 0xB5:  goto yy467;
+          case 0xB6:  goto yy466;
+          case 0xB7:  goto yy465;
+          case 0xB8:  goto yy464;
+          case 0xB9:  goto yy463;
+          case 0xBA:  goto yy462;
+          case 0xBB:  goto yy461;
+          case 0xBC:  goto yy460;
+          case 0xBD:  goto yy459;
+          case 0xBE:  goto yy458;
+          case 0xBF:  goto yy457;
+          default:  goto yy2;
+          }
+yy97:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy456;
+          case 0x81:  goto yy455;
+          case 0x82:  goto yy454;
+          case 0x83:  goto yy453;
+          case 0x84:  goto yy452;
+          case 0x85:  goto yy451;
+          case 0x86:  goto yy450;
+          case 0x87:  goto yy449;
+          case 0x88:  goto yy448;
+          case 0x89:  goto yy447;
+          case 0x8A:  goto yy446;
+          case 0x8B:  goto yy445;
+          case 0x8C:  goto yy444;
+          case 0x8D:  goto yy443;
+          case 0x8E:  goto yy442;
+          case 0x8F:  goto yy441;
+          case 0x90:  goto yy440;
+          case 0x91:  goto yy439;
+          case 0x92:  goto yy438;
+          case 0x93:  goto yy437;
+          case 0x94:  goto yy436;
+          case 0x95:  goto yy435;
+          case 0x96:  goto yy434;
+          case 0x97:  goto yy433;
+          case 0x98:  goto yy432;
+          case 0x99:  goto yy431;
+          case 0x9A:  goto yy430;
+          case 0x9B:  goto yy429;
+          case 0x9C:  goto yy428;
+          case 0x9D:  goto yy427;
+          case 0x9E:  goto yy426;
+          case 0x9F:  goto yy425;
+          case 0xA0:  goto yy424;
+          case 0xA1:  goto yy423;
+          case 0xA2:  goto yy422;
+          case 0xA3:  goto yy421;
+          case 0xA4:  goto yy420;
+          case 0xA5:  goto yy419;
+          case 0xA6:  goto yy418;
+          case 0xA7:  goto yy417;
+          case 0xA8:  goto yy416;
+          case 0xA9:  goto yy415;
+          case 0xAA:  goto yy414;
+          case 0xAB:  goto yy413;
+          case 0xAC:  goto yy412;
+          case 0xAD:  goto yy411;
+          case 0xAE:  goto yy410;
+          case 0xAF:  goto yy409;
+          case 0xB0:  goto yy408;
+          case 0xB1:  goto yy407;
+          case 0xB2:  goto yy406;
+          case 0xB3:  goto yy405;
+          case 0xB4:  goto yy404;
+          case 0xB5:  goto yy403;
+          case 0xB6:  goto yy402;
+          case 0xB7:  goto yy401;
+          case 0xB8:  goto yy400;
+          case 0xB9:  goto yy399;
+          case 0xBA:  goto yy398;
+          case 0xBB:  goto yy397;
+          case 0xBC:  goto yy396;
+          case 0xBD:  goto yy395;
+          case 0xBE:  goto yy394;
+          case 0xBF:  goto yy393;
+          default:  goto yy2;
+          }
+yy98:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy392;
+          case 0x81:  goto yy391;
+          case 0x82:  goto yy390;
+          case 0x83:  goto yy389;
+          case 0x84:  goto yy388;
+          case 0x85:  goto yy387;
+          case 0x86:  goto yy386;
+          case 0x87:  goto yy385;
+          case 0x88:  goto yy384;
+          case 0x89:  goto yy383;
+          case 0x8A:  goto yy382;
+          case 0x8B:  goto yy381;
+          case 0x8C:  goto yy380;
+          case 0x8D:  goto yy379;
+          case 0x8E:  goto yy378;
+          case 0x8F:  goto yy377;
+          case 0x90:  goto yy376;
+          case 0x91:  goto yy375;
+          case 0x92:  goto yy374;
+          case 0x93:  goto yy373;
+          case 0x94:  goto yy372;
+          case 0x95:  goto yy371;
+          case 0x96:  goto yy370;
+          case 0x97:  goto yy369;
+          case 0x98:  goto yy368;
+          case 0x99:  goto yy367;
+          case 0x9A:  goto yy366;
+          case 0x9B:  goto yy365;
+          case 0x9C:  goto yy364;
+          case 0x9D:  goto yy363;
+          case 0x9E:  goto yy362;
+          case 0x9F:  goto yy361;
+          case 0xA0:  goto yy360;
+          case 0xA1:  goto yy359;
+          case 0xA2:  goto yy358;
+          case 0xA3:  goto yy357;
+          case 0xA4:  goto yy356;
+          case 0xA5:  goto yy355;
+          case 0xA6:  goto yy354;
+          case 0xA7:  goto yy353;
+          case 0xA8:  goto yy352;
+          case 0xA9:  goto yy351;
+          case 0xAA:  goto yy350;
+          case 0xAB:  goto yy349;
+          case 0xAC:  goto yy348;
+          case 0xAD:  goto yy347;
+          case 0xAE:  goto yy346;
+          case 0xAF:  goto yy345;
+          case 0xB0:  goto yy344;
+          case 0xB1:  goto yy343;
+          case 0xB2:  goto yy342;
+          case 0xB3:  goto yy341;
+          case 0xB4:  goto yy340;
+          case 0xB5:  goto yy339;
+          case 0xB6:  goto yy338;
+          case 0xB7:  goto yy337;
+          case 0xB8:  goto yy336;
+          case 0xB9:  goto yy335;
+          case 0xBA:  goto yy334;
+          case 0xBB:  goto yy333;
+          case 0xBC:  goto yy332;
+          case 0xBD:  goto yy331;
+          case 0xBE:  goto yy330;
+          case 0xBF:  goto yy329;
+          default:  goto yy2;
+          }
+yy99:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy328;
+          case 0x81:  goto yy327;
+          case 0x82:  goto yy326;
+          case 0x83:  goto yy325;
+          case 0x84:  goto yy324;
+          case 0x85:  goto yy323;
+          case 0x86:  goto yy322;
+          case 0x87:  goto yy321;
+          case 0x88:  goto yy320;
+          case 0x89:  goto yy319;
+          case 0x8A:  goto yy318;
+          case 0x8B:  goto yy317;
+          case 0x8C:  goto yy316;
+          case 0x8D:  goto yy315;
+          case 0x8E:  goto yy314;
+          case 0x8F:  goto yy313;
+          case 0x90:  goto yy312;
+          case 0x91:  goto yy311;
+          case 0x92:  goto yy310;
+          case 0x93:  goto yy309;
+          case 0x94:  goto yy308;
+          case 0x95:  goto yy307;
+          case 0x96:  goto yy306;
+          case 0x97:  goto yy305;
+          case 0x98:  goto yy304;
+          case 0x99:  goto yy303;
+          case 0x9A:  goto yy302;
+          case 0x9B:  goto yy301;
+          case 0x9C:  goto yy300;
+          case 0x9D:  goto yy299;
+          case 0x9E:  goto yy298;
+          case 0x9F:  goto yy297;
+          case 0xA0:  goto yy296;
+          case 0xA1:  goto yy295;
+          case 0xA2:  goto yy294;
+          case 0xA3:  goto yy293;
+          case 0xA4:  goto yy292;
+          case 0xA5:  goto yy291;
+          case 0xA6:  goto yy290;
+          case 0xA7:  goto yy289;
+          case 0xA8:  goto yy288;
+          case 0xA9:  goto yy287;
+          case 0xAA:  goto yy286;
+          case 0xAB:  goto yy285;
+          case 0xAC:  goto yy284;
+          case 0xAD:  goto yy283;
+          case 0xAE:  goto yy282;
+          case 0xAF:  goto yy281;
+          case 0xB0:  goto yy280;
+          case 0xB1:  goto yy279;
+          case 0xB2:  goto yy278;
+          case 0xB3:  goto yy277;
+          case 0xB4:  goto yy276;
+          case 0xB5:  goto yy275;
+          case 0xB6:  goto yy274;
+          case 0xB7:  goto yy273;
+          case 0xB8:  goto yy272;
+          case 0xB9:  goto yy271;
+          case 0xBA:  goto yy270;
+          case 0xBB:  goto yy269;
+          case 0xBC:  goto yy268;
+          case 0xBD:  goto yy267;
+          case 0xBE:  goto yy266;
+          case 0xBF:  goto yy265;
+          default:  goto yy2;
+          }
+yy100:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy264;
+          case 0x81:  goto yy263;
+          case 0x82:  goto yy262;
+          case 0x83:  goto yy261;
+          case 0x84:  goto yy260;
+          case 0x85:  goto yy259;
+          case 0x86:  goto yy258;
+          case 0x87:  goto yy257;
+          case 0x88:  goto yy256;
+          case 0x89:  goto yy255;
+          case 0x8A:  goto yy254;
+          case 0x8B:  goto yy253;
+          case 0x8C:  goto yy252;
+          case 0x8D:  goto yy251;
+          case 0x8E:  goto yy250;
+          case 0x8F:  goto yy249;
+          case 0x90:  goto yy248;
+          case 0x91:  goto yy247;
+          case 0x92:  goto yy246;
+          case 0x93:  goto yy245;
+          case 0x94:  goto yy244;
+          case 0x95:  goto yy243;
+          case 0x96:  goto yy242;
+          case 0x97:  goto yy241;
+          case 0x98:  goto yy240;
+          case 0x99:  goto yy239;
+          case 0x9A:  goto yy238;
+          case 0x9B:  goto yy237;
+          case 0x9C:  goto yy236;
+          case 0x9D:  goto yy235;
+          case 0x9E:  goto yy234;
+          case 0x9F:  goto yy233;
+          case 0xA0:  goto yy232;
+          case 0xA1:  goto yy231;
+          case 0xA2:  goto yy230;
+          case 0xA3:  goto yy229;
+          case 0xA4:  goto yy228;
+          case 0xA5:  goto yy227;
+          case 0xA6:  goto yy226;
+          case 0xA7:  goto yy225;
+          case 0xA8:  goto yy224;
+          case 0xA9:  goto yy223;
+          case 0xAA:  goto yy222;
+          case 0xAB:  goto yy221;
+          case 0xAC:  goto yy220;
+          case 0xAD:  goto yy219;
+          case 0xAE:  goto yy218;
+          case 0xAF:  goto yy217;
+          case 0xB0:  goto yy216;
+          case 0xB1:  goto yy215;
+          case 0xB2:  goto yy214;
+          case 0xB3:  goto yy213;
+          case 0xB4:  goto yy212;
+          case 0xB5:  goto yy211;
+          case 0xB6:  goto yy210;
+          case 0xB7:  goto yy209;
+          case 0xB8:  goto yy208;
+          case 0xB9:  goto yy207;
+          case 0xBA:  goto yy206;
+          case 0xBB:  goto yy205;
+          case 0xBC:  goto yy204;
+          case 0xBD:  goto yy203;
+          case 0xBE:  goto yy202;
+          case 0xBF:  goto yy201;
+          default:  goto yy2;
+          }
+yy101:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy200;
+          case 0x81:  goto yy199;
+          case 0x82:  goto yy198;
+          case 0x83:  goto yy197;
+          case 0x84:  goto yy196;
+          case 0x85:  goto yy195;
+          case 0x86:  goto yy194;
+          case 0x87:  goto yy193;
+          case 0x88:  goto yy192;
+          case 0x89:  goto yy191;
+          case 0x8A:  goto yy190;
+          case 0x8B:  goto yy189;
+          case 0x8C:  goto yy188;
+          case 0x8D:  goto yy187;
+          case 0x8E:  goto yy186;
+          case 0x8F:  goto yy185;
+          case 0x90:  goto yy184;
+          case 0x91:  goto yy183;
+          case 0x92:  goto yy182;
+          case 0x93:  goto yy181;
+          case 0x94:  goto yy180;
+          case 0x95:  goto yy179;
+          case 0x96:  goto yy178;
+          case 0x97:  goto yy177;
+          case 0x98:  goto yy176;
+          case 0x99:  goto yy175;
+          case 0x9A:  goto yy174;
+          case 0x9B:  goto yy173;
+          case 0x9C:  goto yy172;
+          case 0x9D:  goto yy171;
+          case 0x9E:  goto yy170;
+          case 0x9F:  goto yy169;
+          default:  goto yy2;
+          }
+yy102:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy166;
+          case 0x81:  goto yy165;
+          case 0x82:  goto yy164;
+          case 0x83:  goto yy163;
+          case 0x84:  goto yy162;
+          case 0x85:  goto yy161;
+          case 0x86:  goto yy160;
+          case 0x87:  goto yy159;
+          case 0x88:  goto yy158;
+          case 0x89:  goto yy157;
+          case 0x8A:  goto yy156;
+          case 0x8B:  goto yy155;
+          case 0x8C:  goto yy154;
+          case 0x8D:  goto yy153;
+          case 0x8E:  goto yy152;
+          case 0x8F:  goto yy151;
+          case 0x90:  goto yy150;
+          case 0x91:  goto yy149;
+          case 0x92:  goto yy148;
+          case 0x93:  goto yy147;
+          case 0x94:  goto yy146;
+          case 0x95:  goto yy145;
+          case 0x96:  goto yy144;
+          case 0x97:  goto yy143;
+          case 0x98:  goto yy142;
+          case 0x99:  goto yy141;
+          case 0x9A:  goto yy140;
+          case 0x9B:  goto yy139;
+          case 0x9C:  goto yy138;
+          case 0x9D:  goto yy137;
+          case 0x9E:  goto yy136;
+          case 0x9F:  goto yy135;
+          case 0xA0:  goto yy134;
+          case 0xA1:  goto yy133;
+          case 0xA2:  goto yy132;
+          case 0xA3:  goto yy131;
+          case 0xA4:  goto yy130;
+          case 0xA5:  goto yy129;
+          case 0xA6:  goto yy128;
+          case 0xA7:  goto yy127;
+          case 0xA8:  goto yy126;
+          case 0xA9:  goto yy125;
+          case 0xAA:  goto yy124;
+          case 0xAB:  goto yy123;
+          case 0xAC:  goto yy122;
+          case 0xAD:  goto yy121;
+          case 0xAE:  goto yy120;
+          case 0xAF:  goto yy119;
+          case 0xB0:  goto yy118;
+          case 0xB1:  goto yy117;
+          case 0xB2:  goto yy116;
+          case 0xB3:  goto yy115;
+          case 0xB4:  goto yy114;
+          case 0xB5:  goto yy113;
+          case 0xB6:  goto yy112;
+          case 0xB7:  goto yy111;
+          case 0xB8:  goto yy110;
+          case 0xB9:  goto yy109;
+          case 0xBA:  goto yy108;
+          case 0xBB:  goto yy107;
+          case 0xBC:  goto yy106;
+          case 0xBD:  goto yy105;
+          case 0xBE:  goto yy104;
+          case 0xBF:  goto yy103;
+          default:  goto yy2;
+          }
+yy103:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy104:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy105:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy106:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy107:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy108:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy109:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy110:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy111:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy112:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy113:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy114:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy115:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy116:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy117:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy118:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy119:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy120:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy121:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy122:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy123:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy124:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy125:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy126:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy127:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy128:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy129:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy130:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy131:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy132:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy133:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy134:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy135:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy136:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy137:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy138:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy139:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy140:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy141:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy142:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy143:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy144:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy145:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy146:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy147:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy148:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy149:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy150:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy151:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy152:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy153:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy154:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy155:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy156:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy157:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy158:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy159:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy160:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy161:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy162:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy163:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy164:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy165:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy166:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych >= 0xC0) goto yy2;
+yy167:
+          ++sp;
+          { ls.append(sp-3, sp); continue; /* tolower() identity fallback, 3 byte(s)/char */ }
+yy169:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy170:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy171:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy172:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy173:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy174:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy175:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy176:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy177:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy178:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy179:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy180:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy181:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy182:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy183:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy184:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy185:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy186:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy187:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy188:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy189:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy190:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy191:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy192:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy193:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy194:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy195:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy196:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy197:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy198:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy199:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy200:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy201:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy202:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy203:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy204:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy205:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy206:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy207:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy208:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy209:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy210:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy211:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy212:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy213:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy214:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy215:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy216:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy217:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy218:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy219:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy220:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy221:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy222:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy223:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy224:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy225:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy226:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy227:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy228:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy229:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy230:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy231:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy232:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy233:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy234:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy235:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy236:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy237:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy238:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy239:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy240:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy241:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy242:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy243:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy244:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy245:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy246:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy247:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy248:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy249:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy250:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy251:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy252:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy253:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy254:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy255:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy256:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy257:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy258:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy259:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy260:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy261:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy262:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy263:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy264:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy265:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy266:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy267:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy268:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy269:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy270:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy271:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy272:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy273:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy274:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy275:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy276:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy277:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy278:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy279:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy280:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy281:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy282:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy283:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy284:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy285:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy286:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy287:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy288:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy289:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy290:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy291:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy292:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy293:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy294:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy295:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy296:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy297:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy298:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy299:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy300:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy301:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy302:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy303:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy304:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy305:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy306:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy307:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy308:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy309:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy310:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy311:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy312:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy313:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy314:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy315:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy316:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy317:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy318:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy319:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy320:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy321:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy322:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy323:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy324:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy325:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy326:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy327:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy328:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy329:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy330:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy331:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy332:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy333:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy334:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy335:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy336:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy337:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy338:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy339:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy340:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy341:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy342:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy343:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy344:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy345:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy346:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy347:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy348:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy349:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy350:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy351:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy352:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy353:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy354:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy355:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy356:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy357:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy358:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy359:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy360:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy361:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy362:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy363:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy364:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy365:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy366:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy367:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy368:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy369:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy370:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy371:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy372:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy373:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy374:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy375:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy376:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy377:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy378:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy379:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy380:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy381:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy382:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy383:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy384:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy385:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy386:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy387:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy388:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy389:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy390:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy391:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy392:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy393:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy394:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy395:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy396:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy397:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy398:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy399:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy400:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy401:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy402:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy403:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy404:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy405:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy406:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy407:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy408:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy409:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy410:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy411:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy412:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy413:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy414:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy415:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy416:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy417:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy418:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy419:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy420:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy421:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy422:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy423:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy424:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy425:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy426:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy427:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy428:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy429:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy430:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy431:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy432:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy433:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy434:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy435:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy436:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy437:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy438:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy439:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy440:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy441:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy442:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy443:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy444:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy445:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy446:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy447:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy448:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy449:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy450:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy451:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy452:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy453:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy454:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy455:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy456:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy457:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy458:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy459:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy460:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy461:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy462:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy463:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy464:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy465:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy466:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy467:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy468:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy469:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy470:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy471:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy472:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy473:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy474:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy475:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy476:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy477:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy478:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy479:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy480:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy481:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy482:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy483:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy484:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy485:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy486:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy487:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy488:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy489:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy490:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy491:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy492:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy493:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy494:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy495:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy496:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy497:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy498:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy499:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy500:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy501:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy502:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy503:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy504:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy505:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy506:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy507:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy508:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy509:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy510:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy511:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy512:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy513:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy514:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy515:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy516:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy517:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy518:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy519:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy520:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy521:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy522:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy523:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy524:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy525:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy526:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy527:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy528:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy529:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy530:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy531:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy532:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy533:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy534:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy535:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy536:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy537:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy538:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy539:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy540:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy541:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy542:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy543:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy544:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy545:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy546:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy547:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy548:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy549:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy550:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy551:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy552:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy553:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy554:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy555:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy556:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy557:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy558:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy559:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy560:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy561:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy562:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy563:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy564:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy565:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy566:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy567:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy568:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy569:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy570:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy571:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy572:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy573:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy574:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy575:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy576:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy577:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy578:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy579:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy580:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy581:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy582:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy583:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy584:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy585:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy586:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy587:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy588:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy589:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy590:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy591:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy592:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy593:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy594:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy595:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy596:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy597:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy598:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy599:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy600:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy601:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy602:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy603:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy604:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy605:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy606:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy607:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy608:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy609:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy610:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy611:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy612:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy613:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy614:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy615:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy616:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy617:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy618:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy619:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy620:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy621:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy622:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy623:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy624:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy625:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy626:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy627:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy628:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy629:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy630:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy631:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy632:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy633:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy634:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy635:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy636:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy637:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy638:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy639:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy640:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy641:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy642:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy643:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy644:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy645:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy646:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy647:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy648:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy649:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy650:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy651:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy652:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy653:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy654:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy655:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy656:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy657:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy658:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy659:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy660:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy661:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy662:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy663:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy664:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy665:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy666:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy667:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy668:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy669:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy670:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy671:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy672:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy673:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy674:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy675:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy676:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy677:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy678:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy679:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy680:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy681:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy682:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy683:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy684:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy685:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy686:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy687:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy688:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy689:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy690:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy691:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy692:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy693:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy694:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy695:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy696:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy697:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy698:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy699:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy700:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy701:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy702:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy703:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy704:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy705:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy706:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy707:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy708:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy709:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy710:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy711:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy712:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy713:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy714:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy715:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy716:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy717:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy718:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy719:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy720:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy721:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy722:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy723:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy724:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy725:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy726:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy727:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy728:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy729:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy730:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy731:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy732:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy733:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy734:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy735:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy736:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy737:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy738:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy739:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy740:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy741:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy742:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy743:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy744:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy745:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy746:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy747:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy748:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy749:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy750:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy751:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy752:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy753:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy754:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy755:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy756:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy757:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy758:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy759:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy760:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy761:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy762:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy763:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy764:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy765:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy766:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy767:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy768:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy769:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy770:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy771:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy772:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy773:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy774:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy775:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy776:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy777:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy778:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy779:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy780:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy781:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy782:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy783:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy784:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy785:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy786:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy787:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy788:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy789:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy790:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy791:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy792:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy793:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy794:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy795:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy796:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy797:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy798:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy799:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy800:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy801:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy802:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy803:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy804:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy805:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy806:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy807:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy808:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy809:
+          ++sp;
+          { ls.append(sp-2, sp); continue; /* tolower() identity fallback, 2 byte(s)/char */ }
+yy811:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy812:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy813:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy814:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:
+          case 0x81:
+          case 0x82:
+          case 0x83:
+          case 0x84:
+          case 0x85:
+          case 0x86:
+          case 0x87:
+          case 0x88:
+          case 0x89:
+          case 0x8A:
+          case 0x8B:
+          case 0x8C:
+          case 0x8D:
+          case 0x8E:
+          case 0x8F:
+          case 0x90:
+          case 0x91:
+          case 0x92:
+          case 0x93:
+          case 0x94:
+          case 0x95:
+          case 0x96:
+          case 0x97:
+          case 0x98:
+          case 0x99:
+          case 0x9A:
+          case 0x9B:
+          case 0x9C:
+          case 0x9D:
+          case 0x9E:
+          case 0x9F:
+          case 0xA0:
+          case 0xBB:
+          case 0xBC:
+          case 0xBD:
+          case 0xBE:
+          case 0xBF:  goto yy167;
+          case 0xA1:  goto yy875;
+          case 0xA2:  goto yy877;
+          case 0xA3:  goto yy879;
+          case 0xA4:  goto yy881;
+          case 0xA5:  goto yy883;
+          case 0xA6:  goto yy885;
+          case 0xA7:  goto yy887;
+          case 0xA8:  goto yy889;
+          case 0xA9:  goto yy891;
+          case 0xAA:  goto yy893;
+          case 0xAB:  goto yy895;
+          case 0xAC:  goto yy897;
+          case 0xAD:  goto yy899;
+          case 0xAE:  goto yy901;
+          case 0xAF:  goto yy903;
+          case 0xB0:  goto yy905;
+          case 0xB1:  goto yy907;
+          case 0xB2:  goto yy909;
+          case 0xB3:  goto yy911;
+          case 0xB4:  goto yy913;
+          case 0xB5:  goto yy915;
+          case 0xB6:  goto yy917;
+          case 0xB7:  goto yy919;
+          case 0xB8:  goto yy921;
+          case 0xB9:  goto yy923;
+          case 0xBA:  goto yy925;
+          default:  goto yy2;
+          }
+yy815:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy816:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy817:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy818:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy819:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy820:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy821:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy822:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy823:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy824:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy825:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy826:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy827:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy828:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy829:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy830:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy831:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy832:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy833:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy834:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy835:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy836:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy837:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy838:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy839:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy840:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy841:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy842:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy843:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy844:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy845:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy846:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy847:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy848:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy849:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy850:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy851:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy852:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy853:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy854:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy855:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy856:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy857:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy858:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy859:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy860:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy861:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy862:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy863:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy864:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy865:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy866:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy867:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy868:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy869:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy870:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy871:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy872:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy873:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy874:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy875:
+          ++sp;
+          { ls += "\xef\xbd\x81"; continue; 	/* Ａ -> ａ == U+FF21 -> U+FF41 */ }
+yy877:
+          ++sp;
+          { ls += "\xef\xbd\x82"; continue; 	/* Ｂ -> ｂ == U+FF22 -> U+FF42 */ }
+yy879:
+          ++sp;
+          { ls += "\xef\xbd\x83"; continue; 	/* Ｃ -> ｃ == U+FF23 -> U+FF43 */ }
+yy881:
+          ++sp;
+          { ls += "\xef\xbd\x84"; continue; 	/* Ｄ -> ｄ == U+FF24 -> U+FF44 */ }
+yy883:
+          ++sp;
+          { ls += "\xef\xbd\x85"; continue; 	/* Ｅ -> ｅ == U+FF25 -> U+FF45 */ }
+yy885:
+          ++sp;
+          { ls += "\xef\xbd\x86"; continue; 	/* Ｆ -> ｆ == U+FF26 -> U+FF46 */ }
+yy887:
+          ++sp;
+          { ls += "\xef\xbd\x87"; continue; 	/* Ｇ -> ｇ == U+FF27 -> U+FF47 */ }
+yy889:
+          ++sp;
+          { ls += "\xef\xbd\x88"; continue; 	/* Ｈ -> ｈ == U+FF28 -> U+FF48 */ }
+yy891:
+          ++sp;
+          { ls += "\xef\xbd\x89"; continue; 	/* Ｉ -> ｉ == U+FF29 -> U+FF49 */ }
+yy893:
+          ++sp;
+          { ls += "\xef\xbd\x8a"; continue; 	/* Ｊ -> ｊ == U+FF2A -> U+FF4A */ }
+yy895:
+          ++sp;
+          { ls += "\xef\xbd\x8b"; continue; 	/* Ｋ -> ｋ == U+FF2B -> U+FF4B */ }
+yy897:
+          ++sp;
+          { ls += "\xef\xbd\x8c"; continue; 	/* Ｌ -> ｌ == U+FF2C -> U+FF4C */ }
+yy899:
+          ++sp;
+          { ls += "\xef\xbd\x8d"; continue; 	/* Ｍ -> ｍ == U+FF2D -> U+FF4D */ }
+yy901:
+          ++sp;
+          { ls += "\xef\xbd\x8e"; continue; 	/* Ｎ -> ｎ == U+FF2E -> U+FF4E */ }
+yy903:
+          ++sp;
+          { ls += "\xef\xbd\x8f"; continue; 	/* Ｏ -> ｏ == U+FF2F -> U+FF4F */ }
+yy905:
+          ++sp;
+          { ls += "\xef\xbd\x90"; continue; 	/* Ｐ -> ｐ == U+FF30 -> U+FF50 */ }
+yy907:
+          ++sp;
+          { ls += "\xef\xbd\x91"; continue; 	/* Ｑ -> ｑ == U+FF31 -> U+FF51 */ }
+yy909:
+          ++sp;
+          { ls += "\xef\xbd\x92"; continue; 	/* Ｒ -> ｒ == U+FF32 -> U+FF52 */ }
+yy911:
+          ++sp;
+          { ls += "\xef\xbd\x93"; continue; 	/* Ｓ -> ｓ == U+FF33 -> U+FF53 */ }
+yy913:
+          ++sp;
+          { ls += "\xef\xbd\x94"; continue; 	/* Ｔ -> ｔ == U+FF34 -> U+FF54 */ }
+yy915:
+          ++sp;
+          { ls += "\xef\xbd\x95"; continue; 	/* Ｕ -> ｕ == U+FF35 -> U+FF55 */ }
+yy917:
+          ++sp;
+          { ls += "\xef\xbd\x96"; continue; 	/* Ｖ -> ｖ == U+FF36 -> U+FF56 */ }
+yy919:
+          ++sp;
+          { ls += "\xef\xbd\x97"; continue; 	/* Ｗ -> ｗ == U+FF37 -> U+FF57 */ }
+yy921:
+          ++sp;
+          { ls += "\xef\xbd\x98"; continue; 	/* Ｘ -> ｘ == U+FF38 -> U+FF58 */ }
+yy923:
+          ++sp;
+          { ls += "\xef\xbd\x99"; continue; 	/* Ｙ -> ｙ == U+FF39 -> U+FF59 */ }
+yy925:
+          ++sp;
+          { ls += "\xef\xbd\x9a"; continue; 	/* Ｚ -> ｚ == U+FF3A -> U+FF5A */ }
+yy927:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy928:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy929:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy930:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy931:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy932:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy933:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy934:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy935:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy936:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy937:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy938:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy939:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy940:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy941:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy942:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy943:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy944:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy945:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy946:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy947:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy948:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy949:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy950:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy951:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy952:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy953:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy954:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy955:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy956:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy957:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy958:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy959:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy960:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy1145;
+          case 0x81:
+          case 0x83:
+          case 0x85:
+          case 0x87:
+          case 0x88:
+          case 0x89:
+          case 0x8A:
+          case 0x8C:
+          case 0x8E:
+          case 0x8F:
+          case 0x91:
+          case 0x93:
+          case 0x94:
+          case 0x95:
+          case 0x96:
+          case 0x97:
+          case 0x98:
+          case 0x99:
+          case 0x9A:
+          case 0x9B:
+          case 0x9C:
+          case 0x9D:
+          case 0x9E:
+          case 0x9F:
+          case 0xA1:
+          case 0xA3:
+          case 0xA5:
+          case 0xA7:
+          case 0xA9:
+          case 0xAB:
+          case 0xAC:
+          case 0xAD:
+          case 0xAE:
+          case 0xAF:
+          case 0xB0:
+          case 0xB1:
+          case 0xB2:
+          case 0xB3:
+          case 0xB4:
+          case 0xB5:
+          case 0xB6:
+          case 0xB7:
+          case 0xB8:
+          case 0xB9:
+          case 0xBA:
+          case 0xBB:
+          case 0xBC:
+          case 0xBD:
+          case 0xBE:
+          case 0xBF:  goto yy167;
+          case 0x82:  goto yy1147;
+          case 0x84:  goto yy1149;
+          case 0x86:  goto yy1151;
+          case 0x8B:  goto yy1153;
+          case 0x8D:  goto yy1155;
+          case 0x90:  goto yy1157;
+          case 0x92:  goto yy1159;
+          case 0xA0:  goto yy1161;
+          case 0xA2:  goto yy1163;
+          case 0xA4:  goto yy1165;
+          case 0xA6:  goto yy1167;
+          case 0xA8:  goto yy1169;
+          case 0xAA:  goto yy1171;
+          default:  goto yy2;
+          }
+yy961:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy1089;
+          case 0x81:
+          case 0x83:
+          case 0x85:
+          case 0x87:
+          case 0x89:
+          case 0x8B:
+          case 0x8D:
+          case 0x8F:
+          case 0x91:
+          case 0x93:
+          case 0x95:
+          case 0x97:
+          case 0x99:
+          case 0x9B:
+          case 0x9D:
+          case 0x9F:
+          case 0xA1:
+          case 0xA3:
+          case 0xA5:
+          case 0xA7:
+          case 0xA9:
+          case 0xAB:
+          case 0xAD:
+          case 0xAF:
+          case 0xB0:
+          case 0xB1:
+          case 0xB2:
+          case 0xB3:
+          case 0xB4:
+          case 0xB5:
+          case 0xB6:
+          case 0xB7:
+          case 0xB8:
+          case 0xBA:
+          case 0xBC:
+          case 0xBF:  goto yy167;
+          case 0x82:  goto yy1091;
+          case 0x84:  goto yy1093;
+          case 0x86:  goto yy1095;
+          case 0x88:  goto yy1097;
+          case 0x8A:  goto yy1099;
+          case 0x8C:  goto yy1101;
+          case 0x8E:  goto yy1103;
+          case 0x90:  goto yy1105;
+          case 0x92:  goto yy1107;
+          case 0x94:  goto yy1109;
+          case 0x96:  goto yy1111;
+          case 0x98:  goto yy1113;
+          case 0x9A:  goto yy1115;
+          case 0x9C:  goto yy1117;
+          case 0x9E:  goto yy1119;
+          case 0xA0:  goto yy1121;
+          case 0xA2:  goto yy1123;
+          case 0xA4:  goto yy1125;
+          case 0xA6:  goto yy1127;
+          case 0xA8:  goto yy1129;
+          case 0xAA:  goto yy1131;
+          case 0xAC:  goto yy1133;
+          case 0xAE:  goto yy1135;
+          case 0xB9:  goto yy1137;
+          case 0xBB:  goto yy1139;
+          case 0xBD:  goto yy1141;
+          case 0xBE:  goto yy1143;
+          default:  goto yy2;
+          }
+yy962:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:
+          case 0x81:
+          case 0x82:
+          case 0x83:
+          case 0x84:
+          case 0x85:
+          case 0x86:
+          case 0x87:
+          case 0x88:
+          case 0x89:
+          case 0x8A:
+          case 0x8B:
+          case 0x8C:
+          case 0x8D:
+          case 0x8E:
+          case 0x8F:
+          case 0x90:
+          case 0x91:
+          case 0x92:
+          case 0x93:
+          case 0x94:
+          case 0x95:
+          case 0x96:
+          case 0x97:
+          case 0x98:
+          case 0x99:
+          case 0x9A:
+          case 0x9B:
+          case 0x9C:
+          case 0x9D:
+          case 0x9E:
+          case 0x9F:
+          case 0xA0:
+          case 0xA1:
+          case 0xA3:
+          case 0xA5:
+          case 0xA7:
+          case 0xA9:
+          case 0xAB:
+          case 0xAD:
+          case 0xAF:
+          case 0xB0:
+          case 0xB1:
+          case 0xB3:
+          case 0xB5:
+          case 0xB7:
+          case 0xB9:
+          case 0xBB:
+          case 0xBD:
+          case 0xBF:  goto yy167;
+          case 0xA2:  goto yy1061;
+          case 0xA4:  goto yy1063;
+          case 0xA6:  goto yy1065;
+          case 0xA8:  goto yy1067;
+          case 0xAA:  goto yy1069;
+          case 0xAC:  goto yy1071;
+          case 0xAE:  goto yy1073;
+          case 0xB2:  goto yy1075;
+          case 0xB4:  goto yy1077;
+          case 0xB6:  goto yy1079;
+          case 0xB8:  goto yy1081;
+          case 0xBA:  goto yy1083;
+          case 0xBC:  goto yy1085;
+          case 0xBE:  goto yy1087;
+          default:  goto yy2;
+          }
+yy963:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy964:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy1037;
+          case 0x81:
+          case 0x83:
+          case 0x85:
+          case 0x87:
+          case 0x89:
+          case 0x8B:
+          case 0x8D:
+          case 0x8F:
+          case 0x91:
+          case 0x93:
+          case 0x95:
           case 0x97:
           case 0x98:
           case 0x99:
@@ -1224,1440 +6824,686 @@ yy73:
           case 0xBC:
           case 0xBD:
           case 0xBE:
-          case 0xBF:  goto yy81;
+          case 0xBF:  goto yy167;
+          case 0x82:  goto yy1039;
+          case 0x84:  goto yy1041;
+          case 0x86:  goto yy1043;
+          case 0x88:  goto yy1045;
+          case 0x8A:  goto yy1047;
+          case 0x8C:  goto yy1049;
+          case 0x8E:  goto yy1051;
+          case 0x90:  goto yy1053;
+          case 0x92:  goto yy1055;
+          case 0x94:  goto yy1057;
+          case 0x96:  goto yy1059;
           default:  goto yy2;
           }
-yy74:
-          yych = *++sp;
-          if (yych <= 0x9F) goto yy2;
-          if (yych <= 0xBF) goto yy969;
-          goto yy2;
-yy75:
-          yych = *++sp;
-          if (yych <= 0xB9) {
-            if (yych <= 0x82) {
-              if (yych <= 0x7F) goto yy2;
-              if (yych <= 0x81) goto yy969;
-              goto yy970;
-            } else {
-              if (yych <= 0x83) goto yy971;
-              if (yych <= 0xB7) goto yy969;
-              if (yych <= 0xB8) goto yy972;
-              goto yy973;
-            }
-          } else {
-            if (yych <= 0xBC) {
-              if (yych <= 0xBA) goto yy974;
-              if (yych <= 0xBB) goto yy975;
-              goto yy976;
-            } else {
-              if (yych <= 0xBD) goto yy977;
-              if (yych <= 0xBE) goto yy978;
-              if (yych <= 0xBF) goto yy979;
-              goto yy2;
-            }
-          }
-yy76:
-          yych = *++sp;
-          if (yych <= 0x92) {
-            if (yych <= 0x84) {
-              if (yych <= 0x7F) goto yy2;
-              if (yych <= 0x83) goto yy969;
-              goto yy980;
-            } else {
-              if (yych <= 0x85) goto yy981;
-              if (yych <= 0x86) goto yy982;
-              if (yych <= 0x91) goto yy969;
-              goto yy983;
-            }
-          } else {
-            if (yych <= 0xB1) {
-              if (yych <= 0x93) goto yy984;
-              if (yych <= 0xAF) goto yy969;
-              if (yych <= 0xB0) goto yy985;
-              goto yy986;
-            } else {
-              if (yych <= 0xB2) goto yy987;
-              if (yych <= 0xB3) goto yy988;
-              if (yych <= 0xBF) goto yy969;
-              goto yy2;
-            }
-          }
-yy77:
-          yych = *++sp;
-          if (yych <= 0x7F) goto yy2;
-          if (yych <= 0xBF) goto yy969;
-          goto yy2;
-yy78:
-          yych = *++sp;
-          if (yych <= 0x9B) {
-            if (yych <= 0x98) {
-              if (yych <= 0x7F) goto yy2;
-              goto yy969;
-            } else {
-              if (yych <= 0x99) goto yy989;
-              if (yych <= 0x9A) goto yy990;
-              goto yy969;
-            }
-          } else {
-            if (yych <= 0x9D) {
-              if (yych <= 0x9C) goto yy991;
-              goto yy992;
-            } else {
-              if (yych <= 0x9E) goto yy993;
-              if (yych <= 0xBF) goto yy969;
-              goto yy2;
-            }
-          }
-yy79:
-          yych = *++sp;
-          if (yych <= 0x7F) goto yy2;
-          if (yych <= 0x9F) goto yy969;
-          goto yy2;
-yy80:
-          yych = *++sp;
-          if (yych <= 0x7F) goto yy2;
-          if (yych == 0xBC) goto yy994;
-          if (yych <= 0xBF) goto yy969;
-          goto yy2;
-yy81:
-          ++sp;
-          { ls.append(sp-2, sp); continue; /* tolower() identity fallback, 2 byte(s)/char */ }
-yy83:
-          ++sp;
-          { ls += "\xc3\xa0"; continue; 	/* À -> à == U+00C0 -> U+00E0 */ }
-yy85:
-          ++sp;
-          { ls += "\xc3\xa1"; continue; 	/* Á -> á == U+00C1 -> U+00E1 */ }
-yy87:
-          ++sp;
-          { ls += "\xc3\xa2"; continue; 	/* Â -> â == U+00C2 -> U+00E2 */ }
-yy89:
-          ++sp;
-          { ls += "\xc3\xa3"; continue; 	/* Ã -> ã == U+00C3 -> U+00E3 */ }
-yy91:
-          ++sp;
-          { ls += "\xc3\xa4"; continue; 	/* Ä -> ä == U+00C4 -> U+00E4 */ }
-yy93:
-          ++sp;
-          { ls += "\xc3\xa5"; continue; 	/* Å -> å == U+00C5 -> U+00E5 */ }
-yy95:
-          ++sp;
-          { ls += "\xc3\xa6"; continue; 	/* Æ -> æ == U+00C6 -> U+00E6 */ }
-yy97:
-          ++sp;
-          { ls += "\xc3\xa7"; continue; 	/* Ç -> ç == U+00C7 -> U+00E7 */ }
-yy99:
-          ++sp;
-          { ls += "\xc3\xa8"; continue; 	/* È -> è == U+00C8 -> U+00E8 */ }
-yy101:
-          ++sp;
-          { ls += "\xc3\xa9"; continue; 	/* É -> é == U+00C9 -> U+00E9 */ }
-yy103:
-          ++sp;
-          { ls += "\xc3\xaa"; continue; 	/* Ê -> ê == U+00CA -> U+00EA */ }
-yy105:
-          ++sp;
-          { ls += "\xc3\xab"; continue; 	/* Ë -> ë == U+00CB -> U+00EB */ }
-yy107:
-          ++sp;
-          { ls += "\xc3\xac"; continue; 	/* Ì -> ì == U+00CC -> U+00EC */ }
-yy109:
-          ++sp;
-          { ls += "\xc3\xad"; continue; 	/* Í -> í == U+00CD -> U+00ED */ }
-yy111:
-          ++sp;
-          { ls += "\xc3\xae"; continue; 	/* Î -> î == U+00CE -> U+00EE */ }
-yy113:
-          ++sp;
-          { ls += "\xc3\xaf"; continue; 	/* Ï -> ï == U+00CF -> U+00EF */ }
-yy115:
-          ++sp;
-          { ls += "\xc3\xb0"; continue; 	/* Ð -> ð == U+00D0 -> U+00F0 */ }
-yy117:
-          ++sp;
-          { ls += "\xc3\xb1"; continue; 	/* Ñ -> ñ == U+00D1 -> U+00F1 */ }
-yy119:
-          ++sp;
-          { ls += "\xc3\xb2"; continue; 	/* Ò -> ò == U+00D2 -> U+00F2 */ }
-yy121:
-          ++sp;
-          { ls += "\xc3\xb3"; continue; 	/* Ó -> ó == U+00D3 -> U+00F3 */ }
-yy123:
-          ++sp;
-          { ls += "\xc3\xb4"; continue; 	/* Ô -> ô == U+00D4 -> U+00F4 */ }
-yy125:
-          ++sp;
-          { ls += "\xc3\xb5"; continue; 	/* Õ -> õ == U+00D5 -> U+00F5 */ }
-yy127:
-          ++sp;
-          { ls += "\xc3\xb6"; continue; 	/* Ö -> ö == U+00D6 -> U+00F6 */ }
-yy129:
-          ++sp;
-          { ls += "\xc3\xb8"; continue; 	/* Ø -> ø == U+00D8 -> U+00F8 */ }
-yy131:
-          ++sp;
-          { ls += "\xc3\xb9"; continue; 	/* Ù -> ù == U+00D9 -> U+00F9 */ }
-yy133:
-          ++sp;
-          { ls += "\xc3\xba"; continue; 	/* Ú -> ú == U+00DA -> U+00FA */ }
-yy135:
-          ++sp;
-          { ls += "\xc3\xbb"; continue; 	/* Û -> û == U+00DB -> U+00FB */ }
-yy137:
-          ++sp;
-          { ls += "\xc3\xbc"; continue; 	/* Ü -> ü == U+00DC -> U+00FC */ }
-yy139:
-          ++sp;
-          { ls += "\xc3\xbd"; continue; 	/* Ý -> ý == U+00DD -> U+00FD */ }
-yy141:
-          ++sp;
-          { ls += "\xc3\xbe"; continue; 	/* Þ -> þ == U+00DE -> U+00FE */ }
-yy143:
-          ++sp;
-          { ls += "\xc4\x81"; continue; 	/* Ā -> ā == U+0100 -> U+0101 */ }
-yy145:
-          ++sp;
-          { ls += "\xc4\x83"; continue; 	/* Ă -> ă == U+0102 -> U+0103 */ }
-yy147:
-          ++sp;
-          { ls += "\xc4\x85"; continue; 	/* Ą -> ą == U+0104 -> U+0105 */ }
-yy149:
-          ++sp;
-          { ls += "\xc4\x87"; continue; 	/* Ć -> ć == U+0106 -> U+0107 */ }
-yy151:
-          ++sp;
-          { ls += "\xc4\x89"; continue; 	/* Ĉ -> ĉ == U+0108 -> U+0109 */ }
-yy153:
-          ++sp;
-          { ls += "\xc4\x8b"; continue; 	/* Ċ -> ċ == U+010A -> U+010B */ }
-yy155:
-          ++sp;
-          { ls += "\xc4\x8d"; continue; 	/* Č -> č == U+010C -> U+010D */ }
-yy157:
-          ++sp;
-          { ls += "\xc4\x8f"; continue; 	/* Ď -> ď == U+010E -> U+010F */ }
-yy159:
-          ++sp;
-          { ls += "\xc4\x91"; continue; 	/* Đ -> đ == U+0110 -> U+0111 */ }
-yy161:
-          ++sp;
-          { ls += "\xc4\x93"; continue; 	/* Ē -> ē == U+0112 -> U+0113 */ }
-yy163:
-          ++sp;
-          { ls += "\xc4\x95"; continue; 	/* Ĕ -> ĕ == U+0114 -> U+0115 */ }
-yy165:
-          ++sp;
-          { ls += "\xc4\x97"; continue; 	/* Ė -> ė == U+0116 -> U+0117 */ }
-yy167:
-          ++sp;
-          { ls += "\xc4\x99"; continue; 	/* Ę -> ę == U+0118 -> U+0119 */ }
-yy169:
-          ++sp;
-          { ls += "\xc4\x9b"; continue; 	/* Ě -> ě == U+011A -> U+011B */ }
-yy171:
-          ++sp;
-          { ls += "\xc4\x9d"; continue; 	/* Ĝ -> ĝ == U+011C -> U+011D */ }
-yy173:
-          ++sp;
-          { ls += "\xc4\x9f"; continue; 	/* Ğ -> ğ == U+011E -> U+011F */ }
-yy175:
-          ++sp;
-          { ls += "\xc4\xa1"; continue; 	/* Ġ -> ġ == U+0120 -> U+0121 */ }
-yy177:
-          ++sp;
-          { ls += "\xc4\xa3"; continue; 	/* Ģ -> ģ == U+0122 -> U+0123 */ }
-yy179:
-          ++sp;
-          { ls += "\xc4\xa5"; continue; 	/* Ĥ -> ĥ == U+0124 -> U+0125 */ }
-yy181:
-          ++sp;
-          { ls += "\xc4\xa7"; continue; 	/* Ħ -> ħ == U+0126 -> U+0127 */ }
-yy183:
-          ++sp;
-          { ls += "\xc4\xa9"; continue; 	/* Ĩ -> ĩ == U+0128 -> U+0129 */ }
-yy185:
-          ++sp;
-          { ls += "\xc4\xab"; continue; 	/* Ī -> ī == U+012A -> U+012B */ }
-yy187:
-          ++sp;
-          { ls += "\xc4\xad"; continue; 	/* Ĭ -> ĭ == U+012C -> U+012D */ }
-yy189:
-          ++sp;
-          { ls += "\xc4\xaf"; continue; 	/* Į -> į == U+012E -> U+012F */ }
-yy191:
-          ++sp;
-          { ls += "\x69\xcc\x87"; continue; 	/* İ -> i̇ == U+0130 -> U+0069 */ }
-yy193:
-          ++sp;
-          { ls += "\xc4\xb3"; continue; 	/* Ĳ -> ĳ == U+0132 -> U+0133 */ }
-yy195:
-          ++sp;
-          { ls += "\xc4\xb5"; continue; 	/* Ĵ -> ĵ == U+0134 -> U+0135 */ }
-yy197:
-          ++sp;
-          { ls += "\xc4\xb7"; continue; 	/* Ķ -> ķ == U+0136 -> U+0137 */ }
-yy199:
-          ++sp;
-          { ls += "\xc4\xba"; continue; 	/* Ĺ -> ĺ == U+0139 -> U+013A */ }
-yy201:
-          ++sp;
-          { ls += "\xc4\xbc"; continue; 	/* Ļ -> ļ == U+013B -> U+013C */ }
-yy203:
-          ++sp;
-          { ls += "\xc4\xbe"; continue; 	/* Ľ -> ľ == U+013D -> U+013E */ }
-yy205:
-          ++sp;
-          { ls += "\xc5\x80"; continue; 	/* Ŀ -> ŀ == U+013F -> U+0140 */ }
-yy207:
-          ++sp;
-          { ls += "\xc5\x82"; continue; 	/* Ł -> ł == U+0141 -> U+0142 */ }
-yy209:
-          ++sp;
-          { ls += "\xc5\x84"; continue; 	/* Ń -> ń == U+0143 -> U+0144 */ }
-yy211:
-          ++sp;
-          { ls += "\xc5\x86"; continue; 	/* Ņ -> ņ == U+0145 -> U+0146 */ }
-yy213:
-          ++sp;
-          { ls += "\xc5\x88"; continue; 	/* Ň -> ň == U+0147 -> U+0148 */ }
-yy215:
-          ++sp;
-          { ls += "\xc5\x8b"; continue; 	/* Ŋ -> ŋ == U+014A -> U+014B */ }
-yy217:
-          ++sp;
-          { ls += "\xc5\x8d"; continue; 	/* Ō -> ō == U+014C -> U+014D */ }
-yy219:
-          ++sp;
-          { ls += "\xc5\x8f"; continue; 	/* Ŏ -> ŏ == U+014E -> U+014F */ }
-yy221:
-          ++sp;
-          { ls += "\xc5\x91"; continue; 	/* Ő -> ő == U+0150 -> U+0151 */ }
-yy223:
-          ++sp;
-          { ls += "\xc5\x93"; continue; 	/* Œ -> œ == U+0152 -> U+0153 */ }
-yy225:
-          ++sp;
-          { ls += "\xc5\x95"; continue; 	/* Ŕ -> ŕ == U+0154 -> U+0155 */ }
-yy227:
-          ++sp;
-          { ls += "\xc5\x97"; continue; 	/* Ŗ -> ŗ == U+0156 -> U+0157 */ }
-yy229:
-          ++sp;
-          { ls += "\xc5\x99"; continue; 	/* Ř -> ř == U+0158 -> U+0159 */ }
-yy231:
-          ++sp;
-          { ls += "\xc5\x9b"; continue; 	/* Ś -> ś == U+015A -> U+015B */ }
-yy233:
-          ++sp;
-          { ls += "\xc5\x9d"; continue; 	/* Ŝ -> ŝ == U+015C -> U+015D */ }
-yy235:
-          ++sp;
-          { ls += "\xc5\x9f"; continue; 	/* Ş -> ş == U+015E -> U+015F */ }
-yy237:
-          ++sp;
-          { ls += "\xc5\xa1"; continue; 	/* Š -> š == U+0160 -> U+0161 */ }
-yy239:
-          ++sp;
-          { ls += "\xc5\xa3"; continue; 	/* Ţ -> ţ == U+0162 -> U+0163 */ }
-yy241:
-          ++sp;
-          { ls += "\xc5\xa5"; continue; 	/* Ť -> ť == U+0164 -> U+0165 */ }
-yy243:
-          ++sp;
-          { ls += "\xc5\xa7"; continue; 	/* Ŧ -> ŧ == U+0166 -> U+0167 */ }
-yy245:
-          ++sp;
-          { ls += "\xc5\xa9"; continue; 	/* Ũ -> ũ == U+0168 -> U+0169 */ }
-yy247:
-          ++sp;
-          { ls += "\xc5\xab"; continue; 	/* Ū -> ū == U+016A -> U+016B */ }
-yy249:
-          ++sp;
-          { ls += "\xc5\xad"; continue; 	/* Ŭ -> ŭ == U+016C -> U+016D */ }
-yy251:
-          ++sp;
-          { ls += "\xc5\xaf"; continue; 	/* Ů -> ů == U+016E -> U+016F */ }
-yy253:
-          ++sp;
-          { ls += "\xc5\xb1"; continue; 	/* Ű -> ű == U+0170 -> U+0171 */ }
-yy255:
-          ++sp;
-          { ls += "\xc5\xb3"; continue; 	/* Ų -> ų == U+0172 -> U+0173 */ }
-yy257:
-          ++sp;
-          { ls += "\xc5\xb5"; continue; 	/* Ŵ -> ŵ == U+0174 -> U+0175 */ }
-yy259:
-          ++sp;
-          { ls += "\xc5\xb7"; continue; 	/* Ŷ -> ŷ == U+0176 -> U+0177 */ }
-yy261:
-          ++sp;
-          { ls += "\xc3\xbf"; continue; 	/* Ÿ -> ÿ == U+0178 -> U+00FF */ }
-yy263:
-          ++sp;
-          { ls += "\xc5\xba"; continue; 	/* Ź -> ź == U+0179 -> U+017A */ }
-yy265:
-          ++sp;
-          { ls += "\xc5\xbc"; continue; 	/* Ż -> ż == U+017B -> U+017C */ }
-yy267:
-          ++sp;
-          { ls += "\xc5\xbe"; continue; 	/* Ž -> ž == U+017D -> U+017E */ }
-yy269:
-          ++sp;
-          { ls += "\xc9\x93"; continue; 	/* Ɓ -> ɓ == U+0181 -> U+0253 */ }
-yy271:
-          ++sp;
-          { ls += "\xc6\x83"; continue; 	/* Ƃ -> ƃ == U+0182 -> U+0183 */ }
-yy273:
-          ++sp;
-          { ls += "\xc6\x85"; continue; 	/* Ƅ -> ƅ == U+0184 -> U+0185 */ }
-yy275:
-          ++sp;
-          { ls += "\xc9\x94"; continue; 	/* Ɔ -> ɔ == U+0186 -> U+0254 */ }
-yy277:
-          ++sp;
-          { ls += "\xc6\x88"; continue; 	/* Ƈ -> ƈ == U+0187 -> U+0188 */ }
-yy279:
-          ++sp;
-          { ls += "\xc9\x96"; continue; 	/* Ɖ -> ɖ == U+0189 -> U+0256 */ }
-yy281:
-          ++sp;
-          { ls += "\xc9\x97"; continue; 	/* Ɗ -> ɗ == U+018A -> U+0257 */ }
-yy283:
-          ++sp;
-          { ls += "\xc6\x8c"; continue; 	/* Ƌ -> ƌ == U+018B -> U+018C */ }
-yy285:
-          ++sp;
-          { ls += "\xc7\x9d"; continue; 	/* Ǝ -> ǝ == U+018E -> U+01DD */ }
-yy287:
-          ++sp;
-          { ls += "\xc9\x99"; continue; 	/* Ə -> ə == U+018F -> U+0259 */ }
-yy289:
-          ++sp;
-          { ls += "\xc9\x9b"; continue; 	/* Ɛ -> ɛ == U+0190 -> U+025B */ }
-yy291:
-          ++sp;
-          { ls += "\xc6\x92"; continue; 	/* Ƒ -> ƒ == U+0191 -> U+0192 */ }
-yy293:
-          ++sp;
-          { ls += "\xc9\xa0"; continue; 	/* Ɠ -> ɠ == U+0193 -> U+0260 */ }
-yy295:
-          ++sp;
-          { ls += "\xc9\xa3"; continue; 	/* Ɣ -> ɣ == U+0194 -> U+0263 */ }
-yy297:
-          ++sp;
-          { ls += "\xc9\xa9"; continue; 	/* Ɩ -> ɩ == U+0196 -> U+0269 */ }
-yy299:
-          ++sp;
-          { ls += "\xc9\xa8"; continue; 	/* Ɨ -> ɨ == U+0197 -> U+0268 */ }
-yy301:
-          ++sp;
-          { ls += "\xc6\x99"; continue; 	/* Ƙ -> ƙ == U+0198 -> U+0199 */ }
-yy303:
-          ++sp;
-          { ls += "\xc9\xaf"; continue; 	/* Ɯ -> ɯ == U+019C -> U+026F */ }
-yy305:
-          ++sp;
-          { ls += "\xc9\xb2"; continue; 	/* Ɲ -> ɲ == U+019D -> U+0272 */ }
-yy307:
-          ++sp;
-          { ls += "\xc9\xb5"; continue; 	/* Ɵ -> ɵ == U+019F -> U+0275 */ }
-yy309:
-          ++sp;
-          { ls += "\xc6\xa1"; continue; 	/* Ơ -> ơ == U+01A0 -> U+01A1 */ }
-yy311:
-          ++sp;
-          { ls += "\xc6\xa3"; continue; 	/* Ƣ -> ƣ == U+01A2 -> U+01A3 */ }
-yy313:
-          ++sp;
-          { ls += "\xc6\xa5"; continue; 	/* Ƥ -> ƥ == U+01A4 -> U+01A5 */ }
-yy315:
-          ++sp;
-          { ls += "\xca\x80"; continue; 	/* Ʀ -> ʀ == U+01A6 -> U+0280 */ }
-yy317:
-          ++sp;
-          { ls += "\xc6\xa8"; continue; 	/* Ƨ -> ƨ == U+01A7 -> U+01A8 */ }
-yy319:
-          ++sp;
-          { ls += "\xca\x83"; continue; 	/* Ʃ -> ʃ == U+01A9 -> U+0283 */ }
-yy321:
-          ++sp;
-          { ls += "\xc6\xad"; continue; 	/* Ƭ -> ƭ == U+01AC -> U+01AD */ }
-yy323:
-          ++sp;
-          { ls += "\xca\x88"; continue; 	/* Ʈ -> ʈ == U+01AE -> U+0288 */ }
-yy325:
-          ++sp;
-          { ls += "\xc6\xb0"; continue; 	/* Ư -> ư == U+01AF -> U+01B0 */ }
-yy327:
-          ++sp;
-          { ls += "\xca\x8a"; continue; 	/* Ʊ -> ʊ == U+01B1 -> U+028A */ }
-yy329:
-          ++sp;
-          { ls += "\xca\x8b"; continue; 	/* Ʋ -> ʋ == U+01B2 -> U+028B */ }
-yy331:
-          ++sp;
-          { ls += "\xc6\xb4"; continue; 	/* Ƴ -> ƴ == U+01B3 -> U+01B4 */ }
-yy333:
-          ++sp;
-          { ls += "\xc6\xb6"; continue; 	/* Ƶ -> ƶ == U+01B5 -> U+01B6 */ }
-yy335:
-          ++sp;
-          { ls += "\xca\x92"; continue; 	/* Ʒ -> ʒ == U+01B7 -> U+0292 */ }
-yy337:
-          ++sp;
-          { ls += "\xc6\xb9"; continue; 	/* Ƹ -> ƹ == U+01B8 -> U+01B9 */ }
-yy339:
-          ++sp;
-          { ls += "\xc6\xbd"; continue; 	/* Ƽ -> ƽ == U+01BC -> U+01BD */ }
-yy341:
-          ++sp;
-          { ls += "\xc7\x86"; continue; 	/* Ǆ -> ǆ == U+01C4 -> U+01C6 */ }
-yy343:
-          ++sp;
-          { ls += "\xc7\x86"; continue; 	/* ǅ -> ǆ == U+01C5 -> U+01C6 */ }
-yy345:
-          ++sp;
-          { ls += "\xc7\x89"; continue; 	/* Ǉ -> ǉ == U+01C7 -> U+01C9 */ }
-yy347:
-          ++sp;
-          { ls += "\xc7\x89"; continue; 	/* ǈ -> ǉ == U+01C8 -> U+01C9 */ }
-yy349:
-          ++sp;
-          { ls += "\xc7\x8c"; continue; 	/* Ǌ -> ǌ == U+01CA -> U+01CC */ }
-yy351:
-          ++sp;
-          { ls += "\xc7\x8c"; continue; 	/* ǋ -> ǌ == U+01CB -> U+01CC */ }
-yy353:
-          ++sp;
-          { ls += "\xc7\x8e"; continue; 	/* Ǎ -> ǎ == U+01CD -> U+01CE */ }
-yy355:
-          ++sp;
-          { ls += "\xc7\x90"; continue; 	/* Ǐ -> ǐ == U+01CF -> U+01D0 */ }
-yy357:
-          ++sp;
-          { ls += "\xc7\x92"; continue; 	/* Ǒ -> ǒ == U+01D1 -> U+01D2 */ }
-yy359:
-          ++sp;
-          { ls += "\xc7\x94"; continue; 	/* Ǔ -> ǔ == U+01D3 -> U+01D4 */ }
-yy361:
-          ++sp;
-          { ls += "\xc7\x96"; continue; 	/* Ǖ -> ǖ == U+01D5 -> U+01D6 */ }
-yy363:
-          ++sp;
-          { ls += "\xc7\x98"; continue; 	/* Ǘ -> ǘ == U+01D7 -> U+01D8 */ }
-yy365:
-          ++sp;
-          { ls += "\xc7\x9a"; continue; 	/* Ǚ -> ǚ == U+01D9 -> U+01DA */ }
-yy367:
-          ++sp;
-          { ls += "\xc7\x9c"; continue; 	/* Ǜ -> ǜ == U+01DB -> U+01DC */ }
-yy369:
-          ++sp;
-          { ls += "\xc7\x9f"; continue; 	/* Ǟ -> ǟ == U+01DE -> U+01DF */ }
-yy371:
-          ++sp;
-          { ls += "\xc7\xa1"; continue; 	/* Ǡ -> ǡ == U+01E0 -> U+01E1 */ }
-yy373:
-          ++sp;
-          { ls += "\xc7\xa3"; continue; 	/* Ǣ -> ǣ == U+01E2 -> U+01E3 */ }
-yy375:
-          ++sp;
-          { ls += "\xc7\xa5"; continue; 	/* Ǥ -> ǥ == U+01E4 -> U+01E5 */ }
-yy377:
-          ++sp;
-          { ls += "\xc7\xa7"; continue; 	/* Ǧ -> ǧ == U+01E6 -> U+01E7 */ }
-yy379:
-          ++sp;
-          { ls += "\xc7\xa9"; continue; 	/* Ǩ -> ǩ == U+01E8 -> U+01E9 */ }
-yy381:
-          ++sp;
-          { ls += "\xc7\xab"; continue; 	/* Ǫ -> ǫ == U+01EA -> U+01EB */ }
-yy383:
-          ++sp;
-          { ls += "\xc7\xad"; continue; 	/* Ǭ -> ǭ == U+01EC -> U+01ED */ }
-yy385:
-          ++sp;
-          { ls += "\xc7\xaf"; continue; 	/* Ǯ -> ǯ == U+01EE -> U+01EF */ }
-yy387:
-          ++sp;
-          { ls += "\xc7\xb3"; continue; 	/* Ǳ -> ǳ == U+01F1 -> U+01F3 */ }
-yy389:
-          ++sp;
-          { ls += "\xc7\xb3"; continue; 	/* ǲ -> ǳ == U+01F2 -> U+01F3 */ }
-yy391:
-          ++sp;
-          { ls += "\xc7\xb5"; continue; 	/* Ǵ -> ǵ == U+01F4 -> U+01F5 */ }
-yy393:
-          ++sp;
-          { ls += "\xc6\x95"; continue; 	/* Ƕ -> ƕ == U+01F6 -> U+0195 */ }
-yy395:
-          ++sp;
-          { ls += "\xc6\xbf"; continue; 	/* Ƿ -> ƿ == U+01F7 -> U+01BF */ }
-yy397:
-          ++sp;
-          { ls += "\xc7\xb9"; continue; 	/* Ǹ -> ǹ == U+01F8 -> U+01F9 */ }
-yy399:
-          ++sp;
-          { ls += "\xc7\xbb"; continue; 	/* Ǻ -> ǻ == U+01FA -> U+01FB */ }
-yy401:
-          ++sp;
-          { ls += "\xc7\xbd"; continue; 	/* Ǽ -> ǽ == U+01FC -> U+01FD */ }
-yy403:
-          ++sp;
-          { ls += "\xc7\xbf"; continue; 	/* Ǿ -> ǿ == U+01FE -> U+01FF */ }
-yy405:
-          ++sp;
-          { ls += "\xc8\x81"; continue; 	/* Ȁ -> ȁ == U+0200 -> U+0201 */ }
-yy407:
-          ++sp;
-          { ls += "\xc8\x83"; continue; 	/* Ȃ -> ȃ == U+0202 -> U+0203 */ }
-yy409:
-          ++sp;
-          { ls += "\xc8\x85"; continue; 	/* Ȅ -> ȅ == U+0204 -> U+0205 */ }
-yy411:
-          ++sp;
-          { ls += "\xc8\x87"; continue; 	/* Ȇ -> ȇ == U+0206 -> U+0207 */ }
-yy413:
-          ++sp;
-          { ls += "\xc8\x89"; continue; 	/* Ȉ -> ȉ == U+0208 -> U+0209 */ }
-yy415:
-          ++sp;
-          { ls += "\xc8\x8b"; continue; 	/* Ȋ -> ȋ == U+020A -> U+020B */ }
-yy417:
-          ++sp;
-          { ls += "\xc8\x8d"; continue; 	/* Ȍ -> ȍ == U+020C -> U+020D */ }
-yy419:
-          ++sp;
-          { ls += "\xc8\x8f"; continue; 	/* Ȏ -> ȏ == U+020E -> U+020F */ }
-yy421:
-          ++sp;
-          { ls += "\xc8\x91"; continue; 	/* Ȑ -> ȑ == U+0210 -> U+0211 */ }
-yy423:
-          ++sp;
-          { ls += "\xc8\x93"; continue; 	/* Ȓ -> ȓ == U+0212 -> U+0213 */ }
-yy425:
-          ++sp;
-          { ls += "\xc8\x95"; continue; 	/* Ȕ -> ȕ == U+0214 -> U+0215 */ }
-yy427:
-          ++sp;
-          { ls += "\xc8\x97"; continue; 	/* Ȗ -> ȗ == U+0216 -> U+0217 */ }
-yy429:
-          ++sp;
-          { ls += "\xc8\x99"; continue; 	/* Ș -> ș == U+0218 -> U+0219 */ }
-yy431:
-          ++sp;
-          { ls += "\xc8\x9b"; continue; 	/* Ț -> ț == U+021A -> U+021B */ }
-yy433:
-          ++sp;
-          { ls += "\xc8\x9d"; continue; 	/* Ȝ -> ȝ == U+021C -> U+021D */ }
-yy435:
-          ++sp;
-          { ls += "\xc8\x9f"; continue; 	/* Ȟ -> ȟ == U+021E -> U+021F */ }
-yy437:
-          ++sp;
-          { ls += "\xc6\x9e"; continue; 	/* Ƞ -> ƞ == U+0220 -> U+019E */ }
-yy439:
-          ++sp;
-          { ls += "\xc8\xa3"; continue; 	/* Ȣ -> ȣ == U+0222 -> U+0223 */ }
-yy441:
-          ++sp;
-          { ls += "\xc8\xa5"; continue; 	/* Ȥ -> ȥ == U+0224 -> U+0225 */ }
-yy443:
-          ++sp;
-          { ls += "\xc8\xa7"; continue; 	/* Ȧ -> ȧ == U+0226 -> U+0227 */ }
-yy445:
-          ++sp;
-          { ls += "\xc8\xa9"; continue; 	/* Ȩ -> ȩ == U+0228 -> U+0229 */ }
-yy447:
-          ++sp;
-          { ls += "\xc8\xab"; continue; 	/* Ȫ -> ȫ == U+022A -> U+022B */ }
-yy449:
-          ++sp;
-          { ls += "\xc8\xad"; continue; 	/* Ȭ -> ȭ == U+022C -> U+022D */ }
-yy451:
-          ++sp;
-          { ls += "\xc8\xaf"; continue; 	/* Ȯ -> ȯ == U+022E -> U+022F */ }
-yy453:
-          ++sp;
-          { ls += "\xc8\xb1"; continue; 	/* Ȱ -> ȱ == U+0230 -> U+0231 */ }
-yy455:
-          ++sp;
-          { ls += "\xc8\xb3"; continue; 	/* Ȳ -> ȳ == U+0232 -> U+0233 */ }
-yy457:
-          ++sp;
-          { ls += "\xe2\xb1\xa5"; continue; 	/* Ⱥ -> ⱥ == U+023A -> U+2C65 */ }
-yy459:
-          ++sp;
-          { ls += "\xc8\xbc"; continue; 	/* Ȼ -> ȼ == U+023B -> U+023C */ }
-yy461:
-          ++sp;
-          { ls += "\xc6\x9a"; continue; 	/* Ƚ -> ƚ == U+023D -> U+019A */ }
-yy463:
-          ++sp;
-          { ls += "\xe2\xb1\xa6"; continue; 	/* Ⱦ -> ⱦ == U+023E -> U+2C66 */ }
-yy465:
-          ++sp;
-          { ls += "\xc9\x82"; continue; 	/* Ɂ -> ɂ == U+0241 -> U+0242 */ }
-yy467:
-          ++sp;
-          { ls += "\xc6\x80"; continue; 	/* Ƀ -> ƀ == U+0243 -> U+0180 */ }
-yy469:
-          ++sp;
-          { ls += "\xca\x89"; continue; 	/* Ʉ -> ʉ == U+0244 -> U+0289 */ }
-yy471:
-          ++sp;
-          { ls += "\xca\x8c"; continue; 	/* Ʌ -> ʌ == U+0245 -> U+028C */ }
-yy473:
-          ++sp;
-          { ls += "\xc9\x87"; continue; 	/* Ɇ -> ɇ == U+0246 -> U+0247 */ }
-yy475:
-          ++sp;
-          { ls += "\xc9\x89"; continue; 	/* Ɉ -> ɉ == U+0248 -> U+0249 */ }
-yy477:
-          ++sp;
-          { ls += "\xc9\x8b"; continue; 	/* Ɋ -> ɋ == U+024A -> U+024B */ }
-yy479:
-          ++sp;
-          { ls += "\xc9\x8d"; continue; 	/* Ɍ -> ɍ == U+024C -> U+024D */ }
-yy481:
-          ++sp;
-          { ls += "\xc9\x8f"; continue; 	/* Ɏ -> ɏ == U+024E -> U+024F */ }
-yy483:
-          ++sp;
-          { ls += "\xcd\xb1"; continue; 	/* Ͱ -> ͱ == U+0370 -> U+0371 */ }
-yy485:
-          ++sp;
-          { ls += "\xcd\xb3"; continue; 	/* Ͳ -> ͳ == U+0372 -> U+0373 */ }
-yy487:
-          ++sp;
-          { ls += "\xcd\xb7"; continue; 	/* Ͷ -> ͷ == U+0376 -> U+0377 */ }
-yy489:
-          ++sp;
-          { ls += "\xcf\xb3"; continue; 	/* Ϳ -> ϳ == U+037F -> U+03F3 */ }
-yy491:
-          ++sp;
-          { ls += "\xce\xac"; continue; 	/* Ά -> ά == U+0386 -> U+03AC */ }
-yy493:
-          ++sp;
-          { ls += "\xce\xad"; continue; 	/* Έ -> έ == U+0388 -> U+03AD */ }
-yy495:
-          ++sp;
-          { ls += "\xce\xae"; continue; 	/* Ή -> ή == U+0389 -> U+03AE */ }
-yy497:
-          ++sp;
-          { ls += "\xce\xaf"; continue; 	/* Ί -> ί == U+038A -> U+03AF */ }
-yy499:
-          ++sp;
-          { ls += "\xcf\x8c"; continue; 	/* Ό -> ό == U+038C -> U+03CC */ }
-yy501:
-          ++sp;
-          { ls += "\xcf\x8d"; continue; 	/* Ύ -> ύ == U+038E -> U+03CD */ }
-yy503:
-          ++sp;
-          { ls += "\xcf\x8e"; continue; 	/* Ώ -> ώ == U+038F -> U+03CE */ }
-yy505:
-          ++sp;
-          { ls += "\xce\xb1"; continue; 	/* Α -> α == U+0391 -> U+03B1 */ }
-yy507:
-          ++sp;
-          { ls += "\xce\xb2"; continue; 	/* Β -> β == U+0392 -> U+03B2 */ }
-yy509:
-          ++sp;
-          { ls += "\xce\xb3"; continue; 	/* Γ -> γ == U+0393 -> U+03B3 */ }
-yy511:
-          ++sp;
-          { ls += "\xce\xb4"; continue; 	/* Δ -> δ == U+0394 -> U+03B4 */ }
-yy513:
-          ++sp;
-          { ls += "\xce\xb5"; continue; 	/* Ε -> ε == U+0395 -> U+03B5 */ }
-yy515:
-          ++sp;
-          { ls += "\xce\xb6"; continue; 	/* Ζ -> ζ == U+0396 -> U+03B6 */ }
-yy517:
-          ++sp;
-          { ls += "\xce\xb7"; continue; 	/* Η -> η == U+0397 -> U+03B7 */ }
-yy519:
-          ++sp;
-          { ls += "\xce\xb8"; continue; 	/* Θ -> θ == U+0398 -> U+03B8 */ }
-yy521:
-          ++sp;
-          { ls += "\xce\xb9"; continue; 	/* Ι -> ι == U+0399 -> U+03B9 */ }
-yy523:
-          ++sp;
-          { ls += "\xce\xba"; continue; 	/* Κ -> κ == U+039A -> U+03BA */ }
-yy525:
-          ++sp;
-          { ls += "\xce\xbb"; continue; 	/* Λ -> λ == U+039B -> U+03BB */ }
-yy527:
-          ++sp;
-          { ls += "\xce\xbc"; continue; 	/* Μ -> μ == U+039C -> U+03BC */ }
-yy529:
-          ++sp;
-          { ls += "\xce\xbd"; continue; 	/* Ν -> ν == U+039D -> U+03BD */ }
-yy531:
-          ++sp;
-          { ls += "\xce\xbe"; continue; 	/* Ξ -> ξ == U+039E -> U+03BE */ }
-yy533:
-          ++sp;
-          { ls += "\xce\xbf"; continue; 	/* Ο -> ο == U+039F -> U+03BF */ }
-yy535:
-          ++sp;
-          { ls += "\xcf\x80"; continue; 	/* Π -> π == U+03A0 -> U+03C0 */ }
-yy537:
-          ++sp;
-          { ls += "\xcf\x81"; continue; 	/* Ρ -> ρ == U+03A1 -> U+03C1 */ }
-yy539:
-          ++sp;
-          { ls += "\xcf\x83"; continue; 	/* Σ -> σ == U+03A3 -> U+03C3 */ }
-yy541:
-          ++sp;
-          { ls += "\xcf\x84"; continue; 	/* Τ -> τ == U+03A4 -> U+03C4 */ }
-yy543:
-          ++sp;
-          { ls += "\xcf\x85"; continue; 	/* Υ -> υ == U+03A5 -> U+03C5 */ }
-yy545:
-          ++sp;
-          { ls += "\xcf\x86"; continue; 	/* Φ -> φ == U+03A6 -> U+03C6 */ }
-yy547:
-          ++sp;
-          { ls += "\xcf\x87"; continue; 	/* Χ -> χ == U+03A7 -> U+03C7 */ }
-yy549:
-          ++sp;
-          { ls += "\xcf\x88"; continue; 	/* Ψ -> ψ == U+03A8 -> U+03C8 */ }
-yy551:
-          ++sp;
-          { ls += "\xcf\x89"; continue; 	/* Ω -> ω == U+03A9 -> U+03C9 */ }
-yy553:
-          ++sp;
-          { ls += "\xcf\x8a"; continue; 	/* Ϊ -> ϊ == U+03AA -> U+03CA */ }
-yy555:
-          ++sp;
-          { ls += "\xcf\x8b"; continue; 	/* Ϋ -> ϋ == U+03AB -> U+03CB */ }
-yy557:
-          ++sp;
-          { ls += "\xcf\x97"; continue; 	/* Ϗ -> ϗ == U+03CF -> U+03D7 */ }
-yy559:
-          ++sp;
-          { ls += "\xcf\x99"; continue; 	/* Ϙ -> ϙ == U+03D8 -> U+03D9 */ }
-yy561:
-          ++sp;
-          { ls += "\xcf\x9b"; continue; 	/* Ϛ -> ϛ == U+03DA -> U+03DB */ }
-yy563:
-          ++sp;
-          { ls += "\xcf\x9d"; continue; 	/* Ϝ -> ϝ == U+03DC -> U+03DD */ }
-yy565:
-          ++sp;
-          { ls += "\xcf\x9f"; continue; 	/* Ϟ -> ϟ == U+03DE -> U+03DF */ }
-yy567:
-          ++sp;
-          { ls += "\xcf\xa1"; continue; 	/* Ϡ -> ϡ == U+03E0 -> U+03E1 */ }
-yy569:
-          ++sp;
-          { ls += "\xcf\xa3"; continue; 	/* Ϣ -> ϣ == U+03E2 -> U+03E3 */ }
-yy571:
-          ++sp;
-          { ls += "\xcf\xa5"; continue; 	/* Ϥ -> ϥ == U+03E4 -> U+03E5 */ }
-yy573:
-          ++sp;
-          { ls += "\xcf\xa7"; continue; 	/* Ϧ -> ϧ == U+03E6 -> U+03E7 */ }
-yy575:
-          ++sp;
-          { ls += "\xcf\xa9"; continue; 	/* Ϩ -> ϩ == U+03E8 -> U+03E9 */ }
-yy577:
-          ++sp;
-          { ls += "\xcf\xab"; continue; 	/* Ϫ -> ϫ == U+03EA -> U+03EB */ }
-yy579:
-          ++sp;
-          { ls += "\xcf\xad"; continue; 	/* Ϭ -> ϭ == U+03EC -> U+03ED */ }
-yy581:
-          ++sp;
-          { ls += "\xcf\xaf"; continue; 	/* Ϯ -> ϯ == U+03EE -> U+03EF */ }
-yy583:
-          ++sp;
-          { ls += "\xce\xb8"; continue; 	/* ϴ -> θ == U+03F4 -> U+03B8 */ }
-yy585:
-          ++sp;
-          { ls += "\xcf\xb8"; continue; 	/* Ϸ -> ϸ == U+03F7 -> U+03F8 */ }
-yy587:
-          ++sp;
-          { ls += "\xcf\xb2"; continue; 	/* Ϲ -> ϲ == U+03F9 -> U+03F2 */ }
-yy589:
-          ++sp;
-          { ls += "\xcf\xbb"; continue; 	/* Ϻ -> ϻ == U+03FA -> U+03FB */ }
-yy591:
-          ++sp;
-          { ls += "\xcd\xbb"; continue; 	/* Ͻ -> ͻ == U+03FD -> U+037B */ }
-yy593:
-          ++sp;
-          { ls += "\xcd\xbc"; continue; 	/* Ͼ -> ͼ == U+03FE -> U+037C */ }
-yy595:
-          ++sp;
-          { ls += "\xcd\xbd"; continue; 	/* Ͽ -> ͽ == U+03FF -> U+037D */ }
-yy597:
-          ++sp;
-          { ls += "\xd1\x90"; continue; 	/* Ѐ -> ѐ == U+0400 -> U+0450 */ }
-yy599:
-          ++sp;
-          { ls += "\xd1\x91"; continue; 	/* Ё -> ё == U+0401 -> U+0451 */ }
-yy601:
-          ++sp;
-          { ls += "\xd1\x92"; continue; 	/* Ђ -> ђ == U+0402 -> U+0452 */ }
-yy603:
-          ++sp;
-          { ls += "\xd1\x93"; continue; 	/* Ѓ -> ѓ == U+0403 -> U+0453 */ }
-yy605:
-          ++sp;
-          { ls += "\xd1\x94"; continue; 	/* Є -> є == U+0404 -> U+0454 */ }
-yy607:
-          ++sp;
-          { ls += "\xd1\x95"; continue; 	/* Ѕ -> ѕ == U+0405 -> U+0455 */ }
-yy609:
-          ++sp;
-          { ls += "\xd1\x96"; continue; 	/* І -> і == U+0406 -> U+0456 */ }
-yy611:
-          ++sp;
-          { ls += "\xd1\x97"; continue; 	/* Ї -> ї == U+0407 -> U+0457 */ }
-yy613:
-          ++sp;
-          { ls += "\xd1\x98"; continue; 	/* Ј -> ј == U+0408 -> U+0458 */ }
-yy615:
-          ++sp;
-          { ls += "\xd1\x99"; continue; 	/* Љ -> љ == U+0409 -> U+0459 */ }
-yy617:
-          ++sp;
-          { ls += "\xd1\x9a"; continue; 	/* Њ -> њ == U+040A -> U+045A */ }
-yy619:
-          ++sp;
-          { ls += "\xd1\x9b"; continue; 	/* Ћ -> ћ == U+040B -> U+045B */ }
-yy621:
-          ++sp;
-          { ls += "\xd1\x9c"; continue; 	/* Ќ -> ќ == U+040C -> U+045C */ }
-yy623:
-          ++sp;
-          { ls += "\xd1\x9d"; continue; 	/* Ѝ -> ѝ == U+040D -> U+045D */ }
-yy625:
-          ++sp;
-          { ls += "\xd1\x9e"; continue; 	/* Ў -> ў == U+040E -> U+045E */ }
-yy627:
-          ++sp;
-          { ls += "\xd1\x9f"; continue; 	/* Џ -> џ == U+040F -> U+045F */ }
-yy629:
-          ++sp;
-          { ls += "\xd0\xb0"; continue; 	/* А -> а == U+0410 -> U+0430 */ }
-yy631:
-          ++sp;
-          { ls += "\xd0\xb1"; continue; 	/* Б -> б == U+0411 -> U+0431 */ }
-yy633:
-          ++sp;
-          { ls += "\xd0\xb2"; continue; 	/* В -> в == U+0412 -> U+0432 */ }
-yy635:
-          ++sp;
-          { ls += "\xd0\xb3"; continue; 	/* Г -> г == U+0413 -> U+0433 */ }
-yy637:
-          ++sp;
-          { ls += "\xd0\xb4"; continue; 	/* Д -> д == U+0414 -> U+0434 */ }
-yy639:
-          ++sp;
-          { ls += "\xd0\xb5"; continue; 	/* Е -> е == U+0415 -> U+0435 */ }
-yy641:
-          ++sp;
-          { ls += "\xd0\xb6"; continue; 	/* Ж -> ж == U+0416 -> U+0436 */ }
-yy643:
-          ++sp;
-          { ls += "\xd0\xb7"; continue; 	/* З -> з == U+0417 -> U+0437 */ }
-yy645:
-          ++sp;
-          { ls += "\xd0\xb8"; continue; 	/* И -> и == U+0418 -> U+0438 */ }
-yy647:
-          ++sp;
-          { ls += "\xd0\xb9"; continue; 	/* Й -> й == U+0419 -> U+0439 */ }
-yy649:
-          ++sp;
-          { ls += "\xd0\xba"; continue; 	/* К -> к == U+041A -> U+043A */ }
-yy651:
-          ++sp;
-          { ls += "\xd0\xbb"; continue; 	/* Л -> л == U+041B -> U+043B */ }
-yy653:
-          ++sp;
-          { ls += "\xd0\xbc"; continue; 	/* М -> м == U+041C -> U+043C */ }
-yy655:
-          ++sp;
-          { ls += "\xd0\xbd"; continue; 	/* Н -> н == U+041D -> U+043D */ }
-yy657:
-          ++sp;
-          { ls += "\xd0\xbe"; continue; 	/* О -> о == U+041E -> U+043E */ }
-yy659:
-          ++sp;
-          { ls += "\xd0\xbf"; continue; 	/* П -> п == U+041F -> U+043F */ }
-yy661:
-          ++sp;
-          { ls += "\xd1\x80"; continue; 	/* Р -> р == U+0420 -> U+0440 */ }
-yy663:
-          ++sp;
-          { ls += "\xd1\x81"; continue; 	/* С -> с == U+0421 -> U+0441 */ }
-yy665:
-          ++sp;
-          { ls += "\xd1\x82"; continue; 	/* Т -> т == U+0422 -> U+0442 */ }
-yy667:
-          ++sp;
-          { ls += "\xd1\x83"; continue; 	/* У -> у == U+0423 -> U+0443 */ }
-yy669:
-          ++sp;
-          { ls += "\xd1\x84"; continue; 	/* Ф -> ф == U+0424 -> U+0444 */ }
-yy671:
-          ++sp;
-          { ls += "\xd1\x85"; continue; 	/* Х -> х == U+0425 -> U+0445 */ }
-yy673:
-          ++sp;
-          { ls += "\xd1\x86"; continue; 	/* Ц -> ц == U+0426 -> U+0446 */ }
-yy675:
-          ++sp;
-          { ls += "\xd1\x87"; continue; 	/* Ч -> ч == U+0427 -> U+0447 */ }
-yy677:
-          ++sp;
-          { ls += "\xd1\x88"; continue; 	/* Ш -> ш == U+0428 -> U+0448 */ }
-yy679:
-          ++sp;
-          { ls += "\xd1\x89"; continue; 	/* Щ -> щ == U+0429 -> U+0449 */ }
-yy681:
-          ++sp;
-          { ls += "\xd1\x8a"; continue; 	/* Ъ -> ъ == U+042A -> U+044A */ }
-yy683:
-          ++sp;
-          { ls += "\xd1\x8b"; continue; 	/* Ы -> ы == U+042B -> U+044B */ }
-yy685:
-          ++sp;
-          { ls += "\xd1\x8c"; continue; 	/* Ь -> ь == U+042C -> U+044C */ }
-yy687:
-          ++sp;
-          { ls += "\xd1\x8d"; continue; 	/* Э -> э == U+042D -> U+044D */ }
-yy689:
-          ++sp;
-          { ls += "\xd1\x8e"; continue; 	/* Ю -> ю == U+042E -> U+044E */ }
-yy691:
-          ++sp;
-          { ls += "\xd1\x8f"; continue; 	/* Я -> я == U+042F -> U+044F */ }
-yy693:
-          ++sp;
-          { ls += "\xd1\xa1"; continue; 	/* Ѡ -> ѡ == U+0460 -> U+0461 */ }
-yy695:
-          ++sp;
-          { ls += "\xd1\xa3"; continue; 	/* Ѣ -> ѣ == U+0462 -> U+0463 */ }
-yy697:
-          ++sp;
-          { ls += "\xd1\xa5"; continue; 	/* Ѥ -> ѥ == U+0464 -> U+0465 */ }
-yy699:
-          ++sp;
-          { ls += "\xd1\xa7"; continue; 	/* Ѧ -> ѧ == U+0466 -> U+0467 */ }
-yy701:
-          ++sp;
-          { ls += "\xd1\xa9"; continue; 	/* Ѩ -> ѩ == U+0468 -> U+0469 */ }
-yy703:
-          ++sp;
-          { ls += "\xd1\xab"; continue; 	/* Ѫ -> ѫ == U+046A -> U+046B */ }
-yy705:
-          ++sp;
-          { ls += "\xd1\xad"; continue; 	/* Ѭ -> ѭ == U+046C -> U+046D */ }
-yy707:
-          ++sp;
-          { ls += "\xd1\xaf"; continue; 	/* Ѯ -> ѯ == U+046E -> U+046F */ }
-yy709:
-          ++sp;
-          { ls += "\xd1\xb1"; continue; 	/* Ѱ -> ѱ == U+0470 -> U+0471 */ }
-yy711:
-          ++sp;
-          { ls += "\xd1\xb3"; continue; 	/* Ѳ -> ѳ == U+0472 -> U+0473 */ }
-yy713:
-          ++sp;
-          { ls += "\xd1\xb5"; continue; 	/* Ѵ -> ѵ == U+0474 -> U+0475 */ }
-yy715:
-          ++sp;
-          { ls += "\xd1\xb7"; continue; 	/* Ѷ -> ѷ == U+0476 -> U+0477 */ }
-yy717:
-          ++sp;
-          { ls += "\xd1\xb9"; continue; 	/* Ѹ -> ѹ == U+0478 -> U+0479 */ }
-yy719:
-          ++sp;
-          { ls += "\xd1\xbb"; continue; 	/* Ѻ -> ѻ == U+047A -> U+047B */ }
-yy721:
-          ++sp;
-          { ls += "\xd1\xbd"; continue; 	/* Ѽ -> ѽ == U+047C -> U+047D */ }
-yy723:
-          ++sp;
-          { ls += "\xd1\xbf"; continue; 	/* Ѿ -> ѿ == U+047E -> U+047F */ }
-yy725:
-          ++sp;
-          { ls += "\xd2\x81"; continue; 	/* Ҁ -> ҁ == U+0480 -> U+0481 */ }
-yy727:
-          ++sp;
-          { ls += "\xd2\x8b"; continue; 	/* Ҋ -> ҋ == U+048A -> U+048B */ }
-yy729:
-          ++sp;
-          { ls += "\xd2\x8d"; continue; 	/* Ҍ -> ҍ == U+048C -> U+048D */ }
-yy731:
-          ++sp;
-          { ls += "\xd2\x8f"; continue; 	/* Ҏ -> ҏ == U+048E -> U+048F */ }
-yy733:
-          ++sp;
-          { ls += "\xd2\x91"; continue; 	/* Ґ -> ґ == U+0490 -> U+0491 */ }
-yy735:
-          ++sp;
-          { ls += "\xd2\x93"; continue; 	/* Ғ -> ғ == U+0492 -> U+0493 */ }
-yy737:
-          ++sp;
-          { ls += "\xd2\x95"; continue; 	/* Ҕ -> ҕ == U+0494 -> U+0495 */ }
-yy739:
-          ++sp;
-          { ls += "\xd2\x97"; continue; 	/* Җ -> җ == U+0496 -> U+0497 */ }
-yy741:
-          ++sp;
-          { ls += "\xd2\x99"; continue; 	/* Ҙ -> ҙ == U+0498 -> U+0499 */ }
-yy743:
-          ++sp;
-          { ls += "\xd2\x9b"; continue; 	/* Қ -> қ == U+049A -> U+049B */ }
-yy745:
-          ++sp;
-          { ls += "\xd2\x9d"; continue; 	/* Ҝ -> ҝ == U+049C -> U+049D */ }
-yy747:
-          ++sp;
-          { ls += "\xd2\x9f"; continue; 	/* Ҟ -> ҟ == U+049E -> U+049F */ }
-yy749:
-          ++sp;
-          { ls += "\xd2\xa1"; continue; 	/* Ҡ -> ҡ == U+04A0 -> U+04A1 */ }
-yy751:
-          ++sp;
-          { ls += "\xd2\xa3"; continue; 	/* Ң -> ң == U+04A2 -> U+04A3 */ }
-yy753:
-          ++sp;
-          { ls += "\xd2\xa5"; continue; 	/* Ҥ -> ҥ == U+04A4 -> U+04A5 */ }
-yy755:
-          ++sp;
-          { ls += "\xd2\xa7"; continue; 	/* Ҧ -> ҧ == U+04A6 -> U+04A7 */ }
-yy757:
-          ++sp;
-          { ls += "\xd2\xa9"; continue; 	/* Ҩ -> ҩ == U+04A8 -> U+04A9 */ }
-yy759:
-          ++sp;
-          { ls += "\xd2\xab"; continue; 	/* Ҫ -> ҫ == U+04AA -> U+04AB */ }
-yy761:
-          ++sp;
-          { ls += "\xd2\xad"; continue; 	/* Ҭ -> ҭ == U+04AC -> U+04AD */ }
-yy763:
-          ++sp;
-          { ls += "\xd2\xaf"; continue; 	/* Ү -> ү == U+04AE -> U+04AF */ }
-yy765:
-          ++sp;
-          { ls += "\xd2\xb1"; continue; 	/* Ұ -> ұ == U+04B0 -> U+04B1 */ }
-yy767:
-          ++sp;
-          { ls += "\xd2\xb3"; continue; 	/* Ҳ -> ҳ == U+04B2 -> U+04B3 */ }
-yy769:
-          ++sp;
-          { ls += "\xd2\xb5"; continue; 	/* Ҵ -> ҵ == U+04B4 -> U+04B5 */ }
-yy771:
-          ++sp;
-          { ls += "\xd2\xb7"; continue; 	/* Ҷ -> ҷ == U+04B6 -> U+04B7 */ }
-yy773:
-          ++sp;
-          { ls += "\xd2\xb9"; continue; 	/* Ҹ -> ҹ == U+04B8 -> U+04B9 */ }
-yy775:
-          ++sp;
-          { ls += "\xd2\xbb"; continue; 	/* Һ -> һ == U+04BA -> U+04BB */ }
-yy777:
-          ++sp;
-          { ls += "\xd2\xbd"; continue; 	/* Ҽ -> ҽ == U+04BC -> U+04BD */ }
-yy779:
-          ++sp;
-          { ls += "\xd2\xbf"; continue; 	/* Ҿ -> ҿ == U+04BE -> U+04BF */ }
-yy781:
-          ++sp;
-          { ls += "\xd3\x8f"; continue; 	/* Ӏ -> ӏ == U+04C0 -> U+04CF */ }
-yy783:
-          ++sp;
-          { ls += "\xd3\x82"; continue; 	/* Ӂ -> ӂ == U+04C1 -> U+04C2 */ }
-yy785:
-          ++sp;
-          { ls += "\xd3\x84"; continue; 	/* Ӄ -> ӄ == U+04C3 -> U+04C4 */ }
-yy787:
-          ++sp;
-          { ls += "\xd3\x86"; continue; 	/* Ӆ -> ӆ == U+04C5 -> U+04C6 */ }
-yy789:
-          ++sp;
-          { ls += "\xd3\x88"; continue; 	/* Ӈ -> ӈ == U+04C7 -> U+04C8 */ }
-yy791:
-          ++sp;
-          { ls += "\xd3\x8a"; continue; 	/* Ӊ -> ӊ == U+04C9 -> U+04CA */ }
-yy793:
-          ++sp;
-          { ls += "\xd3\x8c"; continue; 	/* Ӌ -> ӌ == U+04CB -> U+04CC */ }
-yy795:
-          ++sp;
-          { ls += "\xd3\x8e"; continue; 	/* Ӎ -> ӎ == U+04CD -> U+04CE */ }
-yy797:
-          ++sp;
-          { ls += "\xd3\x91"; continue; 	/* Ӑ -> ӑ == U+04D0 -> U+04D1 */ }
-yy799:
-          ++sp;
-          { ls += "\xd3\x93"; continue; 	/* Ӓ -> ӓ == U+04D2 -> U+04D3 */ }
-yy801:
-          ++sp;
-          { ls += "\xd3\x95"; continue; 	/* Ӕ -> ӕ == U+04D4 -> U+04D5 */ }
-yy803:
-          ++sp;
-          { ls += "\xd3\x97"; continue; 	/* Ӗ -> ӗ == U+04D6 -> U+04D7 */ }
-yy805:
-          ++sp;
-          { ls += "\xd3\x99"; continue; 	/* Ә -> ә == U+04D8 -> U+04D9 */ }
-yy807:
-          ++sp;
-          { ls += "\xd3\x9b"; continue; 	/* Ӛ -> ӛ == U+04DA -> U+04DB */ }
-yy809:
-          ++sp;
-          { ls += "\xd3\x9d"; continue; 	/* Ӝ -> ӝ == U+04DC -> U+04DD */ }
-yy811:
-          ++sp;
-          { ls += "\xd3\x9f"; continue; 	/* Ӟ -> ӟ == U+04DE -> U+04DF */ }
-yy813:
-          ++sp;
-          { ls += "\xd3\xa1"; continue; 	/* Ӡ -> ӡ == U+04E0 -> U+04E1 */ }
-yy815:
-          ++sp;
-          { ls += "\xd3\xa3"; continue; 	/* Ӣ -> ӣ == U+04E2 -> U+04E3 */ }
-yy817:
-          ++sp;
-          { ls += "\xd3\xa5"; continue; 	/* Ӥ -> ӥ == U+04E4 -> U+04E5 */ }
-yy819:
-          ++sp;
-          { ls += "\xd3\xa7"; continue; 	/* Ӧ -> ӧ == U+04E6 -> U+04E7 */ }
-yy821:
-          ++sp;
-          { ls += "\xd3\xa9"; continue; 	/* Ө -> ө == U+04E8 -> U+04E9 */ }
-yy823:
-          ++sp;
-          { ls += "\xd3\xab"; continue; 	/* Ӫ -> ӫ == U+04EA -> U+04EB */ }
-yy825:
-          ++sp;
-          { ls += "\xd3\xad"; continue; 	/* Ӭ -> ӭ == U+04EC -> U+04ED */ }
-yy827:
-          ++sp;
-          { ls += "\xd3\xaf"; continue; 	/* Ӯ -> ӯ == U+04EE -> U+04EF */ }
-yy829:
-          ++sp;
-          { ls += "\xd3\xb1"; continue; 	/* Ӱ -> ӱ == U+04F0 -> U+04F1 */ }
-yy831:
-          ++sp;
-          { ls += "\xd3\xb3"; continue; 	/* Ӳ -> ӳ == U+04F2 -> U+04F3 */ }
-yy833:
-          ++sp;
-          { ls += "\xd3\xb5"; continue; 	/* Ӵ -> ӵ == U+04F4 -> U+04F5 */ }
-yy835:
-          ++sp;
-          { ls += "\xd3\xb7"; continue; 	/* Ӷ -> ӷ == U+04F6 -> U+04F7 */ }
-yy837:
-          ++sp;
-          { ls += "\xd3\xb9"; continue; 	/* Ӹ -> ӹ == U+04F8 -> U+04F9 */ }
-yy839:
-          ++sp;
-          { ls += "\xd3\xbb"; continue; 	/* Ӻ -> ӻ == U+04FA -> U+04FB */ }
-yy841:
-          ++sp;
-          { ls += "\xd3\xbd"; continue; 	/* Ӽ -> ӽ == U+04FC -> U+04FD */ }
-yy843:
-          ++sp;
-          { ls += "\xd3\xbf"; continue; 	/* Ӿ -> ӿ == U+04FE -> U+04FF */ }
-yy845:
-          ++sp;
-          { ls += "\xd4\x81"; continue; 	/* Ԁ -> ԁ == U+0500 -> U+0501 */ }
-yy847:
-          ++sp;
-          { ls += "\xd4\x83"; continue; 	/* Ԃ -> ԃ == U+0502 -> U+0503 */ }
-yy849:
-          ++sp;
-          { ls += "\xd4\x85"; continue; 	/* Ԅ -> ԅ == U+0504 -> U+0505 */ }
-yy851:
-          ++sp;
-          { ls += "\xd4\x87"; continue; 	/* Ԇ -> ԇ == U+0506 -> U+0507 */ }
-yy853:
-          ++sp;
-          { ls += "\xd4\x89"; continue; 	/* Ԉ -> ԉ == U+0508 -> U+0509 */ }
-yy855:
-          ++sp;
-          { ls += "\xd4\x8b"; continue; 	/* Ԋ -> ԋ == U+050A -> U+050B */ }
-yy857:
-          ++sp;
-          { ls += "\xd4\x8d"; continue; 	/* Ԍ -> ԍ == U+050C -> U+050D */ }
-yy859:
-          ++sp;
-          { ls += "\xd4\x8f"; continue; 	/* Ԏ -> ԏ == U+050E -> U+050F */ }
-yy861:
-          ++sp;
-          { ls += "\xd4\x91"; continue; 	/* Ԑ -> ԑ == U+0510 -> U+0511 */ }
-yy863:
-          ++sp;
-          { ls += "\xd4\x93"; continue; 	/* Ԓ -> ԓ == U+0512 -> U+0513 */ }
-yy865:
-          ++sp;
-          { ls += "\xd4\x95"; continue; 	/* Ԕ -> ԕ == U+0514 -> U+0515 */ }
-yy867:
-          ++sp;
-          { ls += "\xd4\x97"; continue; 	/* Ԗ -> ԗ == U+0516 -> U+0517 */ }
-yy869:
-          ++sp;
-          { ls += "\xd4\x99"; continue; 	/* Ԙ -> ԙ == U+0518 -> U+0519 */ }
-yy871:
-          ++sp;
-          { ls += "\xd4\x9b"; continue; 	/* Ԛ -> ԛ == U+051A -> U+051B */ }
-yy873:
-          ++sp;
-          { ls += "\xd4\x9d"; continue; 	/* Ԝ -> ԝ == U+051C -> U+051D */ }
-yy875:
-          ++sp;
-          { ls += "\xd4\x9f"; continue; 	/* Ԟ -> ԟ == U+051E -> U+051F */ }
-yy877:
-          ++sp;
-          { ls += "\xd4\xa1"; continue; 	/* Ԡ -> ԡ == U+0520 -> U+0521 */ }
-yy879:
-          ++sp;
-          { ls += "\xd4\xa3"; continue; 	/* Ԣ -> ԣ == U+0522 -> U+0523 */ }
-yy881:
-          ++sp;
-          { ls += "\xd4\xa5"; continue; 	/* Ԥ -> ԥ == U+0524 -> U+0525 */ }
-yy883:
-          ++sp;
-          { ls += "\xd4\xa7"; continue; 	/* Ԧ -> ԧ == U+0526 -> U+0527 */ }
-yy885:
-          ++sp;
-          { ls += "\xd4\xa9"; continue; 	/* Ԩ -> ԩ == U+0528 -> U+0529 */ }
-yy887:
-          ++sp;
-          { ls += "\xd4\xab"; continue; 	/* Ԫ -> ԫ == U+052A -> U+052B */ }
-yy889:
-          ++sp;
-          { ls += "\xd4\xad"; continue; 	/* Ԭ -> ԭ == U+052C -> U+052D */ }
-yy891:
-          ++sp;
-          { ls += "\xd4\xaf"; continue; 	/* Ԯ -> ԯ == U+052E -> U+052F */ }
-yy893:
-          ++sp;
-          { ls += "\xd5\xa1"; continue; 	/* Ա -> ա == U+0531 -> U+0561 */ }
-yy895:
-          ++sp;
-          { ls += "\xd5\xa2"; continue; 	/* Բ -> բ == U+0532 -> U+0562 */ }
-yy897:
-          ++sp;
-          { ls += "\xd5\xa3"; continue; 	/* Գ -> գ == U+0533 -> U+0563 */ }
-yy899:
-          ++sp;
-          { ls += "\xd5\xa4"; continue; 	/* Դ -> դ == U+0534 -> U+0564 */ }
-yy901:
-          ++sp;
-          { ls += "\xd5\xa5"; continue; 	/* Ե -> ե == U+0535 -> U+0565 */ }
-yy903:
-          ++sp;
-          { ls += "\xd5\xa6"; continue; 	/* Զ -> զ == U+0536 -> U+0566 */ }
-yy905:
-          ++sp;
-          { ls += "\xd5\xa7"; continue; 	/* Է -> է == U+0537 -> U+0567 */ }
-yy907:
-          ++sp;
-          { ls += "\xd5\xa8"; continue; 	/* Ը -> ը == U+0538 -> U+0568 */ }
-yy909:
-          ++sp;
-          { ls += "\xd5\xa9"; continue; 	/* Թ -> թ == U+0539 -> U+0569 */ }
-yy911:
-          ++sp;
-          { ls += "\xd5\xaa"; continue; 	/* Ժ -> ժ == U+053A -> U+056A */ }
-yy913:
-          ++sp;
-          { ls += "\xd5\xab"; continue; 	/* Ի -> ի == U+053B -> U+056B */ }
-yy915:
-          ++sp;
-          { ls += "\xd5\xac"; continue; 	/* Լ -> լ == U+053C -> U+056C */ }
-yy917:
-          ++sp;
-          { ls += "\xd5\xad"; continue; 	/* Խ -> խ == U+053D -> U+056D */ }
-yy919:
-          ++sp;
-          { ls += "\xd5\xae"; continue; 	/* Ծ -> ծ == U+053E -> U+056E */ }
-yy921:
-          ++sp;
-          { ls += "\xd5\xaf"; continue; 	/* Կ -> կ == U+053F -> U+056F */ }
-yy923:
-          ++sp;
-          { ls += "\xd5\xb0"; continue; 	/* Հ -> հ == U+0540 -> U+0570 */ }
-yy925:
-          ++sp;
-          { ls += "\xd5\xb1"; continue; 	/* Ձ -> ձ == U+0541 -> U+0571 */ }
-yy927:
-          ++sp;
-          { ls += "\xd5\xb2"; continue; 	/* Ղ -> ղ == U+0542 -> U+0572 */ }
-yy929:
-          ++sp;
-          { ls += "\xd5\xb3"; continue; 	/* Ճ -> ճ == U+0543 -> U+0573 */ }
-yy931:
-          ++sp;
-          { ls += "\xd5\xb4"; continue; 	/* Մ -> մ == U+0544 -> U+0574 */ }
-yy933:
-          ++sp;
-          { ls += "\xd5\xb5"; continue; 	/* Յ -> յ == U+0545 -> U+0575 */ }
-yy935:
-          ++sp;
-          { ls += "\xd5\xb6"; continue; 	/* Ն -> ն == U+0546 -> U+0576 */ }
-yy937:
-          ++sp;
-          { ls += "\xd5\xb7"; continue; 	/* Շ -> շ == U+0547 -> U+0577 */ }
-yy939:
-          ++sp;
-          { ls += "\xd5\xb8"; continue; 	/* Ո -> ո == U+0548 -> U+0578 */ }
-yy941:
-          ++sp;
-          { ls += "\xd5\xb9"; continue; 	/* Չ -> չ == U+0549 -> U+0579 */ }
-yy943:
-          ++sp;
-          { ls += "\xd5\xba"; continue; 	/* Պ -> պ == U+054A -> U+057A */ }
-yy945:
-          ++sp;
-          { ls += "\xd5\xbb"; continue; 	/* Ջ -> ջ == U+054B -> U+057B */ }
-yy947:
-          ++sp;
-          { ls += "\xd5\xbc"; continue; 	/* Ռ -> ռ == U+054C -> U+057C */ }
-yy949:
-          ++sp;
-          { ls += "\xd5\xbd"; continue; 	/* Ս -> ս == U+054D -> U+057D */ }
-yy951:
-          ++sp;
-          { ls += "\xd5\xbe"; continue; 	/* Վ -> վ == U+054E -> U+057E */ }
-yy953:
-          ++sp;
-          { ls += "\xd5\xbf"; continue; 	/* Տ -> տ == U+054F -> U+057F */ }
-yy955:
-          ++sp;
-          { ls += "\xd6\x80"; continue; 	/* Ր -> ր == U+0550 -> U+0580 */ }
-yy957:
-          ++sp;
-          { ls += "\xd6\x81"; continue; 	/* Ց -> ց == U+0551 -> U+0581 */ }
-yy959:
-          ++sp;
-          { ls += "\xd6\x82"; continue; 	/* Ւ -> ւ == U+0552 -> U+0582 */ }
-yy961:
-          ++sp;
-          { ls += "\xd6\x83"; continue; 	/* Փ -> փ == U+0553 -> U+0583 */ }
-yy963:
-          ++sp;
-          { ls += "\xd6\x84"; continue; 	/* Ք -> ք == U+0554 -> U+0584 */ }
 yy965:
-          ++sp;
-          { ls += "\xd6\x85"; continue; 	/* Օ -> օ == U+0555 -> U+0585 */ }
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy991;
+          case 0x81:
+          case 0x83:
+          case 0x85:
+          case 0x87:
+          case 0x89:
+          case 0x8B:
+          case 0x8D:
+          case 0x8F:
+          case 0x91:
+          case 0x93:
+          case 0x95:
+          case 0x97:
+          case 0x99:
+          case 0x9B:
+          case 0x9D:
+          case 0x9F:
+          case 0xA1:
+          case 0xA3:
+          case 0xA5:
+          case 0xA7:
+          case 0xA9:
+          case 0xAB:
+          case 0xAD:
+          case 0xAE:
+          case 0xAF:
+          case 0xB0:
+          case 0xB1:
+          case 0xB2:
+          case 0xB3:
+          case 0xB4:
+          case 0xB5:
+          case 0xB6:
+          case 0xB7:
+          case 0xB8:
+          case 0xB9:
+          case 0xBA:
+          case 0xBB:
+          case 0xBC:
+          case 0xBD:
+          case 0xBE:
+          case 0xBF:  goto yy167;
+          case 0x82:  goto yy993;
+          case 0x84:  goto yy995;
+          case 0x86:  goto yy997;
+          case 0x88:  goto yy999;
+          case 0x8A:  goto yy1001;
+          case 0x8C:  goto yy1003;
+          case 0x8E:  goto yy1005;
+          case 0x90:  goto yy1007;
+          case 0x92:  goto yy1009;
+          case 0x94:  goto yy1011;
+          case 0x96:  goto yy1013;
+          case 0x98:  goto yy1015;
+          case 0x9A:  goto yy1017;
+          case 0x9C:  goto yy1019;
+          case 0x9E:  goto yy1021;
+          case 0xA0:  goto yy1023;
+          case 0xA2:  goto yy1025;
+          case 0xA4:  goto yy1027;
+          case 0xA6:  goto yy1029;
+          case 0xA8:  goto yy1031;
+          case 0xAA:  goto yy1033;
+          case 0xAC:  goto yy1035;
+          default:  goto yy2;
+          }
+yy966:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy967:
-          ++sp;
-          { ls += "\xd6\x86"; continue; 	/* Ֆ -> ֆ == U+0556 -> U+0586 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy968:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy969:
           yych = *++sp;
           if (yych <= 0x7F) goto yy2;
-          if (yych <= 0xBF) goto yy995;
+          if (yych <= 0xBF) goto yy167;
           goto yy2;
 yy970:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy971:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy972:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy973:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy974:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy975:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy976:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy977:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy978:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy979:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy980:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy981:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy982:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy983:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy984:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy985:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy986:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy987:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy988:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy989:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy990:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy991:
+          ++sp;
+          { ls += "\xea\x99\x81"; continue; 	/* Ꙁ -> ꙁ == U+A640 -> U+A641 */ }
+yy993:
+          ++sp;
+          { ls += "\xea\x99\x83"; continue; 	/* Ꙃ -> ꙃ == U+A642 -> U+A643 */ }
+yy995:
+          ++sp;
+          { ls += "\xea\x99\x85"; continue; 	/* Ꙅ -> ꙅ == U+A644 -> U+A645 */ }
+yy997:
+          ++sp;
+          { ls += "\xea\x99\x87"; continue; 	/* Ꙇ -> ꙇ == U+A646 -> U+A647 */ }
+yy999:
+          ++sp;
+          { ls += "\xea\x99\x89"; continue; 	/* Ꙉ -> ꙉ == U+A648 -> U+A649 */ }
+yy1001:
+          ++sp;
+          { ls += "\xea\x99\x8b"; continue; 	/* Ꙋ -> ꙋ == U+A64A -> U+A64B */ }
+yy1003:
+          ++sp;
+          { ls += "\xea\x99\x8d"; continue; 	/* Ꙍ -> ꙍ == U+A64C -> U+A64D */ }
+yy1005:
+          ++sp;
+          { ls += "\xea\x99\x8f"; continue; 	/* Ꙏ -> ꙏ == U+A64E -> U+A64F */ }
+yy1007:
+          ++sp;
+          { ls += "\xea\x99\x91"; continue; 	/* Ꙑ -> ꙑ == U+A650 -> U+A651 */ }
+yy1009:
+          ++sp;
+          { ls += "\xea\x99\x93"; continue; 	/* Ꙓ -> ꙓ == U+A652 -> U+A653 */ }
+yy1011:
+          ++sp;
+          { ls += "\xea\x99\x95"; continue; 	/* Ꙕ -> ꙕ == U+A654 -> U+A655 */ }
+yy1013:
+          ++sp;
+          { ls += "\xea\x99\x97"; continue; 	/* Ꙗ -> ꙗ == U+A656 -> U+A657 */ }
+yy1015:
+          ++sp;
+          { ls += "\xea\x99\x99"; continue; 	/* Ꙙ -> ꙙ == U+A658 -> U+A659 */ }
+yy1017:
+          ++sp;
+          { ls += "\xea\x99\x9b"; continue; 	/* Ꙛ -> ꙛ == U+A65A -> U+A65B */ }
+yy1019:
+          ++sp;
+          { ls += "\xea\x99\x9d"; continue; 	/* Ꙝ -> ꙝ == U+A65C -> U+A65D */ }
+yy1021:
+          ++sp;
+          { ls += "\xea\x99\x9f"; continue; 	/* Ꙟ -> ꙟ == U+A65E -> U+A65F */ }
+yy1023:
+          ++sp;
+          { ls += "\xea\x99\xa1"; continue; 	/* Ꙡ -> ꙡ == U+A660 -> U+A661 */ }
+yy1025:
+          ++sp;
+          { ls += "\xea\x99\xa3"; continue; 	/* Ꙣ -> ꙣ == U+A662 -> U+A663 */ }
+yy1027:
+          ++sp;
+          { ls += "\xea\x99\xa5"; continue; 	/* Ꙥ -> ꙥ == U+A664 -> U+A665 */ }
+yy1029:
+          ++sp;
+          { ls += "\xea\x99\xa7"; continue; 	/* Ꙧ -> ꙧ == U+A666 -> U+A667 */ }
+yy1031:
+          ++sp;
+          { ls += "\xea\x99\xa9"; continue; 	/* Ꙩ -> ꙩ == U+A668 -> U+A669 */ }
+yy1033:
+          ++sp;
+          { ls += "\xea\x99\xab"; continue; 	/* Ꙫ -> ꙫ == U+A66A -> U+A66B */ }
+yy1035:
+          ++sp;
+          { ls += "\xea\x99\xad"; continue; 	/* Ꙭ -> ꙭ == U+A66C -> U+A66D */ }
+yy1037:
+          ++sp;
+          { ls += "\xea\x9a\x81"; continue; 	/* Ꚁ -> ꚁ == U+A680 -> U+A681 */ }
+yy1039:
+          ++sp;
+          { ls += "\xea\x9a\x83"; continue; 	/* Ꚃ -> ꚃ == U+A682 -> U+A683 */ }
+yy1041:
+          ++sp;
+          { ls += "\xea\x9a\x85"; continue; 	/* Ꚅ -> ꚅ == U+A684 -> U+A685 */ }
+yy1043:
+          ++sp;
+          { ls += "\xea\x9a\x87"; continue; 	/* Ꚇ -> ꚇ == U+A686 -> U+A687 */ }
+yy1045:
+          ++sp;
+          { ls += "\xea\x9a\x89"; continue; 	/* Ꚉ -> ꚉ == U+A688 -> U+A689 */ }
+yy1047:
+          ++sp;
+          { ls += "\xea\x9a\x8b"; continue; 	/* Ꚋ -> ꚋ == U+A68A -> U+A68B */ }
+yy1049:
+          ++sp;
+          { ls += "\xea\x9a\x8d"; continue; 	/* Ꚍ -> ꚍ == U+A68C -> U+A68D */ }
+yy1051:
+          ++sp;
+          { ls += "\xea\x9a\x8f"; continue; 	/* Ꚏ -> ꚏ == U+A68E -> U+A68F */ }
+yy1053:
+          ++sp;
+          { ls += "\xea\x9a\x91"; continue; 	/* Ꚑ -> ꚑ == U+A690 -> U+A691 */ }
+yy1055:
+          ++sp;
+          { ls += "\xea\x9a\x93"; continue; 	/* Ꚓ -> ꚓ == U+A692 -> U+A693 */ }
+yy1057:
+          ++sp;
+          { ls += "\xea\x9a\x95"; continue; 	/* Ꚕ -> ꚕ == U+A694 -> U+A695 */ }
+yy1059:
+          ++sp;
+          { ls += "\xea\x9a\x97"; continue; 	/* Ꚗ -> ꚗ == U+A696 -> U+A697 */ }
+yy1061:
+          ++sp;
+          { ls += "\xea\x9c\xa3"; continue; 	/* Ꜣ -> ꜣ == U+A722 -> U+A723 */ }
+yy1063:
+          ++sp;
+          { ls += "\xea\x9c\xa5"; continue; 	/* Ꜥ -> ꜥ == U+A724 -> U+A725 */ }
+yy1065:
+          ++sp;
+          { ls += "\xea\x9c\xa7"; continue; 	/* Ꜧ -> ꜧ == U+A726 -> U+A727 */ }
+yy1067:
+          ++sp;
+          { ls += "\xea\x9c\xa9"; continue; 	/* Ꜩ -> ꜩ == U+A728 -> U+A729 */ }
+yy1069:
+          ++sp;
+          { ls += "\xea\x9c\xab"; continue; 	/* Ꜫ -> ꜫ == U+A72A -> U+A72B */ }
+yy1071:
+          ++sp;
+          { ls += "\xea\x9c\xad"; continue; 	/* Ꜭ -> ꜭ == U+A72C -> U+A72D */ }
+yy1073:
+          ++sp;
+          { ls += "\xea\x9c\xaf"; continue; 	/* Ꜯ -> ꜯ == U+A72E -> U+A72F */ }
+yy1075:
+          ++sp;
+          { ls += "\xea\x9c\xb3"; continue; 	/* Ꜳ -> ꜳ == U+A732 -> U+A733 */ }
+yy1077:
+          ++sp;
+          { ls += "\xea\x9c\xb5"; continue; 	/* Ꜵ -> ꜵ == U+A734 -> U+A735 */ }
+yy1079:
+          ++sp;
+          { ls += "\xea\x9c\xb7"; continue; 	/* Ꜷ -> ꜷ == U+A736 -> U+A737 */ }
+yy1081:
+          ++sp;
+          { ls += "\xea\x9c\xb9"; continue; 	/* Ꜹ -> ꜹ == U+A738 -> U+A739 */ }
+yy1083:
+          ++sp;
+          { ls += "\xea\x9c\xbb"; continue; 	/* Ꜻ -> ꜻ == U+A73A -> U+A73B */ }
+yy1085:
+          ++sp;
+          { ls += "\xea\x9c\xbd"; continue; 	/* Ꜽ -> ꜽ == U+A73C -> U+A73D */ }
+yy1087:
+          ++sp;
+          { ls += "\xea\x9c\xbf"; continue; 	/* Ꜿ -> ꜿ == U+A73E -> U+A73F */ }
+yy1089:
+          ++sp;
+          { ls += "\xea\x9d\x81"; continue; 	/* Ꝁ -> ꝁ == U+A740 -> U+A741 */ }
+yy1091:
+          ++sp;
+          { ls += "\xea\x9d\x83"; continue; 	/* Ꝃ -> ꝃ == U+A742 -> U+A743 */ }
+yy1093:
+          ++sp;
+          { ls += "\xea\x9d\x85"; continue; 	/* Ꝅ -> ꝅ == U+A744 -> U+A745 */ }
+yy1095:
+          ++sp;
+          { ls += "\xea\x9d\x87"; continue; 	/* Ꝇ -> ꝇ == U+A746 -> U+A747 */ }
+yy1097:
+          ++sp;
+          { ls += "\xea\x9d\x89"; continue; 	/* Ꝉ -> ꝉ == U+A748 -> U+A749 */ }
+yy1099:
+          ++sp;
+          { ls += "\xea\x9d\x8b"; continue; 	/* Ꝋ -> ꝋ == U+A74A -> U+A74B */ }
+yy1101:
+          ++sp;
+          { ls += "\xea\x9d\x8d"; continue; 	/* Ꝍ -> ꝍ == U+A74C -> U+A74D */ }
+yy1103:
+          ++sp;
+          { ls += "\xea\x9d\x8f"; continue; 	/* Ꝏ -> ꝏ == U+A74E -> U+A74F */ }
+yy1105:
+          ++sp;
+          { ls += "\xea\x9d\x91"; continue; 	/* Ꝑ -> ꝑ == U+A750 -> U+A751 */ }
+yy1107:
+          ++sp;
+          { ls += "\xea\x9d\x93"; continue; 	/* Ꝓ -> ꝓ == U+A752 -> U+A753 */ }
+yy1109:
+          ++sp;
+          { ls += "\xea\x9d\x95"; continue; 	/* Ꝕ -> ꝕ == U+A754 -> U+A755 */ }
+yy1111:
+          ++sp;
+          { ls += "\xea\x9d\x97"; continue; 	/* Ꝗ -> ꝗ == U+A756 -> U+A757 */ }
+yy1113:
+          ++sp;
+          { ls += "\xea\x9d\x99"; continue; 	/* Ꝙ -> ꝙ == U+A758 -> U+A759 */ }
+yy1115:
+          ++sp;
+          { ls += "\xea\x9d\x9b"; continue; 	/* Ꝛ -> ꝛ == U+A75A -> U+A75B */ }
+yy1117:
+          ++sp;
+          { ls += "\xea\x9d\x9d"; continue; 	/* Ꝝ -> ꝝ == U+A75C -> U+A75D */ }
+yy1119:
+          ++sp;
+          { ls += "\xea\x9d\x9f"; continue; 	/* Ꝟ -> ꝟ == U+A75E -> U+A75F */ }
+yy1121:
+          ++sp;
+          { ls += "\xea\x9d\xa1"; continue; 	/* Ꝡ -> ꝡ == U+A760 -> U+A761 */ }
+yy1123:
+          ++sp;
+          { ls += "\xea\x9d\xa3"; continue; 	/* Ꝣ -> ꝣ == U+A762 -> U+A763 */ }
+yy1125:
+          ++sp;
+          { ls += "\xea\x9d\xa5"; continue; 	/* Ꝥ -> ꝥ == U+A764 -> U+A765 */ }
+yy1127:
+          ++sp;
+          { ls += "\xea\x9d\xa7"; continue; 	/* Ꝧ -> ꝧ == U+A766 -> U+A767 */ }
+yy1129:
+          ++sp;
+          { ls += "\xea\x9d\xa9"; continue; 	/* Ꝩ -> ꝩ == U+A768 -> U+A769 */ }
+yy1131:
+          ++sp;
+          { ls += "\xea\x9d\xab"; continue; 	/* Ꝫ -> ꝫ == U+A76A -> U+A76B */ }
+yy1133:
+          ++sp;
+          { ls += "\xea\x9d\xad"; continue; 	/* Ꝭ -> ꝭ == U+A76C -> U+A76D */ }
+yy1135:
+          ++sp;
+          { ls += "\xea\x9d\xaf"; continue; 	/* Ꝯ -> ꝯ == U+A76E -> U+A76F */ }
+yy1137:
+          ++sp;
+          { ls += "\xea\x9d\xba"; continue; 	/* Ꝺ -> ꝺ == U+A779 -> U+A77A */ }
+yy1139:
+          ++sp;
+          { ls += "\xea\x9d\xbc"; continue; 	/* Ꝼ -> ꝼ == U+A77B -> U+A77C */ }
+yy1141:
+          ++sp;
+          { ls += "\xe1\xb5\xb9"; continue; 	/* Ᵹ -> ᵹ == U+A77D -> U+1D79 */ }
+yy1143:
+          ++sp;
+          { ls += "\xea\x9d\xbf"; continue; 	/* Ꝿ -> ꝿ == U+A77E -> U+A77F */ }
+yy1145:
+          ++sp;
+          { ls += "\xea\x9e\x81"; continue; 	/* Ꞁ -> ꞁ == U+A780 -> U+A781 */ }
+yy1147:
+          ++sp;
+          { ls += "\xea\x9e\x83"; continue; 	/* Ꞃ -> ꞃ == U+A782 -> U+A783 */ }
+yy1149:
+          ++sp;
+          { ls += "\xea\x9e\x85"; continue; 	/* Ꞅ -> ꞅ == U+A784 -> U+A785 */ }
+yy1151:
+          ++sp;
+          { ls += "\xea\x9e\x87"; continue; 	/* Ꞇ -> ꞇ == U+A786 -> U+A787 */ }
+yy1153:
+          ++sp;
+          { ls += "\xea\x9e\x8c"; continue; 	/* Ꞌ -> ꞌ == U+A78B -> U+A78C */ }
+yy1155:
+          ++sp;
+          { ls += "\xc9\xa5"; continue; 	/* Ɥ -> ɥ == U+A78D -> U+0265 */ }
+yy1157:
+          ++sp;
+          { ls += "\xea\x9e\x91"; continue; 	/* Ꞑ -> ꞑ == U+A790 -> U+A791 */ }
+yy1159:
+          ++sp;
+          { ls += "\xea\x9e\x93"; continue; 	/* Ꞓ -> ꞓ == U+A792 -> U+A793 */ }
+yy1161:
+          ++sp;
+          { ls += "\xea\x9e\xa1"; continue; 	/* Ꞡ -> ꞡ == U+A7A0 -> U+A7A1 */ }
+yy1163:
+          ++sp;
+          { ls += "\xea\x9e\xa3"; continue; 	/* Ꞣ -> ꞣ == U+A7A2 -> U+A7A3 */ }
+yy1165:
+          ++sp;
+          { ls += "\xea\x9e\xa5"; continue; 	/* Ꞥ -> ꞥ == U+A7A4 -> U+A7A5 */ }
+yy1167:
+          ++sp;
+          { ls += "\xea\x9e\xa7"; continue; 	/* Ꞧ -> ꞧ == U+A7A6 -> U+A7A7 */ }
+yy1169:
+          ++sp;
+          { ls += "\xea\x9e\xa9"; continue; 	/* Ꞩ -> ꞩ == U+A7A8 -> U+A7A9 */ }
+yy1171:
+          ++sp;
+          { ls += "\xc9\xa6"; continue; 	/* Ɦ -> ɦ == U+A7AA -> U+0266 */ }
+yy1173:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1174:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1175:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1176:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1177:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1178:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1179:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1180:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1181:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1182:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1183:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1184:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1185:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy1519;
+          case 0x81:
+          case 0x83:
+          case 0x85:
+          case 0x87:
+          case 0x89:
+          case 0x8B:
+          case 0x8D:
+          case 0x8F:
+          case 0x91:
+          case 0x93:
+          case 0x95:
+          case 0x97:
+          case 0x99:
+          case 0x9B:
+          case 0x9D:
+          case 0x9F:
+          case 0xA1:
+          case 0xA3:
+          case 0xA4:
+          case 0xA5:
+          case 0xA6:
+          case 0xA7:
+          case 0xA8:
+          case 0xA9:
+          case 0xAA:
+          case 0xAC:
+          case 0xAE:
+          case 0xAF:
+          case 0xB0:
+          case 0xB1:
+          case 0xB3:
+          case 0xB4:
+          case 0xB5:
+          case 0xB6:
+          case 0xB7:
+          case 0xB8:
+          case 0xB9:
+          case 0xBA:
+          case 0xBB:
+          case 0xBC:
+          case 0xBD:
+          case 0xBE:
+          case 0xBF:  goto yy167;
+          case 0x82:  goto yy1521;
+          case 0x84:  goto yy1523;
+          case 0x86:  goto yy1525;
+          case 0x88:  goto yy1527;
+          case 0x8A:  goto yy1529;
+          case 0x8C:  goto yy1531;
+          case 0x8E:  goto yy1533;
+          case 0x90:  goto yy1535;
+          case 0x92:  goto yy1537;
+          case 0x94:  goto yy1539;
+          case 0x96:  goto yy1541;
+          case 0x98:  goto yy1543;
+          case 0x9A:  goto yy1545;
+          case 0x9C:  goto yy1547;
+          case 0x9E:  goto yy1549;
+          case 0xA0:  goto yy1551;
+          case 0xA2:  goto yy1553;
+          case 0xAB:  goto yy1555;
+          case 0xAD:  goto yy1557;
+          case 0xB2:  goto yy1559;
+          default:  goto yy2;
+          }
+yy1186:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy1455;
+          case 0x81:
+          case 0x83:
+          case 0x85:
+          case 0x87:
+          case 0x89:
+          case 0x8B:
+          case 0x8D:
+          case 0x8F:
+          case 0x91:
+          case 0x93:
+          case 0x95:
+          case 0x97:
+          case 0x99:
+          case 0x9B:
+          case 0x9D:
+          case 0x9F:
+          case 0xA1:
+          case 0xA3:
+          case 0xA5:
+          case 0xA7:
+          case 0xA9:
+          case 0xAB:
+          case 0xAD:
+          case 0xAF:
+          case 0xB1:
+          case 0xB3:
+          case 0xB5:
+          case 0xB7:
+          case 0xB9:
+          case 0xBB:
+          case 0xBD:
+          case 0xBF:  goto yy167;
+          case 0x82:  goto yy1457;
+          case 0x84:  goto yy1459;
+          case 0x86:  goto yy1461;
+          case 0x88:  goto yy1463;
+          case 0x8A:  goto yy1465;
+          case 0x8C:  goto yy1467;
+          case 0x8E:  goto yy1469;
+          case 0x90:  goto yy1471;
+          case 0x92:  goto yy1473;
+          case 0x94:  goto yy1475;
+          case 0x96:  goto yy1477;
+          case 0x98:  goto yy1479;
+          case 0x9A:  goto yy1481;
+          case 0x9C:  goto yy1483;
+          case 0x9E:  goto yy1485;
+          case 0xA0:  goto yy1487;
+          case 0xA2:  goto yy1489;
+          case 0xA4:  goto yy1491;
+          case 0xA6:  goto yy1493;
+          case 0xA8:  goto yy1495;
+          case 0xAA:  goto yy1497;
+          case 0xAC:  goto yy1499;
+          case 0xAE:  goto yy1501;
+          case 0xB0:  goto yy1503;
+          case 0xB2:  goto yy1505;
+          case 0xB4:  goto yy1507;
+          case 0xB6:  goto yy1509;
+          case 0xB8:  goto yy1511;
+          case 0xBA:  goto yy1513;
+          case 0xBC:  goto yy1515;
+          case 0xBE:  goto yy1517;
+          default:  goto yy2;
+          }
+yy1187:
           yych = *++sp;
           switch (yych) {
           case 0x80:
@@ -2691,442 +7537,92 @@ yy970:
           case 0x9C:
           case 0x9D:
           case 0x9E:
-          case 0x9F:  goto yy995;
-          case 0xA0:  goto yy997;
-          case 0xA1:  goto yy999;
-          case 0xA2:  goto yy1001;
-          case 0xA3:  goto yy1003;
-          case 0xA4:  goto yy1005;
-          case 0xA5:  goto yy1007;
-          case 0xA6:  goto yy1009;
-          case 0xA7:  goto yy1011;
-          case 0xA8:  goto yy1013;
-          case 0xA9:  goto yy1015;
-          case 0xAA:  goto yy1017;
-          case 0xAB:  goto yy1019;
-          case 0xAC:  goto yy1021;
-          case 0xAD:  goto yy1023;
-          case 0xAE:  goto yy1025;
-          case 0xAF:  goto yy1027;
-          case 0xB0:  goto yy1029;
-          case 0xB1:  goto yy1031;
-          case 0xB2:  goto yy1033;
-          case 0xB3:  goto yy1035;
-          case 0xB4:  goto yy1037;
-          case 0xB5:  goto yy1039;
-          case 0xB6:  goto yy1041;
-          case 0xB7:  goto yy1043;
-          case 0xB8:  goto yy1045;
-          case 0xB9:  goto yy1047;
-          case 0xBA:  goto yy1049;
-          case 0xBB:  goto yy1051;
-          case 0xBC:  goto yy1053;
-          case 0xBD:  goto yy1055;
-          case 0xBE:  goto yy1057;
-          case 0xBF:  goto yy1059;
-          default:  goto yy2;
-          }
-yy971:
-          yych = *++sp;
-          if (yych <= 0x84) {
-            if (yych <= 0x81) {
-              if (yych <= 0x7F) goto yy2;
-              if (yych <= 0x80) goto yy1061;
-              goto yy1063;
-            } else {
-              if (yych <= 0x82) goto yy1065;
-              if (yych <= 0x83) goto yy1067;
-              goto yy1069;
-            }
-          } else {
-            if (yych <= 0x87) {
-              if (yych <= 0x85) goto yy1071;
-              if (yych <= 0x86) goto yy995;
-              goto yy1073;
-            } else {
-              if (yych == 0x8D) goto yy1075;
-              if (yych <= 0xBF) goto yy995;
-              goto yy2;
-            }
-          }
-yy972:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:  goto yy1077;
-          case 0x81:
-          case 0x83:
-          case 0x85:
-          case 0x87:
-          case 0x89:
-          case 0x8B:
-          case 0x8D:
-          case 0x8F:
-          case 0x91:
-          case 0x93:
-          case 0x95:
-          case 0x97:
-          case 0x99:
-          case 0x9B:
-          case 0x9D:
           case 0x9F:
           case 0xA1:
-          case 0xA3:
-          case 0xA5:
-          case 0xA7:
-          case 0xA9:
-          case 0xAB:
-          case 0xAD:
-          case 0xAF:
-          case 0xB1:
-          case 0xB3:
-          case 0xB5:
-          case 0xB7:
-          case 0xB9:
-          case 0xBB:
-          case 0xBD:
-          case 0xBF:  goto yy995;
-          case 0x82:  goto yy1079;
-          case 0x84:  goto yy1081;
-          case 0x86:  goto yy1083;
-          case 0x88:  goto yy1085;
-          case 0x8A:  goto yy1087;
-          case 0x8C:  goto yy1089;
-          case 0x8E:  goto yy1091;
-          case 0x90:  goto yy1093;
-          case 0x92:  goto yy1095;
-          case 0x94:  goto yy1097;
-          case 0x96:  goto yy1099;
-          case 0x98:  goto yy1101;
-          case 0x9A:  goto yy1103;
-          case 0x9C:  goto yy1105;
-          case 0x9E:  goto yy1107;
-          case 0xA0:  goto yy1109;
-          case 0xA2:  goto yy1111;
-          case 0xA4:  goto yy1113;
-          case 0xA6:  goto yy1115;
-          case 0xA8:  goto yy1117;
-          case 0xAA:  goto yy1119;
-          case 0xAC:  goto yy1121;
-          case 0xAE:  goto yy1123;
-          case 0xB0:  goto yy1125;
-          case 0xB2:  goto yy1127;
-          case 0xB4:  goto yy1129;
-          case 0xB6:  goto yy1131;
-          case 0xB8:  goto yy1133;
-          case 0xBA:  goto yy1135;
-          case 0xBC:  goto yy1137;
-          case 0xBE:  goto yy1139;
-          default:  goto yy2;
-          }
-yy973:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:  goto yy1141;
-          case 0x81:
-          case 0x83:
-          case 0x85:
-          case 0x87:
-          case 0x89:
-          case 0x8B:
-          case 0x8D:
-          case 0x8F:
-          case 0x91:
-          case 0x93:
-          case 0x95:
-          case 0x97:
-          case 0x99:
-          case 0x9B:
-          case 0x9D:
-          case 0x9F:
-          case 0xA1:
-          case 0xA3:
-          case 0xA5:
-          case 0xA7:
-          case 0xA9:
-          case 0xAB:
-          case 0xAD:
-          case 0xAF:
-          case 0xB1:
-          case 0xB3:
-          case 0xB5:
-          case 0xB7:
-          case 0xB9:
-          case 0xBB:
-          case 0xBD:
-          case 0xBF:  goto yy995;
-          case 0x82:  goto yy1143;
-          case 0x84:  goto yy1145;
-          case 0x86:  goto yy1147;
-          case 0x88:  goto yy1149;
-          case 0x8A:  goto yy1151;
-          case 0x8C:  goto yy1153;
-          case 0x8E:  goto yy1155;
-          case 0x90:  goto yy1157;
-          case 0x92:  goto yy1159;
-          case 0x94:  goto yy1161;
-          case 0x96:  goto yy1163;
-          case 0x98:  goto yy1165;
-          case 0x9A:  goto yy1167;
-          case 0x9C:  goto yy1169;
-          case 0x9E:  goto yy1171;
-          case 0xA0:  goto yy1173;
-          case 0xA2:  goto yy1175;
-          case 0xA4:  goto yy1177;
-          case 0xA6:  goto yy1179;
-          case 0xA8:  goto yy1181;
-          case 0xAA:  goto yy1183;
-          case 0xAC:  goto yy1185;
-          case 0xAE:  goto yy1187;
-          case 0xB0:  goto yy1189;
-          case 0xB2:  goto yy1191;
-          case 0xB4:  goto yy1193;
-          case 0xB6:  goto yy1195;
-          case 0xB8:  goto yy1197;
-          case 0xBA:  goto yy1199;
-          case 0xBC:  goto yy1201;
-          case 0xBE:  goto yy1203;
-          default:  goto yy2;
-          }
-yy974:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:  goto yy1205;
-          case 0x81:
-          case 0x83:
-          case 0x85:
-          case 0x87:
-          case 0x89:
-          case 0x8B:
-          case 0x8D:
-          case 0x8F:
-          case 0x91:
-          case 0x93:
-          case 0x95:
-          case 0x96:
-          case 0x97:
-          case 0x98:
-          case 0x99:
-          case 0x9A:
-          case 0x9B:
-          case 0x9C:
-          case 0x9D:
-          case 0x9F:
-          case 0xA1:
-          case 0xA3:
-          case 0xA5:
-          case 0xA7:
-          case 0xA9:
-          case 0xAB:
-          case 0xAD:
-          case 0xAF:
-          case 0xB1:
-          case 0xB3:
-          case 0xB5:
-          case 0xB7:
-          case 0xB9:
-          case 0xBB:
-          case 0xBD:
-          case 0xBF:  goto yy995;
-          case 0x82:  goto yy1207;
-          case 0x84:  goto yy1209;
-          case 0x86:  goto yy1211;
-          case 0x88:  goto yy1213;
-          case 0x8A:  goto yy1215;
-          case 0x8C:  goto yy1217;
-          case 0x8E:  goto yy1219;
-          case 0x90:  goto yy1221;
-          case 0x92:  goto yy1223;
-          case 0x94:  goto yy1225;
-          case 0x9E:  goto yy1227;
-          case 0xA0:  goto yy1229;
-          case 0xA2:  goto yy1231;
-          case 0xA4:  goto yy1233;
-          case 0xA6:  goto yy1235;
-          case 0xA8:  goto yy1237;
-          case 0xAA:  goto yy1239;
-          case 0xAC:  goto yy1241;
-          case 0xAE:  goto yy1243;
-          case 0xB0:  goto yy1245;
-          case 0xB2:  goto yy1247;
-          case 0xB4:  goto yy1249;
-          case 0xB6:  goto yy1251;
-          case 0xB8:  goto yy1253;
-          case 0xBA:  goto yy1255;
-          case 0xBC:  goto yy1257;
-          case 0xBE:  goto yy1259;
-          default:  goto yy2;
-          }
-yy975:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:  goto yy1261;
-          case 0x81:
-          case 0x83:
-          case 0x85:
-          case 0x87:
-          case 0x89:
-          case 0x8B:
-          case 0x8D:
-          case 0x8F:
-          case 0x91:
-          case 0x93:
-          case 0x95:
-          case 0x97:
-          case 0x99:
-          case 0x9B:
-          case 0x9D:
-          case 0x9F:
-          case 0xA1:
-          case 0xA3:
-          case 0xA5:
-          case 0xA7:
-          case 0xA9:
-          case 0xAB:
-          case 0xAD:
-          case 0xAF:
-          case 0xB1:
-          case 0xB3:
-          case 0xB5:
-          case 0xB7:
-          case 0xB9:
-          case 0xBB:
-          case 0xBD:
-          case 0xBF:  goto yy995;
-          case 0x82:  goto yy1263;
-          case 0x84:  goto yy1265;
-          case 0x86:  goto yy1267;
-          case 0x88:  goto yy1269;
-          case 0x8A:  goto yy1271;
-          case 0x8C:  goto yy1273;
-          case 0x8E:  goto yy1275;
-          case 0x90:  goto yy1277;
-          case 0x92:  goto yy1279;
-          case 0x94:  goto yy1281;
-          case 0x96:  goto yy1283;
-          case 0x98:  goto yy1285;
-          case 0x9A:  goto yy1287;
-          case 0x9C:  goto yy1289;
-          case 0x9E:  goto yy1291;
-          case 0xA0:  goto yy1293;
-          case 0xA2:  goto yy1295;
-          case 0xA4:  goto yy1297;
-          case 0xA6:  goto yy1299;
-          case 0xA8:  goto yy1301;
-          case 0xAA:  goto yy1303;
-          case 0xAC:  goto yy1305;
-          case 0xAE:  goto yy1307;
-          case 0xB0:  goto yy1309;
-          case 0xB2:  goto yy1311;
-          case 0xB4:  goto yy1313;
-          case 0xB6:  goto yy1315;
-          case 0xB8:  goto yy1317;
-          case 0xBA:  goto yy1319;
-          case 0xBC:  goto yy1321;
-          case 0xBE:  goto yy1323;
-          default:  goto yy2;
-          }
-yy976:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:
-          case 0x81:
-          case 0x82:
-          case 0x83:
-          case 0x84:
-          case 0x85:
-          case 0x86:
-          case 0x87:
-          case 0x90:
-          case 0x91:
-          case 0x92:
-          case 0x93:
-          case 0x94:
-          case 0x95:
-          case 0x96:
-          case 0x97:
-          case 0x9E:
-          case 0x9F:
-          case 0xA0:
-          case 0xA1:
-          case 0xA2:
-          case 0xA3:
-          case 0xA4:
           case 0xA5:
           case 0xA6:
-          case 0xA7:
-          case 0xB0:
+          case 0xA8:
+          case 0xAA:
+          case 0xAC:
           case 0xB1:
-          case 0xB2:
           case 0xB3:
           case 0xB4:
-          case 0xB5:
           case 0xB6:
-          case 0xB7:  goto yy995;
-          case 0x88:  goto yy1325;
-          case 0x89:  goto yy1327;
-          case 0x8A:  goto yy1329;
-          case 0x8B:  goto yy1331;
-          case 0x8C:  goto yy1333;
-          case 0x8D:  goto yy1335;
-          case 0x8E:  goto yy1337;
-          case 0x8F:  goto yy1339;
-          case 0x98:  goto yy1341;
-          case 0x99:  goto yy1343;
-          case 0x9A:  goto yy1345;
-          case 0x9B:  goto yy1347;
-          case 0x9C:  goto yy1349;
-          case 0x9D:  goto yy1351;
-          case 0xA8:  goto yy1353;
-          case 0xA9:  goto yy1355;
-          case 0xAA:  goto yy1357;
-          case 0xAB:  goto yy1359;
-          case 0xAC:  goto yy1361;
-          case 0xAD:  goto yy1363;
-          case 0xAE:  goto yy1365;
-          case 0xAF:  goto yy1367;
-          case 0xB8:  goto yy1369;
-          case 0xB9:  goto yy1371;
-          case 0xBA:  goto yy1373;
-          case 0xBB:  goto yy1375;
-          case 0xBC:  goto yy1377;
-          case 0xBD:  goto yy1379;
-          case 0xBE:  goto yy1381;
-          case 0xBF:  goto yy1383;
+          case 0xB7:
+          case 0xB8:
+          case 0xB9:
+          case 0xBA:
+          case 0xBB:
+          case 0xBC:
+          case 0xBD:  goto yy167;
+          case 0xA0:  goto yy1425;
+          case 0xA2:  goto yy1427;
+          case 0xA3:  goto yy1429;
+          case 0xA4:  goto yy1431;
+          case 0xA7:  goto yy1433;
+          case 0xA9:  goto yy1435;
+          case 0xAB:  goto yy1437;
+          case 0xAD:  goto yy1439;
+          case 0xAE:  goto yy1441;
+          case 0xAF:  goto yy1443;
+          case 0xB0:  goto yy1445;
+          case 0xB2:  goto yy1447;
+          case 0xB5:  goto yy1449;
+          case 0xBE:  goto yy1451;
+          case 0xBF:  goto yy1453;
           default:  goto yy2;
           }
-yy977:
+yy1188:
           yych = *++sp;
           switch (yych) {
-          case 0x80:
-          case 0x81:
-          case 0x82:
-          case 0x83:
-          case 0x84:
-          case 0x85:
-          case 0x86:
-          case 0x87:
-          case 0x8E:
-          case 0x8F:
-          case 0x90:
-          case 0x91:
-          case 0x92:
-          case 0x93:
-          case 0x94:
-          case 0x95:
-          case 0x96:
-          case 0x97:
-          case 0x98:
-          case 0x9A:
-          case 0x9C:
-          case 0x9E:
-          case 0xA0:
-          case 0xA1:
-          case 0xA2:
-          case 0xA3:
-          case 0xA4:
-          case 0xA5:
-          case 0xA6:
-          case 0xA7:
+          case 0x80:  goto yy1331;
+          case 0x81:  goto yy1333;
+          case 0x82:  goto yy1335;
+          case 0x83:  goto yy1337;
+          case 0x84:  goto yy1339;
+          case 0x85:  goto yy1341;
+          case 0x86:  goto yy1343;
+          case 0x87:  goto yy1345;
+          case 0x88:  goto yy1347;
+          case 0x89:  goto yy1349;
+          case 0x8A:  goto yy1351;
+          case 0x8B:  goto yy1353;
+          case 0x8C:  goto yy1355;
+          case 0x8D:  goto yy1357;
+          case 0x8E:  goto yy1359;
+          case 0x8F:  goto yy1361;
+          case 0x90:  goto yy1363;
+          case 0x91:  goto yy1365;
+          case 0x92:  goto yy1367;
+          case 0x93:  goto yy1369;
+          case 0x94:  goto yy1371;
+          case 0x95:  goto yy1373;
+          case 0x96:  goto yy1375;
+          case 0x97:  goto yy1377;
+          case 0x98:  goto yy1379;
+          case 0x99:  goto yy1381;
+          case 0x9A:  goto yy1383;
+          case 0x9B:  goto yy1385;
+          case 0x9C:  goto yy1387;
+          case 0x9D:  goto yy1389;
+          case 0x9E:  goto yy1391;
+          case 0x9F:  goto yy1393;
+          case 0xA0:  goto yy1395;
+          case 0xA1:  goto yy1397;
+          case 0xA2:  goto yy1399;
+          case 0xA3:  goto yy1401;
+          case 0xA4:  goto yy1403;
+          case 0xA5:  goto yy1405;
+          case 0xA6:  goto yy1407;
+          case 0xA7:  goto yy1409;
+          case 0xA8:  goto yy1411;
+          case 0xA9:  goto yy1413;
+          case 0xAA:  goto yy1415;
+          case 0xAB:  goto yy1417;
+          case 0xAC:  goto yy1419;
+          case 0xAD:  goto yy1421;
+          case 0xAE:  goto yy1423;
+          case 0xAF:
           case 0xB0:
           case 0xB1:
           case 0xB2:
@@ -3142,368 +7638,844 @@ yy977:
           case 0xBC:
           case 0xBD:
           case 0xBE:
-          case 0xBF:  goto yy995;
-          case 0x88:  goto yy1385;
-          case 0x89:  goto yy1387;
-          case 0x8A:  goto yy1389;
-          case 0x8B:  goto yy1391;
-          case 0x8C:  goto yy1393;
-          case 0x8D:  goto yy1395;
-          case 0x99:  goto yy1397;
-          case 0x9B:  goto yy1399;
-          case 0x9D:  goto yy1401;
-          case 0x9F:  goto yy1403;
-          case 0xA8:  goto yy1405;
-          case 0xA9:  goto yy1407;
-          case 0xAA:  goto yy1409;
-          case 0xAB:  goto yy1411;
-          case 0xAC:  goto yy1413;
-          case 0xAD:  goto yy1415;
-          case 0xAE:  goto yy1417;
-          case 0xAF:  goto yy1419;
+          case 0xBF:  goto yy167;
           default:  goto yy2;
           }
-yy978:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:
-          case 0x81:
-          case 0x82:
-          case 0x83:
-          case 0x84:
-          case 0x85:
-          case 0x86:
-          case 0x87:
-          case 0x90:
-          case 0x91:
-          case 0x92:
-          case 0x93:
-          case 0x94:
-          case 0x95:
-          case 0x96:
-          case 0x97:
-          case 0xA0:
-          case 0xA1:
-          case 0xA2:
-          case 0xA3:
-          case 0xA4:
-          case 0xA5:
-          case 0xA6:
-          case 0xA7:
-          case 0xB0:
-          case 0xB1:
-          case 0xB2:
-          case 0xB3:
-          case 0xB4:
-          case 0xB5:
-          case 0xB6:
-          case 0xB7:
-          case 0xBD:
-          case 0xBE:
-          case 0xBF:  goto yy995;
-          case 0x88:  goto yy1421;
-          case 0x89:  goto yy1423;
-          case 0x8A:  goto yy1425;
-          case 0x8B:  goto yy1427;
-          case 0x8C:  goto yy1429;
-          case 0x8D:  goto yy1431;
-          case 0x8E:  goto yy1433;
-          case 0x8F:  goto yy1435;
-          case 0x98:  goto yy1437;
-          case 0x99:  goto yy1439;
-          case 0x9A:  goto yy1441;
-          case 0x9B:  goto yy1443;
-          case 0x9C:  goto yy1445;
-          case 0x9D:  goto yy1447;
-          case 0x9E:  goto yy1449;
-          case 0x9F:  goto yy1451;
-          case 0xA8:  goto yy1453;
-          case 0xA9:  goto yy1455;
-          case 0xAA:  goto yy1457;
-          case 0xAB:  goto yy1459;
-          case 0xAC:  goto yy1461;
-          case 0xAD:  goto yy1463;
-          case 0xAE:  goto yy1465;
-          case 0xAF:  goto yy1467;
-          case 0xB8:  goto yy1469;
-          case 0xB9:  goto yy1471;
-          case 0xBA:  goto yy1473;
-          case 0xBB:  goto yy1475;
-          case 0xBC:  goto yy1477;
-          default:  goto yy2;
-          }
-yy979:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:
-          case 0x81:
-          case 0x82:
-          case 0x83:
-          case 0x84:
-          case 0x85:
-          case 0x86:
-          case 0x87:
-          case 0x8D:
-          case 0x8E:
-          case 0x8F:
-          case 0x90:
-          case 0x91:
-          case 0x92:
-          case 0x93:
-          case 0x94:
-          case 0x95:
-          case 0x96:
-          case 0x97:
-          case 0x9C:
-          case 0x9D:
-          case 0x9E:
-          case 0x9F:
-          case 0xA0:
-          case 0xA1:
-          case 0xA2:
-          case 0xA3:
-          case 0xA4:
-          case 0xA5:
-          case 0xA6:
-          case 0xA7:
-          case 0xAD:
-          case 0xAE:
-          case 0xAF:
-          case 0xB0:
-          case 0xB1:
-          case 0xB2:
-          case 0xB3:
-          case 0xB4:
-          case 0xB5:
-          case 0xB6:
-          case 0xB7:
-          case 0xBD:
-          case 0xBE:
-          case 0xBF:  goto yy995;
-          case 0x88:  goto yy1479;
-          case 0x89:  goto yy1481;
-          case 0x8A:  goto yy1483;
-          case 0x8B:  goto yy1485;
-          case 0x8C:  goto yy1487;
-          case 0x98:  goto yy1489;
-          case 0x99:  goto yy1491;
-          case 0x9A:  goto yy1493;
-          case 0x9B:  goto yy1495;
-          case 0xA8:  goto yy1497;
-          case 0xA9:  goto yy1499;
-          case 0xAA:  goto yy1501;
-          case 0xAB:  goto yy1503;
-          case 0xAC:  goto yy1505;
-          case 0xB8:  goto yy1507;
-          case 0xB9:  goto yy1509;
-          case 0xBA:  goto yy1511;
-          case 0xBB:  goto yy1513;
-          case 0xBC:  goto yy1515;
-          default:  goto yy2;
-          }
-yy980:
-          yych = *++sp;
-          if (yych <= 0xAA) {
-            if (yych <= 0xA5) {
-              if (yych <= 0x7F) goto yy2;
-              goto yy995;
-            } else {
-              if (yych <= 0xA6) goto yy1517;
-              if (yych <= 0xA9) goto yy995;
-              goto yy1519;
-            }
-          } else {
-            if (yych <= 0xB1) {
-              if (yych <= 0xAB) goto yy1521;
-              goto yy995;
-            } else {
-              if (yych <= 0xB2) goto yy1523;
-              if (yych <= 0xBF) goto yy995;
-              goto yy2;
-            }
-          }
-yy981:
-          yych = *++sp;
-          if (yych <= 0xA7) {
-            if (yych <= 0xA2) {
-              if (yych <= 0x9F) {
-                if (yych <= 0x7F) goto yy2;
-                goto yy995;
-              } else {
-                if (yych <= 0xA0) goto yy1525;
-                if (yych <= 0xA1) goto yy1527;
-                goto yy1529;
-              }
-            } else {
-              if (yych <= 0xA4) {
-                if (yych <= 0xA3) goto yy1531;
-                goto yy1533;
-              } else {
-                if (yych <= 0xA5) goto yy1535;
-                if (yych <= 0xA6) goto yy1537;
-                goto yy1539;
-              }
-            }
-          } else {
-            if (yych <= 0xAC) {
-              if (yych <= 0xA9) {
-                if (yych <= 0xA8) goto yy1541;
-                goto yy1543;
-              } else {
-                if (yych <= 0xAA) goto yy1545;
-                if (yych <= 0xAB) goto yy1547;
-                goto yy1549;
-              }
-            } else {
-              if (yych <= 0xAE) {
-                if (yych <= 0xAD) goto yy1551;
-                goto yy1553;
-              } else {
-                if (yych <= 0xAF) goto yy1555;
-                if (yych <= 0xBF) goto yy995;
-                goto yy2;
-              }
-            }
-          }
-yy982:
+yy1189:
           yych = *++sp;
           if (yych <= 0x7F) goto yy2;
-          if (yych == 0x83) goto yy1557;
-          if (yych <= 0xBF) goto yy995;
+          if (yych <= 0xBF) goto yy167;
           goto yy2;
-yy983:
+yy1190:
           yych = *++sp;
-          if (yych <= 0xB9) {
-            if (yych <= 0xB6) {
-              if (yych <= 0x7F) goto yy2;
-              if (yych <= 0xB5) goto yy995;
-              goto yy1559;
-            } else {
-              if (yych <= 0xB7) goto yy1561;
-              if (yych <= 0xB8) goto yy1563;
-              goto yy1565;
-            }
-          } else {
-            if (yych <= 0xBC) {
-              if (yych <= 0xBA) goto yy1567;
-              if (yych <= 0xBB) goto yy1569;
-              goto yy1571;
-            } else {
-              if (yych <= 0xBD) goto yy1573;
-              if (yych <= 0xBE) goto yy1575;
-              if (yych <= 0xBF) goto yy1577;
-              goto yy2;
-            }
-          }
-yy984:
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1191:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1192:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1193:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1194:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1195:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1196:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1197:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1198:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1199:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1200:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1201:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1202:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1203:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1204:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1205:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1206:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1207:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1208:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1209:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1210:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1211:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1212:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1213:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1214:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1215:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1216:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1217:
           yych = *++sp;
           if (yych <= 0x87) {
             if (yych <= 0x82) {
               if (yych <= 0x7F) goto yy2;
-              if (yych <= 0x80) goto yy1579;
-              if (yych <= 0x81) goto yy1581;
-              goto yy1583;
+              if (yych <= 0x80) goto yy1299;
+              if (yych <= 0x81) goto yy1301;
+              goto yy1303;
             } else {
               if (yych <= 0x84) {
-                if (yych <= 0x83) goto yy1585;
-                goto yy1587;
+                if (yych <= 0x83) goto yy1305;
+                goto yy1307;
               } else {
-                if (yych <= 0x85) goto yy1589;
-                if (yych <= 0x86) goto yy1591;
-                goto yy1593;
+                if (yych <= 0x85) goto yy1309;
+                if (yych <= 0x86) goto yy1311;
+                goto yy1313;
               }
             }
           } else {
             if (yych <= 0x8C) {
               if (yych <= 0x89) {
-                if (yych <= 0x88) goto yy1595;
-                goto yy1597;
+                if (yych <= 0x88) goto yy1315;
+                goto yy1317;
               } else {
-                if (yych <= 0x8A) goto yy1599;
-                if (yych <= 0x8B) goto yy1601;
-                goto yy1603;
+                if (yych <= 0x8A) goto yy1319;
+                if (yych <= 0x8B) goto yy1321;
+                goto yy1323;
               }
             } else {
               if (yych <= 0x8E) {
-                if (yych <= 0x8D) goto yy1605;
-                goto yy1607;
+                if (yych <= 0x8D) goto yy1325;
+                goto yy1327;
               } else {
-                if (yych <= 0x8F) goto yy1609;
-                if (yych <= 0xBF) goto yy995;
+                if (yych <= 0x8F) goto yy1329;
+                if (yych <= 0xBF) goto yy167;
                 goto yy2;
               }
             }
           }
-yy985:
+yy1218:
           yych = *++sp;
-          switch (yych) {
-          case 0x80:  goto yy1611;
-          case 0x81:  goto yy1613;
-          case 0x82:  goto yy1615;
-          case 0x83:  goto yy1617;
-          case 0x84:  goto yy1619;
-          case 0x85:  goto yy1621;
-          case 0x86:  goto yy1623;
-          case 0x87:  goto yy1625;
-          case 0x88:  goto yy1627;
-          case 0x89:  goto yy1629;
-          case 0x8A:  goto yy1631;
-          case 0x8B:  goto yy1633;
-          case 0x8C:  goto yy1635;
-          case 0x8D:  goto yy1637;
-          case 0x8E:  goto yy1639;
-          case 0x8F:  goto yy1641;
-          case 0x90:  goto yy1643;
-          case 0x91:  goto yy1645;
-          case 0x92:  goto yy1647;
-          case 0x93:  goto yy1649;
-          case 0x94:  goto yy1651;
-          case 0x95:  goto yy1653;
-          case 0x96:  goto yy1655;
-          case 0x97:  goto yy1657;
-          case 0x98:  goto yy1659;
-          case 0x99:  goto yy1661;
-          case 0x9A:  goto yy1663;
-          case 0x9B:  goto yy1665;
-          case 0x9C:  goto yy1667;
-          case 0x9D:  goto yy1669;
-          case 0x9E:  goto yy1671;
-          case 0x9F:  goto yy1673;
-          case 0xA0:  goto yy1675;
-          case 0xA1:  goto yy1677;
-          case 0xA2:  goto yy1679;
-          case 0xA3:  goto yy1681;
-          case 0xA4:  goto yy1683;
-          case 0xA5:  goto yy1685;
-          case 0xA6:  goto yy1687;
-          case 0xA7:  goto yy1689;
-          case 0xA8:  goto yy1691;
-          case 0xA9:  goto yy1693;
-          case 0xAA:  goto yy1695;
-          case 0xAB:  goto yy1697;
-          case 0xAC:  goto yy1699;
-          case 0xAD:  goto yy1701;
-          case 0xAE:  goto yy1703;
-          case 0xAF:
-          case 0xB0:
-          case 0xB1:
-          case 0xB2:
-          case 0xB3:
-          case 0xB4:
-          case 0xB5:
-          case 0xB6:
-          case 0xB7:
-          case 0xB8:
-          case 0xB9:
-          case 0xBA:
-          case 0xBB:
-          case 0xBC:
-          case 0xBD:
-          case 0xBE:
-          case 0xBF:  goto yy995;
-          default:  goto yy2;
+          if (yych <= 0xB9) {
+            if (yych <= 0xB6) {
+              if (yych <= 0x7F) goto yy2;
+              if (yych <= 0xB5) goto yy167;
+              goto yy1279;
+            } else {
+              if (yych <= 0xB7) goto yy1281;
+              if (yych <= 0xB8) goto yy1283;
+              goto yy1285;
+            }
+          } else {
+            if (yych <= 0xBC) {
+              if (yych <= 0xBA) goto yy1287;
+              if (yych <= 0xBB) goto yy1289;
+              goto yy1291;
+            } else {
+              if (yych <= 0xBD) goto yy1293;
+              if (yych <= 0xBE) goto yy1295;
+              if (yych <= 0xBF) goto yy1297;
+              goto yy2;
+            }
           }
-yy986:
+yy1219:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1220:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1221:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1222:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1223:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1224:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1225:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1226:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1227:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1228:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1229:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1230:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych == 0x83) goto yy1277;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1231:
+          yych = *++sp;
+          if (yych <= 0xA7) {
+            if (yych <= 0xA2) {
+              if (yych <= 0x9F) {
+                if (yych <= 0x7F) goto yy2;
+                goto yy167;
+              } else {
+                if (yych <= 0xA0) goto yy1245;
+                if (yych <= 0xA1) goto yy1247;
+                goto yy1249;
+              }
+            } else {
+              if (yych <= 0xA4) {
+                if (yych <= 0xA3) goto yy1251;
+                goto yy1253;
+              } else {
+                if (yych <= 0xA5) goto yy1255;
+                if (yych <= 0xA6) goto yy1257;
+                goto yy1259;
+              }
+            }
+          } else {
+            if (yych <= 0xAC) {
+              if (yych <= 0xA9) {
+                if (yych <= 0xA8) goto yy1261;
+                goto yy1263;
+              } else {
+                if (yych <= 0xAA) goto yy1265;
+                if (yych <= 0xAB) goto yy1267;
+                goto yy1269;
+              }
+            } else {
+              if (yych <= 0xAE) {
+                if (yych <= 0xAD) goto yy1271;
+                goto yy1273;
+              } else {
+                if (yych <= 0xAF) goto yy1275;
+                if (yych <= 0xBF) goto yy167;
+                goto yy2;
+              }
+            }
+          }
+yy1232:
+          yych = *++sp;
+          if (yych <= 0xAA) {
+            if (yych <= 0xA5) {
+              if (yych <= 0x7F) goto yy2;
+              goto yy167;
+            } else {
+              if (yych <= 0xA6) goto yy1237;
+              if (yych <= 0xA9) goto yy167;
+              goto yy1239;
+            }
+          } else {
+            if (yych <= 0xB1) {
+              if (yych <= 0xAB) goto yy1241;
+              goto yy167;
+            } else {
+              if (yych <= 0xB2) goto yy1243;
+              if (yych <= 0xBF) goto yy167;
+              goto yy2;
+            }
+          }
+yy1233:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1234:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1235:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1236:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1237:
+          ++sp;
+          { ls += "\xcf\x89"; continue; 	/* Ω -> ω == U+2126 -> U+03C9 */ }
+yy1239:
+          ++sp;
+          { ls += "\x6b"; continue; 	/* K -> k == U+212A -> U+006B */ }
+yy1241:
+          ++sp;
+          { ls += "\xc3\xa5"; continue; 	/* Å -> å == U+212B -> U+00E5 */ }
+yy1243:
+          ++sp;
+          { ls += "\xe2\x85\x8e"; continue; 	/* Ⅎ -> ⅎ == U+2132 -> U+214E */ }
+yy1245:
+          ++sp;
+          { ls += "\xe2\x85\xb0"; continue; 	/* Ⅰ -> ⅰ == U+2160 -> U+2170 */ }
+yy1247:
+          ++sp;
+          { ls += "\xe2\x85\xb1"; continue; 	/* Ⅱ -> ⅱ == U+2161 -> U+2171 */ }
+yy1249:
+          ++sp;
+          { ls += "\xe2\x85\xb2"; continue; 	/* Ⅲ -> ⅲ == U+2162 -> U+2172 */ }
+yy1251:
+          ++sp;
+          { ls += "\xe2\x85\xb3"; continue; 	/* Ⅳ -> ⅳ == U+2163 -> U+2173 */ }
+yy1253:
+          ++sp;
+          { ls += "\xe2\x85\xb4"; continue; 	/* Ⅴ -> ⅴ == U+2164 -> U+2174 */ }
+yy1255:
+          ++sp;
+          { ls += "\xe2\x85\xb5"; continue; 	/* Ⅵ -> ⅵ == U+2165 -> U+2175 */ }
+yy1257:
+          ++sp;
+          { ls += "\xe2\x85\xb6"; continue; 	/* Ⅶ -> ⅶ == U+2166 -> U+2176 */ }
+yy1259:
+          ++sp;
+          { ls += "\xe2\x85\xb7"; continue; 	/* Ⅷ -> ⅷ == U+2167 -> U+2177 */ }
+yy1261:
+          ++sp;
+          { ls += "\xe2\x85\xb8"; continue; 	/* Ⅸ -> ⅸ == U+2168 -> U+2178 */ }
+yy1263:
+          ++sp;
+          { ls += "\xe2\x85\xb9"; continue; 	/* Ⅹ -> ⅹ == U+2169 -> U+2179 */ }
+yy1265:
+          ++sp;
+          { ls += "\xe2\x85\xba"; continue; 	/* Ⅺ -> ⅺ == U+216A -> U+217A */ }
+yy1267:
+          ++sp;
+          { ls += "\xe2\x85\xbb"; continue; 	/* Ⅻ -> ⅻ == U+216B -> U+217B */ }
+yy1269:
+          ++sp;
+          { ls += "\xe2\x85\xbc"; continue; 	/* Ⅼ -> ⅼ == U+216C -> U+217C */ }
+yy1271:
+          ++sp;
+          { ls += "\xe2\x85\xbd"; continue; 	/* Ⅽ -> ⅽ == U+216D -> U+217D */ }
+yy1273:
+          ++sp;
+          { ls += "\xe2\x85\xbe"; continue; 	/* Ⅾ -> ⅾ == U+216E -> U+217E */ }
+yy1275:
+          ++sp;
+          { ls += "\xe2\x85\xbf"; continue; 	/* Ⅿ -> ⅿ == U+216F -> U+217F */ }
+yy1277:
+          ++sp;
+          { ls += "\xe2\x86\x84"; continue; 	/* Ↄ -> ↄ == U+2183 -> U+2184 */ }
+yy1279:
+          ++sp;
+          { ls += "\xe2\x93\x90"; continue; 	/* Ⓐ -> ⓐ == U+24B6 -> U+24D0 */ }
+yy1281:
+          ++sp;
+          { ls += "\xe2\x93\x91"; continue; 	/* Ⓑ -> ⓑ == U+24B7 -> U+24D1 */ }
+yy1283:
+          ++sp;
+          { ls += "\xe2\x93\x92"; continue; 	/* Ⓒ -> ⓒ == U+24B8 -> U+24D2 */ }
+yy1285:
+          ++sp;
+          { ls += "\xe2\x93\x93"; continue; 	/* Ⓓ -> ⓓ == U+24B9 -> U+24D3 */ }
+yy1287:
+          ++sp;
+          { ls += "\xe2\x93\x94"; continue; 	/* Ⓔ -> ⓔ == U+24BA -> U+24D4 */ }
+yy1289:
+          ++sp;
+          { ls += "\xe2\x93\x95"; continue; 	/* Ⓕ -> ⓕ == U+24BB -> U+24D5 */ }
+yy1291:
+          ++sp;
+          { ls += "\xe2\x93\x96"; continue; 	/* Ⓖ -> ⓖ == U+24BC -> U+24D6 */ }
+yy1293:
+          ++sp;
+          { ls += "\xe2\x93\x97"; continue; 	/* Ⓗ -> ⓗ == U+24BD -> U+24D7 */ }
+yy1295:
+          ++sp;
+          { ls += "\xe2\x93\x98"; continue; 	/* Ⓘ -> ⓘ == U+24BE -> U+24D8 */ }
+yy1297:
+          ++sp;
+          { ls += "\xe2\x93\x99"; continue; 	/* Ⓙ -> ⓙ == U+24BF -> U+24D9 */ }
+yy1299:
+          ++sp;
+          { ls += "\xe2\x93\x9a"; continue; 	/* Ⓚ -> ⓚ == U+24C0 -> U+24DA */ }
+yy1301:
+          ++sp;
+          { ls += "\xe2\x93\x9b"; continue; 	/* Ⓛ -> ⓛ == U+24C1 -> U+24DB */ }
+yy1303:
+          ++sp;
+          { ls += "\xe2\x93\x9c"; continue; 	/* Ⓜ -> ⓜ == U+24C2 -> U+24DC */ }
+yy1305:
+          ++sp;
+          { ls += "\xe2\x93\x9d"; continue; 	/* Ⓝ -> ⓝ == U+24C3 -> U+24DD */ }
+yy1307:
+          ++sp;
+          { ls += "\xe2\x93\x9e"; continue; 	/* Ⓞ -> ⓞ == U+24C4 -> U+24DE */ }
+yy1309:
+          ++sp;
+          { ls += "\xe2\x93\x9f"; continue; 	/* Ⓟ -> ⓟ == U+24C5 -> U+24DF */ }
+yy1311:
+          ++sp;
+          { ls += "\xe2\x93\xa0"; continue; 	/* Ⓠ -> ⓠ == U+24C6 -> U+24E0 */ }
+yy1313:
+          ++sp;
+          { ls += "\xe2\x93\xa1"; continue; 	/* Ⓡ -> ⓡ == U+24C7 -> U+24E1 */ }
+yy1315:
+          ++sp;
+          { ls += "\xe2\x93\xa2"; continue; 	/* Ⓢ -> ⓢ == U+24C8 -> U+24E2 */ }
+yy1317:
+          ++sp;
+          { ls += "\xe2\x93\xa3"; continue; 	/* Ⓣ -> ⓣ == U+24C9 -> U+24E3 */ }
+yy1319:
+          ++sp;
+          { ls += "\xe2\x93\xa4"; continue; 	/* Ⓤ -> ⓤ == U+24CA -> U+24E4 */ }
+yy1321:
+          ++sp;
+          { ls += "\xe2\x93\xa5"; continue; 	/* Ⓥ -> ⓥ == U+24CB -> U+24E5 */ }
+yy1323:
+          ++sp;
+          { ls += "\xe2\x93\xa6"; continue; 	/* Ⓦ -> ⓦ == U+24CC -> U+24E6 */ }
+yy1325:
+          ++sp;
+          { ls += "\xe2\x93\xa7"; continue; 	/* Ⓧ -> ⓧ == U+24CD -> U+24E7 */ }
+yy1327:
+          ++sp;
+          { ls += "\xe2\x93\xa8"; continue; 	/* Ⓨ -> ⓨ == U+24CE -> U+24E8 */ }
+yy1329:
+          ++sp;
+          { ls += "\xe2\x93\xa9"; continue; 	/* Ⓩ -> ⓩ == U+24CF -> U+24E9 */ }
+yy1331:
+          ++sp;
+          { ls += "\xe2\xb0\xb0"; continue; 	/* Ⰰ -> ⰰ == U+2C00 -> U+2C30 */ }
+yy1333:
+          ++sp;
+          { ls += "\xe2\xb0\xb1"; continue; 	/* Ⰱ -> ⰱ == U+2C01 -> U+2C31 */ }
+yy1335:
+          ++sp;
+          { ls += "\xe2\xb0\xb2"; continue; 	/* Ⰲ -> ⰲ == U+2C02 -> U+2C32 */ }
+yy1337:
+          ++sp;
+          { ls += "\xe2\xb0\xb3"; continue; 	/* Ⰳ -> ⰳ == U+2C03 -> U+2C33 */ }
+yy1339:
+          ++sp;
+          { ls += "\xe2\xb0\xb4"; continue; 	/* Ⰴ -> ⰴ == U+2C04 -> U+2C34 */ }
+yy1341:
+          ++sp;
+          { ls += "\xe2\xb0\xb5"; continue; 	/* Ⰵ -> ⰵ == U+2C05 -> U+2C35 */ }
+yy1343:
+          ++sp;
+          { ls += "\xe2\xb0\xb6"; continue; 	/* Ⰶ -> ⰶ == U+2C06 -> U+2C36 */ }
+yy1345:
+          ++sp;
+          { ls += "\xe2\xb0\xb7"; continue; 	/* Ⰷ -> ⰷ == U+2C07 -> U+2C37 */ }
+yy1347:
+          ++sp;
+          { ls += "\xe2\xb0\xb8"; continue; 	/* Ⰸ -> ⰸ == U+2C08 -> U+2C38 */ }
+yy1349:
+          ++sp;
+          { ls += "\xe2\xb0\xb9"; continue; 	/* Ⰹ -> ⰹ == U+2C09 -> U+2C39 */ }
+yy1351:
+          ++sp;
+          { ls += "\xe2\xb0\xba"; continue; 	/* Ⰺ -> ⰺ == U+2C0A -> U+2C3A */ }
+yy1353:
+          ++sp;
+          { ls += "\xe2\xb0\xbb"; continue; 	/* Ⰻ -> ⰻ == U+2C0B -> U+2C3B */ }
+yy1355:
+          ++sp;
+          { ls += "\xe2\xb0\xbc"; continue; 	/* Ⰼ -> ⰼ == U+2C0C -> U+2C3C */ }
+yy1357:
+          ++sp;
+          { ls += "\xe2\xb0\xbd"; continue; 	/* Ⰽ -> ⰽ == U+2C0D -> U+2C3D */ }
+yy1359:
+          ++sp;
+          { ls += "\xe2\xb0\xbe"; continue; 	/* Ⰾ -> ⰾ == U+2C0E -> U+2C3E */ }
+yy1361:
+          ++sp;
+          { ls += "\xe2\xb0\xbf"; continue; 	/* Ⰿ -> ⰿ == U+2C0F -> U+2C3F */ }
+yy1363:
+          ++sp;
+          { ls += "\xe2\xb1\x80"; continue; 	/* Ⱀ -> ⱀ == U+2C10 -> U+2C40 */ }
+yy1365:
+          ++sp;
+          { ls += "\xe2\xb1\x81"; continue; 	/* Ⱁ -> ⱁ == U+2C11 -> U+2C41 */ }
+yy1367:
+          ++sp;
+          { ls += "\xe2\xb1\x82"; continue; 	/* Ⱂ -> ⱂ == U+2C12 -> U+2C42 */ }
+yy1369:
+          ++sp;
+          { ls += "\xe2\xb1\x83"; continue; 	/* Ⱃ -> ⱃ == U+2C13 -> U+2C43 */ }
+yy1371:
+          ++sp;
+          { ls += "\xe2\xb1\x84"; continue; 	/* Ⱄ -> ⱄ == U+2C14 -> U+2C44 */ }
+yy1373:
+          ++sp;
+          { ls += "\xe2\xb1\x85"; continue; 	/* Ⱅ -> ⱅ == U+2C15 -> U+2C45 */ }
+yy1375:
+          ++sp;
+          { ls += "\xe2\xb1\x86"; continue; 	/* Ⱆ -> ⱆ == U+2C16 -> U+2C46 */ }
+yy1377:
+          ++sp;
+          { ls += "\xe2\xb1\x87"; continue; 	/* Ⱇ -> ⱇ == U+2C17 -> U+2C47 */ }
+yy1379:
+          ++sp;
+          { ls += "\xe2\xb1\x88"; continue; 	/* Ⱈ -> ⱈ == U+2C18 -> U+2C48 */ }
+yy1381:
+          ++sp;
+          { ls += "\xe2\xb1\x89"; continue; 	/* Ⱉ -> ⱉ == U+2C19 -> U+2C49 */ }
+yy1383:
+          ++sp;
+          { ls += "\xe2\xb1\x8a"; continue; 	/* Ⱊ -> ⱊ == U+2C1A -> U+2C4A */ }
+yy1385:
+          ++sp;
+          { ls += "\xe2\xb1\x8b"; continue; 	/* Ⱋ -> ⱋ == U+2C1B -> U+2C4B */ }
+yy1387:
+          ++sp;
+          { ls += "\xe2\xb1\x8c"; continue; 	/* Ⱌ -> ⱌ == U+2C1C -> U+2C4C */ }
+yy1389:
+          ++sp;
+          { ls += "\xe2\xb1\x8d"; continue; 	/* Ⱍ -> ⱍ == U+2C1D -> U+2C4D */ }
+yy1391:
+          ++sp;
+          { ls += "\xe2\xb1\x8e"; continue; 	/* Ⱎ -> ⱎ == U+2C1E -> U+2C4E */ }
+yy1393:
+          ++sp;
+          { ls += "\xe2\xb1\x8f"; continue; 	/* Ⱏ -> ⱏ == U+2C1F -> U+2C4F */ }
+yy1395:
+          ++sp;
+          { ls += "\xe2\xb1\x90"; continue; 	/* Ⱐ -> ⱐ == U+2C20 -> U+2C50 */ }
+yy1397:
+          ++sp;
+          { ls += "\xe2\xb1\x91"; continue; 	/* Ⱑ -> ⱑ == U+2C21 -> U+2C51 */ }
+yy1399:
+          ++sp;
+          { ls += "\xe2\xb1\x92"; continue; 	/* Ⱒ -> ⱒ == U+2C22 -> U+2C52 */ }
+yy1401:
+          ++sp;
+          { ls += "\xe2\xb1\x93"; continue; 	/* Ⱓ -> ⱓ == U+2C23 -> U+2C53 */ }
+yy1403:
+          ++sp;
+          { ls += "\xe2\xb1\x94"; continue; 	/* Ⱔ -> ⱔ == U+2C24 -> U+2C54 */ }
+yy1405:
+          ++sp;
+          { ls += "\xe2\xb1\x95"; continue; 	/* Ⱕ -> ⱕ == U+2C25 -> U+2C55 */ }
+yy1407:
+          ++sp;
+          { ls += "\xe2\xb1\x96"; continue; 	/* Ⱖ -> ⱖ == U+2C26 -> U+2C56 */ }
+yy1409:
+          ++sp;
+          { ls += "\xe2\xb1\x97"; continue; 	/* Ⱗ -> ⱗ == U+2C27 -> U+2C57 */ }
+yy1411:
+          ++sp;
+          { ls += "\xe2\xb1\x98"; continue; 	/* Ⱘ -> ⱘ == U+2C28 -> U+2C58 */ }
+yy1413:
+          ++sp;
+          { ls += "\xe2\xb1\x99"; continue; 	/* Ⱙ -> ⱙ == U+2C29 -> U+2C59 */ }
+yy1415:
+          ++sp;
+          { ls += "\xe2\xb1\x9a"; continue; 	/* Ⱚ -> ⱚ == U+2C2A -> U+2C5A */ }
+yy1417:
+          ++sp;
+          { ls += "\xe2\xb1\x9b"; continue; 	/* Ⱛ -> ⱛ == U+2C2B -> U+2C5B */ }
+yy1419:
+          ++sp;
+          { ls += "\xe2\xb1\x9c"; continue; 	/* Ⱜ -> ⱜ == U+2C2C -> U+2C5C */ }
+yy1421:
+          ++sp;
+          { ls += "\xe2\xb1\x9d"; continue; 	/* Ⱝ -> ⱝ == U+2C2D -> U+2C5D */ }
+yy1423:
+          ++sp;
+          { ls += "\xe2\xb1\x9e"; continue; 	/* Ⱞ -> ⱞ == U+2C2E -> U+2C5E */ }
+yy1425:
+          ++sp;
+          { ls += "\xe2\xb1\xa1"; continue; 	/* Ⱡ -> ⱡ == U+2C60 -> U+2C61 */ }
+yy1427:
+          ++sp;
+          { ls += "\xc9\xab"; continue; 	/* Ɫ -> ɫ == U+2C62 -> U+026B */ }
+yy1429:
+          ++sp;
+          { ls += "\xe1\xb5\xbd"; continue; 	/* Ᵽ -> ᵽ == U+2C63 -> U+1D7D */ }
+yy1431:
+          ++sp;
+          { ls += "\xc9\xbd"; continue; 	/* Ɽ -> ɽ == U+2C64 -> U+027D */ }
+yy1433:
+          ++sp;
+          { ls += "\xe2\xb1\xa8"; continue; 	/* Ⱨ -> ⱨ == U+2C67 -> U+2C68 */ }
+yy1435:
+          ++sp;
+          { ls += "\xe2\xb1\xaa"; continue; 	/* Ⱪ -> ⱪ == U+2C69 -> U+2C6A */ }
+yy1437:
+          ++sp;
+          { ls += "\xe2\xb1\xac"; continue; 	/* Ⱬ -> ⱬ == U+2C6B -> U+2C6C */ }
+yy1439:
+          ++sp;
+          { ls += "\xc9\x91"; continue; 	/* Ɑ -> ɑ == U+2C6D -> U+0251 */ }
+yy1441:
+          ++sp;
+          { ls += "\xc9\xb1"; continue; 	/* Ɱ -> ɱ == U+2C6E -> U+0271 */ }
+yy1443:
+          ++sp;
+          { ls += "\xc9\x90"; continue; 	/* Ɐ -> ɐ == U+2C6F -> U+0250 */ }
+yy1445:
+          ++sp;
+          { ls += "\xc9\x92"; continue; 	/* Ɒ -> ɒ == U+2C70 -> U+0252 */ }
+yy1447:
+          ++sp;
+          { ls += "\xe2\xb1\xb3"; continue; 	/* Ⱳ -> ⱳ == U+2C72 -> U+2C73 */ }
+yy1449:
+          ++sp;
+          { ls += "\xe2\xb1\xb6"; continue; 	/* Ⱶ -> ⱶ == U+2C75 -> U+2C76 */ }
+yy1451:
+          ++sp;
+          { ls += "\xc8\xbf"; continue; 	/* Ȿ -> ȿ == U+2C7E -> U+023F */ }
+yy1453:
+          ++sp;
+          { ls += "\xc9\x80"; continue; 	/* Ɀ -> ɀ == U+2C7F -> U+0240 */ }
+yy1455:
+          ++sp;
+          { ls += "\xe2\xb2\x81"; continue; 	/* Ⲁ -> ⲁ == U+2C80 -> U+2C81 */ }
+yy1457:
+          ++sp;
+          { ls += "\xe2\xb2\x83"; continue; 	/* Ⲃ -> ⲃ == U+2C82 -> U+2C83 */ }
+yy1459:
+          ++sp;
+          { ls += "\xe2\xb2\x85"; continue; 	/* Ⲅ -> ⲅ == U+2C84 -> U+2C85 */ }
+yy1461:
+          ++sp;
+          { ls += "\xe2\xb2\x87"; continue; 	/* Ⲇ -> ⲇ == U+2C86 -> U+2C87 */ }
+yy1463:
+          ++sp;
+          { ls += "\xe2\xb2\x89"; continue; 	/* Ⲉ -> ⲉ == U+2C88 -> U+2C89 */ }
+yy1465:
+          ++sp;
+          { ls += "\xe2\xb2\x8b"; continue; 	/* Ⲋ -> ⲋ == U+2C8A -> U+2C8B */ }
+yy1467:
+          ++sp;
+          { ls += "\xe2\xb2\x8d"; continue; 	/* Ⲍ -> ⲍ == U+2C8C -> U+2C8D */ }
+yy1469:
+          ++sp;
+          { ls += "\xe2\xb2\x8f"; continue; 	/* Ⲏ -> ⲏ == U+2C8E -> U+2C8F */ }
+yy1471:
+          ++sp;
+          { ls += "\xe2\xb2\x91"; continue; 	/* Ⲑ -> ⲑ == U+2C90 -> U+2C91 */ }
+yy1473:
+          ++sp;
+          { ls += "\xe2\xb2\x93"; continue; 	/* Ⲓ -> ⲓ == U+2C92 -> U+2C93 */ }
+yy1475:
+          ++sp;
+          { ls += "\xe2\xb2\x95"; continue; 	/* Ⲕ -> ⲕ == U+2C94 -> U+2C95 */ }
+yy1477:
+          ++sp;
+          { ls += "\xe2\xb2\x97"; continue; 	/* Ⲗ -> ⲗ == U+2C96 -> U+2C97 */ }
+yy1479:
+          ++sp;
+          { ls += "\xe2\xb2\x99"; continue; 	/* Ⲙ -> ⲙ == U+2C98 -> U+2C99 */ }
+yy1481:
+          ++sp;
+          { ls += "\xe2\xb2\x9b"; continue; 	/* Ⲛ -> ⲛ == U+2C9A -> U+2C9B */ }
+yy1483:
+          ++sp;
+          { ls += "\xe2\xb2\x9d"; continue; 	/* Ⲝ -> ⲝ == U+2C9C -> U+2C9D */ }
+yy1485:
+          ++sp;
+          { ls += "\xe2\xb2\x9f"; continue; 	/* Ⲟ -> ⲟ == U+2C9E -> U+2C9F */ }
+yy1487:
+          ++sp;
+          { ls += "\xe2\xb2\xa1"; continue; 	/* Ⲡ -> ⲡ == U+2CA0 -> U+2CA1 */ }
+yy1489:
+          ++sp;
+          { ls += "\xe2\xb2\xa3"; continue; 	/* Ⲣ -> ⲣ == U+2CA2 -> U+2CA3 */ }
+yy1491:
+          ++sp;
+          { ls += "\xe2\xb2\xa5"; continue; 	/* Ⲥ -> ⲥ == U+2CA4 -> U+2CA5 */ }
+yy1493:
+          ++sp;
+          { ls += "\xe2\xb2\xa7"; continue; 	/* Ⲧ -> ⲧ == U+2CA6 -> U+2CA7 */ }
+yy1495:
+          ++sp;
+          { ls += "\xe2\xb2\xa9"; continue; 	/* Ⲩ -> ⲩ == U+2CA8 -> U+2CA9 */ }
+yy1497:
+          ++sp;
+          { ls += "\xe2\xb2\xab"; continue; 	/* Ⲫ -> ⲫ == U+2CAA -> U+2CAB */ }
+yy1499:
+          ++sp;
+          { ls += "\xe2\xb2\xad"; continue; 	/* Ⲭ -> ⲭ == U+2CAC -> U+2CAD */ }
+yy1501:
+          ++sp;
+          { ls += "\xe2\xb2\xaf"; continue; 	/* Ⲯ -> ⲯ == U+2CAE -> U+2CAF */ }
+yy1503:
+          ++sp;
+          { ls += "\xe2\xb2\xb1"; continue; 	/* Ⲱ -> ⲱ == U+2CB0 -> U+2CB1 */ }
+yy1505:
+          ++sp;
+          { ls += "\xe2\xb2\xb3"; continue; 	/* Ⲳ -> ⲳ == U+2CB2 -> U+2CB3 */ }
+yy1507:
+          ++sp;
+          { ls += "\xe2\xb2\xb5"; continue; 	/* Ⲵ -> ⲵ == U+2CB4 -> U+2CB5 */ }
+yy1509:
+          ++sp;
+          { ls += "\xe2\xb2\xb7"; continue; 	/* Ⲷ -> ⲷ == U+2CB6 -> U+2CB7 */ }
+yy1511:
+          ++sp;
+          { ls += "\xe2\xb2\xb9"; continue; 	/* Ⲹ -> ⲹ == U+2CB8 -> U+2CB9 */ }
+yy1513:
+          ++sp;
+          { ls += "\xe2\xb2\xbb"; continue; 	/* Ⲻ -> ⲻ == U+2CBA -> U+2CBB */ }
+yy1515:
+          ++sp;
+          { ls += "\xe2\xb2\xbd"; continue; 	/* Ⲽ -> ⲽ == U+2CBC -> U+2CBD */ }
+yy1517:
+          ++sp;
+          { ls += "\xe2\xb2\xbf"; continue; 	/* Ⲿ -> ⲿ == U+2CBE -> U+2CBF */ }
+yy1519:
+          ++sp;
+          { ls += "\xe2\xb3\x81"; continue; 	/* Ⳁ -> ⳁ == U+2CC0 -> U+2CC1 */ }
+yy1521:
+          ++sp;
+          { ls += "\xe2\xb3\x83"; continue; 	/* Ⳃ -> ⳃ == U+2CC2 -> U+2CC3 */ }
+yy1523:
+          ++sp;
+          { ls += "\xe2\xb3\x85"; continue; 	/* Ⳅ -> ⳅ == U+2CC4 -> U+2CC5 */ }
+yy1525:
+          ++sp;
+          { ls += "\xe2\xb3\x87"; continue; 	/* Ⳇ -> ⳇ == U+2CC6 -> U+2CC7 */ }
+yy1527:
+          ++sp;
+          { ls += "\xe2\xb3\x89"; continue; 	/* Ⳉ -> ⳉ == U+2CC8 -> U+2CC9 */ }
+yy1529:
+          ++sp;
+          { ls += "\xe2\xb3\x8b"; continue; 	/* Ⳋ -> ⳋ == U+2CCA -> U+2CCB */ }
+yy1531:
+          ++sp;
+          { ls += "\xe2\xb3\x8d"; continue; 	/* Ⳍ -> ⳍ == U+2CCC -> U+2CCD */ }
+yy1533:
+          ++sp;
+          { ls += "\xe2\xb3\x8f"; continue; 	/* Ⳏ -> ⳏ == U+2CCE -> U+2CCF */ }
+yy1535:
+          ++sp;
+          { ls += "\xe2\xb3\x91"; continue; 	/* Ⳑ -> ⳑ == U+2CD0 -> U+2CD1 */ }
+yy1537:
+          ++sp;
+          { ls += "\xe2\xb3\x93"; continue; 	/* Ⳓ -> ⳓ == U+2CD2 -> U+2CD3 */ }
+yy1539:
+          ++sp;
+          { ls += "\xe2\xb3\x95"; continue; 	/* Ⳕ -> ⳕ == U+2CD4 -> U+2CD5 */ }
+yy1541:
+          ++sp;
+          { ls += "\xe2\xb3\x97"; continue; 	/* Ⳗ -> ⳗ == U+2CD6 -> U+2CD7 */ }
+yy1543:
+          ++sp;
+          { ls += "\xe2\xb3\x99"; continue; 	/* Ⳙ -> ⳙ == U+2CD8 -> U+2CD9 */ }
+yy1545:
+          ++sp;
+          { ls += "\xe2\xb3\x9b"; continue; 	/* Ⳛ -> ⳛ == U+2CDA -> U+2CDB */ }
+yy1547:
+          ++sp;
+          { ls += "\xe2\xb3\x9d"; continue; 	/* Ⳝ -> ⳝ == U+2CDC -> U+2CDD */ }
+yy1549:
+          ++sp;
+          { ls += "\xe2\xb3\x9f"; continue; 	/* Ⳟ -> ⳟ == U+2CDE -> U+2CDF */ }
+yy1551:
+          ++sp;
+          { ls += "\xe2\xb3\xa1"; continue; 	/* Ⳡ -> ⳡ == U+2CE0 -> U+2CE1 */ }
+yy1553:
+          ++sp;
+          { ls += "\xe2\xb3\xa3"; continue; 	/* Ⳣ -> ⳣ == U+2CE2 -> U+2CE3 */ }
+yy1555:
+          ++sp;
+          { ls += "\xe2\xb3\xac"; continue; 	/* Ⳬ -> ⳬ == U+2CEB -> U+2CEC */ }
+yy1557:
+          ++sp;
+          { ls += "\xe2\xb3\xae"; continue; 	/* Ⳮ -> ⳮ == U+2CED -> U+2CEE */ }
+yy1559:
+          ++sp;
+          { ls += "\xe2\xb3\xb3"; continue; 	/* Ⳳ -> ⳳ == U+2CF2 -> U+2CF3 */ }
+yy1561:
           yych = *++sp;
           switch (yych) {
           case 0x80:
@@ -3514,11 +8486,6 @@ yy986:
           case 0x85:
           case 0x86:
           case 0x87:
-          case 0x88:
-          case 0x89:
-          case 0x8A:
-          case 0x8B:
-          case 0x8C:
           case 0x8D:
           case 0x8E:
           case 0x8F:
@@ -3530,273 +8497,6 @@ yy986:
           case 0x95:
           case 0x96:
           case 0x97:
-          case 0x98:
-          case 0x99:
-          case 0x9A:
-          case 0x9B:
-          case 0x9C:
-          case 0x9D:
-          case 0x9E:
-          case 0x9F:
-          case 0xA1:
-          case 0xA5:
-          case 0xA6:
-          case 0xA8:
-          case 0xAA:
-          case 0xAC:
-          case 0xB1:
-          case 0xB3:
-          case 0xB4:
-          case 0xB6:
-          case 0xB7:
-          case 0xB8:
-          case 0xB9:
-          case 0xBA:
-          case 0xBB:
-          case 0xBC:
-          case 0xBD:  goto yy995;
-          case 0xA0:  goto yy1705;
-          case 0xA2:  goto yy1707;
-          case 0xA3:  goto yy1709;
-          case 0xA4:  goto yy1711;
-          case 0xA7:  goto yy1713;
-          case 0xA9:  goto yy1715;
-          case 0xAB:  goto yy1717;
-          case 0xAD:  goto yy1719;
-          case 0xAE:  goto yy1721;
-          case 0xAF:  goto yy1723;
-          case 0xB0:  goto yy1725;
-          case 0xB2:  goto yy1727;
-          case 0xB5:  goto yy1729;
-          case 0xBE:  goto yy1731;
-          case 0xBF:  goto yy1733;
-          default:  goto yy2;
-          }
-yy987:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:  goto yy1735;
-          case 0x81:
-          case 0x83:
-          case 0x85:
-          case 0x87:
-          case 0x89:
-          case 0x8B:
-          case 0x8D:
-          case 0x8F:
-          case 0x91:
-          case 0x93:
-          case 0x95:
-          case 0x97:
-          case 0x99:
-          case 0x9B:
-          case 0x9D:
-          case 0x9F:
-          case 0xA1:
-          case 0xA3:
-          case 0xA5:
-          case 0xA7:
-          case 0xA9:
-          case 0xAB:
-          case 0xAD:
-          case 0xAF:
-          case 0xB1:
-          case 0xB3:
-          case 0xB5:
-          case 0xB7:
-          case 0xB9:
-          case 0xBB:
-          case 0xBD:
-          case 0xBF:  goto yy995;
-          case 0x82:  goto yy1737;
-          case 0x84:  goto yy1739;
-          case 0x86:  goto yy1741;
-          case 0x88:  goto yy1743;
-          case 0x8A:  goto yy1745;
-          case 0x8C:  goto yy1747;
-          case 0x8E:  goto yy1749;
-          case 0x90:  goto yy1751;
-          case 0x92:  goto yy1753;
-          case 0x94:  goto yy1755;
-          case 0x96:  goto yy1757;
-          case 0x98:  goto yy1759;
-          case 0x9A:  goto yy1761;
-          case 0x9C:  goto yy1763;
-          case 0x9E:  goto yy1765;
-          case 0xA0:  goto yy1767;
-          case 0xA2:  goto yy1769;
-          case 0xA4:  goto yy1771;
-          case 0xA6:  goto yy1773;
-          case 0xA8:  goto yy1775;
-          case 0xAA:  goto yy1777;
-          case 0xAC:  goto yy1779;
-          case 0xAE:  goto yy1781;
-          case 0xB0:  goto yy1783;
-          case 0xB2:  goto yy1785;
-          case 0xB4:  goto yy1787;
-          case 0xB6:  goto yy1789;
-          case 0xB8:  goto yy1791;
-          case 0xBA:  goto yy1793;
-          case 0xBC:  goto yy1795;
-          case 0xBE:  goto yy1797;
-          default:  goto yy2;
-          }
-yy988:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:  goto yy1799;
-          case 0x81:
-          case 0x83:
-          case 0x85:
-          case 0x87:
-          case 0x89:
-          case 0x8B:
-          case 0x8D:
-          case 0x8F:
-          case 0x91:
-          case 0x93:
-          case 0x95:
-          case 0x97:
-          case 0x99:
-          case 0x9B:
-          case 0x9D:
-          case 0x9F:
-          case 0xA1:
-          case 0xA3:
-          case 0xA4:
-          case 0xA5:
-          case 0xA6:
-          case 0xA7:
-          case 0xA8:
-          case 0xA9:
-          case 0xAA:
-          case 0xAC:
-          case 0xAE:
-          case 0xAF:
-          case 0xB0:
-          case 0xB1:
-          case 0xB3:
-          case 0xB4:
-          case 0xB5:
-          case 0xB6:
-          case 0xB7:
-          case 0xB8:
-          case 0xB9:
-          case 0xBA:
-          case 0xBB:
-          case 0xBC:
-          case 0xBD:
-          case 0xBE:
-          case 0xBF:  goto yy995;
-          case 0x82:  goto yy1801;
-          case 0x84:  goto yy1803;
-          case 0x86:  goto yy1805;
-          case 0x88:  goto yy1807;
-          case 0x8A:  goto yy1809;
-          case 0x8C:  goto yy1811;
-          case 0x8E:  goto yy1813;
-          case 0x90:  goto yy1815;
-          case 0x92:  goto yy1817;
-          case 0x94:  goto yy1819;
-          case 0x96:  goto yy1821;
-          case 0x98:  goto yy1823;
-          case 0x9A:  goto yy1825;
-          case 0x9C:  goto yy1827;
-          case 0x9E:  goto yy1829;
-          case 0xA0:  goto yy1831;
-          case 0xA2:  goto yy1833;
-          case 0xAB:  goto yy1835;
-          case 0xAD:  goto yy1837;
-          case 0xB2:  goto yy1839;
-          default:  goto yy2;
-          }
-yy989:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:  goto yy1841;
-          case 0x81:
-          case 0x83:
-          case 0x85:
-          case 0x87:
-          case 0x89:
-          case 0x8B:
-          case 0x8D:
-          case 0x8F:
-          case 0x91:
-          case 0x93:
-          case 0x95:
-          case 0x97:
-          case 0x99:
-          case 0x9B:
-          case 0x9D:
-          case 0x9F:
-          case 0xA1:
-          case 0xA3:
-          case 0xA5:
-          case 0xA7:
-          case 0xA9:
-          case 0xAB:
-          case 0xAD:
-          case 0xAE:
-          case 0xAF:
-          case 0xB0:
-          case 0xB1:
-          case 0xB2:
-          case 0xB3:
-          case 0xB4:
-          case 0xB5:
-          case 0xB6:
-          case 0xB7:
-          case 0xB8:
-          case 0xB9:
-          case 0xBA:
-          case 0xBB:
-          case 0xBC:
-          case 0xBD:
-          case 0xBE:
-          case 0xBF:  goto yy995;
-          case 0x82:  goto yy1843;
-          case 0x84:  goto yy1845;
-          case 0x86:  goto yy1847;
-          case 0x88:  goto yy1849;
-          case 0x8A:  goto yy1851;
-          case 0x8C:  goto yy1853;
-          case 0x8E:  goto yy1855;
-          case 0x90:  goto yy1857;
-          case 0x92:  goto yy1859;
-          case 0x94:  goto yy1861;
-          case 0x96:  goto yy1863;
-          case 0x98:  goto yy1865;
-          case 0x9A:  goto yy1867;
-          case 0x9C:  goto yy1869;
-          case 0x9E:  goto yy1871;
-          case 0xA0:  goto yy1873;
-          case 0xA2:  goto yy1875;
-          case 0xA4:  goto yy1877;
-          case 0xA6:  goto yy1879;
-          case 0xA8:  goto yy1881;
-          case 0xAA:  goto yy1883;
-          case 0xAC:  goto yy1885;
-          default:  goto yy2;
-          }
-yy990:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:  goto yy1887;
-          case 0x81:
-          case 0x83:
-          case 0x85:
-          case 0x87:
-          case 0x89:
-          case 0x8B:
-          case 0x8D:
-          case 0x8F:
-          case 0x91:
-          case 0x93:
-          case 0x95:
-          case 0x97:
-          case 0x99:
-          case 0x9B:
           case 0x9C:
           case 0x9D:
           case 0x9E:
@@ -3809,11 +8509,6 @@ yy990:
           case 0xA5:
           case 0xA6:
           case 0xA7:
-          case 0xA8:
-          case 0xA9:
-          case 0xAA:
-          case 0xAB:
-          case 0xAC:
           case 0xAD:
           case 0xAE:
           case 0xAF:
@@ -3825,30 +8520,31 @@ yy990:
           case 0xB5:
           case 0xB6:
           case 0xB7:
-          case 0xB8:
-          case 0xB9:
-          case 0xBA:
-          case 0xBB:
-          case 0xBC:
           case 0xBD:
           case 0xBE:
-          case 0xBF:  goto yy995;
-          case 0x82:  goto yy1889;
-          case 0x84:  goto yy1891;
-          case 0x86:  goto yy1893;
-          case 0x88:  goto yy1895;
-          case 0x8A:  goto yy1897;
-          case 0x8C:  goto yy1899;
-          case 0x8E:  goto yy1901;
-          case 0x90:  goto yy1903;
-          case 0x92:  goto yy1905;
-          case 0x94:  goto yy1907;
-          case 0x96:  goto yy1909;
-          case 0x98:  goto yy1911;
-          case 0x9A:  goto yy1913;
+          case 0xBF:  goto yy167;
+          case 0x88:  goto yy2107;
+          case 0x89:  goto yy2109;
+          case 0x8A:  goto yy2111;
+          case 0x8B:  goto yy2113;
+          case 0x8C:  goto yy2115;
+          case 0x98:  goto yy2117;
+          case 0x99:  goto yy2119;
+          case 0x9A:  goto yy2121;
+          case 0x9B:  goto yy2123;
+          case 0xA8:  goto yy2125;
+          case 0xA9:  goto yy2127;
+          case 0xAA:  goto yy2129;
+          case 0xAB:  goto yy2131;
+          case 0xAC:  goto yy2133;
+          case 0xB8:  goto yy2135;
+          case 0xB9:  goto yy2137;
+          case 0xBA:  goto yy2139;
+          case 0xBB:  goto yy2141;
+          case 0xBC:  goto yy2143;
           default:  goto yy2;
           }
-yy991:
+yy1562:
           yych = *++sp;
           switch (yych) {
           case 0x80:
@@ -3859,14 +8555,6 @@ yy991:
           case 0x85:
           case 0x86:
           case 0x87:
-          case 0x88:
-          case 0x89:
-          case 0x8A:
-          case 0x8B:
-          case 0x8C:
-          case 0x8D:
-          case 0x8E:
-          case 0x8F:
           case 0x90:
           case 0x91:
           case 0x92:
@@ -3875,76 +8563,14 @@ yy991:
           case 0x95:
           case 0x96:
           case 0x97:
-          case 0x98:
-          case 0x99:
-          case 0x9A:
-          case 0x9B:
-          case 0x9C:
-          case 0x9D:
-          case 0x9E:
-          case 0x9F:
           case 0xA0:
           case 0xA1:
+          case 0xA2:
           case 0xA3:
+          case 0xA4:
           case 0xA5:
+          case 0xA6:
           case 0xA7:
-          case 0xA9:
-          case 0xAB:
-          case 0xAD:
-          case 0xAF:
-          case 0xB0:
-          case 0xB1:
-          case 0xB3:
-          case 0xB5:
-          case 0xB7:
-          case 0xB9:
-          case 0xBB:
-          case 0xBD:
-          case 0xBF:  goto yy995;
-          case 0xA2:  goto yy1915;
-          case 0xA4:  goto yy1917;
-          case 0xA6:  goto yy1919;
-          case 0xA8:  goto yy1921;
-          case 0xAA:  goto yy1923;
-          case 0xAC:  goto yy1925;
-          case 0xAE:  goto yy1927;
-          case 0xB2:  goto yy1929;
-          case 0xB4:  goto yy1931;
-          case 0xB6:  goto yy1933;
-          case 0xB8:  goto yy1935;
-          case 0xBA:  goto yy1937;
-          case 0xBC:  goto yy1939;
-          case 0xBE:  goto yy1941;
-          default:  goto yy2;
-          }
-yy992:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:  goto yy1943;
-          case 0x81:
-          case 0x83:
-          case 0x85:
-          case 0x87:
-          case 0x89:
-          case 0x8B:
-          case 0x8D:
-          case 0x8F:
-          case 0x91:
-          case 0x93:
-          case 0x95:
-          case 0x97:
-          case 0x99:
-          case 0x9B:
-          case 0x9D:
-          case 0x9F:
-          case 0xA1:
-          case 0xA3:
-          case 0xA5:
-          case 0xA7:
-          case 0xA9:
-          case 0xAB:
-          case 0xAD:
-          case 0xAF:
           case 0xB0:
           case 0xB1:
           case 0xB2:
@@ -3953,1833 +8579,2910 @@ yy992:
           case 0xB5:
           case 0xB6:
           case 0xB7:
-          case 0xB8:
-          case 0xBA:
-          case 0xBC:
-          case 0xBF:  goto yy995;
-          case 0x82:  goto yy1945;
-          case 0x84:  goto yy1947;
-          case 0x86:  goto yy1949;
-          case 0x88:  goto yy1951;
-          case 0x8A:  goto yy1953;
-          case 0x8C:  goto yy1955;
-          case 0x8E:  goto yy1957;
-          case 0x90:  goto yy1959;
-          case 0x92:  goto yy1961;
-          case 0x94:  goto yy1963;
-          case 0x96:  goto yy1965;
-          case 0x98:  goto yy1967;
-          case 0x9A:  goto yy1969;
-          case 0x9C:  goto yy1971;
-          case 0x9E:  goto yy1973;
-          case 0xA0:  goto yy1975;
-          case 0xA2:  goto yy1977;
-          case 0xA4:  goto yy1979;
-          case 0xA6:  goto yy1981;
-          case 0xA8:  goto yy1983;
-          case 0xAA:  goto yy1985;
-          case 0xAC:  goto yy1987;
-          case 0xAE:  goto yy1989;
-          case 0xB9:  goto yy1991;
-          case 0xBB:  goto yy1993;
-          case 0xBD:  goto yy1995;
-          case 0xBE:  goto yy1997;
-          default:  goto yy2;
-          }
-yy993:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:  goto yy1999;
-          case 0x81:
-          case 0x83:
-          case 0x85:
-          case 0x87:
-          case 0x88:
-          case 0x89:
-          case 0x8A:
-          case 0x8C:
-          case 0x8E:
-          case 0x8F:
-          case 0x91:
-          case 0x93:
-          case 0x94:
-          case 0x95:
-          case 0x97:
-          case 0x99:
-          case 0x9B:
-          case 0x9D:
-          case 0x9F:
-          case 0xA1:
-          case 0xA3:
-          case 0xA5:
-          case 0xA7:
-          case 0xA9:
-          case 0xAE:
-          case 0xAF:
-          case 0xB2:
-          case 0xB3:
-          case 0xB4:
-          case 0xB5:
-          case 0xB6:
-          case 0xB7:
-          case 0xB8:
-          case 0xB9:
-          case 0xBA:
-          case 0xBB:
-          case 0xBC:
           case 0xBD:
           case 0xBE:
-          case 0xBF:  goto yy995;
-          case 0x82:  goto yy2001;
-          case 0x84:  goto yy2003;
-          case 0x86:  goto yy2005;
-          case 0x8B:  goto yy2007;
-          case 0x8D:  goto yy2009;
-          case 0x90:  goto yy2011;
-          case 0x92:  goto yy2013;
-          case 0x96:  goto yy2015;
-          case 0x98:  goto yy2017;
-          case 0x9A:  goto yy2019;
-          case 0x9C:  goto yy2021;
-          case 0x9E:  goto yy2023;
-          case 0xA0:  goto yy2025;
-          case 0xA2:  goto yy2027;
-          case 0xA4:  goto yy2029;
-          case 0xA6:  goto yy2031;
-          case 0xA8:  goto yy2033;
-          case 0xAA:  goto yy2035;
-          case 0xAB:  goto yy2037;
-          case 0xAC:  goto yy2039;
-          case 0xAD:  goto yy2041;
-          case 0xB0:  goto yy2043;
-          case 0xB1:  goto yy2045;
+          case 0xBF:  goto yy167;
+          case 0x88:  goto yy2049;
+          case 0x89:  goto yy2051;
+          case 0x8A:  goto yy2053;
+          case 0x8B:  goto yy2055;
+          case 0x8C:  goto yy2057;
+          case 0x8D:  goto yy2059;
+          case 0x8E:  goto yy2061;
+          case 0x8F:  goto yy2063;
+          case 0x98:  goto yy2065;
+          case 0x99:  goto yy2067;
+          case 0x9A:  goto yy2069;
+          case 0x9B:  goto yy2071;
+          case 0x9C:  goto yy2073;
+          case 0x9D:  goto yy2075;
+          case 0x9E:  goto yy2077;
+          case 0x9F:  goto yy2079;
+          case 0xA8:  goto yy2081;
+          case 0xA9:  goto yy2083;
+          case 0xAA:  goto yy2085;
+          case 0xAB:  goto yy2087;
+          case 0xAC:  goto yy2089;
+          case 0xAD:  goto yy2091;
+          case 0xAE:  goto yy2093;
+          case 0xAF:  goto yy2095;
+          case 0xB8:  goto yy2097;
+          case 0xB9:  goto yy2099;
+          case 0xBA:  goto yy2101;
+          case 0xBB:  goto yy2103;
+          case 0xBC:  goto yy2105;
           default:  goto yy2;
           }
-yy994:
-          yych = *++sp;
-          switch (yych) {
-          case 0x80:
-          case 0x81:
-          case 0x82:
-          case 0x83:
-          case 0x84:
-          case 0x85:
-          case 0x86:
-          case 0x87:
-          case 0x88:
-          case 0x89:
-          case 0x8A:
-          case 0x8B:
-          case 0x8C:
-          case 0x8D:
-          case 0x8E:
-          case 0x8F:
-          case 0x90:
-          case 0x91:
-          case 0x92:
-          case 0x93:
-          case 0x94:
-          case 0x95:
-          case 0x96:
-          case 0x97:
-          case 0x98:
-          case 0x99:
-          case 0x9A:
-          case 0x9B:
-          case 0x9C:
-          case 0x9D:
-          case 0x9E:
-          case 0x9F:
-          case 0xA0:
-          case 0xBB:
-          case 0xBC:
-          case 0xBD:
-          case 0xBE:
-          case 0xBF:  goto yy995;
-          case 0xA1:  goto yy2047;
-          case 0xA2:  goto yy2049;
-          case 0xA3:  goto yy2051;
-          case 0xA4:  goto yy2053;
-          case 0xA5:  goto yy2055;
-          case 0xA6:  goto yy2057;
-          case 0xA7:  goto yy2059;
-          case 0xA8:  goto yy2061;
-          case 0xA9:  goto yy2063;
-          case 0xAA:  goto yy2065;
-          case 0xAB:  goto yy2067;
-          case 0xAC:  goto yy2069;
-          case 0xAD:  goto yy2071;
-          case 0xAE:  goto yy2073;
-          case 0xAF:  goto yy2075;
-          case 0xB0:  goto yy2077;
-          case 0xB1:  goto yy2079;
-          case 0xB2:  goto yy2081;
-          case 0xB3:  goto yy2083;
-          case 0xB4:  goto yy2085;
-          case 0xB5:  goto yy2087;
-          case 0xB6:  goto yy2089;
-          case 0xB7:  goto yy2091;
-          case 0xB8:  goto yy2093;
-          case 0xB9:  goto yy2095;
-          case 0xBA:  goto yy2097;
-          default:  goto yy2;
-          }
-yy995:
-          ++sp;
-          { ls.append(sp-3, sp); continue; /* tolower() identity fallback, 3 byte(s)/char */ }
-yy997:
-          ++sp;
-          { ls += "\xe2\xb4\x80"; continue; 	/* Ⴀ -> ⴀ == U+10A0 -> U+2D00 */ }
-yy999:
-          ++sp;
-          { ls += "\xe2\xb4\x81"; continue; 	/* Ⴁ -> ⴁ == U+10A1 -> U+2D01 */ }
-yy1001:
-          ++sp;
-          { ls += "\xe2\xb4\x82"; continue; 	/* Ⴂ -> ⴂ == U+10A2 -> U+2D02 */ }
-yy1003:
-          ++sp;
-          { ls += "\xe2\xb4\x83"; continue; 	/* Ⴃ -> ⴃ == U+10A3 -> U+2D03 */ }
-yy1005:
-          ++sp;
-          { ls += "\xe2\xb4\x84"; continue; 	/* Ⴄ -> ⴄ == U+10A4 -> U+2D04 */ }
-yy1007:
-          ++sp;
-          { ls += "\xe2\xb4\x85"; continue; 	/* Ⴅ -> ⴅ == U+10A5 -> U+2D05 */ }
-yy1009:
-          ++sp;
-          { ls += "\xe2\xb4\x86"; continue; 	/* Ⴆ -> ⴆ == U+10A6 -> U+2D06 */ }
-yy1011:
-          ++sp;
-          { ls += "\xe2\xb4\x87"; continue; 	/* Ⴇ -> ⴇ == U+10A7 -> U+2D07 */ }
-yy1013:
-          ++sp;
-          { ls += "\xe2\xb4\x88"; continue; 	/* Ⴈ -> ⴈ == U+10A8 -> U+2D08 */ }
-yy1015:
-          ++sp;
-          { ls += "\xe2\xb4\x89"; continue; 	/* Ⴉ -> ⴉ == U+10A9 -> U+2D09 */ }
-yy1017:
-          ++sp;
-          { ls += "\xe2\xb4\x8a"; continue; 	/* Ⴊ -> ⴊ == U+10AA -> U+2D0A */ }
-yy1019:
-          ++sp;
-          { ls += "\xe2\xb4\x8b"; continue; 	/* Ⴋ -> ⴋ == U+10AB -> U+2D0B */ }
-yy1021:
-          ++sp;
-          { ls += "\xe2\xb4\x8c"; continue; 	/* Ⴌ -> ⴌ == U+10AC -> U+2D0C */ }
-yy1023:
-          ++sp;
-          { ls += "\xe2\xb4\x8d"; continue; 	/* Ⴍ -> ⴍ == U+10AD -> U+2D0D */ }
-yy1025:
-          ++sp;
-          { ls += "\xe2\xb4\x8e"; continue; 	/* Ⴎ -> ⴎ == U+10AE -> U+2D0E */ }
-yy1027:
-          ++sp;
-          { ls += "\xe2\xb4\x8f"; continue; 	/* Ⴏ -> ⴏ == U+10AF -> U+2D0F */ }
-yy1029:
-          ++sp;
-          { ls += "\xe2\xb4\x90"; continue; 	/* Ⴐ -> ⴐ == U+10B0 -> U+2D10 */ }
-yy1031:
-          ++sp;
-          { ls += "\xe2\xb4\x91"; continue; 	/* Ⴑ -> ⴑ == U+10B1 -> U+2D11 */ }
-yy1033:
-          ++sp;
-          { ls += "\xe2\xb4\x92"; continue; 	/* Ⴒ -> ⴒ == U+10B2 -> U+2D12 */ }
-yy1035:
-          ++sp;
-          { ls += "\xe2\xb4\x93"; continue; 	/* Ⴓ -> ⴓ == U+10B3 -> U+2D13 */ }
-yy1037:
-          ++sp;
-          { ls += "\xe2\xb4\x94"; continue; 	/* Ⴔ -> ⴔ == U+10B4 -> U+2D14 */ }
-yy1039:
-          ++sp;
-          { ls += "\xe2\xb4\x95"; continue; 	/* Ⴕ -> ⴕ == U+10B5 -> U+2D15 */ }
-yy1041:
-          ++sp;
-          { ls += "\xe2\xb4\x96"; continue; 	/* Ⴖ -> ⴖ == U+10B6 -> U+2D16 */ }
-yy1043:
-          ++sp;
-          { ls += "\xe2\xb4\x97"; continue; 	/* Ⴗ -> ⴗ == U+10B7 -> U+2D17 */ }
-yy1045:
-          ++sp;
-          { ls += "\xe2\xb4\x98"; continue; 	/* Ⴘ -> ⴘ == U+10B8 -> U+2D18 */ }
-yy1047:
-          ++sp;
-          { ls += "\xe2\xb4\x99"; continue; 	/* Ⴙ -> ⴙ == U+10B9 -> U+2D19 */ }
-yy1049:
-          ++sp;
-          { ls += "\xe2\xb4\x9a"; continue; 	/* Ⴚ -> ⴚ == U+10BA -> U+2D1A */ }
-yy1051:
-          ++sp;
-          { ls += "\xe2\xb4\x9b"; continue; 	/* Ⴛ -> ⴛ == U+10BB -> U+2D1B */ }
-yy1053:
-          ++sp;
-          { ls += "\xe2\xb4\x9c"; continue; 	/* Ⴜ -> ⴜ == U+10BC -> U+2D1C */ }
-yy1055:
-          ++sp;
-          { ls += "\xe2\xb4\x9d"; continue; 	/* Ⴝ -> ⴝ == U+10BD -> U+2D1D */ }
-yy1057:
-          ++sp;
-          { ls += "\xe2\xb4\x9e"; continue; 	/* Ⴞ -> ⴞ == U+10BE -> U+2D1E */ }
-yy1059:
-          ++sp;
-          { ls += "\xe2\xb4\x9f"; continue; 	/* Ⴟ -> ⴟ == U+10BF -> U+2D1F */ }
-yy1061:
-          ++sp;
-          { ls += "\xe2\xb4\xa0"; continue; 	/* Ⴠ -> ⴠ == U+10C0 -> U+2D20 */ }
-yy1063:
-          ++sp;
-          { ls += "\xe2\xb4\xa1"; continue; 	/* Ⴡ -> ⴡ == U+10C1 -> U+2D21 */ }
-yy1065:
-          ++sp;
-          { ls += "\xe2\xb4\xa2"; continue; 	/* Ⴢ -> ⴢ == U+10C2 -> U+2D22 */ }
-yy1067:
-          ++sp;
-          { ls += "\xe2\xb4\xa3"; continue; 	/* Ⴣ -> ⴣ == U+10C3 -> U+2D23 */ }
-yy1069:
-          ++sp;
-          { ls += "\xe2\xb4\xa4"; continue; 	/* Ⴤ -> ⴤ == U+10C4 -> U+2D24 */ }
-yy1071:
-          ++sp;
-          { ls += "\xe2\xb4\xa5"; continue; 	/* Ⴥ -> ⴥ == U+10C5 -> U+2D25 */ }
-yy1073:
-          ++sp;
-          { ls += "\xe2\xb4\xa7"; continue; 	/* Ⴧ -> ⴧ == U+10C7 -> U+2D27 */ }
-yy1075:
-          ++sp;
-          { ls += "\xe2\xb4\xad"; continue; 	/* Ⴭ -> ⴭ == U+10CD -> U+2D2D */ }
-yy1077:
-          ++sp;
-          { ls += "\xe1\xb8\x81"; continue; 	/* Ḁ -> ḁ == U+1E00 -> U+1E01 */ }
-yy1079:
-          ++sp;
-          { ls += "\xe1\xb8\x83"; continue; 	/* Ḃ -> ḃ == U+1E02 -> U+1E03 */ }
-yy1081:
-          ++sp;
-          { ls += "\xe1\xb8\x85"; continue; 	/* Ḅ -> ḅ == U+1E04 -> U+1E05 */ }
-yy1083:
-          ++sp;
-          { ls += "\xe1\xb8\x87"; continue; 	/* Ḇ -> ḇ == U+1E06 -> U+1E07 */ }
-yy1085:
-          ++sp;
-          { ls += "\xe1\xb8\x89"; continue; 	/* Ḉ -> ḉ == U+1E08 -> U+1E09 */ }
-yy1087:
-          ++sp;
-          { ls += "\xe1\xb8\x8b"; continue; 	/* Ḋ -> ḋ == U+1E0A -> U+1E0B */ }
-yy1089:
-          ++sp;
-          { ls += "\xe1\xb8\x8d"; continue; 	/* Ḍ -> ḍ == U+1E0C -> U+1E0D */ }
-yy1091:
-          ++sp;
-          { ls += "\xe1\xb8\x8f"; continue; 	/* Ḏ -> ḏ == U+1E0E -> U+1E0F */ }
-yy1093:
-          ++sp;
-          { ls += "\xe1\xb8\x91"; continue; 	/* Ḑ -> ḑ == U+1E10 -> U+1E11 */ }
-yy1095:
-          ++sp;
-          { ls += "\xe1\xb8\x93"; continue; 	/* Ḓ -> ḓ == U+1E12 -> U+1E13 */ }
-yy1097:
-          ++sp;
-          { ls += "\xe1\xb8\x95"; continue; 	/* Ḕ -> ḕ == U+1E14 -> U+1E15 */ }
-yy1099:
-          ++sp;
-          { ls += "\xe1\xb8\x97"; continue; 	/* Ḗ -> ḗ == U+1E16 -> U+1E17 */ }
-yy1101:
-          ++sp;
-          { ls += "\xe1\xb8\x99"; continue; 	/* Ḙ -> ḙ == U+1E18 -> U+1E19 */ }
-yy1103:
-          ++sp;
-          { ls += "\xe1\xb8\x9b"; continue; 	/* Ḛ -> ḛ == U+1E1A -> U+1E1B */ }
-yy1105:
-          ++sp;
-          { ls += "\xe1\xb8\x9d"; continue; 	/* Ḝ -> ḝ == U+1E1C -> U+1E1D */ }
-yy1107:
-          ++sp;
-          { ls += "\xe1\xb8\x9f"; continue; 	/* Ḟ -> ḟ == U+1E1E -> U+1E1F */ }
-yy1109:
-          ++sp;
-          { ls += "\xe1\xb8\xa1"; continue; 	/* Ḡ -> ḡ == U+1E20 -> U+1E21 */ }
-yy1111:
-          ++sp;
-          { ls += "\xe1\xb8\xa3"; continue; 	/* Ḣ -> ḣ == U+1E22 -> U+1E23 */ }
-yy1113:
-          ++sp;
-          { ls += "\xe1\xb8\xa5"; continue; 	/* Ḥ -> ḥ == U+1E24 -> U+1E25 */ }
-yy1115:
-          ++sp;
-          { ls += "\xe1\xb8\xa7"; continue; 	/* Ḧ -> ḧ == U+1E26 -> U+1E27 */ }
-yy1117:
-          ++sp;
-          { ls += "\xe1\xb8\xa9"; continue; 	/* Ḩ -> ḩ == U+1E28 -> U+1E29 */ }
-yy1119:
-          ++sp;
-          { ls += "\xe1\xb8\xab"; continue; 	/* Ḫ -> ḫ == U+1E2A -> U+1E2B */ }
-yy1121:
-          ++sp;
-          { ls += "\xe1\xb8\xad"; continue; 	/* Ḭ -> ḭ == U+1E2C -> U+1E2D */ }
-yy1123:
-          ++sp;
-          { ls += "\xe1\xb8\xaf"; continue; 	/* Ḯ -> ḯ == U+1E2E -> U+1E2F */ }
-yy1125:
-          ++sp;
-          { ls += "\xe1\xb8\xb1"; continue; 	/* Ḱ -> ḱ == U+1E30 -> U+1E31 */ }
-yy1127:
-          ++sp;
-          { ls += "\xe1\xb8\xb3"; continue; 	/* Ḳ -> ḳ == U+1E32 -> U+1E33 */ }
-yy1129:
-          ++sp;
-          { ls += "\xe1\xb8\xb5"; continue; 	/* Ḵ -> ḵ == U+1E34 -> U+1E35 */ }
-yy1131:
-          ++sp;
-          { ls += "\xe1\xb8\xb7"; continue; 	/* Ḷ -> ḷ == U+1E36 -> U+1E37 */ }
-yy1133:
-          ++sp;
-          { ls += "\xe1\xb8\xb9"; continue; 	/* Ḹ -> ḹ == U+1E38 -> U+1E39 */ }
-yy1135:
-          ++sp;
-          { ls += "\xe1\xb8\xbb"; continue; 	/* Ḻ -> ḻ == U+1E3A -> U+1E3B */ }
-yy1137:
-          ++sp;
-          { ls += "\xe1\xb8\xbd"; continue; 	/* Ḽ -> ḽ == U+1E3C -> U+1E3D */ }
-yy1139:
-          ++sp;
-          { ls += "\xe1\xb8\xbf"; continue; 	/* Ḿ -> ḿ == U+1E3E -> U+1E3F */ }
-yy1141:
-          ++sp;
-          { ls += "\xe1\xb9\x81"; continue; 	/* Ṁ -> ṁ == U+1E40 -> U+1E41 */ }
-yy1143:
-          ++sp;
-          { ls += "\xe1\xb9\x83"; continue; 	/* Ṃ -> ṃ == U+1E42 -> U+1E43 */ }
-yy1145:
-          ++sp;
-          { ls += "\xe1\xb9\x85"; continue; 	/* Ṅ -> ṅ == U+1E44 -> U+1E45 */ }
-yy1147:
-          ++sp;
-          { ls += "\xe1\xb9\x87"; continue; 	/* Ṇ -> ṇ == U+1E46 -> U+1E47 */ }
-yy1149:
-          ++sp;
-          { ls += "\xe1\xb9\x89"; continue; 	/* Ṉ -> ṉ == U+1E48 -> U+1E49 */ }
-yy1151:
-          ++sp;
-          { ls += "\xe1\xb9\x8b"; continue; 	/* Ṋ -> ṋ == U+1E4A -> U+1E4B */ }
-yy1153:
-          ++sp;
-          { ls += "\xe1\xb9\x8d"; continue; 	/* Ṍ -> ṍ == U+1E4C -> U+1E4D */ }
-yy1155:
-          ++sp;
-          { ls += "\xe1\xb9\x8f"; continue; 	/* Ṏ -> ṏ == U+1E4E -> U+1E4F */ }
-yy1157:
-          ++sp;
-          { ls += "\xe1\xb9\x91"; continue; 	/* Ṑ -> ṑ == U+1E50 -> U+1E51 */ }
-yy1159:
-          ++sp;
-          { ls += "\xe1\xb9\x93"; continue; 	/* Ṓ -> ṓ == U+1E52 -> U+1E53 */ }
-yy1161:
-          ++sp;
-          { ls += "\xe1\xb9\x95"; continue; 	/* Ṕ -> ṕ == U+1E54 -> U+1E55 */ }
-yy1163:
-          ++sp;
-          { ls += "\xe1\xb9\x97"; continue; 	/* Ṗ -> ṗ == U+1E56 -> U+1E57 */ }
-yy1165:
-          ++sp;
-          { ls += "\xe1\xb9\x99"; continue; 	/* Ṙ -> ṙ == U+1E58 -> U+1E59 */ }
-yy1167:
-          ++sp;
-          { ls += "\xe1\xb9\x9b"; continue; 	/* Ṛ -> ṛ == U+1E5A -> U+1E5B */ }
-yy1169:
-          ++sp;
-          { ls += "\xe1\xb9\x9d"; continue; 	/* Ṝ -> ṝ == U+1E5C -> U+1E5D */ }
-yy1171:
-          ++sp;
-          { ls += "\xe1\xb9\x9f"; continue; 	/* Ṟ -> ṟ == U+1E5E -> U+1E5F */ }
-yy1173:
-          ++sp;
-          { ls += "\xe1\xb9\xa1"; continue; 	/* Ṡ -> ṡ == U+1E60 -> U+1E61 */ }
-yy1175:
-          ++sp;
-          { ls += "\xe1\xb9\xa3"; continue; 	/* Ṣ -> ṣ == U+1E62 -> U+1E63 */ }
-yy1177:
-          ++sp;
-          { ls += "\xe1\xb9\xa5"; continue; 	/* Ṥ -> ṥ == U+1E64 -> U+1E65 */ }
-yy1179:
-          ++sp;
-          { ls += "\xe1\xb9\xa7"; continue; 	/* Ṧ -> ṧ == U+1E66 -> U+1E67 */ }
-yy1181:
-          ++sp;
-          { ls += "\xe1\xb9\xa9"; continue; 	/* Ṩ -> ṩ == U+1E68 -> U+1E69 */ }
-yy1183:
-          ++sp;
-          { ls += "\xe1\xb9\xab"; continue; 	/* Ṫ -> ṫ == U+1E6A -> U+1E6B */ }
-yy1185:
-          ++sp;
-          { ls += "\xe1\xb9\xad"; continue; 	/* Ṭ -> ṭ == U+1E6C -> U+1E6D */ }
-yy1187:
-          ++sp;
-          { ls += "\xe1\xb9\xaf"; continue; 	/* Ṯ -> ṯ == U+1E6E -> U+1E6F */ }
-yy1189:
-          ++sp;
-          { ls += "\xe1\xb9\xb1"; continue; 	/* Ṱ -> ṱ == U+1E70 -> U+1E71 */ }
-yy1191:
-          ++sp;
-          { ls += "\xe1\xb9\xb3"; continue; 	/* Ṳ -> ṳ == U+1E72 -> U+1E73 */ }
-yy1193:
-          ++sp;
-          { ls += "\xe1\xb9\xb5"; continue; 	/* Ṵ -> ṵ == U+1E74 -> U+1E75 */ }
-yy1195:
-          ++sp;
-          { ls += "\xe1\xb9\xb7"; continue; 	/* Ṷ -> ṷ == U+1E76 -> U+1E77 */ }
-yy1197:
-          ++sp;
-          { ls += "\xe1\xb9\xb9"; continue; 	/* Ṹ -> ṹ == U+1E78 -> U+1E79 */ }
-yy1199:
-          ++sp;
-          { ls += "\xe1\xb9\xbb"; continue; 	/* Ṻ -> ṻ == U+1E7A -> U+1E7B */ }
-yy1201:
-          ++sp;
-          { ls += "\xe1\xb9\xbd"; continue; 	/* Ṽ -> ṽ == U+1E7C -> U+1E7D */ }
-yy1203:
-          ++sp;
-          { ls += "\xe1\xb9\xbf"; continue; 	/* Ṿ -> ṿ == U+1E7E -> U+1E7F */ }
-yy1205:
-          ++sp;
-          { ls += "\xe1\xba\x81"; continue; 	/* Ẁ -> ẁ == U+1E80 -> U+1E81 */ }
-yy1207:
-          ++sp;
-          { ls += "\xe1\xba\x83"; continue; 	/* Ẃ -> ẃ == U+1E82 -> U+1E83 */ }
-yy1209:
-          ++sp;
-          { ls += "\xe1\xba\x85"; continue; 	/* Ẅ -> ẅ == U+1E84 -> U+1E85 */ }
-yy1211:
-          ++sp;
-          { ls += "\xe1\xba\x87"; continue; 	/* Ẇ -> ẇ == U+1E86 -> U+1E87 */ }
-yy1213:
-          ++sp;
-          { ls += "\xe1\xba\x89"; continue; 	/* Ẉ -> ẉ == U+1E88 -> U+1E89 */ }
-yy1215:
-          ++sp;
-          { ls += "\xe1\xba\x8b"; continue; 	/* Ẋ -> ẋ == U+1E8A -> U+1E8B */ }
-yy1217:
-          ++sp;
-          { ls += "\xe1\xba\x8d"; continue; 	/* Ẍ -> ẍ == U+1E8C -> U+1E8D */ }
-yy1219:
-          ++sp;
-          { ls += "\xe1\xba\x8f"; continue; 	/* Ẏ -> ẏ == U+1E8E -> U+1E8F */ }
-yy1221:
-          ++sp;
-          { ls += "\xe1\xba\x91"; continue; 	/* Ẑ -> ẑ == U+1E90 -> U+1E91 */ }
-yy1223:
-          ++sp;
-          { ls += "\xe1\xba\x93"; continue; 	/* Ẓ -> ẓ == U+1E92 -> U+1E93 */ }
-yy1225:
-          ++sp;
-          { ls += "\xe1\xba\x95"; continue; 	/* Ẕ -> ẕ == U+1E94 -> U+1E95 */ }
-yy1227:
-          ++sp;
-          { ls += "\xc3\x9f"; continue; 	/* ẞ -> ß == U+1E9E -> U+00DF */ }
-yy1229:
-          ++sp;
-          { ls += "\xe1\xba\xa1"; continue; 	/* Ạ -> ạ == U+1EA0 -> U+1EA1 */ }
-yy1231:
-          ++sp;
-          { ls += "\xe1\xba\xa3"; continue; 	/* Ả -> ả == U+1EA2 -> U+1EA3 */ }
-yy1233:
-          ++sp;
-          { ls += "\xe1\xba\xa5"; continue; 	/* Ấ -> ấ == U+1EA4 -> U+1EA5 */ }
-yy1235:
-          ++sp;
-          { ls += "\xe1\xba\xa7"; continue; 	/* Ầ -> ầ == U+1EA6 -> U+1EA7 */ }
-yy1237:
-          ++sp;
-          { ls += "\xe1\xba\xa9"; continue; 	/* Ẩ -> ẩ == U+1EA8 -> U+1EA9 */ }
-yy1239:
-          ++sp;
-          { ls += "\xe1\xba\xab"; continue; 	/* Ẫ -> ẫ == U+1EAA -> U+1EAB */ }
-yy1241:
-          ++sp;
-          { ls += "\xe1\xba\xad"; continue; 	/* Ậ -> ậ == U+1EAC -> U+1EAD */ }
-yy1243:
-          ++sp;
-          { ls += "\xe1\xba\xaf"; continue; 	/* Ắ -> ắ == U+1EAE -> U+1EAF */ }
-yy1245:
-          ++sp;
-          { ls += "\xe1\xba\xb1"; continue; 	/* Ằ -> ằ == U+1EB0 -> U+1EB1 */ }
-yy1247:
-          ++sp;
-          { ls += "\xe1\xba\xb3"; continue; 	/* Ẳ -> ẳ == U+1EB2 -> U+1EB3 */ }
-yy1249:
-          ++sp;
-          { ls += "\xe1\xba\xb5"; continue; 	/* Ẵ -> ẵ == U+1EB4 -> U+1EB5 */ }
-yy1251:
-          ++sp;
-          { ls += "\xe1\xba\xb7"; continue; 	/* Ặ -> ặ == U+1EB6 -> U+1EB7 */ }
-yy1253:
-          ++sp;
-          { ls += "\xe1\xba\xb9"; continue; 	/* Ẹ -> ẹ == U+1EB8 -> U+1EB9 */ }
-yy1255:
-          ++sp;
-          { ls += "\xe1\xba\xbb"; continue; 	/* Ẻ -> ẻ == U+1EBA -> U+1EBB */ }
-yy1257:
-          ++sp;
-          { ls += "\xe1\xba\xbd"; continue; 	/* Ẽ -> ẽ == U+1EBC -> U+1EBD */ }
-yy1259:
-          ++sp;
-          { ls += "\xe1\xba\xbf"; continue; 	/* Ế -> ế == U+1EBE -> U+1EBF */ }
-yy1261:
-          ++sp;
-          { ls += "\xe1\xbb\x81"; continue; 	/* Ề -> ề == U+1EC0 -> U+1EC1 */ }
-yy1263:
-          ++sp;
-          { ls += "\xe1\xbb\x83"; continue; 	/* Ể -> ể == U+1EC2 -> U+1EC3 */ }
-yy1265:
-          ++sp;
-          { ls += "\xe1\xbb\x85"; continue; 	/* Ễ -> ễ == U+1EC4 -> U+1EC5 */ }
-yy1267:
-          ++sp;
-          { ls += "\xe1\xbb\x87"; continue; 	/* Ệ -> ệ == U+1EC6 -> U+1EC7 */ }
-yy1269:
-          ++sp;
-          { ls += "\xe1\xbb\x89"; continue; 	/* Ỉ -> ỉ == U+1EC8 -> U+1EC9 */ }
-yy1271:
-          ++sp;
-          { ls += "\xe1\xbb\x8b"; continue; 	/* Ị -> ị == U+1ECA -> U+1ECB */ }
-yy1273:
-          ++sp;
-          { ls += "\xe1\xbb\x8d"; continue; 	/* Ọ -> ọ == U+1ECC -> U+1ECD */ }
-yy1275:
-          ++sp;
-          { ls += "\xe1\xbb\x8f"; continue; 	/* Ỏ -> ỏ == U+1ECE -> U+1ECF */ }
-yy1277:
-          ++sp;
-          { ls += "\xe1\xbb\x91"; continue; 	/* Ố -> ố == U+1ED0 -> U+1ED1 */ }
-yy1279:
-          ++sp;
-          { ls += "\xe1\xbb\x93"; continue; 	/* Ồ -> ồ == U+1ED2 -> U+1ED3 */ }
-yy1281:
-          ++sp;
-          { ls += "\xe1\xbb\x95"; continue; 	/* Ổ -> ổ == U+1ED4 -> U+1ED5 */ }
-yy1283:
-          ++sp;
-          { ls += "\xe1\xbb\x97"; continue; 	/* Ỗ -> ỗ == U+1ED6 -> U+1ED7 */ }
-yy1285:
-          ++sp;
-          { ls += "\xe1\xbb\x99"; continue; 	/* Ộ -> ộ == U+1ED8 -> U+1ED9 */ }
-yy1287:
-          ++sp;
-          { ls += "\xe1\xbb\x9b"; continue; 	/* Ớ -> ớ == U+1EDA -> U+1EDB */ }
-yy1289:
-          ++sp;
-          { ls += "\xe1\xbb\x9d"; continue; 	/* Ờ -> ờ == U+1EDC -> U+1EDD */ }
-yy1291:
-          ++sp;
-          { ls += "\xe1\xbb\x9f"; continue; 	/* Ở -> ở == U+1EDE -> U+1EDF */ }
-yy1293:
-          ++sp;
-          { ls += "\xe1\xbb\xa1"; continue; 	/* Ỡ -> ỡ == U+1EE0 -> U+1EE1 */ }
-yy1295:
-          ++sp;
-          { ls += "\xe1\xbb\xa3"; continue; 	/* Ợ -> ợ == U+1EE2 -> U+1EE3 */ }
-yy1297:
-          ++sp;
-          { ls += "\xe1\xbb\xa5"; continue; 	/* Ụ -> ụ == U+1EE4 -> U+1EE5 */ }
-yy1299:
-          ++sp;
-          { ls += "\xe1\xbb\xa7"; continue; 	/* Ủ -> ủ == U+1EE6 -> U+1EE7 */ }
-yy1301:
-          ++sp;
-          { ls += "\xe1\xbb\xa9"; continue; 	/* Ứ -> ứ == U+1EE8 -> U+1EE9 */ }
-yy1303:
-          ++sp;
-          { ls += "\xe1\xbb\xab"; continue; 	/* Ừ -> ừ == U+1EEA -> U+1EEB */ }
-yy1305:
-          ++sp;
-          { ls += "\xe1\xbb\xad"; continue; 	/* Ử -> ử == U+1EEC -> U+1EED */ }
-yy1307:
-          ++sp;
-          { ls += "\xe1\xbb\xaf"; continue; 	/* Ữ -> ữ == U+1EEE -> U+1EEF */ }
-yy1309:
-          ++sp;
-          { ls += "\xe1\xbb\xb1"; continue; 	/* Ự -> ự == U+1EF0 -> U+1EF1 */ }
-yy1311:
-          ++sp;
-          { ls += "\xe1\xbb\xb3"; continue; 	/* Ỳ -> ỳ == U+1EF2 -> U+1EF3 */ }
-yy1313:
-          ++sp;
-          { ls += "\xe1\xbb\xb5"; continue; 	/* Ỵ -> ỵ == U+1EF4 -> U+1EF5 */ }
-yy1315:
-          ++sp;
-          { ls += "\xe1\xbb\xb7"; continue; 	/* Ỷ -> ỷ == U+1EF6 -> U+1EF7 */ }
-yy1317:
-          ++sp;
-          { ls += "\xe1\xbb\xb9"; continue; 	/* Ỹ -> ỹ == U+1EF8 -> U+1EF9 */ }
-yy1319:
-          ++sp;
-          { ls += "\xe1\xbb\xbb"; continue; 	/* Ỻ -> ỻ == U+1EFA -> U+1EFB */ }
-yy1321:
-          ++sp;
-          { ls += "\xe1\xbb\xbd"; continue; 	/* Ỽ -> ỽ == U+1EFC -> U+1EFD */ }
-yy1323:
-          ++sp;
-          { ls += "\xe1\xbb\xbf"; continue; 	/* Ỿ -> ỿ == U+1EFE -> U+1EFF */ }
-yy1325:
-          ++sp;
-          { ls += "\xe1\xbc\x80"; continue; 	/* Ἀ -> ἀ == U+1F08 -> U+1F00 */ }
-yy1327:
-          ++sp;
-          { ls += "\xe1\xbc\x81"; continue; 	/* Ἁ -> ἁ == U+1F09 -> U+1F01 */ }
-yy1329:
-          ++sp;
-          { ls += "\xe1\xbc\x82"; continue; 	/* Ἂ -> ἂ == U+1F0A -> U+1F02 */ }
-yy1331:
-          ++sp;
-          { ls += "\xe1\xbc\x83"; continue; 	/* Ἃ -> ἃ == U+1F0B -> U+1F03 */ }
-yy1333:
-          ++sp;
-          { ls += "\xe1\xbc\x84"; continue; 	/* Ἄ -> ἄ == U+1F0C -> U+1F04 */ }
-yy1335:
-          ++sp;
-          { ls += "\xe1\xbc\x85"; continue; 	/* Ἅ -> ἅ == U+1F0D -> U+1F05 */ }
-yy1337:
-          ++sp;
-          { ls += "\xe1\xbc\x86"; continue; 	/* Ἆ -> ἆ == U+1F0E -> U+1F06 */ }
-yy1339:
-          ++sp;
-          { ls += "\xe1\xbc\x87"; continue; 	/* Ἇ -> ἇ == U+1F0F -> U+1F07 */ }
-yy1341:
-          ++sp;
-          { ls += "\xe1\xbc\x90"; continue; 	/* Ἐ -> ἐ == U+1F18 -> U+1F10 */ }
-yy1343:
-          ++sp;
-          { ls += "\xe1\xbc\x91"; continue; 	/* Ἑ -> ἑ == U+1F19 -> U+1F11 */ }
-yy1345:
-          ++sp;
-          { ls += "\xe1\xbc\x92"; continue; 	/* Ἒ -> ἒ == U+1F1A -> U+1F12 */ }
-yy1347:
-          ++sp;
-          { ls += "\xe1\xbc\x93"; continue; 	/* Ἓ -> ἓ == U+1F1B -> U+1F13 */ }
-yy1349:
-          ++sp;
-          { ls += "\xe1\xbc\x94"; continue; 	/* Ἔ -> ἔ == U+1F1C -> U+1F14 */ }
-yy1351:
-          ++sp;
-          { ls += "\xe1\xbc\x95"; continue; 	/* Ἕ -> ἕ == U+1F1D -> U+1F15 */ }
-yy1353:
-          ++sp;
-          { ls += "\xe1\xbc\xa0"; continue; 	/* Ἠ -> ἠ == U+1F28 -> U+1F20 */ }
-yy1355:
-          ++sp;
-          { ls += "\xe1\xbc\xa1"; continue; 	/* Ἡ -> ἡ == U+1F29 -> U+1F21 */ }
-yy1357:
-          ++sp;
-          { ls += "\xe1\xbc\xa2"; continue; 	/* Ἢ -> ἢ == U+1F2A -> U+1F22 */ }
-yy1359:
-          ++sp;
-          { ls += "\xe1\xbc\xa3"; continue; 	/* Ἣ -> ἣ == U+1F2B -> U+1F23 */ }
-yy1361:
-          ++sp;
-          { ls += "\xe1\xbc\xa4"; continue; 	/* Ἤ -> ἤ == U+1F2C -> U+1F24 */ }
-yy1363:
-          ++sp;
-          { ls += "\xe1\xbc\xa5"; continue; 	/* Ἥ -> ἥ == U+1F2D -> U+1F25 */ }
-yy1365:
-          ++sp;
-          { ls += "\xe1\xbc\xa6"; continue; 	/* Ἦ -> ἦ == U+1F2E -> U+1F26 */ }
-yy1367:
-          ++sp;
-          { ls += "\xe1\xbc\xa7"; continue; 	/* Ἧ -> ἧ == U+1F2F -> U+1F27 */ }
-yy1369:
-          ++sp;
-          { ls += "\xe1\xbc\xb0"; continue; 	/* Ἰ -> ἰ == U+1F38 -> U+1F30 */ }
-yy1371:
-          ++sp;
-          { ls += "\xe1\xbc\xb1"; continue; 	/* Ἱ -> ἱ == U+1F39 -> U+1F31 */ }
-yy1373:
-          ++sp;
-          { ls += "\xe1\xbc\xb2"; continue; 	/* Ἲ -> ἲ == U+1F3A -> U+1F32 */ }
-yy1375:
-          ++sp;
-          { ls += "\xe1\xbc\xb3"; continue; 	/* Ἳ -> ἳ == U+1F3B -> U+1F33 */ }
-yy1377:
-          ++sp;
-          { ls += "\xe1\xbc\xb4"; continue; 	/* Ἴ -> ἴ == U+1F3C -> U+1F34 */ }
-yy1379:
-          ++sp;
-          { ls += "\xe1\xbc\xb5"; continue; 	/* Ἵ -> ἵ == U+1F3D -> U+1F35 */ }
-yy1381:
-          ++sp;
-          { ls += "\xe1\xbc\xb6"; continue; 	/* Ἶ -> ἶ == U+1F3E -> U+1F36 */ }
-yy1383:
-          ++sp;
-          { ls += "\xe1\xbc\xb7"; continue; 	/* Ἷ -> ἷ == U+1F3F -> U+1F37 */ }
-yy1385:
-          ++sp;
-          { ls += "\xe1\xbd\x80"; continue; 	/* Ὀ -> ὀ == U+1F48 -> U+1F40 */ }
-yy1387:
-          ++sp;
-          { ls += "\xe1\xbd\x81"; continue; 	/* Ὁ -> ὁ == U+1F49 -> U+1F41 */ }
-yy1389:
-          ++sp;
-          { ls += "\xe1\xbd\x82"; continue; 	/* Ὂ -> ὂ == U+1F4A -> U+1F42 */ }
-yy1391:
-          ++sp;
-          { ls += "\xe1\xbd\x83"; continue; 	/* Ὃ -> ὃ == U+1F4B -> U+1F43 */ }
-yy1393:
-          ++sp;
-          { ls += "\xe1\xbd\x84"; continue; 	/* Ὄ -> ὄ == U+1F4C -> U+1F44 */ }
-yy1395:
-          ++sp;
-          { ls += "\xe1\xbd\x85"; continue; 	/* Ὅ -> ὅ == U+1F4D -> U+1F45 */ }
-yy1397:
-          ++sp;
-          { ls += "\xe1\xbd\x91"; continue; 	/* Ὑ -> ὑ == U+1F59 -> U+1F51 */ }
-yy1399:
-          ++sp;
-          { ls += "\xe1\xbd\x93"; continue; 	/* Ὓ -> ὓ == U+1F5B -> U+1F53 */ }
-yy1401:
-          ++sp;
-          { ls += "\xe1\xbd\x95"; continue; 	/* Ὕ -> ὕ == U+1F5D -> U+1F55 */ }
-yy1403:
-          ++sp;
-          { ls += "\xe1\xbd\x97"; continue; 	/* Ὗ -> ὗ == U+1F5F -> U+1F57 */ }
-yy1405:
-          ++sp;
-          { ls += "\xe1\xbd\xa0"; continue; 	/* Ὠ -> ὠ == U+1F68 -> U+1F60 */ }
-yy1407:
-          ++sp;
-          { ls += "\xe1\xbd\xa1"; continue; 	/* Ὡ -> ὡ == U+1F69 -> U+1F61 */ }
-yy1409:
-          ++sp;
-          { ls += "\xe1\xbd\xa2"; continue; 	/* Ὢ -> ὢ == U+1F6A -> U+1F62 */ }
-yy1411:
-          ++sp;
-          { ls += "\xe1\xbd\xa3"; continue; 	/* Ὣ -> ὣ == U+1F6B -> U+1F63 */ }
-yy1413:
-          ++sp;
-          { ls += "\xe1\xbd\xa4"; continue; 	/* Ὤ -> ὤ == U+1F6C -> U+1F64 */ }
-yy1415:
-          ++sp;
-          { ls += "\xe1\xbd\xa5"; continue; 	/* Ὥ -> ὥ == U+1F6D -> U+1F65 */ }
-yy1417:
-          ++sp;
-          { ls += "\xe1\xbd\xa6"; continue; 	/* Ὦ -> ὦ == U+1F6E -> U+1F66 */ }
-yy1419:
-          ++sp;
-          { ls += "\xe1\xbd\xa7"; continue; 	/* Ὧ -> ὧ == U+1F6F -> U+1F67 */ }
-yy1421:
-          ++sp;
-          { ls += "\xe1\xbe\x80"; continue; 	/* ᾈ -> ᾀ == U+1F88 -> U+1F80 */ }
-yy1423:
-          ++sp;
-          { ls += "\xe1\xbe\x81"; continue; 	/* ᾉ -> ᾁ == U+1F89 -> U+1F81 */ }
-yy1425:
-          ++sp;
-          { ls += "\xe1\xbe\x82"; continue; 	/* ᾊ -> ᾂ == U+1F8A -> U+1F82 */ }
-yy1427:
-          ++sp;
-          { ls += "\xe1\xbe\x83"; continue; 	/* ᾋ -> ᾃ == U+1F8B -> U+1F83 */ }
-yy1429:
-          ++sp;
-          { ls += "\xe1\xbe\x84"; continue; 	/* ᾌ -> ᾄ == U+1F8C -> U+1F84 */ }
-yy1431:
-          ++sp;
-          { ls += "\xe1\xbe\x85"; continue; 	/* ᾍ -> ᾅ == U+1F8D -> U+1F85 */ }
-yy1433:
-          ++sp;
-          { ls += "\xe1\xbe\x86"; continue; 	/* ᾎ -> ᾆ == U+1F8E -> U+1F86 */ }
-yy1435:
-          ++sp;
-          { ls += "\xe1\xbe\x87"; continue; 	/* ᾏ -> ᾇ == U+1F8F -> U+1F87 */ }
-yy1437:
-          ++sp;
-          { ls += "\xe1\xbe\x90"; continue; 	/* ᾘ -> ᾐ == U+1F98 -> U+1F90 */ }
-yy1439:
-          ++sp;
-          { ls += "\xe1\xbe\x91"; continue; 	/* ᾙ -> ᾑ == U+1F99 -> U+1F91 */ }
-yy1441:
-          ++sp;
-          { ls += "\xe1\xbe\x92"; continue; 	/* ᾚ -> ᾒ == U+1F9A -> U+1F92 */ }
-yy1443:
-          ++sp;
-          { ls += "\xe1\xbe\x93"; continue; 	/* ᾛ -> ᾓ == U+1F9B -> U+1F93 */ }
-yy1445:
-          ++sp;
-          { ls += "\xe1\xbe\x94"; continue; 	/* ᾜ -> ᾔ == U+1F9C -> U+1F94 */ }
-yy1447:
-          ++sp;
-          { ls += "\xe1\xbe\x95"; continue; 	/* ᾝ -> ᾕ == U+1F9D -> U+1F95 */ }
-yy1449:
-          ++sp;
-          { ls += "\xe1\xbe\x96"; continue; 	/* ᾞ -> ᾖ == U+1F9E -> U+1F96 */ }
-yy1451:
-          ++sp;
-          { ls += "\xe1\xbe\x97"; continue; 	/* ᾟ -> ᾗ == U+1F9F -> U+1F97 */ }
-yy1453:
-          ++sp;
-          { ls += "\xe1\xbe\xa0"; continue; 	/* ᾨ -> ᾠ == U+1FA8 -> U+1FA0 */ }
-yy1455:
-          ++sp;
-          { ls += "\xe1\xbe\xa1"; continue; 	/* ᾩ -> ᾡ == U+1FA9 -> U+1FA1 */ }
-yy1457:
-          ++sp;
-          { ls += "\xe1\xbe\xa2"; continue; 	/* ᾪ -> ᾢ == U+1FAA -> U+1FA2 */ }
-yy1459:
-          ++sp;
-          { ls += "\xe1\xbe\xa3"; continue; 	/* ᾫ -> ᾣ == U+1FAB -> U+1FA3 */ }
-yy1461:
-          ++sp;
-          { ls += "\xe1\xbe\xa4"; continue; 	/* ᾬ -> ᾤ == U+1FAC -> U+1FA4 */ }
-yy1463:
-          ++sp;
-          { ls += "\xe1\xbe\xa5"; continue; 	/* ᾭ -> ᾥ == U+1FAD -> U+1FA5 */ }
-yy1465:
-          ++sp;
-          { ls += "\xe1\xbe\xa6"; continue; 	/* ᾮ -> ᾦ == U+1FAE -> U+1FA6 */ }
-yy1467:
-          ++sp;
-          { ls += "\xe1\xbe\xa7"; continue; 	/* ᾯ -> ᾧ == U+1FAF -> U+1FA7 */ }
-yy1469:
-          ++sp;
-          { ls += "\xe1\xbe\xb0"; continue; 	/* Ᾰ -> ᾰ == U+1FB8 -> U+1FB0 */ }
-yy1471:
-          ++sp;
-          { ls += "\xe1\xbe\xb1"; continue; 	/* Ᾱ -> ᾱ == U+1FB9 -> U+1FB1 */ }
-yy1473:
-          ++sp;
-          { ls += "\xe1\xbd\xb0"; continue; 	/* Ὰ -> ὰ == U+1FBA -> U+1F70 */ }
-yy1475:
-          ++sp;
-          { ls += "\xe1\xbd\xb1"; continue; 	/* Ά -> ά == U+1FBB -> U+1F71 */ }
-yy1477:
-          ++sp;
-          { ls += "\xe1\xbe\xb3"; continue; 	/* ᾼ -> ᾳ == U+1FBC -> U+1FB3 */ }
-yy1479:
-          ++sp;
-          { ls += "\xe1\xbd\xb2"; continue; 	/* Ὲ -> ὲ == U+1FC8 -> U+1F72 */ }
-yy1481:
-          ++sp;
-          { ls += "\xe1\xbd\xb3"; continue; 	/* Έ -> έ == U+1FC9 -> U+1F73 */ }
-yy1483:
-          ++sp;
-          { ls += "\xe1\xbd\xb4"; continue; 	/* Ὴ -> ὴ == U+1FCA -> U+1F74 */ }
-yy1485:
-          ++sp;
-          { ls += "\xe1\xbd\xb5"; continue; 	/* Ή -> ή == U+1FCB -> U+1F75 */ }
-yy1487:
-          ++sp;
-          { ls += "\xe1\xbf\x83"; continue; 	/* ῌ -> ῃ == U+1FCC -> U+1FC3 */ }
-yy1489:
-          ++sp;
-          { ls += "\xe1\xbf\x90"; continue; 	/* Ῐ -> ῐ == U+1FD8 -> U+1FD0 */ }
-yy1491:
-          ++sp;
-          { ls += "\xe1\xbf\x91"; continue; 	/* Ῑ -> ῑ == U+1FD9 -> U+1FD1 */ }
-yy1493:
-          ++sp;
-          { ls += "\xe1\xbd\xb6"; continue; 	/* Ὶ -> ὶ == U+1FDA -> U+1F76 */ }
-yy1495:
-          ++sp;
-          { ls += "\xe1\xbd\xb7"; continue; 	/* Ί -> ί == U+1FDB -> U+1F77 */ }
-yy1497:
-          ++sp;
-          { ls += "\xe1\xbf\xa0"; continue; 	/* Ῠ -> ῠ == U+1FE8 -> U+1FE0 */ }
-yy1499:
-          ++sp;
-          { ls += "\xe1\xbf\xa1"; continue; 	/* Ῡ -> ῡ == U+1FE9 -> U+1FE1 */ }
-yy1501:
-          ++sp;
-          { ls += "\xe1\xbd\xba"; continue; 	/* Ὺ -> ὺ == U+1FEA -> U+1F7A */ }
-yy1503:
-          ++sp;
-          { ls += "\xe1\xbd\xbb"; continue; 	/* Ύ -> ύ == U+1FEB -> U+1F7B */ }
-yy1505:
-          ++sp;
-          { ls += "\xe1\xbf\xa5"; continue; 	/* Ῥ -> ῥ == U+1FEC -> U+1FE5 */ }
-yy1507:
-          ++sp;
-          { ls += "\xe1\xbd\xb8"; continue; 	/* Ὸ -> ὸ == U+1FF8 -> U+1F78 */ }
-yy1509:
-          ++sp;
-          { ls += "\xe1\xbd\xb9"; continue; 	/* Ό -> ό == U+1FF9 -> U+1F79 */ }
-yy1511:
-          ++sp;
-          { ls += "\xe1\xbd\xbc"; continue; 	/* Ὼ -> ὼ == U+1FFA -> U+1F7C */ }
-yy1513:
-          ++sp;
-          { ls += "\xe1\xbd\xbd"; continue; 	/* Ώ -> ώ == U+1FFB -> U+1F7D */ }
-yy1515:
-          ++sp;
-          { ls += "\xe1\xbf\xb3"; continue; 	/* ῼ -> ῳ == U+1FFC -> U+1FF3 */ }
-yy1517:
-          ++sp;
-          { ls += "\xcf\x89"; continue; 	/* Ω -> ω == U+2126 -> U+03C9 */ }
-yy1519:
-          ++sp;
-          { ls += "\x6b"; continue; 	/* K -> k == U+212A -> U+006B */ }
-yy1521:
-          ++sp;
-          { ls += "\xc3\xa5"; continue; 	/* Å -> å == U+212B -> U+00E5 */ }
-yy1523:
-          ++sp;
-          { ls += "\xe2\x85\x8e"; continue; 	/* Ⅎ -> ⅎ == U+2132 -> U+214E */ }
-yy1525:
-          ++sp;
-          { ls += "\xe2\x85\xb0"; continue; 	/* Ⅰ -> ⅰ == U+2160 -> U+2170 */ }
-yy1527:
-          ++sp;
-          { ls += "\xe2\x85\xb1"; continue; 	/* Ⅱ -> ⅱ == U+2161 -> U+2171 */ }
-yy1529:
-          ++sp;
-          { ls += "\xe2\x85\xb2"; continue; 	/* Ⅲ -> ⅲ == U+2162 -> U+2172 */ }
-yy1531:
-          ++sp;
-          { ls += "\xe2\x85\xb3"; continue; 	/* Ⅳ -> ⅳ == U+2163 -> U+2173 */ }
-yy1533:
-          ++sp;
-          { ls += "\xe2\x85\xb4"; continue; 	/* Ⅴ -> ⅴ == U+2164 -> U+2174 */ }
-yy1535:
-          ++sp;
-          { ls += "\xe2\x85\xb5"; continue; 	/* Ⅵ -> ⅵ == U+2165 -> U+2175 */ }
-yy1537:
-          ++sp;
-          { ls += "\xe2\x85\xb6"; continue; 	/* Ⅶ -> ⅶ == U+2166 -> U+2176 */ }
-yy1539:
-          ++sp;
-          { ls += "\xe2\x85\xb7"; continue; 	/* Ⅷ -> ⅷ == U+2167 -> U+2177 */ }
-yy1541:
-          ++sp;
-          { ls += "\xe2\x85\xb8"; continue; 	/* Ⅸ -> ⅸ == U+2168 -> U+2178 */ }
-yy1543:
-          ++sp;
-          { ls += "\xe2\x85\xb9"; continue; 	/* Ⅹ -> ⅹ == U+2169 -> U+2179 */ }
-yy1545:
-          ++sp;
-          { ls += "\xe2\x85\xba"; continue; 	/* Ⅺ -> ⅺ == U+216A -> U+217A */ }
-yy1547:
-          ++sp;
-          { ls += "\xe2\x85\xbb"; continue; 	/* Ⅻ -> ⅻ == U+216B -> U+217B */ }
-yy1549:
-          ++sp;
-          { ls += "\xe2\x85\xbc"; continue; 	/* Ⅼ -> ⅼ == U+216C -> U+217C */ }
-yy1551:
-          ++sp;
-          { ls += "\xe2\x85\xbd"; continue; 	/* Ⅽ -> ⅽ == U+216D -> U+217D */ }
-yy1553:
-          ++sp;
-          { ls += "\xe2\x85\xbe"; continue; 	/* Ⅾ -> ⅾ == U+216E -> U+217E */ }
-yy1555:
-          ++sp;
-          { ls += "\xe2\x85\xbf"; continue; 	/* Ⅿ -> ⅿ == U+216F -> U+217F */ }
-yy1557:
-          ++sp;
-          { ls += "\xe2\x86\x84"; continue; 	/* Ↄ -> ↄ == U+2183 -> U+2184 */ }
-yy1559:
-          ++sp;
-          { ls += "\xe2\x93\x90"; continue; 	/* Ⓐ -> ⓐ == U+24B6 -> U+24D0 */ }
-yy1561:
-          ++sp;
-          { ls += "\xe2\x93\x91"; continue; 	/* Ⓑ -> ⓑ == U+24B7 -> U+24D1 */ }
 yy1563:
-          ++sp;
-          { ls += "\xe2\x93\x92"; continue; 	/* Ⓒ -> ⓒ == U+24B8 -> U+24D2 */ }
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:
+          case 0x81:
+          case 0x82:
+          case 0x83:
+          case 0x84:
+          case 0x85:
+          case 0x86:
+          case 0x87:
+          case 0x8E:
+          case 0x8F:
+          case 0x90:
+          case 0x91:
+          case 0x92:
+          case 0x93:
+          case 0x94:
+          case 0x95:
+          case 0x96:
+          case 0x97:
+          case 0x98:
+          case 0x9A:
+          case 0x9C:
+          case 0x9E:
+          case 0xA0:
+          case 0xA1:
+          case 0xA2:
+          case 0xA3:
+          case 0xA4:
+          case 0xA5:
+          case 0xA6:
+          case 0xA7:
+          case 0xB0:
+          case 0xB1:
+          case 0xB2:
+          case 0xB3:
+          case 0xB4:
+          case 0xB5:
+          case 0xB6:
+          case 0xB7:
+          case 0xB8:
+          case 0xB9:
+          case 0xBA:
+          case 0xBB:
+          case 0xBC:
+          case 0xBD:
+          case 0xBE:
+          case 0xBF:  goto yy167;
+          case 0x88:  goto yy2013;
+          case 0x89:  goto yy2015;
+          case 0x8A:  goto yy2017;
+          case 0x8B:  goto yy2019;
+          case 0x8C:  goto yy2021;
+          case 0x8D:  goto yy2023;
+          case 0x99:  goto yy2025;
+          case 0x9B:  goto yy2027;
+          case 0x9D:  goto yy2029;
+          case 0x9F:  goto yy2031;
+          case 0xA8:  goto yy2033;
+          case 0xA9:  goto yy2035;
+          case 0xAA:  goto yy2037;
+          case 0xAB:  goto yy2039;
+          case 0xAC:  goto yy2041;
+          case 0xAD:  goto yy2043;
+          case 0xAE:  goto yy2045;
+          case 0xAF:  goto yy2047;
+          default:  goto yy2;
+          }
+yy1564:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:
+          case 0x81:
+          case 0x82:
+          case 0x83:
+          case 0x84:
+          case 0x85:
+          case 0x86:
+          case 0x87:
+          case 0x90:
+          case 0x91:
+          case 0x92:
+          case 0x93:
+          case 0x94:
+          case 0x95:
+          case 0x96:
+          case 0x97:
+          case 0x9E:
+          case 0x9F:
+          case 0xA0:
+          case 0xA1:
+          case 0xA2:
+          case 0xA3:
+          case 0xA4:
+          case 0xA5:
+          case 0xA6:
+          case 0xA7:
+          case 0xB0:
+          case 0xB1:
+          case 0xB2:
+          case 0xB3:
+          case 0xB4:
+          case 0xB5:
+          case 0xB6:
+          case 0xB7:  goto yy167;
+          case 0x88:  goto yy1953;
+          case 0x89:  goto yy1955;
+          case 0x8A:  goto yy1957;
+          case 0x8B:  goto yy1959;
+          case 0x8C:  goto yy1961;
+          case 0x8D:  goto yy1963;
+          case 0x8E:  goto yy1965;
+          case 0x8F:  goto yy1967;
+          case 0x98:  goto yy1969;
+          case 0x99:  goto yy1971;
+          case 0x9A:  goto yy1973;
+          case 0x9B:  goto yy1975;
+          case 0x9C:  goto yy1977;
+          case 0x9D:  goto yy1979;
+          case 0xA8:  goto yy1981;
+          case 0xA9:  goto yy1983;
+          case 0xAA:  goto yy1985;
+          case 0xAB:  goto yy1987;
+          case 0xAC:  goto yy1989;
+          case 0xAD:  goto yy1991;
+          case 0xAE:  goto yy1993;
+          case 0xAF:  goto yy1995;
+          case 0xB8:  goto yy1997;
+          case 0xB9:  goto yy1999;
+          case 0xBA:  goto yy2001;
+          case 0xBB:  goto yy2003;
+          case 0xBC:  goto yy2005;
+          case 0xBD:  goto yy2007;
+          case 0xBE:  goto yy2009;
+          case 0xBF:  goto yy2011;
+          default:  goto yy2;
+          }
 yy1565:
-          ++sp;
-          { ls += "\xe2\x93\x93"; continue; 	/* Ⓓ -> ⓓ == U+24B9 -> U+24D3 */ }
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy1889;
+          case 0x81:
+          case 0x83:
+          case 0x85:
+          case 0x87:
+          case 0x89:
+          case 0x8B:
+          case 0x8D:
+          case 0x8F:
+          case 0x91:
+          case 0x93:
+          case 0x95:
+          case 0x97:
+          case 0x99:
+          case 0x9B:
+          case 0x9D:
+          case 0x9F:
+          case 0xA1:
+          case 0xA3:
+          case 0xA5:
+          case 0xA7:
+          case 0xA9:
+          case 0xAB:
+          case 0xAD:
+          case 0xAF:
+          case 0xB1:
+          case 0xB3:
+          case 0xB5:
+          case 0xB7:
+          case 0xB9:
+          case 0xBB:
+          case 0xBD:
+          case 0xBF:  goto yy167;
+          case 0x82:  goto yy1891;
+          case 0x84:  goto yy1893;
+          case 0x86:  goto yy1895;
+          case 0x88:  goto yy1897;
+          case 0x8A:  goto yy1899;
+          case 0x8C:  goto yy1901;
+          case 0x8E:  goto yy1903;
+          case 0x90:  goto yy1905;
+          case 0x92:  goto yy1907;
+          case 0x94:  goto yy1909;
+          case 0x96:  goto yy1911;
+          case 0x98:  goto yy1913;
+          case 0x9A:  goto yy1915;
+          case 0x9C:  goto yy1917;
+          case 0x9E:  goto yy1919;
+          case 0xA0:  goto yy1921;
+          case 0xA2:  goto yy1923;
+          case 0xA4:  goto yy1925;
+          case 0xA6:  goto yy1927;
+          case 0xA8:  goto yy1929;
+          case 0xAA:  goto yy1931;
+          case 0xAC:  goto yy1933;
+          case 0xAE:  goto yy1935;
+          case 0xB0:  goto yy1937;
+          case 0xB2:  goto yy1939;
+          case 0xB4:  goto yy1941;
+          case 0xB6:  goto yy1943;
+          case 0xB8:  goto yy1945;
+          case 0xBA:  goto yy1947;
+          case 0xBC:  goto yy1949;
+          case 0xBE:  goto yy1951;
+          default:  goto yy2;
+          }
+yy1566:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy1833;
+          case 0x81:
+          case 0x83:
+          case 0x85:
+          case 0x87:
+          case 0x89:
+          case 0x8B:
+          case 0x8D:
+          case 0x8F:
+          case 0x91:
+          case 0x93:
+          case 0x95:
+          case 0x96:
+          case 0x97:
+          case 0x98:
+          case 0x99:
+          case 0x9A:
+          case 0x9B:
+          case 0x9C:
+          case 0x9D:
+          case 0x9F:
+          case 0xA1:
+          case 0xA3:
+          case 0xA5:
+          case 0xA7:
+          case 0xA9:
+          case 0xAB:
+          case 0xAD:
+          case 0xAF:
+          case 0xB1:
+          case 0xB3:
+          case 0xB5:
+          case 0xB7:
+          case 0xB9:
+          case 0xBB:
+          case 0xBD:
+          case 0xBF:  goto yy167;
+          case 0x82:  goto yy1835;
+          case 0x84:  goto yy1837;
+          case 0x86:  goto yy1839;
+          case 0x88:  goto yy1841;
+          case 0x8A:  goto yy1843;
+          case 0x8C:  goto yy1845;
+          case 0x8E:  goto yy1847;
+          case 0x90:  goto yy1849;
+          case 0x92:  goto yy1851;
+          case 0x94:  goto yy1853;
+          case 0x9E:  goto yy1855;
+          case 0xA0:  goto yy1857;
+          case 0xA2:  goto yy1859;
+          case 0xA4:  goto yy1861;
+          case 0xA6:  goto yy1863;
+          case 0xA8:  goto yy1865;
+          case 0xAA:  goto yy1867;
+          case 0xAC:  goto yy1869;
+          case 0xAE:  goto yy1871;
+          case 0xB0:  goto yy1873;
+          case 0xB2:  goto yy1875;
+          case 0xB4:  goto yy1877;
+          case 0xB6:  goto yy1879;
+          case 0xB8:  goto yy1881;
+          case 0xBA:  goto yy1883;
+          case 0xBC:  goto yy1885;
+          case 0xBE:  goto yy1887;
+          default:  goto yy2;
+          }
 yy1567:
-          ++sp;
-          { ls += "\xe2\x93\x94"; continue; 	/* Ⓔ -> ⓔ == U+24BA -> U+24D4 */ }
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy1769;
+          case 0x81:
+          case 0x83:
+          case 0x85:
+          case 0x87:
+          case 0x89:
+          case 0x8B:
+          case 0x8D:
+          case 0x8F:
+          case 0x91:
+          case 0x93:
+          case 0x95:
+          case 0x97:
+          case 0x99:
+          case 0x9B:
+          case 0x9D:
+          case 0x9F:
+          case 0xA1:
+          case 0xA3:
+          case 0xA5:
+          case 0xA7:
+          case 0xA9:
+          case 0xAB:
+          case 0xAD:
+          case 0xAF:
+          case 0xB1:
+          case 0xB3:
+          case 0xB5:
+          case 0xB7:
+          case 0xB9:
+          case 0xBB:
+          case 0xBD:
+          case 0xBF:  goto yy167;
+          case 0x82:  goto yy1771;
+          case 0x84:  goto yy1773;
+          case 0x86:  goto yy1775;
+          case 0x88:  goto yy1777;
+          case 0x8A:  goto yy1779;
+          case 0x8C:  goto yy1781;
+          case 0x8E:  goto yy1783;
+          case 0x90:  goto yy1785;
+          case 0x92:  goto yy1787;
+          case 0x94:  goto yy1789;
+          case 0x96:  goto yy1791;
+          case 0x98:  goto yy1793;
+          case 0x9A:  goto yy1795;
+          case 0x9C:  goto yy1797;
+          case 0x9E:  goto yy1799;
+          case 0xA0:  goto yy1801;
+          case 0xA2:  goto yy1803;
+          case 0xA4:  goto yy1805;
+          case 0xA6:  goto yy1807;
+          case 0xA8:  goto yy1809;
+          case 0xAA:  goto yy1811;
+          case 0xAC:  goto yy1813;
+          case 0xAE:  goto yy1815;
+          case 0xB0:  goto yy1817;
+          case 0xB2:  goto yy1819;
+          case 0xB4:  goto yy1821;
+          case 0xB6:  goto yy1823;
+          case 0xB8:  goto yy1825;
+          case 0xBA:  goto yy1827;
+          case 0xBC:  goto yy1829;
+          case 0xBE:  goto yy1831;
+          default:  goto yy2;
+          }
+yy1568:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:  goto yy1705;
+          case 0x81:
+          case 0x83:
+          case 0x85:
+          case 0x87:
+          case 0x89:
+          case 0x8B:
+          case 0x8D:
+          case 0x8F:
+          case 0x91:
+          case 0x93:
+          case 0x95:
+          case 0x97:
+          case 0x99:
+          case 0x9B:
+          case 0x9D:
+          case 0x9F:
+          case 0xA1:
+          case 0xA3:
+          case 0xA5:
+          case 0xA7:
+          case 0xA9:
+          case 0xAB:
+          case 0xAD:
+          case 0xAF:
+          case 0xB1:
+          case 0xB3:
+          case 0xB5:
+          case 0xB7:
+          case 0xB9:
+          case 0xBB:
+          case 0xBD:
+          case 0xBF:  goto yy167;
+          case 0x82:  goto yy1707;
+          case 0x84:  goto yy1709;
+          case 0x86:  goto yy1711;
+          case 0x88:  goto yy1713;
+          case 0x8A:  goto yy1715;
+          case 0x8C:  goto yy1717;
+          case 0x8E:  goto yy1719;
+          case 0x90:  goto yy1721;
+          case 0x92:  goto yy1723;
+          case 0x94:  goto yy1725;
+          case 0x96:  goto yy1727;
+          case 0x98:  goto yy1729;
+          case 0x9A:  goto yy1731;
+          case 0x9C:  goto yy1733;
+          case 0x9E:  goto yy1735;
+          case 0xA0:  goto yy1737;
+          case 0xA2:  goto yy1739;
+          case 0xA4:  goto yy1741;
+          case 0xA6:  goto yy1743;
+          case 0xA8:  goto yy1745;
+          case 0xAA:  goto yy1747;
+          case 0xAC:  goto yy1749;
+          case 0xAE:  goto yy1751;
+          case 0xB0:  goto yy1753;
+          case 0xB2:  goto yy1755;
+          case 0xB4:  goto yy1757;
+          case 0xB6:  goto yy1759;
+          case 0xB8:  goto yy1761;
+          case 0xBA:  goto yy1763;
+          case 0xBC:  goto yy1765;
+          case 0xBE:  goto yy1767;
+          default:  goto yy2;
+          }
 yy1569:
-          ++sp;
-          { ls += "\xe2\x93\x95"; continue; 	/* Ⓕ -> ⓕ == U+24BB -> U+24D5 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1570:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1571:
-          ++sp;
-          { ls += "\xe2\x93\x96"; continue; 	/* Ⓖ -> ⓖ == U+24BC -> U+24D6 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1572:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1573:
-          ++sp;
-          { ls += "\xe2\x93\x97"; continue; 	/* Ⓗ -> ⓗ == U+24BD -> U+24D7 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1574:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1575:
-          ++sp;
-          { ls += "\xe2\x93\x98"; continue; 	/* Ⓘ -> ⓘ == U+24BE -> U+24D8 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1576:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1577:
-          ++sp;
-          { ls += "\xe2\x93\x99"; continue; 	/* Ⓙ -> ⓙ == U+24BF -> U+24D9 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1578:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1579:
-          ++sp;
-          { ls += "\xe2\x93\x9a"; continue; 	/* Ⓚ -> ⓚ == U+24C0 -> U+24DA */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1580:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1581:
-          ++sp;
-          { ls += "\xe2\x93\x9b"; continue; 	/* Ⓛ -> ⓛ == U+24C1 -> U+24DB */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1582:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1583:
-          ++sp;
-          { ls += "\xe2\x93\x9c"; continue; 	/* Ⓜ -> ⓜ == U+24C2 -> U+24DC */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1584:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1585:
-          ++sp;
-          { ls += "\xe2\x93\x9d"; continue; 	/* Ⓝ -> ⓝ == U+24C3 -> U+24DD */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1586:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1587:
-          ++sp;
-          { ls += "\xe2\x93\x9e"; continue; 	/* Ⓞ -> ⓞ == U+24C4 -> U+24DE */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1588:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1589:
-          ++sp;
-          { ls += "\xe2\x93\x9f"; continue; 	/* Ⓟ -> ⓟ == U+24C5 -> U+24DF */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1590:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1591:
-          ++sp;
-          { ls += "\xe2\x93\xa0"; continue; 	/* Ⓠ -> ⓠ == U+24C6 -> U+24E0 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1592:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1593:
-          ++sp;
-          { ls += "\xe2\x93\xa1"; continue; 	/* Ⓡ -> ⓡ == U+24C7 -> U+24E1 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1594:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1595:
-          ++sp;
-          { ls += "\xe2\x93\xa2"; continue; 	/* Ⓢ -> ⓢ == U+24C8 -> U+24E2 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1596:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1597:
-          ++sp;
-          { ls += "\xe2\x93\xa3"; continue; 	/* Ⓣ -> ⓣ == U+24C9 -> U+24E3 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1598:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1599:
-          ++sp;
-          { ls += "\xe2\x93\xa4"; continue; 	/* Ⓤ -> ⓤ == U+24CA -> U+24E4 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1600:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1601:
-          ++sp;
-          { ls += "\xe2\x93\xa5"; continue; 	/* Ⓥ -> ⓥ == U+24CB -> U+24E5 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1602:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1603:
-          ++sp;
-          { ls += "\xe2\x93\xa6"; continue; 	/* Ⓦ -> ⓦ == U+24CC -> U+24E6 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1604:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1605:
-          ++sp;
-          { ls += "\xe2\x93\xa7"; continue; 	/* Ⓧ -> ⓧ == U+24CD -> U+24E7 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1606:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1607:
-          ++sp;
-          { ls += "\xe2\x93\xa8"; continue; 	/* Ⓨ -> ⓨ == U+24CE -> U+24E8 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1608:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1609:
-          ++sp;
-          { ls += "\xe2\x93\xa9"; continue; 	/* Ⓩ -> ⓩ == U+24CF -> U+24E9 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1610:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1611:
-          ++sp;
-          { ls += "\xe2\xb0\xb0"; continue; 	/* Ⰰ -> ⰰ == U+2C00 -> U+2C30 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1612:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1613:
-          ++sp;
-          { ls += "\xe2\xb0\xb1"; continue; 	/* Ⰱ -> ⰱ == U+2C01 -> U+2C31 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1614:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1615:
-          ++sp;
-          { ls += "\xe2\xb0\xb2"; continue; 	/* Ⰲ -> ⰲ == U+2C02 -> U+2C32 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1616:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1617:
-          ++sp;
-          { ls += "\xe2\xb0\xb3"; continue; 	/* Ⰳ -> ⰳ == U+2C03 -> U+2C33 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1618:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1619:
-          ++sp;
-          { ls += "\xe2\xb0\xb4"; continue; 	/* Ⰴ -> ⰴ == U+2C04 -> U+2C34 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1620:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1621:
-          ++sp;
-          { ls += "\xe2\xb0\xb5"; continue; 	/* Ⰵ -> ⰵ == U+2C05 -> U+2C35 */ }
+          yych = *++sp;
+          if (yych <= 0x84) {
+            if (yych <= 0x81) {
+              if (yych <= 0x7F) goto yy2;
+              if (yych <= 0x80) goto yy1689;
+              goto yy1691;
+            } else {
+              if (yych <= 0x82) goto yy1693;
+              if (yych <= 0x83) goto yy1695;
+              goto yy1697;
+            }
+          } else {
+            if (yych <= 0x87) {
+              if (yych <= 0x85) goto yy1699;
+              if (yych <= 0x86) goto yy167;
+              goto yy1701;
+            } else {
+              if (yych == 0x8D) goto yy1703;
+              if (yych <= 0xBF) goto yy167;
+              goto yy2;
+            }
+          }
+yy1622:
+          yych = *++sp;
+          switch (yych) {
+          case 0x80:
+          case 0x81:
+          case 0x82:
+          case 0x83:
+          case 0x84:
+          case 0x85:
+          case 0x86:
+          case 0x87:
+          case 0x88:
+          case 0x89:
+          case 0x8A:
+          case 0x8B:
+          case 0x8C:
+          case 0x8D:
+          case 0x8E:
+          case 0x8F:
+          case 0x90:
+          case 0x91:
+          case 0x92:
+          case 0x93:
+          case 0x94:
+          case 0x95:
+          case 0x96:
+          case 0x97:
+          case 0x98:
+          case 0x99:
+          case 0x9A:
+          case 0x9B:
+          case 0x9C:
+          case 0x9D:
+          case 0x9E:
+          case 0x9F:  goto yy167;
+          case 0xA0:  goto yy1625;
+          case 0xA1:  goto yy1627;
+          case 0xA2:  goto yy1629;
+          case 0xA3:  goto yy1631;
+          case 0xA4:  goto yy1633;
+          case 0xA5:  goto yy1635;
+          case 0xA6:  goto yy1637;
+          case 0xA7:  goto yy1639;
+          case 0xA8:  goto yy1641;
+          case 0xA9:  goto yy1643;
+          case 0xAA:  goto yy1645;
+          case 0xAB:  goto yy1647;
+          case 0xAC:  goto yy1649;
+          case 0xAD:  goto yy1651;
+          case 0xAE:  goto yy1653;
+          case 0xAF:  goto yy1655;
+          case 0xB0:  goto yy1657;
+          case 0xB1:  goto yy1659;
+          case 0xB2:  goto yy1661;
+          case 0xB3:  goto yy1663;
+          case 0xB4:  goto yy1665;
+          case 0xB5:  goto yy1667;
+          case 0xB6:  goto yy1669;
+          case 0xB7:  goto yy1671;
+          case 0xB8:  goto yy1673;
+          case 0xB9:  goto yy1675;
+          case 0xBA:  goto yy1677;
+          case 0xBB:  goto yy1679;
+          case 0xBC:  goto yy1681;
+          case 0xBD:  goto yy1683;
+          case 0xBE:  goto yy1685;
+          case 0xBF:  goto yy1687;
+          default:  goto yy2;
+          }
 yy1623:
-          ++sp;
-          { ls += "\xe2\xb0\xb6"; continue; 	/* Ⰶ -> ⰶ == U+2C06 -> U+2C36 */ }
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
+yy1624:
+          yych = *++sp;
+          if (yych <= 0x7F) goto yy2;
+          if (yych <= 0xBF) goto yy167;
+          goto yy2;
 yy1625:
           ++sp;
-          { ls += "\xe2\xb0\xb7"; continue; 	/* Ⰷ -> ⰷ == U+2C07 -> U+2C37 */ }
+          { ls += "\xe2\xb4\x80"; continue; 	/* Ⴀ -> ⴀ == U+10A0 -> U+2D00 */ }
 yy1627:
           ++sp;
-          { ls += "\xe2\xb0\xb8"; continue; 	/* Ⰸ -> ⰸ == U+2C08 -> U+2C38 */ }
+          { ls += "\xe2\xb4\x81"; continue; 	/* Ⴁ -> ⴁ == U+10A1 -> U+2D01 */ }
 yy1629:
           ++sp;
-          { ls += "\xe2\xb0\xb9"; continue; 	/* Ⰹ -> ⰹ == U+2C09 -> U+2C39 */ }
+          { ls += "\xe2\xb4\x82"; continue; 	/* Ⴂ -> ⴂ == U+10A2 -> U+2D02 */ }
 yy1631:
           ++sp;
-          { ls += "\xe2\xb0\xba"; continue; 	/* Ⰺ -> ⰺ == U+2C0A -> U+2C3A */ }
+          { ls += "\xe2\xb4\x83"; continue; 	/* Ⴃ -> ⴃ == U+10A3 -> U+2D03 */ }
 yy1633:
           ++sp;
-          { ls += "\xe2\xb0\xbb"; continue; 	/* Ⰻ -> ⰻ == U+2C0B -> U+2C3B */ }
+          { ls += "\xe2\xb4\x84"; continue; 	/* Ⴄ -> ⴄ == U+10A4 -> U+2D04 */ }
 yy1635:
           ++sp;
-          { ls += "\xe2\xb0\xbc"; continue; 	/* Ⰼ -> ⰼ == U+2C0C -> U+2C3C */ }
+          { ls += "\xe2\xb4\x85"; continue; 	/* Ⴅ -> ⴅ == U+10A5 -> U+2D05 */ }
 yy1637:
           ++sp;
-          { ls += "\xe2\xb0\xbd"; continue; 	/* Ⰽ -> ⰽ == U+2C0D -> U+2C3D */ }
+          { ls += "\xe2\xb4\x86"; continue; 	/* Ⴆ -> ⴆ == U+10A6 -> U+2D06 */ }
 yy1639:
           ++sp;
-          { ls += "\xe2\xb0\xbe"; continue; 	/* Ⰾ -> ⰾ == U+2C0E -> U+2C3E */ }
+          { ls += "\xe2\xb4\x87"; continue; 	/* Ⴇ -> ⴇ == U+10A7 -> U+2D07 */ }
 yy1641:
           ++sp;
-          { ls += "\xe2\xb0\xbf"; continue; 	/* Ⰿ -> ⰿ == U+2C0F -> U+2C3F */ }
+          { ls += "\xe2\xb4\x88"; continue; 	/* Ⴈ -> ⴈ == U+10A8 -> U+2D08 */ }
 yy1643:
           ++sp;
-          { ls += "\xe2\xb1\x80"; continue; 	/* Ⱀ -> ⱀ == U+2C10 -> U+2C40 */ }
+          { ls += "\xe2\xb4\x89"; continue; 	/* Ⴉ -> ⴉ == U+10A9 -> U+2D09 */ }
 yy1645:
           ++sp;
-          { ls += "\xe2\xb1\x81"; continue; 	/* Ⱁ -> ⱁ == U+2C11 -> U+2C41 */ }
+          { ls += "\xe2\xb4\x8a"; continue; 	/* Ⴊ -> ⴊ == U+10AA -> U+2D0A */ }
 yy1647:
           ++sp;
-          { ls += "\xe2\xb1\x82"; continue; 	/* Ⱂ -> ⱂ == U+2C12 -> U+2C42 */ }
+          { ls += "\xe2\xb4\x8b"; continue; 	/* Ⴋ -> ⴋ == U+10AB -> U+2D0B */ }
 yy1649:
           ++sp;
-          { ls += "\xe2\xb1\x83"; continue; 	/* Ⱃ -> ⱃ == U+2C13 -> U+2C43 */ }
+          { ls += "\xe2\xb4\x8c"; continue; 	/* Ⴌ -> ⴌ == U+10AC -> U+2D0C */ }
 yy1651:
           ++sp;
-          { ls += "\xe2\xb1\x84"; continue; 	/* Ⱄ -> ⱄ == U+2C14 -> U+2C44 */ }
+          { ls += "\xe2\xb4\x8d"; continue; 	/* Ⴍ -> ⴍ == U+10AD -> U+2D0D */ }
 yy1653:
           ++sp;
-          { ls += "\xe2\xb1\x85"; continue; 	/* Ⱅ -> ⱅ == U+2C15 -> U+2C45 */ }
+          { ls += "\xe2\xb4\x8e"; continue; 	/* Ⴎ -> ⴎ == U+10AE -> U+2D0E */ }
 yy1655:
           ++sp;
-          { ls += "\xe2\xb1\x86"; continue; 	/* Ⱆ -> ⱆ == U+2C16 -> U+2C46 */ }
+          { ls += "\xe2\xb4\x8f"; continue; 	/* Ⴏ -> ⴏ == U+10AF -> U+2D0F */ }
 yy1657:
           ++sp;
-          { ls += "\xe2\xb1\x87"; continue; 	/* Ⱇ -> ⱇ == U+2C17 -> U+2C47 */ }
+          { ls += "\xe2\xb4\x90"; continue; 	/* Ⴐ -> ⴐ == U+10B0 -> U+2D10 */ }
 yy1659:
           ++sp;
-          { ls += "\xe2\xb1\x88"; continue; 	/* Ⱈ -> ⱈ == U+2C18 -> U+2C48 */ }
+          { ls += "\xe2\xb4\x91"; continue; 	/* Ⴑ -> ⴑ == U+10B1 -> U+2D11 */ }
 yy1661:
           ++sp;
-          { ls += "\xe2\xb1\x89"; continue; 	/* Ⱉ -> ⱉ == U+2C19 -> U+2C49 */ }
+          { ls += "\xe2\xb4\x92"; continue; 	/* Ⴒ -> ⴒ == U+10B2 -> U+2D12 */ }
 yy1663:
           ++sp;
-          { ls += "\xe2\xb1\x8a"; continue; 	/* Ⱊ -> ⱊ == U+2C1A -> U+2C4A */ }
+          { ls += "\xe2\xb4\x93"; continue; 	/* Ⴓ -> ⴓ == U+10B3 -> U+2D13 */ }
 yy1665:
           ++sp;
-          { ls += "\xe2\xb1\x8b"; continue; 	/* Ⱋ -> ⱋ == U+2C1B -> U+2C4B */ }
+          { ls += "\xe2\xb4\x94"; continue; 	/* Ⴔ -> ⴔ == U+10B4 -> U+2D14 */ }
 yy1667:
           ++sp;
-          { ls += "\xe2\xb1\x8c"; continue; 	/* Ⱌ -> ⱌ == U+2C1C -> U+2C4C */ }
+          { ls += "\xe2\xb4\x95"; continue; 	/* Ⴕ -> ⴕ == U+10B5 -> U+2D15 */ }
 yy1669:
           ++sp;
-          { ls += "\xe2\xb1\x8d"; continue; 	/* Ⱍ -> ⱍ == U+2C1D -> U+2C4D */ }
+          { ls += "\xe2\xb4\x96"; continue; 	/* Ⴖ -> ⴖ == U+10B6 -> U+2D16 */ }
 yy1671:
           ++sp;
-          { ls += "\xe2\xb1\x8e"; continue; 	/* Ⱎ -> ⱎ == U+2C1E -> U+2C4E */ }
+          { ls += "\xe2\xb4\x97"; continue; 	/* Ⴗ -> ⴗ == U+10B7 -> U+2D17 */ }
 yy1673:
           ++sp;
-          { ls += "\xe2\xb1\x8f"; continue; 	/* Ⱏ -> ⱏ == U+2C1F -> U+2C4F */ }
+          { ls += "\xe2\xb4\x98"; continue; 	/* Ⴘ -> ⴘ == U+10B8 -> U+2D18 */ }
 yy1675:
           ++sp;
-          { ls += "\xe2\xb1\x90"; continue; 	/* Ⱐ -> ⱐ == U+2C20 -> U+2C50 */ }
+          { ls += "\xe2\xb4\x99"; continue; 	/* Ⴙ -> ⴙ == U+10B9 -> U+2D19 */ }
 yy1677:
           ++sp;
-          { ls += "\xe2\xb1\x91"; continue; 	/* Ⱑ -> ⱑ == U+2C21 -> U+2C51 */ }
+          { ls += "\xe2\xb4\x9a"; continue; 	/* Ⴚ -> ⴚ == U+10BA -> U+2D1A */ }
 yy1679:
           ++sp;
-          { ls += "\xe2\xb1\x92"; continue; 	/* Ⱒ -> ⱒ == U+2C22 -> U+2C52 */ }
+          { ls += "\xe2\xb4\x9b"; continue; 	/* Ⴛ -> ⴛ == U+10BB -> U+2D1B */ }
 yy1681:
           ++sp;
-          { ls += "\xe2\xb1\x93"; continue; 	/* Ⱓ -> ⱓ == U+2C23 -> U+2C53 */ }
+          { ls += "\xe2\xb4\x9c"; continue; 	/* Ⴜ -> ⴜ == U+10BC -> U+2D1C */ }
 yy1683:
           ++sp;
-          { ls += "\xe2\xb1\x94"; continue; 	/* Ⱔ -> ⱔ == U+2C24 -> U+2C54 */ }
+          { ls += "\xe2\xb4\x9d"; continue; 	/* Ⴝ -> ⴝ == U+10BD -> U+2D1D */ }
 yy1685:
           ++sp;
-          { ls += "\xe2\xb1\x95"; continue; 	/* Ⱕ -> ⱕ == U+2C25 -> U+2C55 */ }
+          { ls += "\xe2\xb4\x9e"; continue; 	/* Ⴞ -> ⴞ == U+10BE -> U+2D1E */ }
 yy1687:
           ++sp;
-          { ls += "\xe2\xb1\x96"; continue; 	/* Ⱖ -> ⱖ == U+2C26 -> U+2C56 */ }
+          { ls += "\xe2\xb4\x9f"; continue; 	/* Ⴟ -> ⴟ == U+10BF -> U+2D1F */ }
 yy1689:
           ++sp;
-          { ls += "\xe2\xb1\x97"; continue; 	/* Ⱗ -> ⱗ == U+2C27 -> U+2C57 */ }
+          { ls += "\xe2\xb4\xa0"; continue; 	/* Ⴠ -> ⴠ == U+10C0 -> U+2D20 */ }
 yy1691:
           ++sp;
-          { ls += "\xe2\xb1\x98"; continue; 	/* Ⱘ -> ⱘ == U+2C28 -> U+2C58 */ }
+          { ls += "\xe2\xb4\xa1"; continue; 	/* Ⴡ -> ⴡ == U+10C1 -> U+2D21 */ }
 yy1693:
           ++sp;
-          { ls += "\xe2\xb1\x99"; continue; 	/* Ⱙ -> ⱙ == U+2C29 -> U+2C59 */ }
+          { ls += "\xe2\xb4\xa2"; continue; 	/* Ⴢ -> ⴢ == U+10C2 -> U+2D22 */ }
 yy1695:
           ++sp;
-          { ls += "\xe2\xb1\x9a"; continue; 	/* Ⱚ -> ⱚ == U+2C2A -> U+2C5A */ }
+          { ls += "\xe2\xb4\xa3"; continue; 	/* Ⴣ -> ⴣ == U+10C3 -> U+2D23 */ }
 yy1697:
           ++sp;
-          { ls += "\xe2\xb1\x9b"; continue; 	/* Ⱛ -> ⱛ == U+2C2B -> U+2C5B */ }
+          { ls += "\xe2\xb4\xa4"; continue; 	/* Ⴤ -> ⴤ == U+10C4 -> U+2D24 */ }
 yy1699:
           ++sp;
-          { ls += "\xe2\xb1\x9c"; continue; 	/* Ⱜ -> ⱜ == U+2C2C -> U+2C5C */ }
+          { ls += "\xe2\xb4\xa5"; continue; 	/* Ⴥ -> ⴥ == U+10C5 -> U+2D25 */ }
 yy1701:
           ++sp;
-          { ls += "\xe2\xb1\x9d"; continue; 	/* Ⱝ -> ⱝ == U+2C2D -> U+2C5D */ }
+          { ls += "\xe2\xb4\xa7"; continue; 	/* Ⴧ -> ⴧ == U+10C7 -> U+2D27 */ }
 yy1703:
           ++sp;
-          { ls += "\xe2\xb1\x9e"; continue; 	/* Ⱞ -> ⱞ == U+2C2E -> U+2C5E */ }
+          { ls += "\xe2\xb4\xad"; continue; 	/* Ⴭ -> ⴭ == U+10CD -> U+2D2D */ }
 yy1705:
           ++sp;
-          { ls += "\xe2\xb1\xa1"; continue; 	/* Ⱡ -> ⱡ == U+2C60 -> U+2C61 */ }
+          { ls += "\xe1\xb8\x81"; continue; 	/* Ḁ -> ḁ == U+1E00 -> U+1E01 */ }
 yy1707:
           ++sp;
-          { ls += "\xc9\xab"; continue; 	/* Ɫ -> ɫ == U+2C62 -> U+026B */ }
+          { ls += "\xe1\xb8\x83"; continue; 	/* Ḃ -> ḃ == U+1E02 -> U+1E03 */ }
 yy1709:
           ++sp;
-          { ls += "\xe1\xb5\xbd"; continue; 	/* Ᵽ -> ᵽ == U+2C63 -> U+1D7D */ }
+          { ls += "\xe1\xb8\x85"; continue; 	/* Ḅ -> ḅ == U+1E04 -> U+1E05 */ }
 yy1711:
           ++sp;
-          { ls += "\xc9\xbd"; continue; 	/* Ɽ -> ɽ == U+2C64 -> U+027D */ }
+          { ls += "\xe1\xb8\x87"; continue; 	/* Ḇ -> ḇ == U+1E06 -> U+1E07 */ }
 yy1713:
           ++sp;
-          { ls += "\xe2\xb1\xa8"; continue; 	/* Ⱨ -> ⱨ == U+2C67 -> U+2C68 */ }
+          { ls += "\xe1\xb8\x89"; continue; 	/* Ḉ -> ḉ == U+1E08 -> U+1E09 */ }
 yy1715:
           ++sp;
-          { ls += "\xe2\xb1\xaa"; continue; 	/* Ⱪ -> ⱪ == U+2C69 -> U+2C6A */ }
+          { ls += "\xe1\xb8\x8b"; continue; 	/* Ḋ -> ḋ == U+1E0A -> U+1E0B */ }
 yy1717:
           ++sp;
-          { ls += "\xe2\xb1\xac"; continue; 	/* Ⱬ -> ⱬ == U+2C6B -> U+2C6C */ }
+          { ls += "\xe1\xb8\x8d"; continue; 	/* Ḍ -> ḍ == U+1E0C -> U+1E0D */ }
 yy1719:
           ++sp;
-          { ls += "\xc9\x91"; continue; 	/* Ɑ -> ɑ == U+2C6D -> U+0251 */ }
+          { ls += "\xe1\xb8\x8f"; continue; 	/* Ḏ -> ḏ == U+1E0E -> U+1E0F */ }
 yy1721:
           ++sp;
-          { ls += "\xc9\xb1"; continue; 	/* Ɱ -> ɱ == U+2C6E -> U+0271 */ }
+          { ls += "\xe1\xb8\x91"; continue; 	/* Ḑ -> ḑ == U+1E10 -> U+1E11 */ }
 yy1723:
           ++sp;
-          { ls += "\xc9\x90"; continue; 	/* Ɐ -> ɐ == U+2C6F -> U+0250 */ }
+          { ls += "\xe1\xb8\x93"; continue; 	/* Ḓ -> ḓ == U+1E12 -> U+1E13 */ }
 yy1725:
           ++sp;
-          { ls += "\xc9\x92"; continue; 	/* Ɒ -> ɒ == U+2C70 -> U+0252 */ }
+          { ls += "\xe1\xb8\x95"; continue; 	/* Ḕ -> ḕ == U+1E14 -> U+1E15 */ }
 yy1727:
           ++sp;
-          { ls += "\xe2\xb1\xb3"; continue; 	/* Ⱳ -> ⱳ == U+2C72 -> U+2C73 */ }
+          { ls += "\xe1\xb8\x97"; continue; 	/* Ḗ -> ḗ == U+1E16 -> U+1E17 */ }
 yy1729:
           ++sp;
-          { ls += "\xe2\xb1\xb6"; continue; 	/* Ⱶ -> ⱶ == U+2C75 -> U+2C76 */ }
+          { ls += "\xe1\xb8\x99"; continue; 	/* Ḙ -> ḙ == U+1E18 -> U+1E19 */ }
 yy1731:
           ++sp;
-          { ls += "\xc8\xbf"; continue; 	/* Ȿ -> ȿ == U+2C7E -> U+023F */ }
+          { ls += "\xe1\xb8\x9b"; continue; 	/* Ḛ -> ḛ == U+1E1A -> U+1E1B */ }
 yy1733:
           ++sp;
-          { ls += "\xc9\x80"; continue; 	/* Ɀ -> ɀ == U+2C7F -> U+0240 */ }
+          { ls += "\xe1\xb8\x9d"; continue; 	/* Ḝ -> ḝ == U+1E1C -> U+1E1D */ }
 yy1735:
           ++sp;
-          { ls += "\xe2\xb2\x81"; continue; 	/* Ⲁ -> ⲁ == U+2C80 -> U+2C81 */ }
+          { ls += "\xe1\xb8\x9f"; continue; 	/* Ḟ -> ḟ == U+1E1E -> U+1E1F */ }
 yy1737:
           ++sp;
-          { ls += "\xe2\xb2\x83"; continue; 	/* Ⲃ -> ⲃ == U+2C82 -> U+2C83 */ }
+          { ls += "\xe1\xb8\xa1"; continue; 	/* Ḡ -> ḡ == U+1E20 -> U+1E21 */ }
 yy1739:
           ++sp;
-          { ls += "\xe2\xb2\x85"; continue; 	/* Ⲅ -> ⲅ == U+2C84 -> U+2C85 */ }
+          { ls += "\xe1\xb8\xa3"; continue; 	/* Ḣ -> ḣ == U+1E22 -> U+1E23 */ }
 yy1741:
           ++sp;
-          { ls += "\xe2\xb2\x87"; continue; 	/* Ⲇ -> ⲇ == U+2C86 -> U+2C87 */ }
+          { ls += "\xe1\xb8\xa5"; continue; 	/* Ḥ -> ḥ == U+1E24 -> U+1E25 */ }
 yy1743:
           ++sp;
-          { ls += "\xe2\xb2\x89"; continue; 	/* Ⲉ -> ⲉ == U+2C88 -> U+2C89 */ }
+          { ls += "\xe1\xb8\xa7"; continue; 	/* Ḧ -> ḧ == U+1E26 -> U+1E27 */ }
 yy1745:
           ++sp;
-          { ls += "\xe2\xb2\x8b"; continue; 	/* Ⲋ -> ⲋ == U+2C8A -> U+2C8B */ }
+          { ls += "\xe1\xb8\xa9"; continue; 	/* Ḩ -> ḩ == U+1E28 -> U+1E29 */ }
 yy1747:
           ++sp;
-          { ls += "\xe2\xb2\x8d"; continue; 	/* Ⲍ -> ⲍ == U+2C8C -> U+2C8D */ }
+          { ls += "\xe1\xb8\xab"; continue; 	/* Ḫ -> ḫ == U+1E2A -> U+1E2B */ }
 yy1749:
           ++sp;
-          { ls += "\xe2\xb2\x8f"; continue; 	/* Ⲏ -> ⲏ == U+2C8E -> U+2C8F */ }
+          { ls += "\xe1\xb8\xad"; continue; 	/* Ḭ -> ḭ == U+1E2C -> U+1E2D */ }
 yy1751:
           ++sp;
-          { ls += "\xe2\xb2\x91"; continue; 	/* Ⲑ -> ⲑ == U+2C90 -> U+2C91 */ }
+          { ls += "\xe1\xb8\xaf"; continue; 	/* Ḯ -> ḯ == U+1E2E -> U+1E2F */ }
 yy1753:
           ++sp;
-          { ls += "\xe2\xb2\x93"; continue; 	/* Ⲓ -> ⲓ == U+2C92 -> U+2C93 */ }
+          { ls += "\xe1\xb8\xb1"; continue; 	/* Ḱ -> ḱ == U+1E30 -> U+1E31 */ }
 yy1755:
           ++sp;
-          { ls += "\xe2\xb2\x95"; continue; 	/* Ⲕ -> ⲕ == U+2C94 -> U+2C95 */ }
+          { ls += "\xe1\xb8\xb3"; continue; 	/* Ḳ -> ḳ == U+1E32 -> U+1E33 */ }
 yy1757:
           ++sp;
-          { ls += "\xe2\xb2\x97"; continue; 	/* Ⲗ -> ⲗ == U+2C96 -> U+2C97 */ }
+          { ls += "\xe1\xb8\xb5"; continue; 	/* Ḵ -> ḵ == U+1E34 -> U+1E35 */ }
 yy1759:
           ++sp;
-          { ls += "\xe2\xb2\x99"; continue; 	/* Ⲙ -> ⲙ == U+2C98 -> U+2C99 */ }
+          { ls += "\xe1\xb8\xb7"; continue; 	/* Ḷ -> ḷ == U+1E36 -> U+1E37 */ }
 yy1761:
           ++sp;
-          { ls += "\xe2\xb2\x9b"; continue; 	/* Ⲛ -> ⲛ == U+2C9A -> U+2C9B */ }
+          { ls += "\xe1\xb8\xb9"; continue; 	/* Ḹ -> ḹ == U+1E38 -> U+1E39 */ }
 yy1763:
           ++sp;
-          { ls += "\xe2\xb2\x9d"; continue; 	/* Ⲝ -> ⲝ == U+2C9C -> U+2C9D */ }
+          { ls += "\xe1\xb8\xbb"; continue; 	/* Ḻ -> ḻ == U+1E3A -> U+1E3B */ }
 yy1765:
           ++sp;
-          { ls += "\xe2\xb2\x9f"; continue; 	/* Ⲟ -> ⲟ == U+2C9E -> U+2C9F */ }
+          { ls += "\xe1\xb8\xbd"; continue; 	/* Ḽ -> ḽ == U+1E3C -> U+1E3D */ }
 yy1767:
           ++sp;
-          { ls += "\xe2\xb2\xa1"; continue; 	/* Ⲡ -> ⲡ == U+2CA0 -> U+2CA1 */ }
+          { ls += "\xe1\xb8\xbf"; continue; 	/* Ḿ -> ḿ == U+1E3E -> U+1E3F */ }
 yy1769:
           ++sp;
-          { ls += "\xe2\xb2\xa3"; continue; 	/* Ⲣ -> ⲣ == U+2CA2 -> U+2CA3 */ }
+          { ls += "\xe1\xb9\x81"; continue; 	/* Ṁ -> ṁ == U+1E40 -> U+1E41 */ }
 yy1771:
           ++sp;
-          { ls += "\xe2\xb2\xa5"; continue; 	/* Ⲥ -> ⲥ == U+2CA4 -> U+2CA5 */ }
+          { ls += "\xe1\xb9\x83"; continue; 	/* Ṃ -> ṃ == U+1E42 -> U+1E43 */ }
 yy1773:
           ++sp;
-          { ls += "\xe2\xb2\xa7"; continue; 	/* Ⲧ -> ⲧ == U+2CA6 -> U+2CA7 */ }
+          { ls += "\xe1\xb9\x85"; continue; 	/* Ṅ -> ṅ == U+1E44 -> U+1E45 */ }
 yy1775:
           ++sp;
-          { ls += "\xe2\xb2\xa9"; continue; 	/* Ⲩ -> ⲩ == U+2CA8 -> U+2CA9 */ }
+          { ls += "\xe1\xb9\x87"; continue; 	/* Ṇ -> ṇ == U+1E46 -> U+1E47 */ }
 yy1777:
           ++sp;
-          { ls += "\xe2\xb2\xab"; continue; 	/* Ⲫ -> ⲫ == U+2CAA -> U+2CAB */ }
+          { ls += "\xe1\xb9\x89"; continue; 	/* Ṉ -> ṉ == U+1E48 -> U+1E49 */ }
 yy1779:
           ++sp;
-          { ls += "\xe2\xb2\xad"; continue; 	/* Ⲭ -> ⲭ == U+2CAC -> U+2CAD */ }
+          { ls += "\xe1\xb9\x8b"; continue; 	/* Ṋ -> ṋ == U+1E4A -> U+1E4B */ }
 yy1781:
           ++sp;
-          { ls += "\xe2\xb2\xaf"; continue; 	/* Ⲯ -> ⲯ == U+2CAE -> U+2CAF */ }
+          { ls += "\xe1\xb9\x8d"; continue; 	/* Ṍ -> ṍ == U+1E4C -> U+1E4D */ }
 yy1783:
           ++sp;
-          { ls += "\xe2\xb2\xb1"; continue; 	/* Ⲱ -> ⲱ == U+2CB0 -> U+2CB1 */ }
+          { ls += "\xe1\xb9\x8f"; continue; 	/* Ṏ -> ṏ == U+1E4E -> U+1E4F */ }
 yy1785:
           ++sp;
-          { ls += "\xe2\xb2\xb3"; continue; 	/* Ⲳ -> ⲳ == U+2CB2 -> U+2CB3 */ }
+          { ls += "\xe1\xb9\x91"; continue; 	/* Ṑ -> ṑ == U+1E50 -> U+1E51 */ }
 yy1787:
           ++sp;
-          { ls += "\xe2\xb2\xb5"; continue; 	/* Ⲵ -> ⲵ == U+2CB4 -> U+2CB5 */ }
+          { ls += "\xe1\xb9\x93"; continue; 	/* Ṓ -> ṓ == U+1E52 -> U+1E53 */ }
 yy1789:
           ++sp;
-          { ls += "\xe2\xb2\xb7"; continue; 	/* Ⲷ -> ⲷ == U+2CB6 -> U+2CB7 */ }
+          { ls += "\xe1\xb9\x95"; continue; 	/* Ṕ -> ṕ == U+1E54 -> U+1E55 */ }
 yy1791:
           ++sp;
-          { ls += "\xe2\xb2\xb9"; continue; 	/* Ⲹ -> ⲹ == U+2CB8 -> U+2CB9 */ }
+          { ls += "\xe1\xb9\x97"; continue; 	/* Ṗ -> ṗ == U+1E56 -> U+1E57 */ }
 yy1793:
           ++sp;
-          { ls += "\xe2\xb2\xbb"; continue; 	/* Ⲻ -> ⲻ == U+2CBA -> U+2CBB */ }
+          { ls += "\xe1\xb9\x99"; continue; 	/* Ṙ -> ṙ == U+1E58 -> U+1E59 */ }
 yy1795:
           ++sp;
-          { ls += "\xe2\xb2\xbd"; continue; 	/* Ⲽ -> ⲽ == U+2CBC -> U+2CBD */ }
+          { ls += "\xe1\xb9\x9b"; continue; 	/* Ṛ -> ṛ == U+1E5A -> U+1E5B */ }
 yy1797:
           ++sp;
-          { ls += "\xe2\xb2\xbf"; continue; 	/* Ⲿ -> ⲿ == U+2CBE -> U+2CBF */ }
+          { ls += "\xe1\xb9\x9d"; continue; 	/* Ṝ -> ṝ == U+1E5C -> U+1E5D */ }
 yy1799:
           ++sp;
-          { ls += "\xe2\xb3\x81"; continue; 	/* Ⳁ -> ⳁ == U+2CC0 -> U+2CC1 */ }
+          { ls += "\xe1\xb9\x9f"; continue; 	/* Ṟ -> ṟ == U+1E5E -> U+1E5F */ }
 yy1801:
           ++sp;
-          { ls += "\xe2\xb3\x83"; continue; 	/* Ⳃ -> ⳃ == U+2CC2 -> U+2CC3 */ }
+          { ls += "\xe1\xb9\xa1"; continue; 	/* Ṡ -> ṡ == U+1E60 -> U+1E61 */ }
 yy1803:
           ++sp;
-          { ls += "\xe2\xb3\x85"; continue; 	/* Ⳅ -> ⳅ == U+2CC4 -> U+2CC5 */ }
+          { ls += "\xe1\xb9\xa3"; continue; 	/* Ṣ -> ṣ == U+1E62 -> U+1E63 */ }
 yy1805:
           ++sp;
-          { ls += "\xe2\xb3\x87"; continue; 	/* Ⳇ -> ⳇ == U+2CC6 -> U+2CC7 */ }
+          { ls += "\xe1\xb9\xa5"; continue; 	/* Ṥ -> ṥ == U+1E64 -> U+1E65 */ }
 yy1807:
           ++sp;
-          { ls += "\xe2\xb3\x89"; continue; 	/* Ⳉ -> ⳉ == U+2CC8 -> U+2CC9 */ }
+          { ls += "\xe1\xb9\xa7"; continue; 	/* Ṧ -> ṧ == U+1E66 -> U+1E67 */ }
 yy1809:
           ++sp;
-          { ls += "\xe2\xb3\x8b"; continue; 	/* Ⳋ -> ⳋ == U+2CCA -> U+2CCB */ }
+          { ls += "\xe1\xb9\xa9"; continue; 	/* Ṩ -> ṩ == U+1E68 -> U+1E69 */ }
 yy1811:
           ++sp;
-          { ls += "\xe2\xb3\x8d"; continue; 	/* Ⳍ -> ⳍ == U+2CCC -> U+2CCD */ }
+          { ls += "\xe1\xb9\xab"; continue; 	/* Ṫ -> ṫ == U+1E6A -> U+1E6B */ }
 yy1813:
           ++sp;
-          { ls += "\xe2\xb3\x8f"; continue; 	/* Ⳏ -> ⳏ == U+2CCE -> U+2CCF */ }
+          { ls += "\xe1\xb9\xad"; continue; 	/* Ṭ -> ṭ == U+1E6C -> U+1E6D */ }
 yy1815:
           ++sp;
-          { ls += "\xe2\xb3\x91"; continue; 	/* Ⳑ -> ⳑ == U+2CD0 -> U+2CD1 */ }
+          { ls += "\xe1\xb9\xaf"; continue; 	/* Ṯ -> ṯ == U+1E6E -> U+1E6F */ }
 yy1817:
           ++sp;
-          { ls += "\xe2\xb3\x93"; continue; 	/* Ⳓ -> ⳓ == U+2CD2 -> U+2CD3 */ }
+          { ls += "\xe1\xb9\xb1"; continue; 	/* Ṱ -> ṱ == U+1E70 -> U+1E71 */ }
 yy1819:
           ++sp;
-          { ls += "\xe2\xb3\x95"; continue; 	/* Ⳕ -> ⳕ == U+2CD4 -> U+2CD5 */ }
+          { ls += "\xe1\xb9\xb3"; continue; 	/* Ṳ -> ṳ == U+1E72 -> U+1E73 */ }
 yy1821:
           ++sp;
-          { ls += "\xe2\xb3\x97"; continue; 	/* Ⳗ -> ⳗ == U+2CD6 -> U+2CD7 */ }
+          { ls += "\xe1\xb9\xb5"; continue; 	/* Ṵ -> ṵ == U+1E74 -> U+1E75 */ }
 yy1823:
           ++sp;
-          { ls += "\xe2\xb3\x99"; continue; 	/* Ⳙ -> ⳙ == U+2CD8 -> U+2CD9 */ }
+          { ls += "\xe1\xb9\xb7"; continue; 	/* Ṷ -> ṷ == U+1E76 -> U+1E77 */ }
 yy1825:
           ++sp;
-          { ls += "\xe2\xb3\x9b"; continue; 	/* Ⳛ -> ⳛ == U+2CDA -> U+2CDB */ }
+          { ls += "\xe1\xb9\xb9"; continue; 	/* Ṹ -> ṹ == U+1E78 -> U+1E79 */ }
 yy1827:
           ++sp;
-          { ls += "\xe2\xb3\x9d"; continue; 	/* Ⳝ -> ⳝ == U+2CDC -> U+2CDD */ }
+          { ls += "\xe1\xb9\xbb"; continue; 	/* Ṻ -> ṻ == U+1E7A -> U+1E7B */ }
 yy1829:
           ++sp;
-          { ls += "\xe2\xb3\x9f"; continue; 	/* Ⳟ -> ⳟ == U+2CDE -> U+2CDF */ }
+          { ls += "\xe1\xb9\xbd"; continue; 	/* Ṽ -> ṽ == U+1E7C -> U+1E7D */ }
 yy1831:
           ++sp;
-          { ls += "\xe2\xb3\xa1"; continue; 	/* Ⳡ -> ⳡ == U+2CE0 -> U+2CE1 */ }
+          { ls += "\xe1\xb9\xbf"; continue; 	/* Ṿ -> ṿ == U+1E7E -> U+1E7F */ }
 yy1833:
           ++sp;
-          { ls += "\xe2\xb3\xa3"; continue; 	/* Ⳣ -> ⳣ == U+2CE2 -> U+2CE3 */ }
+          { ls += "\xe1\xba\x81"; continue; 	/* Ẁ -> ẁ == U+1E80 -> U+1E81 */ }
 yy1835:
           ++sp;
-          { ls += "\xe2\xb3\xac"; continue; 	/* Ⳬ -> ⳬ == U+2CEB -> U+2CEC */ }
+          { ls += "\xe1\xba\x83"; continue; 	/* Ẃ -> ẃ == U+1E82 -> U+1E83 */ }
 yy1837:
           ++sp;
-          { ls += "\xe2\xb3\xae"; continue; 	/* Ⳮ -> ⳮ == U+2CED -> U+2CEE */ }
+          { ls += "\xe1\xba\x85"; continue; 	/* Ẅ -> ẅ == U+1E84 -> U+1E85 */ }
 yy1839:
           ++sp;
-          { ls += "\xe2\xb3\xb3"; continue; 	/* Ⳳ -> ⳳ == U+2CF2 -> U+2CF3 */ }
+          { ls += "\xe1\xba\x87"; continue; 	/* Ẇ -> ẇ == U+1E86 -> U+1E87 */ }
 yy1841:
           ++sp;
-          { ls += "\xea\x99\x81"; continue; 	/* Ꙁ -> ꙁ == U+A640 -> U+A641 */ }
+          { ls += "\xe1\xba\x89"; continue; 	/* Ẉ -> ẉ == U+1E88 -> U+1E89 */ }
 yy1843:
           ++sp;
-          { ls += "\xea\x99\x83"; continue; 	/* Ꙃ -> ꙃ == U+A642 -> U+A643 */ }
+          { ls += "\xe1\xba\x8b"; continue; 	/* Ẋ -> ẋ == U+1E8A -> U+1E8B */ }
 yy1845:
           ++sp;
-          { ls += "\xea\x99\x85"; continue; 	/* Ꙅ -> ꙅ == U+A644 -> U+A645 */ }
+          { ls += "\xe1\xba\x8d"; continue; 	/* Ẍ -> ẍ == U+1E8C -> U+1E8D */ }
 yy1847:
           ++sp;
-          { ls += "\xea\x99\x87"; continue; 	/* Ꙇ -> ꙇ == U+A646 -> U+A647 */ }
+          { ls += "\xe1\xba\x8f"; continue; 	/* Ẏ -> ẏ == U+1E8E -> U+1E8F */ }
 yy1849:
           ++sp;
-          { ls += "\xea\x99\x89"; continue; 	/* Ꙉ -> ꙉ == U+A648 -> U+A649 */ }
+          { ls += "\xe1\xba\x91"; continue; 	/* Ẑ -> ẑ == U+1E90 -> U+1E91 */ }
 yy1851:
           ++sp;
-          { ls += "\xea\x99\x8b"; continue; 	/* Ꙋ -> ꙋ == U+A64A -> U+A64B */ }
+          { ls += "\xe1\xba\x93"; continue; 	/* Ẓ -> ẓ == U+1E92 -> U+1E93 */ }
 yy1853:
           ++sp;
-          { ls += "\xea\x99\x8d"; continue; 	/* Ꙍ -> ꙍ == U+A64C -> U+A64D */ }
+          { ls += "\xe1\xba\x95"; continue; 	/* Ẕ -> ẕ == U+1E94 -> U+1E95 */ }
 yy1855:
           ++sp;
-          { ls += "\xea\x99\x8f"; continue; 	/* Ꙏ -> ꙏ == U+A64E -> U+A64F */ }
+          { ls += "\xc3\x9f"; continue; 	/* ẞ -> ß == U+1E9E -> U+00DF */ }
 yy1857:
           ++sp;
-          { ls += "\xea\x99\x91"; continue; 	/* Ꙑ -> ꙑ == U+A650 -> U+A651 */ }
+          { ls += "\xe1\xba\xa1"; continue; 	/* Ạ -> ạ == U+1EA0 -> U+1EA1 */ }
 yy1859:
           ++sp;
-          { ls += "\xea\x99\x93"; continue; 	/* Ꙓ -> ꙓ == U+A652 -> U+A653 */ }
+          { ls += "\xe1\xba\xa3"; continue; 	/* Ả -> ả == U+1EA2 -> U+1EA3 */ }
 yy1861:
           ++sp;
-          { ls += "\xea\x99\x95"; continue; 	/* Ꙕ -> ꙕ == U+A654 -> U+A655 */ }
+          { ls += "\xe1\xba\xa5"; continue; 	/* Ấ -> ấ == U+1EA4 -> U+1EA5 */ }
 yy1863:
           ++sp;
-          { ls += "\xea\x99\x97"; continue; 	/* Ꙗ -> ꙗ == U+A656 -> U+A657 */ }
+          { ls += "\xe1\xba\xa7"; continue; 	/* Ầ -> ầ == U+1EA6 -> U+1EA7 */ }
 yy1865:
           ++sp;
-          { ls += "\xea\x99\x99"; continue; 	/* Ꙙ -> ꙙ == U+A658 -> U+A659 */ }
+          { ls += "\xe1\xba\xa9"; continue; 	/* Ẩ -> ẩ == U+1EA8 -> U+1EA9 */ }
 yy1867:
           ++sp;
-          { ls += "\xea\x99\x9b"; continue; 	/* Ꙛ -> ꙛ == U+A65A -> U+A65B */ }
+          { ls += "\xe1\xba\xab"; continue; 	/* Ẫ -> ẫ == U+1EAA -> U+1EAB */ }
 yy1869:
           ++sp;
-          { ls += "\xea\x99\x9d"; continue; 	/* Ꙝ -> ꙝ == U+A65C -> U+A65D */ }
+          { ls += "\xe1\xba\xad"; continue; 	/* Ậ -> ậ == U+1EAC -> U+1EAD */ }
 yy1871:
           ++sp;
-          { ls += "\xea\x99\x9f"; continue; 	/* Ꙟ -> ꙟ == U+A65E -> U+A65F */ }
+          { ls += "\xe1\xba\xaf"; continue; 	/* Ắ -> ắ == U+1EAE -> U+1EAF */ }
 yy1873:
           ++sp;
-          { ls += "\xea\x99\xa1"; continue; 	/* Ꙡ -> ꙡ == U+A660 -> U+A661 */ }
+          { ls += "\xe1\xba\xb1"; continue; 	/* Ằ -> ằ == U+1EB0 -> U+1EB1 */ }
 yy1875:
           ++sp;
-          { ls += "\xea\x99\xa3"; continue; 	/* Ꙣ -> ꙣ == U+A662 -> U+A663 */ }
+          { ls += "\xe1\xba\xb3"; continue; 	/* Ẳ -> ẳ == U+1EB2 -> U+1EB3 */ }
 yy1877:
           ++sp;
-          { ls += "\xea\x99\xa5"; continue; 	/* Ꙥ -> ꙥ == U+A664 -> U+A665 */ }
+          { ls += "\xe1\xba\xb5"; continue; 	/* Ẵ -> ẵ == U+1EB4 -> U+1EB5 */ }
 yy1879:
           ++sp;
-          { ls += "\xea\x99\xa7"; continue; 	/* Ꙧ -> ꙧ == U+A666 -> U+A667 */ }
+          { ls += "\xe1\xba\xb7"; continue; 	/* Ặ -> ặ == U+1EB6 -> U+1EB7 */ }
 yy1881:
           ++sp;
-          { ls += "\xea\x99\xa9"; continue; 	/* Ꙩ -> ꙩ == U+A668 -> U+A669 */ }
+          { ls += "\xe1\xba\xb9"; continue; 	/* Ẹ -> ẹ == U+1EB8 -> U+1EB9 */ }
 yy1883:
           ++sp;
-          { ls += "\xea\x99\xab"; continue; 	/* Ꙫ -> ꙫ == U+A66A -> U+A66B */ }
+          { ls += "\xe1\xba\xbb"; continue; 	/* Ẻ -> ẻ == U+1EBA -> U+1EBB */ }
 yy1885:
           ++sp;
-          { ls += "\xea\x99\xad"; continue; 	/* Ꙭ -> ꙭ == U+A66C -> U+A66D */ }
+          { ls += "\xe1\xba\xbd"; continue; 	/* Ẽ -> ẽ == U+1EBC -> U+1EBD */ }
 yy1887:
           ++sp;
-          { ls += "\xea\x9a\x81"; continue; 	/* Ꚁ -> ꚁ == U+A680 -> U+A681 */ }
+          { ls += "\xe1\xba\xbf"; continue; 	/* Ế -> ế == U+1EBE -> U+1EBF */ }
 yy1889:
           ++sp;
-          { ls += "\xea\x9a\x83"; continue; 	/* Ꚃ -> ꚃ == U+A682 -> U+A683 */ }
+          { ls += "\xe1\xbb\x81"; continue; 	/* Ề -> ề == U+1EC0 -> U+1EC1 */ }
 yy1891:
           ++sp;
-          { ls += "\xea\x9a\x85"; continue; 	/* Ꚅ -> ꚅ == U+A684 -> U+A685 */ }
+          { ls += "\xe1\xbb\x83"; continue; 	/* Ể -> ể == U+1EC2 -> U+1EC3 */ }
 yy1893:
           ++sp;
-          { ls += "\xea\x9a\x87"; continue; 	/* Ꚇ -> ꚇ == U+A686 -> U+A687 */ }
+          { ls += "\xe1\xbb\x85"; continue; 	/* Ễ -> ễ == U+1EC4 -> U+1EC5 */ }
 yy1895:
           ++sp;
-          { ls += "\xea\x9a\x89"; continue; 	/* Ꚉ -> ꚉ == U+A688 -> U+A689 */ }
+          { ls += "\xe1\xbb\x87"; continue; 	/* Ệ -> ệ == U+1EC6 -> U+1EC7 */ }
 yy1897:
           ++sp;
-          { ls += "\xea\x9a\x8b"; continue; 	/* Ꚋ -> ꚋ == U+A68A -> U+A68B */ }
+          { ls += "\xe1\xbb\x89"; continue; 	/* Ỉ -> ỉ == U+1EC8 -> U+1EC9 */ }
 yy1899:
           ++sp;
-          { ls += "\xea\x9a\x8d"; continue; 	/* Ꚍ -> ꚍ == U+A68C -> U+A68D */ }
+          { ls += "\xe1\xbb\x8b"; continue; 	/* Ị -> ị == U+1ECA -> U+1ECB */ }
 yy1901:
           ++sp;
-          { ls += "\xea\x9a\x8f"; continue; 	/* Ꚏ -> ꚏ == U+A68E -> U+A68F */ }
+          { ls += "\xe1\xbb\x8d"; continue; 	/* Ọ -> ọ == U+1ECC -> U+1ECD */ }
 yy1903:
           ++sp;
-          { ls += "\xea\x9a\x91"; continue; 	/* Ꚑ -> ꚑ == U+A690 -> U+A691 */ }
+          { ls += "\xe1\xbb\x8f"; continue; 	/* Ỏ -> ỏ == U+1ECE -> U+1ECF */ }
 yy1905:
           ++sp;
-          { ls += "\xea\x9a\x93"; continue; 	/* Ꚓ -> ꚓ == U+A692 -> U+A693 */ }
+          { ls += "\xe1\xbb\x91"; continue; 	/* Ố -> ố == U+1ED0 -> U+1ED1 */ }
 yy1907:
           ++sp;
-          { ls += "\xea\x9a\x95"; continue; 	/* Ꚕ -> ꚕ == U+A694 -> U+A695 */ }
+          { ls += "\xe1\xbb\x93"; continue; 	/* Ồ -> ồ == U+1ED2 -> U+1ED3 */ }
 yy1909:
           ++sp;
-          { ls += "\xea\x9a\x97"; continue; 	/* Ꚗ -> ꚗ == U+A696 -> U+A697 */ }
+          { ls += "\xe1\xbb\x95"; continue; 	/* Ổ -> ổ == U+1ED4 -> U+1ED5 */ }
 yy1911:
           ++sp;
-          { ls += "\xea\x9a\x99"; continue; 	/* Ꚙ -> ꚙ == U+A698 -> U+A699 */ }
+          { ls += "\xe1\xbb\x97"; continue; 	/* Ỗ -> ỗ == U+1ED6 -> U+1ED7 */ }
 yy1913:
           ++sp;
-          { ls += "\xea\x9a\x9b"; continue; 	/* Ꚛ -> ꚛ == U+A69A -> U+A69B */ }
+          { ls += "\xe1\xbb\x99"; continue; 	/* Ộ -> ộ == U+1ED8 -> U+1ED9 */ }
 yy1915:
           ++sp;
-          { ls += "\xea\x9c\xa3"; continue; 	/* Ꜣ -> ꜣ == U+A722 -> U+A723 */ }
+          { ls += "\xe1\xbb\x9b"; continue; 	/* Ớ -> ớ == U+1EDA -> U+1EDB */ }
 yy1917:
           ++sp;
-          { ls += "\xea\x9c\xa5"; continue; 	/* Ꜥ -> ꜥ == U+A724 -> U+A725 */ }
+          { ls += "\xe1\xbb\x9d"; continue; 	/* Ờ -> ờ == U+1EDC -> U+1EDD */ }
 yy1919:
           ++sp;
-          { ls += "\xea\x9c\xa7"; continue; 	/* Ꜧ -> ꜧ == U+A726 -> U+A727 */ }
+          { ls += "\xe1\xbb\x9f"; continue; 	/* Ở -> ở == U+1EDE -> U+1EDF */ }
 yy1921:
           ++sp;
-          { ls += "\xea\x9c\xa9"; continue; 	/* Ꜩ -> ꜩ == U+A728 -> U+A729 */ }
+          { ls += "\xe1\xbb\xa1"; continue; 	/* Ỡ -> ỡ == U+1EE0 -> U+1EE1 */ }
 yy1923:
           ++sp;
-          { ls += "\xea\x9c\xab"; continue; 	/* Ꜫ -> ꜫ == U+A72A -> U+A72B */ }
+          { ls += "\xe1\xbb\xa3"; continue; 	/* Ợ -> ợ == U+1EE2 -> U+1EE3 */ }
 yy1925:
           ++sp;
-          { ls += "\xea\x9c\xad"; continue; 	/* Ꜭ -> ꜭ == U+A72C -> U+A72D */ }
+          { ls += "\xe1\xbb\xa5"; continue; 	/* Ụ -> ụ == U+1EE4 -> U+1EE5 */ }
 yy1927:
           ++sp;
-          { ls += "\xea\x9c\xaf"; continue; 	/* Ꜯ -> ꜯ == U+A72E -> U+A72F */ }
+          { ls += "\xe1\xbb\xa7"; continue; 	/* Ủ -> ủ == U+1EE6 -> U+1EE7 */ }
 yy1929:
           ++sp;
-          { ls += "\xea\x9c\xb3"; continue; 	/* Ꜳ -> ꜳ == U+A732 -> U+A733 */ }
+          { ls += "\xe1\xbb\xa9"; continue; 	/* Ứ -> ứ == U+1EE8 -> U+1EE9 */ }
 yy1931:
           ++sp;
-          { ls += "\xea\x9c\xb5"; continue; 	/* Ꜵ -> ꜵ == U+A734 -> U+A735 */ }
+          { ls += "\xe1\xbb\xab"; continue; 	/* Ừ -> ừ == U+1EEA -> U+1EEB */ }
 yy1933:
           ++sp;
-          { ls += "\xea\x9c\xb7"; continue; 	/* Ꜷ -> ꜷ == U+A736 -> U+A737 */ }
+          { ls += "\xe1\xbb\xad"; continue; 	/* Ử -> ử == U+1EEC -> U+1EED */ }
 yy1935:
           ++sp;
-          { ls += "\xea\x9c\xb9"; continue; 	/* Ꜹ -> ꜹ == U+A738 -> U+A739 */ }
+          { ls += "\xe1\xbb\xaf"; continue; 	/* Ữ -> ữ == U+1EEE -> U+1EEF */ }
 yy1937:
           ++sp;
-          { ls += "\xea\x9c\xbb"; continue; 	/* Ꜻ -> ꜻ == U+A73A -> U+A73B */ }
+          { ls += "\xe1\xbb\xb1"; continue; 	/* Ự -> ự == U+1EF0 -> U+1EF1 */ }
 yy1939:
           ++sp;
-          { ls += "\xea\x9c\xbd"; continue; 	/* Ꜽ -> ꜽ == U+A73C -> U+A73D */ }
+          { ls += "\xe1\xbb\xb3"; continue; 	/* Ỳ -> ỳ == U+1EF2 -> U+1EF3 */ }
 yy1941:
           ++sp;
-          { ls += "\xea\x9c\xbf"; continue; 	/* Ꜿ -> ꜿ == U+A73E -> U+A73F */ }
+          { ls += "\xe1\xbb\xb5"; continue; 	/* Ỵ -> ỵ == U+1EF4 -> U+1EF5 */ }
 yy1943:
           ++sp;
-          { ls += "\xea\x9d\x81"; continue; 	/* Ꝁ -> ꝁ == U+A740 -> U+A741 */ }
+          { ls += "\xe1\xbb\xb7"; continue; 	/* Ỷ -> ỷ == U+1EF6 -> U+1EF7 */ }
 yy1945:
           ++sp;
-          { ls += "\xea\x9d\x83"; continue; 	/* Ꝃ -> ꝃ == U+A742 -> U+A743 */ }
+          { ls += "\xe1\xbb\xb9"; continue; 	/* Ỹ -> ỹ == U+1EF8 -> U+1EF9 */ }
 yy1947:
           ++sp;
-          { ls += "\xea\x9d\x85"; continue; 	/* Ꝅ -> ꝅ == U+A744 -> U+A745 */ }
+          { ls += "\xe1\xbb\xbb"; continue; 	/* Ỻ -> ỻ == U+1EFA -> U+1EFB */ }
 yy1949:
           ++sp;
-          { ls += "\xea\x9d\x87"; continue; 	/* Ꝇ -> ꝇ == U+A746 -> U+A747 */ }
+          { ls += "\xe1\xbb\xbd"; continue; 	/* Ỽ -> ỽ == U+1EFC -> U+1EFD */ }
 yy1951:
           ++sp;
-          { ls += "\xea\x9d\x89"; continue; 	/* Ꝉ -> ꝉ == U+A748 -> U+A749 */ }
+          { ls += "\xe1\xbb\xbf"; continue; 	/* Ỿ -> ỿ == U+1EFE -> U+1EFF */ }
 yy1953:
           ++sp;
-          { ls += "\xea\x9d\x8b"; continue; 	/* Ꝋ -> ꝋ == U+A74A -> U+A74B */ }
+          { ls += "\xe1\xbc\x80"; continue; 	/* Ἀ -> ἀ == U+1F08 -> U+1F00 */ }
 yy1955:
           ++sp;
-          { ls += "\xea\x9d\x8d"; continue; 	/* Ꝍ -> ꝍ == U+A74C -> U+A74D */ }
+          { ls += "\xe1\xbc\x81"; continue; 	/* Ἁ -> ἁ == U+1F09 -> U+1F01 */ }
 yy1957:
           ++sp;
-          { ls += "\xea\x9d\x8f"; continue; 	/* Ꝏ -> ꝏ == U+A74E -> U+A74F */ }
+          { ls += "\xe1\xbc\x82"; continue; 	/* Ἂ -> ἂ == U+1F0A -> U+1F02 */ }
 yy1959:
           ++sp;
-          { ls += "\xea\x9d\x91"; continue; 	/* Ꝑ -> ꝑ == U+A750 -> U+A751 */ }
+          { ls += "\xe1\xbc\x83"; continue; 	/* Ἃ -> ἃ == U+1F0B -> U+1F03 */ }
 yy1961:
           ++sp;
-          { ls += "\xea\x9d\x93"; continue; 	/* Ꝓ -> ꝓ == U+A752 -> U+A753 */ }
+          { ls += "\xe1\xbc\x84"; continue; 	/* Ἄ -> ἄ == U+1F0C -> U+1F04 */ }
 yy1963:
           ++sp;
-          { ls += "\xea\x9d\x95"; continue; 	/* Ꝕ -> ꝕ == U+A754 -> U+A755 */ }
+          { ls += "\xe1\xbc\x85"; continue; 	/* Ἅ -> ἅ == U+1F0D -> U+1F05 */ }
 yy1965:
           ++sp;
-          { ls += "\xea\x9d\x97"; continue; 	/* Ꝗ -> ꝗ == U+A756 -> U+A757 */ }
+          { ls += "\xe1\xbc\x86"; continue; 	/* Ἆ -> ἆ == U+1F0E -> U+1F06 */ }
 yy1967:
           ++sp;
-          { ls += "\xea\x9d\x99"; continue; 	/* Ꝙ -> ꝙ == U+A758 -> U+A759 */ }
+          { ls += "\xe1\xbc\x87"; continue; 	/* Ἇ -> ἇ == U+1F0F -> U+1F07 */ }
 yy1969:
           ++sp;
-          { ls += "\xea\x9d\x9b"; continue; 	/* Ꝛ -> ꝛ == U+A75A -> U+A75B */ }
+          { ls += "\xe1\xbc\x90"; continue; 	/* Ἐ -> ἐ == U+1F18 -> U+1F10 */ }
 yy1971:
           ++sp;
-          { ls += "\xea\x9d\x9d"; continue; 	/* Ꝝ -> ꝝ == U+A75C -> U+A75D */ }
+          { ls += "\xe1\xbc\x91"; continue; 	/* Ἑ -> ἑ == U+1F19 -> U+1F11 */ }
 yy1973:
           ++sp;
-          { ls += "\xea\x9d\x9f"; continue; 	/* Ꝟ -> ꝟ == U+A75E -> U+A75F */ }
+          { ls += "\xe1\xbc\x92"; continue; 	/* Ἒ -> ἒ == U+1F1A -> U+1F12 */ }
 yy1975:
           ++sp;
-          { ls += "\xea\x9d\xa1"; continue; 	/* Ꝡ -> ꝡ == U+A760 -> U+A761 */ }
+          { ls += "\xe1\xbc\x93"; continue; 	/* Ἓ -> ἓ == U+1F1B -> U+1F13 */ }
 yy1977:
           ++sp;
-          { ls += "\xea\x9d\xa3"; continue; 	/* Ꝣ -> ꝣ == U+A762 -> U+A763 */ }
+          { ls += "\xe1\xbc\x94"; continue; 	/* Ἔ -> ἔ == U+1F1C -> U+1F14 */ }
 yy1979:
           ++sp;
-          { ls += "\xea\x9d\xa5"; continue; 	/* Ꝥ -> ꝥ == U+A764 -> U+A765 */ }
+          { ls += "\xe1\xbc\x95"; continue; 	/* Ἕ -> ἕ == U+1F1D -> U+1F15 */ }
 yy1981:
           ++sp;
-          { ls += "\xea\x9d\xa7"; continue; 	/* Ꝧ -> ꝧ == U+A766 -> U+A767 */ }
+          { ls += "\xe1\xbc\xa0"; continue; 	/* Ἠ -> ἠ == U+1F28 -> U+1F20 */ }
 yy1983:
           ++sp;
-          { ls += "\xea\x9d\xa9"; continue; 	/* Ꝩ -> ꝩ == U+A768 -> U+A769 */ }
+          { ls += "\xe1\xbc\xa1"; continue; 	/* Ἡ -> ἡ == U+1F29 -> U+1F21 */ }
 yy1985:
           ++sp;
-          { ls += "\xea\x9d\xab"; continue; 	/* Ꝫ -> ꝫ == U+A76A -> U+A76B */ }
+          { ls += "\xe1\xbc\xa2"; continue; 	/* Ἢ -> ἢ == U+1F2A -> U+1F22 */ }
 yy1987:
           ++sp;
-          { ls += "\xea\x9d\xad"; continue; 	/* Ꝭ -> ꝭ == U+A76C -> U+A76D */ }
+          { ls += "\xe1\xbc\xa3"; continue; 	/* Ἣ -> ἣ == U+1F2B -> U+1F23 */ }
 yy1989:
           ++sp;
-          { ls += "\xea\x9d\xaf"; continue; 	/* Ꝯ -> ꝯ == U+A76E -> U+A76F */ }
+          { ls += "\xe1\xbc\xa4"; continue; 	/* Ἤ -> ἤ == U+1F2C -> U+1F24 */ }
 yy1991:
           ++sp;
-          { ls += "\xea\x9d\xba"; continue; 	/* Ꝺ -> ꝺ == U+A779 -> U+A77A */ }
+          { ls += "\xe1\xbc\xa5"; continue; 	/* Ἥ -> ἥ == U+1F2D -> U+1F25 */ }
 yy1993:
           ++sp;
-          { ls += "\xea\x9d\xbc"; continue; 	/* Ꝼ -> ꝼ == U+A77B -> U+A77C */ }
+          { ls += "\xe1\xbc\xa6"; continue; 	/* Ἦ -> ἦ == U+1F2E -> U+1F26 */ }
 yy1995:
           ++sp;
-          { ls += "\xe1\xb5\xb9"; continue; 	/* Ᵹ -> ᵹ == U+A77D -> U+1D79 */ }
+          { ls += "\xe1\xbc\xa7"; continue; 	/* Ἧ -> ἧ == U+1F2F -> U+1F27 */ }
 yy1997:
           ++sp;
-          { ls += "\xea\x9d\xbf"; continue; 	/* Ꝿ -> ꝿ == U+A77E -> U+A77F */ }
+          { ls += "\xe1\xbc\xb0"; continue; 	/* Ἰ -> ἰ == U+1F38 -> U+1F30 */ }
 yy1999:
           ++sp;
-          { ls += "\xea\x9e\x81"; continue; 	/* Ꞁ -> ꞁ == U+A780 -> U+A781 */ }
+          { ls += "\xe1\xbc\xb1"; continue; 	/* Ἱ -> ἱ == U+1F39 -> U+1F31 */ }
 yy2001:
           ++sp;
-          { ls += "\xea\x9e\x83"; continue; 	/* Ꞃ -> ꞃ == U+A782 -> U+A783 */ }
+          { ls += "\xe1\xbc\xb2"; continue; 	/* Ἲ -> ἲ == U+1F3A -> U+1F32 */ }
 yy2003:
           ++sp;
-          { ls += "\xea\x9e\x85"; continue; 	/* Ꞅ -> ꞅ == U+A784 -> U+A785 */ }
+          { ls += "\xe1\xbc\xb3"; continue; 	/* Ἳ -> ἳ == U+1F3B -> U+1F33 */ }
 yy2005:
           ++sp;
-          { ls += "\xea\x9e\x87"; continue; 	/* Ꞇ -> ꞇ == U+A786 -> U+A787 */ }
+          { ls += "\xe1\xbc\xb4"; continue; 	/* Ἴ -> ἴ == U+1F3C -> U+1F34 */ }
 yy2007:
           ++sp;
-          { ls += "\xea\x9e\x8c"; continue; 	/* Ꞌ -> ꞌ == U+A78B -> U+A78C */ }
+          { ls += "\xe1\xbc\xb5"; continue; 	/* Ἵ -> ἵ == U+1F3D -> U+1F35 */ }
 yy2009:
           ++sp;
-          { ls += "\xc9\xa5"; continue; 	/* Ɥ -> ɥ == U+A78D -> U+0265 */ }
+          { ls += "\xe1\xbc\xb6"; continue; 	/* Ἶ -> ἶ == U+1F3E -> U+1F36 */ }
 yy2011:
           ++sp;
-          { ls += "\xea\x9e\x91"; continue; 	/* Ꞑ -> ꞑ == U+A790 -> U+A791 */ }
+          { ls += "\xe1\xbc\xb7"; continue; 	/* Ἷ -> ἷ == U+1F3F -> U+1F37 */ }
 yy2013:
           ++sp;
-          { ls += "\xea\x9e\x93"; continue; 	/* Ꞓ -> ꞓ == U+A792 -> U+A793 */ }
+          { ls += "\xe1\xbd\x80"; continue; 	/* Ὀ -> ὀ == U+1F48 -> U+1F40 */ }
 yy2015:
           ++sp;
-          { ls += "\xea\x9e\x97"; continue; 	/* Ꞗ -> ꞗ == U+A796 -> U+A797 */ }
+          { ls += "\xe1\xbd\x81"; continue; 	/* Ὁ -> ὁ == U+1F49 -> U+1F41 */ }
 yy2017:
           ++sp;
-          { ls += "\xea\x9e\x99"; continue; 	/* Ꞙ -> ꞙ == U+A798 -> U+A799 */ }
+          { ls += "\xe1\xbd\x82"; continue; 	/* Ὂ -> ὂ == U+1F4A -> U+1F42 */ }
 yy2019:
           ++sp;
-          { ls += "\xea\x9e\x9b"; continue; 	/* Ꞛ -> ꞛ == U+A79A -> U+A79B */ }
+          { ls += "\xe1\xbd\x83"; continue; 	/* Ὃ -> ὃ == U+1F4B -> U+1F43 */ }
 yy2021:
           ++sp;
-          { ls += "\xea\x9e\x9d"; continue; 	/* Ꞝ -> ꞝ == U+A79C -> U+A79D */ }
+          { ls += "\xe1\xbd\x84"; continue; 	/* Ὄ -> ὄ == U+1F4C -> U+1F44 */ }
 yy2023:
           ++sp;
-          { ls += "\xea\x9e\x9f"; continue; 	/* Ꞟ -> ꞟ == U+A79E -> U+A79F */ }
+          { ls += "\xe1\xbd\x85"; continue; 	/* Ὅ -> ὅ == U+1F4D -> U+1F45 */ }
 yy2025:
           ++sp;
-          { ls += "\xea\x9e\xa1"; continue; 	/* Ꞡ -> ꞡ == U+A7A0 -> U+A7A1 */ }
+          { ls += "\xe1\xbd\x91"; continue; 	/* Ὑ -> ὑ == U+1F59 -> U+1F51 */ }
 yy2027:
           ++sp;
-          { ls += "\xea\x9e\xa3"; continue; 	/* Ꞣ -> ꞣ == U+A7A2 -> U+A7A3 */ }
+          { ls += "\xe1\xbd\x93"; continue; 	/* Ὓ -> ὓ == U+1F5B -> U+1F53 */ }
 yy2029:
           ++sp;
-          { ls += "\xea\x9e\xa5"; continue; 	/* Ꞥ -> ꞥ == U+A7A4 -> U+A7A5 */ }
+          { ls += "\xe1\xbd\x95"; continue; 	/* Ὕ -> ὕ == U+1F5D -> U+1F55 */ }
 yy2031:
           ++sp;
-          { ls += "\xea\x9e\xa7"; continue; 	/* Ꞧ -> ꞧ == U+A7A6 -> U+A7A7 */ }
+          { ls += "\xe1\xbd\x97"; continue; 	/* Ὗ -> ὗ == U+1F5F -> U+1F57 */ }
 yy2033:
           ++sp;
-          { ls += "\xea\x9e\xa9"; continue; 	/* Ꞩ -> ꞩ == U+A7A8 -> U+A7A9 */ }
+          { ls += "\xe1\xbd\xa0"; continue; 	/* Ὠ -> ὠ == U+1F68 -> U+1F60 */ }
 yy2035:
           ++sp;
-          { ls += "\xc9\xa6"; continue; 	/* Ɦ -> ɦ == U+A7AA -> U+0266 */ }
+          { ls += "\xe1\xbd\xa1"; continue; 	/* Ὡ -> ὡ == U+1F69 -> U+1F61 */ }
 yy2037:
           ++sp;
-          { ls += "\xc9\x9c"; continue; 	/* Ɜ -> ɜ == U+A7AB -> U+025C */ }
+          { ls += "\xe1\xbd\xa2"; continue; 	/* Ὢ -> ὢ == U+1F6A -> U+1F62 */ }
 yy2039:
           ++sp;
-          { ls += "\xc9\xa1"; continue; 	/* Ɡ -> ɡ == U+A7AC -> U+0261 */ }
+          { ls += "\xe1\xbd\xa3"; continue; 	/* Ὣ -> ὣ == U+1F6B -> U+1F63 */ }
 yy2041:
           ++sp;
-          { ls += "\xc9\xac"; continue; 	/* Ɬ -> ɬ == U+A7AD -> U+026C */ }
+          { ls += "\xe1\xbd\xa4"; continue; 	/* Ὤ -> ὤ == U+1F6C -> U+1F64 */ }
 yy2043:
           ++sp;
-          { ls += "\xca\x9e"; continue; 	/* Ʞ -> ʞ == U+A7B0 -> U+029E */ }
+          { ls += "\xe1\xbd\xa5"; continue; 	/* Ὥ -> ὥ == U+1F6D -> U+1F65 */ }
 yy2045:
           ++sp;
-          { ls += "\xca\x87"; continue; 	/* Ʇ -> ʇ == U+A7B1 -> U+0287 */ }
+          { ls += "\xe1\xbd\xa6"; continue; 	/* Ὦ -> ὦ == U+1F6E -> U+1F66 */ }
 yy2047:
           ++sp;
-          { ls += "\xef\xbd\x81"; continue; 	/* Ａ -> ａ == U+FF21 -> U+FF41 */ }
+          { ls += "\xe1\xbd\xa7"; continue; 	/* Ὧ -> ὧ == U+1F6F -> U+1F67 */ }
 yy2049:
           ++sp;
-          { ls += "\xef\xbd\x82"; continue; 	/* Ｂ -> ｂ == U+FF22 -> U+FF42 */ }
+          { ls += "\xe1\xbe\x80"; continue; 	/* ᾈ -> ᾀ == U+1F88 -> U+1F80 */ }
 yy2051:
           ++sp;
-          { ls += "\xef\xbd\x83"; continue; 	/* Ｃ -> ｃ == U+FF23 -> U+FF43 */ }
+          { ls += "\xe1\xbe\x81"; continue; 	/* ᾉ -> ᾁ == U+1F89 -> U+1F81 */ }
 yy2053:
           ++sp;
-          { ls += "\xef\xbd\x84"; continue; 	/* Ｄ -> ｄ == U+FF24 -> U+FF44 */ }
+          { ls += "\xe1\xbe\x82"; continue; 	/* ᾊ -> ᾂ == U+1F8A -> U+1F82 */ }
 yy2055:
           ++sp;
-          { ls += "\xef\xbd\x85"; continue; 	/* Ｅ -> ｅ == U+FF25 -> U+FF45 */ }
+          { ls += "\xe1\xbe\x83"; continue; 	/* ᾋ -> ᾃ == U+1F8B -> U+1F83 */ }
 yy2057:
           ++sp;
-          { ls += "\xef\xbd\x86"; continue; 	/* Ｆ -> ｆ == U+FF26 -> U+FF46 */ }
+          { ls += "\xe1\xbe\x84"; continue; 	/* ᾌ -> ᾄ == U+1F8C -> U+1F84 */ }
 yy2059:
           ++sp;
-          { ls += "\xef\xbd\x87"; continue; 	/* Ｇ -> ｇ == U+FF27 -> U+FF47 */ }
+          { ls += "\xe1\xbe\x85"; continue; 	/* ᾍ -> ᾅ == U+1F8D -> U+1F85 */ }
 yy2061:
           ++sp;
-          { ls += "\xef\xbd\x88"; continue; 	/* Ｈ -> ｈ == U+FF28 -> U+FF48 */ }
+          { ls += "\xe1\xbe\x86"; continue; 	/* ᾎ -> ᾆ == U+1F8E -> U+1F86 */ }
 yy2063:
           ++sp;
-          { ls += "\xef\xbd\x89"; continue; 	/* Ｉ -> ｉ == U+FF29 -> U+FF49 */ }
+          { ls += "\xe1\xbe\x87"; continue; 	/* ᾏ -> ᾇ == U+1F8F -> U+1F87 */ }
 yy2065:
           ++sp;
-          { ls += "\xef\xbd\x8a"; continue; 	/* Ｊ -> ｊ == U+FF2A -> U+FF4A */ }
+          { ls += "\xe1\xbe\x90"; continue; 	/* ᾘ -> ᾐ == U+1F98 -> U+1F90 */ }
 yy2067:
           ++sp;
-          { ls += "\xef\xbd\x8b"; continue; 	/* Ｋ -> ｋ == U+FF2B -> U+FF4B */ }
+          { ls += "\xe1\xbe\x91"; continue; 	/* ᾙ -> ᾑ == U+1F99 -> U+1F91 */ }
 yy2069:
           ++sp;
-          { ls += "\xef\xbd\x8c"; continue; 	/* Ｌ -> ｌ == U+FF2C -> U+FF4C */ }
+          { ls += "\xe1\xbe\x92"; continue; 	/* ᾚ -> ᾒ == U+1F9A -> U+1F92 */ }
 yy2071:
           ++sp;
-          { ls += "\xef\xbd\x8d"; continue; 	/* Ｍ -> ｍ == U+FF2D -> U+FF4D */ }
+          { ls += "\xe1\xbe\x93"; continue; 	/* ᾛ -> ᾓ == U+1F9B -> U+1F93 */ }
 yy2073:
           ++sp;
-          { ls += "\xef\xbd\x8e"; continue; 	/* Ｎ -> ｎ == U+FF2E -> U+FF4E */ }
+          { ls += "\xe1\xbe\x94"; continue; 	/* ᾜ -> ᾔ == U+1F9C -> U+1F94 */ }
 yy2075:
           ++sp;
-          { ls += "\xef\xbd\x8f"; continue; 	/* Ｏ -> ｏ == U+FF2F -> U+FF4F */ }
+          { ls += "\xe1\xbe\x95"; continue; 	/* ᾝ -> ᾕ == U+1F9D -> U+1F95 */ }
 yy2077:
           ++sp;
-          { ls += "\xef\xbd\x90"; continue; 	/* Ｐ -> ｐ == U+FF30 -> U+FF50 */ }
+          { ls += "\xe1\xbe\x96"; continue; 	/* ᾞ -> ᾖ == U+1F9E -> U+1F96 */ }
 yy2079:
           ++sp;
-          { ls += "\xef\xbd\x91"; continue; 	/* Ｑ -> ｑ == U+FF31 -> U+FF51 */ }
+          { ls += "\xe1\xbe\x97"; continue; 	/* ᾟ -> ᾗ == U+1F9F -> U+1F97 */ }
 yy2081:
           ++sp;
-          { ls += "\xef\xbd\x92"; continue; 	/* Ｒ -> ｒ == U+FF32 -> U+FF52 */ }
+          { ls += "\xe1\xbe\xa0"; continue; 	/* ᾨ -> ᾠ == U+1FA8 -> U+1FA0 */ }
 yy2083:
           ++sp;
-          { ls += "\xef\xbd\x93"; continue; 	/* Ｓ -> ｓ == U+FF33 -> U+FF53 */ }
+          { ls += "\xe1\xbe\xa1"; continue; 	/* ᾩ -> ᾡ == U+1FA9 -> U+1FA1 */ }
 yy2085:
           ++sp;
-          { ls += "\xef\xbd\x94"; continue; 	/* Ｔ -> ｔ == U+FF34 -> U+FF54 */ }
+          { ls += "\xe1\xbe\xa2"; continue; 	/* ᾪ -> ᾢ == U+1FAA -> U+1FA2 */ }
 yy2087:
           ++sp;
-          { ls += "\xef\xbd\x95"; continue; 	/* Ｕ -> ｕ == U+FF35 -> U+FF55 */ }
+          { ls += "\xe1\xbe\xa3"; continue; 	/* ᾫ -> ᾣ == U+1FAB -> U+1FA3 */ }
 yy2089:
           ++sp;
-          { ls += "\xef\xbd\x96"; continue; 	/* Ｖ -> ｖ == U+FF36 -> U+FF56 */ }
+          { ls += "\xe1\xbe\xa4"; continue; 	/* ᾬ -> ᾤ == U+1FAC -> U+1FA4 */ }
 yy2091:
           ++sp;
-          { ls += "\xef\xbd\x97"; continue; 	/* Ｗ -> ｗ == U+FF37 -> U+FF57 */ }
+          { ls += "\xe1\xbe\xa5"; continue; 	/* ᾭ -> ᾥ == U+1FAD -> U+1FA5 */ }
 yy2093:
           ++sp;
-          { ls += "\xef\xbd\x98"; continue; 	/* Ｘ -> ｘ == U+FF38 -> U+FF58 */ }
+          { ls += "\xe1\xbe\xa6"; continue; 	/* ᾮ -> ᾦ == U+1FAE -> U+1FA6 */ }
 yy2095:
           ++sp;
-          { ls += "\xef\xbd\x99"; continue; 	/* Ｙ -> ｙ == U+FF39 -> U+FF59 */ }
+          { ls += "\xe1\xbe\xa7"; continue; 	/* ᾯ -> ᾧ == U+1FAF -> U+1FA7 */ }
 yy2097:
           ++sp;
-          { ls += "\xef\xbd\x9a"; continue; 	/* Ｚ -> ｚ == U+FF3A -> U+FF5A */ }
+          { ls += "\xe1\xbe\xb0"; continue; 	/* Ᾰ -> ᾰ == U+1FB8 -> U+1FB0 */ }
+yy2099:
+          ++sp;
+          { ls += "\xe1\xbe\xb1"; continue; 	/* Ᾱ -> ᾱ == U+1FB9 -> U+1FB1 */ }
+yy2101:
+          ++sp;
+          { ls += "\xe1\xbd\xb0"; continue; 	/* Ὰ -> ὰ == U+1FBA -> U+1F70 */ }
+yy2103:
+          ++sp;
+          { ls += "\xe1\xbd\xb1"; continue; 	/* Ά -> ά == U+1FBB -> U+1F71 */ }
+yy2105:
+          ++sp;
+          { ls += "\xe1\xbe\xb3"; continue; 	/* ᾼ -> ᾳ == U+1FBC -> U+1FB3 */ }
+yy2107:
+          ++sp;
+          { ls += "\xe1\xbd\xb2"; continue; 	/* Ὲ -> ὲ == U+1FC8 -> U+1F72 */ }
+yy2109:
+          ++sp;
+          { ls += "\xe1\xbd\xb3"; continue; 	/* Έ -> έ == U+1FC9 -> U+1F73 */ }
+yy2111:
+          ++sp;
+          { ls += "\xe1\xbd\xb4"; continue; 	/* Ὴ -> ὴ == U+1FCA -> U+1F74 */ }
+yy2113:
+          ++sp;
+          { ls += "\xe1\xbd\xb5"; continue; 	/* Ή -> ή == U+1FCB -> U+1F75 */ }
+yy2115:
+          ++sp;
+          { ls += "\xe1\xbf\x83"; continue; 	/* ῌ -> ῃ == U+1FCC -> U+1FC3 */ }
+yy2117:
+          ++sp;
+          { ls += "\xe1\xbf\x90"; continue; 	/* Ῐ -> ῐ == U+1FD8 -> U+1FD0 */ }
+yy2119:
+          ++sp;
+          { ls += "\xe1\xbf\x91"; continue; 	/* Ῑ -> ῑ == U+1FD9 -> U+1FD1 */ }
+yy2121:
+          ++sp;
+          { ls += "\xe1\xbd\xb6"; continue; 	/* Ὶ -> ὶ == U+1FDA -> U+1F76 */ }
+yy2123:
+          ++sp;
+          { ls += "\xe1\xbd\xb7"; continue; 	/* Ί -> ί == U+1FDB -> U+1F77 */ }
+yy2125:
+          ++sp;
+          { ls += "\xe1\xbf\xa0"; continue; 	/* Ῠ -> ῠ == U+1FE8 -> U+1FE0 */ }
+yy2127:
+          ++sp;
+          { ls += "\xe1\xbf\xa1"; continue; 	/* Ῡ -> ῡ == U+1FE9 -> U+1FE1 */ }
+yy2129:
+          ++sp;
+          { ls += "\xe1\xbd\xba"; continue; 	/* Ὺ -> ὺ == U+1FEA -> U+1F7A */ }
+yy2131:
+          ++sp;
+          { ls += "\xe1\xbd\xbb"; continue; 	/* Ύ -> ύ == U+1FEB -> U+1F7B */ }
+yy2133:
+          ++sp;
+          { ls += "\xe1\xbf\xa5"; continue; 	/* Ῥ -> ῥ == U+1FEC -> U+1FE5 */ }
+yy2135:
+          ++sp;
+          { ls += "\xe1\xbd\xb8"; continue; 	/* Ὸ -> ὸ == U+1FF8 -> U+1F78 */ }
+yy2137:
+          ++sp;
+          { ls += "\xe1\xbd\xb9"; continue; 	/* Ό -> ό == U+1FF9 -> U+1F79 */ }
+yy2139:
+          ++sp;
+          { ls += "\xe1\xbd\xbc"; continue; 	/* Ὼ -> ὼ == U+1FFA -> U+1F7C */ }
+yy2141:
+          ++sp;
+          { ls += "\xe1\xbd\xbd"; continue; 	/* Ώ -> ώ == U+1FFB -> U+1F7D */ }
+yy2143:
+          ++sp;
+          { ls += "\xe1\xbf\xb3"; continue; 	/* ῼ -> ῳ == U+1FFC -> U+1FF3 */ }
+yy2145:
+          ++sp;
+          { ls += "\xd6\x86"; continue; 	/* Ֆ -> ֆ == U+0556 -> U+0586 */ }
+yy2147:
+          ++sp;
+          { ls += "\xd6\x85"; continue; 	/* Օ -> օ == U+0555 -> U+0585 */ }
+yy2149:
+          ++sp;
+          { ls += "\xd6\x84"; continue; 	/* Ք -> ք == U+0554 -> U+0584 */ }
+yy2151:
+          ++sp;
+          { ls += "\xd6\x83"; continue; 	/* Փ -> փ == U+0553 -> U+0583 */ }
+yy2153:
+          ++sp;
+          { ls += "\xd6\x82"; continue; 	/* Ւ -> ւ == U+0552 -> U+0582 */ }
+yy2155:
+          ++sp;
+          { ls += "\xd6\x81"; continue; 	/* Ց -> ց == U+0551 -> U+0581 */ }
+yy2157:
+          ++sp;
+          { ls += "\xd6\x80"; continue; 	/* Ր -> ր == U+0550 -> U+0580 */ }
+yy2159:
+          ++sp;
+          { ls += "\xd5\xbf"; continue; 	/* Տ -> տ == U+054F -> U+057F */ }
+yy2161:
+          ++sp;
+          { ls += "\xd5\xbe"; continue; 	/* Վ -> վ == U+054E -> U+057E */ }
+yy2163:
+          ++sp;
+          { ls += "\xd5\xbd"; continue; 	/* Ս -> ս == U+054D -> U+057D */ }
+yy2165:
+          ++sp;
+          { ls += "\xd5\xbc"; continue; 	/* Ռ -> ռ == U+054C -> U+057C */ }
+yy2167:
+          ++sp;
+          { ls += "\xd5\xbb"; continue; 	/* Ջ -> ջ == U+054B -> U+057B */ }
+yy2169:
+          ++sp;
+          { ls += "\xd5\xba"; continue; 	/* Պ -> պ == U+054A -> U+057A */ }
+yy2171:
+          ++sp;
+          { ls += "\xd5\xb9"; continue; 	/* Չ -> չ == U+0549 -> U+0579 */ }
+yy2173:
+          ++sp;
+          { ls += "\xd5\xb8"; continue; 	/* Ո -> ո == U+0548 -> U+0578 */ }
+yy2175:
+          ++sp;
+          { ls += "\xd5\xb7"; continue; 	/* Շ -> շ == U+0547 -> U+0577 */ }
+yy2177:
+          ++sp;
+          { ls += "\xd5\xb6"; continue; 	/* Ն -> ն == U+0546 -> U+0576 */ }
+yy2179:
+          ++sp;
+          { ls += "\xd5\xb5"; continue; 	/* Յ -> յ == U+0545 -> U+0575 */ }
+yy2181:
+          ++sp;
+          { ls += "\xd5\xb4"; continue; 	/* Մ -> մ == U+0544 -> U+0574 */ }
+yy2183:
+          ++sp;
+          { ls += "\xd5\xb3"; continue; 	/* Ճ -> ճ == U+0543 -> U+0573 */ }
+yy2185:
+          ++sp;
+          { ls += "\xd5\xb2"; continue; 	/* Ղ -> ղ == U+0542 -> U+0572 */ }
+yy2187:
+          ++sp;
+          { ls += "\xd5\xb1"; continue; 	/* Ձ -> ձ == U+0541 -> U+0571 */ }
+yy2189:
+          ++sp;
+          { ls += "\xd5\xb0"; continue; 	/* Հ -> հ == U+0540 -> U+0570 */ }
+yy2191:
+          ++sp;
+          { ls += "\xd5\xaf"; continue; 	/* Կ -> կ == U+053F -> U+056F */ }
+yy2193:
+          ++sp;
+          { ls += "\xd5\xae"; continue; 	/* Ծ -> ծ == U+053E -> U+056E */ }
+yy2195:
+          ++sp;
+          { ls += "\xd5\xad"; continue; 	/* Խ -> խ == U+053D -> U+056D */ }
+yy2197:
+          ++sp;
+          { ls += "\xd5\xac"; continue; 	/* Լ -> լ == U+053C -> U+056C */ }
+yy2199:
+          ++sp;
+          { ls += "\xd5\xab"; continue; 	/* Ի -> ի == U+053B -> U+056B */ }
+yy2201:
+          ++sp;
+          { ls += "\xd5\xaa"; continue; 	/* Ժ -> ժ == U+053A -> U+056A */ }
+yy2203:
+          ++sp;
+          { ls += "\xd5\xa9"; continue; 	/* Թ -> թ == U+0539 -> U+0569 */ }
+yy2205:
+          ++sp;
+          { ls += "\xd5\xa8"; continue; 	/* Ը -> ը == U+0538 -> U+0568 */ }
+yy2207:
+          ++sp;
+          { ls += "\xd5\xa7"; continue; 	/* Է -> է == U+0537 -> U+0567 */ }
+yy2209:
+          ++sp;
+          { ls += "\xd5\xa6"; continue; 	/* Զ -> զ == U+0536 -> U+0566 */ }
+yy2211:
+          ++sp;
+          { ls += "\xd5\xa5"; continue; 	/* Ե -> ե == U+0535 -> U+0565 */ }
+yy2213:
+          ++sp;
+          { ls += "\xd5\xa4"; continue; 	/* Դ -> դ == U+0534 -> U+0564 */ }
+yy2215:
+          ++sp;
+          { ls += "\xd5\xa3"; continue; 	/* Գ -> գ == U+0533 -> U+0563 */ }
+yy2217:
+          ++sp;
+          { ls += "\xd5\xa2"; continue; 	/* Բ -> բ == U+0532 -> U+0562 */ }
+yy2219:
+          ++sp;
+          { ls += "\xd5\xa1"; continue; 	/* Ա -> ա == U+0531 -> U+0561 */ }
+yy2221:
+          ++sp;
+          { ls += "\xd4\xa7"; continue; 	/* Ԧ -> ԧ == U+0526 -> U+0527 */ }
+yy2223:
+          ++sp;
+          { ls += "\xd4\xa5"; continue; 	/* Ԥ -> ԥ == U+0524 -> U+0525 */ }
+yy2225:
+          ++sp;
+          { ls += "\xd4\xa3"; continue; 	/* Ԣ -> ԣ == U+0522 -> U+0523 */ }
+yy2227:
+          ++sp;
+          { ls += "\xd4\xa1"; continue; 	/* Ԡ -> ԡ == U+0520 -> U+0521 */ }
+yy2229:
+          ++sp;
+          { ls += "\xd4\x9f"; continue; 	/* Ԟ -> ԟ == U+051E -> U+051F */ }
+yy2231:
+          ++sp;
+          { ls += "\xd4\x9d"; continue; 	/* Ԝ -> ԝ == U+051C -> U+051D */ }
+yy2233:
+          ++sp;
+          { ls += "\xd4\x9b"; continue; 	/* Ԛ -> ԛ == U+051A -> U+051B */ }
+yy2235:
+          ++sp;
+          { ls += "\xd4\x99"; continue; 	/* Ԙ -> ԙ == U+0518 -> U+0519 */ }
+yy2237:
+          ++sp;
+          { ls += "\xd4\x97"; continue; 	/* Ԗ -> ԗ == U+0516 -> U+0517 */ }
+yy2239:
+          ++sp;
+          { ls += "\xd4\x95"; continue; 	/* Ԕ -> ԕ == U+0514 -> U+0515 */ }
+yy2241:
+          ++sp;
+          { ls += "\xd4\x93"; continue; 	/* Ԓ -> ԓ == U+0512 -> U+0513 */ }
+yy2243:
+          ++sp;
+          { ls += "\xd4\x91"; continue; 	/* Ԑ -> ԑ == U+0510 -> U+0511 */ }
+yy2245:
+          ++sp;
+          { ls += "\xd4\x8f"; continue; 	/* Ԏ -> ԏ == U+050E -> U+050F */ }
+yy2247:
+          ++sp;
+          { ls += "\xd4\x8d"; continue; 	/* Ԍ -> ԍ == U+050C -> U+050D */ }
+yy2249:
+          ++sp;
+          { ls += "\xd4\x8b"; continue; 	/* Ԋ -> ԋ == U+050A -> U+050B */ }
+yy2251:
+          ++sp;
+          { ls += "\xd4\x89"; continue; 	/* Ԉ -> ԉ == U+0508 -> U+0509 */ }
+yy2253:
+          ++sp;
+          { ls += "\xd4\x87"; continue; 	/* Ԇ -> ԇ == U+0506 -> U+0507 */ }
+yy2255:
+          ++sp;
+          { ls += "\xd4\x85"; continue; 	/* Ԅ -> ԅ == U+0504 -> U+0505 */ }
+yy2257:
+          ++sp;
+          { ls += "\xd4\x83"; continue; 	/* Ԃ -> ԃ == U+0502 -> U+0503 */ }
+yy2259:
+          ++sp;
+          { ls += "\xd4\x81"; continue; 	/* Ԁ -> ԁ == U+0500 -> U+0501 */ }
+yy2261:
+          ++sp;
+          { ls += "\xd3\xbf"; continue; 	/* Ӿ -> ӿ == U+04FE -> U+04FF */ }
+yy2263:
+          ++sp;
+          { ls += "\xd3\xbd"; continue; 	/* Ӽ -> ӽ == U+04FC -> U+04FD */ }
+yy2265:
+          ++sp;
+          { ls += "\xd3\xbb"; continue; 	/* Ӻ -> ӻ == U+04FA -> U+04FB */ }
+yy2267:
+          ++sp;
+          { ls += "\xd3\xb9"; continue; 	/* Ӹ -> ӹ == U+04F8 -> U+04F9 */ }
+yy2269:
+          ++sp;
+          { ls += "\xd3\xb7"; continue; 	/* Ӷ -> ӷ == U+04F6 -> U+04F7 */ }
+yy2271:
+          ++sp;
+          { ls += "\xd3\xb5"; continue; 	/* Ӵ -> ӵ == U+04F4 -> U+04F5 */ }
+yy2273:
+          ++sp;
+          { ls += "\xd3\xb3"; continue; 	/* Ӳ -> ӳ == U+04F2 -> U+04F3 */ }
+yy2275:
+          ++sp;
+          { ls += "\xd3\xb1"; continue; 	/* Ӱ -> ӱ == U+04F0 -> U+04F1 */ }
+yy2277:
+          ++sp;
+          { ls += "\xd3\xaf"; continue; 	/* Ӯ -> ӯ == U+04EE -> U+04EF */ }
+yy2279:
+          ++sp;
+          { ls += "\xd3\xad"; continue; 	/* Ӭ -> ӭ == U+04EC -> U+04ED */ }
+yy2281:
+          ++sp;
+          { ls += "\xd3\xab"; continue; 	/* Ӫ -> ӫ == U+04EA -> U+04EB */ }
+yy2283:
+          ++sp;
+          { ls += "\xd3\xa9"; continue; 	/* Ө -> ө == U+04E8 -> U+04E9 */ }
+yy2285:
+          ++sp;
+          { ls += "\xd3\xa7"; continue; 	/* Ӧ -> ӧ == U+04E6 -> U+04E7 */ }
+yy2287:
+          ++sp;
+          { ls += "\xd3\xa5"; continue; 	/* Ӥ -> ӥ == U+04E4 -> U+04E5 */ }
+yy2289:
+          ++sp;
+          { ls += "\xd3\xa3"; continue; 	/* Ӣ -> ӣ == U+04E2 -> U+04E3 */ }
+yy2291:
+          ++sp;
+          { ls += "\xd3\xa1"; continue; 	/* Ӡ -> ӡ == U+04E0 -> U+04E1 */ }
+yy2293:
+          ++sp;
+          { ls += "\xd3\x9f"; continue; 	/* Ӟ -> ӟ == U+04DE -> U+04DF */ }
+yy2295:
+          ++sp;
+          { ls += "\xd3\x9d"; continue; 	/* Ӝ -> ӝ == U+04DC -> U+04DD */ }
+yy2297:
+          ++sp;
+          { ls += "\xd3\x9b"; continue; 	/* Ӛ -> ӛ == U+04DA -> U+04DB */ }
+yy2299:
+          ++sp;
+          { ls += "\xd3\x99"; continue; 	/* Ә -> ә == U+04D8 -> U+04D9 */ }
+yy2301:
+          ++sp;
+          { ls += "\xd3\x97"; continue; 	/* Ӗ -> ӗ == U+04D6 -> U+04D7 */ }
+yy2303:
+          ++sp;
+          { ls += "\xd3\x95"; continue; 	/* Ӕ -> ӕ == U+04D4 -> U+04D5 */ }
+yy2305:
+          ++sp;
+          { ls += "\xd3\x93"; continue; 	/* Ӓ -> ӓ == U+04D2 -> U+04D3 */ }
+yy2307:
+          ++sp;
+          { ls += "\xd3\x91"; continue; 	/* Ӑ -> ӑ == U+04D0 -> U+04D1 */ }
+yy2309:
+          ++sp;
+          { ls += "\xd3\x8e"; continue; 	/* Ӎ -> ӎ == U+04CD -> U+04CE */ }
+yy2311:
+          ++sp;
+          { ls += "\xd3\x8c"; continue; 	/* Ӌ -> ӌ == U+04CB -> U+04CC */ }
+yy2313:
+          ++sp;
+          { ls += "\xd3\x8a"; continue; 	/* Ӊ -> ӊ == U+04C9 -> U+04CA */ }
+yy2315:
+          ++sp;
+          { ls += "\xd3\x88"; continue; 	/* Ӈ -> ӈ == U+04C7 -> U+04C8 */ }
+yy2317:
+          ++sp;
+          { ls += "\xd3\x86"; continue; 	/* Ӆ -> ӆ == U+04C5 -> U+04C6 */ }
+yy2319:
+          ++sp;
+          { ls += "\xd3\x84"; continue; 	/* Ӄ -> ӄ == U+04C3 -> U+04C4 */ }
+yy2321:
+          ++sp;
+          { ls += "\xd3\x82"; continue; 	/* Ӂ -> ӂ == U+04C1 -> U+04C2 */ }
+yy2323:
+          ++sp;
+          { ls += "\xd3\x8f"; continue; 	/* Ӏ -> ӏ == U+04C0 -> U+04CF */ }
+yy2325:
+          ++sp;
+          { ls += "\xd2\xbf"; continue; 	/* Ҿ -> ҿ == U+04BE -> U+04BF */ }
+yy2327:
+          ++sp;
+          { ls += "\xd2\xbd"; continue; 	/* Ҽ -> ҽ == U+04BC -> U+04BD */ }
+yy2329:
+          ++sp;
+          { ls += "\xd2\xbb"; continue; 	/* Һ -> һ == U+04BA -> U+04BB */ }
+yy2331:
+          ++sp;
+          { ls += "\xd2\xb9"; continue; 	/* Ҹ -> ҹ == U+04B8 -> U+04B9 */ }
+yy2333:
+          ++sp;
+          { ls += "\xd2\xb7"; continue; 	/* Ҷ -> ҷ == U+04B6 -> U+04B7 */ }
+yy2335:
+          ++sp;
+          { ls += "\xd2\xb5"; continue; 	/* Ҵ -> ҵ == U+04B4 -> U+04B5 */ }
+yy2337:
+          ++sp;
+          { ls += "\xd2\xb3"; continue; 	/* Ҳ -> ҳ == U+04B2 -> U+04B3 */ }
+yy2339:
+          ++sp;
+          { ls += "\xd2\xb1"; continue; 	/* Ұ -> ұ == U+04B0 -> U+04B1 */ }
+yy2341:
+          ++sp;
+          { ls += "\xd2\xaf"; continue; 	/* Ү -> ү == U+04AE -> U+04AF */ }
+yy2343:
+          ++sp;
+          { ls += "\xd2\xad"; continue; 	/* Ҭ -> ҭ == U+04AC -> U+04AD */ }
+yy2345:
+          ++sp;
+          { ls += "\xd2\xab"; continue; 	/* Ҫ -> ҫ == U+04AA -> U+04AB */ }
+yy2347:
+          ++sp;
+          { ls += "\xd2\xa9"; continue; 	/* Ҩ -> ҩ == U+04A8 -> U+04A9 */ }
+yy2349:
+          ++sp;
+          { ls += "\xd2\xa7"; continue; 	/* Ҧ -> ҧ == U+04A6 -> U+04A7 */ }
+yy2351:
+          ++sp;
+          { ls += "\xd2\xa5"; continue; 	/* Ҥ -> ҥ == U+04A4 -> U+04A5 */ }
+yy2353:
+          ++sp;
+          { ls += "\xd2\xa3"; continue; 	/* Ң -> ң == U+04A2 -> U+04A3 */ }
+yy2355:
+          ++sp;
+          { ls += "\xd2\xa1"; continue; 	/* Ҡ -> ҡ == U+04A0 -> U+04A1 */ }
+yy2357:
+          ++sp;
+          { ls += "\xd2\x9f"; continue; 	/* Ҟ -> ҟ == U+049E -> U+049F */ }
+yy2359:
+          ++sp;
+          { ls += "\xd2\x9d"; continue; 	/* Ҝ -> ҝ == U+049C -> U+049D */ }
+yy2361:
+          ++sp;
+          { ls += "\xd2\x9b"; continue; 	/* Қ -> қ == U+049A -> U+049B */ }
+yy2363:
+          ++sp;
+          { ls += "\xd2\x99"; continue; 	/* Ҙ -> ҙ == U+0498 -> U+0499 */ }
+yy2365:
+          ++sp;
+          { ls += "\xd2\x97"; continue; 	/* Җ -> җ == U+0496 -> U+0497 */ }
+yy2367:
+          ++sp;
+          { ls += "\xd2\x95"; continue; 	/* Ҕ -> ҕ == U+0494 -> U+0495 */ }
+yy2369:
+          ++sp;
+          { ls += "\xd2\x93"; continue; 	/* Ғ -> ғ == U+0492 -> U+0493 */ }
+yy2371:
+          ++sp;
+          { ls += "\xd2\x91"; continue; 	/* Ґ -> ґ == U+0490 -> U+0491 */ }
+yy2373:
+          ++sp;
+          { ls += "\xd2\x8f"; continue; 	/* Ҏ -> ҏ == U+048E -> U+048F */ }
+yy2375:
+          ++sp;
+          { ls += "\xd2\x8d"; continue; 	/* Ҍ -> ҍ == U+048C -> U+048D */ }
+yy2377:
+          ++sp;
+          { ls += "\xd2\x8b"; continue; 	/* Ҋ -> ҋ == U+048A -> U+048B */ }
+yy2379:
+          ++sp;
+          { ls += "\xd2\x81"; continue; 	/* Ҁ -> ҁ == U+0480 -> U+0481 */ }
+yy2381:
+          ++sp;
+          { ls += "\xd1\xbf"; continue; 	/* Ѿ -> ѿ == U+047E -> U+047F */ }
+yy2383:
+          ++sp;
+          { ls += "\xd1\xbd"; continue; 	/* Ѽ -> ѽ == U+047C -> U+047D */ }
+yy2385:
+          ++sp;
+          { ls += "\xd1\xbb"; continue; 	/* Ѻ -> ѻ == U+047A -> U+047B */ }
+yy2387:
+          ++sp;
+          { ls += "\xd1\xb9"; continue; 	/* Ѹ -> ѹ == U+0478 -> U+0479 */ }
+yy2389:
+          ++sp;
+          { ls += "\xd1\xb7"; continue; 	/* Ѷ -> ѷ == U+0476 -> U+0477 */ }
+yy2391:
+          ++sp;
+          { ls += "\xd1\xb5"; continue; 	/* Ѵ -> ѵ == U+0474 -> U+0475 */ }
+yy2393:
+          ++sp;
+          { ls += "\xd1\xb3"; continue; 	/* Ѳ -> ѳ == U+0472 -> U+0473 */ }
+yy2395:
+          ++sp;
+          { ls += "\xd1\xb1"; continue; 	/* Ѱ -> ѱ == U+0470 -> U+0471 */ }
+yy2397:
+          ++sp;
+          { ls += "\xd1\xaf"; continue; 	/* Ѯ -> ѯ == U+046E -> U+046F */ }
+yy2399:
+          ++sp;
+          { ls += "\xd1\xad"; continue; 	/* Ѭ -> ѭ == U+046C -> U+046D */ }
+yy2401:
+          ++sp;
+          { ls += "\xd1\xab"; continue; 	/* Ѫ -> ѫ == U+046A -> U+046B */ }
+yy2403:
+          ++sp;
+          { ls += "\xd1\xa9"; continue; 	/* Ѩ -> ѩ == U+0468 -> U+0469 */ }
+yy2405:
+          ++sp;
+          { ls += "\xd1\xa7"; continue; 	/* Ѧ -> ѧ == U+0466 -> U+0467 */ }
+yy2407:
+          ++sp;
+          { ls += "\xd1\xa5"; continue; 	/* Ѥ -> ѥ == U+0464 -> U+0465 */ }
+yy2409:
+          ++sp;
+          { ls += "\xd1\xa3"; continue; 	/* Ѣ -> ѣ == U+0462 -> U+0463 */ }
+yy2411:
+          ++sp;
+          { ls += "\xd1\xa1"; continue; 	/* Ѡ -> ѡ == U+0460 -> U+0461 */ }
+yy2413:
+          ++sp;
+          { ls += "\xd1\x8f"; continue; 	/* Я -> я == U+042F -> U+044F */ }
+yy2415:
+          ++sp;
+          { ls += "\xd1\x8e"; continue; 	/* Ю -> ю == U+042E -> U+044E */ }
+yy2417:
+          ++sp;
+          { ls += "\xd1\x8d"; continue; 	/* Э -> э == U+042D -> U+044D */ }
+yy2419:
+          ++sp;
+          { ls += "\xd1\x8c"; continue; 	/* Ь -> ь == U+042C -> U+044C */ }
+yy2421:
+          ++sp;
+          { ls += "\xd1\x8b"; continue; 	/* Ы -> ы == U+042B -> U+044B */ }
+yy2423:
+          ++sp;
+          { ls += "\xd1\x8a"; continue; 	/* Ъ -> ъ == U+042A -> U+044A */ }
+yy2425:
+          ++sp;
+          { ls += "\xd1\x89"; continue; 	/* Щ -> щ == U+0429 -> U+0449 */ }
+yy2427:
+          ++sp;
+          { ls += "\xd1\x88"; continue; 	/* Ш -> ш == U+0428 -> U+0448 */ }
+yy2429:
+          ++sp;
+          { ls += "\xd1\x87"; continue; 	/* Ч -> ч == U+0427 -> U+0447 */ }
+yy2431:
+          ++sp;
+          { ls += "\xd1\x86"; continue; 	/* Ц -> ц == U+0426 -> U+0446 */ }
+yy2433:
+          ++sp;
+          { ls += "\xd1\x85"; continue; 	/* Х -> х == U+0425 -> U+0445 */ }
+yy2435:
+          ++sp;
+          { ls += "\xd1\x84"; continue; 	/* Ф -> ф == U+0424 -> U+0444 */ }
+yy2437:
+          ++sp;
+          { ls += "\xd1\x83"; continue; 	/* У -> у == U+0423 -> U+0443 */ }
+yy2439:
+          ++sp;
+          { ls += "\xd1\x82"; continue; 	/* Т -> т == U+0422 -> U+0442 */ }
+yy2441:
+          ++sp;
+          { ls += "\xd1\x81"; continue; 	/* С -> с == U+0421 -> U+0441 */ }
+yy2443:
+          ++sp;
+          { ls += "\xd1\x80"; continue; 	/* Р -> р == U+0420 -> U+0440 */ }
+yy2445:
+          ++sp;
+          { ls += "\xd0\xbf"; continue; 	/* П -> п == U+041F -> U+043F */ }
+yy2447:
+          ++sp;
+          { ls += "\xd0\xbe"; continue; 	/* О -> о == U+041E -> U+043E */ }
+yy2449:
+          ++sp;
+          { ls += "\xd0\xbd"; continue; 	/* Н -> н == U+041D -> U+043D */ }
+yy2451:
+          ++sp;
+          { ls += "\xd0\xbc"; continue; 	/* М -> м == U+041C -> U+043C */ }
+yy2453:
+          ++sp;
+          { ls += "\xd0\xbb"; continue; 	/* Л -> л == U+041B -> U+043B */ }
+yy2455:
+          ++sp;
+          { ls += "\xd0\xba"; continue; 	/* К -> к == U+041A -> U+043A */ }
+yy2457:
+          ++sp;
+          { ls += "\xd0\xb9"; continue; 	/* Й -> й == U+0419 -> U+0439 */ }
+yy2459:
+          ++sp;
+          { ls += "\xd0\xb8"; continue; 	/* И -> и == U+0418 -> U+0438 */ }
+yy2461:
+          ++sp;
+          { ls += "\xd0\xb7"; continue; 	/* З -> з == U+0417 -> U+0437 */ }
+yy2463:
+          ++sp;
+          { ls += "\xd0\xb6"; continue; 	/* Ж -> ж == U+0416 -> U+0436 */ }
+yy2465:
+          ++sp;
+          { ls += "\xd0\xb5"; continue; 	/* Е -> е == U+0415 -> U+0435 */ }
+yy2467:
+          ++sp;
+          { ls += "\xd0\xb4"; continue; 	/* Д -> д == U+0414 -> U+0434 */ }
+yy2469:
+          ++sp;
+          { ls += "\xd0\xb3"; continue; 	/* Г -> г == U+0413 -> U+0433 */ }
+yy2471:
+          ++sp;
+          { ls += "\xd0\xb2"; continue; 	/* В -> в == U+0412 -> U+0432 */ }
+yy2473:
+          ++sp;
+          { ls += "\xd0\xb1"; continue; 	/* Б -> б == U+0411 -> U+0431 */ }
+yy2475:
+          ++sp;
+          { ls += "\xd0\xb0"; continue; 	/* А -> а == U+0410 -> U+0430 */ }
+yy2477:
+          ++sp;
+          { ls += "\xd1\x9f"; continue; 	/* Џ -> џ == U+040F -> U+045F */ }
+yy2479:
+          ++sp;
+          { ls += "\xd1\x9e"; continue; 	/* Ў -> ў == U+040E -> U+045E */ }
+yy2481:
+          ++sp;
+          { ls += "\xd1\x9d"; continue; 	/* Ѝ -> ѝ == U+040D -> U+045D */ }
+yy2483:
+          ++sp;
+          { ls += "\xd1\x9c"; continue; 	/* Ќ -> ќ == U+040C -> U+045C */ }
+yy2485:
+          ++sp;
+          { ls += "\xd1\x9b"; continue; 	/* Ћ -> ћ == U+040B -> U+045B */ }
+yy2487:
+          ++sp;
+          { ls += "\xd1\x9a"; continue; 	/* Њ -> њ == U+040A -> U+045A */ }
+yy2489:
+          ++sp;
+          { ls += "\xd1\x99"; continue; 	/* Љ -> љ == U+0409 -> U+0459 */ }
+yy2491:
+          ++sp;
+          { ls += "\xd1\x98"; continue; 	/* Ј -> ј == U+0408 -> U+0458 */ }
+yy2493:
+          ++sp;
+          { ls += "\xd1\x97"; continue; 	/* Ї -> ї == U+0407 -> U+0457 */ }
+yy2495:
+          ++sp;
+          { ls += "\xd1\x96"; continue; 	/* І -> і == U+0406 -> U+0456 */ }
+yy2497:
+          ++sp;
+          { ls += "\xd1\x95"; continue; 	/* Ѕ -> ѕ == U+0405 -> U+0455 */ }
+yy2499:
+          ++sp;
+          { ls += "\xd1\x94"; continue; 	/* Є -> є == U+0404 -> U+0454 */ }
+yy2501:
+          ++sp;
+          { ls += "\xd1\x93"; continue; 	/* Ѓ -> ѓ == U+0403 -> U+0453 */ }
+yy2503:
+          ++sp;
+          { ls += "\xd1\x92"; continue; 	/* Ђ -> ђ == U+0402 -> U+0452 */ }
+yy2505:
+          ++sp;
+          { ls += "\xd1\x91"; continue; 	/* Ё -> ё == U+0401 -> U+0451 */ }
+yy2507:
+          ++sp;
+          { ls += "\xd1\x90"; continue; 	/* Ѐ -> ѐ == U+0400 -> U+0450 */ }
+yy2509:
+          ++sp;
+          { ls += "\xcd\xbd"; continue; 	/* Ͽ -> ͽ == U+03FF -> U+037D */ }
+yy2511:
+          ++sp;
+          { ls += "\xcd\xbc"; continue; 	/* Ͼ -> ͼ == U+03FE -> U+037C */ }
+yy2513:
+          ++sp;
+          { ls += "\xcd\xbb"; continue; 	/* Ͻ -> ͻ == U+03FD -> U+037B */ }
+yy2515:
+          ++sp;
+          { ls += "\xcf\xbb"; continue; 	/* Ϻ -> ϻ == U+03FA -> U+03FB */ }
+yy2517:
+          ++sp;
+          { ls += "\xcf\xb2"; continue; 	/* Ϲ -> ϲ == U+03F9 -> U+03F2 */ }
+yy2519:
+          ++sp;
+          { ls += "\xcf\xb8"; continue; 	/* Ϸ -> ϸ == U+03F7 -> U+03F8 */ }
+yy2521:
+          ++sp;
+          { ls += "\xce\xb8"; continue; 	/* ϴ -> θ == U+03F4 -> U+03B8 */ }
+yy2523:
+          ++sp;
+          { ls += "\xcf\xaf"; continue; 	/* Ϯ -> ϯ == U+03EE -> U+03EF */ }
+yy2525:
+          ++sp;
+          { ls += "\xcf\xad"; continue; 	/* Ϭ -> ϭ == U+03EC -> U+03ED */ }
+yy2527:
+          ++sp;
+          { ls += "\xcf\xab"; continue; 	/* Ϫ -> ϫ == U+03EA -> U+03EB */ }
+yy2529:
+          ++sp;
+          { ls += "\xcf\xa9"; continue; 	/* Ϩ -> ϩ == U+03E8 -> U+03E9 */ }
+yy2531:
+          ++sp;
+          { ls += "\xcf\xa7"; continue; 	/* Ϧ -> ϧ == U+03E6 -> U+03E7 */ }
+yy2533:
+          ++sp;
+          { ls += "\xcf\xa5"; continue; 	/* Ϥ -> ϥ == U+03E4 -> U+03E5 */ }
+yy2535:
+          ++sp;
+          { ls += "\xcf\xa3"; continue; 	/* Ϣ -> ϣ == U+03E2 -> U+03E3 */ }
+yy2537:
+          ++sp;
+          { ls += "\xcf\xa1"; continue; 	/* Ϡ -> ϡ == U+03E0 -> U+03E1 */ }
+yy2539:
+          ++sp;
+          { ls += "\xcf\x9f"; continue; 	/* Ϟ -> ϟ == U+03DE -> U+03DF */ }
+yy2541:
+          ++sp;
+          { ls += "\xcf\x9d"; continue; 	/* Ϝ -> ϝ == U+03DC -> U+03DD */ }
+yy2543:
+          ++sp;
+          { ls += "\xcf\x9b"; continue; 	/* Ϛ -> ϛ == U+03DA -> U+03DB */ }
+yy2545:
+          ++sp;
+          { ls += "\xcf\x99"; continue; 	/* Ϙ -> ϙ == U+03D8 -> U+03D9 */ }
+yy2547:
+          ++sp;
+          { ls += "\xcf\x97"; continue; 	/* Ϗ -> ϗ == U+03CF -> U+03D7 */ }
+yy2549:
+          ++sp;
+          { ls += "\xcf\x8b"; continue; 	/* Ϋ -> ϋ == U+03AB -> U+03CB */ }
+yy2551:
+          ++sp;
+          { ls += "\xcf\x8a"; continue; 	/* Ϊ -> ϊ == U+03AA -> U+03CA */ }
+yy2553:
+          ++sp;
+          { ls += "\xcf\x89"; continue; 	/* Ω -> ω == U+03A9 -> U+03C9 */ }
+yy2555:
+          ++sp;
+          { ls += "\xcf\x88"; continue; 	/* Ψ -> ψ == U+03A8 -> U+03C8 */ }
+yy2557:
+          ++sp;
+          { ls += "\xcf\x87"; continue; 	/* Χ -> χ == U+03A7 -> U+03C7 */ }
+yy2559:
+          ++sp;
+          { ls += "\xcf\x86"; continue; 	/* Φ -> φ == U+03A6 -> U+03C6 */ }
+yy2561:
+          ++sp;
+          { ls += "\xcf\x85"; continue; 	/* Υ -> υ == U+03A5 -> U+03C5 */ }
+yy2563:
+          ++sp;
+          { ls += "\xcf\x84"; continue; 	/* Τ -> τ == U+03A4 -> U+03C4 */ }
+yy2565:
+          ++sp;
+          { ls += "\xcf\x83"; continue; 	/* Σ -> σ == U+03A3 -> U+03C3 */ }
+yy2567:
+          ++sp;
+          { ls += "\xcf\x81"; continue; 	/* Ρ -> ρ == U+03A1 -> U+03C1 */ }
+yy2569:
+          ++sp;
+          { ls += "\xcf\x80"; continue; 	/* Π -> π == U+03A0 -> U+03C0 */ }
+yy2571:
+          ++sp;
+          { ls += "\xce\xbf"; continue; 	/* Ο -> ο == U+039F -> U+03BF */ }
+yy2573:
+          ++sp;
+          { ls += "\xce\xbe"; continue; 	/* Ξ -> ξ == U+039E -> U+03BE */ }
+yy2575:
+          ++sp;
+          { ls += "\xce\xbd"; continue; 	/* Ν -> ν == U+039D -> U+03BD */ }
+yy2577:
+          ++sp;
+          { ls += "\xce\xbc"; continue; 	/* Μ -> μ == U+039C -> U+03BC */ }
+yy2579:
+          ++sp;
+          { ls += "\xce\xbb"; continue; 	/* Λ -> λ == U+039B -> U+03BB */ }
+yy2581:
+          ++sp;
+          { ls += "\xce\xba"; continue; 	/* Κ -> κ == U+039A -> U+03BA */ }
+yy2583:
+          ++sp;
+          { ls += "\xce\xb9"; continue; 	/* Ι -> ι == U+0399 -> U+03B9 */ }
+yy2585:
+          ++sp;
+          { ls += "\xce\xb8"; continue; 	/* Θ -> θ == U+0398 -> U+03B8 */ }
+yy2587:
+          ++sp;
+          { ls += "\xce\xb7"; continue; 	/* Η -> η == U+0397 -> U+03B7 */ }
+yy2589:
+          ++sp;
+          { ls += "\xce\xb6"; continue; 	/* Ζ -> ζ == U+0396 -> U+03B6 */ }
+yy2591:
+          ++sp;
+          { ls += "\xce\xb5"; continue; 	/* Ε -> ε == U+0395 -> U+03B5 */ }
+yy2593:
+          ++sp;
+          { ls += "\xce\xb4"; continue; 	/* Δ -> δ == U+0394 -> U+03B4 */ }
+yy2595:
+          ++sp;
+          { ls += "\xce\xb3"; continue; 	/* Γ -> γ == U+0393 -> U+03B3 */ }
+yy2597:
+          ++sp;
+          { ls += "\xce\xb2"; continue; 	/* Β -> β == U+0392 -> U+03B2 */ }
+yy2599:
+          ++sp;
+          { ls += "\xce\xb1"; continue; 	/* Α -> α == U+0391 -> U+03B1 */ }
+yy2601:
+          ++sp;
+          { ls += "\xcf\x8e"; continue; 	/* Ώ -> ώ == U+038F -> U+03CE */ }
+yy2603:
+          ++sp;
+          { ls += "\xcf\x8d"; continue; 	/* Ύ -> ύ == U+038E -> U+03CD */ }
+yy2605:
+          ++sp;
+          { ls += "\xcf\x8c"; continue; 	/* Ό -> ό == U+038C -> U+03CC */ }
+yy2607:
+          ++sp;
+          { ls += "\xce\xaf"; continue; 	/* Ί -> ί == U+038A -> U+03AF */ }
+yy2609:
+          ++sp;
+          { ls += "\xce\xae"; continue; 	/* Ή -> ή == U+0389 -> U+03AE */ }
+yy2611:
+          ++sp;
+          { ls += "\xce\xad"; continue; 	/* Έ -> έ == U+0388 -> U+03AD */ }
+yy2613:
+          ++sp;
+          { ls += "\xce\xac"; continue; 	/* Ά -> ά == U+0386 -> U+03AC */ }
+yy2615:
+          ++sp;
+          { ls += "\xcd\xb7"; continue; 	/* Ͷ -> ͷ == U+0376 -> U+0377 */ }
+yy2617:
+          ++sp;
+          { ls += "\xcd\xb3"; continue; 	/* Ͳ -> ͳ == U+0372 -> U+0373 */ }
+yy2619:
+          ++sp;
+          { ls += "\xcd\xb1"; continue; 	/* Ͱ -> ͱ == U+0370 -> U+0371 */ }
+yy2621:
+          ++sp;
+          { ls += "\xc9\x8f"; continue; 	/* Ɏ -> ɏ == U+024E -> U+024F */ }
+yy2623:
+          ++sp;
+          { ls += "\xc9\x8d"; continue; 	/* Ɍ -> ɍ == U+024C -> U+024D */ }
+yy2625:
+          ++sp;
+          { ls += "\xc9\x8b"; continue; 	/* Ɋ -> ɋ == U+024A -> U+024B */ }
+yy2627:
+          ++sp;
+          { ls += "\xc9\x89"; continue; 	/* Ɉ -> ɉ == U+0248 -> U+0249 */ }
+yy2629:
+          ++sp;
+          { ls += "\xc9\x87"; continue; 	/* Ɇ -> ɇ == U+0246 -> U+0247 */ }
+yy2631:
+          ++sp;
+          { ls += "\xca\x8c"; continue; 	/* Ʌ -> ʌ == U+0245 -> U+028C */ }
+yy2633:
+          ++sp;
+          { ls += "\xca\x89"; continue; 	/* Ʉ -> ʉ == U+0244 -> U+0289 */ }
+yy2635:
+          ++sp;
+          { ls += "\xc6\x80"; continue; 	/* Ƀ -> ƀ == U+0243 -> U+0180 */ }
+yy2637:
+          ++sp;
+          { ls += "\xc9\x82"; continue; 	/* Ɂ -> ɂ == U+0241 -> U+0242 */ }
+yy2639:
+          ++sp;
+          { ls += "\xe2\xb1\xa6"; continue; 	/* Ⱦ -> ⱦ == U+023E -> U+2C66 */ }
+yy2641:
+          ++sp;
+          { ls += "\xc6\x9a"; continue; 	/* Ƚ -> ƚ == U+023D -> U+019A */ }
+yy2643:
+          ++sp;
+          { ls += "\xc8\xbc"; continue; 	/* Ȼ -> ȼ == U+023B -> U+023C */ }
+yy2645:
+          ++sp;
+          { ls += "\xe2\xb1\xa5"; continue; 	/* Ⱥ -> ⱥ == U+023A -> U+2C65 */ }
+yy2647:
+          ++sp;
+          { ls += "\xc8\xb3"; continue; 	/* Ȳ -> ȳ == U+0232 -> U+0233 */ }
+yy2649:
+          ++sp;
+          { ls += "\xc8\xb1"; continue; 	/* Ȱ -> ȱ == U+0230 -> U+0231 */ }
+yy2651:
+          ++sp;
+          { ls += "\xc8\xaf"; continue; 	/* Ȯ -> ȯ == U+022E -> U+022F */ }
+yy2653:
+          ++sp;
+          { ls += "\xc8\xad"; continue; 	/* Ȭ -> ȭ == U+022C -> U+022D */ }
+yy2655:
+          ++sp;
+          { ls += "\xc8\xab"; continue; 	/* Ȫ -> ȫ == U+022A -> U+022B */ }
+yy2657:
+          ++sp;
+          { ls += "\xc8\xa9"; continue; 	/* Ȩ -> ȩ == U+0228 -> U+0229 */ }
+yy2659:
+          ++sp;
+          { ls += "\xc8\xa7"; continue; 	/* Ȧ -> ȧ == U+0226 -> U+0227 */ }
+yy2661:
+          ++sp;
+          { ls += "\xc8\xa5"; continue; 	/* Ȥ -> ȥ == U+0224 -> U+0225 */ }
+yy2663:
+          ++sp;
+          { ls += "\xc8\xa3"; continue; 	/* Ȣ -> ȣ == U+0222 -> U+0223 */ }
+yy2665:
+          ++sp;
+          { ls += "\xc6\x9e"; continue; 	/* Ƞ -> ƞ == U+0220 -> U+019E */ }
+yy2667:
+          ++sp;
+          { ls += "\xc8\x9f"; continue; 	/* Ȟ -> ȟ == U+021E -> U+021F */ }
+yy2669:
+          ++sp;
+          { ls += "\xc8\x9d"; continue; 	/* Ȝ -> ȝ == U+021C -> U+021D */ }
+yy2671:
+          ++sp;
+          { ls += "\xc8\x9b"; continue; 	/* Ț -> ț == U+021A -> U+021B */ }
+yy2673:
+          ++sp;
+          { ls += "\xc8\x99"; continue; 	/* Ș -> ș == U+0218 -> U+0219 */ }
+yy2675:
+          ++sp;
+          { ls += "\xc8\x97"; continue; 	/* Ȗ -> ȗ == U+0216 -> U+0217 */ }
+yy2677:
+          ++sp;
+          { ls += "\xc8\x95"; continue; 	/* Ȕ -> ȕ == U+0214 -> U+0215 */ }
+yy2679:
+          ++sp;
+          { ls += "\xc8\x93"; continue; 	/* Ȓ -> ȓ == U+0212 -> U+0213 */ }
+yy2681:
+          ++sp;
+          { ls += "\xc8\x91"; continue; 	/* Ȑ -> ȑ == U+0210 -> U+0211 */ }
+yy2683:
+          ++sp;
+          { ls += "\xc8\x8f"; continue; 	/* Ȏ -> ȏ == U+020E -> U+020F */ }
+yy2685:
+          ++sp;
+          { ls += "\xc8\x8d"; continue; 	/* Ȍ -> ȍ == U+020C -> U+020D */ }
+yy2687:
+          ++sp;
+          { ls += "\xc8\x8b"; continue; 	/* Ȋ -> ȋ == U+020A -> U+020B */ }
+yy2689:
+          ++sp;
+          { ls += "\xc8\x89"; continue; 	/* Ȉ -> ȉ == U+0208 -> U+0209 */ }
+yy2691:
+          ++sp;
+          { ls += "\xc8\x87"; continue; 	/* Ȇ -> ȇ == U+0206 -> U+0207 */ }
+yy2693:
+          ++sp;
+          { ls += "\xc8\x85"; continue; 	/* Ȅ -> ȅ == U+0204 -> U+0205 */ }
+yy2695:
+          ++sp;
+          { ls += "\xc8\x83"; continue; 	/* Ȃ -> ȃ == U+0202 -> U+0203 */ }
+yy2697:
+          ++sp;
+          { ls += "\xc8\x81"; continue; 	/* Ȁ -> ȁ == U+0200 -> U+0201 */ }
+yy2699:
+          ++sp;
+          { ls += "\xc7\xbf"; continue; 	/* Ǿ -> ǿ == U+01FE -> U+01FF */ }
+yy2701:
+          ++sp;
+          { ls += "\xc7\xbd"; continue; 	/* Ǽ -> ǽ == U+01FC -> U+01FD */ }
+yy2703:
+          ++sp;
+          { ls += "\xc7\xbb"; continue; 	/* Ǻ -> ǻ == U+01FA -> U+01FB */ }
+yy2705:
+          ++sp;
+          { ls += "\xc7\xb9"; continue; 	/* Ǹ -> ǹ == U+01F8 -> U+01F9 */ }
+yy2707:
+          ++sp;
+          { ls += "\xc6\xbf"; continue; 	/* Ƿ -> ƿ == U+01F7 -> U+01BF */ }
+yy2709:
+          ++sp;
+          { ls += "\xc6\x95"; continue; 	/* Ƕ -> ƕ == U+01F6 -> U+0195 */ }
+yy2711:
+          ++sp;
+          { ls += "\xc7\xb5"; continue; 	/* Ǵ -> ǵ == U+01F4 -> U+01F5 */ }
+yy2713:
+          ++sp;
+          { ls += "\xc7\xb3"; continue; 	/* ǲ -> ǳ == U+01F2 -> U+01F3 */ }
+yy2715:
+          ++sp;
+          { ls += "\xc7\xb3"; continue; 	/* Ǳ -> ǳ == U+01F1 -> U+01F3 */ }
+yy2717:
+          ++sp;
+          { ls += "\xc7\xaf"; continue; 	/* Ǯ -> ǯ == U+01EE -> U+01EF */ }
+yy2719:
+          ++sp;
+          { ls += "\xc7\xad"; continue; 	/* Ǭ -> ǭ == U+01EC -> U+01ED */ }
+yy2721:
+          ++sp;
+          { ls += "\xc7\xab"; continue; 	/* Ǫ -> ǫ == U+01EA -> U+01EB */ }
+yy2723:
+          ++sp;
+          { ls += "\xc7\xa9"; continue; 	/* Ǩ -> ǩ == U+01E8 -> U+01E9 */ }
+yy2725:
+          ++sp;
+          { ls += "\xc7\xa7"; continue; 	/* Ǧ -> ǧ == U+01E6 -> U+01E7 */ }
+yy2727:
+          ++sp;
+          { ls += "\xc7\xa5"; continue; 	/* Ǥ -> ǥ == U+01E4 -> U+01E5 */ }
+yy2729:
+          ++sp;
+          { ls += "\xc7\xa3"; continue; 	/* Ǣ -> ǣ == U+01E2 -> U+01E3 */ }
+yy2731:
+          ++sp;
+          { ls += "\xc7\xa1"; continue; 	/* Ǡ -> ǡ == U+01E0 -> U+01E1 */ }
+yy2733:
+          ++sp;
+          { ls += "\xc7\x9f"; continue; 	/* Ǟ -> ǟ == U+01DE -> U+01DF */ }
+yy2735:
+          ++sp;
+          { ls += "\xc7\x9c"; continue; 	/* Ǜ -> ǜ == U+01DB -> U+01DC */ }
+yy2737:
+          ++sp;
+          { ls += "\xc7\x9a"; continue; 	/* Ǚ -> ǚ == U+01D9 -> U+01DA */ }
+yy2739:
+          ++sp;
+          { ls += "\xc7\x98"; continue; 	/* Ǘ -> ǘ == U+01D7 -> U+01D8 */ }
+yy2741:
+          ++sp;
+          { ls += "\xc7\x96"; continue; 	/* Ǖ -> ǖ == U+01D5 -> U+01D6 */ }
+yy2743:
+          ++sp;
+          { ls += "\xc7\x94"; continue; 	/* Ǔ -> ǔ == U+01D3 -> U+01D4 */ }
+yy2745:
+          ++sp;
+          { ls += "\xc7\x92"; continue; 	/* Ǒ -> ǒ == U+01D1 -> U+01D2 */ }
+yy2747:
+          ++sp;
+          { ls += "\xc7\x90"; continue; 	/* Ǐ -> ǐ == U+01CF -> U+01D0 */ }
+yy2749:
+          ++sp;
+          { ls += "\xc7\x8e"; continue; 	/* Ǎ -> ǎ == U+01CD -> U+01CE */ }
+yy2751:
+          ++sp;
+          { ls += "\xc7\x8c"; continue; 	/* ǋ -> ǌ == U+01CB -> U+01CC */ }
+yy2753:
+          ++sp;
+          { ls += "\xc7\x8c"; continue; 	/* Ǌ -> ǌ == U+01CA -> U+01CC */ }
+yy2755:
+          ++sp;
+          { ls += "\xc7\x89"; continue; 	/* ǈ -> ǉ == U+01C8 -> U+01C9 */ }
+yy2757:
+          ++sp;
+          { ls += "\xc7\x89"; continue; 	/* Ǉ -> ǉ == U+01C7 -> U+01C9 */ }
+yy2759:
+          ++sp;
+          { ls += "\xc7\x86"; continue; 	/* ǅ -> ǆ == U+01C5 -> U+01C6 */ }
+yy2761:
+          ++sp;
+          { ls += "\xc7\x86"; continue; 	/* Ǆ -> ǆ == U+01C4 -> U+01C6 */ }
+yy2763:
+          ++sp;
+          { ls += "\xc6\xbd"; continue; 	/* Ƽ -> ƽ == U+01BC -> U+01BD */ }
+yy2765:
+          ++sp;
+          { ls += "\xc6\xb9"; continue; 	/* Ƹ -> ƹ == U+01B8 -> U+01B9 */ }
+yy2767:
+          ++sp;
+          { ls += "\xca\x92"; continue; 	/* Ʒ -> ʒ == U+01B7 -> U+0292 */ }
+yy2769:
+          ++sp;
+          { ls += "\xc6\xb6"; continue; 	/* Ƶ -> ƶ == U+01B5 -> U+01B6 */ }
+yy2771:
+          ++sp;
+          { ls += "\xc6\xb4"; continue; 	/* Ƴ -> ƴ == U+01B3 -> U+01B4 */ }
+yy2773:
+          ++sp;
+          { ls += "\xca\x8b"; continue; 	/* Ʋ -> ʋ == U+01B2 -> U+028B */ }
+yy2775:
+          ++sp;
+          { ls += "\xca\x8a"; continue; 	/* Ʊ -> ʊ == U+01B1 -> U+028A */ }
+yy2777:
+          ++sp;
+          { ls += "\xc6\xb0"; continue; 	/* Ư -> ư == U+01AF -> U+01B0 */ }
+yy2779:
+          ++sp;
+          { ls += "\xca\x88"; continue; 	/* Ʈ -> ʈ == U+01AE -> U+0288 */ }
+yy2781:
+          ++sp;
+          { ls += "\xc6\xad"; continue; 	/* Ƭ -> ƭ == U+01AC -> U+01AD */ }
+yy2783:
+          ++sp;
+          { ls += "\xca\x83"; continue; 	/* Ʃ -> ʃ == U+01A9 -> U+0283 */ }
+yy2785:
+          ++sp;
+          { ls += "\xc6\xa8"; continue; 	/* Ƨ -> ƨ == U+01A7 -> U+01A8 */ }
+yy2787:
+          ++sp;
+          { ls += "\xca\x80"; continue; 	/* Ʀ -> ʀ == U+01A6 -> U+0280 */ }
+yy2789:
+          ++sp;
+          { ls += "\xc6\xa5"; continue; 	/* Ƥ -> ƥ == U+01A4 -> U+01A5 */ }
+yy2791:
+          ++sp;
+          { ls += "\xc6\xa3"; continue; 	/* Ƣ -> ƣ == U+01A2 -> U+01A3 */ }
+yy2793:
+          ++sp;
+          { ls += "\xc6\xa1"; continue; 	/* Ơ -> ơ == U+01A0 -> U+01A1 */ }
+yy2795:
+          ++sp;
+          { ls += "\xc9\xb5"; continue; 	/* Ɵ -> ɵ == U+019F -> U+0275 */ }
+yy2797:
+          ++sp;
+          { ls += "\xc9\xb2"; continue; 	/* Ɲ -> ɲ == U+019D -> U+0272 */ }
+yy2799:
+          ++sp;
+          { ls += "\xc9\xaf"; continue; 	/* Ɯ -> ɯ == U+019C -> U+026F */ }
+yy2801:
+          ++sp;
+          { ls += "\xc6\x99"; continue; 	/* Ƙ -> ƙ == U+0198 -> U+0199 */ }
+yy2803:
+          ++sp;
+          { ls += "\xc9\xa8"; continue; 	/* Ɨ -> ɨ == U+0197 -> U+0268 */ }
+yy2805:
+          ++sp;
+          { ls += "\xc9\xa9"; continue; 	/* Ɩ -> ɩ == U+0196 -> U+0269 */ }
+yy2807:
+          ++sp;
+          { ls += "\xc9\xa3"; continue; 	/* Ɣ -> ɣ == U+0194 -> U+0263 */ }
+yy2809:
+          ++sp;
+          { ls += "\xc9\xa0"; continue; 	/* Ɠ -> ɠ == U+0193 -> U+0260 */ }
+yy2811:
+          ++sp;
+          { ls += "\xc6\x92"; continue; 	/* Ƒ -> ƒ == U+0191 -> U+0192 */ }
+yy2813:
+          ++sp;
+          { ls += "\xc9\x9b"; continue; 	/* Ɛ -> ɛ == U+0190 -> U+025B */ }
+yy2815:
+          ++sp;
+          { ls += "\xc9\x99"; continue; 	/* Ə -> ə == U+018F -> U+0259 */ }
+yy2817:
+          ++sp;
+          { ls += "\xc7\x9d"; continue; 	/* Ǝ -> ǝ == U+018E -> U+01DD */ }
+yy2819:
+          ++sp;
+          { ls += "\xc6\x8c"; continue; 	/* Ƌ -> ƌ == U+018B -> U+018C */ }
+yy2821:
+          ++sp;
+          { ls += "\xc9\x97"; continue; 	/* Ɗ -> ɗ == U+018A -> U+0257 */ }
+yy2823:
+          ++sp;
+          { ls += "\xc9\x96"; continue; 	/* Ɖ -> ɖ == U+0189 -> U+0256 */ }
+yy2825:
+          ++sp;
+          { ls += "\xc6\x88"; continue; 	/* Ƈ -> ƈ == U+0187 -> U+0188 */ }
+yy2827:
+          ++sp;
+          { ls += "\xc9\x94"; continue; 	/* Ɔ -> ɔ == U+0186 -> U+0254 */ }
+yy2829:
+          ++sp;
+          { ls += "\xc6\x85"; continue; 	/* Ƅ -> ƅ == U+0184 -> U+0185 */ }
+yy2831:
+          ++sp;
+          { ls += "\xc6\x83"; continue; 	/* Ƃ -> ƃ == U+0182 -> U+0183 */ }
+yy2833:
+          ++sp;
+          { ls += "\xc9\x93"; continue; 	/* Ɓ -> ɓ == U+0181 -> U+0253 */ }
+yy2835:
+          ++sp;
+          { ls += "\xc5\xbe"; continue; 	/* Ž -> ž == U+017D -> U+017E */ }
+yy2837:
+          ++sp;
+          { ls += "\xc5\xbc"; continue; 	/* Ż -> ż == U+017B -> U+017C */ }
+yy2839:
+          ++sp;
+          { ls += "\xc5\xba"; continue; 	/* Ź -> ź == U+0179 -> U+017A */ }
+yy2841:
+          ++sp;
+          { ls += "\xc3\xbf"; continue; 	/* Ÿ -> ÿ == U+0178 -> U+00FF */ }
+yy2843:
+          ++sp;
+          { ls += "\xc5\xb7"; continue; 	/* Ŷ -> ŷ == U+0176 -> U+0177 */ }
+yy2845:
+          ++sp;
+          { ls += "\xc5\xb5"; continue; 	/* Ŵ -> ŵ == U+0174 -> U+0175 */ }
+yy2847:
+          ++sp;
+          { ls += "\xc5\xb3"; continue; 	/* Ų -> ų == U+0172 -> U+0173 */ }
+yy2849:
+          ++sp;
+          { ls += "\xc5\xb1"; continue; 	/* Ű -> ű == U+0170 -> U+0171 */ }
+yy2851:
+          ++sp;
+          { ls += "\xc5\xaf"; continue; 	/* Ů -> ů == U+016E -> U+016F */ }
+yy2853:
+          ++sp;
+          { ls += "\xc5\xad"; continue; 	/* Ŭ -> ŭ == U+016C -> U+016D */ }
+yy2855:
+          ++sp;
+          { ls += "\xc5\xab"; continue; 	/* Ū -> ū == U+016A -> U+016B */ }
+yy2857:
+          ++sp;
+          { ls += "\xc5\xa9"; continue; 	/* Ũ -> ũ == U+0168 -> U+0169 */ }
+yy2859:
+          ++sp;
+          { ls += "\xc5\xa7"; continue; 	/* Ŧ -> ŧ == U+0166 -> U+0167 */ }
+yy2861:
+          ++sp;
+          { ls += "\xc5\xa5"; continue; 	/* Ť -> ť == U+0164 -> U+0165 */ }
+yy2863:
+          ++sp;
+          { ls += "\xc5\xa3"; continue; 	/* Ţ -> ţ == U+0162 -> U+0163 */ }
+yy2865:
+          ++sp;
+          { ls += "\xc5\xa1"; continue; 	/* Š -> š == U+0160 -> U+0161 */ }
+yy2867:
+          ++sp;
+          { ls += "\xc5\x9f"; continue; 	/* Ş -> ş == U+015E -> U+015F */ }
+yy2869:
+          ++sp;
+          { ls += "\xc5\x9d"; continue; 	/* Ŝ -> ŝ == U+015C -> U+015D */ }
+yy2871:
+          ++sp;
+          { ls += "\xc5\x9b"; continue; 	/* Ś -> ś == U+015A -> U+015B */ }
+yy2873:
+          ++sp;
+          { ls += "\xc5\x99"; continue; 	/* Ř -> ř == U+0158 -> U+0159 */ }
+yy2875:
+          ++sp;
+          { ls += "\xc5\x97"; continue; 	/* Ŗ -> ŗ == U+0156 -> U+0157 */ }
+yy2877:
+          ++sp;
+          { ls += "\xc5\x95"; continue; 	/* Ŕ -> ŕ == U+0154 -> U+0155 */ }
+yy2879:
+          ++sp;
+          { ls += "\xc5\x93"; continue; 	/* Œ -> œ == U+0152 -> U+0153 */ }
+yy2881:
+          ++sp;
+          { ls += "\xc5\x91"; continue; 	/* Ő -> ő == U+0150 -> U+0151 */ }
+yy2883:
+          ++sp;
+          { ls += "\xc5\x8f"; continue; 	/* Ŏ -> ŏ == U+014E -> U+014F */ }
+yy2885:
+          ++sp;
+          { ls += "\xc5\x8d"; continue; 	/* Ō -> ō == U+014C -> U+014D */ }
+yy2887:
+          ++sp;
+          { ls += "\xc5\x8b"; continue; 	/* Ŋ -> ŋ == U+014A -> U+014B */ }
+yy2889:
+          ++sp;
+          { ls += "\xc5\x88"; continue; 	/* Ň -> ň == U+0147 -> U+0148 */ }
+yy2891:
+          ++sp;
+          { ls += "\xc5\x86"; continue; 	/* Ņ -> ņ == U+0145 -> U+0146 */ }
+yy2893:
+          ++sp;
+          { ls += "\xc5\x84"; continue; 	/* Ń -> ń == U+0143 -> U+0144 */ }
+yy2895:
+          ++sp;
+          { ls += "\xc5\x82"; continue; 	/* Ł -> ł == U+0141 -> U+0142 */ }
+yy2897:
+          ++sp;
+          { ls += "\xc5\x80"; continue; 	/* Ŀ -> ŀ == U+013F -> U+0140 */ }
+yy2899:
+          ++sp;
+          { ls += "\xc4\xbe"; continue; 	/* Ľ -> ľ == U+013D -> U+013E */ }
+yy2901:
+          ++sp;
+          { ls += "\xc4\xbc"; continue; 	/* Ļ -> ļ == U+013B -> U+013C */ }
+yy2903:
+          ++sp;
+          { ls += "\xc4\xba"; continue; 	/* Ĺ -> ĺ == U+0139 -> U+013A */ }
+yy2905:
+          ++sp;
+          { ls += "\xc4\xb7"; continue; 	/* Ķ -> ķ == U+0136 -> U+0137 */ }
+yy2907:
+          ++sp;
+          { ls += "\xc4\xb5"; continue; 	/* Ĵ -> ĵ == U+0134 -> U+0135 */ }
+yy2909:
+          ++sp;
+          { ls += "\xc4\xb3"; continue; 	/* Ĳ -> ĳ == U+0132 -> U+0133 */ }
+yy2911:
+          ++sp;
+          { ls += "\x69\xcc\x87"; continue; 	/* İ -> i̇ == U+0130 -> U+0069 */ }
+yy2913:
+          ++sp;
+          { ls += "\xc4\xaf"; continue; 	/* Į -> į == U+012E -> U+012F */ }
+yy2915:
+          ++sp;
+          { ls += "\xc4\xad"; continue; 	/* Ĭ -> ĭ == U+012C -> U+012D */ }
+yy2917:
+          ++sp;
+          { ls += "\xc4\xab"; continue; 	/* Ī -> ī == U+012A -> U+012B */ }
+yy2919:
+          ++sp;
+          { ls += "\xc4\xa9"; continue; 	/* Ĩ -> ĩ == U+0128 -> U+0129 */ }
+yy2921:
+          ++sp;
+          { ls += "\xc4\xa7"; continue; 	/* Ħ -> ħ == U+0126 -> U+0127 */ }
+yy2923:
+          ++sp;
+          { ls += "\xc4\xa5"; continue; 	/* Ĥ -> ĥ == U+0124 -> U+0125 */ }
+yy2925:
+          ++sp;
+          { ls += "\xc4\xa3"; continue; 	/* Ģ -> ģ == U+0122 -> U+0123 */ }
+yy2927:
+          ++sp;
+          { ls += "\xc4\xa1"; continue; 	/* Ġ -> ġ == U+0120 -> U+0121 */ }
+yy2929:
+          ++sp;
+          { ls += "\xc4\x9f"; continue; 	/* Ğ -> ğ == U+011E -> U+011F */ }
+yy2931:
+          ++sp;
+          { ls += "\xc4\x9d"; continue; 	/* Ĝ -> ĝ == U+011C -> U+011D */ }
+yy2933:
+          ++sp;
+          { ls += "\xc4\x9b"; continue; 	/* Ě -> ě == U+011A -> U+011B */ }
+yy2935:
+          ++sp;
+          { ls += "\xc4\x99"; continue; 	/* Ę -> ę == U+0118 -> U+0119 */ }
+yy2937:
+          ++sp;
+          { ls += "\xc4\x97"; continue; 	/* Ė -> ė == U+0116 -> U+0117 */ }
+yy2939:
+          ++sp;
+          { ls += "\xc4\x95"; continue; 	/* Ĕ -> ĕ == U+0114 -> U+0115 */ }
+yy2941:
+          ++sp;
+          { ls += "\xc4\x93"; continue; 	/* Ē -> ē == U+0112 -> U+0113 */ }
+yy2943:
+          ++sp;
+          { ls += "\xc4\x91"; continue; 	/* Đ -> đ == U+0110 -> U+0111 */ }
+yy2945:
+          ++sp;
+          { ls += "\xc4\x8f"; continue; 	/* Ď -> ď == U+010E -> U+010F */ }
+yy2947:
+          ++sp;
+          { ls += "\xc4\x8d"; continue; 	/* Č -> č == U+010C -> U+010D */ }
+yy2949:
+          ++sp;
+          { ls += "\xc4\x8b"; continue; 	/* Ċ -> ċ == U+010A -> U+010B */ }
+yy2951:
+          ++sp;
+          { ls += "\xc4\x89"; continue; 	/* Ĉ -> ĉ == U+0108 -> U+0109 */ }
+yy2953:
+          ++sp;
+          { ls += "\xc4\x87"; continue; 	/* Ć -> ć == U+0106 -> U+0107 */ }
+yy2955:
+          ++sp;
+          { ls += "\xc4\x85"; continue; 	/* Ą -> ą == U+0104 -> U+0105 */ }
+yy2957:
+          ++sp;
+          { ls += "\xc4\x83"; continue; 	/* Ă -> ă == U+0102 -> U+0103 */ }
+yy2959:
+          ++sp;
+          { ls += "\xc4\x81"; continue; 	/* Ā -> ā == U+0100 -> U+0101 */ }
+yy2961:
+          ++sp;
+          { ls += "\xc3\xbe"; continue; 	/* Þ -> þ == U+00DE -> U+00FE */ }
+yy2963:
+          ++sp;
+          { ls += "\xc3\xbd"; continue; 	/* Ý -> ý == U+00DD -> U+00FD */ }
+yy2965:
+          ++sp;
+          { ls += "\xc3\xbc"; continue; 	/* Ü -> ü == U+00DC -> U+00FC */ }
+yy2967:
+          ++sp;
+          { ls += "\xc3\xbb"; continue; 	/* Û -> û == U+00DB -> U+00FB */ }
+yy2969:
+          ++sp;
+          { ls += "\xc3\xba"; continue; 	/* Ú -> ú == U+00DA -> U+00FA */ }
+yy2971:
+          ++sp;
+          { ls += "\xc3\xb9"; continue; 	/* Ù -> ù == U+00D9 -> U+00F9 */ }
+yy2973:
+          ++sp;
+          { ls += "\xc3\xb8"; continue; 	/* Ø -> ø == U+00D8 -> U+00F8 */ }
+yy2975:
+          ++sp;
+          { ls += "\xc3\xb6"; continue; 	/* Ö -> ö == U+00D6 -> U+00F6 */ }
+yy2977:
+          ++sp;
+          { ls += "\xc3\xb5"; continue; 	/* Õ -> õ == U+00D5 -> U+00F5 */ }
+yy2979:
+          ++sp;
+          { ls += "\xc3\xb4"; continue; 	/* Ô -> ô == U+00D4 -> U+00F4 */ }
+yy2981:
+          ++sp;
+          { ls += "\xc3\xb3"; continue; 	/* Ó -> ó == U+00D3 -> U+00F3 */ }
+yy2983:
+          ++sp;
+          { ls += "\xc3\xb2"; continue; 	/* Ò -> ò == U+00D2 -> U+00F2 */ }
+yy2985:
+          ++sp;
+          { ls += "\xc3\xb1"; continue; 	/* Ñ -> ñ == U+00D1 -> U+00F1 */ }
+yy2987:
+          ++sp;
+          { ls += "\xc3\xb0"; continue; 	/* Ð -> ð == U+00D0 -> U+00F0 */ }
+yy2989:
+          ++sp;
+          { ls += "\xc3\xaf"; continue; 	/* Ï -> ï == U+00CF -> U+00EF */ }
+yy2991:
+          ++sp;
+          { ls += "\xc3\xae"; continue; 	/* Î -> î == U+00CE -> U+00EE */ }
+yy2993:
+          ++sp;
+          { ls += "\xc3\xad"; continue; 	/* Í -> í == U+00CD -> U+00ED */ }
+yy2995:
+          ++sp;
+          { ls += "\xc3\xac"; continue; 	/* Ì -> ì == U+00CC -> U+00EC */ }
+yy2997:
+          ++sp;
+          { ls += "\xc3\xab"; continue; 	/* Ë -> ë == U+00CB -> U+00EB */ }
+yy2999:
+          ++sp;
+          { ls += "\xc3\xaa"; continue; 	/* Ê -> ê == U+00CA -> U+00EA */ }
+yy3001:
+          ++sp;
+          { ls += "\xc3\xa9"; continue; 	/* É -> é == U+00C9 -> U+00E9 */ }
+yy3003:
+          ++sp;
+          { ls += "\xc3\xa8"; continue; 	/* È -> è == U+00C8 -> U+00E8 */ }
+yy3005:
+          ++sp;
+          { ls += "\xc3\xa7"; continue; 	/* Ç -> ç == U+00C7 -> U+00E7 */ }
+yy3007:
+          ++sp;
+          { ls += "\xc3\xa6"; continue; 	/* Æ -> æ == U+00C6 -> U+00E6 */ }
+yy3009:
+          ++sp;
+          { ls += "\xc3\xa5"; continue; 	/* Å -> å == U+00C5 -> U+00E5 */ }
+yy3011:
+          ++sp;
+          { ls += "\xc3\xa4"; continue; 	/* Ä -> ä == U+00C4 -> U+00E4 */ }
+yy3013:
+          ++sp;
+          { ls += "\xc3\xa3"; continue; 	/* Ã -> ã == U+00C3 -> U+00E3 */ }
+yy3015:
+          ++sp;
+          { ls += "\xc3\xa2"; continue; 	/* Â -> â == U+00C2 -> U+00E2 */ }
+yy3017:
+          ++sp;
+          { ls += "\xc3\xa1"; continue; 	/* Á -> á == U+00C1 -> U+00E1 */ }
+yy3019:
+          ++sp;
+          { ls += "\xc3\xa0"; continue; 	/* À -> à == U+00C0 -> U+00E0 */ }
         }
 
 

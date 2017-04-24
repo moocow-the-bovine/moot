@@ -188,13 +188,13 @@ public:
   
   /** Typedef for tag-id lookup table */
   typedef mootEnum<mootTagString,
-		    hash<mootTagString>,
+		    moot_hash<mootTagString>,
 		    equal_to<mootTagString> >
           TagIDTable;
 
   /** Typedef for token-id lookup table */
   typedef mootEnum<mootTokString,
-		    hash<mootTokString>,
+		    moot_hash<mootTokString>,
 		    equal_to<mootTokString> >
           TokIDTable;
 

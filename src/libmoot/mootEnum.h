@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2017 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -62,7 +62,7 @@ const mootEnumID mootEnumNone = 0;
  * with gcc-2.95.4 using STLport-4.5.3.
  */
 template <class NameType,
-	  class NameHashFcn  = hash     <NameType>,
+	  class NameHashFcn  = moot_hash <NameType>,
 	  class NameEqualFcn = equal_to <NameType>  >
 class mootEnum {
 public:
