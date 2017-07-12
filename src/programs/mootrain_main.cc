@@ -274,12 +274,13 @@ int main (int argc, char **argv)
 
     //-- print summary to file
     if (lfout.valid()) {
+      lfout.printf("%s  LC_CTYPE   : %s\n", cmts, moot_lc_ctype());
+      lfout.printf("%s  LC_NUMERIC : %s\n", cmts, moot_lc_numeric());
       lfout.printf("%s  Num/Tokens : %g\n", cmts, hmmt.lexfreqs.n_tokens);
       lfout.printf("%s  Num/Types  : %u\n", cmts, hmmt.lexfreqs.lftable.size());
       lfout.printf("%s  Num/Tags   : %u\n", cmts, hmmt.lexfreqs.tagtable.size());
       lfout.printf("%s  Num/Pairs  : %u tok*tag\n", cmts, hmmt.lexfreqs.n_pairs());
       lfout.printf("%s  UnknownMaxF: %g\n", cmts, hmmt.lexfreqs.unknown_threshhold);
-      lfout.printf("%s  LC_CTYPE   : %s\n", cmts, moot_lc_ctype());
       if (hmmt.want_flavors) {
 	lfout.printf("%s  Flavors    : %s [%u rules]\n", cmts, flavor_src, taster.size());
 	if (vlevel >= vlDebug) 
@@ -303,12 +304,13 @@ int main (int argc, char **argv)
     moot_msg(vlevel, vlProgress, "%s: saving ngram frequency file '%s'...", PROGNAME, ngout.name.c_str());
 
     //-- finish summary
+    ngout.printf("%s  LC_NUMERIC  : %s\n", cmts, moot_lc_numeric());
     ngout.printf("%s  EOS Tag     : %s\n", cmts, hmmt.eos_tag.c_str());
     ngout.printf("%s  Num/Tokens  : %g\n", cmts, hmmt.lexfreqs.n_tokens);
     ngout.printf("%s  Num/1-grams : %u\n", cmts, hmmt.ngrams.ngtable.size());
     ngout.printf("%s  Num/2-grams : %u\n", cmts, hmmt.ngrams.n_bigrams());
     ngout.printf("%s  Num/3-grams : %u\n", cmts, hmmt.ngrams.n_trigrams());
-
+      
     //-- guts
     if (!hmmt.ngrams.save(ngout.file, ngout.name.c_str(), !args.verbose_ngrams_given)) {
       moot_croak("\n%s: save FAILED for n-gram frequency file '%s'\n", PROGNAME, ngout.name.c_str());
@@ -328,6 +330,7 @@ int main (int argc, char **argv)
       moot_msg(vlevel,vlWarnings, "%s: Warning: found only %u lexical classes in training data: are you sure your data is pre-analyzed?\n", PROGNAME, hmmt.lcfreqs.lctable.size());
 
     //-- print summary to file
+    lcout.printf("%s  LC_NUMERIC    : %s\n", cmts, moot_lc_numeric());    
     lcout.printf("%s  Num/Tokens    : %g\n", cmts, hmmt.lcfreqs.totalcount);
     lcout.printf("%s  Num/Classes   : %u\n", cmts, hmmt.lcfreqs.lctable.size());
     lcout.printf("%s  Num/Tags      : %u\n", cmts, hmmt.lcfreqs.tagtable.size());

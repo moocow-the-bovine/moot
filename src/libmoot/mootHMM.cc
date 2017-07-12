@@ -2,7 +2,7 @@
 
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2014 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2017 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -250,7 +250,7 @@ bool mootHMM::load_model(const string &modelname,
 	carp("\n%s: load FAILED for class frequency file `%s'\n", myname, ms.lcfile.c_str());
 	return false;
       }
-      else if (verbose >= vlProgress) carp(" loaded.\n");
+      else if (verbose >= vlProgress) carp (" loaded.\n");
     }
 
     // -- load model: flavors
@@ -1795,6 +1795,8 @@ void mootHMM::txtdump(FILE *file, bool dump_constants, bool dump_lexprobs, bool 
     fprintf(file, "%%%%-----------------------------------------------------\n");
     fprintf(file, "%%%% Constants\n");
     fprintf(file, "%%%%-----------------------------------------------------\n");
+    fprintf(file, "LC_NUMERIC=%s\n", moot_lc_numeric());
+    fprintf(file, "LC_CTYPE=%s\n", moot_lc_ctype());
     fprintf(file, "start_tagid\t%u(\"%s\")\n", start_tagid, tagids.id2name(start_tagid).c_str());
     fprintf(file, "nglambda1\t%e (=%e)\n", nglambda1, exp(nglambda1));
     fprintf(file, "nglambda2\t%e (=%e)\n", nglambda2, exp(nglambda2));

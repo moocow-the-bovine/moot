@@ -201,7 +201,7 @@ int read();
 /*-*- Mode: Flex++ -*-*/
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2012 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2017 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -671,7 +671,7 @@ case 4:
   // -- count (float) : return it
   //theLine++; theColumn = 0;
   theColumn += yyleng;
-  yylval->count = atof(reinterpret_cast<const char *>(yytext));
+  yylval->count = strtod(reinterpret_cast<const char *>(yytext),NULL);
   return mootLexfreqsParser::COUNT;
 }
 	YY_BREAK

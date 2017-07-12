@@ -64,6 +64,7 @@ void moot_setlocale(void)
 {
 #ifdef HAVE_LOCALE_H
   setlocale(LC_ALL,"");
+  setlocale(LC_NUMERIC,"C");  //-- always use dot (ASCII 0x2e) as floating-point separator
 #else
   //moot_carp("WARNING: locale support disabled\n");
   return;
@@ -74,6 +75,15 @@ const char *moot_lc_ctype(void)
 {
 #ifdef HAVE_LOCALE_H
   return setlocale(LC_CTYPE,NULL);
+#else
+  return "(unavailable)";
+#endif
+};
+
+const char *moot_lc_numeric(void)
+{
+#ifdef HAVE_LOCALE_H
+  return setlocale(LC_NUMERIC,NULL);
 #else
   return "(unavailable)";
 #endif

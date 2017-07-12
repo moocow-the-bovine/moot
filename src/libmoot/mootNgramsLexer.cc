@@ -201,7 +201,7 @@ int read();
 /*-*- Mode: Flex++ -*-*/
 /*
    libmoot : moocow's part-of-speech tagging library
-   Copyright (C) 2003-2009 by Bryan Jurish <moocow@cpan.org>
+   Copyright (C) 2003-2017 by Bryan Jurish <moocow@cpan.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -676,7 +676,7 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
   // -- count (float): return it
   //theLine++; theColumn = 0;
   theColumn += yyleng;
-  yylval->count = atof(reinterpret_cast<const char *>(yytext));
+  yylval->count = strtod(reinterpret_cast<const char *>(yytext),NULL);
   return mootNgramsParser::COUNT;
 }
 	YY_BREAK

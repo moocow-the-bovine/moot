@@ -45,11 +45,14 @@ namespace moot {
   /*----------------------------------------------------------------------*/
   /** \name Locale Utilities */
   //@{
-  /** initialize the current locale from the environment */
+  /** initialize the current locale from the environment, forcing LC_NUMERIC="C" */
   void moot_setlocale(void);
 
   /** get current value of LC_CTYPE, or the string "(unavailable)" */
   const char *moot_lc_ctype(void);
+
+    /** get current value of LC_NUMERIC, or the string "(unavailable)" */
+  const char *moot_lc_numeric(void);
   //@}
 
 
