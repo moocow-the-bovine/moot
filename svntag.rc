@@ -1,0 +1,2 @@
+svntags=svn+ssh://odo.dwds.de/home/svn/dev/moot/tags
+tagprefix=moot-perl
