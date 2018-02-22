@@ -1,7 +1,7 @@
 ChangeLog for package moot
 
 v2.0.19 Thu, 22 Feb 2018 12:49:55 +0100 moocow
-	+ make explicit mootAutoConfig.h in rule generating mootNoConfig.h (BSD make chokes otherwise)
+	+ explicit mootAutoConfig.h argument in rule generating mootNoConfig.h (BSD make chokes otherwise)
 	  - this probably happens with other (non-pattern?) rules too, fortunately BSD make dies before they're encountered
 	  - should fix Alien::Moot RT bug #124451
 
