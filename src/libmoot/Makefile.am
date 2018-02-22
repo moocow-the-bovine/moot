@@ -195,9 +195,10 @@ mootEventLexer.o: mootEventLexer.h mootEvent.h $(fxx_cc_deps)
 ##----------------------------------------------------
 ## Additional rules
 
+##-- use literal input rather than $< in non-pattern rule, otherwise BSD make chokes
 mootNoConfig.h: mootAutoConfig.h
 	echo "/* src/libgfsm/mootNoConfig.h. Generated from mootAutoConfig.h by make */" > $@
-	sed 's/^#define \([^ ]*\).*$$/#undef \1/;' $< >> $@
+	sed 's/^#define \([^ ]*\).*$$/#undef \1/;' mootAutoConfig.h >> $@
 
 osfcn.h: myosfcn.h
 	cp "$<" "$@"
