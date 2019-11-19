@@ -8,6 +8,7 @@
 # Usage: $0 INPUT_FILENAME
 #-----------------------------------------------------------------------
 
+use lib qw(.);
 use Getopt::Long;
 use File::Basename qw(basename fileparse);
 use vars qw($filepath $filesuff $pppath);
