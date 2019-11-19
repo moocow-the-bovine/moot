@@ -41,7 +41,7 @@ WriteMakefile
    LICENSE      => 'perl',
 
    ##-- prerequisites
-   CONFIGURE_REQUIRES => \%prereq,
+   #CONFIGURE_REQUIRES => \%prereq,
    PREREQ_PM => \%prereq,
 
    ##-- user variables
