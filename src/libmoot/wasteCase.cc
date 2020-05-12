@@ -4158,7 +4158,6 @@ yy995:
           case 0xA5:
           case 0xA7:
           case 0xA9:
-          case 0xAE:
           case 0xAF:
           case 0xB5:
           case 0xB7:
@@ -4191,12 +4190,13 @@ yy995:
           case 0xAB:  goto yy2211;
           case 0xAC:  goto yy2213;
           case 0xAD:  goto yy2215;
-          case 0xB0:  goto yy2217;
-          case 0xB1:  goto yy2219;
-          case 0xB2:  goto yy2221;
-          case 0xB3:  goto yy2223;
-          case 0xB4:  goto yy2225;
-          case 0xB6:  goto yy2227;
+          case 0xAE:  goto yy2217;
+          case 0xB0:  goto yy2219;
+          case 0xB1:  goto yy2221;
+          case 0xB2:  goto yy2223;
+          case 0xB3:  goto yy2225;
+          case 0xB4:  goto yy2227;
+          case 0xB6:  goto yy2229;
           default:  goto yy2;
           }
 yy996:
@@ -4240,32 +4240,32 @@ yy996:
           case 0xBD:
           case 0xBE:
           case 0xBF:  goto yy997;
-          case 0xA1:  goto yy2229;
-          case 0xA2:  goto yy2231;
-          case 0xA3:  goto yy2233;
-          case 0xA4:  goto yy2235;
-          case 0xA5:  goto yy2237;
-          case 0xA6:  goto yy2239;
-          case 0xA7:  goto yy2241;
-          case 0xA8:  goto yy2243;
-          case 0xA9:  goto yy2245;
-          case 0xAA:  goto yy2247;
-          case 0xAB:  goto yy2249;
-          case 0xAC:  goto yy2251;
-          case 0xAD:  goto yy2253;
-          case 0xAE:  goto yy2255;
-          case 0xAF:  goto yy2257;
-          case 0xB0:  goto yy2259;
-          case 0xB1:  goto yy2261;
-          case 0xB2:  goto yy2263;
-          case 0xB3:  goto yy2265;
-          case 0xB4:  goto yy2267;
-          case 0xB5:  goto yy2269;
-          case 0xB6:  goto yy2271;
-          case 0xB7:  goto yy2273;
-          case 0xB8:  goto yy2275;
-          case 0xB9:  goto yy2277;
-          case 0xBA:  goto yy2279;
+          case 0xA1:  goto yy2231;
+          case 0xA2:  goto yy2233;
+          case 0xA3:  goto yy2235;
+          case 0xA4:  goto yy2237;
+          case 0xA5:  goto yy2239;
+          case 0xA6:  goto yy2241;
+          case 0xA7:  goto yy2243;
+          case 0xA8:  goto yy2245;
+          case 0xA9:  goto yy2247;
+          case 0xAA:  goto yy2249;
+          case 0xAB:  goto yy2251;
+          case 0xAC:  goto yy2253;
+          case 0xAD:  goto yy2255;
+          case 0xAE:  goto yy2257;
+          case 0xAF:  goto yy2259;
+          case 0xB0:  goto yy2261;
+          case 0xB1:  goto yy2263;
+          case 0xB2:  goto yy2265;
+          case 0xB3:  goto yy2267;
+          case 0xB4:  goto yy2269;
+          case 0xB5:  goto yy2271;
+          case 0xB6:  goto yy2273;
+          case 0xB7:  goto yy2275;
+          case 0xB8:  goto yy2277;
+          case 0xB9:  goto yy2279;
+          case 0xBA:  goto yy2281;
           default:  goto yy2;
           }
 yy997:
@@ -6100,98 +6100,101 @@ yy2215:
           { ls += "\xc9\xac"; continue; 	/* Ɬ -> ɬ == U+A7AD -> U+026C */ }
 yy2217:
           ++sp;
-          { ls += "\xca\x9e"; continue; 	/* Ʞ -> ʞ == U+A7B0 -> U+029E */ }
+          { ls += "\xc9\xaa"; continue; 	/* Ɪ -> ɪ == U+A7AE -> U+026A */ }
 yy2219:
           ++sp;
-          { ls += "\xca\x87"; continue; 	/* Ʇ -> ʇ == U+A7B1 -> U+0287 */ }
+          { ls += "\xca\x9e"; continue; 	/* Ʞ -> ʞ == U+A7B0 -> U+029E */ }
 yy2221:
           ++sp;
-          { ls += "\xca\x9d"; continue; 	/* Ʝ -> ʝ == U+A7B2 -> U+029D */ }
+          { ls += "\xca\x87"; continue; 	/* Ʇ -> ʇ == U+A7B1 -> U+0287 */ }
 yy2223:
           ++sp;
-          { ls += "\xea\xad\x93"; continue; 	/* Ꭓ -> ꭓ == U+A7B3 -> U+AB53 */ }
+          { ls += "\xca\x9d"; continue; 	/* Ʝ -> ʝ == U+A7B2 -> U+029D */ }
 yy2225:
           ++sp;
-          { ls += "\xea\x9e\xb5"; continue; 	/* Ꞵ -> ꞵ == U+A7B4 -> U+A7B5 */ }
+          { ls += "\xea\xad\x93"; continue; 	/* Ꭓ -> ꭓ == U+A7B3 -> U+AB53 */ }
 yy2227:
           ++sp;
-          { ls += "\xea\x9e\xb7"; continue; 	/* Ꞷ -> ꞷ == U+A7B6 -> U+A7B7 */ }
+          { ls += "\xea\x9e\xb5"; continue; 	/* Ꞵ -> ꞵ == U+A7B4 -> U+A7B5 */ }
 yy2229:
           ++sp;
-          { ls += "\xef\xbd\x81"; continue; 	/* Ａ -> ａ == U+FF21 -> U+FF41 */ }
+          { ls += "\xea\x9e\xb7"; continue; 	/* Ꞷ -> ꞷ == U+A7B6 -> U+A7B7 */ }
 yy2231:
           ++sp;
-          { ls += "\xef\xbd\x82"; continue; 	/* Ｂ -> ｂ == U+FF22 -> U+FF42 */ }
+          { ls += "\xef\xbd\x81"; continue; 	/* Ａ -> ａ == U+FF21 -> U+FF41 */ }
 yy2233:
           ++sp;
-          { ls += "\xef\xbd\x83"; continue; 	/* Ｃ -> ｃ == U+FF23 -> U+FF43 */ }
+          { ls += "\xef\xbd\x82"; continue; 	/* Ｂ -> ｂ == U+FF22 -> U+FF42 */ }
 yy2235:
           ++sp;
-          { ls += "\xef\xbd\x84"; continue; 	/* Ｄ -> ｄ == U+FF24 -> U+FF44 */ }
+          { ls += "\xef\xbd\x83"; continue; 	/* Ｃ -> ｃ == U+FF23 -> U+FF43 */ }
 yy2237:
           ++sp;
-          { ls += "\xef\xbd\x85"; continue; 	/* Ｅ -> ｅ == U+FF25 -> U+FF45 */ }
+          { ls += "\xef\xbd\x84"; continue; 	/* Ｄ -> ｄ == U+FF24 -> U+FF44 */ }
 yy2239:
           ++sp;
-          { ls += "\xef\xbd\x86"; continue; 	/* Ｆ -> ｆ == U+FF26 -> U+FF46 */ }
+          { ls += "\xef\xbd\x85"; continue; 	/* Ｅ -> ｅ == U+FF25 -> U+FF45 */ }
 yy2241:
           ++sp;
-          { ls += "\xef\xbd\x87"; continue; 	/* Ｇ -> ｇ == U+FF27 -> U+FF47 */ }
+          { ls += "\xef\xbd\x86"; continue; 	/* Ｆ -> ｆ == U+FF26 -> U+FF46 */ }
 yy2243:
           ++sp;
-          { ls += "\xef\xbd\x88"; continue; 	/* Ｈ -> ｈ == U+FF28 -> U+FF48 */ }
+          { ls += "\xef\xbd\x87"; continue; 	/* Ｇ -> ｇ == U+FF27 -> U+FF47 */ }
 yy2245:
           ++sp;
-          { ls += "\xef\xbd\x89"; continue; 	/* Ｉ -> ｉ == U+FF29 -> U+FF49 */ }
+          { ls += "\xef\xbd\x88"; continue; 	/* Ｈ -> ｈ == U+FF28 -> U+FF48 */ }
 yy2247:
           ++sp;
-          { ls += "\xef\xbd\x8a"; continue; 	/* Ｊ -> ｊ == U+FF2A -> U+FF4A */ }
+          { ls += "\xef\xbd\x89"; continue; 	/* Ｉ -> ｉ == U+FF29 -> U+FF49 */ }
 yy2249:
           ++sp;
-          { ls += "\xef\xbd\x8b"; continue; 	/* Ｋ -> ｋ == U+FF2B -> U+FF4B */ }
+          { ls += "\xef\xbd\x8a"; continue; 	/* Ｊ -> ｊ == U+FF2A -> U+FF4A */ }
 yy2251:
           ++sp;
-          { ls += "\xef\xbd\x8c"; continue; 	/* Ｌ -> ｌ == U+FF2C -> U+FF4C */ }
+          { ls += "\xef\xbd\x8b"; continue; 	/* Ｋ -> ｋ == U+FF2B -> U+FF4B */ }
 yy2253:
           ++sp;
-          { ls += "\xef\xbd\x8d"; continue; 	/* Ｍ -> ｍ == U+FF2D -> U+FF4D */ }
+          { ls += "\xef\xbd\x8c"; continue; 	/* Ｌ -> ｌ == U+FF2C -> U+FF4C */ }
 yy2255:
           ++sp;
-          { ls += "\xef\xbd\x8e"; continue; 	/* Ｎ -> ｎ == U+FF2E -> U+FF4E */ }
+          { ls += "\xef\xbd\x8d"; continue; 	/* Ｍ -> ｍ == U+FF2D -> U+FF4D */ }
 yy2257:
           ++sp;
-          { ls += "\xef\xbd\x8f"; continue; 	/* Ｏ -> ｏ == U+FF2F -> U+FF4F */ }
+          { ls += "\xef\xbd\x8e"; continue; 	/* Ｎ -> ｎ == U+FF2E -> U+FF4E */ }
 yy2259:
           ++sp;
-          { ls += "\xef\xbd\x90"; continue; 	/* Ｐ -> ｐ == U+FF30 -> U+FF50 */ }
+          { ls += "\xef\xbd\x8f"; continue; 	/* Ｏ -> ｏ == U+FF2F -> U+FF4F */ }
 yy2261:
           ++sp;
-          { ls += "\xef\xbd\x91"; continue; 	/* Ｑ -> ｑ == U+FF31 -> U+FF51 */ }
+          { ls += "\xef\xbd\x90"; continue; 	/* Ｐ -> ｐ == U+FF30 -> U+FF50 */ }
 yy2263:
           ++sp;
-          { ls += "\xef\xbd\x92"; continue; 	/* Ｒ -> ｒ == U+FF32 -> U+FF52 */ }
+          { ls += "\xef\xbd\x91"; continue; 	/* Ｑ -> ｑ == U+FF31 -> U+FF51 */ }
 yy2265:
           ++sp;
-          { ls += "\xef\xbd\x93"; continue; 	/* Ｓ -> ｓ == U+FF33 -> U+FF53 */ }
+          { ls += "\xef\xbd\x92"; continue; 	/* Ｒ -> ｒ == U+FF32 -> U+FF52 */ }
 yy2267:
           ++sp;
-          { ls += "\xef\xbd\x94"; continue; 	/* Ｔ -> ｔ == U+FF34 -> U+FF54 */ }
+          { ls += "\xef\xbd\x93"; continue; 	/* Ｓ -> ｓ == U+FF33 -> U+FF53 */ }
 yy2269:
           ++sp;
-          { ls += "\xef\xbd\x95"; continue; 	/* Ｕ -> ｕ == U+FF35 -> U+FF55 */ }
+          { ls += "\xef\xbd\x94"; continue; 	/* Ｔ -> ｔ == U+FF34 -> U+FF54 */ }
 yy2271:
           ++sp;
-          { ls += "\xef\xbd\x96"; continue; 	/* Ｖ -> ｖ == U+FF36 -> U+FF56 */ }
+          { ls += "\xef\xbd\x95"; continue; 	/* Ｕ -> ｕ == U+FF35 -> U+FF55 */ }
 yy2273:
           ++sp;
-          { ls += "\xef\xbd\x97"; continue; 	/* Ｗ -> ｗ == U+FF37 -> U+FF57 */ }
+          { ls += "\xef\xbd\x96"; continue; 	/* Ｖ -> ｖ == U+FF36 -> U+FF56 */ }
 yy2275:
           ++sp;
-          { ls += "\xef\xbd\x98"; continue; 	/* Ｘ -> ｘ == U+FF38 -> U+FF58 */ }
+          { ls += "\xef\xbd\x97"; continue; 	/* Ｗ -> ｗ == U+FF37 -> U+FF57 */ }
 yy2277:
           ++sp;
-          { ls += "\xef\xbd\x99"; continue; 	/* Ｙ -> ｙ == U+FF39 -> U+FF59 */ }
+          { ls += "\xef\xbd\x98"; continue; 	/* Ｘ -> ｘ == U+FF38 -> U+FF58 */ }
 yy2279:
+          ++sp;
+          { ls += "\xef\xbd\x99"; continue; 	/* Ｙ -> ｙ == U+FF39 -> U+FF59 */ }
+yy2281:
           ++sp;
           { ls += "\xef\xbd\x9a"; continue; 	/* Ｚ -> ｚ == U+FF3A -> U+FF5A */ }
         }

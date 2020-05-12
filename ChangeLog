@@ -1,5 +1,16 @@
 ChangeLog for package moot
 
+v2.0.20 Tue, 12 May 2020 14:09:01 +0200
+	+ documented re2c <= v0.16 requirement for waste
+	+ skip zero-width codepoints ("garbage") in wasteScannerScan.re.skel
+	  - U+0082 BRPERM	- <control> BREAK PERMITTED HERE
+	  - U+200B ZWSP		- ZERO WIDTH SPACE
+	  - U+200C ZWNJ		- ZERO WIDTH NON-JOINER
+	  - U+200D ZWJ		- ZERO WIDTH JOINER
+	  - U+2060 WJ		- WORD JOINER
+	  - U+FEFF ZWNBSP	- ZERO WIDTH NO-BREAK SPACE, BYTE ORDER MARK (BOM)
+	  - U+FFFE NOCHAR	- <not a character>
+
 v2.0.19 Thu, 22 Feb 2018 12:49:55 +0100 moocow
 	+ explicit mootAutoConfig.h argument in rule generating mootNoConfig.h (BSD make chokes otherwise)
 	  - this probably happens with other (non-pattern?) rules too, fortunately BSD make dies before they're encountered

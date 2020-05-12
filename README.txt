@@ -39,6 +39,22 @@ REQUIREMENTS
 
         ought to do the trick too.
 
+    re2c (Optional)
+        Tested with re2c v0.16.
+
+        Scanner generator used for compiling some WASTE library sources.
+        re2c versions later than v0.16 have been observed to cause segaults.
+        If this heppens to you, you can revert revert the original source
+        files from the distribution or version control, e.g.
+
+         for f in src/libmoot/*.re* ; do
+           svn revert ${f%.re*}.{cc,h} && touch ${f%.re*}.{cc,h}
+         done
+
+        Better yet, call ./configure with:
+
+         ./configure RE2C=no
+
     expat (Optional)
         XML parser toolkit library by James Clark, required for XML input,
         available from http://expat.sourceforge.net

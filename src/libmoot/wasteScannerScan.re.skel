@@ -46,7 +46,7 @@ int moot::wasteScanner::yylex ( )
 	HYPH                    = HYPH1|HYPH2;
 	*/
 
-	//-- UTF-8Catch-all
+	//-- UTF-8 catch-all
 	/*!re2c
 	UTF8_ASCII		= [\x01-\x7F];
 	UTF8_REST		= [\x80-\xBF];
@@ -66,7 +66,7 @@ int moot::wasteScanner::yylex ( )
 	*/
 
 
-	//-- Combine alphabet and modifiers
+	//-- Combining alphabetics and modifiers
 	/*!re2c
 	LATIN                  = Latin (Lm|Mn)*;
 	ALPHA                  = (Lu | Ll | Lt | Lo) ( Lm | Mn )*;
@@ -136,6 +136,18 @@ int moot::wasteScanner::yylex ( )
 	CMTTEXT			= ((CMTCHAR+ "%"?)* CMTCHAR)?;
 */
 
+		
+/*!re2c
+	U8_BRPERM	= [\xc2][\x82];
+	U8_ZWSP		= [\xe2][\x80][\x8b];
+	U8_ZWNJ		= [\xe2][\x80][\x8c];
+	U8_ZWJ		= [\xe2][\x80][\x8d];
+	U8_WJ		= [\xe2][\x81][\xa0];
+	U8_ZWNBSP	= [\xef][\xbb][\xbf];
+	U8_NOCHAR	= [\xef][\xbf][\xbe];
+	SKIPPED		= ( U8_BRPERM | U8_ZWSP | U8_ZWNJ | U8_ZWJ | U8_WJ | U8_ZWNBSP | U8_NOCHAR );
+ */
+
 	//-- XML (DISABLED)
 	/*NOT_re2c
 	XML                     = "<"[/]?[a-zA-Z_\.?][^<>\n]*">";
@@ -145,6 +157,8 @@ int moot::wasteScanner::yylex ( )
 
 	/*!re2c
 	[\x00]     		 { return wScanTypeEOF; /*-- EOF simulation with NUL-byte --*/}
+	SKIPPED+                 { add_columns( yyleng() ); return yylex(); /*-- skip zero-width segments by recursion --*/ }
+
 	"%%" CMTTEXT "%%"     	 { add_columns( yyleng() ); return wScanTypeComment; }
 	"$WB$"                   { add_columns( yyleng() ); return wScanTypeWB; }
 	"$SB$"                   { add_columns( yyleng() ); return wScanTypeSB; }

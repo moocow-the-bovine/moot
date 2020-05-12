@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [moot])
-define([THE_PACKAGE_VERSION], [2.0.19-1])
+define([THE_PACKAGE_VERSION], [2.0.20-1])
 define([THE_PACKAGE_MAINTAINER],  [moocow@cpan.org])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -679,9 +679,9 @@ dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ##------------------------------------------------------------
 ## re2c
-AC_ARG_VAR(RE2C,[Path to your re2c executable.])
+AC_ARG_VAR(RE2C,[Path to your re2c (v0.16) executable.])
 if test -z "$RE2C"; then
-  AC_PATH_PROG(RE2C,[re2c],[])
+  AC_PATH_PROGS(RE2C,[re2c-0.16 re2c-v0.16 re2c],[])
 else
   AC_MSG_NOTICE([using environment variable RE2C=$RE2C])
 fi
