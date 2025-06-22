@@ -25,9 +25,6 @@ AM_CONFIG_HEADER([src/libmoot/mootAutoConfig.h])
 dnl default prefix
 AC_PREFIX_DEFAULT(/usr/local)
 
-dnl-- makes libtoolize keep m4 macros in tree
-AC_CONFIG_MACRO_DIR([m4])
-
 #-------------------------------------------------------------
 # save user's *FLAGS
 #USER_LIBS="$LIBS"
