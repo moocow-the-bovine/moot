@@ -1100,7 +1100,7 @@ if test "$enable_warnings" != "no" ; then
    moot_WFLAGS="-Wall -Wno-sign-compare -Wno-deprecated"
 else
   AC_MSG_RESULT(no)
-  moot_WFLAGS=""
+  moot_WFLAGS="-w"
 fi
 AC_SUBST(moot_WFLAGS)
 ##
